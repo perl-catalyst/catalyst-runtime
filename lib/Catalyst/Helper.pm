@@ -2,6 +2,7 @@ package Catalyst::Helper;
 
 use strict;
 use base 'Class::Accessor::Fast';
+use Config;
 use File::Spec;
 use File::Path;
 use IO::File;
@@ -303,7 +304,7 @@ sub _mk_server {
     my $name   = $self->{name};
     my $script = $self->{script};
     $self->mk_file( "$script\/server.pl", <<"EOF");
-#!/usr/bin/perl -w
+$Config{startperl} -w
 
 use strict;
 use Getopt::Long;
@@ -365,7 +366,7 @@ sub _mk_test {
     my $name   = $self->{name};
     my $script = $self->{script};
     $self->mk_file( "$script/test.pl", <<"EOF");
-#!/usr/bin/perl -w
+$Config{startperl} -w
 
 use strict;
 use Getopt::Long;
@@ -431,7 +432,7 @@ sub _mk_create {
     my $name   = $self->{name};
     my $script = $self->{script};
     $self->mk_file( "$script\/create.pl", <<"EOF");
-#!/usr/bin/perl -w
+$Config{startperl} -w
 
 use strict;
 use Getopt::Long;

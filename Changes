@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.25  Sat Mar 12 18:00:00 2005
+        - correct perl pathes for helper generated scripts (Tatsuhiko Miyagawa)
+
 4.24  Sat Mar 12 01:00:00 2005
         - updated cookbook example  
         - fixed base for apache and https (Andrew Ruthven)
