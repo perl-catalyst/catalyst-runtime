@@ -11,7 +11,19 @@ Catalyst::Engine::CGI::NPH - Catalyst CGI Engine
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+A script using the Catalyst::Engine::CGI::NPH module might look like:
+
+    #!/usr/bin/perl -w
+
+    BEGIN { 
+       $ENV{CATALYST_ENGINE} = 'CGI::NPH';
+    }
+
+    use strict;
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+
+    MyApp->run;
 
 =head1 DESCRIPTION
 

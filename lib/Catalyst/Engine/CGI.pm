@@ -53,10 +53,6 @@ useful in production applications, but it may be helpful for development.
 
 =over 4
 
-=item $c->run
-
-To be called from a CGI script to start the Catalyst application.
-
 =item $c->cgi
 
 This config parameter contains the C<CGI::Simple> object.
@@ -204,6 +200,10 @@ sub prepare_uploads {
         };
     }
 }
+
+=item $c->run
+
+=cut
 
 sub run { shift->handler }
 

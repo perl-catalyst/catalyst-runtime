@@ -10,7 +10,19 @@ Catalyst::Engine::FCGI - Catalyst FCGI Engine
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+A script using the Catalyst::Engine::FCGI module might look like:
+
+    #!/usr/bin/perl -w
+
+    BEGIN { 
+       $ENV{CATALYST_ENGINE} = 'FCGI';
+    }
+
+    use strict;
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+
+    MyApp->run;
 
 =head1 DESCRIPTION
 

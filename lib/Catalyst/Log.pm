@@ -42,8 +42,6 @@ Logs a debugging message.
 
 sub debug { shift->_format( 'debug', @_ ) }
 
-sub dump { shift->_format( 'dump', Dumper( $_[1] ) ) }
-
 =item $log->error(@message)
 
 Logs an error message.
@@ -75,6 +73,20 @@ sub _format {
     my $message = join( "\n", @_ );
     printf( STDERR "[%s] [catalyst] [%s] %s\n", $time, $level, $message );
 }
+
+=back
+
+=head1 DEPRECATED METHODS
+
+=over 4
+
+=item $log->dump($reference)
+
+Logs a Data::Dumper of reference.
+
+=cut
+
+sub dump { shift->_format( 'dump', Dumper( $_[1] ) ) }
 
 =back
 

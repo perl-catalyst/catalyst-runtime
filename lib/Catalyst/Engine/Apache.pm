@@ -188,6 +188,10 @@ sub prepare_uploads {
     }
 }
 
+=item $c->run
+
+=cut
+
 sub run { }
 
 =back

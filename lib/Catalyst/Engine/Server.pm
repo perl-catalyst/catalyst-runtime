@@ -9,7 +9,19 @@ Catalyst::Engine::Server - Catalyst Server Engine
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+A script using the Catalyst::Engine::Server module might look like:
+
+    #!/usr/bin/perl -w
+
+    BEGIN { 
+       $ENV{CATALYST_ENGINE} = 'Server';
+    }
+
+    use strict;
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+
+    MyApp->run;
 
 =head1 DESCRIPTION
 

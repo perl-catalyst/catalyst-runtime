@@ -163,7 +163,7 @@ sub set_action {
         $action = "!$action";
     }
     else { 
-       $c->actions->{plain}->{$action} = [ $namespace, $code ] 
+       $c->actions->{plain}->{$action} = [ $namespace, $code ];
     }
 
     my $reverse = $prefix ? "$action ($prefix)" : $action;
@@ -601,7 +601,7 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-=item $c->prepare_connection;
+=item $c->prepare_connection
 
 Prepare connection.
 
@@ -609,7 +609,7 @@ Prepare connection.
 
 sub prepare_connection { }
 
-=item $c->prepare_cookies;
+=item $c->prepare_cookies
 
 Prepare cookies.
 
@@ -688,6 +688,14 @@ sub process {
     }
     return $status;
 }
+
+=item $c->run
+
+Starts the engine.
+
+=cut
+
+sub run { }
 
 =item $c->request
 

@@ -14,7 +14,19 @@ Catalyst::Engine::Test - Catalyst Test Engine
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+A script using the Catalyst::Engine::Test module might look like:
+
+    #!/usr/bin/perl -w
+
+    BEGIN { 
+       $ENV{CATALYST_ENGINE} = 'Test';
+    }
+
+    use strict;
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+
+    MyApp->run('/a/path');
 
 =head1 DESCRIPTION
 
