@@ -161,7 +161,7 @@ sub finalize {
 
     $c->finalize_cookies;
 
-    if ( my $location = $c->res->redirect ) {
+    if ( my $location = $c->response->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $c->response->header( Location => $location );
         $c->response->status(302);
@@ -171,13 +171,13 @@ sub finalize {
         $c->finalize_error;
     }
 
-    if ( !$c->res->output && $c->res->status !~ /^(1\d\d|[23]04)$/ ) {
+    if ( !$c->response->output && $c->response->status !~ /^(1|3)\d\d)$/ ) {
         $c->finalize_error;
     }
 
-    if ( $c->res->output ) {
+    if ( $c->response->output ) {
         use bytes; # play safe with a utf8 aware perl
-        $c->response->content_length( length $c->res->output );
+        $c->response->content_length( length $c->response->output );
     }
 
     my $status = $c->finalize_headers;
