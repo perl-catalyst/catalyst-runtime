@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Catalyst',
     VERSION_FROM => 'lib/Catalyst.pm',
-    EXE_FILES    => ['bin/catalyst'],
+    EXE_FILES    => ['script/catalyst.pl'],
     PREREQ_PM    => {
         UNIVERSAL::require       => 0,
         CGI::Simple              => 0,

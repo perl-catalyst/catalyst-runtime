@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.20  Thu Mar 04 22:00:00 2005
+        - moved bin to script
+
 4.13  Thu Mar 03 11:00:00 2005
         - improved documentation
         - pod coverage test for helper generated apps

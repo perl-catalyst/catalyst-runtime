@@ -101,13 +101,13 @@ Here's how to install Catalyst and get a simple application up and running, usin
 
 =head3 Setup
 
-    $ catalyst My::App
+    $ catalyst.pl My::App
     $ cd My-App
-    $ perl bin/create controller My::Controller
+    $ script/create.pl controller My::Controller
 
 =head3 Run
 
-    $ perl bin/server
+    $ script/server.pl
 
 Now visit these locations with your favorite browser or user agent to see Catalyst in action:
 
