@@ -65,6 +65,4 @@ use Data::Dumper;
 {
     my $response = request('/foo/bar');
     ok( $response->content =~ /foobarfoobarfoobar/ );
-    warn $response->content;
-
 }
