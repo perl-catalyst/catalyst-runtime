@@ -73,7 +73,7 @@ sub finalize_headers {
             -secure  => $cookie->{secure} || 0
         );
 
-        $c->lwp->response->header( 'Set-Cookie' => $cookie->as_string );
+        $c->lwp->response->headers->push_header( 'Set-Cookie' => $cookie->as_string );
     }
 }
 
@@ -245,6 +245,9 @@ sub run {
     unless ( ref $request eq 'HTTP::Request' ) {
         $request = HTTP::Request->new( 'GET', $request );
     }
+
+    my $host = sprintf( '%s:%d', $request->uri->host, $request->uri->port );
+    $request->header( 'Host' => $host );
 
     my $lwp = Catalyst::Engine::Test::LWP->new(
         address  => '127.0.0.1',

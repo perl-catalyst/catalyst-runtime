@@ -127,7 +127,9 @@ sub finalize {
     if ( my $location = $c->res->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $c->res->headers->header( Location => $location );
+        $c->res->headers->remove_content_headers;
         $c->res->status(302);
+        return $c->finalize_headers;
     }
 
     if ( !$c->res->output || $#{ $c->error } >= 0 ) {
