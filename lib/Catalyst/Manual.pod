@@ -24,6 +24,17 @@ L<Catalyst::Manual::Troubleshooting>
 L<Catalyst::Manual::FAQ>
     Frequently Asked Questions.
 
+=head1 SUPPORT
+
+IRC:
+
+    Join #catalyst on irc.perl.org.
+
+Mailing-Lists:
+
+    http://lists.rawmode.org/mailman/listinfo/catalyst
+    http://lists.rawmode.org/mailman/listinfo/catalyst-dev
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>

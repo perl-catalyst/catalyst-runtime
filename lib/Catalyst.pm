@@ -176,6 +176,17 @@ sub import {
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 }
 
+=head1 SUPPORT
+
+IRC:
+
+    Join #catalyst on irc.perl.org.
+
+Mailing-Lists:
+
+    http://lists.rawmode.org/mailman/listinfo/catalyst
+    http://lists.rawmode.org/mailman/listinfo/catalyst-dev
+    
 =head1 SEE ALSO
 
 L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,

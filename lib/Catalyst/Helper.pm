@@ -145,26 +145,18 @@ sub mk_file {
 
 sub next_test {
     my ( $self, $tname ) = @_;
-    my $dir = $self->{test_dir};
-    my $num = '01';
-    for my $i (<$dir/*.t>) {
-        $i =~ /(\d+)[^\/]*.t$/;
-        my $j = $1 || $num;
-        $num = $j if $j > $num;
-    }
-    $num++;
-    $num = sprintf '%02d', $num;
-    if ($tname) { $tname = "$num$tname.t" }
+    if ($tname) { $tname = "$tname.t" }
     else {
         my $name   = $self->{name};
-        my $type   = $self->{type};
         my $prefix = $name;
         $prefix =~ s/::/_/g;
         $prefix         = lc $prefix;
-        $tname          = lc( $num . $type . '_' . $prefix . '.t' );
+        $tname          = $prefix . '.t';
         $self->{prefix} = $prefix;
     }
-    return "$dir/$tname";
+    my $dir  = $self->{test_dir};
+    my $type = lc $self->{type};
+    return File::Spec->catfile( $dir, $type, $tname );
 }
 
 sub _mk_dirs {
@@ -178,6 +170,9 @@ sub _mk_dirs {
     $self->mk_dir( $self->{root} );
     $self->{t} = File::Spec->catdir( $self->{dir}, 't' );
     $self->mk_dir( $self->{t} );
+    $self->mk_dir( File::Spec->catdir( $self->{t}, 'm' ) );
+    $self->mk_dir( File::Spec->catdir( $self->{t}, 'v' ) );
+    $self->mk_dir( File::Spec->catdir( $self->{t}, 'c' ) );
     $self->{class} = File::Spec->catdir( split( /\:\:/, $self->{name} ) );
     $self->{mod} = File::Spec->catdir( $self->{lib}, $self->{class} );
     $self->mk_dir( $self->{mod} );
@@ -255,7 +250,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => '$name',
     VERSION_FROM => 'lib/$class.pm',
-    PREREQ_PM    => { Catalyst => 0 }
+    PREREQ_PM    => { Catalyst => 0 },
+    test         => { TESTS => join ' ', ( glob('t/*.t'), glob('t/*/*.t') ) }
 );
 EOF
 }
