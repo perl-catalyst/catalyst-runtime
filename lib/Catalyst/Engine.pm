@@ -435,24 +435,24 @@ sub handler {
     my $status = -1;
     eval {
         my $handler = sub {
-            my $c      = $class->prepare($r);
-            my $action = $c->req->action;
-            my $name   = '';
-            $name = join '/', @{ $c->req->args } if $action eq '!default';
-            unless ($name) {
+            my $c         = $class->prepare($r);
+            my $action    = $c->req->action;
+            my $namespace = '';
+            $namespace = join '/', @{ $c->req->args } if $action eq '!default';
+            unless ($namespace) {
                 if ( my $result = $c->find_action($action) ) {
-                    $name = _class2prefix( $result->[0]->[0]->[0] );
+                    $namespace = _class2prefix( $result->[0]->[0]->[0] );
                 }
             }
-            my $results = $c->find_action( $action, $name );
+            my $results = $c->find_action( $action, $namespace );
             if ( @{$results} ) {
-                for my $begin ( @{ $c->find_action( '!begin', $name ) } ) {
+                for my $begin ( @{ $c->find_action( '!begin', $namespace ) } ) {
                     $c->process( @{ $begin->[0] } );
                 }
-                for my $result ( @{ $c->find_action( $action, $name ) } ) {
+                for my $result ( @{ $c->find_action( $action, $namespace ) } ) {
                     $c->process( @{ $result->[0] } );
                 }
-                for my $end ( @{ $c->find_action( '!end', $name ) } ) {
+                for my $end ( @{ $c->find_action( '!end', $namespace ) } ) {
                     $c->process( @{ $end->[0] } );
                 }
             }
