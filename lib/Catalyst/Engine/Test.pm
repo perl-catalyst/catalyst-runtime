@@ -60,7 +60,7 @@ sub finalize_headers {
     $c->lwp->response->code( $c->response->status || 200 );
 
     for my $name ( $c->response->headers->header_field_names ) {
-        $c->lwp->response->header( $name => $c->response->header($name) );
+        $c->lwp->response->push_header( $name => [ $c->response->header($name) ] );
     }
 
     while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
@@ -201,6 +201,7 @@ sub prepare_path {
     }
 
     my $path = $c->lwp->request->uri->path || '/';
+    $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~ s/^\///;
 
     $c->req->base($base);

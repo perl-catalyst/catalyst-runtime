@@ -3,7 +3,7 @@ package Catalyst::Engine::HTTP;
 use strict;
 use base 'Catalyst::Engine::Test';
 
-use IO::Socket qw(AF_INET SOCK_STREAM SOMAXCONN);
+use IO::Socket qw(AF_INET INADDR_ANY SOCK_STREAM SOMAXCONN);
 
 =head1 NAME
 
@@ -65,7 +65,7 @@ sub run {
         while ( my $request = $connection->get_request ) {
 
             $request->uri->scheme('http');    # Force URI::http
-            $request->uri->host( $base->host );
+            $request->uri->host( $request->header('Host') );
             $request->uri->port( $base->port );
 
             my $lwp = Catalyst::Engine::Test::LWP->new(
