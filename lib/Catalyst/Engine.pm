@@ -133,7 +133,7 @@ sub execute {
         {
             my $action = $c->actions->{reverse}->{"$code"};
             $action = "/$action" unless $action =~ /\-\>/;
-            $action = "  $action" if $callsub =~ /forward$/;
+            $action = "-> $action" if $callsub =~ /forward$/;
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} },
@@ -548,7 +548,7 @@ sub prepare {
         my @params;
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
-            push @params, "  $key=$value";
+            push @params, "  + $key=$value";
         }
         $c->log->debug( 'Parameters are', @params );
     }
@@ -845,7 +845,7 @@ sub setup_components {
         $self->setup_actions($comp);
     }
     my @comps;
-    push @comps, "  $_" for keys %{ $self->components };
+    push @comps, "  + $_" for keys %{ $self->components };
     $self->log->debug( 'Loaded components', @comps )
       if ( @comps && $self->debug );
     my $actions  = $self->actions;
@@ -918,9 +918,8 @@ sub _class2prefix {
 
 sub _prettify_action {
     my ( $val1, $val2, $val3 ) = @_;
-    formline
-'  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>  ',
-      $val1, $val2, $val3;
+    formline '  + @<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
+      . ' @>>>>>>>>>>>>>>  ', $val1, $val2, $val3;
     my $formatted = $^A;
     $^A = '';
     return $formatted;
@@ -928,7 +927,7 @@ sub _prettify_action {
 
 sub _prettify_stats {
     my ( $val1, $val2 ) = @_;
-    formline '  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< ',
+    formline '  + @<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< ',
       $val1, $val2;
     my $formatted = $^A;
     $^A = '';

@@ -144,17 +144,17 @@ sub import {
         $caller->log->debug('Debug messages enabled');
     }
 
-    my $engine ='Catalyst::Engine::CGI';
+    my $engine = 'Catalyst::Engine::CGI';
 
     if ( $ENV{MOD_PERL} ) {
 
         require mod_perl;
 
         if ( $mod_perl::VERSION >= 1.99 ) {
-            $engine ='Catalyst::Engine::Apache::MP2';
+            $engine = 'Catalyst::Engine::Apache::MP2';
         }
         else {
-            $engine ='Catalyst::Engine::Apache::MP1';
+            $engine = 'Catalyst::Engine::Apache::MP1';
         }
     }
 
@@ -172,12 +172,12 @@ sub import {
             my $plugin = "Catalyst::Plugin::$_";
 
             $plugin->require;
-            
+
             if ($@) {
                 $caller->log->error(qq/Couldn't load plugin "$plugin", "$@"/);
             }
             else {
-                push @plugins, "  $plugin";
+                push @plugins, "  + $plugin";
                 no strict 'refs';
                 push @{"$caller\::ISA"}, $plugin;
             }
