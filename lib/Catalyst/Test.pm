@@ -6,6 +6,8 @@ use HTTP::Response;
 use Socket;
 use URI;
 
+require Catalyst;
+
 my $class;
 $ENV{CATALYST_ENGINE} = 'CGI';
 $ENV{CATALYST_TEST}   = 1;
@@ -59,15 +61,16 @@ Returns a C<HTTP::Response> object.
 
 sub import {
     my $self = shift;
-    $class = shift;
-    $class->require;
-    unless ( $INC{'Test/Builder.pm'} ) {
-        die qq/Couldn't load "$class", "$@"/ if $@;
+    if ( $class = shift ) {
+        $class->require;
+        unless ( $INC{'Test/Builder.pm'} ) {
+            die qq/Couldn't load "$class", "$@"/ if $@;
+        }
+        my $caller = caller(0);
+        no strict 'refs';
+        *{"$caller\::request"} = \&request;
+        *{"$caller\::get"} = sub { request(@_)->content };
     }
-    my $caller = caller(0);
-    no strict 'refs';
-    *{"$caller\::request"} = \&request;
-    *{"$caller\::get"} = sub { request(@_)->content };
 }
 
 sub request {
@@ -96,7 +99,7 @@ Starts a testserver.
 =cut
 
 sub server {
-    my $port = shift;
+    my ( $port, $script ) = @_;
 
     # Listen
     my $tcp = getprotobyname('tcp');
@@ -164,7 +167,7 @@ sub server {
         $ENV{QUERY_STRING}    = $query_string || '';
         $ENV{CONTENT_TYPE}    ||= 'multipart/form-data';
         $ENV{SERVER_SOFTWARE} ||= "Catalyst/$Catalyst::VERSION";
-        $class->run;
+        $script ? print STDOUT `$script` : $class->run;
     }
 }
 

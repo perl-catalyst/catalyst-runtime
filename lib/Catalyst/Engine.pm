@@ -491,8 +491,8 @@ sub prepare {
     $c->prepare_path;
     $c->prepare_cookies;
     $c->prepare_headers;
-    my $method = $c->req->method;
-    my $path   = $c->req->path;
+    my $method = $c->req->method || '';
+    my $path   = $c->req->path   || '';
     $c->log->debug(qq/"$method" request for "$path"/) if $c->debug;
     $c->prepare_action;
     $c->prepare_parameters;

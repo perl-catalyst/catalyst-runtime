@@ -38,7 +38,9 @@ sub mk_app {
     $self->_mk_readme;
     $self->_mk_changes;
     $self->_mk_apptest;
+    $self->_mk_cgi;
     $self->_mk_server;
+    $self->_mk_cgiserver;
     $self->_mk_test;
     $self->_mk_create;
     return 1;
@@ -316,6 +318,51 @@ all_pod_coverage_ok();
 EOF
 }
 
+sub _mk_cgi {
+    my $self   = shift;
+    my $name   = $self->{name};
+    my $script = $self->{script};
+    $self->mk_file( "$script\/cgi.pl", <<"EOF");
+$Config{startperl} -w
+
+use strict;
+use FindBin;
+use lib "\$FindBin::Bin/../lib";
+use $name;
+
+$name->run;
+
+1;
+__END__
+
+=head1 NAME
+
+cgi - Catalyst CGI
+
+=head1 SYNOPSIS
+
+See L<Catalyst::Manual>
+
+=head1 DESCRIPTION
+
+Run a Catalyst application as cgi.
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri\@oook.de>
+
+=head1 COPYRIGHT
+
+Copyright 2004 Sebastian Riedel. All rights reserved.
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+EOF
+    chmod 0700, "$script/cgi.pl";
+}
+
 sub _mk_server {
     my $self   = shift;
     my $name   = $self->{name};
@@ -376,6 +423,72 @@ the same terms as perl itself.
 =cut
 EOF
     chmod 0700, "$script/server.pl";
+}
+
+sub _mk_cgiserver {
+    my $self   = shift;
+    my $name   = $self->{name};
+    my $script = $self->{script};
+    $self->mk_file( "$script\/cgi-server.pl", <<"EOF");
+$Config{startperl} -w
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use FindBin;
+use File::Spec;
+use Catalyst::Test;
+
+my \$help = 0;
+my \$port = 3000;
+
+GetOptions( 'help|?' => \\\$help, 'port=s' => \\\$port );
+
+pod2usage(1) if \$help;
+
+Catalyst::Test::server(
+    \$port, File::Spec->catfile( \$FindBin::Bin, 'cgi.pl' ) );
+
+1;
+__END__
+
+=head1 NAME
+
+cgi-server - Catalyst CGI Testserver
+
+=head1 SYNOPSIS
+
+cgi-server.pl [options]
+
+ Options:
+   -? -help    display this help and exits
+   -p -port    port (defaults to 3000)
+
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
+=head1 DESCRIPTION
+
+Run a Catalyst CGI Testserver for this application.
+
+Similar to the regular server but doesn't require a restart
+after code changes!
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri\@oook.de>
+
+=head1 COPYRIGHT
+
+Copyright 2004 Sebastian Riedel. All rights reserved.
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+EOF
+    chmod 0700, "$script/cgi-server.pl";
 }
 
 sub _mk_test {

@@ -215,9 +215,10 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 THANK YOU
 
-Andrew Ruthven, Christian Hansen, Christopher Hicks, Danijel Milicevic,
-David Naughton, Gary Ashton Jones, Jesse Sheidlower, Johan Lindstrom,
-Marcus Ramberg, Tatsuhiko Miyagawa and all the others who've helped.
+Andrew Ford, Andrew Ruthven, Christian Hansen, Christopher Hicks,
+Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse Sheidlower,
+Johan Lindstrom, Marcus Ramberg, Tatsuhiko Miyagawa and all the others
+who've helped.
 
 =head1 LICENSE
 

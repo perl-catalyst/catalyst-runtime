@@ -2,7 +2,9 @@ This file documents the revision history for Perl extension Catalyst.
 
 4.28  XXX XXX XX XX:00:00 2005
         - fixed isa tree (Christian Hansen)
-        - Reworked documentation (Andrew Ford <A.Ford@ford-mason.co.uk>)
+        - added script/cgi-server.pl, so no more server restarting after
+          code changes
+        - reworked documentation (Andrew Ford <A.Ford@ford-mason.co.uk>)
 
 4.27  Sat Mar 19 01:00:00 2005
         - debug message for parameters
