@@ -171,8 +171,8 @@ sub import {
         else {
             my $plugin = "Catalyst::Plugin::$_";
 
-            # Plugin caller should be our application class
-            eval "package $caller; require $plugin";
+            $plugin->require;
+            
             if ($@) {
                 $caller->log->error(qq/Couldn't load plugin "$plugin", "$@"/);
             }
