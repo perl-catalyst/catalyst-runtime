@@ -22,8 +22,25 @@ Catalyst::Test - Test Catalyst applications
     request('index.html');
     get('index.html');
 
-    # Request
-    perl -MCatalyst::Test=MyApp -e1 index.html
+    # Tests with inline apps need to use Catalyst::Engine::Test
+    package TestApp;
+
+    use Catalyst qw[-Engine=Test];
+
+    __PACKAGE__->action(
+        foo => sub {
+            my ( $self, $c ) = @_;
+            $c->res->output('bar');
+        }
+    );
+
+    package main;
+
+    use Test::More tests => 1;
+    use Catalyst::Test 'TestApp';
+
+    ok( get('/foo') =~ /bar/ );
+
 
 =head1 DESCRIPTION
 
@@ -45,15 +62,6 @@ Returns a C<HTTP::Response> object.
 
 =cut
 
-{
-    no warnings;
-    CHECK {
-        if ( ( caller(0) )[1] eq '-e' ) {
-            print request( $ARGV[0] || 'http://localhost' )->content;
-        }
-    }
-}
-
 sub import {
     my $self = shift;
     if ( $class = shift ) {
@@ -63,13 +71,6 @@ sub import {
         }
 
         no strict 'refs';
-
-        unless ( $class->engine->isa('Catalyst::Engine::Test') ) {
-            require Catalyst::Engine::Test;
-            splice( @{"$class\::ISA"}, @{"$class\::ISA"} - 1,
-                0, 'Catalyst::Engine::Test' );
-        }
-
         my $caller = caller(0);
         *{"$caller\::request"} = sub { $class->run(@_) };
         *{"$caller\::get"}     = sub { $class->run(@_)->content };
