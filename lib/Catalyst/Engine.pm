@@ -481,6 +481,15 @@ sub prepare {
     $c->log->debug(qq/"$method" request for "$path"/) if $c->debug;
     $c->prepare_action;
     $c->prepare_parameters;
+
+    if ( $c->debug && keys %{ $c->req->params } ) {
+        my @params;
+        for my $key ( keys %{ $c->req->params } ) {
+            my $value = $c->req->params->{$key};
+            push @params, "$key=$value";
+        }
+        $c->log->debug( 'Parameters are "' . join( ' ', @params ) . '"' );
+    }
     $c->prepare_uploads;
     return $c;
 }

@@ -1,9 +1,12 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.27  Wed Mar 16 20:00:00 2005
+        - debug message for parameters
+
 4.26  Wed Mar 16 10:00:00 2005
         - fixed the weird bug that caused regex actions to fail on every
           second request
-        - somemore debug messages
+        - more debug messages
         - 100% pod coverage.
 
 4.25  Sat Mar 12 18:00:00 2005
