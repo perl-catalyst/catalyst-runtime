@@ -54,7 +54,7 @@ Catalyst allows you to dispatch any URLs to any application L<Actions>, even via
 
 With Catalyst you register your actions and address them directly. For example:
 
-    sub hello : Absolute {
+    sub hello : Global {
         my ( $self, $context ) = @_;
         $context->response->output('Hello World!');
     }
@@ -175,7 +175,7 @@ Catalyst automatically blesses a Context object into your application class and 
 
 As illustrated earlier in our URL-to-Action dispatching example, the Context is always the second method parameter, behind the Component object reference or class name itself. Previously we called it C<$context> for clarity, but most Catalyst developers just call it C<$c>:
 
-    sub hello : Absolute {
+    sub hello : Global {
         my ( $self, $c ) = @_;
         $c->res->output('Hello World!');
     }
@@ -231,7 +231,7 @@ The response is like the request, but contains just response-specific informatio
 
 The last of these, the stash, is a universal hash for sharing data among application components. For an example, we return to our 'hello' action:
 
-    sub hello : Absolute {
+    sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{message} = 'Hello World!';
         $c->forward('show-message');
@@ -252,7 +252,7 @@ Catalyst supports several ways to define Actions:
 
 =item * B<Literal>
 
-    sub bar : Absolute('foo/bar') { }
+    sub bar : Path('/foo/bar') { }
 
 Matches only http://localhost:3000/foo/bar.
 
@@ -267,7 +267,7 @@ If you use capturing parantheses to extract values within the matching URL (23, 
 =item * B<Namespace-Prefixed>
 
     package MyApp::Controller::My::Controller; 
-    sub foo : Relative { }
+    sub foo : Local { }
 
 Matches http://localhost:3000/my/controller/foo. The action key must be prefixed with '?'.
 
@@ -320,8 +320,8 @@ If you want to pass variable arguments at the end of a URL, you must use regex a
 
 But what if you also defined actions for /foo/boo and /foo/boo/hoo ?
 
-    sub boo : Absolute('foo/boo') { .. }
-    sub hoo : Absolute('foo/boo/hoo') { .. }
+    sub boo : Path('/foo/boo') { .. }
+    sub hoo : Path('/foo/boo/hoo') { .. }
 
 Catalyst matches actions in most specific to least specific order:
 
@@ -335,7 +335,7 @@ So Catalyst would never mistakenly dispatch the first two URLs to the '/^foo$/' 
 
 Control the application flow with the C<forward> method, which accepts the key of an action to execute.
 
-    sub hello : Absolute {
+    sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{message} = 'Hello World!';
         $c->forward('check-message');
@@ -354,12 +354,12 @@ Control the application flow with the C<forward> method, which accepts the key o
 
 You can also forward to classes and methods.
 
-    sub hello : Absolute {
+    sub hello : Global {
         my ( $self, $c ) = @_;
         $c->forward(qw/MyApp::M::Hello say_hello/);
     }
 
-    sub bye : Absolute {
+    sub bye : Global {
         my ( $self, $c ) = @_;
         $c->forward('MyApp::M::Hello');
     }
@@ -425,7 +425,7 @@ To show how to define views, we'll use an already-existing base class for the L<
 
 This gives us a process() method and we can now just do $c->forward('MyApp::V::TT') to render our templates. The base class makes process() implicit, so we don't have to say C<$c-E<gt>forward(qw/MyApp::V::TT process/)>.
 
-    sub hello : Absolute {
+    sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{template} = 'hello.tt';
     }
@@ -494,7 +494,7 @@ Catalyst automatically loads table layouts and relationships. Use the stash to p
         $c->forward('MyApp::V::TT');
     }
 
-    sub view : Absolute {
+    sub view : Global {
         my ( $self, $c, $id ) = @_;
         $c->stash->{item} = MyApp::M::CDBI::Foo->retrieve($id);
     }
@@ -515,14 +515,14 @@ Multiple Controllers are a good way to separate logical domains of your applicat
 
     package MyApp::C::Catalog;
 
-    sub view : Relative { }
-    sub list : Relative { }
+    sub view : Local { }
+    sub list : Local { }
 
     package MyApp::C::Cart;
 
-    sub add : Relative { }
-    sub update : Relative { }
-    sub order : Relative { }
+    sub add : Local { }
+    sub update : Local { }
+    sub order : Local { }
 
 =head3 Testing
 

@@ -42,7 +42,7 @@ Catalyst - The Elegant MVC Web Application Framework
 
     sub default : Private { $_[1]->res->output('Hello') } );
 
-    sub index : Absolute('index.html') {
+    sub index : Path('/index.html') {
         my ( $self, $c ) = @_;
         $c->res->output('Hello');
         $c->forward('_foo');
