@@ -2,6 +2,9 @@ package Catalyst::Log;
 
 use strict;
 use base 'Class::Accessor::Fast';
+use Data::Dumper;
+
+$Data::Dumper::Terse = 1;
 
 =head1 NAME
 
@@ -24,6 +27,14 @@ Log debug informations.
 =cut
 
 sub debug { _format( 'debug', $_[1] ) }
+
+=head3 dump
+
+Dump stuff.
+
+=cut
+
+sub dump { _format( 'dump', Dumper( $_[1] ) ) }
 
 =head3 error
 
