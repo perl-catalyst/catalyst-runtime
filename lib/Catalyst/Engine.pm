@@ -357,9 +357,10 @@ sub handler ($$) {
     # Always expect worst case!
     my $status = -1;
     eval {
+        my @stats = ();
         my $handler = sub {
             my $c = $class->prepare($r);
-            $c->{stats} = [];
+            $c->{stats} = \@stats;
             my $action    = $c->req->action;
             my $namespace = '';
             $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
@@ -385,9 +386,6 @@ sub handler ($$) {
                 {
                     $c->state( $c->execute( @{ $end->[0] } ) );
                 }
-                my @stats = @{ $c->{stats} };
-                $c->log->info( 'Processing took', @stats )
-                  if ( @stats && $c->debug );
             }
             else {
                 my $path  = $c->req->path;
@@ -404,7 +402,7 @@ sub handler ($$) {
             ( $elapsed, $status ) = $class->benchmark($handler);
             $elapsed = sprintf '%f', $elapsed;
             my $av = sprintf '%.3f', 1 / $elapsed;
-            $class->log->info( "Request took $elapsed" . "s ($av/s)" );
+            $class->log->info( "Request took $elapsed" . "s ($av/s)", @stats );
         }
         else { $status = &$handler }
     };
