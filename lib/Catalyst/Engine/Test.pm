@@ -1,7 +1,7 @@
 package Catalyst::Engine::Test;
 
 use strict;
-use base 'Catalyst::Engine::HTTP';
+use base 'Catalyst::Engine::LWP';
 
 =head1 NAME
 
@@ -29,7 +29,7 @@ This is the Catalyst engine specialized for testing.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::HTTP>.
+This class overloads some methods from C<Catalyst::Engine::LWP>.
 
 =over 4
 
@@ -54,15 +54,15 @@ sub run {
         $request = HTTP::Request->new( 'GET', $request );
     }
 
-    my $http = Catalyst::Engine::HTTP::LWP->new(
+    my $lwp = Catalyst::Engine::LWP::HTTP->new(
         request  => $request,
         address  => '127.0.0.1',
         hostname => 'localhost'
     );
 
-    $class->handler($http);
+    $class->handler($lwp);
 
-    return $http->response;
+    return $lwp->response;
 }
 
 =back

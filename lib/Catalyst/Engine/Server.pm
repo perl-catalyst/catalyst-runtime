@@ -1,7 +1,7 @@
 package Catalyst::Engine::Server;
 
 use strict;
-use base 'Catalyst::Engine::HTTP::Daemon';
+use base 'Catalyst::Engine::LWP::Daemon';
 
 =head1 NAME
 
@@ -29,7 +29,7 @@ This is the Catalyst engine specialized for development and testing.
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine::HTTP::Daemon>.
+L<Catalyst>, L<Catalyst::Engine::LWP::Daemon>.
 
 =head1 AUTHOR
 

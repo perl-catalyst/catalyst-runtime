@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Catalyst.
         - whole new core for private action inheritance
         - problems with mod_perl2 fixed
         - added Test::Pod support
+        - added new server backend with HTTP/1.1 support
+        - added option to run tests against a remote server
 
 4.34  Wed Mar 23 07:00:00 2005
         - added some messages to Makefile.PL
@@ -11,7 +13,7 @@ This file documents the revision history for Perl extension Catalyst.
         - added Catalyst::Engine::CGI::NPH
         - simplified Catalyst::Log to be easier to implement/subclass
         - added cgi.pl
-        - updated Catalyst::Log to use Catalyst::Engine::Test
+        - updated Catalyst::Test to use Catalyst::Engine::Test
         - updated helper scripts
           IMPORTANT: this will be the last time you'll have to regenerate
           the script directory. We promise!

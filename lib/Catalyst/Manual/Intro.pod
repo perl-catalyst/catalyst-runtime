@@ -71,6 +71,8 @@ Use L<Catalyst::Engine::Apache> or L<Catalyst::Engine::CGI>.
 
 The best part is that Catalyst implements all this flexibility in a very simple way.
 
+=over 4
+
 =item * B<Building Block Interface>
 
 Components interoperate very smoothly. For example, Catalyst automatically makes a L<Context> object available in every component. Via the context, you can access the request object, share data between components, and control the flow of your application. Building a Catalyst application feels a lot like snapping together toy building blocks, and everything just works.
@@ -90,6 +92,8 @@ Catalyst comes with a builtin, lightweight http server and test framework, makin
 =item * B<Helper Scripts>
 
 Catalyst provides helper scripts to quickly generate running starter code for components and unit tests.
+
+=back
 
 =head2 Quickstart
 

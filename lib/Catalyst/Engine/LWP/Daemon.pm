@@ -1,22 +1,22 @@
-package Catalyst::Engine::HTTP::Daemon;
+package Catalyst::Engine::LWP::Daemon;
 
 use strict;
-use base 'Catalyst::Engine::HTTP';
+use base 'Catalyst::Engine::LWP';
 
 use IO::Socket qw(AF_INET);
 
 =head1 NAME
 
-Catalyst::Engine::HTTP::Daemon - Catalyst HTTP Daemon Engine
+Catalyst::Engine::LWP::Daemon - Catalyst LWP Daemon Engine
 
 =head1 SYNOPSIS
 
-A script using the Catalyst::Engine::HTTP::Daemon module might look like:
+A script using the Catalyst::Engine::LWP::Daemon module might look like:
 
     #!/usr/bin/perl -w
 
     BEGIN { 
-       $ENV{CATALYST_ENGINE} = 'HTTP::Daemon';
+       $ENV{CATALYST_ENGINE} = 'LWP::Daemon';
     }
 
     use strict;
@@ -31,7 +31,7 @@ This is the Catalyst engine specialized for development and testing.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::HTTP>.
+This class overloads some methods from C<Catalyst::Engine::LWP>.
 
 =over 4
 
@@ -45,7 +45,7 @@ sub run {
     my $class = shift;
     my $port  = shift || 3000;
 
-    my $daemon = Catalyst::Engine::HTTP::Daemon::Catalyst->new(
+    my $daemon = Catalyst::Engine::LWP::Daemon::Catalyst->new(
         LocalPort => $port,
         ReuseAddr => 1
     );
@@ -62,14 +62,14 @@ sub run {
 
             $request->uri->scheme('http');    # Force URI::http
 
-            my $http = Catalyst::Engine::HTTP::LWP->new(
+            my $lwp = Catalyst::Engine::LWP::HTTP->new(
                 request  => $request,
                 address  => $connection->peerhost,
                 hostname => gethostbyaddr( $connection->peeraddr, AF_INET )
             );
 
-            $class->handler($http);
-            $connection->send_response( $http->response );
+            $class->handler($lwp);
+            $connection->send_response( $lwp->response );
         }
 
         $connection->close;
@@ -95,7 +95,7 @@ the same terms as Perl itself.
 
 =cut
 
-package Catalyst::Engine::HTTP::Daemon::Catalyst;
+package Catalyst::Engine::LWP::Daemon::Catalyst;
 
 use strict;
 use base 'HTTP::Daemon';

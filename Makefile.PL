@@ -9,12 +9,16 @@ WriteMakefile(
         CGI::Simple                       => 0,
         Class::Accessor::Fast             => 0,
         Class::Data::Inheritable          => 0,
+        HTTP::Daemon                      => 0,
         HTML::Entities                    => 0,
         HTTP::Headers                     => 0,
-        HTTP::Server::Simple              => '0.04',
+        HTTP::Request                     => 0,
+        HTTP::Response                    => 0,
+        LWP::UserAgent                    => 0,
         Module::Pluggable::Fast           => 0,
         Tree::Simple                      => 0,
         Tree::Simple::Visitor::FindByPath => 0,
+        URI                               => 0,
     }
 );
 

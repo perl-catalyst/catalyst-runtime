@@ -1,4 +1,4 @@
-package Catalyst::Engine::HTTP;
+package Catalyst::Engine::LWP;
 
 use strict;
 use base 'Catalyst::Engine';
@@ -11,9 +11,9 @@ use HTTP::Response;
 use IO::File;
 use URI;
 
-__PACKAGE__->mk_accessors(qw/http/);
+__PACKAGE__->mk_accessors(qw/lwp/);
 
-Class::Struct::struct 'Catalyst::Engine::HTTP::LWP' => {
+Class::Struct::struct 'Catalyst::Engine::LWP::HTTP' => {
     request  => 'HTTP::Request',
     response => 'HTTP::Response',
     hostname => '$',
@@ -22,7 +22,7 @@ Class::Struct::struct 'Catalyst::Engine::HTTP::LWP' => {
 
 =head1 NAME
 
-Catalyst::Engine::HTTP - Catalyst HTTP Engine
+Catalyst::Engine::LWP - Catalyst LWP Engine
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ sub finalize_headers {
         $response->header( 'Set-Cookie' => $cookie->as_string );
     }
 
-    $c->http->response($response);
+    $c->lwp->response($response);
 }
 
 =item $c->finalize_output
@@ -71,7 +71,7 @@ sub finalize_headers {
 
 sub finalize_output {
     my $c = shift;
-    $c->http->response->content_ref( \$c->response->{output} );
+    $c->lwp->response->content_ref( \$c->response->{output} );
 }
 
 =item $c->prepare_connection
@@ -80,8 +80,8 @@ sub finalize_output {
 
 sub prepare_connection {
     my $c = shift;
-    $c->req->hostname( $c->http->hostname );
-    $c->req->address( $c->http->address );
+    $c->req->hostname( $c->lwp->hostname );
+    $c->req->address( $c->lwp->address );
 }
 
 =item $c->prepare_cookies
@@ -91,7 +91,7 @@ sub prepare_connection {
 sub prepare_cookies {
     my $c = shift;
 
-    if ( my $header = $c->http->request->header('Cookie') ) {
+    if ( my $header = $c->lwp->request->header('Cookie') ) {
         $c->req->cookies( { CGI::Simple::Cookie->parse($header) } );
     }
 }
@@ -102,8 +102,8 @@ sub prepare_cookies {
 
 sub prepare_headers {
     my $c = shift;
-    $c->req->method( $c->http->request->method );
-    $c->req->headers( $c->http->request->headers );
+    $c->req->method( $c->lwp->request->method );
+    $c->req->headers( $c->lwp->request->headers );
 }
 
 =item $c->prepare_parameters
@@ -114,7 +114,7 @@ sub prepare_parameters {
     my $c = shift;
 
     my @params  = ();
-    my $request = $c->http->request;
+    my $request = $c->lwp->request;
 
     push( @params, $request->uri->query_form );
 
@@ -176,9 +176,9 @@ sub prepare_path {
 
     my $base;
     {
-        my $scheme = $c->http->request->uri->scheme;
-        my $host   = $c->http->request->uri->host;
-        my $port   = $c->http->request->uri->port;
+        my $scheme = $c->lwp->request->uri->scheme;
+        my $host   = $c->lwp->request->uri->host;
+        my $port   = $c->lwp->request->uri->port;
 
         $base = URI->new;
         $base->scheme($scheme);
@@ -188,7 +188,7 @@ sub prepare_path {
         $base = $base->canonical->as_string;
     }
 
-    my $path = $c->http->request->uri->path || '/';
+    my $path = $c->lwp->request->uri->path || '/';
     $path =~ s/^\///;
 
     $c->req->base($base);
@@ -200,8 +200,8 @@ sub prepare_path {
 =cut
 
 sub prepare_request {
-    my ( $c, $http ) = @_;
-    $c->http($http);
+    my ( $c, $lwp ) = @_;
+    $c->lwp($lwp);
 }
 
 =item $c->prepare_uploads
