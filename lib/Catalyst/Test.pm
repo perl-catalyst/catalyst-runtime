@@ -89,7 +89,8 @@ sub request {
         $request = HTTP::Request->new( 'GET', $request );
     }
     local ( *STDIN, *STDOUT );
-    my %clean = %ENV;
+    my %clean  = %ENV;
+    my $output = '';
     $ENV{CONTENT_TYPE}   ||= $request->header('Content-Type')   || '';
     $ENV{CONTENT_LENGTH} ||= $request->header('Content-Length') || '';
     $ENV{GATEWAY_INTERFACE} ||= 'CGI/1.1';
