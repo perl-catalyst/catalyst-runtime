@@ -5,6 +5,7 @@ use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
 use Text::ASCIITable;
+use Text::ASCIITable::Wrap 'wrap';
 
 __PACKAGE__->mk_classdata($_) for qw/engine log/;
 
@@ -187,7 +188,7 @@ sub import {
     my $t = Text::ASCIITable->new;
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow($_) for @plugins;
+    $t->addRow( wrap( $_, 75 ) ) for @plugins;
     $caller->log->debug( 'Loaded plugins', $t->draw )
       if ( @plugins && $caller->debug );
 

@@ -10,6 +10,7 @@ use HTTP::Headers;
 use Memoize;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Text::ASCIITable;
+use Text::ASCIITable::Wrap 'wrap';
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 use Catalyst::Request;
@@ -494,7 +495,7 @@ sub handler {
             $t->setColWidth( 'Time',   9,  1 );
 
             for my $stat (@stats) {
-                $t->addRow(@$stat);
+                $t->addRow( wrap( $stat->[0], 64 ), wrap( $stat->[1], 9 ) );
             }
             $class->log->info( "Request took $elapsed" . "s ($av/s)",
                 $t->draw );
@@ -564,7 +565,7 @@ sub prepare {
         $t->setColWidth( 'Value', 36, 1 );
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
-            $t->addRow( $key, $value );
+            $t->addRow( wrap( $key, 37 ), wrap( $value, 36 ) );
         }
         $c->log->debug( 'Parameters are', $t->draw );
     }
@@ -864,7 +865,7 @@ sub setup_components {
     my $t = Text::ASCIITable->new;
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow($_) for keys %{ $self->components };
+    $t->addRow( wrap( $_, 75 ) ) for keys %{ $self->components };
     $self->log->debug( 'Loaded components', $t->draw )
       if ( @{ $t->{tbl_rows} } && $self->debug );
     my $actions  = $self->actions;
@@ -880,7 +881,11 @@ sub setup_components {
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            $privates->addRow( "$prefix$action", $class, $code );
+            $privates->addRow(
+                wrap( "$prefix$action", 28 ),
+                wrap( $class,           28 ),
+                wrap( $code,            14 )
+            );
         }
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
@@ -895,7 +900,11 @@ sub setup_components {
 
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        $publics->addRow( "/$plain", $class, $code );
+        $publics->addRow(
+            wrap( "/$plain", 28 ),
+            wrap( $class,    28 ),
+            wrap( $code,     14 )
+        );
     }
     $self->log->debug( 'Loaded public actions', $publics->draw )
       if ( @{ $publics->{tbl_rows} } && $self->debug );
@@ -906,7 +915,11 @@ sub setup_components {
     $regexes->setColWidth( 'Code',   14, 1 );
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        $regexes->addRow( $regex, $class, $code );
+        $regexes->addRow(
+            wrap( $regex, 28 ),
+            wrap( $class, 28 ),
+            wrap( $code,  14 )
+        );
     }
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
