@@ -159,19 +159,28 @@ sub prepare_parameters {
 
 sub prepare_path {
     my $c = shift;
-    $c->req->path( $c->cgi->url( -absolute => 1, -path_info => 1 ) );
-    my $loc = $c->cgi->url( -absolute => 1 );
-    no warnings 'uninitialized';
-    $c->req->{path} =~ s/^($loc)?\///;
-    $c->req->{path} .= '/' if $c->req->path eq $loc;
-    my $base = $c->cgi->url;
-    if ( $ENV{CATALYST_TEST} ) {
-        my $script = $c->cgi->script_name;
-        $base =~ s/$script$//i;
+
+    my $base;
+    {
+        my $scheme = $ENV{HTTPS} ? 'https' : 'http';
+        my $host   = $ENV{HTTP_HOST} || $ENV{SERVER_NAME};
+        my $port   = $ENV{SERVER_PORT} || 80;
+        my $path   = $ENV{SCRIPT_NAME} || '/';
+
+        $base = URI->new;
+        $base->scheme($scheme);
+        $base->host($host);
+        $base->port($port);
+        $base->path($path);
+
+        $base = $base->canonical->as_string;
     }
-    $base = URI->new($base);
-    $base->path('/') if ( $ENV{CATALYST_TEST} || !$base->path );
-    $c->req->base( $base->as_string );
+
+    my $path = $ENV{PATH_INFO} || '/';
+    $path =~  s/^\///;
+
+    $c->req->base($base);
+    $c->req->path($path);
 }
 
 =item $c->prepare_request
