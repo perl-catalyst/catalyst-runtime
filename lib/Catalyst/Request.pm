@@ -31,7 +31,11 @@ Catalyst::Request - Catalyst Request Class
     $req->args;
     $req->arguments;
     $req->base;
+    $req->content_encoding;
+    $req->content_length;
+    $req->content_type;
     $req->cookies;
+    $req->header;
     $req->headers;
     $req->hostname;
     $req->match;
@@ -39,8 +43,10 @@ Catalyst::Request - Catalyst Request Class
     $req->parameters;
     $req->params;
     $req->path;
+    $req->referer;
     $req->snippets;
     $req->uploads;
+    $req->user_agent
 
 See also L<Catalyst>.
 
@@ -79,11 +85,27 @@ Returns a reference to an array containing the arguments.
 
 Contains the uri base.
 
+=item $req->content_encoding
+
+Shortcut to $req->headers->content_encoding
+
+=item $req->content_length
+
+Shortcut to $req->headers->content_length
+
+=item $req->content_type
+
+Shortcut to $req->headers->content_type
+
 =item $req->cookies
 
 Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
+
+=item $req->header
+
+Shortcut to $req->headers->header
 
 =item $req->headers
 
@@ -103,6 +125,12 @@ Contains the match.
 
     print $c->request->match;
 
+=item $req->method
+
+Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
+
+    print $c->request->method
+
 =item $req->parameters
 
 =item $req->params
@@ -117,11 +145,9 @@ Contains the path.
 
     print $c->request->path;
 
-=item $req->method
+=item $req->referer
 
-Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
-
-    print $c->request->method
+Shortcut to $req->headers->referer
 
 =item $req->snippets
 
@@ -138,6 +164,10 @@ Returns a reference to a hash containing the uploads.
     print $c->request->uploads->{$filename}->{size};
     my $fh = $c->request->uploads->{$filename}->{fh};
     my $content = do { local $/; <$fh> };
+
+=item $req->user_agent
+
+Shortcut to $req->headers->user_agent
 
 =back
 

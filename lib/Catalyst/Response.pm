@@ -17,6 +17,9 @@ Catalyst::Response - Catalyst Response Class
 =head1 SYNOPSIS
 
     $resp = $c->response;
+    $resp->content_encoding;
+    $resp->content_length;
+    $resp->content_type;
     $resp->cookies;
     $resp->headers;
     $resp->output;
@@ -34,11 +37,27 @@ response data.
 
 =over 4
 
+=item $resp->content_encoding
+
+Shortcut to $resp->headers->content_encoding
+
+=item $resp->content_length
+
+Shortcut to $resp->headers->content_length
+
+=item $resp->content_type
+
+Shortcut to $resp->headers->content_type
+
 =item $resp->cookies
 
 Returns a reference to a hash containing the cookies.
 
     $c->response->cookies->{foo} = { value => '123' };
+
+=item $resp->header
+
+Shortcut to $resp->headers->header
 
 =item $resp->headers
 
