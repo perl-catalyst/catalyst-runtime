@@ -121,11 +121,13 @@ sub dispatch {
         $c->state(1);
         if ( my $begin = @{ $c->get_action( 'begin', $namespace ) }[-1] ) {
             $c->execute( @{ $begin->[0] } );
+            return if scalar @{ $c->error };
         }
 
         # Execute the auto chain
         for my $auto ( @{ $c->get_action( 'auto', $namespace ) } ) {
             $c->execute( @{ $auto->[0] } );
+            return if scalar @{ $c->error };
             last unless $c->state;
         }
 
@@ -139,6 +141,7 @@ sub dispatch {
         # Execute last end
         if ( my $end = @{ $c->get_action( 'end', $namespace ) }[-1] ) {
             $c->execute( @{ $end->[0] } );
+            return if scalar @{ $c->error };
         }
     }
     else {
@@ -200,10 +203,14 @@ sub execute {
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
     };
     if ( my $error = $@ ) {
-        chomp $error;
-        $error = qq/Caught exception "$error"/;
+
+        unless ( ref $error ) {
+            chomp $error;
+            $error = qq/Caught exception "$error"/;
+        }
+
         $c->log->error($error);
-        $c->error($error) if $c->debug;
+        $c->error($error);
         $c->state(0);
     }
     return $c->state;
@@ -433,6 +440,8 @@ sub forward {
     }
     for my $result ( @{$results} ) {
         $c->execute( @{ $result->[0] } );
+        return if scalar @{ $c->error };
+        last unless $c->state;
     }
     return $c->state;
 }
