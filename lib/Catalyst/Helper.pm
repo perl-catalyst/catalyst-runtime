@@ -39,6 +39,7 @@ sub mk_app {
     $self->_mk_changes;
     $self->_mk_apptest;
     $self->_mk_cgi;
+    $self->_mk_fcgi;
     $self->_mk_server;
     $self->_mk_test;
     $self->_mk_create;
@@ -365,6 +366,67 @@ the same terms as perl itself.
 =cut
 EOF
     chmod 0700, "$script/nph-cgi.pl";
+}
+
+sub _mk_fcgi {
+    my $self   = shift;
+    my $name   = $self->{name};
+    my $script = $self->{script};
+    $self->mk_file( "$script\/fcgi.pl", <<"EOF");
+$Config{startperl} -w
+
+BEGIN {
+    \$ENV{CATALYST_ENGINE} = 'CGI';
+    \$ENV{CATALYST_TEST}   = 1;
+}
+
+use strict;
+use FindBin;
+use lib "\$FindBin::Bin/../lib";
+use FCGI;
+use $name;
+
+my \$request = FCGI::Request();
+while ( \$request->Accept() >= 0 ) {
+    my \$output;
+    {
+        local(*STDOUT);
+        open( STDOUT, '>', \\\$output );
+        $name->run;
+    }
+    \$output =~ s!^HTTP/\\d+.\\d+ \\d\\d\\d.*?\\n!!s;
+    print \$output;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+fcgi - Catalyst FCGI
+
+=head1 SYNOPSIS
+
+See L<Catalyst::Manual>
+
+=head1 DESCRIPTION
+
+Run a Catalyst application as fcgi.
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri\@oook.de>
+
+=head1 COPYRIGHT
+
+Copyright 2004 Sebastian Riedel. All rights reserved.
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+EOF
+    chmod 0700, "$script/fcgi.pl";
 }
 
 sub _mk_server {
