@@ -31,7 +31,7 @@ sub finalize_headers {
     my $c = shift;
 
     my $status = $c->response->status || 200;
-    printf( "%d %s\n", $status, HTTP::Status::status_message($status) );
+    printf( "%d %s\015\012", $status, HTTP::Status::status_message($status) );
     $c->SUPER::finalize_headers;
 }
 
