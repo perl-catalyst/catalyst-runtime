@@ -3,7 +3,6 @@ package Catalyst::Engine::FCGI;
 use strict;
 use base 'Catalyst::Engine::CGI';
 use FCGI;
-use NEXT;
 
 =head1 NAME
 
