@@ -4,7 +4,7 @@ Catalyst::Manual::Cookbook - Cooking with Catalyst
 
 =head1 DESCRIPTION
 
-Yummy!
+Yummy code like your mum used to bake!
 
 =head1 RECIPES
 
@@ -67,6 +67,73 @@ Just use Catalyst::Model::CDBI::CRUD as baseclass.
 
 Modify the $c->form() parameters to match your needs, and don't forget to copy
 the templates. ;)
+
+==head2 Serving static files and CSS as text/css
+
+If you want to serve static content (like images, txt or CSS) via Catalyst,
+then all you need is the plugin Catalyst::Plugin::Static as well as a small
+regex to set the MIME type for CSS to text/css.
+
+    # lib/MyApp.pm
+    package MyApp;
+
+    use strict;
+    use Catalyst qw/-Debug Static/;
+    
+    __PACKAGE__->action(
+
+        '!default' => sub {
+            my ( $self, $c ) = @_;
+	    $c->serve_static;
+	},
+	    
+        '/^.*\.css$/' => sub {
+            my ( $self, $c ) = @_;
+            $c->serve_static('text/css');
+        },
+    );
+
+==head2 Uploads with Catalyst
+
+To implement uploads in Catalyst you need to have a HTML form similiar to
+this:
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="form_submit" value="yes">
+      <input type="file" name="my_file">
+      <input type="submit" value="Send">
+    </form>
+
+It's very important not to forget enctype="multipart/form-data" in form, 
+if it's not there, uploads just don't work.
+
+Catalyst Controller module 'upload' action:
+
+    MyApp->action(
+    
+        'upload' => sub {
+            my ($self, $c) = @_;
+            if ($c->req->parameters->{form_submit} eq 'yes') {
+                my $filename = $c->req->parameters->{my_file};
+                if ($filename) {
+                    my $fh = $c->req->uploads->{$filename}->{fh};
+                    open(NEW_FILE, ">/tmp/$filename") or die
+                        "Can't open file for writing: $!";
+                    while ($fh->read(my $buf, 32768)) {
+                        print NEW_FILE $buf;
+                    }
+                    close(NEW_FILE);
+                }
+            }
+            $c->stash->{template} = 'upload_form.tt';
+            $c->forward('MyApp::V::View');
+        },
+    );
+
+If you want to upload bigger files than 1MB, then just add to your Controller 
+module:
+
+    $CGI::Simple::POST_MAX = 1048576000;
 
 =head1 AUTHOR
 
