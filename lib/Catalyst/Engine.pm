@@ -337,6 +337,13 @@ sub forward {
         $command = _prefix( $caller, $command );
         $command = "\!$command";
     }
+    elsif ( $command =~ /^\!(.*)$/ ) {
+        my $try    = $1;
+        my $caller = caller(0);
+        my $prefix = _class2prefix($caller);
+        $try = "!$prefix/$command";
+        $command = $try if $c->actions->{plain}->{$try};
+    }
     my ( $class, $code );
     if ( my $action = $c->action($command) ) {
         ( $class, $code ) = @{ $action->[0] };
