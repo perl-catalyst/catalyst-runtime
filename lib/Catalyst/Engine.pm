@@ -466,7 +466,7 @@ sub prepare {
             my $value = $c->req->params->{$key} || '';
             push @params, "$key=$value";
         }
-        $c->log->debug( 'Parameters are "' . join( ' ', @params ) . '"' );
+        $c->log->debug( 'Parameters are', @params );
     }
     $c->prepare_uploads;
     return $c;
@@ -668,8 +668,6 @@ sub set_action {
     my $uid = $parent->getUID;
     $c->actions->{private}->{$uid}->{$method} = [ $namespace, $code ];
     my $forward = $prefix ? "$prefix/$method" : $method;
-    $c->log->debug(qq|Private "/$forward" is "$namespace->$method"|)
-      if $c->debug;
 
     if ( $flags{path} ) {
         $flags{path} =~ s/^\w+//;
@@ -696,12 +694,10 @@ sub set_action {
         $absolute = 1 if $flags{global};
         my $name = $absolute ? $path : "$prefix/$path";
         $c->actions->{plain}->{$name} = [ $namespace, $code ];
-        $c->log->debug(qq|Public "/$name" is "/$forward"|) if $c->debug;
     }
     if ( my $regex = $flags{regex} ) {
         push @{ $c->actions->{compiled} }, [ $regex, qr#$regex# ];
         $c->actions->{regex}->{$regex} = [ $namespace, $code ];
-        $c->log->debug(qq|Public "$regex" is "/$forward"|) if $c->debug;
     }
 
     $c->actions->{reverse}->{"$code"} = $reverse;
@@ -791,10 +787,37 @@ sub setup_components {
         $self->components->{ ref $comp } = $comp;
         $self->setup_actions($comp);
     }
-    $self->log->debug( 'Initialized components "'
-          . join( ' ', keys %{ $self->components } )
-          . '"' )
-      if $self->debug;
+    my @comps = keys %{ $self->components };
+    $self->log->debug( 'Loaded components', @comps )
+      if ( @comps && $self->debug );
+    my $actions  = $self->actions;
+    my @messages = ('Loaded private actions');
+    my $walker   = sub {
+        my ( $walker, $parent, $messages, $prefix ) = @_;
+        $prefix .= $parent->getNodeValue || '';
+        $prefix .= '/' unless $prefix =~ /\/$/;
+        my $uid = $parent->getUID;
+        for my $action ( keys %{ $actions->{private}->{$uid} } ) {
+            my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
+            push @$messages, qq/"$prefix$action" in "$class" as "$code"/;
+        }
+        $walker->( $walker, $_, $messages, $prefix )
+          for $parent->getAllChildren;
+    };
+    $walker->( $walker, $self->tree, \@messages, '' );
+    $self->log->debug(@messages) if ( $#messages && $self->debug );
+    @messages = ('Loaded plain actions');
+    for my $plain ( keys %{ $actions->{plain} } ) {
+        my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
+        push @messages, qq|"/$plain" in "$class" as "$code"|;
+    }
+    $self->log->debug(@messages) if ( $#messages && $self->debug );
+    @messages = ('Loaded regex actions');
+    for my $regex ( keys %{ $actions->{regex} } ) {
+        my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
+        push @messages, qq|"$regex" in "$class" as "$code"|;
+    }
+    $self->log->debug(@messages) if ( $#messages && $self->debug );
 }
 
 =item $c->stash
