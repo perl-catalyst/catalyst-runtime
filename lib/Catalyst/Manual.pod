@@ -15,6 +15,15 @@ L<Catalyst::Manual::Cookbook>
 L<Catalyst::Manual::Internals>
     Here be dragons!
 
+L<Catalyst::Manual::SuccessStories>
+    Catalyst rocks!
+
+L<Catalyst::Manual::Troubleshooting>
+    Got trouble? Read this first!
+
+L<Catalyst::Manual::FAQ>
+    Frequently Asked Questions.
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>

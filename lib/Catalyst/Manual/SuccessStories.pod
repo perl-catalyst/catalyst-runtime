@@ -1,0 +1,31 @@
+=head1 NAME
+
+Catalyst::Manual::SuccessStories - Catalyst rocks!
+
+=head1 DESCRIPTION
+
+Wohoooooo!!!
+
+=head1 STORIES
+
+=head2 A first benchmark after porting from Maypole to Catalyst
+
+    the_jester: Very fast. Very very fast.
+    the_jester: I've run some basic benchmarks. On a "list" page,
+                I was getting about 7-8 pages/second with Maypole;
+                I'm getting 18 with Catalyst. On a "view" page,
+                I'm getting 16 pages/second under Maypole,
+                and 57 under Catalyst.
+    the_jester: And NOTE: That's Maypole running with cached templates,
+                and Catalyst running without.
+                Adding template caching to Maypole gave me an
+                improvement of about 250%, so....
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,18 @@
+=head1 NAME
+
+Catalyst::Manual::FAQ - Frequently Asked Questions
+
+=head1 DESCRIPTION
+
+Lalala...
+
+=head1 ANSWERS
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
