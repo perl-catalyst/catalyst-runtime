@@ -23,7 +23,7 @@ catalyst - Bootstrap a Catalyst application
 
 =head1 SYNOPSIS
 
-catalyst [options] application-name
+catalyst.pl [options] application-name
 
  Options:
    -help        display this help and exits
@@ -31,8 +31,8 @@ catalyst [options] application-name
  application-name has to be a valid Perl module name and can include ::
 
  Examples:
-    catalyst My::App
-    catalyst MyApp
+    catalyst.pl My::App
+    catalyst.pl MyApp
 
  See also:
     perldoc Catalyst::Manual
