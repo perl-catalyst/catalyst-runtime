@@ -137,7 +137,7 @@ sub prepare_path {
     no warnings 'uninitialized';
     $c->req->{path} =~ s/^($loc)?\///;
     my $base = URI->new;
-    $base->scheme( $c->apache_request->protocol =~ /HTTPS/ ? 'https' : 'http' );
+    $base->scheme( $ENV{HTTPS} ? 'https' : 'http' );
     $base->host( $c->apache_request->hostname );
     $base->port( $c->apache_request->get_server_port );
     my $path = $c->apache_request->location;
