@@ -12,7 +12,7 @@ Catalyst is an elegant web application framework, extremely flexible yet extreme
 
 =head3 MVC
 
-Catalyst follows the Model-View-Controller (MVC) design pattern, allowing you to easily separate concerns, like content, presentation and flow control, into separate modules. This separation allows you to modify code tat handles one concern without affecting code that handles the others. Catalyst promotes re-use of existing Perl modules that already handle common web application concerns well.
+Catalyst follows the Model-View-Controller (MVC) design pattern, allowing you to easily separate concerns, like content, presentation and flow control, into separate modules. This separation allows you to modify code that handles one concern without affecting code that handles the others. Catalyst promotes re-use of existing Perl modules that already handle common web application concerns well.
 
 Here's how the M, V and C map to those concerns, with examples of well-known Perl modules you may want to use for each.
 
@@ -192,12 +192,12 @@ The request contains all kind of request specific informations like query parame
     $c->req->headers->content_type;
     $c->req->base;
 
-=item * L<Catalyst::Reponse>
+=item * L<Catalyst::Response>
 
     $c->response
     $c->res # alias
 
-The response is like the request but contais just response specific informations.
+The response is like the request but contains just response specific informations.
 
     $c->res->output('Hello World');
     $c->res->status(404);
@@ -244,7 +244,7 @@ The last of these, the stash, is a universal hash for sharing data among applica
 
 =head3 Actions
 
-To define a Catalyst action, register it into your applicaton with the C<action> method. C<action> accepts a key-value pair, where the key represents one or more URLs or application states and the value is a code reference, the action to execute in reponse to the URL(s) or application state(s).
+To define a Catalyst action, register it into your application with the C<action> method. C<action> accepts a key-value pair, where the key represents one or more URLs or application states and the value is a code reference, the action to execute in reponse to the URL(s) or application state(s).
 
 Catalyst supports several ways to define Actions:
 
@@ -306,7 +306,7 @@ Called at the end of a request, after all matching actions are called.
 =item * !?default, !?begin and !?end
 
 Like their equivalents above but used to overload them from Controllers.
-So each Controller can have their own !?default, !?begin and !?end.
+So each Controller can have its own !?default, !?begin and !?end.
 
 =back
 
@@ -500,7 +500,7 @@ Catalyst automatically loads table layouts and relationships. Use the stash to p
 
 =head4 Controllers
 
-Multiple Controllers are a good way to separate logical domains of your application and distribute tasks to different programmers in a teams.
+Multiple Controllers are a good way to separate logical domains of your application.
 
     package MyApp::C::Login;
 

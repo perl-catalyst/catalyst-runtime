@@ -187,8 +187,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 THANK YOU
 
-David Naughton, Gary Ashton Jones, Marcus Ramberg and all the others who've
-helped.
+Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse Sheidlower,
+Marcus Ramberg and all the others who've helped.
 
 =head1 LICENSE
 
