@@ -54,13 +54,16 @@ sub run {
         die("Failed to create daemon: $!\n");
     }
 
-    printf( "You can connect to your server at %s\n", $daemon->url );
+    my $base = URI->new( $daemon->url )->canonical;
+
+    printf( "You can connect to your server at %s\n", $base );
 
     while ( my $connection = $daemon->accept ) {
 
         while ( my $request = $connection->get_request ) {
 
             $request->uri->scheme('http');    # Force URI::http
+            $request->uri->host( $base->host );
 
             my $lwp = Catalyst::Engine::Test::LWP->new(
                 request  => $request,

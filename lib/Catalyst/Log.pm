@@ -86,7 +86,7 @@ Logs a Data::Dumper of reference.
 
 =cut
 
-sub dump { shift->_format( 'dump', Dumper( $_[1] ) ) }
+sub dump { shift->_format( 'dump', Dumper( $_[0] ) ) }
 
 =back
 

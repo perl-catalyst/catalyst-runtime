@@ -482,8 +482,8 @@ sub prepare {
     }
     $c->prepare_request($r);
     $c->prepare_path;
-    $c->prepare_cookies;
     $c->prepare_headers;
+    $c->prepare_cookies;
     $c->prepare_connection;
     my $method   = $c->req->method   || '';
     my $path     = $c->req->path     || '';
