@@ -134,7 +134,7 @@ sub execute {
         {
             my $action = $c->actions->{reverse}->{"$code"};
             $action = "/$action" unless $action =~ /\-\>/;
-            $action = "    $action" if $callsub =~ /forward$/;
+            $action = "-> $action" if $callsub =~ /forward$/;
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
