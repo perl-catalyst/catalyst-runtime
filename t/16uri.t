@@ -1,6 +1,6 @@
 package TestApp;
 
-use Catalyst;
+use Catalyst qw[-Engine=Test];
 
 TestApp->action( '!default'  => \&default );
 TestApp->action( 'index/a/b' => \&default );

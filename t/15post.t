@@ -1,6 +1,6 @@
 package TestApp;
 
-use Catalyst;
+use Catalyst qw[-Engine=Test];
 
 __PACKAGE__->action(
     echo => sub {

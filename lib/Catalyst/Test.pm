@@ -6,6 +6,7 @@ use UNIVERSAL::require;
 require Catalyst;
 
 my $class;
+$ENV{CATALYST_ENGINE} = 'Test';
 
 =head1 NAME
 
