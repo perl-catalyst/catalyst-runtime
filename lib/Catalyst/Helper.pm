@@ -268,7 +268,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => '$name',
     VERSION_FROM => 'lib/$class.pm',
-    PREREQ_PM    => { Catalyst => 0 },
+    PREREQ_PM    => { Catalyst => 5 },
     test         => { TESTS => join ' ', ( glob('t/*.t'), glob('t/*/*.t') ) }
 );
 EOF
