@@ -47,7 +47,6 @@ sub run {
         Listen    => SOMAXCONN,
         LocalPort => $port,
         ReuseAddr => 1,
-        Timeout   => .1,
         Type      => SOCK_STREAM,
     );
 
@@ -59,9 +58,7 @@ sub run {
 
     printf( "You can connect to your server at %s\n", $base );
 
-    while ( 1 ) {
-
-        my $connection = $daemon->accept or next;
+    while ( my $connection = $daemon->accept ) {
 
         while ( my $request = $connection->get_request ) {
 
