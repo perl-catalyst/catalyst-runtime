@@ -205,8 +205,12 @@ sub execute {
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
     };
     if ( my $error = $@ ) {
-        chomp $error;
-        $error = qq/Caught exception "$error"/;
+
+        unless ( ref $error ) {
+            chomp $error;
+            $error = qq/Caught exception "$error"/;
+        }
+        
         $c->log->error($error);
         $c->error($error);
         $c->state(0);
