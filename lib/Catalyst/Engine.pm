@@ -459,7 +459,8 @@ sub handler {
                 for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
                     $c->state( $c->execute( @{ $begin->[0] } ) );
                 }
-                for my $result ( @{ $c->get_action( $action, $default ) }[-1] )
+                for my $result (
+                    @{ $c->get_action( $c->req->action, $default ) }[-1] )
                 {
                     $c->state( $c->execute( @{ $result->[0] } ) );
                     last unless $default;
