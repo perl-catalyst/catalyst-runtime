@@ -4,9 +4,7 @@ Catalyst::Manual::FAQ - Frequently Asked Questions
 
 =head1 DESCRIPTION
 
-Lalala...
-
-=head1 ANSWERS
+No questions yet, everything perfect...
 
 =head1 AUTHOR
 

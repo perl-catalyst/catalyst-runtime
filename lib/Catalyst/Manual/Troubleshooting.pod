@@ -4,9 +4,7 @@ Catalyst::Manual::Troubleshooting - Got trouble?
 
 =head1 DESCRIPTION
 
-D'OH!
-
-=head1 ANSWERS
+No trouble yet...
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ Catalyst::Manual::SuccessStories - Catalyst rocks!
 
 =head1 DESCRIPTION
 
-Wohoooooo!!!
+Catalyst is great, no question...
 
 =head1 STORIES
 
