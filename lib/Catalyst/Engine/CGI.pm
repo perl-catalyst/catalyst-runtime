@@ -135,6 +135,8 @@ sub prepare_headers {
         ( my $field = $header ) =~ s/^HTTPS?_//;
         $c->req->headers->header( $field => $c->cgi->http($header) );
     }
+    $c->req->headers->header( 'Content-Type'   => $c->cgi->content_type );
+    $c->req->headers->header( 'Content-Length' => $c->cgi->content_length );
 }
 
 =item $c->prepare_parameters

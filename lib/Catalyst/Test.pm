@@ -2,6 +2,8 @@ package Catalyst::Test;
 
 use strict;
 use UNIVERSAL::require;
+use IO::File;
+use HTTP::Request;
 use HTTP::Response;
 use Socket;
 use URI;
@@ -17,6 +19,11 @@ $ENV{CATALYST_TEST}   = 1;
 Catalyst::Test - Test Catalyst applications
 
 =head1 SYNOPSIS
+
+    # Helper
+    script/cgi-server.pl
+    script/server.pl
+    script/test.pl
 
     # Tests
     use Catalyst::Test 'TestApp';
@@ -74,17 +81,41 @@ sub import {
 }
 
 sub request {
-    my $uri = shift;
-    local *STDOUT;
-    my $output = '';
-    open STDOUT, '>', \$output;
-    $uri = URI->new($uri);
+    my $request = shift;
+    unless ( ref $request ) {
+        $request = URI->new( $request, 'http' );
+    }
+    unless ( ref $request eq 'HTTP::Request' ) {
+        $request = HTTP::Request->new( 'GET', $request );
+    }
+    local ( *STDIN, *STDOUT );
     my %clean = %ENV;
-    $ENV{REQUEST_METHOD} ||= 'GET';
-    $ENV{HTTP_HOST}      ||= $uri->authority || 'localhost';
-    $ENV{SCRIPT_NAME}    ||= $uri->path || '/';
-    $ENV{QUERY_STRING}   ||= $uri->query || '';
-    $ENV{CONTENT_TYPE}   ||= 'text/plain';
+    $ENV{CONTENT_TYPE}   ||= $request->header('Content-Type')   || '';
+    $ENV{CONTENT_LENGTH} ||= $request->header('Content-Length') || '';
+    $ENV{GATEWAY_INTERFACE} ||= 'CGI/1.1';
+    $ENV{HTTP_HOST}         ||= $request->uri->host || 'localhost';
+    $ENV{QUERY_STRING}      ||= $request->uri->query || '';
+    $ENV{REQUEST_METHOD}    ||= $request->method;
+    $ENV{SCRIPT_NAME}       ||= $request->uri->path || '/';
+    $ENV{SERVER_NAME}       ||= $request->uri->host || 'localhost';
+    $ENV{SERVER_PORT}       ||= $request->uri->port;
+    $ENV{SERVER_PROTOCOL}   ||= 'HTTP/1.1';
+
+    for my $field ( $request->header_field_names ) {
+        if ( $field =~ /^Content-(Length|Type)$/ ) {
+            next;
+        }
+        $field =~ s/-/_/g;
+        $ENV{ 'HTTP_' . uc($field) } = $request->header($field);
+    }
+    if ( $request->content_length ) {
+        my $body = IO::File->new_tmpfile;
+        $body->print( $request->content ) or die $!;
+        $body->seek( 0, SEEK_SET ) or die $!;
+        open( STDIN, "<&=", $body->fileno )
+          or die("Failed to dup \$body: $!");
+    }
+    open( STDOUT, '>', \$output );
     $class->handler;
     %ENV = %clean;
     return HTTP::Response->parse($output);
