@@ -291,14 +291,7 @@ a normal, single-shot CGI script.
 
     my $request = FCGI::Request();
     while ($request->Accept() >= 0) {
-        my $output;
-	{ 
-	    local(*STDOUT);
-	    open( STDOUT, '>', \$output );
-	    MyApp->run;
-	}
-	$output =~ s!^HTTP/\d+.\d+ \d\d\d.*?\n!!s;
-	print $output;
+        MyApp->run;
     }
 
 Any initialization code should be included outside the request-accept loop.
@@ -362,13 +355,8 @@ run.
             # PP-specific initialization code
         }
     }
-    { 
-	local(*STDOUT);
-	open( STDOUT, '>', \$output );
-	MyApp->run;
-    }
-    $output =~ s!^HTTP/\d+.\d+ \d\d\d.*?\n!!s;
-    print $output;
+
+    MyApp->run;
 
 For more information see the C<PersistentPerl> documentation.
 
