@@ -4,7 +4,14 @@ use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
 use NEXT;
 
-__PACKAGE__->mk_classdata('_config');
+__PACKAGE__->mk_classdata($_) for qw/_cache _config/;
+__PACKAGE__->_cache( [] );
+
+sub MODIFY_CODE_ATTRIBUTES {
+    my ( $class, $code, @attrs ) = @_;
+    push @{ $class->_cache }, [ $code, [@attrs] ];
+    return ();
+}
 
 =head1 NAME
 
@@ -89,8 +96,6 @@ sub config {
 =cut
 
 sub process { 1 }
-
-=back
 
 =head1 SEE ALSO
 

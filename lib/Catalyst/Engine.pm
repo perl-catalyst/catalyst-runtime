@@ -21,7 +21,7 @@ __PACKAGE__->mk_classdata($_) for qw/actions components tree/;
 __PACKAGE__->mk_accessors(qw/request response state/);
 
 __PACKAGE__->actions(
-    { plain => {}, private => {}, regex => {}, compiled => {}, reverse => {} }
+    { plain => {}, private => {}, regex => {}, compiled => [], reverse => {} }
 );
 __PACKAGE__->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
 
@@ -47,32 +47,6 @@ See L<Catalyst>.
 =head1 METHODS
 
 =over 4
-
-=item $c->action( $name => $coderef, ... )
-
-Add one or more actions.
-
-    $c->action( '!foo' => sub { $_[1]->res->output('Foo!') } );
-
-It also automatically calls setup() if needed.
-
-See L<Catalyst::Manual::Intro> for more informations about actions.
-
-=cut
-
-sub action {
-    my $self = shift;
-    $self->setup unless $self->components;
-    $self->actions( {} ) unless $self->actions;
-    my $action;
-    $_[1] ? ( $action = {@_} ) : ( $action = shift );
-    if ( ref $action eq 'HASH' ) {
-        while ( my ( $name, $code ) = each %$action ) {
-            $self->set_action( $name, $code, caller(0) );
-        }
-    }
-    return 1;
-}
 
 =item $c->benchmark($coderef)
 
@@ -273,11 +247,11 @@ sub finalize_output { }
 
 =item $c->forward($command)
 
-Forward processing to a private/public action or a method from a class.
+Forward processing to a private action or a method from a class.
 If you define a class without method it will default to process().
 
-    $c->forward('!foo');
-    $c->forward('index.html');
+    $c->forward('foo');
+    $c->forward('index');
     $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
 
@@ -290,27 +264,12 @@ sub forward {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
     }
-    my $caller = caller(0);
-    if ( $command =~ /^\?(.*)$/ ) {
-        $command = $1;
-        $command = _prefix( $caller, $command );
-    }
-    my $namespace = '';
-    if ( $command =~ /^\!/ ) {
-        $namespace = _class2prefix($caller);
-    }
+    my $caller    = caller(0);
+    my $namespace = '/';
+    if ( $command =~ /^\/(.*)$/ ) { $command = $1 }
+    else { $namespace = _class2prefix($caller) || '/' }
     my $results = $c->get_action( $command, $namespace );
-    if ( @{$results} ) {
-        unless ( $command =~ /^\!/ ) {
-            $results = [ pop @{$results} ];
-            if ( $results->[0]->[2] ) {
-                $c->log->debug(qq/Couldn't forward "$command" to regex action/)
-                  if $c->debug;
-                return 0;
-            }
-        }
-    }
-    else {
+    unless ( @{$results} ) {
         my $class = $command;
         if ( $class =~ /[^\w\:]/ ) {
             $c->log->debug(qq/Couldn't forward to "$class"/) if $c->debug;
@@ -342,34 +301,30 @@ Get an action in a given namespace.
 sub get_action {
     my ( $c, $action, $namespace ) = @_;
     $namespace ||= '';
-    if ( $action =~ /^\!(.*)/ ) {
-        $action = $1;
+    if ($namespace) {
+        $namespace = '' if $namespace eq '/';
         my $parent = $c->tree;
         my @results;
         my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
         push @results, [$result] if $result;
         my $visitor = Tree::Simple::Visitor::FindByPath->new;
-        my $local;
         for my $part ( split '/', $namespace ) {
-            $local = undef;
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
             my $child = $visitor->getResult;
             my $uid   = $child->getUID if $child;
             my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
-            return [ [$match] ] if ( $match && $match =~ /^?.*/ );
-            $local = $c->actions->{private}->{$uid}->{"?$action"} if $uid;
             push @results, [$match] if $match;
             $parent = $child if $child;
         }
-        return [ [$local] ] if $local;
         return \@results;
     }
     elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
     elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
     else {
-        for my $regex ( keys %{ $c->actions->{compiled} } ) {
-            my $name = $c->actions->{compiled}->{$regex};
+        for my $i ( 0 .. $#{ $c->actions->{compiled} } ) {
+            my $name  = $c->actions->{compiled}->[$i]->[0];
+            my $regex = $c->actions->{compiled}->[$i]->[1];
             if ( $action =~ $regex ) {
                 my @snippets;
                 for my $i ( 1 .. 9 ) {
@@ -400,22 +355,25 @@ sub handler ($$) {
             my $c         = $class->prepare($r);
             my $action    = $c->req->action;
             my $namespace = '';
-            $namespace = join '/', @{ $c->req->args } if $action eq '!default';
+            $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
+              if $action eq 'default';
             unless ($namespace) {
                 if ( my $result = $c->get_action($action) ) {
                     $namespace = _class2prefix( $result->[0]->[0]->[0] );
                 }
             }
-            my $results = $c->get_action( $action, $namespace );
+            my $default = $action eq 'default' ? $namespace : undef;
+            my $results = $c->get_action( $action, $default );
+            $namespace ||= '/';
             if ( @{$results} ) {
-                for my $begin ( @{ $c->get_action( '!begin', $namespace ) } ) {
+                for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
                     $c->state( $c->process( @{ $begin->[0] } ) );
                 }
-                for my $result ( @{ $c->get_action( $action, $namespace ) } ) {
+                for my $result ( @{ $c->get_action( $action, $default ) } ) {
                     $c->state( $c->process( @{ $result->[0] } ) );
-                    last unless $action =~ /^\!.*/;
+                    last unless $default;
                 }
-                for my $end ( @{ $c->get_action( '!end', $namespace ) } ) {
+                for my $end ( @{ $c->get_action( 'end', $namespace ) } ) {
                     $c->state( $c->process( @{ $end->[0] } ) );
                 }
             }
@@ -482,8 +440,8 @@ sub prepare {
     }
     $c->prepare_request($r);
     $c->prepare_path;
-    $c->prepare_headers;
     $c->prepare_cookies;
+    $c->prepare_headers;
     $c->prepare_connection;
     my $method   = $c->req->method   || '';
     my $path     = $c->req->path     || '';
@@ -543,7 +501,7 @@ sub prepare_action {
         unshift @args, pop @path;
     }
     unless ( $c->req->action ) {
-        $c->req->action('!default');
+        $c->req->action('default');
         $c->req->match('');
     }
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
@@ -663,52 +621,103 @@ Returns a C<Catalyst::Response> object.
 
     my $res = $c->res;
 
-=item $c->set_action( $action, $code, $namespace )
+=item $c->set_action( $action, $code, $namespace, $attrs )
 
 Set an action in a given namespace.
 
 =cut
 
 sub set_action {
-    my ( $c, $action, $code, $namespace ) = @_;
-    my $prefix = '';
-    if ( $action =~ /^\?(.*)$/ ) {
-        my $prefix = $1 || '';
-        $action = $2;
-        $action = $prefix . _prefix( $namespace, $action );
-        $c->actions->{plain}->{$action} = [ $namespace, $code ];
+    my ( $c, $method, $code, $namespace, $attrs ) = @_;
+
+    my $prefix   = _class2prefix($namespace) || '';
+    my $action   = 0;
+    my $public   = 0;
+    my $regex    = 0;
+    my $arg      = '';
+    my $absolute = 0;
+
+    for my $attr ( @{$attrs} ) {
+        if ( $attr =~ /^Action$/ ) {
+            $action++;
+            $arg = $1 if $1;
+        }
+        elsif ( $attr =~ /^Path\((.+)\)$/i ) {
+            $arg = $1;
+            $public++;
+        }
+        elsif ( $attr =~ /^Public$/i ) {
+            $public++;
+        }
+        elsif ( $attr =~ /^Private$/i ) {
+            $action++;
+        }
+        elsif ( $attr =~ /Regex(?:\((.+)\))?$/i ) {
+            $regex++;
+            $action++;
+            $arg = $1 if $1;
+        }
+        elsif ( $attr =~ /Absolute(?:\((.+)\))?$/i ) {
+            $action++;
+            $absolute++;
+            $public++;
+            $arg = $1 if $1;
+        }
+        elsif ( $attr =~ /Relative(?:\((.+)\))?$/i ) {
+            $action++;
+            $public++;
+            $arg = $1 if $1;
+        }
     }
-    elsif ( $action =~ /^\/(.*)\/$/ ) {
-        my $regex = $1;
-        $c->actions->{compiled}->{qr#$regex#} = $action;
-        $c->actions->{regex}->{$action} = [ $namespace, $code ];
-    }
-    elsif ( $action =~ /^\!(.*)$/ ) {
-        $action = $1;
-        my $parent  = $c->tree;
-        my $visitor = Tree::Simple::Visitor::FindByPath->new;
-        $prefix = _class2prefix($namespace);
-        for my $part ( split '/', $prefix ) {
+
+    return unless $action;
+
+    my $parent  = $c->tree;
+    my $visitor = Tree::Simple::Visitor::FindByPath->new;
+    for my $part ( split '/', $prefix ) {
+        $visitor->setSearchPath($part);
+        $parent->accept($visitor);
+        my $child = $visitor->getResult;
+        unless ($child) {
+            $child = $parent->addChild( Tree::Simple->new($part) );
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
-            my $child = $visitor->getResult;
-            unless ($child) {
-                $child = $parent->addChild( Tree::Simple->new($part) );
-                $visitor->setSearchPath($part);
-                $parent->accept($visitor);
-                $child = $visitor->getResult;
-            }
-            $parent = $child;
+            $child = $visitor->getResult;
         }
-        my $uid = $parent->getUID;
-        $c->actions->{private}->{$uid}->{$action} = [ $namespace, $code ];
-        $action = "!$action";
+        $parent = $child;
     }
-    else { $c->actions->{plain}->{$action} = [ $namespace, $code ] }
-    my $reverse = $prefix ? "$action ($prefix)" : $action;
-    $c->actions->{reverse}->{"$code"} = $reverse;
-    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/)
+    my $uid = $parent->getUID;
+    $c->actions->{private}->{$uid}->{$method} = [ $namespace, $code ];
+    my $forward = $prefix ? "$prefix/$method" : $method;
+    $c->log->debug(qq|Private "/$forward" is "$namespace->$method"|)
       if $c->debug;
+
+    $arg =~ s/^\w+//;
+    $arg =~ s/\w+$//;
+    if ( $arg =~ /^'(.*)'$/ ) { $arg = $1 }
+    if ( $arg =~ /^"(.*)"$/ ) { $arg = $1 }
+
+    my $reverse = $prefix ? "$method ($prefix)" : $method;
+
+    if ($public) {
+        my $is_absolute = 0;
+        $is_absolute = 1 if $absolute;
+        if ( $arg =~ /^\/(.+)/ ) {
+            $arg         = $1;
+            $is_absolute = 1;
+        }
+        my $name =
+          $is_absolute ? ( $arg || $method ) : "$prefix/" . ( $arg || $method );
+        $c->actions->{plain}->{$name} = [ $namespace, $code ];
+        $c->log->debug(qq|Public "/$name" is "/$forward"|) if $c->debug;
+    }
+    if ($regex) {
+        push @{ $c->actions->{compiled} }, [ $arg, qr#$arg# ];
+        $c->actions->{regex}->{$arg} = [ $namespace, $code ];
+        $c->log->debug(qq|Public "$arg" is "/$forward"|) if $c->debug;
+    }
+
+    $c->actions->{reverse}->{"$code"} = $reverse;
 }
 
 =item $class->setup
@@ -725,6 +734,28 @@ sub setup {
     if ( $self->debug ) {
         my $name = $self->config->{name} || 'Application';
         $self->log->info("$name powered by Catalyst $Catalyst::VERSION");
+    }
+}
+
+=item $class->setup_actions($component)
+
+Setup actions for a component.
+
+=cut
+
+sub setup_actions {
+    my ( $self, $comp ) = @_;
+    $comp = ref $comp || $comp;
+    for my $action ( @{ $comp->_cache } ) {
+        my ( $code, $attrs ) = @{$action};
+        my $name = '';
+        no strict 'refs';
+        for my $sym ( values %{ $comp . '::' } ) {
+            if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
+                $name = *{$sym}{NAME};
+                $self->set_action( $name, $code, $comp, $attrs );
+            }
+        }
     }
 }
 
@@ -754,9 +785,11 @@ sub setup_components {
         $self->log->error(
             qq/Couldn't initialize "Module::Pluggable::Fast", "$error"/);
     }
+    $self->setup_actions($self);
     $self->components( {} );
-    for my $component ( $self->_components($self) ) {
-        $self->components->{ ref $component } = $component;
+    for my $comp ( $self->_components($self) ) {
+        $self->components->{ ref $comp } = $comp;
+        $self->setup_actions($comp);
     }
     $self->log->debug( 'Initialized components "'
           . join( ' ', keys %{ $self->components } )
@@ -787,7 +820,6 @@ sub stash {
 sub _prefix {
     my ( $class, $name ) = @_;
     my $prefix = _class2prefix($class);
-    warn "$class - $name - $prefix";
     $name = "$prefix/$name" if $prefix;
     return $name;
 }

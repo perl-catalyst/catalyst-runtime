@@ -1,11 +1,11 @@
 package Catalyst;
 
 use strict;
-use base 'Class::Data::Inheritable';
+use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
 
-__PACKAGE__->mk_classdata($_) for qw/_config engine log/;
+__PACKAGE__->mk_classdata($_) for qw/engine log/;
 
 our $VERSION = '5.00';
 our @ISA;
@@ -125,18 +125,6 @@ Returns a hashref containing your applications settings.
 
 =cut
 
-sub config {
-    my $self = shift;
-    $self->_config( {} ) unless $self->_config;
-    if ( $_[0] ) {
-        my $config = $_[1] ? {@_} : $_[0];
-        while ( my ( $key, $val ) = each %$config ) {
-            $self->_config->{$key} = $val;
-        }
-    }
-    return $self->_config;
-}
-
 sub import {
     my ( $self, @options ) = @_;
     my $caller = caller(0);
@@ -147,7 +135,7 @@ sub import {
     }
 
     if ( $caller->engine ) {
-        return; # Catalyst is allready initialized
+        return;    # Catalyst is allready initialized
     }
 
     unless ( $caller->log ) {
@@ -161,7 +149,8 @@ sub import {
     }
 
     # Options
-    my $engine = $ENV{MOD_PERL}
+    my $engine =
+      $ENV{MOD_PERL}
       ? 'Catalyst::Engine::Apache'
       : 'Catalyst::Engine::CGI';
 
@@ -197,15 +186,15 @@ sub import {
 
     if ( $engine eq 'Catalyst::Engine::Server' ) {
         $engine = 'Catalyst::Engine::HTTP::Daemon';
-        $caller->log->warn(  "Catalyst::Engine::Server is deprecated, "
-                           . "using Catalyst::Engine::HTTP::Daemon." );
+        $caller->log->warn( "Catalyst::Engine::Server is deprecated, "
+              . "using Catalyst::Engine::HTTP::Daemon." );
     }
 
     $engine->require;
     die qq/Couldn't load engine "$engine", "$@"/ if $@;
     {
         no strict 'refs';
-        push @{"$caller\::ISA"}, $engine;
+        unshift @{"$caller\::ISA"}, $engine;
     }
     $caller->engine($engine);
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
