@@ -7,6 +7,9 @@ This file documents the revision history for Perl extension Catalyst.
         - added Test::Pod support
         - added new server backend with HTTP/1.1 support
         - added option to run tests against a remote server
+        - more better docs
+          IMPORTANT: This release is very incompatible to previous ones
+          and you have to regenerate the helper scripts again...
 
 4.34  Wed Mar 23 07:00:00 2005
         - added some messages to Makefile.PL

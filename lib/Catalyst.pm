@@ -180,12 +180,6 @@ sub import {
     $engine = "Catalyst::Engine::$ENV{CATALYST_ENGINE}"
       if $ENV{CATALYST_ENGINE};
 
-    if ( $engine eq 'Catalyst::Engine::Server' ) {
-        $engine = 'Catalyst::Engine::HTTP::Daemon';
-        $caller->log->warn( "Catalyst::Engine::Server is deprecated, "
-              . "using Catalyst::Engine::HTTP::Daemon." );
-    }
-
     $engine->require;
     die qq/Couldn't load engine "$engine", "$@"/ if $@;
     {

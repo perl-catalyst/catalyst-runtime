@@ -1,4 +1,4 @@
-package Catalyst::Engine::HTTP::Daemon;
+package Catalyst::Engine::HTTP;
 
 use strict;
 use base 'Catalyst::Engine::Test';
@@ -7,17 +7,15 @@ use IO::Socket qw(AF_INET);
 
 =head1 NAME
 
-Catalyst::Engine::HTTP::Daemon - Catalyst HTTP Daemon Engine
+Catalyst::Engine::HTTP - Catalyst HTTP Engine
 
 =head1 SYNOPSIS
 
-A script using the Catalyst::Engine::HTTP::Daemon module might look like:
+A script using the Catalyst::Engine::HTTP module might look like:
 
     #!/usr/bin/perl -w
 
-    BEGIN { 
-       $ENV{CATALYST_ENGINE} = 'HTTP::Daemon';
-    }
+    BEGIN {  $ENV{CATALYST_ENGINE} = 'HTTP' }
 
     use strict;
     use lib '/path/to/MyApp/lib';
@@ -45,7 +43,7 @@ sub run {
     my $class = shift;
     my $port  = shift || 3000;
 
-    my $daemon = Catalyst::Engine::HTTP::Daemon::Catalyst->new(
+    my $daemon = Catalyst::Engine::HTTP::Catalyst->new(
         LocalPort => $port,
         ReuseAddr => 1
     );
@@ -99,7 +97,7 @@ the same terms as Perl itself.
 
 =cut
 
-package Catalyst::Engine::HTTP::Daemon::Catalyst;
+package Catalyst::Engine::HTTP::Catalyst;
 
 use strict;
 use base 'HTTP::Daemon';
