@@ -9,6 +9,7 @@ use HTML::Entities;
 use HTTP::Headers;
 use Memoize;
 use Time::HiRes qw/gettimeofday tv_interval/;
+use Text::ASCIITable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 use Catalyst::Request;
@@ -133,11 +134,10 @@ sub execute {
         {
             my $action = $c->actions->{reverse}->{"$code"};
             $action = "/$action" unless $action =~ /\-\>/;
-            $action = "-> $action" if $callsub =~ /forward$/;
+            $action = "    $action" if $callsub =~ /forward$/;
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
-            push @{ $c->{stats} },
-              _prettify_stats( $action, sprintf( '%fs', $elapsed ), '' );
+            push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
             $c->state(@state);
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
@@ -484,7 +484,13 @@ sub handler {
             ( $elapsed, $status ) = $class->benchmark($handler);
             $elapsed = sprintf '%f', $elapsed;
             my $av = sprintf '%.3f', 1 / $elapsed;
-            $class->log->info( "Request took $elapsed" . "s ($av/s)", @stats );
+            my $t = Text::ASCIITable->new;
+            $t->setCols( 'Action', 'Time' );
+            for my $stat (@stats) {
+                $t->addRow(@$stat);
+            }
+            $class->log->info( "Request took $elapsed" . "s ($av/s)",
+                $t->draw );
         }
         else { $status = &$handler }
     };
@@ -545,12 +551,13 @@ sub prepare {
     $c->prepare_parameters;
 
     if ( $c->debug && keys %{ $c->req->params } ) {
-        my @params;
+        my $t = Text::ASCIITable->new;
+        $t->setCols( 'Key', 'Value' );
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
-            push @params, "  + $key=$value";
+            $t->addRow( $key, $value );
         }
-        $c->log->debug( 'Parameters are', @params );
+        $c->log->debug( 'Parameters are', $t->draw );
     }
     $c->prepare_uploads;
     return $c;
@@ -844,39 +851,44 @@ sub setup_components {
         $self->components->{ ref $comp } = $comp;
         $self->setup_actions($comp);
     }
-    my @comps;
-    push @comps, "  + $_" for keys %{ $self->components };
-    $self->log->debug( 'Loaded components', @comps )
-      if ( @comps && $self->debug );
+    my $t = Text::ASCIITable->new;
+    $t->setCols('Class');
+    $t->addRow($_) for keys %{ $self->components };
+    $self->log->debug( 'Loaded components', $t->draw )
+      if ( @{ $t->{tbl_rows} } && $self->debug );
     my $actions  = $self->actions;
-    my @messages = ('Loaded private actions');
-    my $walker   = sub {
-        my ( $walker, $parent, $messages, $prefix ) = @_;
+    my $privates = Text::ASCIITable->new;
+    $privates->setCols( 'Action', 'Class', 'Code' );
+    my $walker = sub {
+        my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
         $prefix .= '/' unless $prefix =~ /\/$/;
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            push @$messages,
-              _prettify_action( "$prefix$action", $class, $code );
+            $privates->addRow( "$prefix$action", $class, $code );
         }
-        $walker->( $walker, $_, $messages, $prefix )
-          for $parent->getAllChildren;
+        $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
-    $walker->( $walker, $self->tree, \@messages, '' );
-    $self->log->debug(@messages) if ( $#messages && $self->debug );
-    @messages = ('Loaded plain actions');
+    $walker->( $walker, $self->tree, '' );
+    $self->log->debug( 'Loaded private actions', $privates->draw )
+      if ( @{ $privates->{tbl_rows} } && $self->debug );
+    my $publics = Text::ASCIITable->new;
+    $publics->setCols( 'Action', 'Class', 'Code' );
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        push @messages, _prettify_action( "/$plain", $class, $code );
+        $publics->addRow( "/$plain", $class, $code );
     }
-    $self->log->debug(@messages) if ( $#messages && $self->debug );
-    @messages = ('Loaded regex actions');
+    $self->log->debug( 'Loaded public actions', $publics->draw )
+      if ( @{ $publics->{tbl_rows} } && $self->debug );
+    my $regexes = Text::ASCIITable->new;
+    $regexes->setCols( 'Action', 'Class', 'Code' );
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        push @messages, _prettify_action( $regex, $class, $code );
+        $regexes->addRow( $regex, $class, $code );
     }
-    $self->log->debug(@messages) if ( $#messages && $self->debug );
+    $self->log->debug( 'Loaded regex actions', $regexes->draw )
+      if ( @{ $regexes->{tbl_rows} } && $self->debug );
 }
 
 =item $c->stash

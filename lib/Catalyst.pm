@@ -4,6 +4,7 @@ use strict;
 use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
+use Text::ASCIITable;
 
 __PACKAGE__->mk_classdata($_) for qw/engine log/;
 
@@ -183,7 +184,10 @@ sub import {
             }
         }
     }
-    $caller->log->debug( 'Loaded plugins', @plugins )
+    my $t = Text::ASCIITable->new;
+    $t->setCols('Class');
+    $t->addRow($_) for @plugins;
+    $caller->log->debug( 'Loaded plugins', $t->draw )
       if ( @plugins && $caller->debug );
 
     # Engine
