@@ -21,6 +21,7 @@ Catalyst::Response - Catalyst Response Class
     $resp->content_length;
     $resp->content_type;
     $resp->cookies;
+    $resp->header;
     $resp->headers;
     $resp->output;
     $resp->redirect;
