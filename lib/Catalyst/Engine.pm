@@ -356,15 +356,19 @@ sub get_action {
         my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
         push @results, [$result] if $result;
         my $visitor = Tree::Simple::Visitor::FindByPath->new;
+        my $local;
         for my $part ( split '/', $namespace ) {
+            $local = undef;
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
             my $child = $visitor->getResult;
             my $uid   = $child->getUID if $child;
             my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
+            $local = $c->actions->{private}->{$uid}->{"?$action"} if $uid;
             push @results, [$match] if $match;
             $parent = $child if $child;
         }
+        return [ [$local] ] if $local;
         return \@results;
     }
     elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
@@ -482,8 +486,8 @@ sub prepare {
     }
     $c->prepare_request($r);
     $c->prepare_path;
-    $c->prepare_headers;
     $c->prepare_cookies;
+    $c->prepare_headers;
     $c->prepare_connection;
     my $method   = $c->req->method   || '';
     my $path     = $c->req->path     || '';
@@ -670,7 +674,6 @@ Set an action in a given namespace.
 
 sub set_action {
     my ( $c, $action, $code, $namespace ) = @_;
-
     my $prefix = '';
     if ( $action =~ /^\?(.*)$/ ) {
         my $prefix = $1 || '';
@@ -678,7 +681,7 @@ sub set_action {
         $action = $prefix . _prefix( $namespace, $action );
         $c->actions->{plain}->{$action} = [ $namespace, $code ];
     }
-    if ( $action =~ /^\/(.*)\/$/ ) {
+    elsif ( $action =~ /^\/(.*)\/$/ ) {
         my $regex = $1;
         $c->actions->{compiled}->{qr#$regex#} = $action;
         $c->actions->{regex}->{$action} = [ $namespace, $code ];
@@ -704,15 +707,10 @@ sub set_action {
         $c->actions->{private}->{$uid}->{$action} = [ $namespace, $code ];
         $action = "!$action";
     }
-    else {
-        $c->actions->{plain}->{$action} = [ $namespace, $code ];
-    }
-
+    else { $c->actions->{plain}->{$action} = [ $namespace, $code ] }
     my $reverse = $prefix ? "$action ($prefix)" : $action;
     $c->actions->{reverse}->{"$code"} = $reverse;
-
-    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/)
-      if $c->debug;
+    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/) if $c->debug;
 }
 
 =item $class->setup
@@ -791,6 +789,7 @@ sub stash {
 sub _prefix {
     my ( $class, $name ) = @_;
     my $prefix = _class2prefix($class);
+    warn "$class - $name - $prefix";
     $name = "$prefix/$name" if $prefix;
     return $name;
 }
