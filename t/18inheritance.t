@@ -57,25 +57,25 @@ use Catalyst::Test 'TestApp';
 
 {
     my $response = request('/foo');
-    ok( $response->content =~ /foofoofoo/ );
+    is( $response->content, 'foofoofoo' );
 }
 
 {
     my $response = request('/foo/rab');
-    ok( $response->content =~ /foofoofoo/ );
+    is( $response->content, 'foofoofoo' );
 }
 
 {
     my $response = request('/foo/bar');
-    ok( $response->content =~ /foobarfoobarfoobar/ );
+    is( $response->content, 'foobarfoobarfoobar' );
 }
 
 {
     my $response = request('/foobar');
-    ok( $response->content !~ /foofoofoo/ );
+    isnt( $response->content, 'foofoofoo' );
 }
 
 {
     my $response = request('/foo_bar/yada');
-    ok( $response->content !~ /foobarfoobarfoobar/ );
+    isnt( $response->content, 'foobarfoobarfoobar' );
 }
