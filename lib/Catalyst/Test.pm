@@ -12,7 +12,6 @@ require Catalyst;
 
 my $class;
 $ENV{CATALYST_ENGINE} = 'CGI';
-$ENV{CATALYST_TEST}   = 1;
 
 =head1 NAME
 
