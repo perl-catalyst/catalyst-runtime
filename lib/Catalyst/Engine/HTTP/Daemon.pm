@@ -1,4 +1,4 @@
-package Catalyst::Engine::LWP::Daemon;
+package Catalyst::Engine::HTTP::Daemon;
 
 use strict;
 use base 'Catalyst::Engine::LWP';
@@ -7,16 +7,16 @@ use IO::Socket qw(AF_INET);
 
 =head1 NAME
 
-Catalyst::Engine::LWP::Daemon - Catalyst LWP Daemon Engine
+Catalyst::Engine::HTTP::Daemon - Catalyst HTTP Daemon Engine
 
 =head1 SYNOPSIS
 
-A script using the Catalyst::Engine::LWP::Daemon module might look like:
+A script using the Catalyst::Engine::HTTP::Daemon module might look like:
 
     #!/usr/bin/perl -w
 
     BEGIN { 
-       $ENV{CATALYST_ENGINE} = 'LWP::Daemon';
+       $ENV{CATALYST_ENGINE} = 'HTTP::Daemon';
     }
 
     use strict;
@@ -45,7 +45,7 @@ sub run {
     my $class = shift;
     my $port  = shift || 3000;
 
-    my $daemon = Catalyst::Engine::LWP::Daemon::Catalyst->new(
+    my $daemon = Catalyst::Engine::HTTP::Daemon::Catalyst->new(
         LocalPort => $port,
         ReuseAddr => 1
     );
@@ -95,7 +95,7 @@ the same terms as Perl itself.
 
 =cut
 
-package Catalyst::Engine::LWP::Daemon::Catalyst;
+package Catalyst::Engine::HTTP::Daemon::Catalyst;
 
 use strict;
 use base 'HTTP::Daemon';

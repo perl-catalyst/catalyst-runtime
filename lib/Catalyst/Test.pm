@@ -20,7 +20,7 @@ Catalyst::Test - Test Catalyst applications
     get('index.html');
 
     # Run tests against a remote server
-    CATALYST_REMOTE='http://localhost:3000/' prove -l lib/ t/
+    CATALYST_SERVER='http://localhost:3000/' prove -l lib/ t/
 
     # Tests with inline apps need to use Catalyst::Engine::Test
     package TestApp;
@@ -67,16 +67,19 @@ sub import {
 
     my ( $get, $request );
 
-    if ( $ENV{CATALYST_REMOTE} ) {
+    if ( $ENV{CATALYST_SERVER} ) {
         $request = sub { remote_request(@_) };
         $get     = sub { remote_request(@_)->content };
     }
 
     else {
         $class->require;
+
         unless ( $INC{'Test/Builder.pm'} ) {
             die qq/Couldn't load "$class", "$@"/ if $@;
         }
+
+        $class->import;
 
         $request = sub { $class->run(@_) };
         $get     = sub { $class->run(@_)->content };
@@ -93,7 +96,7 @@ sub remote_request {
 
     require LWP::UserAgent;
 
-    my $remote = URI->new( $ENV{CATALYST_REMOTE} );
+    my $remote = URI->new( $ENV{CATALYST_SERVER} );
 
     unless ( ref $request ) {
 

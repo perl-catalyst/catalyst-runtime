@@ -476,7 +476,7 @@ sub _mk_server {
     $self->mk_file( "$script\/server.pl", <<"EOF");
 $Config{startperl} -w
 
-BEGIN { \$ENV{CATALYST_ENGINE} = 'Server' }
+BEGIN { \$ENV{CATALYST_ENGINE} = 'HTTP::Daemon' }
 
 use strict;
 use Getopt::Long;

@@ -91,7 +91,7 @@ sub prepare_connection {
 sub prepare_cookies {
     my $c = shift;
 
-    if ( my $header = $c->lwp->request->header('Cookie') ) {
+    if ( my $header = $c->request->headers->header('Cookie') ) {
         $c->req->cookies( { CGI::Simple::Cookie->parse($header) } );
     }
 }
