@@ -447,13 +447,13 @@ sub handler {
             my $results = $c->find_action( $action, $namespace );
             if ( @{$results} ) {
                 for my $begin ( @{ $c->find_action( '!begin', $namespace ) } ) {
-                    $c->process( @{ $begin->[0] } );
+                    $c->state( $c->process( @{ $begin->[0] } ) );
                 }
                 for my $result ( @{ $c->find_action( $action, $namespace ) } ) {
-                    $c->process( @{ $result->[0] } );
+                    $c->state( $c->process( @{ $result->[0] } ) );
                 }
                 for my $end ( @{ $c->find_action( '!end', $namespace ) } ) {
-                    $c->process( @{ $end->[0] } );
+                    $c->state( $c->process( @{ $end->[0] } ) );
                 }
             }
             else {
