@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Catalyst.
         - removed some warnings
         - improved docs
         - private prefixed actions override private non prefixed actions
+        - added server_base
 
 4.10  Wed Mar 02 10:00:00 2005
         - improved documentation
