@@ -386,7 +386,7 @@ sub handler ($$) {
                     $c->state( $c->execute( @{ $end->[0] } ) );
                 }
                 my @stats = @{ $c->{stats} };
-                $c->log->debug( 'Processed', @stats )
+                $c->log->info( 'Processing took', @stats )
                   if ( @stats && $c->debug );
             }
             else {
@@ -470,7 +470,7 @@ sub prepare {
             my $value = $c->req->params->{$key} || '';
             push @params, " $key=$value";
         }
-        $c->log->debug( 'Parameters', @params );
+        $c->log->debug( 'Parameters are', @params );
     }
     $c->prepare_uploads;
     return $c;
