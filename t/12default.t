@@ -23,5 +23,5 @@ package main;
 use Test::More tests => 2;
 use Catalyst::Test 'TestApp';
 
-ok( get('/foo')         =~ /bar/ );
-ok( get('/foo_bar/foo') =~ /yada/ );
+like( get('/foo')         , qr/bar/ );
+like( get('/foo_bar/foo') , qr/yada/ );
