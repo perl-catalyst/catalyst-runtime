@@ -3,6 +3,7 @@ package Catalyst::Engine;
 use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
 use UNIVERSAL::require;
+use CGI::Cookie;
 use Data::Dumper;
 use HTML::Entities;
 use HTTP::Headers;
@@ -115,6 +116,40 @@ sub error {
     return $c->{error};
 }
 
+=item $c->execute($class, $coderef)
+
+Execute a coderef in given class and catch exceptions.
+Errors are available via $c->error.
+
+=cut
+
+sub execute {
+    my ( $c, $class, $code ) = @_;
+    $class = $c->comp($class) || $class;
+    $c->state(0);
+    eval {
+        if ( $c->debug )
+        {
+            my $action = $c->actions->{reverse}->{"$code"};
+            $action = "/$action" unless $action =~ /\-\>/;
+            my ( $elapsed, @state ) =
+              $c->benchmark( $code, $class, $c, @{ $c->req->args } );
+            push @{ $c->{stats} },
+              _prettify( $action, sprintf( '%fs', $elapsed ), '' );
+            $c->state(@state);
+        }
+        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
+    };
+    if ( my $error = $@ ) {
+        chomp $error;
+        $error = qq/Caught exception "$error"/;
+        $c->log->error($error);
+        $c->error($error) if $c->debug;
+        $c->state(0);
+    }
+    return $c->state;
+}
+
 =item $c->finalize
 
 Finalize request.
@@ -124,11 +159,16 @@ Finalize request.
 sub finalize {
     my $c = shift;
 
+    $c->finalize_cookies;
+
     if ( my $location = $c->res->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
-        $c->res->headers->header( Location => $location );
-        $c->res->headers->remove_content_headers;
-        $c->res->status(302);
+        $c->response->header( Location => $location );
+        $c->response->status(302);
+    }
+
+    if ( $c->res->status =~ /^(1\d\d|[23]04)$/ ) {
+        $c->response->headers->remove_content_headers;
         return $c->finalize_headers;
     }
 
@@ -229,6 +269,29 @@ sub finalize {
     my $status = $c->finalize_headers;
     $c->finalize_output;
     return $status;
+}
+
+=item $c->finalize_cookies
+
+Finalize cookies.
+
+=cut
+
+sub finalize_cookies {
+    my $c = shift;
+
+    while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
+        my $cookie = CGI::Cookie->new(
+            -name    => $name,
+            -value   => $cookie->{value},
+            -expires => $cookie->{expires},
+            -domain  => $cookie->{domain},
+            -path    => $cookie->{path},
+            -secure  => $cookie->{secure} || 0
+        );
+
+        $c->res->headers->push_header( 'Set-Cookie' => $cookie->as_string );
+    }
 }
 
 =item $c->finalize_headers
@@ -351,15 +414,15 @@ Handles the request.
 
 =cut
 
-sub handler ($$) {
-    my ( $class, $r ) = @_;
+sub handler {
+    my ( $class, $engine ) = @_;
 
     # Always expect worst case!
     my $status = -1;
     eval {
         my @stats = ();
         my $handler = sub {
-            my $c = $class->prepare($r);
+            my $c = $class->prepare($engine);
             $c->{stats} = \@stats;
             my $action    = $c->req->action;
             my $namespace = '';
@@ -532,7 +595,13 @@ Prepare cookies.
 
 =cut
 
-sub prepare_cookies { }
+sub prepare_cookies {
+    my $c = shift;
+
+    if ( my $header = $c->request->header('Cookie') ) {
+        $c->req->cookies( { CGI::Cookie->parse($header) } );
+    }
+}
 
 =item $c->prepare_headers
 
@@ -573,40 +642,6 @@ Prepare uploads.
 =cut
 
 sub prepare_uploads { }
-
-=item $c->execute($class, $coderef)
-
-Execute a coderef in given class and catch exceptions.
-Errors are available via $c->error.
-
-=cut
-
-sub execute {
-    my ( $c, $class, $code ) = @_;
-    $class = $c->comp($class) || $class;
-    $c->state(0);
-    eval {
-        if ( $c->debug )
-        {
-            my $action = $c->actions->{reverse}->{"$code"};
-            $action = "/$action" unless $action =~ /\-\>/;
-            my ( $elapsed, @state ) =
-              $c->benchmark( $code, $class, $c, @{ $c->req->args } );
-            push @{ $c->{stats} },
-              _prettify( $action, sprintf( '%fs', $elapsed ), '' );
-            $c->state(@state);
-        }
-        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
-    };
-    if ( my $error = $@ ) {
-        chomp $error;
-        $error = qq/Caught exception "$error"/;
-        $c->log->error($error);
-        $c->error($error) if $c->debug;
-        $c->state(0);
-    }
-    return $c->state;
-}
 
 =item $c->run
 

@@ -3,7 +3,6 @@ package Catalyst::Engine::Test;
 use strict;
 use base 'Catalyst::Engine';
 
-use CGI::Cookie;
 use Class::Struct ();
 use HTTP::Headers::Util 'split_header_words';
 use HTTP::Request;
@@ -11,9 +10,9 @@ use HTTP::Response;
 use IO::File;
 use URI;
 
-__PACKAGE__->mk_accessors(qw/lwp/);
+__PACKAGE__->mk_accessors(qw/http/);
 
-Class::Struct::struct 'Catalyst::Engine::Test::LWP' => {
+Class::Struct::struct 'Catalyst::Engine::Test::HTTP' => {
     request  => 'HTTP::Request',
     response => 'HTTP::Response',
     hostname => '$',
@@ -57,23 +56,10 @@ This class overloads some methods from C<Catalyst::Engine>.
 sub finalize_headers {
     my $c = shift;
 
-    $c->lwp->response->code( $c->response->status || 200 );
+    $c->http->response->code( $c->response->status );
 
     for my $name ( $c->response->headers->header_field_names ) {
-        $c->lwp->response->push_header( $name => [ $c->response->header($name) ] );
-    }
-
-    while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
-        my $cookie = CGI::Cookie->new(
-            -name    => $name,
-            -value   => $cookie->{value},
-            -expires => $cookie->{expires},
-            -domain  => $cookie->{domain},
-            -path    => $cookie->{path},
-            -secure  => $cookie->{secure} || 0
-        );
-
-        $c->lwp->response->headers->push_header( 'Set-Cookie' => $cookie->as_string );
+        $c->http->response->push_header( $name => [ $c->response->header($name) ] );
     }
 }
 
@@ -83,7 +69,7 @@ sub finalize_headers {
 
 sub finalize_output {
     my $c = shift;
-    $c->lwp->response->content_ref( \$c->response->{output} );
+    $c->http->response->content_ref( \$c->response->{output} );
 }
 
 =item $c->prepare_connection
@@ -92,20 +78,8 @@ sub finalize_output {
 
 sub prepare_connection {
     my $c = shift;
-    $c->req->hostname( $c->lwp->hostname );
-    $c->req->address( $c->lwp->address );
-}
-
-=item $c->prepare_cookies
-
-=cut
-
-sub prepare_cookies {
-    my $c = shift;
-
-    if ( my $header = $c->request->header('Cookie') ) {
-        $c->req->cookies( { CGI::Cookie->parse($header) } );
-    }
+    $c->req->hostname( $c->http->hostname );
+    $c->req->address( $c->http->address );
 }
 
 =item $c->prepare_headers
@@ -114,8 +88,8 @@ sub prepare_cookies {
 
 sub prepare_headers {
     my $c = shift;
-    $c->req->method( $c->lwp->request->method );
-    $c->req->headers( $c->lwp->request->headers );
+    $c->req->method( $c->http->request->method );
+    $c->req->headers( $c->http->request->headers );
 }
 
 =item $c->prepare_parameters
@@ -126,7 +100,7 @@ sub prepare_parameters {
     my $c = shift;
 
     my @params  = ();
-    my $request = $c->lwp->request;
+    my $request = $c->http->request;
 
     push( @params, $request->uri->query_form );
 
@@ -188,9 +162,9 @@ sub prepare_path {
 
     my $base;
     {
-        my $scheme = $c->lwp->request->uri->scheme;
-        my $host   = $c->lwp->request->uri->host;
-        my $port   = $c->lwp->request->uri->port;
+        my $scheme = $c->http->request->uri->scheme;
+        my $host   = $c->http->request->uri->host;
+        my $port   = $c->http->request->uri->port;
 
         $base = URI->new;
         $base->scheme($scheme);
@@ -200,7 +174,7 @@ sub prepare_path {
         $base = $base->canonical->as_string;
     }
 
-    my $path = $c->lwp->request->uri->path || '/';
+    my $path = $c->http->request->uri->path || '/';
     $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~ s/^\///;
 
@@ -213,8 +187,8 @@ sub prepare_path {
 =cut
 
 sub prepare_request {
-    my ( $c, $lwp ) = @_;
-    $c->lwp($lwp);
+    my ( $c, $http ) = @_;
+    $c->http($http);
 }
 
 =item $c->prepare_uploads
@@ -249,18 +223,18 @@ sub run {
     my $host = sprintf( '%s:%d', $request->uri->host, $request->uri->port );
     $request->header( 'Host' => $host );
 
-    my $lwp = Catalyst::Engine::Test::LWP->new(
+    my $http = Catalyst::Engine::Test::HTTP->new(
         address  => '127.0.0.1',
         hostname => 'localhost',
         request  => $request,
         response => HTTP::Response->new
     );
 
-    $lwp->response->date(time);
+    $http->response->date(time);
 
-    $class->handler($lwp);
+    $class->handler($http);
 
-    return $lwp->response;
+    return $http->response;
 }
 
 =back

@@ -5,7 +5,6 @@ use base 'Catalyst::Engine';
 use URI;
 
 require CGI::Simple;
-require CGI::Cookie;
 
 $CGI::Simple::POST_MAX        = 1048576;
 $CGI::Simple::DISABLE_UPLOADS = 0;
@@ -41,11 +40,6 @@ application module:
 
     use Catalyst qw(-Engine=CGI);
 
-Catalyst::Engine::CGI generates a full set of HTTP headers, which means that
-applications using the engine must be be configured as "Non-parsed Headers"
-scripts (at least when running under Apache).  To configure this under Apache
-name the starting with C<nph->.
-
 The performance of this way of using Catalyst is not expected to be
 useful in production applications, but it may be helpful for development.
 
@@ -72,22 +66,13 @@ This class overloads some methods from C<Catalyst::Engine>.
 sub finalize_headers {
     my $c = shift;
     my %headers;
+
     $headers{-status} = $c->response->status if $c->response->status;
+
     for my $name ( $c->response->headers->header_field_names ) {
-        $headers{"-$name"} = $c->response->headers->header($name);
+        $headers{"-$name"} = $c->response->header($name);
     }
-    my @cookies;
-    while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
-        push @cookies, $c->cgi->cookie(
-            -name    => $name,
-            -value   => $cookie->{value},
-            -expires => $cookie->{expires},
-            -domain  => $cookie->{domain},
-            -path    => $cookie->{path},
-            -secure  => $cookie->{secure} || 0
-        );
-    }
-    $headers{-cookie} = \@cookies if @cookies;
+
     print $c->cgi->header(%headers);
 }
 
@@ -111,14 +96,6 @@ sub prepare_connection {
     $c->req->hostname( $c->cgi->remote_host );
     $c->req->address( $c->cgi->remote_addr );
 }
-
-=item $c->prepare_cookies
-
-Sets up cookies.
-
-=cut
-
-sub prepare_cookies { shift->req->cookies( { CGI::Cookie->fetch } ) }
 
 =item $c->prepare_headers
 
@@ -176,6 +153,7 @@ sub prepare_path {
     }
 
     my $path = $ENV{PATH_INFO} || '/';
+    $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~  s/^\///;
 
     $c->req->base($base);

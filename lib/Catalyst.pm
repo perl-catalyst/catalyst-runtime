@@ -144,11 +144,19 @@ sub import {
         $caller->log->debug('Debug messages enabled');
     }
 
-    # Options
-    my $engine =
-      $ENV{MOD_PERL}
-      ? 'Catalyst::Engine::Apache'
-      : 'Catalyst::Engine::CGI';
+    my $engine ='Catalyst::Engine::CGI';
+
+    if ( $ENV{MOD_PERL} ) {
+
+        require mod_perl;
+
+        if ( $mod_perl::VERSION >= 1.99 ) {
+            $engine ='Catalyst::Engine::Apache::MP2';
+        }
+        else {
+            $engine ='Catalyst::Engine::Apache::MP1';
+        }
+    }
 
     my @plugins;
     foreach (@options) {

@@ -68,15 +68,15 @@ sub run {
             $request->uri->host( $request->header('Host') || $base->host );
             $request->uri->port( $base->port );
 
-            my $lwp = Catalyst::Engine::Test::LWP->new(
+            my $http = Catalyst::Engine::Test::HTTP->new(
                 address  => $connection->peerhost,
                 hostname => gethostbyaddr( $connection->peeraddr, AF_INET ),
                 request  => $request,
                 response => HTTP::Response->new
             );
 
-            $class->handler($lwp);
-            $connection->send_response( $lwp->response );
+            $class->handler($http);
+            $connection->send_response( $http->response );
 
         }
 
