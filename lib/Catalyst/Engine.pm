@@ -118,27 +118,27 @@ sub component {
     }
 }
 
-=item $c->errors
+=item $c->error
 
-=item $c->errors($error, ...)
+=item $c->error($error, ...)
 
-=item $c->errors($arrayref)
+=item $c->error($arrayref)
 
-Returns an arrayref containing errors messages.
+Returns an arrayref containing error messages.
 
-    my @errors = @{ $c->errors };
+    my @error = @{ $c->error };
 
 Add a new error.
 
-    $c->errors('Something bad happened');
+    $c->error('Something bad happened');
 
 =cut
 
-sub errors {
+sub error {
     my $c = shift;
-    my $errors = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-    push @{ $c->{errors} }, @$errors;
-    return $c->{errors};
+    my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+    push @{ $c->{error} }, @$error;
+    return $c->{error};
 }
 
 =item $c->finalize
@@ -156,13 +156,13 @@ sub finalize {
         $c->res->status(302);
     }
 
-    if ( !$c->res->output || $#{ $c->errors } >= 0 ) {
+    if ( !$c->res->output || $#{ $c->error } >= 0 ) {
         $c->res->headers->content_type('text/html');
         my $name = $c->config->{name} || 'Catalyst Application';
-        my ( $title, $errors, $infos );
+        my ( $title, $error, $infos );
         if ( $c->debug ) {
-            $errors = join '<br/>', @{ $c->errors };
-            $errors ||= 'No output';
+            $error = join '<br/>', @{ $c->error };
+            $error ||= 'No output';
             $title = $name = "$name on Catalyst $Catalyst::VERSION";
             my $req   = encode_entities Dumper $c->req;
             my $res   = encode_entities Dumper $c->res;
@@ -178,9 +178,9 @@ sub finalize {
 
         }
         else {
-            $title  = $name;
-            $errors = '';
-            $infos  = <<"";
+            $title = $name;
+            $error = '';
+            $infos = <<"";
 <pre>
 (en) Please come back later
 (de) Bitte versuchen sie es spaeter nocheinmal
@@ -214,7 +214,7 @@ sub finalize {
                 margin: 10px;
                 -moz-border-radius: 10px;
             }
-            div.errors {
+            div.error {
                 background-color: #977;
                 border: 1px solid #755;
                 padding: 8px;
@@ -241,7 +241,7 @@ sub finalize {
     </head>
     <body>
         <div class="box">
-            <div class="errors">$errors</div>
+            <div class="error">$error</div>
             <div class="infos">$infos</div>
             <div class="name">$name</div>
         </div>
@@ -286,7 +286,6 @@ If you define a class without method it will default to process().
 sub forward {
     my $c       = shift;
     my $command = shift;
-    $c->state(0);
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
@@ -329,9 +328,7 @@ sub forward {
         }
     }
     for my $result ( @{$results} ) {
-        my ( $class, $code ) = @{ $result->[0] };
-        $class = $c->comp->{$class} || $class;
-        $c->state( $c->process( $class, $code ) );
+        $c->state( $c->process( @{ $result->[0] } ) );
     }
     return $c->state;
 }
@@ -416,6 +413,7 @@ sub handler ($$) {
                 }
                 for my $result ( @{ $c->get_action( $action, $namespace ) } ) {
                     $c->state( $c->process( @{ $result->[0] } ) );
+                    last unless $action =~ /^\!.*/;
                 }
                 for my $end ( @{ $c->get_action( '!end', $namespace ) } ) {
                     $c->state( $c->process( @{ $end->[0] } ) );
@@ -427,7 +425,7 @@ sub handler ($$) {
                   ? qq/Unknown resource "$path"/
                   : "No default action defined";
                 $c->log->error($error) if $c->debug;
-                $c->errors($error);
+                $c->error($error);
             }
             return $c->finalize;
         };
@@ -450,7 +448,8 @@ sub handler ($$) {
 
 =item $c->prepare($r)
 
-Turns the engine-specific request (Apache, CGI...) into a Catalyst context.
+Turns the engine-specific request( Apache, CGI ... )
+into a Catalyst context .
 
 =cut
 
@@ -610,33 +609,34 @@ sub prepare_uploads { }
 =item $c->process($class, $coderef)
 
 Process a coderef in given class and catch exceptions.
-Errors are available via $c->errors.
+Errors are available via $c->error.
 
 =cut
 
 sub process {
     my ( $c, $class, $code ) = @_;
-    my $status;
+    $class = $c->comp($class) || $class;
+    $c->state(0);
     eval {
         if ( $c->debug )
         {
             my $action = $c->actions->{reverse}->{"$code"} || "$code";
-            my $elapsed;
-            ( $elapsed, $status ) =
+            my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             $c->log->info( sprintf qq/Processing "$action" took %fs/, $elapsed )
               if $c->debug;
+            $c->state(@state);
         }
-        else { $status = &$code( $class, $c, @{ $c->req->args } ) }
+        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
     };
     if ( my $error = $@ ) {
         chomp $error;
         $error = qq/Caught exception "$error"/;
         $c->log->error($error);
-        $c->errors($error) if $c->debug;
-        return 0;
+        $c->error($error) if $c->debug;
+        $c->state(0);
     }
-    return $status;
+    return $c->state;
 }
 
 =item $c->run
@@ -707,7 +707,8 @@ sub set_action {
     else { $c->actions->{plain}->{$action} = [ $namespace, $code ] }
     my $reverse = $prefix ? "$action ($prefix)" : $action;
     $c->actions->{reverse}->{"$code"} = $reverse;
-    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/) if $c->debug;
+    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/)
+      if $c->debug;
 }
 
 =item $class->setup
