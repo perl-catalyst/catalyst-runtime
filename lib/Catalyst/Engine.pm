@@ -808,13 +808,13 @@ sub setup_components {
     $walker->( $walker, $self->tree, \@messages, '' );
     $self->log->debug(@messages) if ( $#messages && $self->debug );
     @messages = ('Loaded plain actions');
-    for my $plain ( keys %{ $actions->{plain} } ) {
+    for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
         push @messages, _prettify( "/$plain", $class, $code );
     }
     $self->log->debug(@messages) if ( $#messages && $self->debug );
     @messages = ('Loaded regex actions');
-    for my $regex ( keys %{ $actions->{regex} } ) {
+    for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
         push @messages, _prettify( $regex, $class, $code );
     }
