@@ -250,7 +250,7 @@ sub finalize_output { }
 Forward processing to a private action or a method from a class.
 If you define a class without method it will default to process().
 
-    $c->forward('foo');
+    $c->forward('/foo');
     $c->forward('index');
     $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
@@ -266,7 +266,7 @@ sub forward {
     }
     my $caller    = caller(0);
     my $namespace = '/';
-    if ( $command =~ /^\/$/ ) {
+    if ( $command =~ /^\// ) {
         $command =~ /^(.*)\/(\w+)$/;
         $namespace = $1 || '/';
         $command = $2;
