@@ -30,8 +30,12 @@ This class overloads some methods from C<Catalyst::Engine::CGI>.
 sub finalize_headers {
     my $c = shift;
 
-    my $status = $c->response->status || 200;
-    printf( "%d %s\015\012", $status, HTTP::Status::status_message($status) );
+    my $protocol = $ENV{SERVER_PROTOCOL} || 'HTTP/1.0';
+    my $status   = $c->response->status || 200;
+    my $message  =  HTTP::Status::status_message($status);
+   
+    printf( "%s %d %s\015\012", $protocol, $status, $message );
+
     $c->SUPER::finalize_headers;
 }
 
