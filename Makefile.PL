@@ -16,7 +16,11 @@ WriteMakefile(
     }
 );
 
-print(
-    (qw/draven naughton sri the_jester/)[ int( rand(4) ) ],
-    " is the greatest and gabb is drunk again!\n"
-);
+print( (qw/chansen draven fordmason naughton sri the_jester/)[ int( rand(6) ) ],
+    " is the greatest and gabb is drunk again!\n" );
+
+eval "use mod_perl; use Apache::Request";
+print qq/Install "mod_perl" and "Apache::Request" for Apache support.\n/ if $@;
+
+eval "use FCGI";
+print qq/Install "FCGI" for FastCGI support.\n/ if $@;

@@ -7,7 +7,7 @@ use Catalyst::Log;
 
 __PACKAGE__->mk_classdata($_) for qw/_config engine log/;
 
-our $VERSION = '4.33';
+our $VERSION = '4.34';
 our @ISA;
 
 =head1 NAME
