@@ -125,7 +125,6 @@ sub prepare_path {
     $base = URI->new($base);
     $base->path('/') if ( $ENV{CATALYST_TEST} || !$base->path );
     $c->req->base( $base->as_string );
-    $c->req->server_base( $base->scheme . '://' . $base->authority . '/' );
 }
 
 =head3 prepare_request

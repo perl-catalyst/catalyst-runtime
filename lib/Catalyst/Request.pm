@@ -5,7 +5,7 @@ use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(
     qw/action arguments base cookies headers match method parameters path
-      server_base snippets uploads/
+      snippets uploads/
 );
 
 *args   = \&arguments;
@@ -76,10 +76,6 @@ Contains the path.
 Contains the request method.
 
     print $c->request->method
-
-=head3 server_base
-
-Contains the server part of the uri base.
 
 =head3 snippets
 

@@ -142,7 +142,6 @@ sub prepare_path {
     $base->port( $c->apache_request->get_server_port );
     $base->path( $c->apache_request->location );
     $c->req->base( $base->as_string );
-    $c->req->server_base( $base->scheme . '://' . $base->authority . '/' );
 }
 
 =head3 prepare_request
