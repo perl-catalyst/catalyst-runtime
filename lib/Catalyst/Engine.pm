@@ -638,11 +638,11 @@ sub set_action {
     my %flags;
 
     for my $attr ( @{$attrs} ) {
-        if    ( $attr =~ /^Local$/ )         { $flags{local}++ }
-        elsif ( $attr =~ /^Global$/ )        { $flags{global}++ }
-        elsif ( $attr =~ /^Path\((.+)\)$/i ) { $flags{path} = $1 }
-        elsif ( $attr =~ /^Private$/i )      { $flags{private}++ }
-        elsif ( $attr =~ /Regex\((.+)\)$/i ) { $flags{regex} = $1 }
+        if    ( $attr =~ /^(Local|Relative)$/ )        { $flags{local}++    } 
+        elsif ( $attr =~ /^(Global|Absolute)$/ )       { $flags{global}++   }
+        elsif ( $attr =~ /^Path\((.+)\)$/i )           { $flags{path} = $1  }
+        elsif ( $attr =~ /^Private$/i )                { $flags{private}++  }
+        elsif ( $attr =~ /^(Regex|Regexp)\((.+)\)$/i ) { $flags{regex} = $2 }
     }
 
     return unless keys %flags;
