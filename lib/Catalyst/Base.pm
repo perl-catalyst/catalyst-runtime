@@ -97,6 +97,8 @@ sub config {
 
 sub process { 1 }
 
+=back
+
 =head1 SEE ALSO
 
 L<Catalyst>.

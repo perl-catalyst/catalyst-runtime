@@ -47,13 +47,15 @@ Test Catalyst applications.
 
 =head2 METHODS
 
-=head3 get
+=over 4
+
+=item get
 
 Returns the content.
 
     my $content = get('foo/bar?test=1');
 
-=head3 request
+=item request
 
 Returns a C<HTTP::Response> object.
 
@@ -92,6 +94,12 @@ sub import {
 }
 
 my $agent;
+
+=item remote_request
+
+Do an actual remote rquest using LWP.
+
+=cut
 
 sub remote_request {
     my $request = shift;
@@ -134,6 +142,8 @@ sub remote_request {
 
     return $agent->request($request);
 }
+
+=back 
 
 =head1 SEE ALSO
 
