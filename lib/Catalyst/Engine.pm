@@ -137,7 +137,7 @@ sub execute {
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} },
-              _prettify( $action, sprintf( '%fs', $elapsed ), '' );
+              _prettify_stats( $action, sprintf( '%fs', $elapsed ), '' );
             $c->state(@state);
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
@@ -857,7 +857,8 @@ sub setup_components {
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            push @$messages, _prettify( "$prefix$action", $class, $code );
+            push @$messages,
+              _prettify_action( "$prefix$action", $class, $code );
         }
         $walker->( $walker, $_, $messages, $prefix )
           for $parent->getAllChildren;
@@ -867,13 +868,13 @@ sub setup_components {
     @messages = ('Loaded plain actions');
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        push @messages, _prettify( "/$plain", $class, $code );
+        push @messages, _prettify_action( "/$plain", $class, $code );
     }
     $self->log->debug(@messages) if ( $#messages && $self->debug );
     @messages = ('Loaded regex actions');
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        push @messages, _prettify( $regex, $class, $code );
+        push @messages, _prettify_action( $regex, $class, $code );
     }
     $self->log->debug(@messages) if ( $#messages && $self->debug );
 }
@@ -915,11 +916,20 @@ sub _class2prefix {
     return $prefix;
 }
 
-sub _prettify {
+sub _prettify_action {
     my ( $val1, $val2, $val3 ) = @_;
     formline
 '  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>  ',
       $val1, $val2, $val3;
+    my $formatted = $^A;
+    $^A = '';
+    return $formatted;
+}
+
+sub _prettify_stats {
+    my ( $val1, $val2 ) = @_;
+    formline '  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< ',
+      $val1, $val2;
     my $formatted = $^A;
     $^A = '';
     return $formatted;
