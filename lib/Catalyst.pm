@@ -194,7 +194,7 @@ sub import {
     die qq/Couldn't load engine "$engine", "$@"/ if $@;
     {
         no strict 'refs';
-        unshift @{"$caller\::ISA"}, $engine;
+        push @{"$caller\::ISA"}, $engine;
     }
     $caller->engine($engine);
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;

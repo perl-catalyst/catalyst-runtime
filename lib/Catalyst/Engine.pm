@@ -287,7 +287,7 @@ sub forward {
         }
     }
     for my $result ( @{$results} ) {
-        $c->state( $c->process( @{ $result->[0] } ) );
+        $c->state( $c->execute( @{ $result->[0] } ) );
     }
     return $c->state;
 }
@@ -367,14 +367,14 @@ sub handler ($$) {
             $namespace ||= '/';
             if ( @{$results} ) {
                 for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
-                    $c->state( $c->process( @{ $begin->[0] } ) );
+                    $c->state( $c->execute( @{ $begin->[0] } ) );
                 }
                 for my $result ( @{ $c->get_action( $action, $default ) } ) {
-                    $c->state( $c->process( @{ $result->[0] } ) );
+                    $c->state( $c->execute( @{ $result->[0] } ) );
                     last unless $default;
                 }
                 for my $end ( @{ $c->get_action( 'end', $namespace ) } ) {
-                    $c->state( $c->process( @{ $end->[0] } ) );
+                    $c->state( $c->execute( @{ $end->[0] } ) );
                 }
             }
             else {
@@ -564,14 +564,14 @@ Prepare uploads.
 
 sub prepare_uploads { }
 
-=item $c->process($class, $coderef)
+=item $c->execute($class, $coderef)
 
-Process a coderef in given class and catch exceptions.
+Execute a coderef in given class and catch exceptions.
 Errors are available via $c->error.
 
 =cut
 
-sub process {
+sub execute {
     my ( $c, $class, $code ) = @_;
     $class = $c->comp($class) || $class;
     $c->state(0);
