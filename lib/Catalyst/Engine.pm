@@ -810,7 +810,7 @@ sub setup_components {
     @messages = ('Loaded plain actions');
     for my $plain ( keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        push @messages, _prettify( $plain, $class, $code );
+        push @messages, _prettify( "/$plain", $class, $code );
     }
     $self->log->debug(@messages) if ( $#messages && $self->debug );
     @messages = ('Loaded regex actions');
