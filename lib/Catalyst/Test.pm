@@ -91,32 +91,46 @@ sub import {
     *{"$caller\::get"}     = $get;
 }
 
+my $agent;
+
 sub remote_request {
     my $request = shift;
 
     require LWP::UserAgent;
 
-    my $server = URI->new( $ENV{CATALYST_SERVER} );
-
     unless ( ref $request ) {
 
-        my $uri =
-          ( $request =~ m/http/i )
+        my $uri = ( $request =~ m/http/i )
           ? URI->new($request)
           : URI->new( 'http://localhost' . $request );
 
         $request = $uri->canonical;
     }
 
-    $request->scheme( $server->scheme );
-    $request->host( $server->host );
-    $request->port( $server->port );
-
     unless ( ref $request eq 'HTTP::Request' ) {
         $request = HTTP::Request->new( 'GET', $request );
     }
 
-    my $agent = LWP::UserAgent->new;
+    my $server = URI->new( $ENV{CATALYST_SERVER} );
+
+    if ( $server->path =~ m|^(.+)?/$| ) {
+        $server->path("$1"); # need to be quoted
+    }
+
+    $request->uri->scheme( $server->scheme );
+    $request->uri->host( $server->host );
+    $request->uri->port( $server->port );
+    $request->uri->path( $server->path . $request->uri->path );
+
+    unless ($agent) {
+        $agent = LWP::UserAgent->new(
+         #  cookie_jar   => {},
+            keep_alive   => 1,
+            max_redirect => 0,
+            timeout      => 60,
+        );
+        $agent->env_proxy;
+    }
 
     return $agent->request($request);
 }

@@ -3,7 +3,7 @@ package Catalyst::Engine::Test;
 use strict;
 use base 'Catalyst::Engine';
 
-use CGI::Simple::Cookie;
+use CGI::Cookie;
 use Class::Struct ();
 use HTTP::Headers::Util 'split_header_words';
 use HTTP::Request;
@@ -62,7 +62,7 @@ sub finalize_headers {
     my $response = HTTP::Response->new( $status, undef, $headers );
 
     while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
-        my $cookie = CGI::Simple::Cookie->new(
+        my $cookie = CGI::Cookie->new(
             -name    => $name,
             -value   => $cookie->{value},
             -expires => $cookie->{expires},
@@ -104,7 +104,7 @@ sub prepare_cookies {
     my $c = shift;
 
     if ( my $header = $c->request->headers->header('Cookie') ) {
-        $c->req->cookies( { CGI::Simple::Cookie->parse($header) } );
+        $c->req->cookies( { CGI::Cookie->parse($header) } );
     }
 }
 

@@ -141,6 +141,9 @@ sub prepare_headers {
 
 sub prepare_parameters {
     my $c    = shift;
+
+    $c->cgi->parse_query_string;
+ 
     my %vars = $c->cgi->Vars;
     while ( my ( $key, $value ) = each %vars ) {
         my @values = split "\0", $value;
