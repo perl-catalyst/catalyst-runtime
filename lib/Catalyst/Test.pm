@@ -66,7 +66,6 @@ sub import {
         unless ( $INC{'Test/Builder.pm'} ) {
             die qq/Couldn't load "$class", "$@"/ if $@;
         }
-        $class->import;
 
         no strict 'refs';
         my $caller = caller(0);
