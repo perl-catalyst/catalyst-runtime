@@ -862,7 +862,7 @@ sub setup_components {
         $self->components->{ ref $comp } = $comp;
         $self->setup_actions($comp);
     }
-    my $t = Text::ASCIITable->new;
+    my $t = Text::ASCIITable->new({ hide_HeadRow => 1, hide_HeadLine => 1});
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
     $t->addRow( wrap( $_, 75 ) ) for keys %{ $self->components };
@@ -870,10 +870,10 @@ sub setup_components {
       if ( @{ $t->{tbl_rows} } && $self->debug );
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
-    $privates->setCols( 'Action', 'Class', 'Code' );
-    $privates->setColWidth( 'Action', 28, 1 );
-    $privates->setColWidth( 'Class',  28, 1 );
-    $privates->setColWidth( 'Code',   14, 1 );
+    $privates->setCols( 'Private', 'Class', 'Code' );
+    $privates->setColWidth( 'Private', 28, 1 );
+    $privates->setColWidth( 'Class',   28, 1 );
+    $privates->setColWidth( 'Code',    14, 1 );
     my $walker = sub {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
@@ -893,33 +893,25 @@ sub setup_components {
     $self->log->debug( 'Loaded private actions', $privates->draw )
       if ( @{ $privates->{tbl_rows} } && $self->debug );
     my $publics = Text::ASCIITable->new;
-    $publics->setCols( 'Action', 'Class', 'Code' );
-    $publics->setColWidth( 'Action', 28, 1 );
-    $publics->setColWidth( 'Class',  28, 1 );
-    $publics->setColWidth( 'Code',   14, 1 );
+    $publics->setCols( 'Public', 'Private' );
+    $publics->setColWidth( 'Public',  37, 1 );
+    $publics->setColWidth( 'Private', 36, 1 );
 
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        $publics->addRow(
-            wrap( "/$plain", 28 ),
-            wrap( $class,    28 ),
-            wrap( $code,     14 )
-        );
+        $publics->addRow( wrap( "/$plain", 37 ),
+            wrap( $self->actions->{reverse}->{$code} || $code, 36 ) );
     }
     $self->log->debug( 'Loaded public actions', $publics->draw )
       if ( @{ $publics->{tbl_rows} } && $self->debug );
     my $regexes = Text::ASCIITable->new;
-    $regexes->setCols( 'Action', 'Class', 'Code' );
-    $regexes->setColWidth( 'Action', 28, 1 );
-    $regexes->setColWidth( 'Class',  28, 1 );
-    $regexes->setColWidth( 'Code',   14, 1 );
+    $regexes->setCols( 'Regex', 'Private' );
+    $regexes->setColWidth( 'Regex',   37, 1 );
+    $regexes->setColWidth( 'Private', 36, 1 );
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        $regexes->addRow(
-            wrap( $regex, 28 ),
-            wrap( $class, 28 ),
-            wrap( $code,  14 )
-        );
+        $regexes->addRow( wrap( $regex, 37 ),
+            wrap( $self->actions->{reverse}->{$class} || $class, 36 ) );
     }
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );

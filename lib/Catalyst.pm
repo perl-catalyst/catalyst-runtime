@@ -185,7 +185,7 @@ sub import {
             }
         }
     }
-    my $t = Text::ASCIITable->new;
+    my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
     $t->addRow( wrap( $_, 75 ) ) for @plugins;
