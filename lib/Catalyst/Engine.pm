@@ -314,10 +314,7 @@ sub get_action {
             my $child = $visitor->getResult;
             my $uid   = $child->getUID if $child;
             my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
-            if ($match) {
-                $action eq 'end' ? unshift @results, [$match] : push @results,
-                  [$match];
-            }
+            push @results, [$match] if $match;
             $parent = $child if $child;
         }
         return \@results;
