@@ -9,6 +9,7 @@ use URI;
 # mod_perl
 if (MP2) {
     require Apache2;
+    require Apache::Connection;
     require Apache::RequestIO;
     require Apache::RequestRec;
     require Apache::SubRequest;
@@ -94,6 +95,16 @@ sub finalize_headers {
 sub finalize_output {
     my $c = shift;
     $c->original_request->print( $c->response->{output} );
+}
+
+=item $c->prepare_connection
+
+=cut
+
+sub prepare_connection {
+    my $c = shift;
+    $c->req->hostname( $c->apache_request->connection->remote_host );
+    $c->req->address( $c->apache_request->connection->remote_ip );
 }
 
 =item $c->prepare_cookies

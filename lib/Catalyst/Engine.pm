@@ -124,7 +124,6 @@ sub action {
     }
 }
 
-
 =item $c->benchmark($coderef)
 
 Takes a coderef with arguments and returns elapsed time as float.
@@ -491,9 +490,13 @@ sub prepare {
     $c->prepare_path;
     $c->prepare_cookies;
     $c->prepare_headers;
-    my $method = $c->req->method || '';
-    my $path   = $c->req->path   || '';
-    $c->log->debug(qq/"$method" request for "$path"/) if $c->debug;
+    $c->prepare_connection;
+    my $method   = $c->req->method   || '';
+    my $path     = $c->req->path     || '';
+    my $hostname = $c->req->hostname || '';
+    my $address  = $c->req->address  || '';
+    $c->log->debug(qq/"$method" request for "$path" from $hostname($address)/)
+      if $c->debug;
     $c->prepare_action;
     $c->prepare_parameters;
 
@@ -561,6 +564,14 @@ sub prepare_action {
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
 }
+
+=item $c->prepare_connection;
+
+Prepare connection.
+
+=cut
+
+sub prepare_connection { }
 
 =item $c->prepare_cookies;
 

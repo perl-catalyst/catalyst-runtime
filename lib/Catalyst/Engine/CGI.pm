@@ -106,6 +106,16 @@ sub finalize_output {
     print $c->response->output;
 }
 
+=item $c->prepare_connection
+
+=cut
+
+sub prepare_connection {
+    my $c = shift;
+    $c->req->hostname( $c->cgi->remote_host );
+    $c->req->address( $c->cgi->remote_addr );
+}
+
 =item $c->prepare_cookies
 
 Sets up cookies.

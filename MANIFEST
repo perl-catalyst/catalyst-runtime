@@ -34,3 +34,4 @@ t/10redirect.t
 t/11stash.t
 t/12default.t
 t/13beginend.t
+t/14connection.t

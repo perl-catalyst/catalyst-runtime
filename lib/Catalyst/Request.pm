@@ -4,8 +4,8 @@ use strict;
 use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(
-    qw/action arguments base cookies headers match method parameters path
-      snippets uploads/
+    qw/action address arguments base cookies headers hostname match method
+      parameters path snippets uploads/
 );
 
 *args   = \&arguments;
@@ -31,6 +31,12 @@ Contains the action.
 
     print $c->request->action;
 
+=head3 address
+
+Contains the remote address.
+
+    print $c->request->address
+
 =head3 arguments (args)
 
 Returns an arrayref containing the arguments.
@@ -52,6 +58,12 @@ Returns a hashref containing the cookies.
 Returns a L<HTTP::Headers> object containing the headers.
 
     print $c->request->headers->header('X-Catalyst');
+
+=head3 hostname
+
+Contains the remote hostname.
+
+    print $c->request->hostname
 
 =head3 match
 
