@@ -16,17 +16,17 @@ TestApp->action(
 
     '!begin' => sub {
         my ( $self, $c ) = @_;
-        $c->res->output( 'foo' . $c->res->output  );
+        $c->res->output( 'foo' );
     },
 
     '!default' => sub { 
         my ( $self, $c ) = @_;
-        $c->res->output( 'foo' . $c->res->output );
+        $c->res->output( $c->res->output . 'foo' );
      },
 
     '!end' => sub {
         my ( $self, $c ) = @_;
-        $c->res->output( 'foo' . $c->res->output );
+        $c->res->output( $c->res->output . 'foo');
     },
 );
 
@@ -65,4 +65,6 @@ use Data::Dumper;
 {
     my $response = request('/foo/bar');
     ok( $response->content =~ /foobarfoobarfoobar/ );
+    warn $response->content;
+
 }
