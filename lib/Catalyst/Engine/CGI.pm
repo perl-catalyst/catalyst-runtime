@@ -3,6 +3,7 @@ package Catalyst::Engine::CGI;
 use strict;
 use base 'Catalyst::Engine';
 use URI;
+use URI::http;
 
 require CGI::Simple;
 
