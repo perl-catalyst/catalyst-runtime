@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.35  xxx
+        - added call to $class->import in import sub in Catalyst::Test
+
 4.34  Wed Mar 23 07:00:00 2005
         - added some messages to Makefile.PL
         - added Catalyst::Engine::Test
