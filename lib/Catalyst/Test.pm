@@ -96,7 +96,7 @@ sub remote_request {
 
     require LWP::UserAgent;
 
-    my $remote = URI->new( $ENV{CATALYST_SERVER} );
+    my $server = URI->new( $ENV{CATALYST_SERVER} );
 
     unless ( ref $request ) {
 
@@ -108,9 +108,9 @@ sub remote_request {
         $request = $uri->canonical;
     }
 
-    $request->scheme( $remote->scheme );
-    $request->host( $remote->host );
-    $request->port( $remote->port );
+    $request->scheme( $server->scheme );
+    $request->host( $server->host );
+    $request->port( $server->port );
 
     unless ( ref $request eq 'HTTP::Request' ) {
         $request = HTTP::Request->new( 'GET', $request );

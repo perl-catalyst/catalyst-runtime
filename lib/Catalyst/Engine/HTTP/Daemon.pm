@@ -1,7 +1,7 @@
 package Catalyst::Engine::HTTP::Daemon;
 
 use strict;
-use base 'Catalyst::Engine::LWP';
+use base 'Catalyst::Engine::Test';
 
 use IO::Socket qw(AF_INET);
 
@@ -31,7 +31,7 @@ This is the Catalyst engine specialized for development and testing.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::LWP>.
+This class overloads some methods from C<Catalyst::Engine::Test>.
 
 =over 4
 
@@ -62,7 +62,7 @@ sub run {
 
             $request->uri->scheme('http');    # Force URI::http
 
-            my $lwp = Catalyst::Engine::LWP::HTTP->new(
+            my $lwp = Catalyst::Engine::Test::LWP->new(
                 request  => $request,
                 address  => $connection->peerhost,
                 hostname => gethostbyaddr( $connection->peeraddr, AF_INET )
