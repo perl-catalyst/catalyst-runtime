@@ -20,6 +20,11 @@ placing a die() call in the _end action.
         }
     );
 
+If you're tired of removing and adding this all the time, you
+can easily add a condition. for example:
+
+  die "Testing" if $c->param->{dump_info};
+
 =head2 Disable statistics
 
 Just add this line to your application class if you don't want those nifty

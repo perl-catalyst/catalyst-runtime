@@ -1,11 +1,14 @@
 This file documents the revision history for Perl extension Catalyst.
-
+4.24  Xxx Mar 00 00:00:00 2005
+        - updated cookbook example  
+        
 4.23  Wed Mar 09 20:00:00 2005
         - no more regex actions in forward
         - added support for test directories t/m, t/v and t/c
 
 4.22  Tue Mar 08 20:00:00 2005
         - catch errors in application class
+        - handle die properly.
 
 4.21  Sat Mar 05 17:00:00 2005
         - fixed docs
