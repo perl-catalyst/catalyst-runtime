@@ -373,11 +373,11 @@ sub handler ($$) {
                 for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
                     $c->state( $c->execute( @{ $begin->[0] } ) );
                 }
-                for my $result ( @{ $c->get_action( $action, $default ) } ) {
+                for my $result ( @{ $c->get_action( $action, $default ) }[-1] ) {
                     $c->state( $c->execute( @{ $result->[0] } ) );
                     last unless $default;
                 }
-                for my $end ( @{ $c->get_action( 'end', $namespace ) } ) {
+                for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } ) {
                     $c->state( $c->execute( @{ $end->[0] } ) );
                 }
             }
