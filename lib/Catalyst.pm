@@ -152,8 +152,8 @@ sub import {
         }
     }
 
-    unless ( $self->log ) {
-        $self->log( Catalyst::Log->new );
+    unless ( $caller->log ) {
+        $caller->log( Catalyst::Log->new );
     }
 
     # Options
