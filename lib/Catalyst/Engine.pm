@@ -373,11 +373,13 @@ sub handler ($$) {
                 for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
                     $c->state( $c->execute( @{ $begin->[0] } ) );
                 }
-                for my $result ( @{ $c->get_action( $action, $default ) }[-1] ) {
+                for my $result ( @{ $c->get_action( $action, $default ) }[-1] )
+                {
                     $c->state( $c->execute( @{ $result->[0] } ) );
                     last unless $default;
                 }
-                for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } ) {
+                for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } )
+                {
                     $c->state( $c->execute( @{ $end->[0] } ) );
                 }
             }
@@ -638,10 +640,10 @@ sub set_action {
     my %flags;
 
     for my $attr ( @{$attrs} ) {
-        if    ( $attr =~ /^(Local|Relative)$/ )        { $flags{local}++    } 
-        elsif ( $attr =~ /^(Global|Absolute)$/ )       { $flags{global}++   }
-        elsif ( $attr =~ /^Path\((.+)\)$/i )           { $flags{path} = $1  }
-        elsif ( $attr =~ /^Private$/i )                { $flags{private}++  }
+        if    ( $attr =~ /^(Local|Relative)$/ )        { $flags{local}++ }
+        elsif ( $attr =~ /^(Global|Absolute)$/ )       { $flags{global}++ }
+        elsif ( $attr =~ /^Path\((.+)\)$/i )           { $flags{path} = $1 }
+        elsif ( $attr =~ /^Private$/i )                { $flags{private}++ }
         elsif ( $attr =~ /^(Regex|Regexp)\((.+)\)$/i ) { $flags{regex} = $2 }
     }
 
@@ -733,10 +735,24 @@ sub setup_actions {
         my ( $code, $attrs ) = @{$action};
         my $name = '';
         no strict 'refs';
-        for my $sym ( values %{ $comp . '::' } ) {
-            if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
-                $name = *{$sym}{NAME};
-                $self->set_action( $name, $code, $comp, $attrs );
+        my @cache = ( $comp, @{"$comp\::ISA"} );
+        my @namespaces;
+        my %seen;
+        while ( my $namespace = shift @cache ) {
+            push @namespaces, $namespace;
+            for my $isa ( @{"$comp\::ISA"} ) {
+                next if $seen{$isa};
+                push @cache, $isa;
+                $seen{$isa}++;
+            }
+        }
+        for my $namespace (@namespaces) {
+            for my $sym ( values %{ $namespace . '::' } ) {
+                if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
+                    $name = *{$sym}{NAME};
+                    $self->set_action( $name, $code, $comp, $attrs );
+                    last;
+                }
             }
         }
     }
@@ -810,9 +826,9 @@ sub _prefix {
 sub _class2prefix {
     my $class = shift || '';
     my $prefix;
-    if ($class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/) {
-      $prefix = lc $2;
-      $prefix =~ s/\:\:/\//g;
+    if ( $class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/ ) {
+        $prefix = lc $2;
+        $prefix =~ s/\:\:/\//g;
     }
     return $prefix;
 }
