@@ -325,10 +325,7 @@ sub _mk_cgi {
     $self->mk_file( "$script\/nph-cgi.pl", <<"EOF");
 $Config{startperl} -w
 
-BEGIN {
-    \$ENV{CATALYST_ENGINE} = 'CGI';
-    \$ENV{CATALYST_TEST}   = 1;
-}
+BEGIN { \$ENV{CATALYST_ENGINE} = 'CGI' }
 
 use strict;
 use FindBin;
@@ -375,28 +372,14 @@ sub _mk_fcgi {
     $self->mk_file( "$script\/fcgi.pl", <<"EOF");
 $Config{startperl} -w
 
-BEGIN {
-    \$ENV{CATALYST_ENGINE} = 'CGI';
-    \$ENV{CATALYST_TEST}   = 1;
-}
+BEGIN { \$ENV{CATALYST_ENGINE} = 'FCGI' }
 
 use strict;
 use FindBin;
 use lib "\$FindBin::Bin/../lib";
-use FCGI;
 use $name;
 
-my \$request = FCGI::Request();
-while ( \$request->Accept() >= 0 ) {
-    my \$output;
-    {
-        local(*STDOUT);
-        open( STDOUT, '>', \\\$output );
-        $name->run;
-    }
-    \$output =~ s!^HTTP/\\d+.\\d+ \\d\\d\\d.*?\\n!!s;
-    print \$output;
-}
+$name->run;
 
 1;
 __END__
@@ -436,10 +419,7 @@ sub _mk_server {
     $self->mk_file( "$script\/server.pl", <<"EOF");
 $Config{startperl} -w
 
-BEGIN { 
-    \$ENV{CATALYST_ENGINE} = 'Server';
-    \$ENV{CATALYST_TEST}   = 1;
-}
+BEGIN { \$ENV{CATALYST_ENGINE} = 'Server' }
 
 use strict;
 use Getopt::Long;
