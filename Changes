@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-4.34  XXX XXX XX XX:00:00 2005
+4.34  Wed Mar 23 07:00:00 2005
         - added some messages to Makefile.PL
         - added Catalyst::Engine::Test
         - added Catalyst::Engine::CGI::NPH
