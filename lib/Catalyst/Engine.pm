@@ -266,7 +266,11 @@ sub forward {
     }
     my $caller    = caller(0);
     my $namespace = '/';
-    if ( $command =~ /^\/(.*)$/ ) { $command = $1 }
+    if ( $command =~ /^\/$/ ) {
+        $command =~ /^(.*)\/(\w+)$/;
+        $namespace = $1 || '/';
+        $command = $2;
+    }
     else { $namespace = _class2prefix($caller) || '/' }
     my $results = $c->get_action( $command, $namespace );
     unless ( @{$results} ) {
