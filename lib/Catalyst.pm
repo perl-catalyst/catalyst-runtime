@@ -141,15 +141,9 @@ sub import {
     my ( $self, @options ) = @_;
     my $caller = caller(0);
 
-    # Class
-    {
+    unless ( $caller->isa($self) ) {
         no strict 'refs';
-        *{"$caller\::handler"} =
-          sub { Catalyst::Engine::handler( $caller, @_ ) };
-
-        unless ( $caller->isa($self) ) {
-            push @{"$caller\::ISA"}, $self;
-        }
+        push @{"$caller\::ISA"}, $self;
     }
 
     unless ( $caller->log ) {
