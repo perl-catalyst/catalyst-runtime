@@ -13,11 +13,10 @@ Catalyst::Log - Catalyst Log Class
 =head1 SYNOPSIS
 
     $log = $c->log;
-    $log->debug($msg, @args);
-    $log->dump($ref);
-    $log->error($msg, @args);
-    $log->info($msg, @args);
-    $log->warn($msg, @args);
+    $log->debug(@message);
+    $log->error(@message);
+    $log->info(@message);
+    $log->warn(@message);
 
 See L<Catalyst>.
 
@@ -35,53 +34,46 @@ Your logging object is expected to provide the interface described here.
 
 =over 4
 
-=item $log->debug($msg, @args)
+=item $log->debug(@message)
 
 Logs a debugging message.
 
 =cut
 
-sub debug { _format( 'debug', splice(@_, 1) ) }
+sub debug { shift->_format( 'debug', @_ ) }
 
-=item $log->dump($ref)
+sub dump { shift->_format( 'dump', Dumper( $_[1] ) ) }
 
-Logs a formatted dump of a variable passed by reference (uses C<Data::Dumper>).
-
-=cut
-
-sub dump { _format( 'dump', Dumper( $_[1] ) ) }
-
-=item $log->error($msg, @args)
+=item $log->error(@message)
 
 Logs an error message.
 
 =cut
 
-sub error { _format( 'error', splice(@_, 1) ) }
+sub error { shift->_format( 'error', @_ ) }
 
-=item $log->info($msg, @args)
+=item $log->info(@message)
 
 Logs an informational message.
 
 =cut
 
-sub info { _format( 'info', splice(@_, 1) ) }
+sub info { shift->_format( 'info', @_ ) }
 
-=item $log->warn($msg, @args)
+=item $log->warn(@message)
 
 Logs a warning message.
 
 =cut
 
-sub warn { _format( 'warn', splice(@_, 1) ) }
+sub warn { shift->_format( 'warn', @_ ) }
 
 sub _format {
-    if (@_ > 2) {
-	printf STDERR '[' . localtime(time) . "] [catalyst] [$_[0]] $_[1]\n", splice(@_, 2);
-    }
-    else {
-	print STDERR '[' . localtime(time) . "] [catalyst] [$_[0]] $_[1]\n";
-    }
+    my $class   = shift;
+    my $level   = shift;
+    my $time    = localtime(time);
+    my $message = join( "\n", @_ );
+    printf( STDERR "[%s] [catalyst] [%s] %s\n", $time, $level, $message );
 }
 
 =back
