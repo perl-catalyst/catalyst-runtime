@@ -88,9 +88,9 @@ Returns an arrayref containing regex snippets.
 Returns a hashref containing the uploads.
 
     my $filename = $c->req->parameters->{foo};
-    print $c->request->uploads->{$filename}->type;
-    print $c->request->uploads->{$filename}->size;
-    my $fh = $c->request->uploads->{$filename}->fh;
+    print $c->request->uploads->{$filename}->{type};
+    print $c->request->uploads->{$filename}->{size};
+    my $fh = $c->request->uploads->{$filename}->{fh};
     my $content = do { local $/; <$fh> };
 
 =head1 AUTHOR
