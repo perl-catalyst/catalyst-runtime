@@ -1,0 +1,197 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial - Getting started with Catalyst
+
+=head1 DESCRIPTION
+
+This document aims to get you up and running with Catalyst.
+
+NOTE: THIS DOCUMENT IS STILL VERY MUCH AT AN ALPHA STAGE.
+
+Please send comments, corrections and suggestions for improvements to
+A.Ford@ford-mason.co.uk
+
+
+=head2 Installation
+
+The first step is to install Catalyst, and the simplest way to do this is to
+install the Catalyst bundle from CPAN:
+
+    $ perl -MCPAN -e 'install Bundle::Catalyst'
+
+This will retrieve Catalyst and a number of useful extensions and install them
+for you.
+
+
+=head2 Setting up your application
+
+Catalyst includes a helper script, C<catalyst.pl>, that will set up a skeleton
+application for you:
+
+    $ catalyst.pl My::App
+    created "My-App"
+    created "My-App/script"
+    created "My-App/lib"
+    created "My-App/root"
+    created "My-App/t"
+    created "My-App/t/m"
+    created "My-App/t/v"
+    created "My-App/t/c"
+    created "My-App/lib/My/App"
+    created "My-App/lib/My/App/M"
+    created "My-App/lib/My/App/V"
+    created "My-App/lib/My/App/C"
+    created "My-App/lib/My/App.pm"
+    created "My-App/Makefile.PL"
+    created "My-App/README"
+    created "My-App/Changes"
+    created "My-App/t/01app.t"
+    created "My-App/t/02podcoverage.t"
+    created "My-App/script/server.pl"
+    created "My-App/script/test.pl"
+    created "My-App/script/create.pl"
+
+This creates the directory structure shown.
+
+
+
+=head2 Testing out the sample application
+
+You can test out your new application by running the server script that
+catalyst provides:
+
+    $ cd My-App
+    $ script/server.pl 
+    [Sun Mar 20 12:31:18 2005] [catalyst] [debug] Debug messages enabled
+    [Sun Mar 20 12:31:18 2005] [catalyst] [debug] Loaded engine "Catalyst::Engine::CGI"
+    [Sun Mar 20 12:31:18 2005] [catalyst] [debug] Initialized components ""
+    [Sun Mar 20 12:31:18 2005] [catalyst] [info] My::App powered by Catalyst 4.26
+    [Sun Mar 20 12:31:18 2005] [catalyst] [debug] "My::App" defined "!default" as "CODE(0x83fd570)"
+    You can connect to your server at http://localhost:3000
+
+The server is now waiting for you to make requests of it.  Try using telnet to
+manually make a simple GET request of the server (when telnet responds with
+"Escape character is '^]'.", type "GET / HTTP/1.0" and hit return twice):
+
+    $ telnet localhost 3000
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    GET / HTTP/1.0
+    
+    HTTP/1.0 200
+    Server: Catalyst/4.26
+    Status: 200
+    Date: Sun, 20 Mar 2005 12:31:55 GMT
+    X-catalyst: 4.26
+    Content-length: 40
+    Content-Type: text/html; charset=ISO-8859-1
+
+    Congratulations, My::App is on Catalyst!
+    Connection closed by foreign host.
+    $
+
+More trace messages will appear in the original terminal window:
+
+    [Sun Mar 20 12:31:55 2005] [catalyst] [debug] ********************************
+    [Sun Mar 20 12:31:55 2005] [catalyst] [debug] * Request 1 (0.027/s) [9818]
+    [Sun Mar 20 12:31:55 2005] [catalyst] [debug] ********************************
+    [Sun Mar 20 12:31:55 2005] [catalyst] [debug] "GET" request for ""
+    [Sun Mar 20 12:31:55 2005] [catalyst] [debug] Using default action
+    [Sun Mar 20 12:31:55 2005] [catalyst] [info] Processing "!default" took 0.000033s
+    [Sun Mar 20 12:31:55 2005] [catalyst] [info] Request took 0.051399s (19.456/s)
+
+The server will continue running until you interrupt it.
+
+The application can also be tested from the command line using the generated
+helper script, C<script/test.pl>.
+
+
+=head2 Getting your application invoked
+
+Catalyst applications are intended to be run from mod_perl, but can also be
+run as CGI scripts.  Running under mod_perl gives better performance, but for
+development purposes you may want to run your application as a CGI script,
+especially as each changes to your application code take effect under CGI
+without having to restart the web server.
+
+To run from mod_perl you need to add something like this to your Apache
+configuration file:
+
+    <Location /myapp>
+        SetHandler  perl-script
+        PerlHandler MyApp
+    </Location>
+
+To run as a CGI script you need a wrapper script like:
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+
+    MyApp->run;
+
+Catalyst outputs a complete HTTP response, which is not what is expected of a
+CGI script.  You need to configure the script as a so-called "Non-parsed
+Headers" script for it to function properly.  To do this in Apache just name
+the script starting with C<nph->.
+
+
+
+
+=head2 Extending the generated code
+
+The generated application code looks like this:
+
+    package My::App;
+
+    use strict;
+    use Catalyst qw/-Debug/;
+
+    our $VERSION = '0.01';
+
+    My::App->config(
+	name => 'My::App',
+	root => '/home/andrew/My-App/root',
+    );
+
+    My::App->action(
+	'!default' => sub {
+	    my ( $self, $c ) = @_;
+	    $c->res->output('Congratulations, My::App is on Catalyst!');
+	},
+    );
+
+    1;
+
+
+You can start extending the application by adding new actions:
+
+    My::App->action(
+        'test1' => sub {
+	    my ( $self, $c ) = @_;
+	    $c->res->output('In a new test action #1');
+	},
+        'test1' => sub {
+	    my ( $self, $c ) = @_;
+	    $c->res->output('In a new test action #1');
+	},
+	'!default' => sub {
+	    my ( $self, $c ) = @_;
+	    $c->res->output('Congratulations, My::App is on Catalyst!');
+	},
+    );
+
+
+
+
+=head1 AUTHOR
+
+Andrew Ford, C<A.Ford@ford-mason.co.uk>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
