@@ -2,16 +2,14 @@ package TestApp;
 
 use Catalyst qw[-Engine=Test];
 
-__PACKAGE__->action(
-    hostname => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output( $c->req->hostname );
-    },
-    address => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output( $c->req->address );
-    }
-);
+sub hostname : Global {
+    my ( $self, $c ) = @_;
+    $c->res->output( $c->req->hostname );
+}
+sub address : Global {
+    my ( $self, $c ) = @_;
+    $c->res->output( $c->req->address );
+}
 
 package main;
 

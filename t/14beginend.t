@@ -2,40 +2,37 @@ package TestApp;
 
 use Catalyst qw[-Engine=Test];
 
-__PACKAGE__->action(
 
-    '!begin' => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output('foo');
-    },
+sub begin : Private { 
+    my ( $self, $c ) = @_;
+    $c->res->output('foo');
+}
 
-    '!default' => sub { },
+sub default : Private { }
 
-    '!end' => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output( $c->res->output . 'bar' );
-    },
+sub end : Private { 
+    my ( $self, $c ) = @_;
+    $c->res->output( $c->res->output . 'bar' );
+}
 
-);
+
+__PACKAGE__->setup;
 
 package TestApp::C::Foo::Bar;
 
-TestApp->action(
+use base 'Catalyst::Base';
 
-    '!begin' => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output('yada');
-    },
+sub begin : Private { 
+    my ( $self, $c ) = @_;
+    $c->res->output('yada');
+}
 
-    '!default' => sub { },
+sub default : Private { }
 
-    '!end' => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output('yada');
-        $c->res->output( $c->res->output . 'yada' );
-    },
-
-);
+sub end : Private { 
+    my ( $self, $c ) = @_;
+    $c->res->output( $c->res->output . 'yada' );
+}
 
 package main;
 

@@ -2,21 +2,21 @@ package TestApp;
 
 use Catalyst qw[-Engine=Test];
 
-__PACKAGE__->action(
-    '!default' => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output('bar');
-    }
-);
+sub default : Private {
+    my ( $self, $c ) = @_;
+    $c->res->output('bar');
+}
+
+__PACKAGE__->setup;
 
 package TestApp::C::Foo::Bar;
 
-TestApp->action(
-    '!default' => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output('yada');
-    }
-);
+use base 'Catalyst::Base';
+
+sub default : Private {
+    my ( $self, $c ) = @_;
+    $c->res->output('yada');
+}
 
 package main;
 
