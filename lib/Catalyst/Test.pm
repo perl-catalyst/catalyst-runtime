@@ -94,6 +94,7 @@ sub request {
     $ENV{CONTENT_TYPE}   ||= $request->header('Content-Type')   || '';
     $ENV{CONTENT_LENGTH} ||= $request->header('Content-Length') || '';
     $ENV{GATEWAY_INTERFACE} ||= 'CGI/1.1';
+    $ENV{HTTP_USER_AGENT}   ||= 'Catalyst';
     $ENV{HTTP_HOST}         ||= $request->uri->host || 'localhost';
     $ENV{QUERY_STRING}      ||= $request->uri->query || '';
     $ENV{REQUEST_METHOD}    ||= $request->method;
