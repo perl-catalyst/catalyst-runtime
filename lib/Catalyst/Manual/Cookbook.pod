@@ -68,7 +68,7 @@ Just use Catalyst::Model::CDBI::CRUD as baseclass.
 Modify the $c->form() parameters to match your needs, and don't forget to copy
 the templates. ;)
 
-==head2 Serving static files and CSS as text/css
+=head2 Serving static files and CSS as text/css
 
 If you want to serve static content (like images, txt or CSS) via Catalyst,
 then all you need is the plugin Catalyst::Plugin::Static as well as a small
@@ -93,7 +93,7 @@ regex to set the MIME type for CSS to text/css.
         },
     );
 
-==head2 Uploads with Catalyst
+=head2 Uploads with Catalyst
 
 To implement uploads in Catalyst you need to have a HTML form similiar to
 this:
@@ -135,9 +135,136 @@ module:
 
     $CGI::Simple::POST_MAX = 1048576000;
 
+=head2 Authentication with Catalyst::Plugin::Authentication::CDBI
+
+There are (at least) two ways to implement authentication with this plugin:
+1) only checking username and password
+2) checking username, password and the roles the user has
+
+For both variants you'll need the following code in your MyApp package:
+
+    use Catalyst qw/Session::FastMmap Static Authentication::CDBI/;
+
+    MyApp->config( authentication => { user_class => 'MyApp::M::MyApp::Users',
+                                       user_field => 'email',
+                                       password_field => 'password' });
+
+'user_class' is a Class::DBI class for your users table.
+'user_field' tells which field is used for username lookup (might be 
+email, first name, surname etc).
+'password_field' is, well, password field in your table and by default 
+password is stored in plain text. Authentication::CDBI looks for 'user' 
+and 'password' fields in table, if they're not defined in the config.
+
+In PostgreSQL users table might be something like:
+
+CREATE TABLE users (
+  user_id   serial,
+  name      varchar(100),
+  surname   varchar(100),
+  password  varchar(100),
+  email     varchar(100),
+  primary key(user_id)
+);
+
+We'll discuss the first variant for now:
+1. user:password login / auth without roles
+
+To log in a user you might use a action like this:
+
+    '?login' => sub {
+        my ($self, $c) = @_;
+        if ($c->req->params->{username}) {
+            $c->session_login($c->req->params->{username}, 
+	                      $c->req->params->{password} );
+            if ($c->req->{user}) {
+                $c->forward('?restricted_area');
+            }
+        }
+    },
+
+$c->req->params->{username} and $c->req->params->{password} are html 
+form parameters from a login form. If login succeeds, then $c->req->{user} 
+contains the username of the authenticated user.
+
+If you want to remember the users login status inbetween further requests, 
+then just use the $c->session_login method, Catalyst will create a session 
+id, session cookie and automatically append session id to all urls. So 
+all you have to do, is just check $c->req->{user} where needed.
+
+To log out user, just call $c->session_logout.
+
+Now lets take a look at the second variant:
+2. user:password login / auth with roles
+
+To use roles you need to add to MyApp->config in the 'authentication' 
+section following parameters:
+
+    role_class      => 'MyApp::M::MyApp::Roles',
+    user_role_class => 'MyApp::M::MyApp::UserRoles',
+    user_role_user_field => 'user_id',
+    user_role_role_field => 'role_id',
+
+Corresponding tables in PostgreSQL could look like this:
+
+CREATE TABLE roles (
+  role_id  serial,
+  name     varchar(100),
+  primary key(role_id)
+);
+
+CREATE TABLE user_roles (
+  user_role_id  serial,
+  user_id       int,
+  role_id       int,
+  primary key(user_role_id),
+  foreign key(user_id) references users(user_id),
+  foreign key(role_id) references roles(role_id)
+);
+
+The 'roles' table is a list of role names and the 'user_role' table is used for
+the user -> role lookup.
+
+Now if a logged in user wants to see a location which is allowed only for 
+people with 'admin' role then in you controller you can check it with:
+
+    '?add' => sub {
+        my ($self, $c) = @_;
+        if ($c->roles(qw/admin/)) {
+            $c->req->output("Your account has the role 'admin.'");
+        } else {
+            $c->req->output("You're not allowed to be here");
+        }
+    },
+
+One thing you might need is to forward non-authenticated users to login 
+form, if they try to access restricted areas. If you want to do this 
+controller-wide (if you have one controller for admin section) then it's 
+best to add user check to '!begin' action:
+
+    '!begin' => sub {
+        my ($self, $c) = @_;
+        unless ($c->req->{user}) {
+            $c->req->action(undef);  ## notice this!!
+            $c->forward('?login');
+        }
+    },
+
+Pay attention to $c->req->action(undef). This is needed, because of the 
+way $c->forward works - forward to login gets called, but after that 
+Catalyst executes anyway the action defined in the uri (eg. if you tried to 
+watch /add, then first '!begin' forwards to '?login', but after that 
+anyway '?add' is executed). So $c->req->action(undef) undefines any 
+actions that were to be called and forwards user where we want him/her 
+to be.
+
+And this is all you need to do, isn't Catalyst wonderful?
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
+Danijel Milicevic C<me@danijel.de>
+Viljo Marrandi C<vilts@yahoo.com>
 
 =head1 COPYRIGHT
 
