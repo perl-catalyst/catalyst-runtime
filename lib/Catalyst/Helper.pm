@@ -223,6 +223,8 @@ $name->config(
     root => '$base/root',
 );
 
+$name->setup;
+
 sub default : Private {
     my ( \$self, \$c ) = \@_;
     \$c->res->output('Congratulations, $name is on Catalyst!');
