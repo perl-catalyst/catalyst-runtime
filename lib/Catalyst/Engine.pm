@@ -464,9 +464,9 @@ sub prepare {
         my @params;
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
-            push @params, "$key=$value";
+            push @params, " $key=$value";
         }
-        $c->log->debug( 'Parameters are', @params );
+        $c->log->debug( 'Parameters', @params );
     }
     $c->prepare_uploads;
     return $c;
@@ -787,7 +787,8 @@ sub setup_components {
         $self->components->{ ref $comp } = $comp;
         $self->setup_actions($comp);
     }
-    my @comps = keys %{ $self->components };
+    my @comps;
+    push @comps, " $_" for keys %{ $self->components };
     $self->log->debug( 'Loaded components', @comps )
       if ( @comps && $self->debug );
     my $actions  = $self->actions;
@@ -799,7 +800,7 @@ sub setup_components {
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            push @$messages, qq/"$prefix$action" in "$class" as "$code"/;
+            push @$messages, _prettify( "$prefix$action", $class, $code );
         }
         $walker->( $walker, $_, $messages, $prefix )
           for $parent->getAllChildren;
@@ -809,13 +810,13 @@ sub setup_components {
     @messages = ('Loaded plain actions');
     for my $plain ( keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        push @messages, qq|"/$plain" in "$class" as "$code"|;
+        push @messages, _prettify( $plain, $class, $code );
     }
     $self->log->debug(@messages) if ( $#messages && $self->debug );
     @messages = ('Loaded regex actions');
     for my $regex ( keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        push @messages, qq|"$regex" in "$class" as "$code"|;
+        push @messages, _prettify( $regex, $class, $code );
     }
     $self->log->debug(@messages) if ( $#messages && $self->debug );
 }
@@ -855,6 +856,16 @@ sub _class2prefix {
         $prefix =~ s/\:\:/\//g;
     }
     return $prefix;
+}
+
+sub _prettify {
+    my ( $action, $class, $code ) = @_;
+    formline
+' @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @|||||||||||||| ',
+      $action, $class, $code;
+    my $formatted = $^A;
+    $^A = '';
+    return $formatted;
 }
 
 =back
