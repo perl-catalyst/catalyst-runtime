@@ -70,12 +70,12 @@ sub finalize_headers {
             $name => $c->response->headers->header($name) );
     }
     while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
-        my %cookie = ( -name => $name, -value => $cookie->{value} );
-        $cookie->{-expires} = $cookie->{expires} if $cookie->{expires};
-        $cookie->{-domain}  = $cookie->{domain}  if $cookie->{domain};
-        $cookie->{-path}    = $cookie->{path}    if $cookie->{path};
-        $cookie->{-secure}  = $cookie->{secure}  if $cookie->{secure};
-        my $cookie = Apache::Cookie->new( $c->original_request, %cookie );
+        my %crunchy = ( -name => $name, -value => $cookie->{value} );
+        $crunchy{-expires} = $cookie->{expires} if $cookie->{expires};
+        $crunchy{-domain}  = $cookie->{domain}  if $cookie->{domain};
+        $crunchy{-path}    = $cookie->{path}    if $cookie->{path};
+        $crunchy{-secure}  = $cookie->{secure}  if $cookie->{secure};
+        my $cookie = Apache::Cookie->new( $c->original_request, %crunchy );
         MP2
           ? $c->apache_request->err_headers_out->add(
             'Set-Cookie' => $cookie->as_string )
