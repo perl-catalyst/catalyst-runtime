@@ -18,15 +18,15 @@ Here's how the M, V and C map to those concerns, with examples of well-known Per
 
 =over 4
 
-=item * Model
+=item * B<Model>
 
 Access and modify content (data). L<Class::DBI>, L<Plucene>, L<Net::LDAP>...
 
-=item * View
+=item * B<View>
 
 Present content to the user. L<Template Toolkit|Template>, L<Mason|HTML::Mason>...
 
-=item * Controller
+=item * B<Controller>
 
 Control the whole request phase, check parameters, dispatch actions, flow control. Catalyst!
 
@@ -40,17 +40,17 @@ Catalyst is much more flexible than many other frameworks.
 
 =over 4
 
-=item * Multiple Models, Views and Controllers
+=item * B<Multiple Models, Views and Controllers>
 
 To build a Catalyst application, you handle each type of concern inside special modules called L</Components>. Often this code will be very simple, just calling out to Perl modules like those listed above under L</MVC>. Catalyst is very flexible about these Components. Use as many Models, Views and Controllers as you like, using as many different Perl modules as you like, all in the same application. Want to manipulate multiple databases, plus retrieve some data via LDAP? No problem. Want to present data from the same Model using L<Template Toolkit|Template> and L<PDF::Template>? Easy.
 
-=item * Re-Useable Components
+=item * B<Re-Useable Components>
 
 Not only does Catalyst promote the re-use of already-existing Perl modules, it also allows you to re-use your Catalyst components in multiple Catalyst applications.
 
-=item * Unrestrained URL-to-Action Dispatching
+=item * B<Unrestrained URL-to-Action Dispatching>
 
-Catalyst allows you to dispatch any URLs to any application L<Actions>, even via regular expressions! Unlike some other frameworks, it doesn't require you to put class and method names in your URLs.
+Catalyst allows you to dispatch any URLs to any application L<Actions>, even via regular expressions! Unlike some other frameworks, it doesn't require mod_rewrite or class and method names in URLs.
 
 With Catalyst you register your actions and address them directly. For example:
 
@@ -61,7 +61,7 @@ With Catalyst you register your actions and address them directly. For example:
 
 Now http://localhost:3000/hello prints "Hello World!".
 
-=item * Support for CGI, mod_perl, Apache::Request
+=item * B<Support for CGI, mod_perl, Apache::Request>
 
 Use L<Catalyst::Engine::Apache> or L<Catalyst::Engine::CGI>.
 
@@ -71,23 +71,23 @@ Use L<Catalyst::Engine::Apache> or L<Catalyst::Engine::CGI>.
 
 The best part is that Catalyst implements all this flexibility in a very simple way.
 
-=item * Building Block Interface
+=item * B<Building Block Interface>
 
 Components interoperate very smoothly. For example, Catalyst automatically makes a L<Context> object available in every component. Via the context, you can access the request object, share data between components, and control the flow of your application. Building a Catalyst application feels a lot like snapping together toy building blocks, and everything just works.
 
-=item * Component Auto-Discovery
+=item * B<Component Auto-Discovery>
 
 No need to C<use> all of your components. Catalyst automatically finds and loads them.
 
-=item * Pre-Built Components for Popular Modules
+=item * B<Pre-Built Components for Popular Modules>
 
 See L<Catalyst::Model::CDBI> for L<Class::DBI>, or L<Catalyst::View::TT> for L<Template Toolkit|Template>. You can even get an instant web database front end with L<Catalyst::Model::CDBI::CRUD>.
 
-=item * Builtin Test Framework
+=item * B<Builtin Test Framework>
 
 Catalyst comes with a builtin, lightweight http server and test framework, making it easy to test applications from the command line.
 
-=item * Helper Scripts
+=item * B<Helper Scripts>
 
 Catalyst provides helper scripts to quickly generate running starter code for components and unit tests.
 
@@ -153,23 +153,23 @@ For most applications, Catalyst requires you to define only two config parameter
 
 =over 4
 
-=item * name
+=item * B<name>
 
 Name of your application.
 
-=item * root
+=item * B<root>
 
 Path to additional files like templates, images or other static data.
 
 =back
 
-However, you can define as many parameters as you want for plugins or whatever you need. You can access them anywhere in your application via $context->config->{$param_name}.
+However, you can define as many parameters as you want for plugins or whatever you need. You can access them anywhere in your application via C<$context-E<gt>config-E<gt>{$param_name}>.
 
 =head3 Context
 
 Catalyst automatically blesses a Context object into your application class and makes it available everywhere in your application. Use the Context to directly interact with Catalyst and glue your L<Components> together. 
 
-As illustrated earlier in our URL-to-Action dispatching example, the Context is always the second method parameter, behind the Component object reference itself. Previously we called it $context for clarity, but most Catalyst developers just call it $c:
+As illustrated earlier in our URL-to-Action dispatching example, the Context is always the second method parameter, behind the Component object reference or class name itself. Previously we called it C<$context> for clarity, but most Catalyst developers just call it C<$c>:
 
     MyApp->action( 'hello' => sub {
         my ( $self, $c ) = @_;
@@ -185,7 +185,7 @@ The Context contains several important objects:
     $c->request
     $c->req # alias
 
-The request contains all kind of request specific informations like query parameters, cookies, uploads, headers and more.
+The request contains all kinds of request-specific information, like query parameters, cookies, uploads, headers and more.
 
     $c->req->params->{foo};
     $c->req->cookies->{sessionid};
@@ -197,7 +197,7 @@ The request contains all kind of request specific informations like query parame
     $c->response
     $c->res # alias
 
-The response is like the request but contains just response specific informations.
+The response is like the request, but contains just response-specific information.
 
     $c->res->output('Hello World');
     $c->res->status(404);
@@ -217,7 +217,7 @@ The response is like the request but contains just response specific information
     $c->log->debug('Something happened');
     $c->log->info('Something you should know');
 
-=item * Stash
+=item * B<Stash>
 
     $c->stash
 
@@ -225,7 +225,7 @@ The response is like the request but contains just response specific information
 
 =back
 
-The last of these, the stash, is a universal hash for sharing data among application components. For an example, we return to our 'hello' action example:
+The last of these, the stash, is a universal hash for sharing data among application components. For an example, we return to our 'hello' action:
 
     MyApp->action(
 
@@ -250,21 +250,21 @@ Catalyst supports several ways to define Actions:
 
 =over 4
 
-=item * Literal
+=item * B<Literal>
 
     MyApp->action( 'foo/bar' => sub { } );
 
 Matches only http://localhost:3000/foo/bar.
 
-=item * Regex
+=item * B<Regex>
 
     MyApp->action( '/^foo(\d+)/bar(\d+)$/' => sub { } );
 
 Matches any URL that matches the pattern in the action key, e.g. http://localhost:3000/foo23/bar42. The pattern must be enclosed with forward slashes, i.e. '/$pattern/'.
 
-If you use capturing parantheses to extract values within the matching URL (23, 42 in the above example), those values are available in the $c->req->snippets array. Be sure to use ^ and $ if your action has arguments.
+If you use capturing parantheses to extract values within the matching URL (23, 42 in the above example), those values are available in the $c->req->snippets array. If you want to pass arguments at the end of your URL, you must use regex action keys. See L</URL Argument Handling> below.
 
-=item * Namespace-Prefixed
+=item * B<Namespace-Prefixed>
 
     package MyApp::Controller::My::Controller; 
     MyApp->action( '?foo' => sub { } );
@@ -273,7 +273,7 @@ Matches http://localhost:3000/my_controller/foo. The action key must be prefixed
 
 Prefixing the action key with '?' indicates that the matching URL must be prefixed with a modified form of the component's class (package) name. This modified class name excludes the parts that have a pre-defined meaning in Catalyst ("MyApp::Controller" in the above example), replaces "::" with "_" and converts the name to lower case. See L</Components> for a full explanation of the pre-defined meaning of Catalyst component class names.
 
-=item * Private
+=item * B<Private>
 
     MyApp->action( '!foo' => sub { } );
 
@@ -291,24 +291,45 @@ In response to specific application states, Catalyst will automatically call the
 
 =over 4
 
-=item * !default 
+=item * B<!default>
 
 Called when no other action matches.
 
-=item * !begin
+=item * B<!begin>
 
 Called at the beginning of a request, before any matching actions are called.
 
-=item * !end
+=item * B<!end>
+
+=back
 
 Called at the end of a request, after all matching actions are called.
 
-=item * !?default, !?begin and !?end
+=head4 B<Namespace-Prefixed Private Actions>
 
-Like their equivalents above but used to overload them from Controllers.
-So each Controller can have its own !?default, !?begin and !?end.
+    MyApp->action( '!?foo' => sub { } );
+    MyApp->action( '!?default' => sub { } );
 
-=back
+The leading '!?' indicates that these are namespace-prefixed private actions. These override any application-wide private actions with the same names, and can be called only from within the namespace in which they are defined. Any private action can be namespace-prefixed, including the builtins. One use for this might be to give a Controller its own !?default, !?begin and !?end.
+
+=head4 B<URL Argument Handling>
+
+If you want to pass variable arguments at the end of a URL, you must use regex actions keys with '^' and '$' anchors, and the arguments must be separated with forward slashes (/) in the URL. For example, suppose you want to handle /foo/$bar/$baz, where $bar and $baz may vary:
+
+    MyApp->action( '/^foo$/' => sub { my ($self, $context, $bar, $baz) = @_; } ); 
+
+But what if you also defined actions for /foo/boo and /foo/boo/hoo ?
+
+    MyApp->action( '/foo/boo' => sub { .. } );
+    MyApp->action( '/foo/boo/hoo' => sub { .. } );
+
+Catalyst matches actions in most specific to least specific order:
+
+    /foo/boo/hoo
+    /foo/boo
+    /foo # might be /foo/bar/baz
+
+So Catalyst would never mistakenly dispatch the first two URLs to the '/^foo$/' action.
 
 =head3 Flow Control
 
@@ -368,9 +389,9 @@ Catalyst will automatically try to call process() if you omit the method.
 
 =head3 Components
 
-Again, Catalyst has an uncommonly flexible component system. You can define as many L<Models>, L<Views> and Controllers as you like.
+Again, Catalyst has an uncommonly flexible component system. You can define as many L<Models>, L<Views> and L<Controllers> as you like.
 
-All components are must inherit from L<Catalyst::Base>, which provides a simple class structure and some common class methods like C<config> and C<new> (constructor).
+All components must inherit from L<Catalyst::Base>, which provides a simple class structure and some common class methods like C<config> and C<new> (constructor).
 
     package MyApp::Controller::MyController;
 
@@ -385,17 +406,17 @@ You don't have to C<use> or otherwise register Models, Views and Controllers. Ca
 
 =over 4
 
-=item * MyApp/Model/ 
+=item * B<MyApp/Model/> 
 
-=item * MyApp/M/
+=item * B<MyApp/M/>
 
-=item * MyApp/View/
+=item * B<MyApp/View/>
 
-=item * MyApp/V/
+=item * B<MyApp/V/>
 
-=item * MyApp/Controller/
+=item * B<MyApp/Controller/>
 
-=item * MyApp/C/
+=item * B<MyApp/C/>
 
 =back
 
@@ -533,11 +554,19 @@ Start your application on the command line...
 
     perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 3000
 
+or
+
+    perl bin/server
+
 ...then visit http://localhost:3000/ in a browser to view the output.
 
 You can also do it all from the command line:
 
     perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 http://localhost/
+
+or
+
+    perl bin/test http://localhost/
 
 Have fun!
 
