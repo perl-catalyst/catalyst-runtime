@@ -171,7 +171,7 @@ sub finalize {
         $c->finalize_error;
     }
 
-    if ( !$c->response->output && $c->response->status !~ /^(1|3)\d\d)$/ ) {
+    if ( !$c->response->output && $c->response->status !~ /^(1|3)\d\d$/ ) {
         $c->finalize_error;
     }
 
