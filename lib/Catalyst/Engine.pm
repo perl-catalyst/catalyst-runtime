@@ -431,8 +431,8 @@ sub handler {
             if ( my $begin = $c->find_action( '!begin', $namespace ) ) {
                 $c->process( @{ $begin->[0] } );
             }
-            if ( my $default = $c->find_action( '!default', $namespace ) ) {
-                $c->process( @{ $default->[0] } );
+            if ( my $result = $c->find_action( $action, $namespace ) ) {
+                $c->process( @{ $result->[0] } );
             }
             else {
                 my $path  = $c->req->path;
