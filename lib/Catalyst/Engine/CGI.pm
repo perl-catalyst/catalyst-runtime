@@ -187,6 +187,7 @@ sub prepare_request { shift->cgi( CGI::Simple->new ) }
 sub prepare_uploads {
     my $c = shift;
     for my $name ( $c->cgi->upload ) {
+        next unless defined $name;
         $c->req->uploads->{$name} = {
             fh   => $c->cgi->upload($name),
             size => $c->cgi->upload_info( $name, 'size' ),
