@@ -364,6 +364,7 @@ sub get_action {
             my $child = $visitor->getResult;
             my $uid   = $child->getUID if $child;
             my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
+            return [ [$match] ] if ( $match && $match =~ /^?.*/ );
             $local = $c->actions->{private}->{$uid}->{"?$action"} if $uid;
             push @results, [$match] if $match;
             $parent = $child if $child;
