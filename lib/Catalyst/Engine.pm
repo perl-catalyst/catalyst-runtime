@@ -486,8 +486,8 @@ sub handler {
             my $av = sprintf '%.3f', 1 / $elapsed;
             my $t = Text::ASCIITable->new;
             $t->setCols( 'Action', 'Time' );
-            $t->setColWidth( 'Action', 65, 1 );
-            $t->setColWidth( 'Time',   8,  1 );
+            $t->setColWidth( 'Action', 64, 1 );
+            $t->setColWidth( 'Time',   9,  1 );
 
             for my $stat (@stats) {
                 $t->addRow(@$stat);
