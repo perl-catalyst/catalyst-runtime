@@ -49,58 +49,75 @@ sub mk_app {
 =cut
 
 sub mk_component {
-    my ( $self, $app, $type, $name, $helper, @args ) = @_;
-    return 0
-      if ( $name =~ /[^\w\:]/ || !\$type =~ /^model|m|view|v|controller|c\$/i );
-    return 0 if $name =~ /[^\w\:]/;
-    $type = 'M' if $type =~ /model|m/i;
-    $type = 'V' if $type =~ /view|v/i;
-    $type = 'C' if $type =~ /controller|c/i;
-    $self->{type}  = $type;
-    $self->{name}  = $name;
-    $self->{class} = "$app\::$type\::$name";
-    $self->{app}   = $app;
-
-    # Class
-    my $appdir = File::Spec->catdir( split /\:\:/, $app );
-    my $path = File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir, $type );
-    my $file = $name;
-    if ( $name =~ /\:/ ) {
-        my @path = split /\:\:/, $name;
-        $file = pop @path;
-        $path = File::Spec->catdir( $path, @path );
-        mkpath $path;
-    }
-    $file = File::Spec->catfile( $path, "$file.pm" );
-    $self->{file} = $file;
-
-    # Test
-    $self->{test_dir} = File::Spec->catdir( $FindBin::Bin, '..', 't' );
-    $self->{test}     = $self->next_test;
-
-    # Helper
-    if ($helper) {
-        my $comp = 'Model';
-        $comp = 'View'       if $type eq 'V';
-        $comp = 'Controller' if $type eq 'C';
-        my $class = "Catalyst::Helper::$comp\::$helper";
+    my $self = shift;
+    my $app  = shift;
+    $self->{app} = $app;
+    $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
+    unless ( $_[0] =~ /^model|m|view|v|controller|c\$/i ) {
+        my $helper = shift;
+        my @args   = @_;
+        my $class  = "Catalyst::Helper::$helper";
         eval "require $class";
         die qq/Couldn't load helper "$class", "$@"/ if $@;
-        if ( $class->can('mk_compclass') ) {
-            return 1 unless $class->mk_compclass( $self, @args );
+        if ( $class->can('mk_stuff') ) {
+            return 1 unless $class->mk_stuff( $self, @args );
         }
-        else { return 1 unless $self->_mk_compclass }
-
-        if ( $class->can('mk_comptest') ) {
-            $class->mk_comptest( $self, @args );
-        }
-        else { $self->_mk_comptest }
     }
-
-    # Fallback
     else {
-        return 1 unless $self->_mk_compclass;
-        $self->_mk_comptest;
+        my $type   = shift;
+        my $name   = shift;
+        my $helper = shift;
+        my @args   = @_;
+        return 0 if $name =~ /[^\w\:]/;
+        $type = 'M' if $type =~ /model|m/i;
+        $type = 'V' if $type =~ /view|v/i;
+        $type = 'C' if $type =~ /controller|c/i;
+        $self->{type}  = $type;
+        $self->{name}  = $name;
+        $self->{class} = "$app\::$type\::$name";
+
+        # Class
+        my $appdir = File::Spec->catdir( split /\:\:/, $app );
+        my $path =
+          File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir, $type );
+        my $file = $name;
+        if ( $name =~ /\:/ ) {
+            my @path = split /\:\:/, $name;
+            $file = pop @path;
+            $path = File::Spec->catdir( $path, @path );
+            mkpath $path;
+        }
+        $file = File::Spec->catfile( $path, "$file.pm" );
+        $self->{file} = $file;
+
+        # Test
+        $self->{test_dir} = File::Spec->catdir( $FindBin::Bin, '..', 't' );
+        $self->{test}     = $self->next_test;
+
+        # Helper
+        if ($helper) {
+            my $comp = 'Model';
+            $comp = 'View'       if $type eq 'V';
+            $comp = 'Controller' if $type eq 'C';
+            my $class = "Catalyst::Helper::$comp\::$helper";
+            eval "require $class";
+            die qq/Couldn't load helper "$class", "$@"/ if $@;
+            if ( $class->can('mk_compclass') ) {
+                return 1 unless $class->mk_compclass( $self, @args );
+            }
+            else { return 1 unless $self->_mk_compclass }
+
+            if ( $class->can('mk_comptest') ) {
+                $class->mk_comptest( $self, @args );
+            }
+            else { $self->_mk_comptest }
+        }
+
+        # Fallback
+        else {
+            return 1 unless $self->_mk_compclass;
+            $self->_mk_comptest;
+        }
     }
     return 1;
 }
@@ -443,7 +460,7 @@ my \$help = 0;
 
 GetOptions( 'help|?' => \$help );
 
-pod2usage(1) if ( \$help || !\$ARGV[1] );
+pod2usage(1) if ( \$help || !\$ARGV[0] );
 
 my \$helper = Catalyst::Helper->new;
 pod2usage(1) unless \$helper->mk_component( '$name', \@ARGV );
@@ -470,6 +487,7 @@ create.pl [options] model|view|controller name [helper] [options]
    create.pl model My::Model
    create.pl model SomeDB CDBI dbi:SQLite:/tmp/my.db
    create.pl model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
+   create.pl Ajax
 
  See also:
    perldoc Catalyst::Manual

@@ -136,7 +136,7 @@ sub benchmark {
     return wantarray ? ( $elapsed, @return ) : $elapsed;
 }
 
-=head3 component / comp
+=head3 component (comp)
 
 Get a component object by name.
 
@@ -485,7 +485,7 @@ sub prepare {
     if ( $c->debug && keys %{ $c->req->params } ) {
         my @params;
         for my $key ( keys %{ $c->req->params } ) {
-            my $value = $c->req->params->{$key};
+            my $value = $c->req->params->{$key} || '';
             push @params, "$key=$value";
         }
         $c->log->debug( 'Parameters are "' . join( ' ', @params ) . '"' );
