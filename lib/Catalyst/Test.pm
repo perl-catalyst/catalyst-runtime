@@ -92,7 +92,7 @@ sub request {
     $ENV{QUERY_STRING}      ||= $request->uri->query || '';
     $ENV{REQUEST_METHOD}    ||= $request->method;
     $ENV{PATH_INFO}         ||= $request->uri->path || '/';
-    $ENV{SCRIPT_NAME}       ||= $request->uri->path || '/';
+    $ENV{SCRIPT_NAME}       ||= '/';
     $ENV{SERVER_NAME}       ||= $request->uri->host || 'localhost';
     $ENV{SERVER_PORT}       ||= $request->uri->port;
     $ENV{SERVER_PROTOCOL}   ||= 'HTTP/1.1';
