@@ -41,37 +41,159 @@ sub mk_app {
     return 1;
 }
 
+=head3 mk_component
+
+=cut
+
+sub mk_component {
+    my ( $self, $app, $type, $name, $helper, @args ) = @_;
+    return 0
+      if ( $name =~ /[^\w\:]/ || !\$type =~ /^model|m|view|v|controller|c\$/i );
+    return 0 if $name =~ /[^\w\:]/;
+    $type = 'M' if $type =~ /model|m/i;
+    $type = 'V' if $type =~ /view|v/i;
+    $type = 'C' if $type =~ /controller|c/i;
+    $self->{type}  = $type;
+    $self->{name}  = $name;
+    $self->{class} = "$app\::$type\::$name";
+    $self->{app}   = $app;
+
+    # Class
+    my $appdir = File::Spec->catdir( split /\:\:/, $app );
+    my $path = File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir, $type );
+    my $file = $name;
+    if ( $name =~ /\:/ ) {
+        my @path = split /\:\:/, $name;
+        $file = pop @path;
+        $path = File::Spec->catdir( $path, @path );
+        mkpath $path;
+    }
+    $file = File::Spec->catfile( $path, "$file.pm" );
+    $self->{file} = $file;
+
+    # Test
+    $self->{test_dir} = File::Spec->catdir( $FindBin::Bin, '..', 't' );
+    $self->{test}     = $self->next_test;
+
+    # Helper
+    if ($helper) {
+        my $comp = 'Model';
+        $comp = 'View'       if $type eq 'V';
+        $comp = 'Controller' if $type eq 'C';
+        my $class = "Catalyst::Helper::$comp\::$helper";
+        eval "require $class";
+        die qq/Couldn't load helper "$class", "$@"/ if $@;
+        if ( $class->can('mk_compclass') ) {
+            return 1 unless $class->mk_compclass( $self, @args );
+        }
+        else { return 1 unless $self->_mk_compclass }
+
+        if ( $class->can('mk_comptest') ) {
+            $class->mk_comptest( $self, @args );
+        }
+        else { $self->_mk_comptest }
+    }
+
+    # Fallback
+    else {
+        return 1 unless $self->_mk_compclass;
+        $self->_mk_comptest;
+    }
+    return 1;
+}
+
+=head3 mk_dir
+
+=cut
+
+sub mk_dir {
+    my ( $self, $dir ) = @_;
+    if ( -d $dir ) {
+        print qq/ exists "$dir"\n/;
+        return 0;
+    }
+    if ( mkpath $dir) {
+        print qq/created "$dir"\n/;
+        return 1;
+    }
+    die qq/Couldn't create "$dir", "$!"/;
+}
+
+=head3 mk_file
+
+=cut
+
+sub mk_file {
+    my ( $self, $file, $content ) = @_;
+    if ( -e $file ) {
+        print qq/ exists "$file"\n/;
+        return 0;
+    }
+    if ( my $f = IO::File->new("> $file") ) {
+        print $f $content;
+        print qq/created "$file"\n/;
+        return 1;
+    }
+    die qq/Couldn't create "$file", "$!"/;
+}
+
+=head3 next_test
+
+=cut
+
+sub next_test {
+    my ( $self, $tname ) = @_;
+    my $dir = $self->{test_dir};
+    my $num = '01';
+    for my $i (<$dir/*.t>) {
+        $i =~ /(\d+)[^\/]*.t$/;
+        my $j = $1 || $num;
+        $num = $j if $j > $num;
+    }
+    $num++;
+    $num = sprintf '%02d', $num;
+    if ($tname) { $tname = "$num$tname.t" }
+    else {
+        my $name   = $self->{name};
+        my $type   = $self->{type};
+        my $prefix = $name;
+        $prefix =~ s/::/_/g;
+        $prefix         = lc $prefix;
+        $tname          = lc( $num . $type . '_' . $prefix . '.t' );
+        $self->{prefix} = $prefix;
+    }
+    return "$dir/$tname";
+}
+
 sub _mk_dirs {
     my $self = shift;
-    mkpath $self->{dir} unless -d $self->{dir};
+    $self->mk_dir( $self->{dir} );
     $self->{bin} = File::Spec->catdir( $self->{dir}, 'bin' );
-    mkpath $self->{bin};
+    $self->mk_dir( $self->{bin} );
     $self->{lib} = File::Spec->catdir( $self->{dir}, 'lib' );
-    mkpath $self->{lib};
+    $self->mk_dir( $self->{lib} );
     $self->{root} = File::Spec->catdir( $self->{dir}, 'root' );
-    mkpath $self->{root};
+    $self->mk_dir( $self->{root} );
     $self->{t} = File::Spec->catdir( $self->{dir}, 't' );
-    mkpath $self->{t};
+    $self->mk_dir( $self->{t} );
     $self->{class} = File::Spec->catdir( split( /\:\:/, $self->{name} ) );
     $self->{mod} = File::Spec->catdir( $self->{lib}, $self->{class} );
-    mkpath $self->{mod};
+    $self->mk_dir( $self->{mod} );
     $self->{m} = File::Spec->catdir( $self->{mod}, 'M' );
-    mkpath $self->{m};
+    $self->mk_dir( $self->{m} );
     $self->{v} = File::Spec->catdir( $self->{mod}, 'V' );
-    mkpath $self->{v};
+    $self->mk_dir( $self->{v} );
     $self->{c} = File::Spec->catdir( $self->{mod}, 'C' );
-    mkpath $self->{c};
+    $self->mk_dir( $self->{c} );
     $self->{base} = File::Spec->rel2abs( $self->{dir} );
 }
 
 sub _mk_appclass {
-    my $self  = shift;
-    my $mod   = $self->{mod};
-    my $name  = $self->{name};
-    my $base  = $self->{base};
-    my $class = IO::File->new("> $mod.pm")
-      or die qq/Couldn't open "$mod.pm", "$!"/;
-    print $class <<"EOF";
+    my $self = shift;
+    my $mod  = $self->{mod};
+    my $name = $self->{name};
+    my $base = $self->{base};
+    $self->mk_file( "$mod.pm", <<"EOF");
 package $name;
 
 use strict;
@@ -121,13 +243,11 @@ EOF
 }
 
 sub _mk_makefile {
-    my $self     = shift;
-    my $name     = $self->{name};
-    my $dir      = $self->{dir};
-    my $class    = $self->{class};
-    my $makefile = IO::File->new("> $dir/Makefile.PL")
-      or die qq/Couldn't open "$dir\/Makefile.PL", "$!"/;
-    print $makefile <<"EOF";
+    my $self  = shift;
+    my $name  = $self->{name};
+    my $dir   = $self->{dir};
+    my $class = $self->{class};
+    $self->mk_file( "$dir\/Makefile.PL", <<"EOF");
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -142,17 +262,13 @@ sub _mk_apptest {
     my $self = shift;
     my $t    = $self->{t};
     my $name = $self->{name};
-    my $test = IO::File->new("> $t/01app.t")
-      or die qq/Couldn't open "$t\/01app.t", "$!"/;
-    print $test <<"EOF";
+    $self->mk_file( "$t\/01app.t", <<"EOF");
 use Test::More tests => 2;
 use_ok( Catalyst::Test, '$name' );
 
 ok( request('/')->is_success );
 EOF
-    my $pc = IO::File->new("> $t/02podcoverage.t")
-      or die qq/Couldn't open "$t\/02podcoverage.t", "$!"/;
-    print $pc <<"EOF";
+    $self->mk_file( "$t\/02podcoverage.t", <<"EOF");
 use Test::More;
 
 eval "use Test::Pod::Coverage 1.04";
@@ -164,12 +280,10 @@ EOF
 }
 
 sub _mk_server {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $bin    = $self->{bin};
-    my $server = IO::File->new("> $bin/server")
-      or die qq/Could't open "$bin\/server", "$!"/;
-    print $server <<"EOF";
+    my $self = shift;
+    my $name = $self->{name};
+    my $bin  = $self->{bin};
+    $self->mk_file( "$bin\/server", <<"EOF");
 #!/usr/bin/perl -w
 
 use strict;
@@ -200,8 +314,8 @@ server - Catalyst Testserver
 server [options]
 
  Options:
-   -help    display this help and exits
-   -port    port (defaults to 3000)
+   -? -help    display this help and exits
+   -p -port    port (defaults to 3000)
 
  See also:
    perldoc Catalyst::Manual
@@ -231,9 +345,7 @@ sub _mk_test {
     my $self = shift;
     my $name = $self->{name};
     my $bin  = $self->{bin};
-    my $test = IO::File->new("> $bin/test")
-      or die qq/Could't open "$bin\/test", "$!"/;
-    print $test <<"EOF";
+    $self->mk_file( "$bin/test", <<"EOF");
 #!/usr/bin/perl -w
 
 use strict;
@@ -296,12 +408,10 @@ EOF
 }
 
 sub _mk_create {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $bin    = $self->{bin};
-    my $create = IO::File->new("> $bin/create")
-      or die qq/Could't open "$bin\/create", "$!"/;
-    print $create <<"EOF";
+    my $self = shift;
+    my $name = $self->{name};
+    my $bin  = $self->{bin};
+    $self->mk_file( "$bin\/create", <<"EOF");
 #!/usr/bin/perl -w
 
 use strict;
@@ -365,81 +475,6 @@ EOF
     chmod 0700, "$bin/create";
 }
 
-=head3 mk_component
-
-=cut
-
-sub mk_component {
-    my ( $self, $app, $type, $name, $helper, @args ) = @_;
-    return 0
-      if ( $name =~ /[^\w\:]/ || !\$type =~ /^model|m|view|v|controller|c\$/i );
-    return 0 if $name =~ /[^\w\:]/;
-    $type = 'M' if $type =~ /model|m/i;
-    $type = 'V' if $type =~ /view|v/i;
-    $type = 'C' if $type =~ /controller|c/i;
-    $self->{type}  = $type;
-    $self->{name}  = $name;
-    $self->{class} = "$app\::$type\::$name";
-    $self->{app}   = $app;
-
-    # Class
-    my $appdir = File::Spec->catdir( split /\:\:/, $app );
-    my $path = File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir, $type );
-    my $file = $name;
-    if ( $name =~ /\:/ ) {
-        my @path = split /\:\:/, $name;
-        $file = pop @path;
-        $path = File::Spec->catdir( $path, @path );
-        mkpath $path;
-    }
-    $file = File::Spec->catfile( $path, "$file.pm" );
-    $self->{file} = $file;
-
-    # Test
-    my $dir = File::Spec->catdir( $FindBin::Bin, '..', 't' );
-    my $num = '01';
-    for my $i (<$dir/*.t>) {
-        $i =~ /(\d+)[^\/]*.t$/;
-        my $j = $1 || $num;
-        $num = $j if $j > $num;
-    }
-    $num++;
-    $num = sprintf '%02d', $num;
-    my $prefix = $name;
-    $prefix =~ s/::/_/g;
-    $prefix = lc $prefix;
-    my $tname = lc( $num . $type . '_' . $prefix . '.t' );
-    $self->{prefix}   = $prefix;
-    $self->{test_dir} = $dir;
-    $self->{test}     = "$dir/$tname";
-
-    # Helper
-    if ($helper) {
-        my $comp = 'Model';
-        $comp = 'View'       if $type eq 'V';
-        $comp = 'Controller' if $type eq 'C';
-        my $class = "Catalyst::Helper::$comp\::$helper";
-        eval "require $class";
-        die qq/Couldn't load helper "$class", "$@"/ if $@;
-        if ( $class->can('mk_compclass') ) {
-            $class->mk_compclass( $self, @args );
-        }
-        else { $self->_mk_compclass }
-
-        if ( $class->can('mk_comptest') ) {
-            $class->mk_comptest( $self, @args );
-        }
-        else { $self->_mk_comptest }
-    }
-
-    # Fallback
-    else {
-        $self->_mk_compclass;
-        $self->_mk_comptest;
-    }
-    return 1;
-}
-
 sub _mk_compclass {
     my $self   = shift;
     my $app    = $self->{app};
@@ -458,9 +493,7 @@ $app->action(
 );
 EOF
     my $file = $self->{file};
-    my $comp = IO::File->new("> $file")
-      or die qq/Couldn't open "$file", "$!"/;
-    print $comp <<"EOF";
+    return $self->mk_file( "$file", <<"EOF");
 package $class;
 
 use strict;
@@ -500,10 +533,8 @@ sub _mk_comptest {
     my $class  = $self->{class};
     my $app    = $self->{app};
     my $test   = $self->{test};
-    my $t = IO::File->new("> $test") or die qq/Couldn't open "$test", "$!"/;
-
     if ( $self->{type} eq 'C' ) {
-        print $t <<"EOF";
+        $self->mk_file( "$test", <<"EOF");
 use Test::More tests => 3;
 use_ok( Catalyst::Test, '$app' );
 use_ok('$class');
@@ -512,7 +543,7 @@ ok( request('$prefix')->is_success );
 EOF
     }
     else {
-        print $t <<"EOF";
+        $self->mk_file( "$test", <<"EOF");
 use Test::More tests => 1;
 use_ok('$class');
 EOF
