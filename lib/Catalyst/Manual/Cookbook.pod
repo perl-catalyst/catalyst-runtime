@@ -142,12 +142,21 @@ If you store datetime data in your tables, you can easily expand this column to
 a L<Time::Piece> object which lets you call useful methods like ymd, mon and 
 datetime on it.
 
-In order to set it up, add something like the following to your CDBI Model Class:
+In order to set it up, add something like the following to your CDBI Model Class,
+if you are storing dates as ISO timestamps:
 
      __PACKAGE__->has_a(
          mycolumn => 'Time::Piece',
          inflate => sub { Time::Piece->strptime( shift, "%FT%H:%M:%S" ) },
          deflate => 'datetime'
+     );
+
+or if you prefer to store dates in unix epoch time you can do something like this:
+
+     __PACKAGE__->has_a(
+         mycolumn => 'Time::Piece',
+         inflate => sub { Time::Piece->strptime( shift, "%s" ) },
+         deflate => 'epoch'
      );
 
 If you want to use another format in the database, you can change the strptime call 
