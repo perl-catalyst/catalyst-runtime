@@ -17,93 +17,122 @@ Catalyst::Request - Catalyst Request Class
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+
+    $req = $c->request;
+    $req->action;
+    $req->address;
+    $req->args;
+    $req->arguments;
+    $req->base;
+    $req->cookies;
+    $req->headers;
+    $req->hostname;
+    $req->match;
+    $req->method;
+    $req->parameters;
+    $req->params;
+    $req->path;
+    $req->snippets;
+    $req->uploads;
+
+See also L<Catalyst>.
 
 =head1 DESCRIPTION
 
-The Catalyst Request.
+This is the Catalyst Request class, which provides a set of accessors to the
+request data.  The request object is prepared by the specialized Catalyst
+Engine module thus hiding the details of the particular engine implementation.
 
-=head2 METHODS
 
-=head3 action
+=head1 METHODS
+
+=over 4
+
+=item $req->action
 
 Contains the action.
 
     print $c->request->action;
 
-=head3 address
+=item $req->address
 
 Contains the remote address.
 
     print $c->request->address
 
-=head3 arguments (args)
+=item $req->arguments
 
-Returns an arrayref containing the arguments.
+=item $req->args
+
+Returns a reference to an array containing the arguments.
 
     print $c->request->arguments->[0];
 
-=head3 base
+=item $req->base
 
 Contains the uri base.
 
-=head3 cookies
+=item $req->cookies
 
-Returns a hashref containing the cookies.
+Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-=head3 headers
+=item $req->headers
 
-Returns a L<HTTP::Headers> object containing the headers.
+Returns an L<HTTP::Headers> object containing the headers.
 
     print $c->request->headers->header('X-Catalyst');
 
-=head3 hostname
+=item $req->hostname
 
 Contains the remote hostname.
 
     print $c->request->hostname
 
-=head3 match
+=item $req->match
 
 Contains the match.
 
     print $c->request->match;
 
-=head3 parameters (params)
+=item $req->parameters
 
-Returns a hashref containing the parameters.
+=item $req->params
+
+Returns a reference to a hash containing the parameters.
 
     print $c->request->parameters->{foo};
 
-=head3 path
+=item $req->path
 
 Contains the path.
 
     print $c->request->path;
 
-=head3 method
+=item $req->method
 
-Contains the request method.
+Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
     print $c->request->method
 
-=head3 snippets
+=item $req->snippets
 
-Returns an arrayref containing regex snippets.
+Returns a reference to an array containing regex snippets.
 
     my @snippets = @{ $c->request->snippets };
 
-=head3 uploads
+=item $req->uploads
 
-Returns a hashref containing the uploads.
+Returns a reference to a hash containing the uploads.
 
     my $filename = $c->req->parameters->{foo};
     print $c->request->uploads->{$filename}->{type};
     print $c->request->uploads->{$filename}->{size};
     my $fh = $c->request->uploads->{$filename}->{fh};
     my $content = do { local $/; <$fh> };
+
+=back
 
 =head1 AUTHOR
 

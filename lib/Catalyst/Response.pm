@@ -11,43 +11,55 @@ Catalyst::Response - Catalyst Response Class
 
 =head1 SYNOPSIS
 
-See L<Catalyst::Application>.
+    $resp = $c->response;
+    $resp->cookies;
+    $resp->headers;
+    $resp->output;
+    $resp->redirect;
+    $resp->status;
+
+See also L<Catalyst::Application>.
 
 =head1 DESCRIPTION
 
-The Catalyst Response.
+This is the Catalyst Response class, which provides a set of accessors to
+response data.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 cookies
+=over 4
 
-Returns a hashref containing the cookies.
+=item $resp->cookies
+
+Returns a reference to a hash containing the cookies.
 
     $c->response->cookies->{foo} = { value => '123' };
 
-=head3 headers
+=item $resp->headers
 
 Returns a L<HTTP::Headers> object containing the headers.
 
     $c->response->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
 
-=head3 output
+=item $resp->output($text)
 
 Contains the final output.
 
     $c->response->output('Catalyst rockz!');
 
-=head3 redirect
+=item $resp->redirect($url)
 
 Contains a location to redirect to.
 
     $c->response->redirect('http://slashdot.org');
 
-=head3 status
+=item status
 
 Contains the HTTP status.
 
     $c->response->status(404);
+
+=back
 
 =head1 AUTHOR
 

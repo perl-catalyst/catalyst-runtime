@@ -18,43 +18,45 @@ See L<Catalyst>.
 
 Simple logging functionality for Catalyst.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 debug
+=over 4
 
-Log debug informations.
+=item $c->debug($msg)
+
+Logs a debugging message.
 
 =cut
 
 sub debug { _format( 'debug', $_[1] ) }
 
-=head3 dump
+=item $c->dump($ref)
 
-Dump stuff.
+Logs a formatted dump of a variable passed by reference (uses C<Data::Dumper>).
 
 =cut
 
 sub dump { _format( 'dump', Dumper( $_[1] ) ) }
 
-=head3 error
+=item $c->error($msg)
 
-Log error informations.
+Logs an error message.
 
 =cut
 
 sub error { _format( 'error', $_[1] ) }
 
-=head3 info
+=item $c->info($msg)
 
-Log informations.
+Logs an informational message.
 
 =cut
 
 sub info { _format( 'info', $_[1] ) }
 
-=head3 warn
+=item $c->warn($msg)
 
-Log warnings.
+Logs a warning message.
 
 =cut
 
@@ -63,6 +65,8 @@ sub warn { _format( 'warn', $_[1] ) }
 sub _format {
     print STDERR '[' . localtime(time) . "] [catalyst] [$_[0]] $_[1]\n";
 }
+
+=back
 
 =head1 SEE ALSO
 
