@@ -17,8 +17,6 @@ SYNOPSIS
         # command line interface
         script/test.pl /yada
 
-        See also L<Catalyst::Manual::Intro>
-
         use Catalyst;
 
         use Catalyst qw/My::Module My::OtherModule/;
@@ -44,6 +42,8 @@ SYNOPSIS
                 $c->stash->{product} = $c->req->snippets->[0];
             }
         );
+
+    See also Catalyst::Manual::Intro
 
 DESCRIPTION
     Catalyst is based upon Maypole, which you should consider for smaller
@@ -86,6 +86,16 @@ DESCRIPTION
    config
     Returns a hashref containing your applications settings.
 
+SUPPORT
+    IRC:
+
+        Join #catalyst on irc.perl.org.
+
+    Mailing-Lists:
+
+        http://lists.rawmode.org/mailman/listinfo/catalyst
+        http://lists.rawmode.org/mailman/listinfo/catalyst-dev
+    
 SEE ALSO
     Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
     Catalyst::Engine
@@ -94,8 +104,9 @@ AUTHOR
     Sebastian Riedel, "sri@oook.de"
 
 THANK YOU
-    Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse Sheidlower,
-    Johan Lindstrom, Marcus Ramberg and all the others who've helped.
+    Andrew Ruthven, Danijel Milicevic, David Naughton, Gary Ashton Jones,
+    Jesse Sheidlower, Johan Lindstrom, Marcus Ramberg and all the others
+    who've helped.
 
 LICENSE
     This library is free software . You can redistribute it and/or modify it
