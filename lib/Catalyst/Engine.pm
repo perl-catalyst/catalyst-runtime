@@ -634,47 +634,18 @@ Set an action in a given namespace.
 sub set_action {
     my ( $c, $method, $code, $namespace, $attrs ) = @_;
 
-    my $prefix   = _class2prefix($namespace) || '';
-    my $action   = 0;
-    my $public   = 0;
-    my $regex    = 0;
-    my $arg      = '';
-    my $absolute = 0;
+    my $prefix = _class2prefix($namespace) || '';
+    my %flags;
 
     for my $attr ( @{$attrs} ) {
-        if ( $attr =~ /^Action$/ ) {
-            $action++;
-            $arg = $1 if $1;
-        }
-        elsif ( $attr =~ /^Path\((.+)\)$/i ) {
-            $arg = $1;
-            $public++;
-        }
-        elsif ( $attr =~ /^Public$/i ) {
-            $public++;
-        }
-        elsif ( $attr =~ /^Private$/i ) {
-            $action++;
-        }
-        elsif ( $attr =~ /Regex(?:\((.+)\))?$/i ) {
-            $regex++;
-            $action++;
-            $arg = $1 if $1;
-        }
-        elsif ( $attr =~ /Absolute(?:\((.+)\))?$/i ) {
-            $action++;
-            $absolute++;
-            $public++;
-            $arg = $1 if $1;
-        }
-        elsif ( $attr =~ /Relative(?:\((.+)\))?$/i ) {
-            $action++;
-            $public++;
-            $arg = $1 if $1;
-        }
+        if    ( $attr =~ /^Local$/ )         { $flags{local}++ }
+        elsif ( $attr =~ /^Global$/ )        { $flags{global}++ }
+        elsif ( $attr =~ /^Path\((.+)\)$/i ) { $flags{path} = $1 }
+        elsif ( $attr =~ /^Private$/i )      { $flags{private}++ }
+        elsif ( $attr =~ /Regex\((.+)\)$/i ) { $flags{regex} = $1 }
     }
 
-    return unless $action;
+    return unless keys %flags;
 
     my $parent  = $c->tree;
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
@@ -696,29 +667,36 @@ sub set_action {
     $c->log->debug(qq|Private "/$forward" is "$namespace->$method"|)
       if $c->debug;
 
-    $arg =~ s/^\w+//;
-    $arg =~ s/\w+$//;
-    if ( $arg =~ /^'(.*)'$/ ) { $arg = $1 }
-    if ( $arg =~ /^"(.*)"$/ ) { $arg = $1 }
+    if ( $flags{path} ) {
+        $flags{path} =~ s/^\w+//;
+        $flags{path} =~ s/\w+$//;
+        if ( $flags{path} =~ /^'(.*)'$/ ) { $flags{path} = $1 }
+        if ( $flags{path} =~ /^"(.*)"$/ ) { $flags{path} = $1 }
+    }
+    if ( $flags{regex} ) {
+        $flags{regex} =~ s/^\w+//;
+        $flags{regex} =~ s/\w+$//;
+        if ( $flags{regex} =~ /^'(.*)'$/ ) { $flags{regex} = $1 }
+        if ( $flags{regex} =~ /^"(.*)"$/ ) { $flags{regex} = $1 }
+    }
 
     my $reverse = $prefix ? "$method ($prefix)" : $method;
 
-    if ($public) {
-        my $is_absolute = 0;
-        $is_absolute = 1 if $absolute;
-        if ( $arg =~ /^\/(.+)/ ) {
-            $arg         = $1;
-            $is_absolute = 1;
+    if ( $flags{local} || $flags{global} || $flags{path} ) {
+        my $path = $flags{path} || $method;
+        my $absolute = 0;
+        if ( $path =~ /^\/(.+)/ ) {
+            $path     = $1;
+            $absolute = 1;
         }
-        my $name =
-          $is_absolute ? ( $arg || $method ) : "$prefix/" . ( $arg || $method );
+        my $name = $absolute ? $path : "$prefix/$path";
         $c->actions->{plain}->{$name} = [ $namespace, $code ];
         $c->log->debug(qq|Public "/$name" is "/$forward"|) if $c->debug;
     }
-    if ($regex) {
-        push @{ $c->actions->{compiled} }, [ $arg, qr#$arg# ];
-        $c->actions->{regex}->{$arg} = [ $namespace, $code ];
-        $c->log->debug(qq|Public "$arg" is "/$forward"|) if $c->debug;
+    if ( my $regex = $flags{regex} ) {
+        push @{ $c->actions->{compiled} }, [ $regex, qr#$regex# ];
+        $c->actions->{regex}->{$regex} = [ $namespace, $code ];
+        $c->log->debug(qq|Public "$regex" is "/$forward"|) if $c->debug;
     }
 
     $c->actions->{reverse}->{"$code"} = $reverse;
