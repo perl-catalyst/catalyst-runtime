@@ -34,9 +34,19 @@ catalyst [options] application-name
     catalyst My::App
     catalyst MyApp
 
+ See also:
+    perldoc Catalyst::Manual
+    perldoc Catalyst::Manual::Intro
+
 =head1 DESCRIPTION
 
 Bootstrap a Catalyst application.
+
+=head1 SEE ALSO
+
+L<Catalyst>, L<Catalyst::Manual>, L<Catalyst::Manual::Intro>,
+L<Catalyst::Test>, L<Catalyst::Request>, L<Catalyst::Response>,
+L<Catalyst::Engine>
 
 =head1 AUTHOR
 

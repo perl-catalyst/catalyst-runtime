@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.01  Tue Mar 01 10:00:00 2005
+        - improved documentation
+
 4.00  Sun Feb 27 22:00:00 2005
         - more verbose debug messages, especially for forward()
         - implemented prefixed prvate actions, icluding built in

@@ -192,6 +192,10 @@ server [options]
    -help    display this help and exits
    -port    port (defaults to 3000)
 
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
 =head1 DESCRIPTION
 
 Run a Catalyst Testserver for this application.
@@ -256,6 +260,10 @@ test [options] uri
    test http://localhost/some_action
    test /some_action
 
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
 =head1 DESCRIPTION
 
 Run a Catalyst action from the comand line.
@@ -308,15 +316,23 @@ create - Create a new Catalyst Component
 
 =head1 SYNOPSIS
 
-create [options] model|view|controller name
+create [options] model|view|controller name [helper] [options]
 
  Options:
    -help    display this help and exits
 
  Examples:
    create controller My::Controller
-   create model My::Model
    create view My::View
+   create view MyView TT
+   create view TT TT
+   create model My::Model
+   create model SomeDB CDBI dbi:SQLite:/tmp/my.db
+   create model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
+
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
 
 =head1 DESCRIPTION
 
