@@ -26,13 +26,12 @@ This class overloads some methods from C<Catalyst::Engine::CGI>.
 =cut
 
 sub run {
-    my $class  = shift;
-    my $port   = shift || 3000;
-    my $script = shift;
+    my $class = shift;
+    my $port  = shift || 3000;
 
     my $server = Catalyst::Engine::Server::Simple->new($port);
 
-    $server->handler( sub { $script ? print `$script` : $class->handler } );
+    $server->handler( sub { $class->handler } );
     $server->run;
 }
 
