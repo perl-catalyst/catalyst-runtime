@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
+
 4.24  Xxx Mar 00 00:00:00 2005
         - updated cookbook example  
+        - fixed base for apache (Andrew Ruthven)
         
 4.23  Wed Mar 09 20:00:00 2005
         - no more regex actions in forward

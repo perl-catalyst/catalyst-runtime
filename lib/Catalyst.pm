@@ -7,7 +7,7 @@ use Catalyst::Log;
 
 __PACKAGE__->mk_classdata($_) for qw/_config log/;
 
-our $VERSION = '4.23';
+our $VERSION = '4.24';
 our @ISA;
 
 =head1 NAME
@@ -30,9 +30,6 @@ Catalyst - The Elegant MVC Web Application Framework
 
     # command line interface
     script/test.pl /yada
-
-
-    See also L<Catalyst::Manual::Intro>
 
 
     use Catalyst;
@@ -60,6 +57,8 @@ Catalyst - The Elegant MVC Web Application Framework
             $c->stash->{product} = $c->req->snippets->[0];
         }
     );
+
+See also L<Catalyst::Manual::Intro>
 
 =head1 DESCRIPTION
 
@@ -198,8 +197,9 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 THANK YOU
 
-Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse Sheidlower,
-Johan Lindstrom, Marcus Ramberg and all the others who've helped.
+Andrew Ruthven, Danijel Milicevic, David Naughton, Gary Ashton Jones,
+Jesse Sheidlower, Johan Lindstrom, Marcus Ramberg and all the others
+who've helped.
 
 =head1 LICENSE
 
