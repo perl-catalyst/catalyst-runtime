@@ -101,13 +101,13 @@ Here's how to install Catalyst and get a simple application up and running, usin
 
 =head3 Setup
 
-    $ catalyst My::App
+    $ perl /path/to/catalyst My::App
     $ cd My-App
-    $ bin/create controller My::Controller
+    $ perl bin/create controller My::Controller
 
 =head3 Run
 
-    $ bin/server
+    $ perl bin/server
 
 Now visit these locations with your favorite browser or user agent to see Catalyst in action:
 
@@ -252,13 +252,13 @@ Catalyst supports several ways to define Actions:
 
 =item * Literal
 
-    $c->action( 'foo/bar' => sub { } );
+    MyApp->action( 'foo/bar' => sub { } );
 
 Matches only http://localhost:3000/foo/bar.
 
 =item * Regex
 
-    $c->action( '^/foo(\d+)/bar(\d+)$/' => sub { } );
+    MyApp->action( '^/foo(\d+)/bar(\d+)$/' => sub { } );
 
 Matches any URL that matches the pattern in the action key, e.g. http://localhost:3000/foo23/bar42. The pattern must be enclosed with forward slashes, i.e. '/$pattern/'.
 
@@ -267,7 +267,7 @@ If you use capturing parantheses to extract values within the matching URL (23, 
 =item * Namespace-Prefixed
 
     package MyApp::Controller::My::Controller; 
-    $c->action( '?foo' => sub { } );
+    MyApp->action( '?foo' => sub { } );
 
 Matches http://localhost:3000/my_controller/foo. The action key must be prefixed with '?'.
 
@@ -275,7 +275,7 @@ Prefixing the action key with '?' indicates that the matching URL must be prefix
 
 =item * Private
 
-    $c->action( '!foo' => sub { } );
+    MyApp->action( '!foo' => sub { } );
 
 Matches no URL, and cannot be executed by requesting a URL that corresponds to the action key. Private actions can be executed only inside a Catalyst application, by calling the C<forward> method:
 

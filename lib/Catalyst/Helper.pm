@@ -257,8 +257,8 @@ test [options] uri
    -help    display this help and exits
 
  Examples:
-   test http://localhost/some_action
-   test /some_action
+   perl test http://localhost/some_action
+   perl test /some_action
 
  See also:
    perldoc Catalyst::Manual
@@ -322,13 +322,13 @@ create [options] model|view|controller name [helper] [options]
    -help    display this help and exits
 
  Examples:
-   create controller My::Controller
-   create view My::View
-   create view MyView TT
-   create view TT TT
-   create model My::Model
-   create model SomeDB CDBI dbi:SQLite:/tmp/my.db
-   create model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
+   perl create controller My::Controller
+   perl create view My::View
+   perl create view MyView TT
+   perl create view TT TT
+   perl create model My::Model
+   perl create model SomeDB CDBI dbi:SQLite:/tmp/my.db
+   perl create model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
 
  See also:
    perldoc Catalyst::Manual

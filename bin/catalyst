@@ -31,8 +31,8 @@ catalyst [options] application-name
  application-name has to be a valid Perl module name and can include ::
 
  Examples:
-    catalyst My::App
-    catalyst MyApp
+    perl /path/to/catalyst My::App
+    perl /path/to/catalyst MyApp
 
  See also:
     perldoc Catalyst::Manual
