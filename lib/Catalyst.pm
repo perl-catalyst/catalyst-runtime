@@ -5,7 +5,7 @@ use base 'Class::Data::Inheritable';
 use UNIVERSAL::require;
 use Catalyst::Log;
 
-__PACKAGE__->mk_classdata($_) for qw/_config log/;
+__PACKAGE__->mk_classdata($_) for qw/_config engine log/;
 
 our $VERSION = '4.33';
 our @ISA;
@@ -194,8 +194,13 @@ sub import {
         no strict 'refs';
         push @{"$caller\::ISA"}, $engine;
     }
+    $caller->engine($engine);
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 }
+
+=item $c->engine
+
+Contains the engine class.
 
 =item $c->log
 
