@@ -17,7 +17,7 @@ Catalyst - The Elegant MVC Web Application Framework
 =head1 SYNOPSIS
 
     # use the helper to start a new application
-    perl /path/to/catalyst MyApp
+    catalyst MyApp
     cd MyApp
 
     # add models, views, controllers

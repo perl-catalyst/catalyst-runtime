@@ -101,7 +101,7 @@ Here's how to install Catalyst and get a simple application up and running, usin
 
 =head3 Setup
 
-    $ perl /path/to/catalyst My::App
+    $ catalyst My::App
     $ cd My-App
     $ perl bin/create controller My::Controller
 
@@ -552,21 +552,21 @@ Catalyst has a built in http server for testing! (Later, you can easily use a mo
 
 Start your application on the command line...
 
-    perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 3000
+    perl bin/server
 
 or
 
-    perl bin/server
+    perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 3000
 
 ...then visit http://localhost:3000/ in a browser to view the output.
 
 You can also do it all from the command line:
 
-    perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 http://localhost/
+    perl bin/test http://localhost/
 
 or
 
-    perl bin/test http://localhost/
+    perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 http://localhost/
 
 Have fun!
 
