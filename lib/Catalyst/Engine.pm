@@ -121,13 +121,11 @@ sub dispatch {
         $c->state(1);
         if ( my $begin = @{ $c->get_action( 'begin', $namespace ) }[-1] ) {
             $c->execute( @{ $begin->[0] } );
-            return if scalar @{$c->error};
         }
 
         # Execute the auto chain
         for my $auto ( @{ $c->get_action( 'auto', $namespace ) } ) {
             $c->execute( @{ $auto->[0] } );
-            return if scalar @{$c->error};
             last unless $c->state;
         }
 
@@ -141,7 +139,6 @@ sub dispatch {
         # Execute last end
         if ( my $end = @{ $c->get_action( 'end', $namespace ) }[-1] ) {
             $c->execute( @{ $end->[0] } );
-            return if scalar @{$c->error};
         }
     }
     else {
@@ -203,14 +200,10 @@ sub execute {
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
     };
     if ( my $error = $@ ) {
-
-        unless ( ref $error ) {
-            chomp $error;
-            $error = qq/Caught exception "$error"/;
-        }
-        
+        chomp $error;
+        $error = qq/Caught exception "$error"/;
         $c->log->error($error);
-        $c->error($error);
+        $c->error($error) if $c->debug;
         $c->state(0);
     }
     return $c->state;
@@ -794,7 +787,7 @@ sub set_action {
             $absolute = 1;
         }
         $absolute = 1 if $flags{global};
-        my $name = $absolute ? $path : "$prefix/$path";
+        my $name = $absolute ? $path : $prefix ? "$prefix/$path" : $path;
         $c->actions->{plain}->{$name} = [ $namespace, $code ];
     }
     if ( my $regex = $flags{regex} ) {
