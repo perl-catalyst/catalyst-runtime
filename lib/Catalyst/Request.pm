@@ -11,6 +11,13 @@ __PACKAGE__->mk_accessors(
 *args   = \&arguments;
 *params = \&parameters;
 
+sub content_encoding { shift->headers->content_encoding(@_) }
+sub content_length   { shift->headers->content_length(@_)   }
+sub content_type     { shift->headers->content_type(@_)     }
+sub header           { shift->headers->header(@_)           }
+sub referer          { shift->headers->referer(@_)          }
+sub user_agent       { shift->headers->user_agent(@_)       }
+
 =head1 NAME
 
 Catalyst::Request - Catalyst Request Class

@@ -5,6 +5,11 @@ use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(qw/cookies headers output redirect status/);
 
+sub content_encoding { shift->headers->content_encoding(@_) }
+sub content_length   { shift->headers->content_length(@_)   }
+sub content_type     { shift->headers->content_type(@_)     }
+sub header           { shift->headers->header(@_)           }
+
 =head1 NAME
 
 Catalyst::Response - Catalyst Response Class
