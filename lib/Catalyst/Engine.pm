@@ -286,6 +286,7 @@ If you define a class without method it will default to process().
 sub forward {
     my $c       = shift;
     my $command = shift;
+    $c->state(0);
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
@@ -301,22 +302,13 @@ sub forward {
     }
     my $results = $c->get_action( $command, $namespace );
     if ( @{$results} ) {
-        if ( $command =~ /^\!/ ) {
-            for my $result ( @{$results} ) {
-                my ( $class, $code ) = @{ $result->[0] };
-                $c->state( $c->process( $class, $code ) );
-            }
-        }
-        else {
-            return 0 unless my $result = $results->[0];
-            if ( $result->[2] ) {
+        unless ( $command =~ /^\!/ ) {
+            $results = [ pop @{$results} ];
+            if ( $results->[0]->[2] ) {
                 $c->log->debug(qq/Couldn't forward "$command" to regex action/)
                   if $c->debug;
                 return 0;
             }
-            my ( $class, $code ) = @{ $result->[0] };
-            $class = $c->components->{$class} || $class;
-            $c->state( $c->process( $class, $code ) );
         }
     }
     else {
@@ -328,14 +320,18 @@ sub forward {
         my $method = shift || 'process';
         if ( my $code = $class->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
-            $class = $c->comp($class) || $class;
-            $c->state( $c->process( $class, $code ) );
+            $results = [ [ [ $class, $code ] ] ];
         }
         else {
             $c->log->debug(qq/Couldn't forward to "$class->$method"/)
               if $c->debug;
             return 0;
         }
+    }
+    for my $result ( @{$results} ) {
+        my ( $class, $code ) = @{ $result->[0] };
+        $class = $c->comp->{$class} || $class;
+        $c->state( $c->process( $class, $code ) );
     }
     return $c->state;
 }
