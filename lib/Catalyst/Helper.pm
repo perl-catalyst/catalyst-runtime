@@ -325,7 +325,10 @@ sub _mk_cgi {
     $self->mk_file( "$script\/nph-cgi.pl", <<"EOF");
 $Config{startperl} -w
 
-BEGIN { \$ENV{CATALYST_ENGINE} = 'CGI' }
+BEGIN {
+    \$ENV{CATALYST_ENGINE} = 'CGI';
+    \$ENV{CATALYST_TEST    = 1;
+}
 
 use strict;
 use FindBin;
@@ -374,6 +377,7 @@ $Config{startperl} -w
 
 BEGIN { 
     \$ENV{CATALYST_ENGINE} = 'Server';
+    \$ENV{CATALYST_TEST}   = 1;
 }
 
 use strict;
@@ -440,6 +444,7 @@ $Config{startperl} -w
 
 BEGIN { 
     \$ENV{CATALYST_ENGINE} = 'Server';
+    \$ENV{CATALYST_TEST}   = 1;
 }
 
 use strict;
