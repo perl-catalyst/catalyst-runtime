@@ -595,7 +595,7 @@ sub execute {
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} },
-              _prettify( $action, sprintf( '%fs', $elapsed ), '' );
+              _prettify( $action, '', sprintf( '%fs', $elapsed ) );
             $c->state(@state);
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
