@@ -9,6 +9,9 @@ This is the comprehensive user guide and reference for Catalyst.
 L<Catalyst::Manual::Intro>
     Introduction to Catalyst.
 
+L<Catalyst::Manual::Tutorial>
+    A simple step by step tutorial.
+
 L<Catalyst::Manual::Cookbook>
     Cooking with Catalyst.
 

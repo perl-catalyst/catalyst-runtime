@@ -11,6 +11,7 @@ WriteMakefile(
         Class::Data::Inheritable => 0,
         HTML::Entities           => 0,
         HTTP::Headers            => 0,
+        HTTP::Server::Simple     => 0,
         Module::Pluggable::Fast  => 0
     }
 );
