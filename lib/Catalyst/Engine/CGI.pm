@@ -18,11 +18,26 @@ Catalyst::Engine::CGI - The CGI Engine
 
 =head1 SYNOPSIS
 
+    #!/usr/bin/perl -w
+
+    use strict;
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+
+    MyApp->run;
+
 See L<Catalyst>.
 
 =head1 DESCRIPTION
 
 This is the CGI engine for Catalyst.
+
+The script shown above must be designated as a "Non-parsed Headers"
+script to function properly.
+To do this in Apache name the script starting with C<nph->.
+
+The performance of this way of using Catalyst is not expected to be
+useful in production applications, but it may be helpful for development.
 
 =head2 METHODS
 
