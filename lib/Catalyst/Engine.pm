@@ -582,7 +582,8 @@ sub prepare_action {
             if ($#$result) {
                 my $match    = $result->[1];
                 my @snippets = @{ $result->[2] };
-                $c->log->debug(qq/Requested action "$path" matched "$match"/)
+                $c->log->debug(
+                    qq/Requested action is "$path" and matched "$match"/)
                   if $c->debug;
                 $c->log->debug(
                     'Snippets are "' . join( ' ', @snippets ) . '"' )
@@ -592,7 +593,7 @@ sub prepare_action {
             }
             else {
                 $c->req->action($path);
-                $c->log->debug(qq/Requested action "$path"/) if $c->debug;
+                $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
             }
             $c->req->match($path);
             last;
@@ -926,24 +927,6 @@ sub _class2prefix {
         $prefix =~ s/\:\:/\//g;
     }
     return $prefix;
-}
-
-sub _prettify_action {
-    my ( $val1, $val2, $val3 ) = @_;
-    formline '  + @<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
-      . ' @>>>>>>>>>>>>>>  ', $val1, $val2, $val3;
-    my $formatted = $^A;
-    $^A = '';
-    return $formatted;
-}
-
-sub _prettify_stats {
-    my ( $val1, $val2 ) = @_;
-    formline '  + @<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< ',
-      $val1, $val2;
-    my $formatted = $^A;
-    $^A = '';
-    return $formatted;
 }
 
 =back
