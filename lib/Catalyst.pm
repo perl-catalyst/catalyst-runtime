@@ -7,7 +7,7 @@ use Catalyst::Log;
 
 __PACKAGE__->mk_classdata($_) for qw/_config log/;
 
-our $VERSION = '4.30';
+our $VERSION = '4.31';
 our @ISA;
 
 =head1 NAME
@@ -146,9 +146,15 @@ sub import {
         no strict 'refs';
         *{"$caller\::handler"} =
           sub { Catalyst::Engine::handler( $caller, @_ ) };
-        push @{"$caller\::ISA"}, $self;
+
+        unless ( $caller->isa($self) ) {
+            push @{"$caller\::ISA"}, $self;
+        }
     }
-    $self->log( Catalyst::Log->new );
+
+    unless ( $self->log ) {
+        $self->log( Catalyst::Log->new );
+    }
 
     # Options
     my $engine =
@@ -157,7 +163,7 @@ sub import {
         if (/^\-Debug$/) {
             no warnings;
             no strict 'refs';
-            *{"$self\::debug"} = sub { 1 };
+            *{"$caller\::debug"} = sub { 1 };
             $caller->log->debug('Debug messages enabled');
         }
         elsif (/^-Engine=(.*)$/) { $engine = "Catalyst::Engine::$1" }
