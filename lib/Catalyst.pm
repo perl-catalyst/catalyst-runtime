@@ -150,6 +150,7 @@ sub import {
       ? 'Catalyst::Engine::Apache'
       : 'Catalyst::Engine::CGI';
 
+    my @plugins;
     foreach (@options) {
         if (/^\-Debug$/) {
             next if $caller->debug;
@@ -168,13 +169,14 @@ sub import {
                 $caller->log->error(qq/Couldn't load plugin "$plugin", "$@"/);
             }
             else {
-                $caller->log->debug(qq/Loaded plugin "$plugin"/)
-                  if $caller->debug;
+                push @plugins, " $plugin";
                 no strict 'refs';
                 push @{"$caller\::ISA"}, $plugin;
             }
         }
     }
+    $caller->log->debug( 'Loaded plugins', @plugins )
+      if ( @plugins && $caller->debug );
 
     # Engine
     $engine = "Catalyst::Engine::$ENV{CATALYST_ENGINE}"
