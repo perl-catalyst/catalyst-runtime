@@ -167,105 +167,19 @@ sub finalize {
         $c->response->status(302);
     }
 
-    if ( $c->res->status =~ /^(1\d\d|[23]04)$/ ) {
-        $c->response->headers->remove_content_headers;
-        return $c->finalize_headers;
+    if ( $#{ $c->error } >= 0 ) {
+        $c->finalize_error;
     }
 
-    if ( !$c->res->output || $#{ $c->error } >= 0 ) {
-        $c->res->headers->content_type('text/html');
-        my $name = $c->config->{name} || 'Catalyst Application';
-        my ( $title, $error, $infos );
-        if ( $c->debug ) {
-            $error = join '<br/>', @{ $c->error };
-            $error ||= 'No output';
-            $title = $name = "$name on Catalyst $Catalyst::VERSION";
-            my $req   = encode_entities Dumper $c->req;
-            my $res   = encode_entities Dumper $c->res;
-            my $stash = encode_entities Dumper $c->stash;
-            $infos = <<"";
-<br/>
-<b><u>Request</u></b><br/>
-<pre>$req</pre>
-<b><u>Response</u></b><br/>
-<pre>$res</pre>
-<b><u>Stash</u></b><br/>
-<pre>$stash</pre>
-
-        }
-        else {
-            $title = $name;
-            $error = '';
-            $infos = <<"";
-<pre>
-(en) Please come back later
-(de) Bitte versuchen sie es spaeter nocheinmal
-(nl) Gelieve te komen later terug
-(no) Vennligst prov igjen senere
-(fr) Veuillez revenir plus tard
-(es) Vuelto por favor mas adelante
-(pt) Voltado por favor mais tarde
-(it) Ritornato prego più successivamente
-</pre>
-
-            $name = '';
-        }
-        $c->res->{output} = <<"";
-<html>
-    <head>
-        <title>$title</title>
-        <style type="text/css">
-            body {
-                font-family: "Bitstream Vera Sans", "Trebuchet MS", Verdana,
-                             Tahoma, Arial, helvetica, sans-serif;
-                color: #ddd;
-                background-color: #eee;
-                margin: 0px;
-                padding: 0px;
-            }
-            div.box {
-                background-color: #ccc;
-                border: 1px solid #aaa;
-                padding: 4px;
-                margin: 10px;
-                -moz-border-radius: 10px;
-            }
-            div.error {
-                background-color: #977;
-                border: 1px solid #755;
-                padding: 8px;
-                margin: 4px;
-                margin-bottom: 10px;
-                -moz-border-radius: 10px;
-            }
-            div.infos {
-                background-color: #797;
-                border: 1px solid #575;
-                padding: 8px;
-                margin: 4px;
-                margin-bottom: 10px;
-                -moz-border-radius: 10px;
-            }
-            div.name {
-                background-color: #779;
-                border: 1px solid #557;
-                padding: 8px;
-                margin: 4px;
-                -moz-border-radius: 10px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="box">
-            <div class="error">$error</div>
-            <div class="infos">$infos</div>
-            <div class="name">$name</div>
-        </div>
-    </body>
-</html>
-
+    if ( !$c->res->output && $c->res->status !~ /^(1\d\d|[23]04)$/ ) {
+        $c->finalize_error;
     }
-    $c->res->headers->content_length( length $c->res->output );
+
+    if ( $c->res->output ) {
+        use bytes; # play safe with a utf8 aware perl
+        $c->response->content_length( length $c->res->output );
+    }
+
     my $status = $c->finalize_headers;
     $c->finalize_output;
     return $status;
@@ -292,6 +206,109 @@ sub finalize_cookies {
 
         $c->res->headers->push_header( 'Set-Cookie' => $cookie->as_string );
     }
+}
+
+=item $c->finalize_error
+
+Finalize error.
+
+=cut
+
+sub finalize_error {
+    my $c = shift;
+
+    $c->res->headers->content_type('text/html');
+    my $name = $c->config->{name} || 'Catalyst Application';
+
+    my ( $title, $error, $infos );
+    if ( $c->debug ) {
+        $error = join '<br/>', @{ $c->error };
+        $error ||= 'No output';
+        $title = $name = "$name on Catalyst $Catalyst::VERSION";
+        my $req   = encode_entities Dumper $c->req;
+        my $res   = encode_entities Dumper $c->res;
+        my $stash = encode_entities Dumper $c->stash;
+        $infos = <<"";
+<br/>
+<b><u>Request</u></b><br/>
+<pre>$req</pre>
+<b><u>Response</u></b><br/>
+<pre>$res</pre>
+<b><u>Stash</u></b><br/>
+<pre>$stash</pre>
+
+    }
+    else {
+        $title = $name;
+        $error = '';
+        $infos = <<"";
+<pre>
+(en) Please come back later
+(de) Bitte versuchen sie es spaeter nocheinmal
+(nl) Gelieve te komen later terug
+(no) Vennligst prov igjen senere
+(fr) Veuillez revenir plus tard
+(es) Vuelto por favor mas adelante
+(pt) Voltado por favor mais tarde
+(it) Ritornato prego più successivamente
+</pre>
+
+        $name = '';
+    }
+    $c->res->output( <<"" );
+<html>
+<head>
+    <title>$title</title>
+    <style type="text/css">
+        body {
+            font-family: "Bitstream Vera Sans", "Trebuchet MS", Verdana,
+                         Tahoma, Arial, helvetica, sans-serif;
+            color: #ddd;
+            background-color: #eee;
+            margin: 0px;
+            padding: 0px;
+        }
+        div.box {
+            background-color: #ccc;
+            border: 1px solid #aaa;
+            padding: 4px;
+            margin: 10px;
+            -moz-border-radius: 10px;
+        }
+        div.error {
+            background-color: #977;
+            border: 1px solid #755;
+            padding: 8px;
+            margin: 4px;
+            margin-bottom: 10px;
+            -moz-border-radius: 10px;
+        }
+        div.infos {
+            background-color: #797;
+            border: 1px solid #575;
+            padding: 8px;
+            margin: 4px;
+            margin-bottom: 10px;
+            -moz-border-radius: 10px;
+        }
+        div.name {
+            background-color: #779;
+            border: 1px solid #557;
+            padding: 8px;
+            margin: 4px;
+            -moz-border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="error">$error</div>
+        <div class="infos">$infos</div>
+        <div class="name">$name</div>
+    </div>
+</body>
+</html>
+
 }
 
 =item $c->finalize_headers

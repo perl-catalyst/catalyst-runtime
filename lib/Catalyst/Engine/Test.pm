@@ -69,7 +69,7 @@ sub finalize_headers {
 
 sub finalize_output {
     my $c = shift;
-    $c->http->response->content_ref( \$c->response->{output} );
+    $c->http->response->content( $c->response->output );
 }
 
 =item $c->prepare_connection

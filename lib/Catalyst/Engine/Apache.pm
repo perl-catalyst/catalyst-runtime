@@ -70,7 +70,7 @@ sub finalize_headers {
 
 sub finalize_output {
     my $c = shift;
-    $c->apache->print( $c->response->{output} );
+    $c->apache->print( $c->response->output );
 }
 
 =item $c->prepare_connection
