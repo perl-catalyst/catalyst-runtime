@@ -16,17 +16,17 @@ TestApp->action(
 
     '!begin' => sub {
         my ( $self, $c ) = @_;
-        $c->res->output( 'foo' );
+        $c->res->output('foo');
     },
 
-    '!default' => sub { 
+    '!default' => sub {
         my ( $self, $c ) = @_;
         $c->res->output( $c->res->output . 'foo' );
-     },
+    },
 
     '!end' => sub {
         my ( $self, $c ) = @_;
-        $c->res->output( $c->res->output . 'foo');
+        $c->res->output( $c->res->output . 'foo' );
     },
 );
 
@@ -39,10 +39,10 @@ TestApp->action(
         $c->res->output( $c->res->output . 'bar' );
     },
 
-    '!default' => sub { 
+    '!default' => sub {
         my ( $self, $c ) = @_;
         $c->res->output( $c->res->output . 'bar' );
-     },
+    },
 
     '!end' => sub {
         my ( $self, $c ) = @_;
@@ -52,10 +52,8 @@ TestApp->action(
 
 package main;
 
-use Test::More tests => 2;
+use Test::More tests => 5;
 use Catalyst::Test 'TestApp';
-
-use Data::Dumper;
 
 {
     my $response = request('/foo');
@@ -63,6 +61,21 @@ use Data::Dumper;
 }
 
 {
+    my $response = request('/foo/rab');
+    ok( $response->content =~ /foofoofoo/ );
+}
+
+{
     my $response = request('/foo/bar');
     ok( $response->content =~ /foobarfoobarfoobar/ );
+}
+
+{
+    my $response = request('/foobar');
+    ok( $response->content !~ /foofoofoo/ );
+}
+
+{
+    my $response = request('/foo_bar/yada');
+    ok( $response->content !~ /foobarfoobarfoobar/ );
 }
