@@ -325,6 +325,8 @@ sub _mk_cgi {
     $self->mk_file( "$script\/nph-cgi.pl", <<"EOF");
 $Config{startperl} -w
 
+BEGIN { \$ENV{CATALYST_ENGINE} = 'CGI' }
+
 use strict;
 use FindBin;
 use lib "\$FindBin::Bin/../lib";
