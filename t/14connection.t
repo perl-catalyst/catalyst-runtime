@@ -3,7 +3,7 @@ package TestApp;
 use Catalyst;
 
 __PACKAGE__->action(
-    host => sub {
+    hostname => sub {
         my ( $self, $c ) = @_;
         $c->res->output( $c->req->hostname );
     },
