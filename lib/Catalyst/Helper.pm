@@ -322,7 +322,7 @@ sub _mk_cgi {
     my $self   = shift;
     my $name   = $self->{name};
     my $script = $self->{script};
-    $self->mk_file( "$script\/cgi.pl", <<"EOF");
+    $self->mk_file( "$script\/nph-cgi.pl", <<"EOF");
 $Config{startperl} -w
 
 use strict;
@@ -337,7 +337,7 @@ __END__
 
 =head1 NAME
 
-cgi - Catalyst CGI
+nph-cgi - Catalyst CGI
 
 =head1 SYNOPSIS
 
@@ -360,7 +360,7 @@ the same terms as perl itself.
 
 =cut
 EOF
-    chmod 0700, "$script/cgi.pl";
+    chmod 0700, "$script/nph-cgi.pl";
 }
 
 sub _mk_server {
@@ -447,7 +447,7 @@ GetOptions( 'help|?' => \\\$help, 'port=s' => \\\$port );
 pod2usage(1) if \$help;
 
 Catalyst::Test::server(
-    \$port, File::Spec->catfile( \$FindBin::Bin, 'cgi.pl' ) );
+    \$port, File::Spec->catfile( \$FindBin::Bin, 'nph-cgi.pl' ) );
 
 1;
 __END__
