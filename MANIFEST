@@ -4,8 +4,10 @@ lib/Catalyst/Base.pm
 lib/Catalyst/Engine.pm
 lib/Catalyst/Engine/Apache.pm
 lib/Catalyst/Engine/CGI.pm
+lib/Catalyst/Engine/CGI/NPH.pm
 lib/Catalyst/Engine/FCGI.pm
 lib/Catalyst/Engine/Server.pm
+lib/Catalyst/Engine/Test.pm
 lib/Catalyst/Helper.pm
 lib/Catalyst/Log.pm
 lib/Catalyst/Manual.pod

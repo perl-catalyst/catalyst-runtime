@@ -1,7 +1,7 @@
 package Catalyst::Engine::Server;
 
 use strict;
-use base 'Catalyst::Engine::CGI';
+use base 'Catalyst::Engine::CGI::NPH';
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ This is the Catalyst engine specialized for development and testing.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::CGI>.
+This class overloads some methods from C<Catalyst::Engine::CGI::NPH>.
 
 =over 4
 

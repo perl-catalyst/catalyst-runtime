@@ -31,14 +31,7 @@ sub run {
     my $class   = shift;
     my $request = FCGI::Request();
     while ( $request->Accept() >= 0 ) {
-        my $output;
-        {
-            local (*STDOUT);
-            open( STDOUT, '>', \$output );
-            $class->NEXT::run;
-        }
-        $output =~ s!^HTTP/\d+.\d+ \d\d\d.*?\n!!s;
-        print $output;
+        $class->handler;
     }
 }
 

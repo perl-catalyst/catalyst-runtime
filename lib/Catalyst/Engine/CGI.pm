@@ -75,7 +75,7 @@ This class overloads some methods from C<Catalyst>.
 
 sub finalize_headers {
     my $c = shift;
-    my %headers = ( -nph => 1 );
+    my %headers;
     $headers{-status} = $c->response->status if $c->response->status;
     for my $name ( $c->response->headers->header_field_names ) {
         $headers{"-$name"} = $c->response->headers->header($name);

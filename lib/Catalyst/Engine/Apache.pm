@@ -188,6 +188,8 @@ sub prepare_uploads {
     }
 }
 
+sub run { }
+
 =back
 
 =head1 SEE ALSO

@@ -325,7 +325,7 @@ sub _mk_cgi {
     $self->mk_file( "$script\/nph-cgi.pl", <<"EOF");
 $Config{startperl} -w
 
-BEGIN { \$ENV{CATALYST_ENGINE} = 'CGI' }
+BEGIN { \$ENV{CATALYST_ENGINE} = 'CGI::NPH' }
 
 use strict;
 use FindBin;
@@ -483,11 +483,14 @@ sub _mk_test {
     $self->mk_file( "$script/test.pl", <<"EOF");
 $Config{startperl} -w
 
+BEGIN { \$ENV{CATALYST_ENGINE} = 'Test' }
+
 use strict;
 use Getopt::Long;
 use Pod::Usage;
 use FindBin;
 use lib "\$FindBin::Bin/../lib";
+use $name;
 
 my \$help = 0;
 
@@ -495,10 +498,7 @@ GetOptions( 'help|?' => \\\$help );
 
 pod2usage(1) if ( \$help || !\$ARGV[0] );
 
-require Catalyst::Test;
-import Catalyst::Test '$name';
-
-print get(\$ARGV[0]) . "\n";
+print $name->run(\$ARGV[0])->content . "\n";
 
 1;
 __END__

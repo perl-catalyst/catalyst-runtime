@@ -2,16 +2,10 @@ package Catalyst::Test;
 
 use strict;
 use UNIVERSAL::require;
-use IO::File;
-use HTTP::Request;
-use HTTP::Response;
-use Socket;
-use URI;
 
 require Catalyst;
 
 my $class;
-$ENV{CATALYST_ENGINE} = 'CGI';
 
 =head1 NAME
 
@@ -66,55 +60,19 @@ sub import {
         unless ( $INC{'Test/Builder.pm'} ) {
             die qq/Couldn't load "$class", "$@"/ if $@;
         }
-        my $caller = caller(0);
+
         no strict 'refs';
-        *{"$caller\::request"} = \&request;
-        *{"$caller\::get"} = sub { request(@_)->content };
-    }
-}
 
-sub request {
-    my $request = shift;
-    unless ( ref $request ) {
-        $request = URI->new( $request, 'http' );
-    }
-    unless ( ref $request eq 'HTTP::Request' ) {
-        $request = HTTP::Request->new( 'GET', $request );
-    }
-    local ( *STDIN, *STDOUT );
-    my %clean  = %ENV;
-    my $output = '';
-    $ENV{CONTENT_TYPE}   ||= $request->header('Content-Type')   || '';
-    $ENV{CONTENT_LENGTH} ||= $request->header('Content-Length') || '';
-    $ENV{GATEWAY_INTERFACE} ||= 'CGI/1.1';
-    $ENV{HTTP_USER_AGENT}   ||= 'Catalyst';
-    $ENV{HTTP_HOST}         ||= $request->uri->host || 'localhost';
-    $ENV{QUERY_STRING}      ||= $request->uri->query || '';
-    $ENV{REQUEST_METHOD}    ||= $request->method;
-    $ENV{PATH_INFO}         ||= $request->uri->path || '/';
-    $ENV{SCRIPT_NAME}       ||= '/';
-    $ENV{SERVER_NAME}       ||= $request->uri->host || 'localhost';
-    $ENV{SERVER_PORT}       ||= $request->uri->port;
-    $ENV{SERVER_PROTOCOL}   ||= 'HTTP/1.1';
-
-    for my $field ( $request->header_field_names ) {
-        if ( $field =~ /^Content-(Length|Type)$/ ) {
-            next;
+        unless ( $class->engine->isa('Catalyst::Engine::Test') ) {
+            require Catalyst::Engine::Test;
+            splice( @{"$class\::ISA"}, @{"$class\::ISA"} - 1,
+                0, 'Catalyst::Engine::Test' );
         }
-        $field =~ s/-/_/g;
-        $ENV{ 'HTTP_' . uc($field) } = $request->header($field);
+
+        my $caller = caller(0);
+        *{"$caller\::request"} = sub { $class->run(@_) };
+        *{"$caller\::get"}     = sub { $class->run(@_)->content };
     }
-    if ( $request->content_length ) {
-        my $body = IO::File->new_tmpfile;
-        $body->print( $request->content ) or die $!;
-        $body->seek( 0, SEEK_SET ) or die $!;
-        open( STDIN, "<&=", $body->fileno )
-          or die("Failed to dup \$body: $!");
-    }
-    open( STDOUT, '>', \$output );
-    $class->handler;
-    %ENV = %clean;
-    return HTTP::Response->parse($output);
 }
 
 =head1 SEE ALSO
