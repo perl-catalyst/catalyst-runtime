@@ -118,15 +118,18 @@ sub dispatch {
     if ( @{$results} ) {
         for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
             $c->execute( @{ $begin->[0] } );
+            return if scalar @{$c->error};
+            last unless $c->state;
         }
-        if ( my $action = $c->req->action ) {
-            for my $result ( @{ $c->get_action( $action, $default ) }[-1] ) {
-                $c->execute( @{ $result->[0] } );
-                last unless $default;
-            }
+        if ( my $action = @{ $c->get_action( $action, $default ) }[-1] ) {
+            $c->execute( @{ $action->[0] } );
+            return if scalar @{$c->error};
+            last unless $c->state;
         }
         for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } ) {
             $c->execute( @{ $end->[0] } );
+            return if scalar @{$c->error};
+            last unless $c->state;            
         }
     }
     else {
@@ -191,7 +194,7 @@ sub execute {
         chomp $error;
         $error = qq/Caught exception "$error"/;
         $c->log->error($error);
-        $c->error($error) if $c->debug;
+        $c->error($error);
         $c->state(0);
     }
     return $c->state;
