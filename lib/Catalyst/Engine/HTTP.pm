@@ -20,7 +20,6 @@ Class::Struct::struct 'Catalyst::Engine::HTTP::LWP' => {
     address  => '$'
 };
 
-
 =head1 NAME
 
 Catalyst::Engine::HTTP - Catalyst HTTP Engine

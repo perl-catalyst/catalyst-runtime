@@ -50,8 +50,8 @@ sub run {
         ReuseAddr => 1
     );
 
-    unless ( $daemon ) {
-       die( "Failed to create daemon: $!\n" );
+    unless ($daemon) {
+        die("Failed to create daemon: $!\n");
     }
 
     printf( "You can connect to your server at %s\n", $daemon->url );
@@ -105,4 +105,3 @@ sub product_tokens {
 }
 
 1;
-

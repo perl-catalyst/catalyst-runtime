@@ -74,105 +74,6 @@ sub action {
     return 1;
 }
 
-=item $c->get_action( $action, $namespace )
-
-Get an action in a given namespace.
-
-=cut
-
-sub get_action {
-    my ( $c, $action, $namespace ) = @_;
-    $namespace ||= '';
-    if ( $action =~ /^\!(.*)/ ) {
-        $action = $1;
-        my $parent = $c->tree;
-        my @results;
-        my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
-        push @results, [$result] if $result;
-        my $visitor = Tree::Simple::Visitor::FindByPath->new;
-        for my $part ( split '/', $namespace ) {
-            $visitor->setSearchPath($part);
-            $parent->accept($visitor);
-            my $child = $visitor->getResult;
-            my $uid   = $child->getUID if $child;
-            my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
-            push @results, [$match] if $match;
-            $parent = $child if $child;
-        }
-        return \@results;
-    }
-    elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
-    elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
-    else {
-        for my $regex ( keys %{ $c->actions->{compiled} } ) {
-            my $name = $c->actions->{compiled}->{$regex};
-            if ( $action =~ $regex ) {
-                my @snippets;
-                for my $i ( 1 .. 9 ) {
-                    no strict 'refs';
-                    last unless ${$i};
-                    push @snippets, ${$i};
-                }
-                return [ [ $c->actions->{regex}->{$name}, $name, \@snippets ] ];
-            }
-        }
-    }
-    return [];
-}
-
-=item $c->set_action( $action, $code, $namespace )
-
-Set an action in a given namespace.
-
-=cut
-
-sub set_action {
-    my ( $c, $action, $code, $namespace ) = @_;
-
-    my $prefix = '';
-    if ( $action =~ /^\?(.*)$/ ) {
-        my $prefix = $1 || '';
-        $action = $2;
-        $action = $prefix . _prefix( $namespace, $action );
-        $c->actions->{plain}->{$action} = [ $namespace, $code ];
-    }
-    if ( $action =~ /^\/(.*)\/$/ ) {
-        my $regex = $1;
-        $c->actions->{compiled}->{qr#$regex#} = $action;
-        $c->actions->{regex}->{$action} = [ $namespace, $code ];
-    }
-    elsif ( $action =~ /^\!(.*)$/ ) {
-        $action = $1;
-        my $parent  = $c->tree;
-        my $visitor = Tree::Simple::Visitor::FindByPath->new;
-        $prefix = _class2prefix($namespace);
-        for my $part ( split '/', $prefix ) {
-            $visitor->setSearchPath($part);
-            $parent->accept($visitor);
-            my $child = $visitor->getResult;
-            unless ($child) {
-                $child = $parent->addChild( Tree::Simple->new($part) );
-                $visitor->setSearchPath($part);
-                $parent->accept($visitor);
-                $child = $visitor->getResult;
-            }
-            $parent = $child;
-        }
-        my $uid = $parent->getUID;
-        $c->actions->{private}->{$uid}->{$action} = [ $namespace, $code ];
-        $action = "!$action";
-    }
-    else { 
-       $c->actions->{plain}->{$action} = [ $namespace, $code ];
-    }
-
-    my $reverse = $prefix ? "$action ($prefix)" : $action;
-    $c->actions->{reverse}->{"$code"} = $reverse;
-
-    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/)
-      if $c->debug;
-}
-
 =item $c->benchmark($coderef)
 
 Takes a coderef with arguments and returns elapsed time as float.
@@ -398,7 +299,8 @@ sub forward {
     if ( $command =~ /^\!/ ) {
         $namespace = _class2prefix($caller);
     }
-    if ( my $results = $c->get_action( $command, $namespace ) ) {
+    my $results = $c->get_action( $command, $namespace );
+    if ( @{$results} ) {
         if ( $command =~ /^\!/ ) {
             for my $result ( @{$results} ) {
                 my ( $class, $code ) = @{ $result->[0] };
@@ -426,6 +328,7 @@ sub forward {
         my $method = shift || 'process';
         if ( my $code = $class->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
+            $class = $c->comp($class) || $class;
             $c->state( $c->process( $class, $code ) );
         }
         else {
@@ -435,6 +338,52 @@ sub forward {
         }
     }
     return $c->state;
+}
+
+=item $c->get_action( $action, $namespace )
+
+Get an action in a given namespace.
+
+=cut
+
+sub get_action {
+    my ( $c, $action, $namespace ) = @_;
+    $namespace ||= '';
+    if ( $action =~ /^\!(.*)/ ) {
+        $action = $1;
+        my $parent = $c->tree;
+        my @results;
+        my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
+        push @results, [$result] if $result;
+        my $visitor = Tree::Simple::Visitor::FindByPath->new;
+        for my $part ( split '/', $namespace ) {
+            $visitor->setSearchPath($part);
+            $parent->accept($visitor);
+            my $child = $visitor->getResult;
+            my $uid   = $child->getUID if $child;
+            my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
+            push @results, [$match] if $match;
+            $parent = $child if $child;
+        }
+        return \@results;
+    }
+    elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
+    elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
+    else {
+        for my $regex ( keys %{ $c->actions->{compiled} } ) {
+            my $name = $c->actions->{compiled}->{$regex};
+            if ( $action =~ $regex ) {
+                my @snippets;
+                for my $i ( 1 .. 9 ) {
+                    no strict 'refs';
+                    last unless ${$i};
+                    push @snippets, ${$i};
+                }
+                return [ [ $c->actions->{regex}->{$name}, $name, \@snippets ] ];
+            }
+        }
+    }
+    return [];
 }
 
 =item $c->handler($r)
@@ -712,6 +661,59 @@ Returns a C<Catalyst::Request> object.
 Returns a C<Catalyst::Response> object.
 
     my $res = $c->res;
+
+=item $c->set_action( $action, $code, $namespace )
+
+Set an action in a given namespace.
+
+=cut
+
+sub set_action {
+    my ( $c, $action, $code, $namespace ) = @_;
+
+    my $prefix = '';
+    if ( $action =~ /^\?(.*)$/ ) {
+        my $prefix = $1 || '';
+        $action = $2;
+        $action = $prefix . _prefix( $namespace, $action );
+        $c->actions->{plain}->{$action} = [ $namespace, $code ];
+    }
+    if ( $action =~ /^\/(.*)\/$/ ) {
+        my $regex = $1;
+        $c->actions->{compiled}->{qr#$regex#} = $action;
+        $c->actions->{regex}->{$action} = [ $namespace, $code ];
+    }
+    elsif ( $action =~ /^\!(.*)$/ ) {
+        $action = $1;
+        my $parent  = $c->tree;
+        my $visitor = Tree::Simple::Visitor::FindByPath->new;
+        $prefix = _class2prefix($namespace);
+        for my $part ( split '/', $prefix ) {
+            $visitor->setSearchPath($part);
+            $parent->accept($visitor);
+            my $child = $visitor->getResult;
+            unless ($child) {
+                $child = $parent->addChild( Tree::Simple->new($part) );
+                $visitor->setSearchPath($part);
+                $parent->accept($visitor);
+                $child = $visitor->getResult;
+            }
+            $parent = $child;
+        }
+        my $uid = $parent->getUID;
+        $c->actions->{private}->{$uid}->{$action} = [ $namespace, $code ];
+        $action = "!$action";
+    }
+    else {
+        $c->actions->{plain}->{$action} = [ $namespace, $code ];
+    }
+
+    my $reverse = $prefix ? "$action ($prefix)" : $action;
+    $c->actions->{reverse}->{"$code"} = $reverse;
+
+    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/)
+      if $c->debug;
+}
 
 =item $class->setup
 

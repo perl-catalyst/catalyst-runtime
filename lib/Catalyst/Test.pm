@@ -41,7 +41,6 @@ Catalyst::Test - Test Catalyst applications
 
     ok( get('/foo') =~ /bar/ );
 
-
 =head1 DESCRIPTION
 
 Test Catalyst applications.
@@ -63,7 +62,7 @@ Returns a C<HTTP::Response> object.
 =cut
 
 sub import {
-    my $self = shift;
+    my $self  = shift;
     my $class = shift;
 
     my ( $get, $request );
@@ -98,7 +97,8 @@ sub remote_request {
 
     unless ( ref $request ) {
 
-        my $uri = ( $request =~ m/http/i )
+        my $uri =
+          ( $request =~ m/http/i )
           ? URI->new($request)
           : URI->new( 'http://localhost' . $request );
 
