@@ -3,6 +3,8 @@ package Catalyst::Engine::CGI::NPH;
 use strict;
 use base 'Catalyst::Engine::CGI';
 
+use HTTP::Status ();
+
 =head1 NAME
 
 Catalyst::Engine::CGI::NPH - Catalyst CGI Engine
@@ -27,24 +29,10 @@ This class overloads some methods from C<Catalyst::Engine::CGI>.
 
 sub finalize_headers {
     my $c = shift;
-    my %headers = ( -nph => 1 );
-    $headers{-status} = $c->response->status if $c->response->status;
-    for my $name ( $c->response->headers->header_field_names ) {
-        $headers{"-$name"} = $c->response->headers->header($name);
-    }
-    my @cookies;
-    while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
-        push @cookies, $c->cgi->cookie(
-            -name    => $name,
-            -value   => $cookie->{value},
-            -expires => $cookie->{expires},
-            -domain  => $cookie->{domain},
-            -path    => $cookie->{path},
-            -secure  => $cookie->{secure} || 0
-        );
-    }
-    $headers{-cookie} = \@cookies if @cookies;
-    print $c->cgi->header(%headers);
+
+    my $status = $c->response->status || 200;
+    printf( "%d %s\n", $status, HTTP::Status::status_message($status) );
+    $c->SUPER::finalize_headers;
 }
 
 =back
