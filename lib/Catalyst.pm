@@ -197,6 +197,18 @@ sub import {
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 }
 
+=item $c->log
+
+Contains the logging object.  Unless it is already set Catalyst sets this up with a
+C<Catalyst::Log> object.  To use your own log class:
+
+    $c->log( MyLogger->new );
+    $c->log->info("now logging with my own logger!");
+
+Your log class should implement the methods described in the C<Catalyst::Log>
+man page.
+
+
 =back
 
 =head1 SUPPORT

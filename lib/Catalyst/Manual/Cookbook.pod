@@ -265,6 +265,114 @@ to be.
 
 And this is all you need to do, isn't Catalyst wonderful?
 
+
+=head2 How to use Catalyst without mod_perl
+
+Catalyst applications give optimum performance when run under mod_perl.
+However sometimes mod_perl is not an option, and running under CGI is just too
+slow.  There are two alternatives to mod_perl that give reasonable
+performance: FastCGI and PersistentPerl.
+
+B<Using FastCGI>
+
+To quote from L<http://www.fastcgi.com/>: "FastCGI is a language independent,
+scalable, extension to CGI that provides high performance without the
+limitations of specific server APIs."  Web server support is provided for
+Apache in the form of C<mod_fastcgi> and there is Perl support in the C<FCGI>
+module.  To convert a CGI Catalyst application to FastCGI one needs to
+initialize an C<FCGI::Request> object and loop while the C<Accept> method
+returns zero.  The following code shows how it is done - and it also works as
+a normal, single-shot CGI script.
+
+    #!/usr/bin/perl
+    use strict;
+    use FCGI;
+    use MyApp;
+
+    my $request = FCGI::Request();
+    while ($request->Accept() >= 0) {
+        my $output;
+	{ 
+	    local(*STDOUT);
+	    open( STDOUT, '>', \$output );
+	    MyApp->run;
+	}
+	$output =~ s!^HTTP/\d+.\d+ \d\d\d.*?\n!!s;
+	print $output;
+    }
+
+Any initialization code should be included outside the request-accept loop.
+
+There is one little complication, which is that C<MyApp->run> outputs a
+complete HTTP response including the status line (e.g.: "C<HTTP/1.1 200>").
+FastCGI just wants a set of headers, so the sample code captures the output
+and  drops the first line if it is an HTTP status line (note: this may change).
+
+The Apache C<mod_fastcgi> module is provided by a number of Linux distros and
+is straightforward to compile for most Unix-like systems.  The module provides
+a FastCGI Process Manager, which manages FastCGI scripts.  You configure your
+script as a FastCGI script with the following Apache configuration directives:
+
+    <Location /fcgi-bin>
+       AddHandler fastcgi-script fcgi
+    </Location>
+
+or:
+
+    <Location /fcgi-bin>
+       SetHandler fastcgi-script
+       Action fastcgi-script /path/to/fcgi-bin/fcgi-script
+    </Location>
+
+C<mod_fastcgi> provides a number of options for controlling the FastCGI
+scripts spawned; it also allows scripts to be run to handle the
+authentication, authorization and access check phases.
+
+For more information see the FastCGI documentation, the C<FCGI> module and
+L<http://www.fastcgi.com/>.
+
+
+B<PersistentPerl>
+
+PersistentPerl (previously known as C<CGI::SpeedyCGI>) is a persistent Perl
+interpreter.  After the script is initially run, instead of exiting, the perl
+interpreter is kept running. During subsequent runs, this interpreter is used
+to handle new executions instead of starting a new perl interpreter each
+time. A very fast frontend program contacts the persistent Perl process, which
+is usually already running, to do the work and return the results.
+PersistentPerl can be used to speed up perl CGI scripts.  It also provides an
+Apache module so that scripts can be run without the overhead of doing a
+fork/exec for each request.
+
+The code for PersistentPerl is simpler than for FastCGI; rather than waiting
+in an accept loop the script runs to completion, however variables are not
+reinitialized on subsequent runs but maintain their values from the previous
+run.
+
+
+    #!/usr/bin/perperl
+    use strict;
+    use vars qw($output $initialized);
+    use PersistentPerl;
+    use MyApp;
+
+    if (!$initialized++) {
+        # initialization code - set up database, etc
+        if ($PersistentPerl::i_am_per_perl) {
+            # PP-specific initialization code
+        }
+    }
+    { 
+	local(*STDOUT);
+	open( STDOUT, '>', \$output );
+	MyApp->run;
+    }
+    $output =~ s!^HTTP/\d+.\d+ \d\d\d.*?\n!!s;
+    print $output;
+
+For more information see the C<PersistentPerl> documentation.
+
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
