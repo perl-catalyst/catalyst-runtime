@@ -224,14 +224,10 @@ $name->config(
     root => '$base/root',
 );
 
-$name->action(
-
-    '!default' => sub {
-        my ( \$self, \$c ) = \@_;
-        \$c->res->output('Congratulations, $name is on Catalyst!');
-    },
-
-);
+sub default : Private {
+    my ( \$self, \$c ) = \@_;
+    \$c->res->output('Congratulations, $name is on Catalyst!');
+}
 
 =head1 NAME
 
@@ -676,14 +672,11 @@ sub _mk_compclass {
     my $action = '';
     $action = <<"EOF" if $type eq 'C';
 
-$app->action(
+sub default : Private {
+    my ( \$self, \$c ) = \@_;
+    \$c->res->output('Congratulations, $class is on Catalyst!');
+}
 
-    '!?default' => sub {
-        my ( \$self, \$c ) = \@_;
-        \$c->res->output('Congratulations, $class is on Catalyst!');
-    },
-
-);
 EOF
     my $file = $self->{file};
     return $self->mk_file( "$file", <<"EOF");

@@ -40,23 +40,19 @@ Catalyst - The Elegant MVC Web Application Framework
 
     use Catalyst qw/-Debug -Engine=CGI/;
 
-    __PACKAGE__->action( '!default' => sub { $_[1]->res->output('Hello') } );
+    sub default : Private { $_[1]->res->output('Hello') } );
 
-    __PACKAGE__->action(
-        'index.html' => sub {
-            my ( $self, $c ) = @_;
-            $c->res->output('Hello');
-            $c->forward('_foo');
-        }
-    );
+    sub index : Absolute('index.html') {
+        my ( $self, $c ) = @_;
+        $c->res->output('Hello');
+        $c->forward('_foo');
+    }
 
-    __PACKAGE__->action(
-        '/^product[_]*(\d*).html$/' => sub {
-            my ( $self, $c ) = @_;
-            $c->stash->{template} = 'product.tt';
-            $c->stash->{product} = $c->req->snippets->[0];
-        }
-    );
+    sub product : Regex('/^product[_]*(\d*).html$/') {
+        my ( $self, $c ) = @_;
+        $c->stash->{template} = 'product.tt';
+        $c->stash->{product} = $c->req->snippets->[0];
+    }
 
 See also L<Catalyst::Manual::Intro>
 
