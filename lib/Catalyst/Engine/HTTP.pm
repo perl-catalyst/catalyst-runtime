@@ -65,7 +65,7 @@ sub run {
         while ( my $request = $connection->get_request ) {
 
             $request->uri->scheme('http');    # Force URI::http
-            $request->uri->host( $request->header('Host') );
+            $request->uri->host( $request->header('Host') || $base->host );
             $request->uri->port( $base->port );
 
             my $lwp = Catalyst::Engine::Test::LWP->new(

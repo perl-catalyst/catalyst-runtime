@@ -253,6 +253,8 @@ sub run {
         response => HTTP::Response->new
     );
 
+    $lwp->response->date(time);
+
     $class->handler($lwp);
 
     return $lwp->response;
