@@ -78,10 +78,6 @@ sub run {
             $class->handler($lwp);
             $connection->send_response( $lwp->response );
 
-            if ( $class->debug ) {
-                $class->log->info( sprintf( "Peer %s:%d",$connection->peerhost, $connection->peerport ) );
-            }
-
         }
 
         $connection->close;

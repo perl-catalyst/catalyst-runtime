@@ -630,7 +630,6 @@ sub default : Private {
     my ( \$self, \$c ) = \@_;
     \$c->res->output('Congratulations, $class is on Catalyst!');
 }
-
 EOF
     my $file = $self->{file};
     return $self->mk_file( "$file", <<"EOF");
