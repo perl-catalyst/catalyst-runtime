@@ -3,9 +3,6 @@ package Catalyst::Test;
 use strict;
 use UNIVERSAL::require;
 
-require Catalyst;
-
-my $class;
 $ENV{CATALYST_ENGINE} = 'Test';
 
 =head1 NAME
@@ -64,7 +61,7 @@ Returns a C<HTTP::Response> object.
 
 sub import {
     my $self = shift;
-    if ( $class = shift ) {
+    if ( my $class = shift ) {
         $class->require;
         unless ( $INC{'Test/Builder.pm'} ) {
             die qq/Couldn't load "$class", "$@"/ if $@;
