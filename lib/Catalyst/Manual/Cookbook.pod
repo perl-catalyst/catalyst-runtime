@@ -1,0 +1,78 @@
+=head1 NAME
+
+Catalyst::Manual::Cookbook - Cooking with Catalyst
+
+=head1 DESCRIPTION
+
+Yummy!
+
+=head1 RECIPES
+
+=head2 Force debug screen
+
+You can force Catalyst to display the debug screen at the end of the request by
+placing a die() call in the _end action.
+
+    __PACKAGE__->action(
+        '!end' => sub {
+            my ( $self, $c ) = @_;
+            die "testing";
+        }
+    );
+
+=head2 Disable statistics
+
+Just add this line to your application class if you don't want those nifty
+statistics in your debug messages.
+
+    sub Catalyst::Log::info { }
+
+=head2 Scaffolding
+
+Scaffolding is very simple with Catalyst.
+Just use Catalyst::Model::CDBI::CRUD as baseclass.
+
+    # lib/MyApp/Model/CDBI.pm
+    package MyApp::Model::CDBI;
+
+    use strict;
+    use base 'Catalyst::Model::CDBI::CRUD';
+
+    __PACKAGE__->config(
+        dsn           => 'dbi:SQLite:/tmp/myapp.db',
+        relationships => 1
+    );
+
+    1;
+
+    # lib/MyApp.pm
+    package MyApp;
+
+    use Catalyst 'FormValidator';
+
+    __PACKAGE__->config(
+        name => 'My Application',
+        root => '/home/joeuser/myapp/root'
+    );
+
+    __PACKAGE__->action(
+        'table' => sub {
+            my ( $self, $c ) = @_;
+            $c->form( optional => [ MyApp::Model::CDBI::Table->columns ] );
+            $c->forward('MyApp::Model::CDBI::Table');
+        }
+    );
+
+    1;
+
+Modify the $c->form() parameters to match your needs, and don't forget to copy
+the templates. ;)
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.

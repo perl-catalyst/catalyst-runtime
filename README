@@ -1,0 +1,103 @@
+NAME
+    Catalyst - The Elegant MVC Web Application Framework
+
+SYNOPSIS
+        # use the helper to start a new application
+        catalyst MyApp
+        cd MyApp
+
+        # add models, views, controllers
+        bin/create model Something
+        bin/create view Stuff
+        bin/create controller Yada
+
+        # built in testserver
+        bin/server
+
+        # command line interface
+        bin/test /yada
+
+        See also L<Catalyst::Manual::Intro>
+
+        use Catalyst;
+
+        use Catalyst qw/My::Module My::OtherModule/;
+
+        use Catalyst '-Debug';
+
+        use Catalyst qw/-Debug -Engine=CGI/;
+
+        __PACKAGE__->action( '!default' => sub { $_[1]->res->output('Hello') } );
+
+        __PACKAGE__->action(
+            'index.html' => sub {
+                my ( $self, $c ) = @_;
+                $c->res->output('Hello');
+                $c->forward('_foo');
+            }
+        );
+
+        __PACKAGE__->action(
+            '/^product[_]*(\d*).html$/' => sub {
+                my ( $self, $c ) = @_;
+                $c->stash->{template} = 'product.tt';
+                $c->stash->{product} = $c->req->snippets->[0];
+            }
+        );
+
+DESCRIPTION
+    Catalyst is based upon Maypole, which you should consider for smaller
+    projects.
+
+    The key concept of Catalyst is DRY (Don't Repeat Yourself).
+
+    See Catalyst::Manual for more documentation.
+
+    Omit the Catalyst::Plugin:: prefix from plugins. So
+    Catalyst::Plugin::My::Module becomes My::Module.
+
+        use Catalyst 'My::Module';
+
+    You can also set special flags like -Debug and -Engine.
+
+        use Catalyst qw/-Debug My::Module/;
+
+    The position of plugins and flags in the chain is important, because
+    they are loaded in the same order they appear.
+
+  -Debug
+        use Catalyst '-Debug';
+
+    is equivalent to
+
+        use Catalyst;
+        sub debug { 1 }
+
+  -Engine
+    Force Catalyst to use a specific engine. Omit the Catalyst::Engine::
+    prefix.
+
+        use Catalyst '-Engine=CGI';
+
+  METHODS
+   debug
+    Overload to enable debug messages.
+
+   config
+    Returns a hashref containing your applications settings.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
+    Catalyst::Engine
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de"
+
+THANK YOU
+    David Naughton, Gary Ashton Jones, Marcus Ramberg and all the others
+    who've helped.
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

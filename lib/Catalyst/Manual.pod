@@ -1,0 +1,25 @@
+=head1 NAME
+
+Catalyst::Manual - User guide and reference for Catalyst
+
+=head1 DESCRIPTION
+
+This is the comprehensive user guide and reference for Catalyst.
+
+L<Catalyst::Manual::Intro>
+    Introduction to Catalyst.
+
+L<Catalyst::Manual::Cookbook>
+    Cooking with Catalyst.
+
+L<Catalyst::Manual::Internals>
+    Here be dragons!
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
