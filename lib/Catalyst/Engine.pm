@@ -535,9 +535,9 @@ sub prepare {
     if ( $c->debug ) {
         my $secs = time - $START || 1;
         my $av = sprintf '%.3f', $COUNT / $secs;
-        $c->log->debug('********************************');
+        $c->log->debug('**********************************');
         $c->log->debug("* Request $COUNT ($av/s) [$$]");
-        $c->log->debug('********************************');
+        $c->log->debug('**********************************');
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
     $c->prepare_request($r);
