@@ -12,25 +12,38 @@ Catalyst::Log - Catalyst Log Class
 
 =head1 SYNOPSIS
 
+    $log = $c->log;
+    $log->debug($msg, @args);
+    $log->dump($ref);
+    $log->error($msg, @args);
+    $log->info($msg, @args);
+    $log->warn($msg, @args);
+
 See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-Simple logging functionality for Catalyst.
+This module provides the default, simple logging functionality for Catalyst.
+If you want something different set C<$c->log> in your application module, e.g.:
+
+    $c->log( MyLogger->new );
+
+Your logging object is expected to provide the interface described here.
+
 
 =head1 METHODS
 
 =over 4
 
-=item $c->debug($msg)
+=item $log->debug($msg, @args)
 
 Logs a debugging message.
 
 =cut
 
-sub debug { _format( 'debug', $_[1] ) }
+sub debug { _format( 'debug', splice(@_, 1) ) }
 
-=item $c->dump($ref)
+=item $log->dump($ref)
 
 Logs a formatted dump of a variable passed by reference (uses C<Data::Dumper>).
 
@@ -38,32 +51,37 @@ Logs a formatted dump of a variable passed by reference (uses C<Data::Dumper>).
 
 sub dump { _format( 'dump', Dumper( $_[1] ) ) }
 
-=item $c->error($msg)
+=item $log->error($msg, @args)
 
 Logs an error message.
 
 =cut
 
-sub error { _format( 'error', $_[1] ) }
+sub error { _format( 'error', splice(@_, 1) ) }
 
-=item $c->info($msg)
+=item $log->info($msg, @args)
 
 Logs an informational message.
 
 =cut
 
-sub info { _format( 'info', $_[1] ) }
+sub info { _format( 'info', splice(@_, 1) ) }
 
-=item $c->warn($msg)
+=item $log->warn($msg, @args)
 
 Logs a warning message.
 
 =cut
 
-sub warn { _format( 'warn', $_[1] ) }
+sub warn { _format( 'warn', splice(@_, 1) ) }
 
 sub _format {
-    print STDERR '[' . localtime(time) . "] [catalyst] [$_[0]] $_[1]\n";
+    if (@_ > 2) {
+	printf STDERR '[' . localtime(time) . "] [catalyst] [$_[0]] $_[1]\n", splice(@_, 2);
+    }
+    else {
+	print STDERR '[' . localtime(time) . "] [catalyst] [$_[0]] $_[1]\n";
+    }
 }
 
 =back

@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.32  xxx
+        - added optional arguments to Catalyst::Log methods (Andrew Ford)
+
 4.32  Tue Mar 22 02:10:00 2005
         - made a damn typo *AAAAAAAAAAAAAAHHHH!!!*
 
