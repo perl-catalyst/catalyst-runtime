@@ -68,7 +68,8 @@ sub action {
     $_[1] ? ( $action = {@_} ) : ( $action = shift );
     if ( ref $action eq 'HASH' ) {
         while ( my ( $name, $code ) = each %$action ) {
-            my $class = caller(0);
+            my $prefix = '';
+            my $class  = caller(0);
             if ( $name =~ /^\?(.*)$/ ) {
                 my $prefix = $1 || '';
                 $name = $2;
@@ -84,7 +85,8 @@ sub action {
                 $name = $1;
                 my $parent  = $self->tree;
                 my $visitor = Tree::Simple::Visitor::FindByPath->new;
-                for my $part ( split '/', _class2prefix($class) ) {
+                $prefix = _class2prefix($class);
+                for my $part ( split '/', $prefix ) {
                     $visitor->setSearchPath($part);
                     $parent->accept($visitor);
                     my $child = $visitor->getResult;
@@ -98,9 +100,11 @@ sub action {
                 }
                 my $uid = $parent->getUID;
                 $self->actions->{private}->{$uid}->{$name} = [ $class, $code ];
+                $name = "!$name";
             }
             else { $self->actions->{plain}->{$name} = [ $class, $code ] }
-            $self->actions->{reverse}->{"$code"} = $name;
+            my $reverse = $prefix ? "$name ($prefix)" : $name;
+            $self->actions->{reverse}->{"$code"} = $reverse;
             $self->log->debug(qq/"$class" defined "$name" as "$code"/)
               if $self->debug;
         }
