@@ -70,7 +70,7 @@ The key concept of Catalyst is DRY (Don't Repeat Yourself).
 See L<Catalyst::Manual> for more documentation.
 
 Catalyst plugins can be loaded by naming them as arguments to the "use Catalyst" statement.
-Omit the C<Catalyst::Plugin::> prefix from the plugin name, 
+Omit the C<Catalyst::Plugin::> prefix from the plugin name,
 so C<Catalyst::Plugin::My::Module> becomes C<My::Module>.
 
     use Catalyst 'My::Module';
@@ -150,12 +150,20 @@ sub import {
         $caller->log( Catalyst::Log->new );
     }
 
+    if ( $ENV{CATALYST_DEBUG} || $ENV{ uc($caller) . '_DEBUG' } ) {
+        no strict 'refs';
+        *{"$caller\::debug"} = sub { 1 };
+        $caller->log->debug('Debug messages enabled');
+    }
+
     # Options
-    my $engine =
-      $ENV{MOD_PERL} ? 'Catalyst::Engine::Apache' : 'Catalyst::Engine::CGI';
+    my $engine = $ENV{MOD_PERL}
+      ? 'Catalyst::Engine::Apache'
+      : 'Catalyst::Engine::CGI';
+
     foreach (@options) {
         if (/^\-Debug$/) {
-            no warnings;
+            next if $caller->debug;
             no strict 'refs';
             *{"$caller\::debug"} = sub { 1 };
             $caller->log->debug('Debug messages enabled');
@@ -220,7 +228,7 @@ Mailing-Lists:
 
     http://lists.rawmode.org/mailman/listinfo/catalyst
     http://lists.rawmode.org/mailman/listinfo/catalyst-dev
-    
+
 =head1 SEE ALSO
 
 L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,
