@@ -16,21 +16,8 @@ sub default {
 
 package main;
 
-use Test::More tests => 9;
+use Test::More tests => 6;
 use Catalyst::Test 'TestApp';
-
-{
-    local %ENV;
-
-    $ENV{SCRIPT_NAME} = '/nph-catalyst.cgi';
-    $ENV{PATH_INFO}   = '/index';
-
-    my $response = request('/nph-catalyst.cgi/index');
-
-    ok( $response->headers->header('X-Base') eq 'http://localhost/nph-catalyst.cgi' );
-    ok( $response->headers->header('X-Arguments') eq 'index' );
-    ok( $response->headers->header('X-Path') eq 'index' );
-}
 
 {
     local %ENV;

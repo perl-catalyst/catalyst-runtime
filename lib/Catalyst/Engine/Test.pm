@@ -1,12 +1,7 @@
 package Catalyst::Engine::Test;
 
 use strict;
-use base 'Catalyst::Engine::CGI::NPH';
-
-use HTTP::Request;
-use HTTP::Response;
-use IO::File;
-use URI;
+use base 'Catalyst::Engine::HTTP';
 
 =head1 NAME
 
@@ -34,7 +29,7 @@ This is the Catalyst engine specialized for testing.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::CGI::NPH>.
+This class overloads some methods from C<Catalyst::Engine::HTTP>.
 
 =over 4
 
@@ -47,49 +42,27 @@ sub run {
     my $request = shift || '/';
 
     unless ( ref $request ) {
-        $request = URI->new( $request, 'http' );
+
+        my $uri = ( $request =~ m/http/i )
+          ? URI->new($request)
+          : URI->new( 'http://localhost' . $request );
+
+        $request = $uri->canonical;
     }
+
     unless ( ref $request eq 'HTTP::Request' ) {
         $request = HTTP::Request->new( 'GET', $request );
     }
 
-    local ( *STDIN, *STDOUT );
+    my $http = Catalyst::Engine::HTTP::LWP->new(
+        request  => $request,
+        address  => '127.0.0.1',
+        hostname => 'localhost'
+    );
 
-    my %clean  = %ENV;
-    my $output = '';
-    $ENV{CONTENT_TYPE}   ||= $request->header('Content-Type')   || '';
-    $ENV{CONTENT_LENGTH} ||= $request->header('Content-Length') || '';
-    $ENV{GATEWAY_INTERFACE} ||= 'CGI/1.1';
-    $ENV{HTTP_USER_AGENT}   ||= 'Catalyst';
-    $ENV{HTTP_HOST}         ||= $request->uri->host || 'localhost';
-    $ENV{QUERY_STRING}      ||= $request->uri->query || '';
-    $ENV{REQUEST_METHOD}    ||= $request->method;
-    $ENV{PATH_INFO}         ||= $request->uri->path || '/';
-    $ENV{SCRIPT_NAME}       ||= '/';
-    $ENV{SERVER_NAME}       ||= $request->uri->host || 'localhost';
-    $ENV{SERVER_PORT}       ||= $request->uri->port;
-    $ENV{SERVER_PROTOCOL}   ||= 'HTTP/1.1';
+    $class->handler($http);
 
-    for my $field ( $request->header_field_names ) {
-        if ( $field =~ /^Content-(Length|Type)$/ ) {
-            next;
-        }
-        $field =~ s/-/_/g;
-        $ENV{ 'HTTP_' . uc($field) } = $request->header($field);
-    }
-
-    if ( $request->content_length ) {
-        my $body = IO::File->new_tmpfile;
-        $body->print( $request->content ) or die $!;
-        $body->seek( 0, SEEK_SET ) or die $!;
-        open( STDIN, "<&=", $body->fileno )
-          or die("Failed to dup \$body: $!");
-    }
-
-    open( STDOUT, '>', \$output );
-    $class->handler;
-    %ENV = %clean;
-    return HTTP::Response->parse($output);
+    return $http->response;
 }
 
 =back

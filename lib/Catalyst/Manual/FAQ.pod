@@ -4,7 +4,11 @@ Catalyst::Manual::FAQ - Frequently Asked Questions
 
 =head1 DESCRIPTION
 
-No questions yet, everything perfect...
+Frequently Asked Questions
+
+=head2 How do I regenerate the helper scripts?
+
+Create a new app with the same name and copy scripts/ to app directory
 
 =head1 AUTHOR
 

@@ -61,7 +61,7 @@ This config parameter contains the C<CGI::Simple> object.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst>.
+This class overloads some methods from C<Catalyst::Engine>.
 
 =over 4
 

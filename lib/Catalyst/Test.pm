@@ -19,6 +19,9 @@ Catalyst::Test - Test Catalyst applications
     request('index.html');
     get('index.html');
 
+    # Run tests against a remote server
+    CATALYST_REMOTE='http://localhost:3000/' prove -l lib/ t/
+
     # Tests with inline apps need to use Catalyst::Engine::Test
     package TestApp;
 
@@ -61,17 +64,58 @@ Returns a C<HTTP::Response> object.
 
 sub import {
     my $self = shift;
-    if ( my $class = shift ) {
+    my $class = shift;
+
+    my ( $get, $request );
+
+    if ( $ENV{CATALYST_REMOTE} ) {
+        $request = sub { remote_request(@_) };
+        $get     = sub { remote_request(@_)->content };
+    }
+
+    else {
         $class->require;
         unless ( $INC{'Test/Builder.pm'} ) {
             die qq/Couldn't load "$class", "$@"/ if $@;
         }
 
-        no strict 'refs';
-        my $caller = caller(0);
-        *{"$caller\::request"} = sub { $class->run(@_) };
-        *{"$caller\::get"}     = sub { $class->run(@_)->content };
+        $request = sub { $class->run(@_) };
+        $get     = sub { $class->run(@_)->content };
     }
+
+    no strict 'refs';
+    my $caller = caller(0);
+    *{"$caller\::request"} = $request;
+    *{"$caller\::get"}     = $get;
+}
+
+sub remote_request {
+    my $request = shift;
+
+    require LWP::UserAgent;
+
+    my $remote = URI->new( $ENV{CATALYST_REMOTE} );
+
+    unless ( ref $request ) {
+
+        my $uri = ( $request =~ m/http/i )
+          ? URI->new($request)
+          : URI->new( 'http://localhost' . $request );
+
+        $request = $uri->canonical;
+    }
+
+    $request->scheme( $remote->scheme );
+    $request->host( $remote->host );
+    $request->port( $remote->port );
+
+    unless ( ref $request eq 'HTTP::Request' ) {
+        $request = HTTP::Request->new( 'GET', $request );
+    }
+
+    my $agent = LWP::UserAgent->new;
+
+    return $agent->request($request);
 }
 
 =head1 SEE ALSO
