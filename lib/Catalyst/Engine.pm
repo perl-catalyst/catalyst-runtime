@@ -127,11 +127,13 @@ sub execute {
     my ( $c, $class, $code ) = @_;
     $class = $c->comp($class) || $class;
     $c->state(0);
+    my $callsub = ( caller(1) )[3];
     eval {
         if ( $c->debug )
         {
             my $action = $c->actions->{reverse}->{"$code"};
             $action = "/$action" unless $action =~ /\-\>/;
+            $action = "  $action" if $callsub =~ /forward$/;
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} },
@@ -176,7 +178,7 @@ sub finalize {
     }
 
     if ( $c->response->output && !$c->response->content_length ) {
-        use bytes; # play safe with a utf8 aware perl
+        use bytes;    # play safe with a utf8 aware perl
         $c->response->content_length( length $c->response->output );
     }
 
