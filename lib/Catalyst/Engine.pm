@@ -117,16 +117,16 @@ sub dispatch {
     $namespace ||= '/';
     if ( @{$results} ) {
         for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
-            $c->state( $c->execute( @{ $begin->[0] } ) );
+            $c->execute( @{ $begin->[0] } );
         }
         if ( my $action = $c->req->action ) {
             for my $result ( @{ $c->get_action( $action, $default ) }[-1] ) {
-                $c->state( $c->execute( @{ $result->[0] } ) );
+                $c->execute( @{ $result->[0] } );
                 last unless $default;
             }
         }
         for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } ) {
-            $c->state( $c->execute( @{ $end->[0] } ) );
+            $c->execute( @{ $end->[0] } );
         }
     }
     else {
@@ -420,7 +420,7 @@ sub forward {
         }
     }
     for my $result ( @{$results} ) {
-        $c->state( $c->execute( @{ $result->[0] } ) );
+        $c->execute( @{ $result->[0] } );
     }
     return $c->state;
 }
