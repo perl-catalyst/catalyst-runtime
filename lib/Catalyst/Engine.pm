@@ -18,7 +18,7 @@ require Module::Pluggable::Fast;
 $Data::Dumper::Terse = 1;
 
 __PACKAGE__->mk_classdata($_) for qw/actions components tree/;
-__PACKAGE__->mk_accessors(qw/request response/);
+__PACKAGE__->mk_accessors(qw/request response state/);
 
 __PACKAGE__->actions(
     { plain => {}, private => {}, regex => {}, compiled => {}, reverse => {} }
@@ -123,8 +123,10 @@ sub find_action {
     $namespace ||= '';
     if ( $action =~ /^\!(.*)/ ) {
         $action = $1;
-        my $parent  = $c->tree;
-        my $result  = $c->actions->{private}->{ $parent->getUID }->{$action};
+        my $parent = $c->tree;
+        my @results;
+        my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
+        push @results, [$result] if $result;
         my $visitor = Tree::Simple::Visitor::FindByPath->new;
         for my $part ( split '/', $namespace ) {
             $visitor->setSearchPath($part);
@@ -132,13 +134,13 @@ sub find_action {
             my $child = $visitor->getResult;
             my $uid   = $child->getUID if $child;
             my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
-            $result = $match if $match;
+            push @results, [$match] if $match;
             $parent = $child if $child;
         }
-        return [$result] if $result;
+        return \@results;
     }
-    elsif ( my $p = $c->actions->{plain}->{$action} ) { return [$p] }
-    elsif ( my $r = $c->actions->{regex}->{$action} ) { return [$r] }
+    elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
+    elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
     else {
         for my $regex ( keys %{ $c->actions->{compiled} } ) {
             my $name = $c->actions->{compiled}->{$regex};
@@ -149,11 +151,11 @@ sub find_action {
                     last unless ${$i};
                     push @snippets, ${$i};
                 }
-                return [ $c->actions->{regex}->{$name}, $name, \@snippets ];
+                return [ [ $c->actions->{regex}->{$name}, $name, \@snippets ] ];
             }
         }
     }
-    return 0;
+    return [];
 }
 
 =item $c->benchmark($coderef)
@@ -381,24 +383,35 @@ sub forward {
     if ( $command =~ /^\!/ ) {
         $namespace = _class2prefix($caller);
     }
-    my ( $class, $code );
-    if ( my $action = $c->find_action( $command, $namespace ) ) {
-        if ( $action->[2] ) {
-            $c->log->debug(qq/Couldn't forward "$command" to regex action/)
-              if $c->debug;
-            return 0;
+    if ( my $results = $c->find_action( $command, $namespace ) ) {
+        if ( $command =~ /^\!/ ) {
+            for my $result ( @{$results} ) {
+                my ( $class, $code ) = @{ $result->[0] };
+                $c->state( $c->process( $class, $code ) );
+            }
         }
-        ( $class, $code ) = @{ $action->[0] };
+        else {
+            return 0 unless my $result = $results->[0];
+            if ( $result->[2] ) {
+                $c->log->debug(qq/Couldn't forward "$command" to regex action/)
+                  if $c->debug;
+                return 0;
+            }
+            my ( $class, $code ) = @{ $result->[0] };
+            $class = $c->components->{$class} || $class;
+            $c->state( $c->process( $class, $code ) );
+        }
     }
     else {
-        $class = $command;
+        my $class = $command;
         if ( $class =~ /[^\w\:]/ ) {
             $c->log->debug(qq/Couldn't forward to "$class"/) if $c->debug;
             return 0;
         }
         my $method = shift || 'process';
-        if ( $code = $class->can($method) ) {
+        if ( my $code = $class->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
+            $c->state( $c->process( $class, $code ) );
         }
         else {
             $c->log->debug(qq/Couldn't forward to "$class->$method"/)
@@ -406,8 +419,7 @@ sub forward {
             return 0;
         }
     }
-    $class = $c->components->{$class} || $class;
-    return $c->process( $class, $code );
+    return $c->state;
 }
 
 =item $c->handler($r)
@@ -423,20 +435,26 @@ sub handler {
     my $status = -1;
     eval {
         my $handler = sub {
-            my $c         = $class->prepare($r);
-            my $action    = $c->req->action;
-            my $namespace = '';
-            $namespace = join '/', @{ $c->req->args } if $action eq '!default';
-            unless ($namespace) {
+            my $c      = $class->prepare($r);
+            my $action = $c->req->action;
+            my $name   = '';
+            $name = join '/', @{ $c->req->args } if $action eq '!default';
+            unless ($name) {
                 if ( my $result = $c->find_action($action) ) {
-                    $namespace = _class2prefix( $result->[0]->[0] );
+                    $name = _class2prefix( $result->[0]->[0]->[0] );
                 }
             }
-            if ( my $begin = $c->find_action( '!begin', $namespace ) ) {
-                $c->process( @{ $begin->[0] } );
-            }
-            if ( my $result = $c->find_action( $action, $namespace ) ) {
-                $c->process( @{ $result->[0] } );
+            my $results = $c->find_action( $action, $name );
+            if ( @{$results} ) {
+                for my $begin ( @{ $c->find_action( '!begin', $name ) } ) {
+                    $c->process( @{ $begin->[0] } );
+                }
+                for my $result ( @{ $c->find_action( $action, $name ) } ) {
+                    $c->process( @{ $result->[0] } );
+                }
+                for my $end ( @{ $c->find_action( '!end', $name ) } ) {
+                    $c->process( @{ $end->[0] } );
+                }
             }
             else {
                 my $path  = $c->req->path;
@@ -445,9 +463,6 @@ sub handler {
                   : "No default action defined";
                 $c->log->error($error) if $c->debug;
                 $c->errors($error);
-            }
-            if ( my $end = $c->find_action( '!end', $namespace ) ) {
-                $c->process( @{ $end->[0] } );
             }
             return $c->finalize;
         };
@@ -490,7 +505,8 @@ sub prepare {
         response => Catalyst::Response->new(
             { cookies => {}, headers => HTTP::Headers->new, status => 200 }
         ),
-        stash => {}
+        stash => {},
+        state => 0
     }, $class;
     if ( $c->debug ) {
         my $secs = time - $START || 1;
@@ -539,7 +555,7 @@ sub prepare_action {
     $c->req->args( \my @args );
     while (@path) {
         $path = join '/', @path;
-        if ( my $result = $c->find_action($path) ) {
+        if ( my $result = ${ $c->find_action($path) }[0] ) {
 
             # It's a regex
             if ($#$result) {
@@ -755,8 +771,8 @@ sub _prefix {
 }
 
 sub _class2prefix {
-    my $class = shift;
-    $class =~ /^.*::([MVC]|Model|View|Controller)+::(.*)$/;
+    my $class = shift || '';
+    $class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/;
     my $prefix = lc $2 || '';
     $prefix =~ s/\:\:/\//g;
     return $prefix;
