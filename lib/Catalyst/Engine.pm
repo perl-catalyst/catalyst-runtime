@@ -468,7 +468,7 @@ sub prepare {
         my @params;
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
-            push @params, " $key=$value";
+            push @params, "  $key=$value";
         }
         $c->log->debug( 'Parameters are', @params );
     }
@@ -793,7 +793,7 @@ sub setup_components {
         $self->setup_actions($comp);
     }
     my @comps;
-    push @comps, " $_" for keys %{ $self->components };
+    push @comps, "  $_" for keys %{ $self->components };
     $self->log->debug( 'Loaded components', @comps )
       if ( @comps && $self->debug );
     my $actions  = $self->actions;
@@ -866,7 +866,7 @@ sub _class2prefix {
 sub _prettify {
     my ( $val1, $val2, $val3 ) = @_;
     formline
-' @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>> ',
+'  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>> ',
       $val1, $val2, $val3;
     my $formatted = $^A;
     $^A = '';

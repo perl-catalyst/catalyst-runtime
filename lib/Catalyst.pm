@@ -169,7 +169,7 @@ sub import {
                 $caller->log->error(qq/Couldn't load plugin "$plugin", "$@"/);
             }
             else {
-                push @plugins, " $plugin";
+                push @plugins, "  $plugin";
                 no strict 'refs';
                 push @{"$caller\::ISA"}, $plugin;
             }
