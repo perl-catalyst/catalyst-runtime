@@ -122,7 +122,6 @@ sub dispatch {
         if ( my $begin = @{ $c->get_action( 'begin', $namespace ) }[-1] ) {
             $c->execute( @{ $begin->[0] } );
             return if scalar @{$c->error};
-            last unless $c->state;
         }
 
         # Execute the auto chain
@@ -143,7 +142,6 @@ sub dispatch {
         if ( my $end = @{ $c->get_action( 'end', $namespace ) }[-1] ) {
             $c->execute( @{ $end->[0] } );
             return if scalar @{$c->error};
-            last unless $c->state;
         }
     }
     else {
