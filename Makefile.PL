@@ -15,8 +15,7 @@ WriteMakefile(
     }
 );
 
-my $gabb =
-  int( rand(2) ) == 1
-  ? "Gabbana is the greatest!"
-  : "Gabbana is drunk again!";
-print "$gabb\n";
+print(
+    (qw/draven naughton sri the_jester/)[ int( rand(4) ) ],
+    " is the greatest and gabb is drunk again!\n"
+);

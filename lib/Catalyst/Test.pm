@@ -162,7 +162,7 @@ sub server {
         $ENV{REMOTE_ADDR}     = $peeraddr;
         $ENV{REMOTE_HOST}     = $peername;
         $ENV{QUERY_STRING}    = $query_string || '';
-        $ENV{CONTENT_TYPE}    ||= 'text/plain';
+        $ENV{CONTENT_TYPE}    ||= 'multipart/form-data';
         $ENV{SERVER_SOFTWARE} ||= "Catalyst/$Catalyst::VERSION";
         $class->run;
     }

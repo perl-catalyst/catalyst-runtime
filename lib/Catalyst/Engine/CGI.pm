@@ -7,6 +7,9 @@ use URI;
 require CGI::Simple;
 require CGI::Cookie;
 
+$CGI::Simple::POST_MAX        = 1048576;
+$CGI::Simple::DISABLE_UPLOADS = 0;
+
 __PACKAGE__->mk_accessors('cgi');
 
 =head1 NAME
@@ -115,6 +118,10 @@ sub prepare_path {
     $c->req->{path} =~ s/^($loc)?\///;
     $c->req->{path} .= '/' if $c->req->path eq $loc;
     my $base = $c->cgi->url;
+    if ( $ENV{CATALYST_TEST} ) {
+        my $script = $c->cgi->script_name;
+        $base =~ s/$script$//i;
+    }
     $base = URI->new($base);
     $base->path('/') if ( $ENV{CATALYST_TEST} || !$base->path );
     $c->req->base( $base->as_string );
@@ -133,12 +140,10 @@ sub prepare_request { shift->cgi( CGI::Simple->new ) }
 sub prepare_uploads {
     my $c = shift;
     for my $name ( $c->cgi->upload ) {
-        my $filename = $c->req->params->{$name};
         $c->req->uploads->{$name} = {
-            fh       => $c->cgi->upload($filename),
-            filename => $filename,
-            size     => $c->cgi->upload_info( $filename, 'size' ),
-            type     => $c->cgi->upload_info( $filename, 'mime' )
+            fh   => $c->cgi->upload($name),
+            size => $c->cgi->upload_info( $name, 'size' ),
+            type => $c->cgi->upload_info( $name, 'mime' )
         };
     }
 }

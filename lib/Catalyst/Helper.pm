@@ -508,6 +508,26 @@ EOF
     }
 }
 
+=head1 HELPERS
+
+Helpers are classes that provide two methods.
+
+    * mk_compclass - creates the Component class
+    * mk_comptest  - creates the Component test
+
+So when you call C<bin/create view MyView TT>, create would try to execute
+Catalyst::Helper::View::TT->mk_compclass and
+Catalyst::Helper::View::TT->mk_comptest.
+
+See L<Catalyst::Helper::View::TT> and L<Catalyst::Helper::Model::CDBI> for
+examples.
+
+All helper classes should be under one of the following namespaces.
+
+    Catalyst::Helper::Model::
+    Catalyst::Helper::View::
+    Catalyst::Helper::Controller::
+
 =head1 SEE ALSO
 
 L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,

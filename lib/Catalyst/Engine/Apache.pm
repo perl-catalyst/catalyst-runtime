@@ -162,11 +162,10 @@ sub prepare_uploads {
     my $c = shift;
     for my $upload ( $c->apache_request->upload ) {
         $upload = $c->apache_request->upload($upload) if MP2;
-        $c->req->uploads->{ $upload->name } = {
-            fh       => $upload->fh,
-            filename => $upload->filename,
-            size     => $upload->size,
-            type     => $upload->type
+        $c->req->uploads->{ $upload->filename } = {
+            fh   => $upload->fh,
+            size => $upload->size,
+            type => $upload->type
         };
     }
 }

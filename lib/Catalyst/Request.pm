@@ -5,7 +5,7 @@ use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(
     qw/action arguments base cookies headers match method parameters path
-      snippets uploads user/
+      snippets uploads/
 );
 
 *args   = \&arguments;
@@ -87,14 +87,11 @@ Returns an arrayref containing regex snippets.
 
 Returns a hashref containing the uploads.
 
-    print $c->request->uploads->{foo}->filename;
-    print $c->request->uploads->{foo}->type;
-    print $c->request->uploads->{foo}->size;
-    my $fh = $c->request->uploads->{foo}->fh;
-
-=head3 user
-
-Returns the user.
+    my $filename = $c->req->parameters->{foo};
+    print $c->request->uploads->{$filename}->type;
+    print $c->request->uploads->{$filename}->size;
+    my $fh = $c->request->uploads->{$filename}->fh;
+    my $content = do { local $/; <$fh> };
 
 =head1 AUTHOR
 

@@ -1,5 +1,15 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.11  Wed Mar 02 11:00:00 2005
+        - removed some warnings
+        - improved docs
+
+4.10  Wed Mar 02 10:00:00 2005
+        - improved documentation
+        - fixed upload bug
+        - fixed prefixed private actions bug
+        - fixed more little bugs
+
 4.01  Tue Mar 01 10:00:00 2005
         - improved documentation
         - documentation fixes (Johan Lindstrom)

@@ -7,7 +7,7 @@ use Catalyst::Log;
 
 __PACKAGE__->mk_classdata($_) for qw/_config log/;
 
-our $VERSION = '4.01';
+our $VERSION = '4.11';
 our @ISA;
 
 =head1 NAME
@@ -17,19 +17,19 @@ Catalyst - The Elegant MVC Web Application Framework
 =head1 SYNOPSIS
 
     # use the helper to start a new application
-    catalyst MyApp
+    perl /path/to/catalyst MyApp
     cd MyApp
 
     # add models, views, controllers
-    bin/create model Something
-    bin/create view Stuff
-    bin/create controller Yada
+    perl bin/create model Something
+    perl bin/create view Stuff
+    perl bin/create controller Yada
 
     # built in testserver
-    bin/server
+    perl bin/server
 
     # command line interface
-    bin/test /yada
+    perl bin/test /yada
 
 
     See also L<Catalyst::Manual::Intro>

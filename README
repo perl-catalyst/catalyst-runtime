@@ -3,19 +3,19 @@ NAME
 
 SYNOPSIS
         # use the helper to start a new application
-        catalyst MyApp
+        perl /path/to/catalyst MyApp
         cd MyApp
 
         # add models, views, controllers
-        bin/create model Something
-        bin/create view Stuff
-        bin/create controller Yada
+        perl bin/create model Something
+        perl bin/create view Stuff
+        perl bin/create controller Yada
 
         # built in testserver
-        bin/server
+        perl bin/server
 
         # command line interface
-        bin/test /yada
+        perl bin/test /yada
 
         See also L<Catalyst::Manual::Intro>
 
@@ -94,8 +94,8 @@ AUTHOR
     Sebastian Riedel, "sri@oook.de"
 
 THANK YOU
-    David Naughton, Gary Ashton Jones, Marcus Ramberg and all the others
-    who've helped.
+    Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse Sheidlower,
+    Johan Lindstrom, Marcus Ramberg and all the others who've helped.
 
 LICENSE
     This library is free software . You can redistribute it and/or modify it

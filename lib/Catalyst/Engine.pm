@@ -3,7 +3,6 @@ package Catalyst::Engine;
 use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
 use UNIVERSAL::require;
-use B;
 use Data::Dumper;
 use HTML::Entities;
 use HTTP::Headers;
@@ -68,8 +67,7 @@ sub action {
     $_[1] ? ( $action = {@_} ) : ( $action = shift );
     if ( ref $action eq 'HASH' ) {
         while ( my ( $name, $code ) = each %$action ) {
-            my $class  = B::svref_2object($code)->STASH->NAME;
-            my $caller = caller(0);
+            my $class = caller(0);
             if ( $name =~ /^\/(.*)\/$/ ) {
                 my $regex = $1;
                 $self->actions->{compiled}->{qr/$regex/} = $name;
@@ -77,19 +75,18 @@ sub action {
             }
             elsif ( $name =~ /^\?(.*)$/ ) {
                 $name = $1;
-                $name = _prefix( $caller, $name );
+                $name = _prefix( $class, $name );
                 $self->actions->{plain}->{$name} = [ $class, $code ];
             }
             elsif ( $name =~ /^\!\?(.*)$/ ) {
                 $name = $1;
-                $name = _prefix( $caller, $name );
+                $name = _prefix( $class, $name );
                 $name = "\!$name";
                 $self->actions->{plain}->{$name} = [ $class, $code ];
             }
             else { $self->actions->{plain}->{$name} = [ $class, $code ] }
             $self->actions->{reverse}->{"$code"} = $name;
-            $self->log->debug(
-                qq/"$caller" defined "$name" as "$code" from "$class"/)
+            $self->log->debug(qq/"$class" defined "$name" as "$code"/)
               if $self->debug;
         }
     }
@@ -378,9 +375,11 @@ sub handler {
     eval {
         my $handler = sub {
             my $c = $class->prepare($r);
-            if ( $c->req->action ) {
+            if ( my $action = $c->action( $c->req->action ) ) {
                 my ( $begin, $end );
-                if ( my $prefix = $c->req->args->[0] ) {
+                my $class  = ${ $action->[0] }[0];
+                my $prefix = _class2prefix($class);
+                if ($prefix) {
                     if ( $c->actions->{plain}->{"\!$prefix/begin"} ) {
                         $begin = "\!$prefix/begin";
                     }
@@ -392,6 +391,12 @@ sub handler {
                     }
                     elsif ( $c->actions->{plain}->{'!end'} ) { $end = '!end' }
                 }
+                else {
+                    if ( $c->actions->{plain}->{'!begin'} ) {
+                        $begin = '!begin';
+                    }
+                    if ( $c->actions->{plain}->{'!end'} ) { $end = '!end' }
+                }
                 $c->forward($begin)            if $begin;
                 $c->forward( $c->req->action ) if $c->req->action;
                 $c->forward($end)              if $end;
@@ -400,7 +405,7 @@ sub handler {
                 my $action = $c->req->path;
                 my $error  = $action
                   ? qq/Unknown resource "$action"/
-                  : "Congratulations, you're on Catalyst!";
+                  : "No default action defined";
                 $c->log->error($error) if $c->debug;
                 $c->errors($error);
             }
@@ -479,7 +484,7 @@ sub prepare_action {
     my @path = split /\//, $c->req->path;
     $c->req->args( \my @args );
     while (@path) {
-        my $path = join '/', @path;
+        $path = join '/', @path;
         if ( my $result = $c->action($path) ) {
 
             # It's a regex
@@ -710,11 +715,17 @@ sub stash {
 
 sub _prefix {
     my ( $class, $name ) = @_;
+    my $prefix = _class2prefix($class);
+    $name = "$prefix/$name" if $prefix;
+    return $name;
+}
+
+sub _class2prefix {
+    my $class = shift;
     $class =~ /^.*::[(M)(Model)(V)(View)(C)(Controller)]+::(.*)$/;
     my $prefix = lc $1 || '';
     $prefix =~ s/\:\:/_/g;
-    $name = "$prefix/$name" if $prefix;
-    return $name;
+    return $prefix;
 }
 
 =head1 AUTHOR
