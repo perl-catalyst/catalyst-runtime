@@ -2,12 +2,12 @@ package TestApp;
 
 use Catalyst qw[-Engine=Test];
 
-__PACKAGE__->action(
-    foo => sub {
-        my ( $self, $c ) = @_;
-        $c->res->output( $c->req->params->{foo} );
-    }
-);
+sub foo : Global {
+    my ( $self, $c ) = @_;
+    $c->res->output( $c->req->params->{foo} );
+}
+
+__PACKAGE__->setup;
 
 package main;
 

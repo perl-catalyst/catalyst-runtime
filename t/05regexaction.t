@@ -2,12 +2,12 @@ package TestApp;
 
 use Catalyst qw[-Engine=Test];
 
-__PACKAGE__->action(
-    '/foo/(.*)/' => sub {
+sub testregex : Regex(foo/(.*)) {
         my ( $self, $c ) = @_;
         $c->res->output( $c->req->snippets->[0] );
-    }
-);
+}
+
+__PACKAGE__->setup();
 
 package main;
 
