@@ -186,6 +186,7 @@ sub import {
     }
     my $t = Text::ASCIITable->new;
     $t->setCols('Class');
+    $t->setColWidth( 'Class', 75, 1 );
     $t->addRow($_) for @plugins;
     $caller->log->debug( 'Loaded plugins', $t->draw )
       if ( @plugins && $caller->debug );

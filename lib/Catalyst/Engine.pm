@@ -486,6 +486,9 @@ sub handler {
             my $av = sprintf '%.3f', 1 / $elapsed;
             my $t = Text::ASCIITable->new;
             $t->setCols( 'Action', 'Time' );
+            $t->setColWidth( 'Action', 65, 1 );
+            $t->setColWidth( 'Time',   8,  1 );
+
             for my $stat (@stats) {
                 $t->addRow(@$stat);
             }
@@ -553,6 +556,8 @@ sub prepare {
     if ( $c->debug && keys %{ $c->req->params } ) {
         my $t = Text::ASCIITable->new;
         $t->setCols( 'Key', 'Value' );
+        $t->setColWidth( 'Key',   37, 1 );
+        $t->setColWidth( 'Value', 36, 1 );
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
             $t->addRow( $key, $value );
@@ -854,12 +859,16 @@ sub setup_components {
     }
     my $t = Text::ASCIITable->new;
     $t->setCols('Class');
+    $t->setColWidth( 'Class', 75, 1 );
     $t->addRow($_) for keys %{ $self->components };
     $self->log->debug( 'Loaded components', $t->draw )
       if ( @{ $t->{tbl_rows} } && $self->debug );
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
     $privates->setCols( 'Action', 'Class', 'Code' );
+    $privates->setColWidth( 'Action', 28, 1 );
+    $privates->setColWidth( 'Class',  28, 1 );
+    $privates->setColWidth( 'Code',   14, 1 );
     my $walker = sub {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
@@ -876,6 +885,10 @@ sub setup_components {
       if ( @{ $privates->{tbl_rows} } && $self->debug );
     my $publics = Text::ASCIITable->new;
     $publics->setCols( 'Action', 'Class', 'Code' );
+    $publics->setColWidth( 'Action', 28, 1 );
+    $publics->setColWidth( 'Class',  28, 1 );
+    $publics->setColWidth( 'Code',   14, 1 );
+
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
         $publics->addRow( "/$plain", $class, $code );
@@ -884,6 +897,9 @@ sub setup_components {
       if ( @{ $publics->{tbl_rows} } && $self->debug );
     my $regexes = Text::ASCIITable->new;
     $regexes->setCols( 'Action', 'Class', 'Code' );
+    $regexes->setColWidth( 'Action', 28, 1 );
+    $regexes->setColWidth( 'Class',  28, 1 );
+    $regexes->setColWidth( 'Code',   14, 1 );
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
         $regexes->addRow( $regex, $class, $code );
