@@ -37,9 +37,15 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 action
+=over 4
+
+=item $c->action( $name => $coderef, ... )
+
+=item $c->action( $name )
+
+=item $c->action
 
 Add one or more actions.
 
@@ -118,7 +124,8 @@ sub action {
     }
 }
 
-=head3 benchmark
+
+=item $c->benchmark($coderef)
 
 Takes a coderef with arguments and returns elapsed time as float.
 
@@ -136,7 +143,9 @@ sub benchmark {
     return wantarray ? ( $elapsed, @return ) : $elapsed;
 }
 
-=head3 component (comp)
+=item $c->comp($name)
+
+=item $c->component($name)
 
 Get a component object by name.
 
@@ -160,7 +169,11 @@ sub component {
     }
 }
 
-=head3 errors
+=item $c->errors
+
+=item $c->errors($error, ...)
+
+=item $c->errors($arrayref)
 
 Returns an arrayref containing errors messages.
 
@@ -179,7 +192,7 @@ sub errors {
     return $c->{errors};
 }
 
-=head3 finalize
+=item $c->finalize
 
 Finalize request.
 
@@ -187,6 +200,13 @@ Finalize request.
 
 sub finalize {
     my $c = shift;
+
+    if ( my $location = $c->res->redirect ) {
+        $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
+        $c->res->headers->header( Location => $location );
+        $c->res->status(302);
+    }
+
     if ( !$c->res->output || $#{ $c->errors } >= 0 ) {
         $c->res->headers->content_type('text/html');
         my $name = $c->config->{name} || 'Catalyst Application';
@@ -280,18 +300,13 @@ sub finalize {
 </html>
 
     }
-    if ( my $location = $c->res->redirect ) {
-        $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
-        $c->res->headers->header( Location => $location );
-        $c->res->status(302);
-    }
     $c->res->headers->content_length( length $c->res->output );
     my $status = $c->finalize_headers;
     $c->finalize_output;
     return $status;
 }
 
-=head3 finalize_headers
+=item $c->finalize_headers
 
 Finalize headers.
 
@@ -299,7 +314,7 @@ Finalize headers.
 
 sub finalize_headers { }
 
-=head3 finalize_output
+=item $c->finalize_output
 
 Finalize output.
 
@@ -307,7 +322,7 @@ Finalize output.
 
 sub finalize_output { }
 
-=head3 forward
+=item $c->forward($command)
 
 Forward processing to a private/public action or a method from a class.
 If you define a class without method it will default to process().
@@ -373,7 +388,7 @@ sub forward {
     return $c->process( $class, $code );
 }
 
-=head3 handler
+=item $c->handler($r)
 
 Handles the request.
 
@@ -440,9 +455,9 @@ sub handler {
     return $status;
 }
 
-=head3 prepare
+=item $c->prepare($r)
 
-Turns the request (Apache, CGI...) into a Catalyst context.
+Turns the engine-specific request (Apache, CGI...) into a Catalyst context.
 
 =cut
 
@@ -494,7 +509,7 @@ sub prepare {
     return $c;
 }
 
-=head3 prepare_action
+=item $c->prepare_action
 
 Prepare action.
 
@@ -547,7 +562,7 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-=head3 prepare_cookies;
+=item $c->prepare_cookies;
 
 Prepare cookies.
 
@@ -555,7 +570,7 @@ Prepare cookies.
 
 sub prepare_cookies { }
 
-=head3 prepare_headers
+=item $c->prepare_headers
 
 Prepare headers.
 
@@ -563,7 +578,7 @@ Prepare headers.
 
 sub prepare_headers { }
 
-=head3 prepare_parameters
+=item $c->prepare_parameters
 
 Prepare parameters.
 
@@ -571,7 +586,7 @@ Prepare parameters.
 
 sub prepare_parameters { }
 
-=head3 prepare_path
+=item $c->prepare_path
 
 Prepare path and base.
 
@@ -579,7 +594,7 @@ Prepare path and base.
 
 sub prepare_path { }
 
-=head3 prepare_request
+=item $c->prepare_request
 
 Prepare the engine request.
 
@@ -587,7 +602,7 @@ Prepare the engine request.
 
 sub prepare_request { }
 
-=head3 prepare_uploads
+=item $c->prepare_uploads
 
 Prepare uploads.
 
@@ -595,7 +610,7 @@ Prepare uploads.
 
 sub prepare_uploads { }
 
-=head3 process
+=item $c->process($class, $coderef)
 
 Process a coderef in given class and catch exceptions.
 Errors are available via $c->errors.
@@ -627,7 +642,7 @@ sub process {
     return $status;
 }
 
-=head3 remove_action
+=item $c->remove_action($action)
 
 Remove an action.
 
@@ -650,19 +665,23 @@ sub remove_action {
     }
 }
 
-=head3 request (req)
+=item $c->request
+
+=item $c->req
 
 Returns a C<Catalyst::Request> object.
 
     my $req = $c->req;
 
-=head3 response (res)
+=item $c->response
+
+=item $c->res
 
 Returns a C<Catalyst::Response> object.
 
     my $res = $c->res;
 
-=head3 setup
+=item $class->setup
 
 Setup.
 
@@ -679,7 +698,7 @@ sub setup {
     }
 }
 
-=head3 setup_components
+=item $class->setup_components
 
 Setup components.
 
@@ -715,7 +734,7 @@ sub setup_components {
       if $self->debug;
 }
 
-=head3 stash
+=item $c->stash
 
 Returns a hashref containing all your data.
 
@@ -749,6 +768,8 @@ sub _class2prefix {
     $prefix =~ s/\:\:/_/g;
     return $prefix;
 }
+
+=back
 
 =head1 AUTHOR
 

@@ -69,37 +69,49 @@ The key concept of Catalyst is DRY (Don't Repeat Yourself).
 
 See L<Catalyst::Manual> for more documentation.
 
-Omit the Catalyst::Plugin:: prefix from plugins.
-So Catalyst::Plugin::My::Module becomes My::Module.
+Catalyst plugins can be loaded by naming them as arguments to the "use Catalyst" statement.
+Omit the C<Catalyst::Plugin::> prefix from the plugin name, 
+so C<Catalyst::Plugin::My::Module> becomes C<My::Module>.
 
     use Catalyst 'My::Module';
 
-You can also set special flags like -Debug and -Engine.
+Special flags like -Debug and -Engine can also be specifed as arguments when
+Catalyst is loaded:
 
     use Catalyst qw/-Debug My::Module/;
 
-The position of plugins and flags in the chain is important,
-because they are loaded in the same order they appear.
+The position of plugins and flags in the chain is important, because they are
+loaded in exactly the order that they appear.
 
-=head2 -Debug
+The following flags are supported:
+
+=over 4
+
+=item -Debug
+
+enables debug output, i.e.:
 
     use Catalyst '-Debug';
 
-is equivalent to
+this is equivalent to:
 
     use Catalyst;
     sub debug { 1 }
 
-=head2 -Engine
+=item -Engine
 
 Force Catalyst to use a specific engine.
-Omit the Catalyst::Engine:: prefix.
+Omit the C<Catalyst::Engine::> prefix of the engine name, i.e.:
 
     use Catalyst '-Engine=CGI';
 
-=head2 METHODS
+=back
 
-=head3 debug
+=head1 METHODS
+
+=over 4
+
+=item debug
 
 Overload to enable debug messages.
 
@@ -107,7 +119,7 @@ Overload to enable debug messages.
 
 sub debug { 0 }
 
-=head3 config
+=item config
 
 Returns a hashref containing your applications settings.
 
@@ -178,6 +190,8 @@ sub import {
     }
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 }
+
+=back
 
 =head1 SUPPORT
 

@@ -48,9 +48,12 @@ This is the universal base class for Catalyst components
 It provides you with a generic new() for instantiation through Catalyst's
 component loader with config() support and a process() method placeholder.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 new
+=over 4
+
+=item new($c)
+
 =cut
 
 sub new {
@@ -58,7 +61,14 @@ sub new {
     return $self->NEXT::new( $self->config );
 }
 
-=head3 config
+# remember to leave blank lines between the consecutive =item's
+# otherwise the pod tools don't recognize the subsequent =items
+
+=item $c->config
+
+=item $c->config($hashref)
+
+=item $c->config($key, $value, ...)
 
 =cut
 
@@ -74,7 +84,7 @@ sub config {
     return $self->_config;
 }
 
-=head3 process
+=item $c->process()
 
 =cut
 

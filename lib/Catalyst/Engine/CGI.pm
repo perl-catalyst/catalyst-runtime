@@ -18,6 +18,8 @@ Catalyst::Engine::CGI - The CGI Engine
 
 =head1 SYNOPSIS
 
+A script using the Catalyst::Engine::CGI module might look like:
+
     #!/usr/bin/perl -w
 
     use strict;
@@ -26,34 +28,48 @@ Catalyst::Engine::CGI - The CGI Engine
 
     MyApp->run;
 
-See L<Catalyst>.
+The application module (C<MyApp>) would use C<Catalyst>, which loads the
+appropriate engine module.
 
 =head1 DESCRIPTION
 
-This is the CGI engine for Catalyst.
+This is the Catalyst engine specialized for the CGI environment (using the
+C<CGI::Simple> and C<CGI::Cookie> modules).  Normally Catalyst will select the
+appropriate engine according to the environment that it detects, however you
+can force Catalyst to use the CGI engine by specifying the following in your
+application module:
 
-The script shown above must be designated as a "Non-parsed Headers"
-script to function properly.
-To do this in Apache name the script starting with C<nph->.
+    use Catalyst qw(-Engine=CGI);
+
+Catalyst::Engine::CGI generates a full set of HTTP headers, which means that
+applications using the engine must be be configured as "Non-parsed Headers"
+scripts (at least when running under Apache).  To configure this under Apache
+name the starting with C<nph->.
 
 The performance of this way of using Catalyst is not expected to be
 useful in production applications, but it may be helpful for development.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 run
+=over 4
+
+=item $c->run
 
 To be called from a CGI script to start the Catalyst application.
 
-=head3 cgi
+=item $c->cgi
 
 This config parameter contains the C<CGI::Simple> object.
 
-=head2 OVERLOADED METHODS
+=back
+
+=head1 OVERLOADED METHODS
 
 This class overloads some methods from C<Catalyst>.
 
-=head3 finalize_headers
+=over 4
+
+=item $c->finalize_headers
 
 =cut
 
@@ -79,7 +95,9 @@ sub finalize_headers {
     print $c->cgi->header(%headers);
 }
 
-=head3 finalize_output
+=item $c->finalize_output
+
+Prints the response output to STDOUT.
 
 =cut
 
@@ -88,13 +106,15 @@ sub finalize_output {
     print $c->response->output;
 }
 
-=head3 prepare_cookies
+=item $c->prepare_cookies
+
+Sets up cookies.
 
 =cut
 
 sub prepare_cookies { shift->req->cookies( { CGI::Cookie->fetch } ) }
 
-=head3 prepare_headers
+=item $c->prepare_headers
 
 =cut
 
@@ -107,7 +127,7 @@ sub prepare_headers {
     }
 }
 
-=head3 prepare_parameters
+=item $c->prepare_parameters
 
 =cut
 
@@ -121,7 +141,7 @@ sub prepare_parameters {
     $c->req->parameters( {%vars} );
 }
 
-=head3 prepare_path
+=item $c->prepare_path
 
 =cut
 
@@ -142,13 +162,13 @@ sub prepare_path {
     $c->req->base( $base->as_string );
 }
 
-=head3 prepare_request
+=item $c->prepare_request
 
 =cut
 
 sub prepare_request { shift->cgi( CGI::Simple->new ) }
 
-=head3 prepare_uploads
+=item $c->prepare_uploads
 
 =cut
 
@@ -164,6 +184,8 @@ sub prepare_uploads {
 }
 
 sub run { shift->handler }
+
+=back
 
 =head1 SEE ALSO
 

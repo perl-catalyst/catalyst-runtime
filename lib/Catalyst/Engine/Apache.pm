@@ -35,23 +35,29 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-The Apache Engine.
+This is the Catalyst engine specialized for Apache (i.e. for mod_perl).
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 apache_request
+=over 4
+
+=item $c->apache_request
 
 Returns an C<Apache::Request> object.
 
-=head3 original_request
+=item $c->original_request
 
 Returns the original Apache request object.
 
-=head2 OVERLOADED METHODS
+=back
+
+=head1 OVERLOADED METHODS
 
 This class overloads some methods from C<Catalyst::Engine>.
 
-=head3 finalize_headers
+=over 4
+
+=item $c->finalize_headers
 
 =cut
 
@@ -81,7 +87,7 @@ sub finalize_headers {
     return 0;
 }
 
-=head3 finalize_output
+=item $c->finalize_output
 
 =cut
 
@@ -90,7 +96,7 @@ sub finalize_output {
     $c->original_request->print( $c->response->{output} );
 }
 
-=head3 prepare_cookies
+=item $c->prepare_cookies
 
 =cut
 
@@ -102,7 +108,7 @@ sub prepare_cookies {
         { Apache::Cookie->new( $c->apache_request )->fetch } );
 }
 
-=head3 prepare_headers
+=item $c->prepare_headers
 
 =cut
 
@@ -112,7 +118,7 @@ sub prepare_headers {
     $c->req->headers->header( %{ $c->apache_request->headers_in } );
 }
 
-=head3 prepare_parameters
+=item $c->prepare_parameters
 
 =cut
 
@@ -126,7 +132,7 @@ sub prepare_parameters {
     $c->req->parameters( \%args );
 }
 
-=head3 prepare_path
+=item $c->prepare_path
 
 =cut
 
@@ -145,7 +151,7 @@ sub prepare_path {
     $c->req->base( $base->as_string );
 }
 
-=head3 prepare_request
+=item $c->prepare_request($r)
 
 =cut
 
@@ -155,7 +161,7 @@ sub prepare_request {
     $c->original_request($r);
 }
 
-=head3 prepare_uploads
+=item $c->prepare_uploads
 
 =cut
 
@@ -170,6 +176,8 @@ sub prepare_uploads {
         };
     }
 }
+
+=back
 
 =head1 SEE ALSO
 
