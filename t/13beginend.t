@@ -22,14 +22,14 @@ package TestApp::C::Foo::Bar;
 
 TestApp->action(
 
-    '!?begin' => sub {
+    '!begin' => sub {
         my ( $self, $c ) = @_;
         $c->res->output('yada');
     },
 
-    '!?default' => sub { },
+    '!default' => sub { },
 
-    '!?end' => sub {
+    '!end' => sub {
         my ( $self, $c ) = @_;
         $c->res->output('yada');
         $c->res->output( $c->res->output . 'yada' );
@@ -43,4 +43,4 @@ use Test::More tests => 2;
 use Catalyst::Test 'TestApp';
 
 ok( get('/foo')         =~ /foobar/ );
-ok( get('/foo_bar/foo') =~ /yadayada/ );
+ok( get('/foo/bar/foo') =~ /yadayada/ );

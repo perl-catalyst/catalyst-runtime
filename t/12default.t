@@ -12,7 +12,7 @@ __PACKAGE__->action(
 package TestApp::C::Foo::Bar;
 
 TestApp->action(
-    '!?default' => sub {
+    '!default' => sub {
         my ( $self, $c ) = @_;
         $c->res->output('yada');
     }
@@ -24,4 +24,4 @@ use Test::More tests => 2;
 use Catalyst::Test 'TestApp';
 
 ok( get('/foo')         =~ /bar/ );
-ok( get('/foo_bar/foo') =~ /yada/ );
+ok( get('/foo/bar/foo') =~ /yada/ );
