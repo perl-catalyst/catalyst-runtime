@@ -41,7 +41,7 @@ sub run {
     my $class = shift;
     my $port  = shift || 3000;
 
-    my $server = Catalyst::Engine::Server::Simple->new($port);
+    my $server = Catalyst::Engine::HTTP::Server::Simple->new($port);
 
     $server->handler( sub { $class->handler } );
     $server->run;
@@ -65,7 +65,7 @@ the same terms as Perl itself.
 
 =cut
 
-package Catalyst::Engine::Server::Simple;
+package Catalyst::Engine::HTTP::Server::Simple;
 
 use strict;
 use base 'HTTP::Server::Simple';
