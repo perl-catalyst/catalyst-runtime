@@ -7,7 +7,7 @@ use Catalyst::Log;
 
 __PACKAGE__->mk_classdata($_) for qw/_config log/;
 
-our $VERSION = '4.27';
+our $VERSION = '4.28';
 our @ISA;
 
 =head1 NAME
@@ -161,7 +161,8 @@ sub import {
             else {
                 $caller->log->debug(qq/Loaded plugin "$plugin"/)
                   if $caller->debug;
-                unshift @ISA, $plugin;
+                no strict 'refs';
+                push @{"$caller\::ISA"}, $plugin;
             }
         }
     }
@@ -171,7 +172,10 @@ sub import {
       if $ENV{CATALYST_ENGINE};
     $engine->require;
     die qq/Couldn't load engine "$engine", "$@"/ if $@;
-    push @ISA, $engine;
+    {
+        no strict 'refs';
+        push @{"$caller\::ISA"}, $engine;
+    }
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 }
 
@@ -197,9 +201,9 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 THANK YOU
 
-Andrew Ruthven, Christopher Hicks, Danijel Milicevic, David Naughton,
-Gary Ashton Jones, Jesse Sheidlower, Johan Lindstrom, Marcus Ramberg,
-Tatsuhiko Miyagawa and all the others who've helped.
+Andrew Ruthven, Christian Hansen, Christopher Hicks, Danijel Milicevic,
+David Naughton, Gary Ashton Jones, Jesse Sheidlower, Johan Lindstrom,
+Marcus Ramberg, Tatsuhiko Miyagawa and all the others who've helped.
 
 =head1 LICENSE
 
