@@ -593,7 +593,7 @@ sub execute {
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} },
-              _prettify( $action, '', sprintf( '%fs', $elapsed ) );
+              _prettify( $action, sprintf( '%fs', $elapsed ), '' );
             $c->state(@state);
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
@@ -864,7 +864,7 @@ sub _class2prefix {
 sub _prettify {
     my ( $val1, $val2, $val3 ) = @_;
     formline
-'  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>> ',
+'  @<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>  ',
       $val1, $val2, $val3;
     my $formatted = $^A;
     $^A = '';
