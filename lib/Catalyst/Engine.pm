@@ -738,17 +738,16 @@ sub setup_actions {
         my $name = '';
         no strict 'refs';
         my @cache = ( $comp, @{"$comp\::ISA"} );
-        my @namespaces;
-        my %seen;
+        my %namespaces;
         while ( my $namespace = shift @cache ) {
-            push @namespaces, $namespace;
+            $namespaces{$namespace}++;
             for my $isa ( @{"$comp\::ISA"} ) {
-                next if $seen{$isa};
+                next if $namespaces{$isa};
                 push @cache, $isa;
-                $seen{$isa}++;
+                $namespaces{$isa}++;
             }
         }
-        for my $namespace (@namespaces) {
+        for my $namespace ( keys %namespaces ) {
             for my $sym ( values %{ $namespace . '::' } ) {
                 if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
                     $name = *{$sym}{NAME};
