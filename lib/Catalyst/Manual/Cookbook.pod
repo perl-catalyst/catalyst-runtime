@@ -68,7 +68,7 @@ Just use Catalyst::Model::CDBI::CRUD as baseclass.
 Modify the $c->form() parameters to match your needs, and don't forget to copy
 the templates. ;)
 
-=head2 Serving static files and CSS as text/css
+==head2 Serving static files and CSS as text/css
 
 If you want to serve static content (like images, txt or CSS) via Catalyst,
 then all you need is the plugin Catalyst::Plugin::Static as well as a small
@@ -93,7 +93,7 @@ regex to set the MIME type for CSS to text/css.
         },
     );
 
-=head2 Uploads with Catalyst
+==head2 Uploads with Catalyst
 
 To implement uploads in Catalyst you need to have a HTML form similiar to
 this:
@@ -134,34 +134,6 @@ If you want to upload bigger files than 1MB, then just add to your Controller
 module:
 
     $CGI::Simple::POST_MAX = 1048576000;
-
-
-=head2 Easily working with datetime objects.
-
-If you store datetime data in your tables, you can easily expand this column to
-a L<Time::Piece> object which lets you call useful methods like ymd, mon and 
-datetime on it.
-
-In order to set it up, add something like the following to your CDBI Model Class,
-if you are storing dates as ISO timestamps:
-
-     __PACKAGE__->has_a(
-         mycolumn => 'Time::Piece',
-         inflate => sub { Time::Piece->strptime( shift, "%FT%H:%M:%S" ) },
-         deflate => 'datetime'
-     );
-
-or if you prefer to store dates in unix epoch time you can do something like this:
-
-     __PACKAGE__->has_a(
-         mycolumn => 'Time::Piece',
-         inflate => sub { Time::Piece->strptime( shift, "%s" ) },
-         deflate => 'epoch'
-     );
-
-If you want to use another format in the database, you can change the strptime call 
-to fit your format, and use strftime to return it with your custom format to the 
-database during deflate. See the L<Time::Piece> and L<Class::DBI> docs for more info.
 
 =head1 AUTHOR
 

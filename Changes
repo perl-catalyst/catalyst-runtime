@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
 4.13  Thu Mar 03 11:00:00 2005
         - improved documentation
+        - pod coverage test for helper generated apps
 
 4.12  Wed Mar 02 11:00:00 2005
         - server_base sucks, removed

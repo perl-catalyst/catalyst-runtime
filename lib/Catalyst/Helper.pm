@@ -150,6 +150,17 @@ use_ok( Catalyst::Test, '$name' );
 
 ok( request('/')->is_success );
 EOF
+    my $pc = IO::File->new("> $t/02podcoverage.t")
+      or die qq/Couldn't open "$t\/02podcoverage.t", "$!"/;
+    print $pc <<"EOF";
+use Test::More;
+
+eval "use Test::Pod::Coverage 1.04";
+plan skip_all => 'Test::Pod::Coverage 1.04 required' if \$@;
+plan skip_all => 'set TEST_POD to enable this test' unless \$ENV{TEST_POD};
+
+all_pod_coverage_ok();
+EOF
 }
 
 sub _mk_server {
