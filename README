@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
         # use the helper to start a new application
-        perl /path/to/catalyst MyApp
+        catalyst MyApp
         cd MyApp
 
         # add models, views, controllers
