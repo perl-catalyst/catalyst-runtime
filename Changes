@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.26  Wed Mar 16 10:00:00 2005
+        - fixed the weird bug that caused regex actions to fail on every
+          second request
+        - somemore debug messages
+
 4.25  Sat Mar 12 18:00:00 2005
         - correct perl pathes for helper generated scripts (Tatsuhiko Miyagawa)
         - improved cgi engine docs (Christoper Hicks)

@@ -94,9 +94,8 @@ sub action {
         if    ( my $p = $self->actions->{plain}->{$action} ) { return [$p] }
         elsif ( my $r = $self->actions->{regex}->{$action} ) { return [$r] }
         else {
-            while ( my ( $regex, $name ) =
-                each %{ $self->actions->{compiled} } )
-            {
+            for my $regex ( keys %{ $self->actions->{compiled} } ) {
+                my $name = $self->actions->{compiled}->{$regex};
                 if ( $action =~ $regex ) {
                     my @snippets;
                     for my $i ( 1 .. 9 ) {
@@ -475,10 +474,11 @@ sub prepare {
     }
     $c->prepare_request($r);
     $c->prepare_path;
-    my $path = $c->request->path;
-    $c->log->debug(qq/Requested path "$path"/) if $c->debug;
     $c->prepare_cookies;
     $c->prepare_headers;
+    my $method = $c->req->method;
+    my $path   = $c->req->path;
+    $c->log->debug(qq/"$method" request for "$path"/) if $c->debug;
     $c->prepare_action;
     $c->prepare_parameters;
     $c->prepare_uploads;
@@ -517,8 +517,6 @@ sub prepare_action {
                 $c->log->debug(qq/Requested action "$path"/) if $c->debug;
             }
             $c->req->match($path);
-            $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
-              if ( $c->debug && @args );
             last;
         }
         unshift @args, pop @path;
@@ -536,6 +534,8 @@ sub prepare_action {
             $c->log->debug('Using default action') if $c->debug;
         }
     }
+    $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
+      if ( $c->debug && @args );
 }
 
 =head3 prepare_cookies;
