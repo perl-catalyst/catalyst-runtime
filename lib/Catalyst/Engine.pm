@@ -116,17 +116,30 @@ sub dispatch {
     my $results = $c->get_action( $action, $default );
     $namespace ||= '/';
     if ( @{$results} ) {
-        for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
+
+        # Execute last begin
+        $c->state(1);
+        if ( my $begin = @{ $c->get_action( 'begin', $namespace ) }[-1] ) {
             $c->execute( @{ $begin->[0] } );
             return if scalar @{$c->error};
             last unless $c->state;
         }
-        if ( my $action = @{ $c->get_action( $action, $default ) }[-1] ) {
-            $c->execute( @{ $action->[0] } );
-            return if scalar @{$c->error};
+
+        # Execute the auto chain
+        for my $auto ( @{ $c->get_action( 'auto', $namespace ) } ) {
+            $c->execute( @{ $auto->[0] } );
             last unless $c->state;
         }
-        for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } ) {
+
+        # Execute the action or last default
+        if ( ( my $action = $c->req->action ) && $c->state ) {
+            if ( my $result = @{ $c->get_action( $action, $default ) }[-1] ) {
+                $c->execute( @{ $result->[0] } );
+            }
+        }
+
+        # Execute last end
+        if ( my $end = @{ $c->get_action( 'end', $namespace ) }[-1] ) {
             $c->execute( @{ $end->[0] } );
             return if scalar @{$c->error};
             last unless $c->state;            
