@@ -5,6 +5,7 @@ use base 'Catalyst::Engine::Apache';
 
 use Apache2 ();
 use Apache::Connection ();
+use Apache::Const ( -compile => qw(:common) );
 use Apache::RequestIO ();
 use Apache::RequestRec ();
 use Apache::RequestUtil ();

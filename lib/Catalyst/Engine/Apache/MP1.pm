@@ -4,6 +4,7 @@ use strict;
 use base 'Catalyst::Engine::Apache';
 
 use Apache ();
+use Apache::Constants qw(:common);
 use Apache::Request ();
 use Apache::Cookie ();
 
