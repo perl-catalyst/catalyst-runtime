@@ -128,6 +128,7 @@ sub dispatch {
         # Execute the auto chain
         for my $auto ( @{ $c->get_action( 'auto', $namespace ) } ) {
             $c->execute( @{ $auto->[0] } );
+            return if scalar @{$c->error};
             last unless $c->state;
         }
 
@@ -142,7 +143,7 @@ sub dispatch {
         if ( my $end = @{ $c->get_action( 'end', $namespace ) }[-1] ) {
             $c->execute( @{ $end->[0] } );
             return if scalar @{$c->error};
-            last unless $c->state;            
+            last unless $c->state;
         }
     }
     else {
