@@ -11,6 +11,8 @@ sub address : Global {
     $c->res->output( $c->req->address );
 }
 
+__PACKAGE__->setup;
+
 package main;
 
 use Test::More tests => 2;

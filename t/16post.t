@@ -2,20 +2,20 @@ package TestApp;
 
 use Catalyst qw[-Engine=Test];
 
-__PACKAGE__->action(
-    echo => sub {
-        my ( $self, $c ) = @_;
+sub echo : Global {
+    my ( $self, $c ) = @_;
 
-        for my $field ( $c->req->headers->header_field_names ) {
-            my $header = ( $field =~ /^X-/ ) ? $field : "X-$field";
-            $c->res->headers->header(
-                $header => $c->req->headers->header($field) );
-        }
-
-        $c->res->headers->content_type('text/plain');
-        $c->res->output('ok');
+    for my $field ( $c->req->headers->header_field_names ) {
+        my $header = ( $field =~ /^X-/ ) ? $field : "X-$field";
+        $c->res->headers->header(
+            $header => $c->req->headers->header($field) );
     }
-);
+
+    $c->res->headers->content_type('text/plain');
+    $c->res->output('ok');
+}
+
+__PACKAGE__->setup;
 
 package main;
 
