@@ -5,6 +5,7 @@ use mod_perl;
 use constant MP2 => $mod_perl::VERSION >= 1.99;
 use base 'Catalyst::Engine';
 use URI;
+use URI::http;
 
 __PACKAGE__->mk_accessors(qw/apache/);
 

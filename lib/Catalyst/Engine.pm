@@ -167,7 +167,7 @@ sub finalize {
     if ( my $location = $c->response->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $c->response->header( Location => $location );
-        $c->response->status(302) if $c->response->status !~ /3\d\d$/;
+        $c->response->status(302) if $c->response->status !~ /^3\d\d$/;
     }
 
     if ( $#{ $c->error } >= 0 ) {
