@@ -6,6 +6,10 @@ This file documents the revision history for Perl extension Catalyst.
         - HTTP::Request support in Catalyst::Test (Christian Hansen)
         - moved cgi.pl to nph-cgi.pl
         - added Catalyst::Engine::Server (Christian Hansen)
+        - removed Catalyst::Test::server
+        - updated helper scripts
+          IMPORTANT: note that you have to regenerate script/server.pl,
+          script/cgi-server.pl and script/cgi.pl (now nph-cgi.pl)
 
 4.28  Sat Mar 19 22:00:00 2005
         - fixed isa tree (Christian Hansen)

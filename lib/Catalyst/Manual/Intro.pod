@@ -554,19 +554,11 @@ Start your application on the command line...
 
     script/server.pl
 
-or
-
-    perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 3000
-
 ...then visit http://localhost:3000/ in a browser to view the output.
 
 You can also do it all from the command line:
 
     script/test.pl http://localhost/
-
-or
-
-    perl -I/home/joeuser/myapp/lib -MCatalyst::Test=MyApp -e1 http://localhost/
 
 Have fun!
 

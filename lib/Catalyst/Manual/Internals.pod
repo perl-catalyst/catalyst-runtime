@@ -15,6 +15,7 @@ extend Catalyst.
         prepare_path
         prepare_cookies
         prepare_headers
+        prepare_connection
         prepare_action
         prepare_parameters
         prepare_uploads
