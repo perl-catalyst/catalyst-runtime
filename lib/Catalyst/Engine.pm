@@ -386,13 +386,13 @@ sub get_action {
     return [];
 }
 
-=item $c->handler($r)
+=item $c->handler( $class, $r )
 
 Handles the request.
 
 =cut
 
-sub handler {
+sub handler ($$) {
     my ( $class, $r ) = @_;
 
     # Always expect worst case!

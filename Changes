@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
 5.00  XXX XXX XX XX:00:00 2005
         - whole new core for private action inheritance
+        - problems with mod_perl2 fixed
 
 4.34  Wed Mar 23 07:00:00 2005
         - added some messages to Makefile.PL
