@@ -327,7 +327,7 @@ $Config{startperl} -w
 
 BEGIN {
     \$ENV{CATALYST_ENGINE} = 'CGI';
-    \$ENV{CATALYST_TEST    = 1;
+    \$ENV{CATALYST_TEST}   = 1;
 }
 
 use strict;

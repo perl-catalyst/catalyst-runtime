@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.32  Tue Mar 22 02:10:00 2005
+        - made a damn typo *AAAAAAAAAAAAAAHHHH!!!*
+
 4.31  Tue Mar 22 02:00:00 2005
         - fixed inheritance (Christian Hansen)
         - previous release was borked!
