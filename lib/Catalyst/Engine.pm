@@ -358,7 +358,8 @@ sub handler ($$) {
     my $status = -1;
     eval {
         my $handler = sub {
-            my $c         = $class->prepare($r);
+            my $c = $class->prepare($r);
+            $c->{stats} = [];
             my $action    = $c->req->action;
             my $namespace = '';
             $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
@@ -384,6 +385,9 @@ sub handler ($$) {
                 {
                     $c->state( $c->execute( @{ $end->[0] } ) );
                 }
+                my @stats = @{ $c->{stats} };
+                $c->log->debug( 'Processed', @stats )
+                  if ( @stats && $c->debug );
             }
             else {
                 my $path  = $c->req->path;
@@ -586,11 +590,12 @@ sub execute {
     eval {
         if ( $c->debug )
         {
-            my $action = $c->actions->{reverse}->{"$code"} || "$code";
+            my $action = $c->actions->{reverse}->{"$code"};
+            $action = "/$action" unless $action =~ /\-\>/;
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
-            $c->log->info( sprintf qq/Processing "$action" took %fs/, $elapsed )
-              if $c->debug;
+            push @{ $c->{stats} },
+              _prettify( $action, sprintf( '%fs', $elapsed ), '' );
             $c->state(@state);
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
@@ -682,7 +687,7 @@ sub set_action {
         if ( $flags{regex} =~ /^"(.*)"$/ ) { $flags{regex} = $1 }
     }
 
-    my $reverse = $prefix ? "$method ($prefix)" : $method;
+    my $reverse = $prefix ? "$prefix/$method" : $method;
 
     if ( $flags{local} || $flags{global} || $flags{path} ) {
         my $path = $flags{path} || $method;
@@ -859,10 +864,10 @@ sub _class2prefix {
 }
 
 sub _prettify {
-    my ( $action, $class, $code ) = @_;
+    my ( $val1, $val2, $val3 ) = @_;
     formline
-' @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @|||||||||||||| ',
-      $action, $class, $code;
+' @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>> ',
+      $val1, $val2, $val3;
     my $formatted = $^A;
     $^A = '';
     return $formatted;
