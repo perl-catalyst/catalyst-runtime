@@ -689,6 +689,7 @@ sub set_action {
             $path     = $1;
             $absolute = 1;
         }
+        $absolute = 1 if $flags{global};
         my $name = $absolute ? $path : "$prefix/$path";
         $c->actions->{plain}->{$name} = [ $namespace, $code ];
         $c->log->debug(qq|Public "/$name" is "/$forward"|) if $c->debug;
