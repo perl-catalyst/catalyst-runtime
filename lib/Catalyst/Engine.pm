@@ -136,7 +136,7 @@ sub benchmark {
     return wantarray ? ( $elapsed, @return ) : $elapsed;
 }
 
-=head3 component (comp)
+=head3 component / comp
 
 Get a component object by name.
 

@@ -50,6 +50,7 @@ component loader with config() support and a process() method placeholder.
 
 =head2 METHODS
 
+=head3 new
 =cut
 
 sub new {
