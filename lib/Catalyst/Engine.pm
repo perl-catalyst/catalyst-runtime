@@ -809,9 +809,11 @@ sub _prefix {
 
 sub _class2prefix {
     my $class = shift || '';
-    $class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/;
-    my $prefix = lc $2 || '';
-    $prefix =~ s/\:\:/\//g;
+    my $prefix;
+    if ($class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/) {
+      $prefix = lc $2;
+      $prefix =~ s/\:\:/\//g;
+    }
     return $prefix;
 }
 
