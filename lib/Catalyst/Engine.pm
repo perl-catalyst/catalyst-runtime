@@ -68,57 +68,19 @@ sub action {
     $_[1] ? ( $action = {@_} ) : ( $action = shift );
     if ( ref $action eq 'HASH' ) {
         while ( my ( $name, $code ) = each %$action ) {
-            my $prefix = '';
-            my $class  = caller(0);
-            if ( $name =~ /^\?(.*)$/ ) {
-                my $prefix = $1 || '';
-                $name = $2;
-                $name = $prefix . _prefix( $class, $name );
-                $self->actions->{plain}->{$name} = [ $class, $code ];
-            }
-            if ( $name =~ /^\/(.*)\/$/ ) {
-                my $regex = $1;
-                $self->actions->{compiled}->{qr#$regex#} = $name;
-                $self->actions->{regex}->{$name} = [ $class, $code ];
-            }
-            elsif ( $name =~ /^\!(.*)$/ ) {
-                $name = $1;
-                my $parent  = $self->tree;
-                my $visitor = Tree::Simple::Visitor::FindByPath->new;
-                $prefix = _class2prefix($class);
-                for my $part ( split '/', $prefix ) {
-                    $visitor->setSearchPath($part);
-                    $parent->accept($visitor);
-                    my $child = $visitor->getResult;
-                    unless ($child) {
-                        $child = $parent->addChild( Tree::Simple->new($part) );
-                        $visitor->setSearchPath($part);
-                        $parent->accept($visitor);
-                        $child = $visitor->getResult;
-                    }
-                    $parent = $child;
-                }
-                my $uid = $parent->getUID;
-                $self->actions->{private}->{$uid}->{$name} = [ $class, $code ];
-                $name = "!$name";
-            }
-            else { $self->actions->{plain}->{$name} = [ $class, $code ] }
-            my $reverse = $prefix ? "$name ($prefix)" : $name;
-            $self->actions->{reverse}->{"$code"} = $reverse;
-            $self->log->debug(qq/"$class" defined "$name" as "$code"/)
-              if $self->debug;
+            $self->set_action( $name, $code, caller(0) );
         }
     }
     return 1;
 }
 
-=item $c->find_action( $name, $namespace )
+=item $c->get_action( $action, $namespace )
 
-Find an action in a given namespace.
+Get an action in a given namespace.
 
 =cut
 
-sub find_action {
+sub get_action {
     my ( $c, $action, $namespace ) = @_;
     $namespace ||= '';
     if ( $action =~ /^\!(.*)/ ) {
@@ -156,6 +118,59 @@ sub find_action {
         }
     }
     return [];
+}
+
+=item $c->set_action( $action, $code, $namespace )
+
+Set an action in a given namespace.
+
+=cut
+
+sub set_action {
+    my ( $c, $action, $code, $namespace ) = @_;
+
+    my $prefix = '';
+    if ( $action =~ /^\?(.*)$/ ) {
+        my $prefix = $1 || '';
+        $action = $2;
+        $action = $prefix . _prefix( $namespace, $action );
+        $c->actions->{plain}->{$action} = [ $namespace, $code ];
+    }
+    if ( $action =~ /^\/(.*)\/$/ ) {
+        my $regex = $1;
+        $c->actions->{compiled}->{qr#$regex#} = $action;
+        $c->actions->{regex}->{$action} = [ $namespace, $code ];
+    }
+    elsif ( $action =~ /^\!(.*)$/ ) {
+        $action = $1;
+        my $parent  = $c->tree;
+        my $visitor = Tree::Simple::Visitor::FindByPath->new;
+        $prefix = _class2prefix($namespace);
+        for my $part ( split '/', $prefix ) {
+            $visitor->setSearchPath($part);
+            $parent->accept($visitor);
+            my $child = $visitor->getResult;
+            unless ($child) {
+                $child = $parent->addChild( Tree::Simple->new($part) );
+                $visitor->setSearchPath($part);
+                $parent->accept($visitor);
+                $child = $visitor->getResult;
+            }
+            $parent = $child;
+        }
+        my $uid = $parent->getUID;
+        $c->actions->{private}->{$uid}->{$action} = [ $namespace, $code ];
+        $action = "!$action";
+    }
+    else { 
+       $c->actions->{plain}->{$action} = [ $namespace, $code ] 
+    }
+
+    my $reverse = $prefix ? "$action ($prefix)" : $action;
+    $c->actions->{reverse}->{"$code"} = $reverse;
+
+    $c->log->debug(qq/"$namespace" defined "$action" as "$code"/)
+      if $c->debug;
 }
 
 =item $c->benchmark($coderef)
@@ -383,7 +398,7 @@ sub forward {
     if ( $command =~ /^\!/ ) {
         $namespace = _class2prefix($caller);
     }
-    if ( my $results = $c->find_action( $command, $namespace ) ) {
+    if ( my $results = $c->get_action( $command, $namespace ) ) {
         if ( $command =~ /^\!/ ) {
             for my $result ( @{$results} ) {
                 my ( $class, $code ) = @{ $result->[0] };
@@ -440,19 +455,19 @@ sub handler {
             my $namespace = '';
             $namespace = join '/', @{ $c->req->args } if $action eq '!default';
             unless ($namespace) {
-                if ( my $result = $c->find_action($action) ) {
+                if ( my $result = $c->get_action($action) ) {
                     $namespace = _class2prefix( $result->[0]->[0]->[0] );
                 }
             }
-            my $results = $c->find_action( $action, $namespace );
+            my $results = $c->get_action( $action, $namespace );
             if ( @{$results} ) {
-                for my $begin ( @{ $c->find_action( '!begin', $namespace ) } ) {
+                for my $begin ( @{ $c->get_action( '!begin', $namespace ) } ) {
                     $c->state( $c->process( @{ $begin->[0] } ) );
                 }
-                for my $result ( @{ $c->find_action( $action, $namespace ) } ) {
+                for my $result ( @{ $c->get_action( $action, $namespace ) } ) {
                     $c->state( $c->process( @{ $result->[0] } ) );
                 }
-                for my $end ( @{ $c->find_action( '!end', $namespace ) } ) {
+                for my $end ( @{ $c->get_action( '!end', $namespace ) } ) {
                     $c->state( $c->process( @{ $end->[0] } ) );
                 }
             }
@@ -555,7 +570,7 @@ sub prepare_action {
     $c->req->args( \my @args );
     while (@path) {
         $path = join '/', @path;
-        if ( my $result = ${ $c->find_action($path) }[0] ) {
+        if ( my $result = ${ $c->get_action($path) }[0] ) {
 
             # It's a regex
             if ($#$result) {
