@@ -4,9 +4,48 @@ Catalyst::Manual::Internals - Catalyst Internals
 
 =head1 DESCRIPTION
 
-=head2 Lifecycle
+This document provides an overview of the internals of Catalyst.  As Catalyst
+is still developing rapidly details may become out of date.
 
-These are the steps of a Catalyst request, every step can be overloaded to
+The coverage is split into initialization and request lifecycle.
+
+
+=head2 Initialization
+
+Catalyst initializes itself in two stages (I may be wrong in some of
+the details here - AF):
+
+=over 4
+
+=item 1
+
+When the Catalyst module is imported in the main application module it
+evaluates any options (C<-Debug>, C<-Engine=XXX>) and loads any specified
+plugins, making application module inherit from the plugin classes.  It also
+sets up a default log object and ensures that the application module inherits
+from C<Catalyst> and from the selected specialized Engine module.
+
+=item 2
+
+When the application module makes the first call to C<< __PACKAGE__->action() >>
+(implemented in C<Catalyst::Engine>) Catalyst automatically loads all
+components it finds in the C<$class\::Controller>, C<$class\::C>,
+C<$class\::Model>, C<$class\::M>, C<$class\::View> and C<$class\::V>
+namespaces (using C<Module::Pluggable::Fast>).  A table of actions is built up
+and added to on subsequent calls to C<action()>.
+
+=back
+
+
+=head2 Request Lifecycle
+
+For each request Catalyst builds a I<context> object, which includes
+information about the request, and searches the action table for matching
+actions.  
+
+The handling of a request can be divided into three stages: preparation of the
+context, processing of the request, and finalization of the response.  These
+are the steps of a Catalyst request in detail; every step can be overloaded to
 extend Catalyst.
 
     handler
@@ -24,9 +63,14 @@ extend Catalyst.
         finalize_headers
         finalize_output
 
-These steps are normally overloaded from engine classes, and extended by
-plugins.
-Extending means using multiple inheritance with L<NEXT>.
+These steps are normally overloaded from engine classes, and may also be
+extended by plugins.  Extending means using multiple inheritance with L<NEXT>.
+
+The specialized engine classes populate the Catalyst request object with
+information from the underlying layer (C<Apache::Request> or C<CGI::Simple>)
+during the prepare phase, then push the generated response information down to
+the underlying layer during the finalize phase.
+
 
 =head1 AUTHOR
 
