@@ -57,9 +57,11 @@ This class overloads some methods from C<Catalyst::Engine>.
 sub finalize_headers {
     my $c = shift;
 
-    my $status   = $c->response->status || 200;
-    my $headers  = $c->response->headers;
-    my $response = HTTP::Response->new( $status, undef, $headers );
+    $c->lwp->response->code( $c->response->status || 200 );
+
+    for my $name ( $c->response->headers->header_field_names ) {
+        $c->lwp->response->header( $name => $c->response->header($name) );
+    }
 
     while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
         my $cookie = CGI::Cookie->new(
@@ -71,10 +73,8 @@ sub finalize_headers {
             -secure  => $cookie->{secure} || 0
         );
 
-        $response->header( 'Set-Cookie' => $cookie->as_string );
+        $c->lwp->response->header( 'Set-Cookie' => $cookie->as_string );
     }
-
-    $c->lwp->response($response);
 }
 
 =item $c->finalize_output
@@ -103,7 +103,7 @@ sub prepare_connection {
 sub prepare_cookies {
     my $c = shift;
 
-    if ( my $header = $c->request->headers->header('Cookie') ) {
+    if ( my $header = $c->request->header('Cookie') ) {
         $c->req->cookies( { CGI::Cookie->parse($header) } );
     }
 }
@@ -246,9 +246,10 @@ sub run {
     }
 
     my $lwp = Catalyst::Engine::Test::LWP->new(
-        request  => $request,
         address  => '127.0.0.1',
-        hostname => 'localhost'
+        hostname => 'localhost',
+        request  => $request,
+        response => HTTP::Response->new
     );
 
     $class->handler($lwp);

@@ -60,6 +60,8 @@ sub run {
 
     while ( my $connection = $daemon->accept ) {
 
+        $connection->timeout(5);
+
         while ( my $request = $connection->get_request ) {
 
             $request->uri->scheme('http');    # Force URI::http
@@ -67,13 +69,19 @@ sub run {
             $request->uri->port( $base->port );
 
             my $lwp = Catalyst::Engine::Test::LWP->new(
-                request  => $request,
                 address  => $connection->peerhost,
-                hostname => gethostbyaddr( $connection->peeraddr, AF_INET )
+                hostname => gethostbyaddr( $connection->peeraddr, AF_INET ),
+                request  => $request,
+                response => HTTP::Response->new
             );
 
             $class->handler($lwp);
             $connection->send_response( $lwp->response );
+
+            if ( $class->debug ) {
+                $class->log->info( sprintf( "Peer %s:%d",$connection->peerhost, $connection->peerport ) );
+            }
+
         }
 
         $connection->close;
