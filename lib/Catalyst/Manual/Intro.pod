@@ -258,7 +258,7 @@ Matches only http://localhost:3000/foo/bar.
 
 =item * Regex
 
-    MyApp->action( '^/foo(\d+)/bar(\d+)$/' => sub { } );
+    MyApp->action( '/^foo(\d+)/bar(\d+)$/' => sub { } );
 
 Matches any URL that matches the pattern in the action key, e.g. http://localhost:3000/foo23/bar42. The pattern must be enclosed with forward slashes, i.e. '/$pattern/'.
 
