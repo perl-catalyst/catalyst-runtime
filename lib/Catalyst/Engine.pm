@@ -104,7 +104,8 @@ sub action {
                         last unless ${$i};
                         push @snippets, ${$i};
                     }
-                    return [ $name, \@snippets ];
+                    return [ $self->actions->{regex}->{$name},
+                        $name, \@snippets ];
                 }
             }
         }
@@ -346,6 +347,11 @@ sub forward {
     }
     my ( $class, $code );
     if ( my $action = $c->action($command) ) {
+        if ( $action->[2] ) {
+            $c->log->debug(qq/Couldn't forward "$command" to regex action/)
+              if $c->debug;
+            return 0;
+        }
         ( $class, $code ) = @{ $action->[0] };
     }
     else {
@@ -496,8 +502,8 @@ sub prepare_action {
 
             # It's a regex
             if ($#$result) {
-                my $match    = $result->[0];
-                my @snippets = @{ $result->[1] };
+                my $match    = $result->[1];
+                my @snippets = @{ $result->[2] };
                 $c->log->debug(qq/Requested action "$path" matched "$match"/)
                   if $c->debug;
                 $c->log->debug(
