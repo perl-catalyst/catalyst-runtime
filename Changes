@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+4.22  Tue Mar 09 20:00:00 2005
+        - catch errors in application class
+
 4.21  Sat Mar 05 17:00:00 2005
         - fixed docs
 
