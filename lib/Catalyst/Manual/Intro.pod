@@ -552,7 +552,7 @@ Catalyst has a built in http server for testing! (Later, you can easily use a mo
 
 Start your application on the command line...
 
-    perl bin/server
+    script/server.pl
 
 or
 
@@ -562,7 +562,7 @@ or
 
 You can also do it all from the command line:
 
-    perl bin/test http://localhost/
+    script/test.pl http://localhost/
 
 or
 
