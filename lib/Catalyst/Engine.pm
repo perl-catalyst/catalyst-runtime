@@ -95,6 +95,50 @@ sub component {
     }
 }
 
+=item $c->dispatch
+
+Dispatch request to actions.
+
+=cut
+
+sub dispatch {
+    my $c         = shift;
+    my $action    = $c->req->action;
+    my $namespace = '';
+    $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
+      if $action eq 'default';
+    unless ($namespace) {
+        if ( my $result = $c->get_action($action) ) {
+            $namespace = _class2prefix( $result->[0]->[0]->[0] );
+        }
+    }
+    my $default = $action eq 'default' ? $namespace : undef;
+    my $results = $c->get_action( $action, $default );
+    $namespace ||= '/';
+    if ( @{$results} ) {
+        for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
+            $c->state( $c->execute( @{ $begin->[0] } ) );
+        }
+        if ( my $action = $c->req->action ) {
+            for my $result ( @{ $c->get_action( $action, $default ) }[-1] ) {
+                $c->state( $c->execute( @{ $result->[0] } ) );
+                last unless $default;
+            }
+        }
+        for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } ) {
+            $c->state( $c->execute( @{ $end->[0] } ) );
+        }
+    }
+    else {
+        my $path  = $c->req->path;
+        my $error = $path
+          ? qq/Unknown resource "$path"/
+          : "No default action defined";
+        $c->log->error($error) if $c->debug;
+        $c->error($error);
+    }
+}
+
 =item $c->error
 
 =item $c->error($error, ...)
@@ -167,7 +211,7 @@ sub finalize {
     if ( my $location = $c->response->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $c->response->header( Location => $location );
-        $c->response->status(302) if $c->response->status !~ /^3\d\d$/;
+        $c->response->status(302) if $c->response->status !~ /3\d\d$/;
     }
 
     if ( $#{ $c->error } >= 0 ) {
@@ -445,43 +489,7 @@ sub handler {
         my $handler = sub {
             my $c = $class->prepare($engine);
             $c->{stats} = \@stats;
-            my $action    = $c->req->action;
-            my $namespace = '';
-            $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
-              if $action eq 'default';
-            unless ($namespace) {
-                if ( my $result = $c->get_action($action) ) {
-                    $namespace = _class2prefix( $result->[0]->[0]->[0] );
-                }
-            }
-            my $default = $action eq 'default' ? $namespace : undef;
-            my $results = $c->get_action( $action, $default );
-            $namespace ||= '/';
-            if ( @{$results} ) {
-                for my $begin ( @{ $c->get_action( 'begin', $namespace ) } ) {
-                    $c->state( $c->execute( @{ $begin->[0] } ) );
-                }
-                if ( my $action = $c->req->action ) {
-                    for my $result (
-                        @{ $c->get_action( $action, $default ) }[-1] )
-                    {
-                        $c->state( $c->execute( @{ $result->[0] } ) );
-                        last unless $default;
-                    }
-                }
-                for my $end ( reverse @{ $c->get_action( 'end', $namespace ) } )
-                {
-                    $c->state( $c->execute( @{ $end->[0] } ) );
-                }
-            }
-            else {
-                my $path  = $c->req->path;
-                my $error = $path
-                  ? qq/Unknown resource "$path"/
-                  : "No default action defined";
-                $c->log->error($error) if $c->debug;
-                $c->error($error);
-            }
+            $c->dispatch;
             return $c->finalize;
         };
         if ( $class->debug ) {
@@ -862,7 +870,7 @@ sub setup_components {
         $self->components->{ ref $comp } = $comp;
         $self->setup_actions($comp);
     }
-    my $t = Text::ASCIITable->new({ hide_HeadRow => 1, hide_HeadLine => 1});
+    my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
     $t->addRow( wrap( $_, 75 ) ) for keys %{ $self->components };
@@ -916,6 +924,10 @@ sub setup_components {
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
 }
+
+=item $c->state
+
+Contains the return value of the last executed action.
 
 =item $c->stash
 
