@@ -3,7 +3,7 @@ package Catalyst::Engine::HTTP;
 use strict;
 use base 'Catalyst::Engine::Test';
 
-use IO::Socket qw(AF_INET);
+use IO::Socket qw(AF_INET SOCK_STREAM SOMAXCONN);
 
 =head1 NAME
 
@@ -44,8 +44,10 @@ sub run {
     my $port  = shift || 3000;
 
     my $daemon = Catalyst::Engine::HTTP::Catalyst->new(
+        Listen    => SOMAXCONN,
         LocalPort => $port,
-        ReuseAddr => 1
+        ReuseAddr => 1,
+        Type      => SOCK_STREAM,
     );
 
     unless ($daemon) {
