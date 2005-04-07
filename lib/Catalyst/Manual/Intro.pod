@@ -105,8 +105,8 @@ Here's how to install Catalyst and get a simple application up and running, usin
 
 =head3 Setup
 
-    $ catalyst.pl My::App
-    $ cd My-App
+    $ catalyst.pl MyApp
+    $ cd MyApp
     $ script/create.pl controller My::Controller
 
 =head3 Run
@@ -277,12 +277,12 @@ directly to the application base.
 
 =item * B<Namespace-Prefixed>
 
-    package MyApp::Controller::My::Controller; 
+    package MyApp::C::My::Controller; 
     sub foo : Local { }
 
 Matches http://localhost:3000/my/controller/foo. 
 
-This action type indicates that the matching URL must be prefixed with a modified form of the component's class (package) name. This modified class name excludes the parts that have a pre-defined meaning in Catalyst ("MyApp::Controller" in the above example), replaces "::" with "_" and converts the name to lower case. See L</Components> for a full explanation of the pre-defined meaning of Catalyst component class names.
+This action type indicates that the matching URL must be prefixed with a modified form of the component's class (package) name. This modified class name excludes the parts that have a pre-defined meaning in Catalyst ("MyApp::C" in the above example), replaces "::" with "/" and converts the name to lower case. See L</Components> for a full explanation of the pre-defined meaning of Catalyst component class names.
 
 =item * B<Private>
 
@@ -425,7 +425,7 @@ Again, Catalyst has an uncommonly flexible component system. You can define as m
 
 All components must inherit from L<Catalyst::Base>, which provides a simple class structure and some common class methods like C<config> and C<new> (constructor).
 
-    package MyApp::Controller::MyController;
+    package MyApp::C::MyController;
 
     use strict;
     use base 'Catalyst::Base';
@@ -472,7 +472,7 @@ This gives us a process() method and we can now just do $c->forward('MyApp::V::T
 
     sub end : Private {
         my ( $self, $c ) = @_;
-        $c->forward('MyApp::View::TT');
+        $c->forward('MyApp::V::TT');
     }
 
 You normally render templates at the end of a request, so it's a perfect use for the global end action.
