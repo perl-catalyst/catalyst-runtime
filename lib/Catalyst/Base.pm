@@ -7,6 +7,7 @@ use NEXT;
 __PACKAGE__->mk_classdata($_) for qw/_cache _config/;
 __PACKAGE__->_cache( [] );
 
+# note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {
     my ( $class, $code, @attrs ) = @_;
     push @{ $class->_cache }, [ $code, [@attrs] ];
@@ -40,7 +41,6 @@ Catalyst::Base - Catalyst Universal Base Class
 
     # Methods can be a request step
     $c->forward(qw/MyApp::Model::Something forward_to_me/);
-    MyApp->action( 'index.html' => \&MyApp::Model::Something::forward_to_me );
 
     # Or just methods
     print $c->comp('MyApp::Model::Something')->test;
@@ -95,7 +95,7 @@ sub config {
 
 =cut
 
-sub process { 1 }
+sub process { die __PACKAGE__." did not override process."; }
 
 =back
 
@@ -106,6 +106,7 @@ L<Catalyst>.
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 

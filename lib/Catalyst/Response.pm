@@ -31,8 +31,8 @@ See also L<Catalyst::Application>.
 
 =head1 DESCRIPTION
 
-This is the Catalyst Response class, which provides a set of accessors to
-response data.
+This is the Catalyst Response class, which provides a set of accessors
+to response data.
 
 =head1 METHODS
 
@@ -52,7 +52,7 @@ Shortcut to $resp->headers->content_type
 
 =item $resp->cookies
 
-Returns a reference to a hash containing the cookies.
+Returns a reference to a hash containing the cookies to be set.
 
     $c->response->cookies->{foo} = { value => '123' };
 
@@ -70,7 +70,7 @@ Returns a L<HTTP::Headers> object containing the headers.
 
 Contains the final output.
 
-    $c->response->output('Catalyst rockz!');
+    $c->response->output('Catalyst rocks!');
 
 =item $resp->redirect($url)
 
@@ -89,11 +89,12 @@ Contains the HTTP status.
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify 
+it under the same terms as Perl itself.
 
 =cut
 

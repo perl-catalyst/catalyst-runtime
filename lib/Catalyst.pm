@@ -237,8 +237,21 @@ Mailing-Lists:
 
 =head1 SEE ALSO
 
-L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,
-L<Catalyst::Response>, L<Catalyst::Engine>
+=over 4
+
+=item L<Catalyst::Manual> - The Catalyst Manual
+
+=item L<Catalyst::Engine> - Core Engine
+
+=item L<Catalyst::Log> - The Log Class.
+
+=item L<Catalyst::Request> - The Request Object
+
+=item L<Catalyst::Response> - The Response Object
+
+=item L<Catalyst::Test> - The test suite.
+
+=back
 
 =head1 AUTHOR
 

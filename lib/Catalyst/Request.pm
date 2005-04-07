@@ -63,7 +63,7 @@ Engine module thus hiding the details of the particular engine implementation.
 
 =item $req->action
 
-Contains the action.
+Contains the requested action.
 
     print $c->request->action;
 
@@ -73,9 +73,11 @@ Contains the remote address.
 
     print $c->request->address
 
-=item $req->arguments
-
 =item $req->args
+
+Shortcut for arguments
+
+=item $req->arguments
 
 Returns a reference to an array containing the arguments.
 
@@ -83,7 +85,7 @@ Returns a reference to an array containing the arguments.
 
 =item $req->base
 
-Contains the uri base.
+Contains the url base. This will always have a trailing slash.
 
 =item $req->content_encoding
 
@@ -115,13 +117,14 @@ Returns an L<HTTP::Headers> object containing the headers.
 
 =item $req->hostname
 
-Contains the remote hostname.
+Contains the hostname of the remote user.
 
     print $c->request->hostname
 
 =item $req->match
 
-Contains the match.
+This contains be the matching part of a regexp action. otherwise it 
+returns the same as 'action'.
 
     print $c->request->match;
 
@@ -131,9 +134,11 @@ Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
     print $c->request->method
 
-=item $req->parameters
-
 =item $req->params
+
+Shortcut for $req->parameters.
+
+=item $req->parameters
 
 Returns a reference to a hash containing the parameters.
 
@@ -147,7 +152,7 @@ Contains the path.
 
 =item $req->referer
 
-Shortcut to $req->headers->referer
+Shortcut to $req->headers->referer. Referring page.
 
 =item $req->snippets
 
@@ -167,18 +172,19 @@ Returns a reference to a hash containing the uploads.
 
 =item $req->user_agent
 
-Shortcut to $req->headers->user_agent
+Shortcut to $req->headers->user_agent. User Agent version string.
 
 =back
 
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify 
+it under the same terms as Perl itself.
 
 =cut
 

@@ -6,26 +6,24 @@ Catalyst::Manual::Tutorial - Getting started with Catalyst
 
 This document aims to get you up and running with Catalyst.
 
-NOTE: THIS DOCUMENT IS STILL VERY MUCH IN AN EARLY DRAFT STATE.  SEE THE NOTES
-AT THE BOTTOM OF THE DOCUMENT.
-
-
+NOTE: THIS DOCUMENT IS STILL VERY MUCH IN AN EARLY DRAFT STATE.  SEE 
+THE NOTES AT THE BOTTOM OF THE DOCUMENT.
 
 =head2 Installation
 
-The first step is to install Catalyst, and the simplest way to do this is to
-install the Catalyst bundle from CPAN:
+The first step is to install Catalyst, and the simplest way to do this 
+is to install the Catalyst bundle from CPAN:
 
     $ perl -MCPAN -e 'install Bundle::Catalyst'
 
-This will retrieve Catalyst and a number of useful extensions and install them
-for you.
+This will retrieve Catalyst and a number of useful extensions and 
+install them for you.
 
 
 =head2 Setting up your application
 
-Catalyst includes a helper script, C<catalyst.pl>, that will set up a skeleton
-application for you:
+Catalyst includes a helper script, C<catalyst.pl>, that will set up a 
+skeleton application for you:
 
     $ catalyst.pl My::App
     created "My-App"
@@ -53,7 +51,8 @@ application for you:
     created "My-App/script/test.pl"
     created "My-App/script/create.pl"
 
-This creates the directory structure shown, populated with skeleton files.
+This creates the directory structure shown, populated with skeleton 
+files.
 
 
 
@@ -65,18 +64,24 @@ catalyst provides:
     $ cd My-App
     $ script/server.pl 
     [...] [catalyst] [debug] Debug messages enabled
-    [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::CGI"
-    [...] [catalyst] [debug] Initialized components ""
-    [...] [catalyst] [info] My::App powered by Catalyst 4.26
-    [...] [catalyst] [debug] "My::App" defined "!default" as "CODE(0x83fd570)"
+    [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [...] [catalyst] [debug] Loaded private actions
+    .=----------------------+----------------------+---------------=.
+    | Private               | Class                | Code           |
+    |=----------------------+----------------------+---------------=|
+    | /default              | MyApp                | CODE(0x86f08ac |
+    '=----------------------+----------------------+---------------='
+     "My::App" defined "!default" as "CODE(0x83fd570)"
+    [...] [catalyst] [info] My::App powered by Catalyst 5.00
     You can connect to your server at http://localhost:3000
 
-(Note that each line logged by Catalyst includes a timestamp, which has been
-replaced here with "C<...>" so that the text fits onto the lines.)
+(Note that each line logged by Catalyst includes a timestamp, which has
+been replaced here with "C<...>" so that the text fits onto the lines.)
 
-The server is now waiting for you to make requests of it.  Try using telnet to
-manually make a simple GET request of the server (when telnet responds with
-"Escape character is '^]'.", type "GET / HTTP/1.0" and hit return twice):
+The server is now waiting for you to make requests of it.  Try using 
+telnet to manually make a simple GET request of the server (when 
+telnet responds with "Escape character is '^]'.", type "GET / HTTP/1.0"
+and hit return twice):
 
     $ telnet localhost 3000
     Trying 127.0.0.1...
@@ -85,10 +90,10 @@ manually make a simple GET request of the server (when telnet responds with
     GET / HTTP/1.0
     
     HTTP/1.0 200
-    Server: Catalyst/4.26
+    Server: Catalyst/5.00
     Status: 200
     Date: Sun, 20 Mar 2005 12:31:55 GMT
-    X-catalyst: 4.26
+    X-catalyst: 5.00
     Content-length: 40
     Content-Type: text/html; charset=ISO-8859-1
 
@@ -101,10 +106,13 @@ More trace messages will appear in the original terminal window:
     [...] [catalyst] [debug] ********************************
     [...] [catalyst] [debug] * Request 1 (0.027/s) [9818]
     [...] [catalyst] [debug] ********************************
-    [...] [catalyst] [debug] "GET" request for ""
-    [...] [catalyst] [debug] Using default action
-    [...] [catalyst] [info] Processing "!default" took 0.000033s
+    [...] [catalyst] [debug] "GET" request for "" from localhost
     [...] [catalyst] [info] Request took 0.051399s (19.456/s)
+    .=--------------------------------------------------+----------=.
+    | Action                                            | Time      |
+    |=--------------------------------------------------+----------=|
+    | /default                                          | 0.000026s |
+    '=--------------------------------------------------+----------='
 
 The server will continue running until you interrupt it.
 
@@ -114,11 +122,11 @@ helper script, C<script/test.pl>.
 
 =head2 Getting your application invoked
 
-Catalyst applications are usually run from mod_perl, but can also be run as
-CGI or FastCGI scripts.  Running under mod_perl gives better performance, but
-for development purposes you may want to run your application as a CGI script,
-especially as changes to your application code take effect under CGI without
-having to restart the web server.
+Catalyst applications are usually run from mod_perl, but can also be
+run as CGI or FastCGI scripts.  Running under mod_perl gives better 
+performance, but for development purposes you may want to run your 
+application as a CGI script, especially as changes to your application 
+code take effect under CGI without having to restart the web server.
 
 To run from mod_perl you need to add something like this to your Apache
 configuration file:
@@ -138,17 +146,12 @@ To run as a CGI script you need a wrapper script like:
 
     My::App->run;
 
-Catalyst outputs a complete HTTP response, which is not what is expected of a
-CGI script.  You need to configure the script as a so-called "Non-parsed
-Headers" script for it to function properly.  To do this in Apache just name
-the script starting with C<nph->.
-
-CHECK: is this statement still valid for Cat5?
 
 
 =head2 Examining the generated code
 
-The generated application code is quite simple and looks something like this:
+The generated application code is quite simple and looks something 
+like this:
 
     package My::App;
 
@@ -158,97 +161,97 @@ The generated application code is quite simple and looks something like this:
     our $VERSION = '0.01';
 
     My::App->config(
-	name => 'My::App',
-	root => '/home/andrew/My-App/root',
+    name => 'My::App',
+    root => '/home/andrew/My-App/root',
     );
 
-    My::App->action(
-	'!default' => sub {
-	    my ( $self, $c ) = @_;
-	    $c->res->output('Congratulations, My::App is on Catalyst!');
-	},
-    );
+    __PACKAGE__->setup();
+
+    sub default : Private {
+      my ( $self, $c ) = @_;
+      $c->res->output('Congratulations, My::App is on Catalyst!');
+    }
 
     1;
 
 
-When the C<Catalyst> module is imported by the application code, Catalyst
-performs the first stage of its initialization.  This includes loading the
-appropriate Engine module for the environment in which the application is
-running, loading any plugins and ensuring that the calling module (the
-application module) inherits from C<Catalyst> (which makes the Catalyst
-methods C<config> and C<action> available to the application module).
+When the C<Catalyst> module is imported by the application code, 
+Catalyst performs the first stage of its initialization.  This includes
+loading the appropriate Engine module for the environment in which the 
+application is running, loading any plugins and ensuring that the 
+calling module (the application module) inherits from C<Catalyst> 
+(which makes the Catalyst methods C<config> and C<setup> available to 
+the application module).
 
-The call to C<config> sets up configuration data for the application.  The
-C<name> and C<root> items are the minimum required, and specify the name of
-the application and the path to the root directory where documents, images and
-templates can be found.
+The call to C<config> sets up configuration data for the application.  
+The C<name> and C<root> items are the minimum required, and specify 
+the name of the application and the path to the root directory where 
+documents, images and templates can be found.
 
-Catalyst associates I<actions> with URLs and on receiving a request dispatches
-to the action that matches to request URL.  The call to C<action> in the code
-above registers a default action.  With just this action registered the
-application will respond to all requests with the same message
-"Congratulations, My::App is on Catalyst!".
+Catalyst associates I<actions> with URLs and on receiving a request 
+dispatches to the action that matches to request URL.  The call to 
+C<setup> in the code above registers a default action.  With just 
+this action registered the application will respond to all requests 
+with the same message "Congratulations, My::App is on Catalyst!".
 
-TODO: mention private actions and attributes
+As you see, the default action is defined as a Private action. 
+Most private actions are not directly available from a web url. The
+exceptions are the built-in actions, 'default','begin','end' and
+'auto'. The rest can only be reached by using C<forward>.
 
 
-The first call to the C<action> method triggers the second stage of Catalyst's
-initialization process.  In this phase Catalyst searches for any component
-modules, locating and registering any actions it finds in those modules.
+The call to the C<setup> method also triggers the second stage of 
+Catalyst's initialization process.  In this phase Catalyst searches 
+for any component modules, locating and registering any actions it 
+finds in those modules.
+
 Component modules have names prefixed with the application module name,
-followed by C<Model>, C<View> or C<Controller> (or the alternative short
+followed by C<Model>, C<View> or C<Controller> (or the default short
 forms: C<M>, C<V> or C<C>) followed by the component name, for example:
 
-    My::App::Controller::ShoppingCart
-
+    My::App::Controller::ShoppingCart  # long version
+    My::App::C::ShoppingCart           # short version 
 
 
 
 =head2 Extending the generated code
 
-NOTE: this section is outdated by Cat5.
 
 You can start extending the application by adding new actions:
 
-    My::App->action(
-        'test1' => sub {
-	    my ( $self, $c ) = @_;
-	    $c->res->output('In a new test action #1');
-	},
-        'test1' => sub {
-	    my ( $self, $c ) = @_;
-	    $c->res->output('In a new test action #1');
-	},
-	'!default' => sub {
-	    my ( $self, $c ) = @_;
-	    $c->res->output('Congratulations, My::App is on Catalyst!');
-	},
-    );
+    sub test1 : Global {
+      my ( $self, $c ) = @_;
+      $c->res->output('In a new test action #1');
+    }
+    sub default : Private {
+      my ( $self, $c ) = @_;
+      $c->res->output('Congratulations, My::App is on Catalyst!');
+    }
 
 
 TODO: explain briefly about plugins, actions and components
 
-regex actions passed subexpression matches in $c->req->snippets (array ref).
+regex actions passed subexpression matches in $c->req->snippets
+(array ref).
 
 
 =head2 Hooking in to Template Toolkit
 
-One of the first things you will probably want to add to your application is a
-templating system for generating your output.  Catalyst works well with
-Template Toolkit.  If you are unfamiliar with Template Toolkit then I suggest
-you look at L<http://tt2.org>, install C<Template>, read the documentation and
-play around with it, and have a look at the I<Badger Book> (I<Template
-Toolkit> by Darren Chamberlain, Dave Cross and Andy Wardly, O'Reilly &
-Associates, 2004).
+One of the first things you will probably want to add to your 
+application is a templating system for generating your output.  
+Catalyst works well with Template Toolkit.  If you are unfamiliar with 
+Template Toolkit then I suggest you look at L<http://tt2.org>, install 
+C<Template>, read the documentation and play around with it, and have 
+a look at the I<Badger Book> (I<Template Toolkit> by Darren 
+Chamberlain, Dave Cross and Andy Wardly, O'Reilly & Associates, 2004).
 
-You can create a stub Template Toolkit view component using the create script
-that Catalyst set up as part of the skeleton application:
+You can create a stub Template Toolkit view component using the create 
+script that Catalyst set up as part of the skeleton application:
 
     $ script/create.pl view TT TT
 
-this generates a view component named C<My::App::View::TT>, which you might
-use by forwarding from your C<end> action:
+this generates a view component named C<My::App::View::TT>, which you 
+might use by forwarding from your C<end> action:
 
     # In My::App or My::App::Controller::SomeController
 
@@ -257,8 +260,9 @@ use by forwarding from your C<end> action:
         $c->forward('My::App::View::TT');
     }
 
-The generated TT view component simply subclasses the C<Catalyst::View::TT>
-class.  It looks like this (with the POD stripped out):
+The generated TT view component simply subclasses the 
+C<Catalyst::View::TT> class.  It looks like this (with the POD 
+stripped out): 
 
     package My::App::V::TT;
 
@@ -267,16 +271,17 @@ class.  It looks like this (with the POD stripped out):
 
     1;
 
-C<Catalyst::View::TT> initializes a Template Toolkit object with an options
-hash initialized with built-in default settings followed by the contents of
-the hash C<<%{__PACKAGE__->config()}>>.  You can configure TT more to your
-needs by adding a C<new> method to the generated TT component:
+C<Catalyst::View::TT> initializes a Template Toolkit object with an 
+options hash initialized with built-in default settings followed by 
+the contents of the hash C<<%{__PACKAGE__->config()}>>.  You can
+configure TT more to your needs by adding a C<new> method to the 
+generated TT component:
 
     sub new {
-	my $self = shift;
-	$self->config->{PRE_PROCESS} = 'config/main';
-	$self->config->{WRAPPER}     = 'site/wrapper';
-	return $self->SUPER::new(@_);
+      my $self = shift;
+      $self->config->{PRE_PROCESS} = 'config/main';
+      $self->config->{WRAPPER}     = 'site/wrapper';
+      return $self->SUPER::new(@_);
     }
 
 
@@ -284,9 +289,10 @@ needs by adding a C<new> method to the generated TT component:
 =head1 AUTHOR
 
 Andrew Ford, C<A.Ford@ford-mason.co.uk>
+Marcus Ramberg, C<mramberg@cpan.org>
 
-As noted above, this document is at an alpha stage.  My plan for this document
-is as follows:
+As noted above, this document is at an alpha stage.  My plan for this 
+document is as follows:
 
 =over 4
 
@@ -313,5 +319,5 @@ A.Ford@ford-mason.co.uk
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify 
+it under the same terms as Perl itself.
