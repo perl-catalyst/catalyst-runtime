@@ -250,14 +250,14 @@ script that Catalyst set up as part of the skeleton application:
 
     $ script/create.pl view TT TT
 
-this generates a view component named C<My::App::View::TT>, which you 
+this generates a view component named C<My::App::V::TT>, which you 
 might use by forwarding from your C<end> action:
 
     # In My::App or My::App::Controller::SomeController
 
     sub end : Private {
         my($self, $c) = @_;
-        $c->forward('My::App::View::TT');
+        $c->forward('My::App::V::TT');
     }
 
 The generated TT view component simply subclasses the 
