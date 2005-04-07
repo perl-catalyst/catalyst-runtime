@@ -413,6 +413,7 @@ sub forward {
         return 0;
     }
     my $caller    = caller(0);
+    my $global    = $command =~ /^\// ? 0 : 1;
     my $namespace = '/';
     if ( $command =~ /^\// ) {
         $command =~ /^(.*)\/(\w+)$/;
@@ -420,7 +421,7 @@ sub forward {
         $command = $2;
     }
     else { $namespace = _class2prefix($caller) || '/' }
-    my $results = $c->get_action( $command, $namespace );
+    my $results = $c->get_action( $command, $namespace, $global );
     unless ( @{$results} ) {
         my $class = $command;
         if ( $class =~ /[^\w\:]/ ) {
@@ -446,33 +447,44 @@ sub forward {
     return $c->state;
 }
 
-=item $c->get_action( $action, $namespace )
+=item $c->get_action( $action, $namespace, $global )
 
 Get an action in a given namespace.
 
 =cut
 
 sub get_action {
-    my ( $c, $action, $namespace ) = @_;
+    my ( $c, $action, $namespace, $global ) = @_;
     return [] unless $action;
     $namespace ||= '';
     if ($namespace) {
-        $namespace = '' if $namespace eq '/';
-        my $parent = $c->tree;
-        my @results;
-        my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
-        push @results, [$result] if $result;
-        my $visitor = Tree::Simple::Visitor::FindByPath->new;
-        for my $part ( split '/', $namespace ) {
-            $visitor->setSearchPath($part);
-            $parent->accept($visitor);
-            my $child = $visitor->getResult;
-            my $uid   = $child->getUID if $child;
-            my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
-            push @results, [$match] if $match;
-            $parent = $child if $child;
+        if ($global) {
+            my @results;
+            for my $uid ( keys %{ $c->actions->{private} } ) {
+                if ( my $result = $c->actions->{private}->{$uid}->{$action} ) {
+                    push @results, [$result];
+                }
+            }
+            return \@results;
         }
-        return \@results;
+        else {
+            $namespace = '' if $namespace eq '/';
+            my $parent = $c->tree;
+            my @results;
+            my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
+            push @results, [$result] if $result;
+            my $visitor = Tree::Simple::Visitor::FindByPath->new;
+            for my $part ( split '/', $namespace ) {
+                $visitor->setSearchPath($part);
+                $parent->accept($visitor);
+                my $child = $visitor->getResult;
+                my $uid   = $child->getUID if $child;
+                my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
+                push @results, [$match] if $match;
+                $parent = $child if $child;
+            }
+            return \@results;
+        }
     }
     elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
     elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
