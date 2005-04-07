@@ -47,9 +47,6 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is the core of catalyst. The various drivers are subclasses
-of this class.
-
 =head1 METHODS
 
 =over 4
@@ -73,8 +70,6 @@ sub benchmark {
 }
 
 =item $c->comp($name)
-
-Shortcut for $c->component
 
 =item $c->component($name)
 
@@ -223,8 +218,7 @@ sub execute {
 
 =item $c->finalize
 
-Finalize request. This function can typically be overloaded with
-NEXT by plugins that need to do something at the end of the request.
+Finalize request.
 
 =cut
 
@@ -282,8 +276,7 @@ sub finalize_cookies {
 
 =item $c->finalize_error
 
-This is the default error screen displayed from finalize. Override
-with your own output if you need something special.
+Finalize error.
 
 =cut
 
@@ -386,7 +379,7 @@ sub finalize_error {
 
 =item $c->finalize_headers
 
-Finalize headers. Null action by default.
+Finalize headers.
 
 =cut
 
@@ -394,7 +387,7 @@ sub finalize_headers { }
 
 =item $c->finalize_output
 
-Finalize output. Null action by default
+Finalize output.
 
 =cut
 
@@ -406,7 +399,6 @@ Forward processing to a private action or a method from a class.
 If you define a class without method it will default to process().
 
     $c->forward('/foo');
-    $c->forward('/controller/action');
     $c->forward('index');
     $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
@@ -421,7 +413,6 @@ sub forward {
         return 0;
     }
     my $caller    = caller(0);
-    my $global    = $command =~ /^\// ? 0 : 1;
     my $namespace = '/';
     if ( $command =~ /^\// ) {
         $command =~ /^(.*)\/(\w+)$/;
@@ -429,7 +420,7 @@ sub forward {
         $command = $2;
     }
     else { $namespace = _class2prefix($caller) || '/' }
-    my $results = $c->get_action( $command, $namespace, $global );
+    my $results = $c->get_action( $command, $namespace );
     unless ( @{$results} ) {
         my $class = $command;
         if ( $class =~ /[^\w\:]/ ) {
@@ -455,30 +446,22 @@ sub forward {
     return $c->state;
 }
 
-=item $c->get_action( $action, $namespace, $global )
+=item $c->get_action( $action, $namespace )
 
 Get an action in a given namespace.
 
 =cut
 
 sub get_action {
-    my ( $c, $action, $namespace, $global ) = @_;
+    my ( $c, $action, $namespace ) = @_;
     return [] unless $action;
     $namespace ||= '';
     if ($namespace) {
-        if ($global) {
-            my @results;
-            for my $uid ( keys %{ $c->actions->{private} } ) {
-                if ( my $result = $c->actions->{private}->{$uid}->{$action} ) {
-                    push @results, [$result];
-                }
-            }
-            return \@results;
-        }
-        else {
-            $namespace = '' if $namespace eq '/';
-            my $parent = $c->tree;
-            my @results;
+        $namespace = '' if $namespace eq '/';
+        my $parent = $c->tree;
+        my @results;
+        my %allowed = ( begin => 1, auto => 1, default => 1, end => 1 );
+        if ( $allowed{$action} ) {
             my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
             push @results, [$result] if $result;
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
@@ -491,8 +474,25 @@ sub get_action {
                 push @results, [$match] if $match;
                 $parent = $child if $child;
             }
-            return \@results;
         }
+        else {
+            if ($namespace) {
+                my $visitor = Tree::Simple::Visitor::FindByPath->new;
+                $visitor->setSearchPath( split '/', $namespace );
+                $parent->accept($visitor);
+                my $child = $visitor->getResult;
+                my $uid   = $child->getUID if $child;
+                my $match = $c->actions->{private}->{$uid}->{$action}
+                  if $uid;
+                push @results, [$match] if $match;
+            }
+            else {
+                my $result =
+                  $c->actions->{private}->{ $parent->getUID }->{$action};
+                push @results, [$result] if $result;
+            }
+        }
+        return \@results;
     }
     elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
     elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
@@ -516,7 +516,7 @@ sub get_action {
 
 =item $c->handler( $class, $r )
 
-The main request handler.
+Handles the request.
 
 =cut
 
@@ -624,7 +624,7 @@ sub prepare {
 
 =item $c->prepare_action
 
-Prepare action for processing.
+Prepare action.
 
 =cut
 
@@ -669,7 +669,7 @@ sub prepare_action {
 
 =item $c->prepare_connection
 
-Prepare connection. Null action by default
+Prepare connection.
 
 =cut
 
@@ -677,7 +677,7 @@ sub prepare_connection { }
 
 =item $c->prepare_cookies
 
-Prepare cookies. 
+Prepare cookies.
 
 =cut
 
@@ -691,7 +691,7 @@ sub prepare_cookies {
 
 =item $c->prepare_headers
 
-Prepare headers. Null action by default
+Prepare headers.
 
 =cut
 
@@ -699,7 +699,7 @@ sub prepare_headers { }
 
 =item $c->prepare_parameters
 
-Prepare parameters. Null action by default
+Prepare parameters.
 
 =cut
 
@@ -707,7 +707,7 @@ sub prepare_parameters { }
 
 =item $c->prepare_path
 
-Prepare path and base. Null action by default
+Prepare path and base.
 
 =cut
 
@@ -715,7 +715,7 @@ sub prepare_path { }
 
 =item $c->prepare_request
 
-Prepare the engine request. Null action by default
+Prepare the engine request.
 
 =cut
 
@@ -723,7 +723,7 @@ sub prepare_request { }
 
 =item $c->prepare_uploads
 
-Prepare uploads.  Null action by default
+Prepare uploads.
 
 =cut
 
@@ -731,27 +731,23 @@ sub prepare_uploads { }
 
 =item $c->run
 
-Starts the engine. Null action by default
+Starts the engine.
 
 =cut
 
 sub run { }
 
-=item $c->req
-
-Shortcut for $c->request
-
 =item $c->request
+
+=item $c->req
 
 Returns a C<Catalyst::Request> object.
 
-    my $req = $c->request;
-
-=item $c->res
-
-Shortcut for $c->response
+    my $req = $c->req;
 
 =item $c->response
+
+=item $c->res
 
 Returns a C<Catalyst::Response> object.
 
@@ -759,8 +755,7 @@ Returns a C<Catalyst::Response> object.
 
 =item $c->set_action( $action, $code, $namespace, $attrs )
 
-Set an action in a given namespace. Used to defined the actions
-in the attribute handlers.
+Set an action in a given namespace.
 
 =cut
 
@@ -834,7 +829,7 @@ sub set_action {
 
 =item $class->setup
 
-Setup the application. required to initialize actions.
+Setup.
 
     MyApp->setup;
 
@@ -886,7 +881,7 @@ sub setup_actions {
 
 =item $class->setup_components
 
-Setup all the components in YourApp::(M|V|C|Model|View|Controller)::*
+Setup components.
 
 =cut
 
@@ -977,8 +972,7 @@ Contains the return value of the last executed action.
 
 =item $c->stash
 
-The stash is a global hash which can be used to pass around data
-between your components.
+Returns a hashref containing all your data.
 
     $c->stash->{foo} ||= 'yada';
     print $c->stash->{foo};
@@ -1015,22 +1009,9 @@ sub _class2prefix {
 
 =back
 
-=head1 SEE ALSO
-
-=over 4
-
-=item L<Catalyst::Engine::Apache> - Apache Engines for MP1/2
-=item L<Catalyst::Engine::CGI>    - CGI Engine
-=item L<Catalyst::Engine::FCGI>   - FastCGI Engine
-=item L<Catalyst::Engine::HTTP>   - Standalone Catalyst Server
-=item L<Catalyst::Engine::Test>   - Engine for testing
-
-=back
-
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
-Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 
