@@ -8,7 +8,6 @@ lib/Catalyst/Engine/Apache/MP2.pm
 lib/Catalyst/Engine/CGI.pm
 lib/Catalyst/Engine/FCGI.pm
 lib/Catalyst/Engine/HTTP.pm
-lib/Catalyst/Engine/Server.pm
 lib/Catalyst/Engine/Test.pm
 lib/Catalyst/Helper.pm
 lib/Catalyst/Log.pm
