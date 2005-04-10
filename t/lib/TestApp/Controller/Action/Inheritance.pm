@@ -3,6 +3,11 @@ package TestApp::Controller::Action::Inheritance;
 use strict;
 use base 'TestApp::Controller::Action';
 
+sub auto : Private {
+    my ( $self, $c ) = @_;
+    return 1;
+}
+
 sub begin : Private {
     my ( $self, $c ) = @_;
     $self->SUPER::begin($c);
@@ -22,6 +27,11 @@ package TestApp::Controller::Action::Inheritance::A;
 use strict;
 use base 'TestApp::Controller::Action';
 
+sub auto : Private {
+    my ( $self, $c ) = @_;
+    return 1;
+}
+
 sub begin : Private {
     my ( $self, $c ) = @_;
     $self->SUPER::begin($c);
@@ -40,6 +50,11 @@ package TestApp::Controller::Action::Inheritance::A::B;
 
 use strict;
 use base 'TestApp::Controller::Action';
+
+sub auto : Private {
+    my ( $self, $c ) = @_;
+    return 1;
+}
 
 sub begin : Private {
     my ( $self, $c ) = @_;

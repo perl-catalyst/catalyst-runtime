@@ -13,6 +13,7 @@ use Catalyst::Test 'TestApp';
 {
     my @expected = qw[
         TestApp::Controller::Action::Inheritance->begin
+        TestApp::Controller::Action::Inheritance->auto
         TestApp::Controller::Action::Inheritance->default
         TestApp::View::Dump::Request->process
         TestApp::Controller::Action::Inheritance->end
@@ -32,6 +33,8 @@ use Catalyst::Test 'TestApp';
 {
     my @expected = qw[
         TestApp::Controller::Action::Inheritance::A->begin
+        TestApp::Controller::Action::Inheritance->auto 
+        TestApp::Controller::Action::Inheritance::A->auto       
         TestApp::Controller::Action::Inheritance::A->default
         TestApp::View::Dump::Request->process
         TestApp::Controller::Action::Inheritance::A->end
@@ -51,6 +54,9 @@ use Catalyst::Test 'TestApp';
 {
     my @expected = qw[
         TestApp::Controller::Action::Inheritance::A::B->begin
+        TestApp::Controller::Action::Inheritance->auto 
+        TestApp::Controller::Action::Inheritance::A->auto
+        TestApp::Controller::Action::Inheritance::A::B->auto
         TestApp::Controller::Action::Inheritance::A::B->default
         TestApp::View::Dump::Request->process
         TestApp::Controller::Action::Inheritance::A::B->end
