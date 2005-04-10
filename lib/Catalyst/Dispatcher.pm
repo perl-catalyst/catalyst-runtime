@@ -320,18 +320,11 @@ sub setup_actions {
             }
         }
     }
-    my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
-    $t->setCols('Class');
-    $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow( wrap( $_, 75 ) ) for keys %{ $self->components };
-    $self->log->debug( 'Loaded components', $t->draw )
-      if ( @{ $t->{tbl_rows} } && $self->debug );
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
-    $privates->setCols( 'Private', 'Class', 'Code' );
-    $privates->setColWidth( 'Private', 28, 1 );
-    $privates->setColWidth( 'Class',   27, 1 );
-    $privates->setColWidth( 'Code',    15, 1 );
+    $privates->setCols( 'Private', 'Class' );
+    $privates->setColWidth( 'Private', 36, 1 );
+    $privates->setColWidth( 'Class',   37, 1 );
     my $walker = sub {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
@@ -339,11 +332,8 @@ sub setup_actions {
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            $privates->addRow(
-                wrap( "$prefix$action", 28 ),
-                wrap( $class,           27 ),
-                wrap( $code,            15 )
-            );
+            $privates->addRow( wrap( "$prefix$action", 36 ),
+                wrap( $class, 37 ) );
         }
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };

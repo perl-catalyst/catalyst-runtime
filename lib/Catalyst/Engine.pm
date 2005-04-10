@@ -613,6 +613,12 @@ sub setup_components {
         $self->components->{ ref $comp } = $comp;
         push @comps, $comp;
     }
+    my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
+    $t->setCols('Class');
+    $t->setColWidth( 'Class', 75, 1 );
+    $t->addRow( wrap( $_, 75 ) ) for keys %{ $self->components };
+    $self->log->debug( 'Loaded components', $t->draw )
+      if ( @{ $t->{tbl_rows} } && $self->debug );
     $self->setup_actions( [ $self, @comps ] );
 }
 
