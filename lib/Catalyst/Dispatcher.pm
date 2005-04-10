@@ -121,7 +121,9 @@ sub forward {
     unless ( @{$results} ) {
         my $class = $command;
         if ( $class =~ /[^\w\:]/ ) {
-            $c->log->debug(qq/Couldn't forward to "$class"/) if $c->debug;
+            my $error = qq/Couldn't forward to "$class"/;
+            $c->error($error);
+            $c->log->debug($error) if $c->debug;
             return 0;
         }
         my $method = shift || 'process';
@@ -130,7 +132,9 @@ sub forward {
             $results = [ [ [ $class, $code ] ] ];
         }
         else {
-            $c->log->debug(qq/Couldn't forward to "$class->$method"/)
+            my $error = qq/Couldn't forward to "$class->$method"/;
+            $c->error($error);
+            $c->log->debug($error)
               if $c->debug;
             return 0;
         }

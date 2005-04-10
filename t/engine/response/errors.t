@@ -24,7 +24,7 @@ use Catalyst::Test 'TestApp';
     is( $response->code, 404, 'Response Code' );
     is( $response->content_type, 'text/html', 'Response Content-Type' );
     is( $response->header('X-Catalyst-Action'), 'engine/response/errors/two', 'Test Action' );
-    like( $response->header('X-Catalyst-Error'), qr/^Unknown resource/, 'Catalyst Error' );
+    like( $response->header('X-Catalyst-Error'), qr/^Couldn't forward to/, 'Catalyst Error' );
 }
 
 {
