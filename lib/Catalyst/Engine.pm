@@ -1,7 +1,8 @@
 package Catalyst::Engine;
 
 use strict;
-use base qw/Class::Data::Inheritable Class::Accessor::Fast Catalyst::Dispatch/;
+use base
+  qw/Class::Data::Inheritable Class::Accessor::Fast Catalyst::Dispatcher/;
 use UNIVERSAL::require;
 use CGI::Cookie;
 use Data::Dumper;
