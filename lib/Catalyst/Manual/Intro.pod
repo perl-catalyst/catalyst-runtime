@@ -367,6 +367,11 @@ false, it would look like this:
 
 =back
 
+I<Note:> You can also die in the autochain action, in that case,
+the request will go straight to the finalize stage, without processing
+further actions.
+
+
 =head4 B<URL Argument Handling>
 
 If you want to pass variable arguments at the end of a URL, you must use regex actions keys with '^' and '$' anchors, and the arguments must be separated with forward slashes (/) in the URL. For example, suppose you want to handle /foo/$bar/$baz, where $bar and $baz may vary:
