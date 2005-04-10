@@ -342,25 +342,25 @@ sub setup_actions {
       if ( @{ $privates->{tbl_rows} } && $self->debug );
     my $publics = Text::ASCIITable->new;
     $publics->setCols( 'Public', 'Private' );
-    $publics->setColWidth( 'Public',  37, 1 );
-    $publics->setColWidth( 'Private', 36, 1 );
+    $publics->setColWidth( 'Public',  36, 1 );
+    $publics->setColWidth( 'Private', 37, 1 );
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
         my $reverse = $self->actions->{reverse}->{$code};
         $reverse = $reverse ? "/$reverse" : $code;
-        $publics->addRow( wrap( "/$plain", 37 ), wrap( $reverse, 36 ) );
+        $publics->addRow( wrap( "/$plain", 36 ), wrap( $reverse, 37 ) );
     }
     $self->log->debug( 'Loaded public actions', $publics->draw )
       if ( @{ $publics->{tbl_rows} } && $self->debug );
     my $regexes = Text::ASCIITable->new;
     $regexes->setCols( 'Regex', 'Private' );
-    $regexes->setColWidth( 'Regex',   37, 1 );
-    $regexes->setColWidth( 'Private', 36, 1 );
+    $regexes->setColWidth( 'Regex',   36, 1 );
+    $regexes->setColWidth( 'Private', 37, 1 );
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
         my $reverse = $self->actions->{reverse}->{$code};
         $reverse = $reverse ? "/$reverse" : $code;
-        $regexes->addRow( wrap( $regex, 37 ), wrap( $reverse, 36 ) );
+        $regexes->addRow( wrap( $regex, 36 ), wrap( $reverse, 37 ) );
     }
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
