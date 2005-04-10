@@ -7,6 +7,8 @@ sub begin : Private {
     my ( $self, $c ) = @_;
     $c->res->header( 'X-Test-Class'  => ref($self) );
     $c->response->content_type('text/plain; charset=utf-8');
+    
+    return 1;
 }
 
 sub default : Private {
