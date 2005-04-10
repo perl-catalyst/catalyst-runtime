@@ -15,7 +15,7 @@ use Catalyst::Test 'TestApp';
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->header('X-Catalyst-Action'), 'action_absolute_one', 'Test Action' );
-    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Absoulte', 'Test Class' );
+    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Absolute', 'Test Class' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
 }
 
@@ -24,7 +24,7 @@ use Catalyst::Test 'TestApp';
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->header('X-Catalyst-Action'), 'action_absolute_two', 'Test Action' );
-    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Absoulte', 'Test Class' );
+    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Absolute', 'Test Class' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
 }
 
@@ -33,6 +33,6 @@ use Catalyst::Test 'TestApp';
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->header('X-Catalyst-Action'), 'action_absolute_three', 'Test Action' );
-    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Absoulte', 'Test Class' );
+    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Absolute', 'Test Class' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
 }

@@ -1,4 +1,4 @@
-package TestApp::Controller::Action::Absoulte;
+package TestApp::Controller::Action::Absolute;
 
 use strict;
 use base 'TestApp::Controller::Action';
