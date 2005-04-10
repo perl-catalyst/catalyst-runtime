@@ -12,7 +12,6 @@ use Catalyst::Test 'TestApp';
 
 {
     my @expected = qw[
-        TestApp::Controller::Action->begin
         TestApp::Controller::Action::Default->begin
         TestApp::Controller::Action::Default->default
         TestApp::View::Dump::Request->process

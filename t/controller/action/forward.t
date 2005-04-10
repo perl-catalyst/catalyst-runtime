@@ -12,7 +12,6 @@ use Catalyst::Test 'TestApp';
 
 {
     my @expected = qw[
-        TestApp::Controller::Action->begin
         TestApp::Controller::Action::Forward->begin
         TestApp::Controller::Action::Forward->one
         TestApp::Controller::Action::Forward->two
@@ -35,7 +34,6 @@ use Catalyst::Test 'TestApp';
 
 {
     my @expected = qw[
-        TestApp::Controller::Action->begin
         TestApp::Controller::Action::Forward->begin
         TestApp::Controller::Action::Forward->jojo
         TestApp::Controller::Action::Forward->one

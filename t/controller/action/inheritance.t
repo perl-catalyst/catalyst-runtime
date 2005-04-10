@@ -12,7 +12,6 @@ use Catalyst::Test 'TestApp';
 
 {
     my @expected = qw[
-        TestApp::Controller::Action->begin
         TestApp::Controller::Action::Inheritance->begin
         TestApp::Controller::Action::Inheritance->default
         TestApp::View::Dump::Request->process
@@ -32,13 +31,10 @@ use Catalyst::Test 'TestApp';
 
 {
     my @expected = qw[
-        TestApp::Controller::Action->begin
-        TestApp::Controller::Action::Inheritance->begin
         TestApp::Controller::Action::Inheritance::A->begin
         TestApp::Controller::Action::Inheritance::A->default
         TestApp::View::Dump::Request->process
         TestApp::Controller::Action::Inheritance::A->end
-        TestApp::Controller::Action::Inheritance->end
     ];
 
     my $expected = join( ", ", @expected );
@@ -54,15 +50,10 @@ use Catalyst::Test 'TestApp';
 
 {
     my @expected = qw[
-        TestApp::Controller::Action->begin
-        TestApp::Controller::Action::Inheritance->begin
-        TestApp::Controller::Action::Inheritance::A->begin
         TestApp::Controller::Action::Inheritance::A::B->begin
         TestApp::Controller::Action::Inheritance::A::B->default
         TestApp::View::Dump::Request->process
         TestApp::Controller::Action::Inheritance::A::B->end
-        TestApp::Controller::Action::Inheritance::A->end
-        TestApp::Controller::Action::Inheritance->end
     ];
 
     my $expected = join( ", ", @expected );
