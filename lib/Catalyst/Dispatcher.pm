@@ -231,6 +231,12 @@ sub set_action {
         elsif ( $attr =~ /^(Regex|Regexp)\((.+)\)$/i ) { $flags{regex} = $2 }
     }
 
+    if ( $flags{private} && ( keys %flags > 1 ) ) {
+        $c->log->error( 'Bad action definition "'
+              . join( ' ', @{$attrs} )
+              . qq/" for "$namespace->$method"/ );
+        return;
+    }
     return unless keys %flags;
 
     my $parent  = $c->tree;
