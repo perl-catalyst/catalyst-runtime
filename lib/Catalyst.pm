@@ -7,7 +7,7 @@ use Catalyst::Log;
 use Text::ASCIITable;
 use Text::ASCIITable::Wrap 'wrap';
 
-__PACKAGE__->mk_classdata($_) for qw/engine log/;
+__PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
 
 our $VERSION = '5.00';
 our @ISA;
@@ -146,7 +146,8 @@ sub import {
         $caller->log->debug('Debug messages enabled');
     }
 
-    my $engine = 'Catalyst::Engine::CGI';
+    my $engine     = 'Catalyst::Engine::CGI';
+    my $dispatcher = 'Catalyst::Dispatcher';
 
     if ( $ENV{MOD_PERL} ) {
 
@@ -167,6 +168,9 @@ sub import {
             no strict 'refs';
             *{"$caller\::debug"} = sub { 1 };
             $caller->log->debug('Debug messages enabled');
+        }
+        elsif (/^-Dispatcher=(.*)$/) {
+            $dispatcher = "Catalyst::Dispatcher::$1";
         }
         elsif (/^-Engine=(.*)$/) { $engine = "Catalyst::Engine::$1" }
         elsif (/^-.*$/) { $caller->log->error(qq/Unknown flag "$_"/) }
@@ -204,6 +208,20 @@ sub import {
     }
     $caller->engine($engine);
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
+
+    # Dispatcher
+    $dispatcher = "Catalyst::Dispatcher::$ENV{CATALYST_DISPATCHER}"
+      if $ENV{CATALYST_DISPATCHER};
+
+    $dispatcher->require;
+    die qq/Couldn't load dispatcher "$dispatcher", "$@"/ if $@;
+    {
+        no strict 'refs';
+        push @{"$caller\::ISA"}, $dispatcher;
+    }
+    $caller->dispatcher($dispatcher);
+    $caller->log->debug(qq/Loaded dispatcher "$dispatcher"/) if $caller->debug;
+
 }
 
 =item $c->engine
