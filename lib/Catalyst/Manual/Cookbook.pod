@@ -69,7 +69,7 @@ Just use Catalyst::Model::CDBI::CRUD as baseclass.
 Modify the $c->form() parameters to match your needs, and don't forget to copy
 the templates. ;)
 
-=head2 Uploads with Catalyst
+=head2 Single file upload with Catalyst
 
 To implement uploads in Catalyst you need to have a HTML form similiar to
 this:
@@ -85,13 +85,50 @@ if it's not there, uploads just don't work.
 
 Catalyst Controller module 'upload' action:
 
-        sub upload : Global {
-            my ($self, $c) = @_;
-            if ($c->req->parameters->{form_submit} eq 'yes') {
-                my $filename = $c->req->parameters->{my_file};
-                if ($filename) {
-                    my $fh = $c->req->uploads->{$filename}->{fh};
-                    open(NEW_FILE, ">/tmp/$filename") or die
+    sub upload : Global {
+        my ($self, $c) = @_;
+        if ($c->req->parameters->{form_submit} eq 'yes') {
+            my $upload = $c->req->upload('my_file');
+            if ($upload->filename) {
+                my $filename = $upload->filename;
+                my $fh = $upload->fh;
+                open(NEW_FILE, ">/tmp/upload/$filename") or die
+                    "Can't open file for writing: $!";
+                while ($fh->read(my $buf, 32768)) {
+                    print NEW_FILE $buf;
+                }
+                close(NEW_FILE);
+            }
+        }
+        $c->stash->{template} = 'file_upload.html';
+    }
+
+=head2 Multiple file upload with Catalyst
+
+Code for uploading multiple files from one form needs little changes compared
+to single file upload.
+
+Form goes like this:
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="form_submit" value="yes">
+      <input type="file" name="file1" size="50"><br>
+      <input type="file" name="file2" size="50"><br>
+      <input type="file" name="file3" size="50"><br>
+      <input type="submit" value="Send">
+    </form>
+
+Controller:
+
+    sub upload : Local {
+        my ($self, $c) = @_;
+        if ($c->req->parameters->{form_submit} eq 'yes') {
+            for my $field ($c->req->upload) {
+                my $upload = $c->req->upload($field);
+                if ($upload->filename) {
+                    my $filename = $upload->filename;
+                    my $fh = $upload->fh;
+                    open(NEW_FILE, ">/tmp/upload/$filename") or die
                         "Can't open file for writing: $!";
                     while ($fh->read(my $buf, 32768)) {
                         print NEW_FILE $buf;
@@ -99,14 +136,20 @@ Catalyst Controller module 'upload' action:
                     close(NEW_FILE);
                 }
             }
-            $c->stash->{template} = 'upload_form.tt';
-            $c->forward('MyApp::V::View');
         }
+        $c->stash->{template} = 'file_upload.html';
+    }
 
-If you want to upload bigger files than 1MB, then just add to your Controller 
-module:
+for my $field ($c->req->upload) loops automatically over all file input
+fields and gets input names. After that is basic file saving code, just like in
+single file upload.
 
-    $CGI::Simple::POST_MAX = 1048576000;
+Notice: die'ing might not be what you want to do, when error occurs, but
+it works as an example. Better idea would be to store error $! in
+$c->stash->{error} and show custom error template displaying this message.
+
+For more information about uploads and usable methods look at
+C<Catalyst::Request::Upload> and C<Catalyst::Request>.
 
 =head2 Authentication with Catalyst::Plugin::Authentication::CDBI
 

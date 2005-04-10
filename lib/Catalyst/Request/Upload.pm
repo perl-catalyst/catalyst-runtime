@@ -65,7 +65,7 @@ sub link {
     my $self   = shift;
     my $target = shift;
 
-    return link( $self->tempname, $target );
+    return CORE::link( $self->tempname, $target );
 }
 
 =item $upload->size
