@@ -325,25 +325,45 @@ Called at the end of a request, after all matching actions are called.
     sub begin : Private { }
     sub default : Private { }
 
-You can define the Builtin Private Actions within your controllers as well. Default actions will override the ones in lower level controllers/global, while begin/end actions will be chained together, so if you have a default action in MyApp::C::Foo::Bar as well as a global one, and a global begin/end, as well as a begin end in MyApp::C::Foo and MyApp::C::Foo::Bar, the components will be called as follows:
+You can define the Builtin Private Actions within your controllers as 
+well. The actions will override the ones in lower level controllers/
+global.
+
+In addition to the normal builtins, you have a special action for 
+making inheritance chains, 'auto'. These will be run after begin, 
+but before your action is processed.
 
 =over 4
 
 =item for a request for /foo/foo
 
   MyApp::begin
+  MyApp::auto
   MyApp::default
   MyApp::end
 
 =item for a request for /foo/bar/foo
 
-  MyApp::begin
-  MyApp::C::Foo::begin
   MyApp::C::Foo::Bar::begin
+  MyApp::auto
+  MyApp::C::Foo::auto
   MyApp::C::Foo::Bar::default
   MyApp::C::Foo::Bar::end
-  MyApp::C::Foo::end
-  MyApp::end
+
+=back
+
+Also, if you need to break out of the chain in one of your auto 
+actions, you can return 0, if so, your action will not be processed,
+but the end will, so for the request above, if the first auto returns
+false, it would look like this:
+
+=over 4
+
+=item for a request for /foo/bar/foo where auto returns false
+
+  MyApp::C::Foo::Bar::begin
+  MyApp::auto
+  MyApp::C::Foo::Bar::end
 
 =back
 
