@@ -42,7 +42,7 @@ Opens tempname and returns a C<IO::File> handle.
 sub fh {
     my $self = shift;
 
-    my $fh = IO::File->new( $self->tempname, O_RDWR )
+    my $fh = IO::File->new( $self->tempname, O_RDONLY )
       or die( "Can't open ", $self->tempname, ": ", $! );
 
     return $fh;
