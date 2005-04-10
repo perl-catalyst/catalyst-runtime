@@ -7,7 +7,7 @@ use Class::Struct ();
 use HTTP::Headers::Util 'split_header_words';
 use HTTP::Request;
 use HTTP::Response;
-use IO::File;
+use File::Temp;
 use URI;
 
 __PACKAGE__->mk_accessors(qw/http/);
@@ -99,7 +99,8 @@ sub prepare_headers {
 sub prepare_parameters {
     my $c = shift;
 
-    my @params  = ();
+    my ( @params, @uploads );
+
     my $request = $c->http->request;
 
     push( @params, $request->uri->query_form );
@@ -119,38 +120,29 @@ sub prepare_parameters {
 
             if ( $parameters{filename} ) {
 
-                my $fh = IO::File->new_tmpfile;
+                my $fh = File::Temp->new;
                 $fh->write( $part->content ) or die $!;
-                $fh->seek( SEEK_SET, 0 ) or die $!;
+                seek( $fh, 0, 0 ) or die $!;
 
-                $c->req->uploads->{ $parameters{filename} } = {
-                    fh   => $fh,
-                    size => ( stat $fh )[7],
-                    type => $part->content_type
+                my $upload = {
+                    fh       => $fh,
+                    filename => $parameters{filename},
+                    size     => ( stat $fh )[7],
+                    tempname => $fh->filename,
+                    type     => $part->content_type
                 };
 
-                push( @params, $parameters{filename}, $fh );
+                push( @uploads, $parameters{name}, $upload );
+                push( @params,  $parameters{name}, $fh );
             }
             else {
                 push( @params, $parameters{name}, $part->content );
             }
         }
     }
-
-    my $parameters = $c->req->parameters;
-
-    while ( my ( $name, $value ) = splice( @params, 0, 2 ) ) {
-
-        if ( exists $parameters->{$name} ) {
-            for ( $parameters->{$name} ) {
-                $_ = [$_] unless ref($_) eq "ARRAY";
-                push( @$_, $value );
-            }
-        }
-        else {
-            $parameters->{$name} = $value;
-        }
-    }
+    
+    $c->req->_assign_values( $c->req->parameters, \@params );
+    $c->req->_assign_values( $c->req->uploads, \@uploads );
 }
 
 =item $c->prepare_path
@@ -209,7 +201,8 @@ sub run {
 
     unless ( ref $request ) {
 
-        my $uri = ( $request =~ m/http/i )
+        my $uri =
+          ( $request =~ m/http/i )
           ? URI->new($request)
           : URI->new( 'http://localhost' . $request );
 

@@ -18,6 +18,24 @@ sub header           { shift->headers->header(@_)           }
 sub referer          { shift->headers->referer(@_)          }
 sub user_agent       { shift->headers->user_agent(@_)       }
 
+
+sub _assign_values {
+    my ( $self, $map, $values ) = @_;
+    
+    while ( my ( $name, $value ) = splice( @{ $values }, 0, 2 ) ) {
+
+        if ( exists $map->{$name} ) {
+            for ( $map->{$name} ) {
+                $_ = [$_] unless ref($_) eq "ARRAY";
+                push( @$_, $value );
+            }
+        }
+        else {
+            $map->{$name} = $value;
+        }
+    }
+}
+
 =head1 NAME
 
 Catalyst::Request - Catalyst Request Class
@@ -40,11 +58,13 @@ Catalyst::Request - Catalyst Request Class
     $req->hostname;
     $req->match;
     $req->method;
-    $req->parameters;
+    $req->param;
     $req->params;
+    $req->parameters;
     $req->path;
     $req->referer;
     $req->snippets;
+    $req->upload;
     $req->uploads;
     $req->user_agent
 
@@ -123,7 +143,7 @@ Contains the hostname of the remote user.
 
 =item $req->match
 
-This contains be the matching part of a regexp action. otherwise it 
+This contains be the matching part of a regexp action. otherwise it
 returns the same as 'action'.
 
     print $c->request->match;
@@ -132,7 +152,42 @@ returns the same as 'action'.
 
 Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
-    print $c->request->method
+    print $c->request->method;
+
+=item $req->param
+
+Get request parameters with a CGI.pm like param method.
+
+    $value  = $c->request->param('foo');
+    @values = $c->request->param('foo');
+    @params = $c->request->param;
+
+=cut
+
+sub param {
+    my $self = shift;
+
+    if ( @_ == 0 ) {
+        return keys %{ $self->parameters };
+    }
+
+    my $param = shift;
+
+    unless ( exists $self->parameters->{$param} ) {
+        return wantarray ? () : undef;
+    }
+
+    if ( ref $self->parameters->{$param} eq 'ARRAY' ) {
+        return (wantarray)
+          ? @{ $self->parameters->{$param} }
+          : $self->parameters->{$param}->[0];
+    }
+    else {
+        return (wantarray)
+          ? ( $self->parameters->{$param} )
+          : $self->parameters->{$param};
+    }
+}
 
 =item $req->params
 
@@ -140,9 +195,11 @@ Shortcut for $req->parameters.
 
 =item $req->parameters
 
-Returns a reference to a hash containing the parameters.
+Returns a reference to a hash containing parameters. Values can
+be either a scalar or a arrayref containing scalars.
 
-    print $c->request->parameters->{foo};
+    print $c->request->parameters->{field};
+    print $c->request->parameters->{field}->[0];
 
 =item $req->path
 
@@ -160,15 +217,78 @@ Returns a reference to an array containing regex snippets.
 
     my @snippets = @{ $c->request->snippets };
 
+=item $req->upload
+
+A convenient method to $req->uploads.
+
+    $upload  = $c->request->upload('field');
+    @uploads = $c->request->upload('field');
+    @fields  = $c->request->upload;
+    
+    for my $upload ( $c->request->upload('field') ) {
+        print $upload->{filename};
+    }
+
+=cut
+
+sub upload {
+    my $self = shift;
+
+    if ( @_ == 0 ) {
+        return keys %{ $self->uploads };
+    }
+
+    my $upload = shift;
+
+    unless ( exists $self->uploads->{$upload} ) {
+        return wantarray ? () : undef;
+    }
+
+    if ( ref $self->uploads->{$upload} eq 'ARRAY' ) {
+        return (wantarray)
+          ? @{ $self->uploads->{$upload} }
+          : $self->uploads->{$upload}->[0];
+    }
+    else {
+        return (wantarray)
+          ? ( $self->uploads->{$upload} )
+          : $self->uploads->{$upload};
+    }
+}
+
 =item $req->uploads
 
-Returns a reference to a hash containing the uploads.
+Returns a reference to a hash containing uploads. Values can
+be either a hashref or a arrayref containing hashrefs.
 
-    my $filename = $c->req->parameters->{foo};
-    print $c->request->uploads->{$filename}->{type};
-    print $c->request->uploads->{$filename}->{size};
-    my $fh = $c->request->uploads->{$filename}->{fh};
-    my $content = do { local $/; <$fh> };
+    my $upload = $c->request->uploads->{field};
+    my $upload = $c->request->uploads->{field}->[0];
+
+The upload hashref contains the following keys:
+
+=over 4
+
+=item * fh 
+
+Filehandle.
+
+=item * filename 
+
+Client supplied filename.
+
+=item * size
+
+Size of the file in bytes.
+
+=item * tempname
+
+Path to the temporary spool file.
+
+=item * type
+
+Client supplied Content-Type.
+
+=back
 
 =item $req->user_agent
 
@@ -183,7 +303,7 @@ Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify 
+This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

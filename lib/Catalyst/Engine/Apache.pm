@@ -1,9 +1,8 @@
 package Catalyst::Engine::Apache;
 
 use strict;
-use mod_perl;
-use constant MP2 => $mod_perl::VERSION >= 1.99;
 use base 'Catalyst::Engine';
+
 use URI;
 use URI::http;
 
@@ -36,34 +35,6 @@ Returns an C<Apache::Request> object.
 This class overloads some methods from C<Catalyst::Engine>.
 
 =over 4
-
-=item $c->finalize_headers
-
-=cut
-
-sub finalize_headers {
-    my $c = shift;
-
-    for my $name ( $c->response->headers->header_field_names ) {
-        next if $name =~ /Content-Type/i;
-        my @values = $c->response->header($name);
-        $c->apache->headers_out->add( $name => $_ ) for @values;
-    }
-
-    if ( $c->response->header('Set-Cookie') && $c->response->status >= 300 ) {
-        my @values = $c->response->header('Set-Cookie');
-        $c->apache->err_headers_out->add( 'Set-Cookie' => $_ ) for @values;
-    }
-
-    $c->apache->status( $c->response->status );
-    $c->apache->content_type( $c->response->header('Content-Type') );
-
-    unless ( MP2 ) {
-        $c->apache->send_http_header;
-    }
-
-    return 0;
-}
 
 =item $c->finalize_output
 
@@ -100,12 +71,11 @@ sub prepare_headers {
 
 sub prepare_parameters {
     my $c = shift;
-    my %args;
+
     foreach my $key ( $c->apache->param ) {
         my @values = $c->apache->param($key);
-        $args{$key} = @values == 1 ? $values[0] : \@values;
+        $c->req->parameters->{$key} = ( @values == 1 ) ? $values[0] : \@values;
     }
-    $c->request->parameters( \%args );
 }
 
 =item $c->prepare_path
@@ -136,22 +106,6 @@ sub prepare_path {
 sub prepare_request {
     my ( $c, $r ) = @_;
     $c->apache( Apache::Request->new($r) );
-}
-
-=item $c->prepare_uploads
-
-=cut
-
-sub prepare_uploads {
-    my $c = shift;
-    for my $upload ( $c->apache->upload ) {
-        $upload = $c->apache->upload($upload) if MP2;
-        $c->request->uploads->{ $upload->filename } = {
-            fh   => $upload->fh,
-            size => $upload->size,
-            type => $upload->type
-        };
-    }
 }
 
 =item $c->run
