@@ -14,6 +14,7 @@ use Text::ASCIITable::Wrap 'wrap';
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 use Catalyst::Request;
+use Catalyst::Request::Upload;
 use Catalyst::Response;
 
 require Module::Pluggable::Fast;

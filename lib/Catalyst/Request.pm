@@ -18,11 +18,10 @@ sub header           { shift->headers->header(@_)           }
 sub referer          { shift->headers->referer(@_)          }
 sub user_agent       { shift->headers->user_agent(@_)       }
 
-
 sub _assign_values {
     my ( $self, $map, $values ) = @_;
-    
-    while ( my ( $name, $value ) = splice( @{ $values }, 0, 2 ) ) {
+
+    while ( my ( $name, $value ) = splice( @{$values}, 0, 2 ) ) {
 
         if ( exists $map->{$name} ) {
             for ( $map->{$name} ) {
@@ -226,7 +225,7 @@ A convenient method to $req->uploads.
     @fields  = $c->request->upload;
     
     for my $upload ( $c->request->upload('field') ) {
-        print $upload->{filename};
+        print $upload->filename;
     }
 
 =cut
@@ -258,37 +257,11 @@ sub upload {
 
 =item $req->uploads
 
-Returns a reference to a hash containing uploads. Values can
-be either a hashref or a arrayref containing hashrefs.
+Returns a reference to a hash containing uploads. Values can be either a 
+hashref or a arrayref containing C<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
-
-The upload hashref contains the following keys:
-
-=over 4
-
-=item * fh 
-
-Filehandle.
-
-=item * filename 
-
-Client supplied filename.
-
-=item * size
-
-Size of the file in bytes.
-
-=item * tempname
-
-Path to the temporary spool file.
-
-=item * type
-
-Client supplied Content-Type.
-
-=back
 
 =item $req->user_agent
 

@@ -189,13 +189,12 @@ sub prepare_uploads {
             my $disposition = $info->{'Content-Disposition'};
             my $filename    = ( $disposition =~ / filename="([^;]*)"/ )[0];
 
-            my $upload = {
-                fh       => $fh,
+            my $upload = Catalyst::Request::Upload->new(
                 filename => $filename,
                 size     => $size,
                 tempname => $tempname,
                 type     => $type
-            };
+            );
             
             push( @uploads, $param, $upload );
         }

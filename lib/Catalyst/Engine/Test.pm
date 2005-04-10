@@ -120,17 +120,17 @@ sub prepare_parameters {
 
             if ( $parameters{filename} ) {
 
-                my $fh = File::Temp->new;
+                my $fh = File::Temp->new( UNLINK => 0 );
                 $fh->write( $part->content ) or die $!;
-                seek( $fh, 0, 0 ) or die $!;
 
-                my $upload = {
-                    fh       => $fh,
+                my $upload = Catalyst::Request::Upload->new(
                     filename => $parameters{filename},
                     size     => ( stat $fh )[7],
                     tempname => $fh->filename,
                     type     => $part->content_type
-                };
+                );
+                
+                $fh->close;
 
                 push( @uploads, $parameters{name}, $upload );
                 push( @params,  $parameters{name}, $fh );

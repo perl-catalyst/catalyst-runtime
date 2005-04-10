@@ -80,15 +80,14 @@ sub prepare_uploads {
 
         for my $upload ( $c->apache->upload($field) ) {
 
-            my $hash = {
-                fh       => $upload->fh,
+            my $object = Catalyst::Request::Upload->new(
                 filename => $upload->filename,
                 size     => $upload->size,
                 tempname => $upload->tempname,
                 type     => $upload->type
-            };
+            );
 
-            push( @uploads, $field, $hash );
+            push( @uploads, $field, $object );
         }
     }
 
