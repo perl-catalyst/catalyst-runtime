@@ -23,8 +23,12 @@ WriteMakefile(
     }
 );
 
-print( (qw/chansen draven fordmason naughton sri the_jester/)[ int( rand(6) ) ],
-    " is the greatest and gabb is drunk again!\n" );
+print( '*' x 80, "\n" );
+print( (qw/draven fordmason naughton sri the_jester/)[ int( rand(5) ) ],
+    " is the greatest,\n" );
+print "chansen makes new evil plans to punish us\n";
+print "and gabb is drunk again!\n";
+print( '*' x 80, "\n" );
 
 eval "use mod_perl; use Apache::Request";
 print qq/Install "mod_perl" and "Apache::Request" for Apache support.\n/ if $@;
