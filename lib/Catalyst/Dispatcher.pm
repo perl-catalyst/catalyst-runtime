@@ -330,8 +330,8 @@ sub setup_actions {
     my $privates = Text::ASCIITable->new;
     $privates->setCols( 'Private', 'Class', 'Code' );
     $privates->setColWidth( 'Private', 28, 1 );
-    $privates->setColWidth( 'Class',   28, 1 );
-    $privates->setColWidth( 'Code',    14, 1 );
+    $privates->setColWidth( 'Class',   27, 1 );
+    $privates->setColWidth( 'Code',    15, 1 );
     my $walker = sub {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
@@ -341,8 +341,8 @@ sub setup_actions {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
             $privates->addRow(
                 wrap( "$prefix$action", 28 ),
-                wrap( $class,           28 ),
-                wrap( $code,            14 )
+                wrap( $class,           27 ),
+                wrap( $code,            15 )
             );
         }
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
@@ -356,8 +356,9 @@ sub setup_actions {
     $publics->setColWidth( 'Private', 36, 1 );
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        $publics->addRow( wrap( "/$plain", 37 ),
-            wrap( $self->actions->{reverse}->{$code} || $code, 36 ) );
+        my $reverse = $self->actions->{reverse}->{$code};
+        $reverse = $reverse ? "/$reverse" : $code;
+        $publics->addRow( wrap( "/$plain", 37 ), wrap( $reverse, 36 ) );
     }
     $self->log->debug( 'Loaded public actions', $publics->draw )
       if ( @{ $publics->{tbl_rows} } && $self->debug );
@@ -367,8 +368,9 @@ sub setup_actions {
     $regexes->setColWidth( 'Private', 36, 1 );
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        $regexes->addRow( wrap( $regex, 37 ),
-            wrap( $self->actions->{reverse}->{$class} || $class, 36 ) );
+        my $reverse = $self->actions->{reverse}->{$code};
+        $reverse = $reverse ? "/$reverse" : $code;
+        $regexes->addRow( wrap( $regex, 37 ), wrap( $reverse, 36 ) );
     }
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
