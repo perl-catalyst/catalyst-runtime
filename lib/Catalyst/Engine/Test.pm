@@ -122,6 +122,7 @@ sub prepare_parameters {
 
                 my $fh = File::Temp->new( UNLINK => 0 );
                 $fh->write( $part->content ) or die $!;
+                $fh->flush or die $!;
 
                 my $upload = Catalyst::Request::Upload->new(
                     filename => $parameters{filename},
@@ -133,7 +134,7 @@ sub prepare_parameters {
                 $fh->close;
 
                 push( @uploads, $parameters{name}, $upload );
-                push( @params,  $parameters{name}, $fh );
+                push( @params,  $parameters{name}, $parameters{filename} );
             }
             else {
                 push( @params, $parameters{name}, $part->content );

@@ -51,8 +51,7 @@ use HTTP::Request::Common;
         
         isa_ok( $upload, 'Catalyst::Request::Upload' );
 
-        #isnt( $upload, undef, 'Upload filename' );
-        #is( $upload->{type}, $part->content_type, 'Upload Content-Type' );
-        #is( $upload->{size}, length( $part->content ), 'Upload Content-Length' );
+        is( $upload->type, $part->content_type, 'Upload Content-Type' );
+        is( $upload->size, length( $part->content ), 'Upload Content-Length' );
     }
 }
