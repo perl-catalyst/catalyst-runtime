@@ -1,4 +1,4 @@
-package Catalyst::Dispatch;
+package Catalyst::Dispatcher;
 
 use strict;
 use base 'Class::Data::Inheritable';
