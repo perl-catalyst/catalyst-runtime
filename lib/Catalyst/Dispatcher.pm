@@ -236,9 +236,10 @@ sub set_action {
     }
 
     if ( $flags{private} && ( keys %flags > 1 ) ) {
-        $c->log->error( 'Bad action definition "'
+        $c->log->debug( 'Bad action definition "'
               . join( ' ', @{$attrs} )
-              . qq/" for "$namespace->$method"/ );
+              . qq/" for "$namespace->$method"/ )
+          if $c->debug;
         return;
     }
     return unless keys %flags;
