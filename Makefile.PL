@@ -23,7 +23,10 @@ WriteMakefile(
     },
     test => {
         TESTS => join ' ',
-        ( glob('t/*.t'), glob('t/*/*.t'), glob('t/*/*/*.t') )
+        (
+            glob('t/*.t'),     glob('t/*/*.t'),
+            glob('t/*/*/*.t'), glob('t/*/*/*/*.t')
+        )
     }
 );
 
