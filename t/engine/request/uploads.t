@@ -31,7 +31,7 @@ use HTTP::Request::Common;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
-
+    
     {
         no strict 'refs';
         ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
