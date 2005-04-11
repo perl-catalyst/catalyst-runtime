@@ -91,18 +91,13 @@ Catalyst Controller module 'upload' action:
         if ( $c->request->parameters->{form_submit} eq 'yes' ) {
 
             if ( my $upload = $c->request->upload('my_file') ) {
-
+            
                 my $filename = $upload->filename;
-                my $fh       = $upload->fh;
-
-                open( NEW_FILE, ">/tmp/upload/$filename" ) 
-                  or die( "Can't open file for writing: $!" );
-
-                while ( $fh->read( my $buf, 32768 ) ) {
-                    print NEW_FILE $buf;
+                my $target   = "/tmp/upload/$filename";
+                
+                unless ( $upload->link($target) || $upload->copy($target) ) {
+                    die( "Failed to copy '$filename' to '$target': $!" );
                 }
-
-                close(NEW_FILE);
             }
         }
         
@@ -133,18 +128,12 @@ Controller:
 
             for my $field ( $c->req->upload ) {
 
-                my $upload   = $c->request->upload($field);
                 my $filename = $upload->filename;
-                my $fh       = $upload->fh;
-
-                open( NEW_FILE, ">/tmp/upload/$filename" ) 
-                  or die ("Can't open file for writing: $!");
-
-                while ( $fh->read( my $buf, 32768 ) ) {
-                    print NEW_FILE $buf;
+                my $target   = "/tmp/upload/$filename";
+                
+                unless ( $upload->link($target) || $upload->copy($target) ) {
+                    die( "Failed to copy '$filename' to '$target': $!" );
                 }
-
-                close(NEW_FILE);
             }
         }
 
