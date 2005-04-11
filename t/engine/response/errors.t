@@ -9,6 +9,8 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More no_plan => 1;
 use Catalyst::Test 'TestApp';
 
+close STDERR; # i'm naughty :)
+
 {
     ok( my $response = request('http://localhost/engine/response/errors/one'), 'Request' );
     ok( $response->is_error, 'Response Server Error 5xx' );
