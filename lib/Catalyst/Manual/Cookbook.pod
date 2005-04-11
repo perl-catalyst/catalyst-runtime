@@ -87,19 +87,25 @@ Catalyst Controller module 'upload' action:
 
     sub upload : Global {
         my ($self, $c) = @_;
-        if ($c->req->parameters->{form_submit} eq 'yes') {
-            my $upload = $c->req->upload('my_file');
-            if ($upload->filename) {
+
+        if ( $c->request->parameters->{form_submit} eq 'yes' ) {
+
+            if ( my $upload = $c->request->upload('my_file') ) {
+
                 my $filename = $upload->filename;
-                my $fh = $upload->fh;
-                open(NEW_FILE, ">/tmp/upload/$filename") or die
-                    "Can't open file for writing: $!";
-                while ($fh->read(my $buf, 32768)) {
+                my $fh       = $upload->fh;
+
+                open( NEW_FILE, ">/tmp/upload/$filename" ) 
+                  or die( "Can't open file for writing: $!" );
+
+                while ( $fh->read( my $buf, 32768 ) ) {
                     print NEW_FILE $buf;
                 }
+
                 close(NEW_FILE);
             }
         }
+        
         $c->stash->{template} = 'file_upload.html';
     }
 
@@ -122,21 +128,26 @@ Controller:
 
     sub upload : Local {
         my ($self, $c) = @_;
-        if ($c->req->parameters->{form_submit} eq 'yes') {
-            for my $field ($c->req->upload) {
-                my $upload = $c->req->upload($field);
-                if ($upload->filename) {
-                    my $filename = $upload->filename;
-                    my $fh = $upload->fh;
-                    open(NEW_FILE, ">/tmp/upload/$filename") or die
-                        "Can't open file for writing: $!";
-                    while ($fh->read(my $buf, 32768)) {
-                        print NEW_FILE $buf;
-                    }
-                    close(NEW_FILE);
+
+        if ( $c->request->parameters->{form_submit} eq 'yes' ) {
+
+            for my $field ( $c->req->upload ) {
+
+                my $upload   = $c->request->upload($field);
+                my $filename = $upload->filename;
+                my $fh       = $upload->fh;
+
+                open( NEW_FILE, ">/tmp/upload/$filename" ) 
+                  or die ("Can't open file for writing: $!");
+
+                while ( $fh->read( my $buf, 32768 ) ) {
+                    print NEW_FILE $buf;
                 }
+
+                close(NEW_FILE);
             }
         }
+
         $c->stash->{template} = 'file_upload.html';
     }
 
