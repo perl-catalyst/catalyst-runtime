@@ -95,7 +95,7 @@ Catalyst Controller module 'upload' action:
                 my $filename = $upload->filename;
                 my $target   = "/tmp/upload/$filename";
                 
-                unless ( $upload->link($target) || $upload->copy($target) ) {
+                unless ( $upload->link_to($target) || $upload->copy_to($target) ) {
                     die( "Failed to copy '$filename' to '$target': $!" );
                 }
             }
@@ -131,7 +131,7 @@ Controller:
                 my $filename = $upload->filename;
                 my $target   = "/tmp/upload/$filename";
                 
-                unless ( $upload->link($target) || $upload->copy($target) ) {
+                unless ( $upload->link_to($target) || $upload->copy_to($target) ) {
                     die( "Failed to copy '$filename' to '$target': $!" );
                 }
             }

@@ -16,10 +16,10 @@ Catalyst::Request::Upload - Catalyst Request Upload Class
 
 =head1 SYNOPSIS
 
-    $upload->copy
+    $upload->copy_to
     $upload->fh
     $upload->filename;
-    $upload->link;
+    $upload->link_to;
     $upload->size;
     $upload->tempname;
     $upload->type;
@@ -35,13 +35,15 @@ to the upload data.
 
 =over 4
 
-=item $upload->copy( $target [, $bufferlen ] )
+=item $upload->copy_to
 
 Copies tempname using C<File::Copy>. Returns true for success, false otherwise.
 
+     $upload->copy_to('/path/to/target');
+
 =cut
 
-sub copy {
+sub copy_to {
     my ( $self, $target, $buffer ) = @_;
     return File::Copy::copy( $self->tempname, $target, $buffer );
 }
@@ -65,16 +67,16 @@ sub fh {
 
 Contains client supplied filename.
 
-=item $upload->link
+=item $upload->link_to
 
-Creates a new filename linked to the old filename.  Returns true for
-success, false otherwise.
+Creates a hard link to the tempname.  Returns true for success, 
+false otherwise.
 
-    $upload->link('/my/path');
+    $upload->link_to('/path/to/target');
 
 =cut
 
-sub link {
+sub link_to {
     my ( $self, $target ) = @_;
     return CORE::link( $self->tempname, $target );
 }
