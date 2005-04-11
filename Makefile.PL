@@ -20,6 +20,10 @@ WriteMakefile(
         Tree::Simple                      => 0,
         Tree::Simple::Visitor::FindByPath => 0,
         URI                               => 0,
+    },
+    test => {
+        TESTS => join ' ',
+        ( glob('t/*.t'), glob('t/*/*.t'), glob('t/*/*/*.t') )
     }
 );
 
