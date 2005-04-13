@@ -7,6 +7,9 @@ use File::Spec;
 use File::Path;
 use IO::File;
 use FindBin;
+use Template;
+
+my %cache;
 
 =head1 NAME
 
@@ -22,6 +25,28 @@ Bootstrap a Catalyst application.
 
 =head2 METHODS
 
+=head3 get_file
+
+Slurp file from DATA.
+
+=cut
+
+sub get_file {
+    my ( $self, $class, $file ) = @_;
+    unless ( $cache{$class} ) {
+        local $/;
+        $cache{$class} = eval "package $class; <DATA>";
+    }
+    my $data = $cache{$class};
+    my @files = split /^__(.+)__\n/m, $data;
+    shift @files;
+    while (@files) {
+        my ( $name, $content ) = splice @files, 0, 2;
+        return $content if $name eq $file;
+    }
+    return 0;
+}
+
 =head3 mk_app
 
 =cut
@@ -32,6 +57,7 @@ sub mk_app {
     $self->{name} = $name;
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
+    $self->{startperl} = $Config{startperl};
     $self->_mk_dirs;
     $self->_mk_appclass;
     $self->_mk_makefile;
@@ -179,6 +205,23 @@ sub next_test {
     return File::Spec->catfile( $dir, $type, $tname );
 }
 
+=head3 render_file
+
+Render and create a file from a template in DATA.
+
+=cut
+
+sub render_file {
+    my ( $self, $file, $path, $vars ) = @_;
+    $vars ||= {};
+    my $t = Template->new;
+    my $template = $self->get_file( ( caller(0) )[0], $file );
+    return 0 unless $template;
+    my $output;
+    $t->process( \$template, { %{$self}, %$vars }, \$output );
+    $self->mk_file( $path, $output );
+}
+
 sub _mk_dirs {
     my $self = shift;
     $self->mk_dir( $self->{dir} );
@@ -208,31 +251,145 @@ sub _mk_dirs {
 sub _mk_appclass {
     my $self = shift;
     my $mod  = $self->{mod};
-    my $name = $self->{name};
-    my $base = $self->{base};
-    $self->mk_file( "$mod.pm", <<"EOF");
-package $name;
+    $self->render_file( 'appclass', "$mod.pm" );
+}
+
+sub _mk_makefile {
+    my $self = shift;
+    my $dir  = $self->{dir};
+    $self->render_file( 'makefile', "$dir\/Makefile.PL" );
+}
+
+sub _mk_readme {
+    my $self = shift;
+    my $dir  = $self->{dir};
+    $self->render_file( 'readme', "$dir\/README" );
+}
+
+sub _mk_changes {
+    my $self = shift;
+    my $dir  = $self->{dir};
+    my $time = localtime time;
+    $self->render_file( 'changes', "$dir\/Changes", { time => $time } );
+}
+
+sub _mk_apptest {
+    my $self = shift;
+    my $t    = $self->{t};
+    $self->render_file( 'apptest',         "$t\/01app.t" );
+    $self->render_file( 'podtest',         "$t\/02pod.t" );
+    $self->render_file( 'podcoveragetest', "$t\/03podcoverage.t" );
+}
+
+sub _mk_cgi {
+    my $self   = shift;
+    my $script = $self->{script};
+    $self->render_file( 'cgi', "$script\/cgi.pl" );
+    chmod 0700, "$script/cgi.pl";
+}
+
+sub _mk_fcgi {
+    my $self   = shift;
+    my $script = $self->{script};
+    $self->render_file( 'fcgi', "$script\/fcgi.pl" );
+    chmod 0700, "$script/fcgi.pl";
+}
+
+sub _mk_server {
+    my $self   = shift;
+    my $script = $self->{script};
+    $self->render_file( 'server', "$script\/server.pl" );
+    chmod 0700, "$script/server.pl";
+}
+
+sub _mk_test {
+    my $self   = shift;
+    my $script = $self->{script};
+    $self->render_file( 'test', "$script/test.pl" );
+    chmod 0700, "$script/test.pl";
+}
+
+sub _mk_create {
+    my $self   = shift;
+    my $script = $self->{script};
+    $self->render_file( 'create', "$script\/create.pl" );
+    chmod 0700, "$script/create.pl";
+}
+
+sub _mk_compclass {
+    my $self = shift;
+    my $file = $self->{file};
+    return $self->render_file( 'compclass', "$file" );
+}
+
+sub _mk_comptest {
+    my $self = shift;
+    my $test = $self->{test};
+    $self->render_file( 'comptest', "$test" );
+}
+
+=head1 HELPERS
+
+Helpers are classes that provide two methods.
+
+    * mk_compclass - creates the Component class
+    * mk_comptest  - creates the Component test
+
+So when you call C<bin/create view MyView TT>, create would try to execute
+Catalyst::Helper::View::TT->mk_compclass and
+Catalyst::Helper::View::TT->mk_comptest.
+
+See L<Catalyst::Helper::View::TT> and L<Catalyst::Helper::Model::CDBI> for
+examples.
+
+All helper classes should be under one of the following namespaces.
+
+    Catalyst::Helper::Model::
+    Catalyst::Helper::View::
+    Catalyst::Helper::Controller::
+
+=head1 SEE ALSO
+
+L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,
+L<Catalyst::Response>, L<Catalyst>
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
+
+=head1 LICENSE
+
+This library is free software . You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+
+1;
+__DATA__
+
+__appclass__
+package [% name %];
 
 use strict;
 use Catalyst qw/-Debug/;
 
-our \$VERSION = '0.01';
+our $VERSION = '0.01';
 
-$name->config(
-    name => '$name',
-    root => '$base/root',
+[% name %]->config(
+    name => '[% name %]',
+    root => '[% base %]/root',
 );
 
-$name->setup;
+[% name %]->setup;
 
 sub default : Private {
-    my ( \$self, \$c ) = \@_;
-    \$c->res->output('Congratulations, $name is on Catalyst!');
+    my ( $self, $c ) = @_;
+    $c->res->output('Congratulations, [% name %] is on Catalyst!');
 }
 
 =head1 NAME
 
-$name - A very nice application
+[% name %] - A very nice application
 
 =head1 SYNOPSIS
 
@@ -254,95 +411,62 @@ the same terms as perl itself.
 =cut
 
 1;
-EOF
-}
 
-sub _mk_makefile {
-    my $self  = shift;
-    my $name  = $self->{name};
-    my $dir   = $self->{dir};
-    my $class = $self->{class};
-    $self->mk_file( "$dir\/Makefile.PL", <<"EOF");
+__makefile__
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME         => '$name',
-    VERSION_FROM => 'lib/$class.pm',
+    NAME         => '[% name %]',
+    VERSION_FROM => 'lib/[% class %].pm',
     PREREQ_PM    => { Catalyst => 5 },
     test         => { TESTS => join ' ', ( glob('t/*.t'), glob('t/*/*.t') ) }
 );
-EOF
-}
 
-sub _mk_readme {
-    my $self = shift;
-    my $dir  = $self->{dir};
-    $self->mk_file( "$dir\/README", <<"EOF");
+__readme__
 Run script/server.pl to test the application.
-EOF
-}
 
-sub _mk_changes {
-    my $self = shift;
-    my $name = $self->{name};
-    my $dir  = $self->{dir};
-    my $time = localtime time;
-    $self->mk_file( "$dir\/Changes", <<"EOF");
+__changes__
 This file documents the revision history for Perl extension $name.
 
-0.01  $time
+0.01  [% time %]
         - initial revision, generated by Catalyst
-EOF
-}
 
-sub _mk_apptest {
-    my $self = shift;
-    my $t    = $self->{t};
-    my $name = $self->{name};
-    $self->mk_file( "$t\/01app.t", <<"EOF");
+__apptest__
 use Test::More tests => 2;
-use_ok( Catalyst::Test, '$name' );
+use_ok( Catalyst::Test, '[% name %]' );
 
 ok( request('/')->is_success );
-EOF
-    $self->mk_file( "$t\/02pod.t", <<"EOF");
+
+__podtest__
 use Test::More;
 
 eval "use Test::Pod 1.14";
-plan skip_all => 'Test::Pod 1.14 required' if \$@;
-plan skip_all => 'set TEST_POD to enable this test' unless \$ENV{TEST_POD};
+plan skip_all => 'Test::Pod 1.14 required' if $@;
+plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 
 all_pod_files_ok();
-EOF
-    $self->mk_file( "$t\/03podcoverage.t", <<"EOF");
+
+__podcoveragetest__
 use Test::More;
 
 eval "use Test::Pod::Coverage 1.04";
-plan skip_all => 'Test::Pod::Coverage 1.04 required' if \$@;
-plan skip_all => 'set TEST_POD to enable this test' unless \$ENV{TEST_POD};
+plan skip_all => 'Test::Pod::Coverage 1.04 required' if $@;
+plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 
 all_pod_coverage_ok();
-EOF
-}
 
-sub _mk_cgi {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $script = $self->{script};
-    $self->mk_file( "$script\/cgi.pl", <<"EOF");
-$Config{startperl} -w
-
-BEGIN { \$ENV{CATALYST_ENGINE} = 'CGI' }
+__cgi_
+[% startperl %] -w
+BEGIN { $ENV{CATALYST_ENGINE} = 'CGI' }
 
 use strict;
 use FindBin;
-use lib "\$FindBin::Bin/../lib";
-use $name;
+use lib "$FindBin::Bin/../lib";
+use [% name %];
 
-$name->run;
+[% name %]->run;
 
 1;
-__END__
 
 =head1 NAME
 
@@ -358,7 +482,7 @@ Run a Catalyst application as cgi.
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri\@oook.de>
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 
@@ -368,28 +492,20 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as perl itself.
 
 =cut
-EOF
-    chmod 0700, "$script/cgi.pl";
-}
 
-sub _mk_fcgi {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $script = $self->{script};
-    $self->mk_file( "$script\/fcgi.pl", <<"EOF");
-$Config{startperl} -w
+__fcgi__
+[% startperl %] -w
 
-BEGIN { \$ENV{CATALYST_ENGINE} = 'FCGI' }
+BEGIN { $ENV{CATALYST_ENGINE} = 'FCGI' }
 
 use strict;
 use FindBin;
-use lib "\$FindBin::Bin/../lib";
-use $name;
+use lib "$FindBin::Bin/../lib";
+use [% name %];
 
-$name->run;
+[% name %]->run;
 
 1;
-__END__
 
 =head1 NAME
 
@@ -405,7 +521,7 @@ Run a Catalyst application as fcgi.
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri\@oook.de>
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 
@@ -415,37 +531,29 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as perl itself.
 
 =cut
-EOF
-    chmod 0700, "$script/fcgi.pl";
-}
 
-sub _mk_server {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $script = $self->{script};
-    $self->mk_file( "$script\/server.pl", <<"EOF");
-$Config{startperl} -w
+__server__
+[% startperl %] -w
 
-BEGIN { \$ENV{CATALYST_ENGINE} = 'HTTP' }
+BEGIN { $ENV{CATALYST_ENGINE} = 'HTTP' }
 
 use strict;
 use Getopt::Long;
 use Pod::Usage;
 use FindBin;
-use lib "\$FindBin::Bin/../lib";
-use $name;
+use lib "$FindBin::Bin/../lib";
+use [% name %];
 
-my \$help = 0;
-my \$port = 3000;
+my $help = 0;
+my $port = 3000;
 
-GetOptions( 'help|?' => \\\$help, 'port=s' => \\\$port );
+GetOptions( 'help|?' => \$help, 'port=s' => \$port );
 
 pod2usage(1) if \$help;
 
-$name->run(\$port);
+[% name %]->run($port);
 
 1;
-__END__
 
 =head1 NAME
 
@@ -469,7 +577,7 @@ Run a Catalyst Testserver for this application.
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri\@oook.de>
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 
@@ -479,36 +587,28 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as perl itself.
 
 =cut
-EOF
-    chmod 0700, "$script/server.pl";
-}
 
-sub _mk_test {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $script = $self->{script};
-    $self->mk_file( "$script/test.pl", <<"EOF");
-$Config{startperl} -w
+__test__
+[% startperl %] -w
 
-BEGIN { \$ENV{CATALYST_ENGINE} = 'Test' }
+BEGIN { $ENV{CATALYST_ENGINE} = 'Test' }
 
 use strict;
 use Getopt::Long;
 use Pod::Usage;
 use FindBin;
-use lib "\$FindBin::Bin/../lib";
-use $name;
+use lib "$FindBin::Bin/../lib";
+use [% name %];
 
-my \$help = 0;
+my $help = 0;
 
-GetOptions( 'help|?' => \\\$help );
+GetOptions( 'help|?' => \$help );
 
-pod2usage(1) if ( \$help || !\$ARGV[0] );
+pod2usage(1) if ( $help || !$ARGV[0] );
 
-print $name->run(\$ARGV[0])->content . "\n";
+print [% name %]->run($ARGV[0])->content . "\n";
 
 1;
-__END__
 
 =head1 NAME
 
@@ -535,7 +635,7 @@ Run a Catalyst action from the comand line.
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri\@oook.de>
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 
@@ -545,33 +645,25 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as perl itself.
 
 =cut
-EOF
-    chmod 0700, "$script/test.pl";
-}
 
-sub _mk_create {
-    my $self   = shift;
-    my $name   = $self->{name};
-    my $script = $self->{script};
-    $self->mk_file( "$script\/create.pl", <<"EOF");
-$Config{startperl} -w
+__create__
+[% startperl %] -w
 
 use strict;
 use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
 
-my \$help = 0;
+my $help = 0;
 
 GetOptions( 'help|?' => \$help );
 
-pod2usage(1) if ( \$help || !\$ARGV[0] );
+pod2usage(1) if ( $help || !$ARGV[0] );
 
-my \$helper = Catalyst::Helper->new;
-pod2usage(1) unless \$helper->mk_component( '$name', \@ARGV );
+my $helper = Catalyst::Helper->new;
+pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
 1;
-__END__
 
 =head1 NAME
 
@@ -614,33 +706,23 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as perl itself.
 
 =cut
-EOF
-    chmod 0700, "$script/create.pl";
-}
 
-sub _mk_compclass {
-    my $self   = shift;
-    my $app    = $self->{app};
-    my $class  = $self->{class};
-    my $type   = $self->{type};
-    my $action = '';
-    $action = <<"EOF" if $type eq 'C';
-
-sub default : Private {
-    my ( \$self, \$c ) = \@_;
-    \$c->res->output('Congratulations, $class is on Catalyst!');
-}
-EOF
-    my $file = $self->{file};
-    return $self->mk_file( "$file", <<"EOF");
-package $class;
+__compclass__
+package [% class %];
 
 use strict;
 use base 'Catalyst::Base';
-$action
+
+[% IF type == 'C' %]
+sub default : Private {
+    my ( $self, $c ) = \@_;
+    $c->res->output('Congratulations, [% class %] is on Catalyst!');
+}
+
+[% END %]
 =head1 NAME
 
-$class - A Component
+[% class %] - A Component
 
 =head1 SYNOPSIS
 
@@ -662,67 +744,15 @@ the same terms as perl itself.
 =cut
 
 1;
-EOF
-}
 
-sub _mk_comptest {
-    my $self   = shift;
-    my $prefix = $self->{prefix};
-    my $type   = $self->{type};
-    my $class  = $self->{class};
-    my $app    = $self->{app};
-    my $test   = $self->{test};
-    if ( $self->{type} eq 'C' ) {
-        $self->mk_file( "$test", <<"EOF");
+__comptest__
+[% IF type == 'C' %]
 use Test::More tests => 3;
-use_ok( Catalyst::Test, '$app' );
-use_ok('$class');
+use_ok( Catalyst::Test, '[% app %]' );
+use_ok('[% class %]');
 
-ok( request('$prefix')->is_success );
-EOF
-    }
-    else {
-        $self->mk_file( "$test", <<"EOF");
+ok( request('[% prefix %]')->is_success );
+[% ELSE %]
 use Test::More tests => 1;
-use_ok('$class');
-EOF
-    }
-}
-
-=head1 HELPERS
-
-Helpers are classes that provide two methods.
-
-    * mk_compclass - creates the Component class
-    * mk_comptest  - creates the Component test
-
-So when you call C<bin/create view MyView TT>, create would try to execute
-Catalyst::Helper::View::TT->mk_compclass and
-Catalyst::Helper::View::TT->mk_comptest.
-
-See L<Catalyst::Helper::View::TT> and L<Catalyst::Helper::Model::CDBI> for
-examples.
-
-All helper classes should be under one of the following namespaces.
-
-    Catalyst::Helper::Model::
-    Catalyst::Helper::View::
-    Catalyst::Helper::Controller::
-
-=head1 SEE ALSO
-
-L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,
-L<Catalyst::Response>, L<Catalyst>
-
-=head1 AUTHOR
-
-Sebastian Riedel, C<sri@oook.de>
-
-=head1 LICENSE
-
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
-
-=cut
-
-1;
+use_ok('[% class %]');
+[% END %]

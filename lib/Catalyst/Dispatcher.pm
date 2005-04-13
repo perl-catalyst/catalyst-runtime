@@ -61,14 +61,17 @@ sub dispatch {
         }
 
         # Execute the auto chain
+        my $auto = 0;
         for my $auto ( @{ $c->get_action( 'auto', $namespace ) } ) {
             $c->execute( @{ $auto->[0] } );
             return if scalar @{ $c->error };
             last unless $c->state;
+            $auto++;
         }
 
         # Execute the action or last default
-        if ( ( my $action = $c->req->action ) && $c->state ) {
+        my $mkay = $auto ? $c->state ? 1 : 0 : 1;
+        if ( ( my $action = $c->req->action ) && $mkay ) {
             if ( my $result = @{ $c->get_action( $action, $default ) }[-1] ) {
                 $c->execute( @{ $result->[0] } );
             }
