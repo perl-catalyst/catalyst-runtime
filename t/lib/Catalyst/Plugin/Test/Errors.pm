@@ -6,7 +6,7 @@ sub error {
     my $c = shift;
 
     unless ( $_[0] ) {
-        $c->NEXT::error(@_);
+        return $c->NEXT::error(@_);
     }
 
     if ( $_[0] =~ /^(Unknown resource|No default action defined)/ ) {

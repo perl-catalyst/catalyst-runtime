@@ -7,7 +7,7 @@ sub one : Relative {
     my ( $self, $c ) = @_;
     my $a = 0;
     my $b = 0;
-    my $c = $a / $b;
+    my $t = $a / $b;
 }
 
 sub two : Relative {

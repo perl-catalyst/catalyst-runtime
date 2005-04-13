@@ -126,7 +126,7 @@ sub prepare_parameters {
 
                 my $upload = Catalyst::Request::Upload->new(
                     filename => $parameters{filename},
-                    size     => ( stat $fh )[7],
+                    size     => ( $fh->stat )[7],
                     tempname => $fh->filename,
                     type     => $part->content_type
                 );

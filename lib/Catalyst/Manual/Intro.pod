@@ -237,7 +237,7 @@ The last of these, the stash, is a universal hash for sharing data among applica
         $c->forward('show-message');
     }
 
-    show-message : Private {
+    sub show-message : Private {
         my ( $self, $c ) = @_;
         $c->res->output( $c->stash->{message} );
     }

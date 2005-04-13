@@ -44,8 +44,8 @@ Copies tempname using C<File::Copy>. Returns true for success, false otherwise.
 =cut
 
 sub copy_to {
-    my ( $self, $target, $buffer ) = @_;
-    return File::Copy::copy( $self->tempname, $target, $buffer );
+    my $self = shift;
+    return File::Copy::copy( $self->tempname, @_ );
 }
 
 =item $upload->fh
