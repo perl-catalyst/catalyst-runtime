@@ -455,7 +455,7 @@ plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 
 all_pod_coverage_ok();
 
-__cgi_
+__cgi__
 [% startperl %] -w
 BEGIN { $ENV{CATALYST_ENGINE} = 'CGI' }
 
@@ -549,7 +549,7 @@ my $port = 3000;
 
 GetOptions( 'help|?' => \$help, 'port=s' => \$port );
 
-pod2usage(1) if \$help;
+pod2usage(1) if $help;
 
 [% name %]->run($port);
 
