@@ -15,6 +15,7 @@ use Catalyst::Response;
 
 require Module::Pluggable::Fast;
 
+# For pretty dumps
 $Data::Dumper::Terse = 1;
 
 __PACKAGE__->mk_classdata('components');
@@ -24,6 +25,7 @@ __PACKAGE__->mk_accessors(qw/request response state/);
 *req  = \&request;
 *res  = \&response;
 
+# For statistics
 our $COUNT = 1;
 our $START = time;
 
@@ -75,14 +77,17 @@ Regex search for a component.
 
 sub component {
     my ( $c, $name ) = @_;
+
     if ( my $component = $c->components->{$name} ) {
         return $component;
     }
+
     else {
         for my $component ( keys %{ $c->components } ) {
             return $c->components->{$component} if $component =~ /$name/i;
         }
     }
+
 }
 
 =item $c->error
@@ -120,6 +125,7 @@ sub execute {
     $class = $c->comp($class) || $class;
     $c->state(0);
     my $callsub = ( caller(1) )[3];
+
     eval {
         if ( $c->debug )
         {
@@ -133,6 +139,7 @@ sub execute {
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
     };
+
     if ( my $error = $@ ) {
 
         unless ( ref $error ) {
@@ -337,12 +344,14 @@ sub handler {
     my $status = -1;
     eval {
         my @stats = ();
+
         my $handler = sub {
             my $c = $class->prepare($engine);
             $c->{stats} = \@stats;
             $c->dispatch;
             return $c->finalize;
         };
+
         if ( $class->debug ) {
             my $elapsed;
             ( $elapsed, $status ) = $class->benchmark($handler);
@@ -358,11 +367,14 @@ sub handler {
                 $t->draw );
         }
         else { $status = &$handler }
+
     };
+
     if ( my $error = $@ ) {
         chomp $error;
         $class->log->error(qq/Caught exception in engine "$error"/);
     }
+
     $COUNT++;
     return $status;
 }
@@ -376,6 +388,7 @@ into a Catalyst context .
 
 sub prepare {
     my ( $class, $r ) = @_;
+
     my $c = bless {
         request => Catalyst::Request->new(
             {
@@ -393,6 +406,7 @@ sub prepare {
         stash => {},
         state => 0
     }, $class;
+
     if ( $c->debug ) {
         my $secs = time - $START || 1;
         my $av = sprintf '%.3f', $COUNT / $secs;
@@ -401,17 +415,20 @@ sub prepare {
         $c->log->debug('**********************************');
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
+
     $c->prepare_request($r);
     $c->prepare_path;
     $c->prepare_headers;
     $c->prepare_cookies;
     $c->prepare_connection;
+
     my $method   = $c->req->method   || '';
     my $path     = $c->req->path     || '';
     my $hostname = $c->req->hostname || '';
     my $address  = $c->req->address  || '';
     $c->log->debug(qq/"$method" request for "$path" from $hostname($address)/)
       if $c->debug;
+
     $c->prepare_action;
     $c->prepare_parameters;
 
@@ -426,6 +443,7 @@ sub prepare {
         }
         $c->log->debug( 'Parameters are', $t->draw );
     }
+
     $c->prepare_uploads;
     return $c;
 }
@@ -441,6 +459,7 @@ sub prepare_action {
     my $path = $c->req->path;
     my @path = split /\//, $c->req->path;
     $c->req->args( \my @args );
+
     while (@path) {
         $path = join '/', @path;
         if ( my $result = ${ $c->get_action($path) }[0] ) {
@@ -458,19 +477,23 @@ sub prepare_action {
                 $c->req->action($match);
                 $c->req->snippets( \@snippets );
             }
+
             else {
                 $c->req->action($path);
                 $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
             }
+
             $c->req->match($path);
             last;
         }
         unshift @args, pop @path;
     }
+
     unless ( $c->req->action ) {
         $c->req->action('default');
         $c->req->match('');
     }
+
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
 }
@@ -604,18 +627,21 @@ sub setup_components {
         $self->log->error(
             qq/Couldn't initialize "Module::Pluggable::Fast", "$error"/);
     }
+
     $self->components( {} );
     my @comps;
     for my $comp ( $self->_components($self) ) {
         $self->components->{ ref $comp } = $comp;
         push @comps, $comp;
     }
+
     my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
     $t->addRow($_) for keys %{ $self->components };
     $self->log->debug( 'Loaded components', $t->draw )
       if ( @{ $t->{tbl_rows} } && $self->debug );
+
     $self->setup_actions( [ $self, @comps ] );
 }
 

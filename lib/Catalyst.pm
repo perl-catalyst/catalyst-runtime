@@ -126,6 +126,7 @@ sub import {
     my ( $self, @options ) = @_;
     my $caller = caller(0);
 
+    # Prepare inheritance
     unless ( $caller->isa($self) ) {
         no strict 'refs';
         push @{"$caller\::ISA"}, $self;
@@ -139,6 +140,7 @@ sub import {
         $caller->log( Catalyst::Log->new );
     }
 
+    # Debug?
     if ( $ENV{CATALYST_DEBUG} || $ENV{ uc($caller) . '_DEBUG' } ) {
         no strict 'refs';
         *{"$caller\::debug"} = sub { 1 };
@@ -148,6 +150,7 @@ sub import {
     my $engine     = 'Catalyst::Engine::CGI';
     my $dispatcher = 'Catalyst::Dispatcher';
 
+    # Detect mod_perl
     if ( $ENV{MOD_PERL} ) {
 
         require mod_perl;
@@ -160,19 +163,24 @@ sub import {
         }
     }
 
+    # Process options
     my @plugins;
     foreach (@options) {
+
         if (/^\-Debug$/) {
             next if $caller->debug;
             no strict 'refs';
             *{"$caller\::debug"} = sub { 1 };
             $caller->log->debug('Debug messages enabled');
         }
+
         elsif (/^-Dispatcher=(.*)$/) {
             $dispatcher = "Catalyst::Dispatcher::$1";
         }
+
         elsif (/^-Engine=(.*)$/) { $engine = "Catalyst::Engine::$1" }
         elsif (/^-.*$/) { $caller->log->error(qq/Unknown flag "$_"/) }
+
         else {
             my $plugin = "Catalyst::Plugin::$_";
 
@@ -187,7 +195,10 @@ sub import {
                 push @{"$caller\::ISA"}, $plugin;
             }
         }
+
     }
+
+    # Plugin table
     my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );

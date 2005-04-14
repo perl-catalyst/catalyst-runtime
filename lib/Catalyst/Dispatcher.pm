@@ -9,9 +9,12 @@ use Tree::Simple::Visitor::FindByPath;
 
 __PACKAGE__->mk_classdata($_) for qw/actions tree/;
 
+# These are the core structures
 __PACKAGE__->actions(
     { plain => {}, private => {}, regex => {}, compiled => [], reverse => {} }
 );
+
+# We use a tree
 __PACKAGE__->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
 
 memoize('_class2prefix');
@@ -42,14 +45,17 @@ sub dispatch {
     my $namespace = '';
     $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
       if $action eq 'default';
+
     unless ($namespace) {
         if ( my $result = $c->get_action($action) ) {
             $namespace = _class2prefix( $result->[0]->[0]->[0] );
         }
     }
+
     my $default = $action eq 'default' ? $namespace : undef;
     my $results = $c->get_action( $action, $default );
     $namespace ||= '/';
+
     if ( @{$results} ) {
 
         # Execute last begin
@@ -82,6 +88,7 @@ sub dispatch {
             return if scalar @{ $c->error };
         }
     }
+
     else {
         my $path  = $c->req->path;
         my $error = $path
@@ -107,33 +114,44 @@ If you define a class without method it will default to process().
 sub forward {
     my $c       = shift;
     my $command = shift;
+
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
     }
+
     my $caller    = caller(0);
     my $namespace = '/';
+
     if ( $command =~ /^\// ) {
         $command =~ /^\/(.*)\/(\w+)$/;
         $namespace = $1 || '/';
         $command   = $2 || $command;
         $command =~ s/^\///;
+        warn "NAMESPACE: $namespace COMMAND: $command";
     }
+
     else { $namespace = _class2prefix($caller) || '/' }
+
     my $results = $c->get_action( $command, $namespace );
+
     unless ( @{$results} ) {
         my $class = $command || '';
+
         if ( $class =~ /[^\w\:]/ ) {
             my $error = qq/Couldn't forward to "$class"/;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
         }
+
         my $method = shift || 'process';
+
         if ( my $code = $class->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
             $results = [ [ [ $class, $code ] ] ];
         }
+
         else {
             my $error = qq/Couldn't forward to "$class"/;
             $c->error($error);
@@ -141,12 +159,15 @@ sub forward {
               if $c->debug;
             return 0;
         }
+
     }
+
     for my $result ( @{$results} ) {
         $c->execute( @{ $result->[0] } );
         return if scalar @{ $c->error };
         last unless $c->state;
     }
+
     return $c->state;
 }
 
@@ -160,15 +181,18 @@ sub get_action {
     my ( $c, $action, $namespace ) = @_;
     return [] unless $action;
     $namespace ||= '';
+
     if ($namespace) {
         $namespace = '' if $namespace eq '/';
         my $parent = $c->tree;
         my @results;
         my %allowed = ( begin => 1, auto => 1, default => 1, end => 1 );
+
         if ( $allowed{$action} ) {
             my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
             push @results, [$result] if $result;
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
+
             for my $part ( split '/', $namespace ) {
                 $visitor->setSearchPath($part);
                 $parent->accept($visitor);
@@ -178,8 +202,11 @@ sub get_action {
                 push @results, [$match] if $match;
                 $parent = $child if $child;
             }
+
         }
+
         else {
+
             if ($namespace) {
                 my $visitor = Tree::Simple::Visitor::FindByPath->new;
                 $visitor->setSearchPath( split '/', $namespace );
@@ -190,20 +217,26 @@ sub get_action {
                   if $uid;
                 push @results, [$match] if $match;
             }
+
             else {
                 my $result =
                   $c->actions->{private}->{ $parent->getUID }->{$action};
                 push @results, [$result] if $result;
             }
+
         }
         return \@results;
     }
+
     elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
     elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
+
     else {
+
         for my $i ( 0 .. $#{ $c->actions->{compiled} } ) {
             my $name  = $c->actions->{compiled}->[$i]->[0];
             my $regex = $c->actions->{compiled}->[$i]->[1];
+
             if ( $action =~ $regex ) {
                 my @snippets;
                 for my $i ( 1 .. 9 ) {
@@ -213,6 +246,7 @@ sub get_action {
                 }
                 return [ [ $c->actions->{regex}->{$name}, $name, \@snippets ] ];
             }
+
         }
     }
     return [];
@@ -249,18 +283,22 @@ sub set_action {
 
     my $parent  = $c->tree;
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
+
     for my $part ( split '/', $prefix ) {
         $visitor->setSearchPath($part);
         $parent->accept($visitor);
         my $child = $visitor->getResult;
+
         unless ($child) {
             $child = $parent->addChild( Tree::Simple->new($part) );
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
             $child = $visitor->getResult;
         }
+
         $parent = $child;
     }
+
     my $uid = $parent->getUID;
     $c->actions->{private}->{$uid}->{$method} = [ $namespace, $code ];
     my $forward = $prefix ? "$prefix/$method" : $method;
@@ -271,6 +309,7 @@ sub set_action {
         if ( $flags{path} =~ /^'(.*)'$/ ) { $flags{path} = $1 }
         if ( $flags{path} =~ /^"(.*)"$/ ) { $flags{path} = $1 }
     }
+
     if ( $flags{regex} ) {
         $flags{regex} =~ s/^\w+//;
         $flags{regex} =~ s/\w+$//;
@@ -281,16 +320,19 @@ sub set_action {
     my $reverse = $prefix ? "$prefix/$method" : $method;
 
     if ( $flags{local} || $flags{global} || $flags{path} ) {
-        my $path = $flags{path} || $method;
+        my $path     = $flags{path} || $method;
         my $absolute = 0;
+
         if ( $path =~ /^\/(.+)/ ) {
             $path     = $1;
             $absolute = 1;
         }
+
         $absolute = 1 if $flags{global};
         my $name = $absolute ? $path : $prefix ? "$prefix/$path" : $path;
         $c->actions->{plain}->{$name} = [ $namespace, $code ];
     }
+
     if ( my $regex = $flags{regex} ) {
         push @{ $c->actions->{compiled} }, [ $regex, qr#$regex# ];
         $c->actions->{regex}->{$regex} = [ $namespace, $code ];
@@ -307,14 +349,17 @@ Setup actions for a component.
 
 sub setup_actions {
     my ( $self, $comps ) = @_;
+
     for my $comp (@$comps) {
         $comp = ref $comp || $comp;
+
         for my $action ( @{ $comp->_cache } ) {
             my ( $code, $attrs ) = @{$action};
             my $name = '';
             no strict 'refs';
             my @cache = ( $comp, @{"$comp\::ISA"} );
             my %namespaces;
+
             while ( my $namespace = shift @cache ) {
                 $namespaces{$namespace}++;
                 for my $isa ( @{"$comp\::ISA"} ) {
@@ -323,58 +368,77 @@ sub setup_actions {
                     $namespaces{$isa}++;
                 }
             }
+
             for my $namespace ( keys %namespaces ) {
+
                 for my $sym ( values %{ $namespace . '::' } ) {
+
                     if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
+
                         $name = *{$sym}{NAME};
                         $self->set_action( $name, $code, $comp, $attrs );
                         last;
                     }
+
                 }
+
             }
+
         }
+
     }
+
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
     $privates->setCols( 'Private', 'Class' );
     $privates->setColWidth( 'Private', 36, 1 );
     $privates->setColWidth( 'Class',   37, 1 );
+
     my $walker = sub {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
         $prefix .= '/' unless $prefix =~ /\/$/;
         my $uid = $parent->getUID;
+
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
             $privates->addRow( "$prefix$action", $class );
         }
+
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
+
     $walker->( $walker, $self->tree, '' );
     $self->log->debug( 'Loaded private actions', $privates->draw )
       if ( @{ $privates->{tbl_rows} } && $self->debug );
+
     my $publics = Text::ASCIITable->new;
     $publics->setCols( 'Public', 'Private' );
     $publics->setColWidth( 'Public',  36, 1 );
     $publics->setColWidth( 'Private', 37, 1 );
+
     for my $plain ( sort keys %{ $actions->{plain} } ) {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
         my $reverse = $self->actions->{reverse}->{$code};
         $reverse = $reverse ? "/$reverse" : $code;
         $publics->addRow( "/$plain", $reverse );
     }
+
     $self->log->debug( 'Loaded public actions', $publics->draw )
       if ( @{ $publics->{tbl_rows} } && $self->debug );
+
     my $regexes = Text::ASCIITable->new;
     $regexes->setCols( 'Regex', 'Private' );
     $regexes->setColWidth( 'Regex',   36, 1 );
     $regexes->setColWidth( 'Private', 37, 1 );
+
     for my $regex ( sort keys %{ $actions->{regex} } ) {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
         my $reverse = $self->actions->{reverse}->{$code};
         $reverse = $reverse ? "/$reverse" : $code;
         $regexes->addRow( $regex, $reverse );
     }
+
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
 }
