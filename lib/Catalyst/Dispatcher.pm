@@ -114,10 +114,10 @@ sub forward {
     my $caller    = caller(0);
     my $namespace = '/';
     if ( $command =~ /^\// ) {
-        $command =~ /^(.*)\/(\w+)$/;
+        $command =~ /^\/(.*)\/(\w+)$/;
         $namespace = $1 || '/';
-        $namespace = s/^\/// if $namespace ne '/';
-        $command = $2;
+        $command   = $2 || $command;
+        $command =~ s/^\///;
     }
     else { $namespace = _class2prefix($caller) || '/' }
     my $results = $c->get_action( $command, $namespace );
