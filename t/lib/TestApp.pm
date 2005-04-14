@@ -14,6 +14,11 @@ TestApp->setup;
 
 #sub execute { return shift->NEXT::execute(@_); } # does not work, bug?
 
+sub main_action : Private {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 sub execute {
     my $c       = shift;
     my $class   = ref( $c->component($_[0]) ) || $_[0];
