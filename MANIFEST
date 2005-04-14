@@ -55,7 +55,6 @@ t/lib/Catalyst/Plugin/Test/Errors.pm
 t/lib/Catalyst/Plugin/Test/Headers.pm
 t/lib/TestApp.pm
 t/lib/TestApp/Controller/Action.pm
-t/lib/TestApp/Controller/Action/Absolute.pm
 t/lib/TestApp/Controller/Action/Begin.pm
 t/lib/TestApp/Controller/Action/Default.pm
 t/lib/TestApp/Controller/Action/End.pm
@@ -64,7 +63,6 @@ t/lib/TestApp/Controller/Action/Inheritance.pm
 t/lib/TestApp/Controller/Action/Path.pm
 t/lib/TestApp/Controller/Action/Private.pm
 t/lib/TestApp/Controller/Action/Regexp.pm
-t/lib/TestApp/Controller/Action/Relative.pm
 t/lib/TestApp/Controller/Dump.pm
 t/lib/TestApp/Controller/Engine/Response/Cookies.pm
 t/lib/TestApp/Controller/Engine/Response/Errors.pm

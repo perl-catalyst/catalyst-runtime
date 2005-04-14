@@ -76,6 +76,8 @@ sub import {
 
     else {
         $class->require;
+        my $error = $UNIVERSAL::require::ERROR;
+        die qq/Couldn't load "$class", "$error"/ if $error;
 
         unless ( $INC{'Test/Builder.pm'} ) {
             die qq/Couldn't load "$class", "$@"/ if $@;
@@ -108,7 +110,8 @@ sub remote_request {
 
     unless ( ref $request ) {
 
-        my $uri = ( $request =~ m/http/i )
+        my $uri =
+          ( $request =~ m/http/i )
           ? URI->new($request)
           : URI->new( 'http://localhost' . $request );
 
@@ -122,7 +125,7 @@ sub remote_request {
     my $server = URI->new( $ENV{CATALYST_SERVER} );
 
     if ( $server->path =~ m|^(.+)?/$| ) {
-        $server->path("$1"); # need to be quoted
+        $server->path("$1");    # need to be quoted
     }
 
     $request->uri->scheme( $server->scheme );
@@ -132,7 +135,8 @@ sub remote_request {
 
     unless ($agent) {
         $agent = LWP::UserAgent->new(
-         #  cookie_jar   => {},
+
+            #  cookie_jar   => {},
             keep_alive   => 1,
             max_redirect => 0,
             timeout      => 60,
