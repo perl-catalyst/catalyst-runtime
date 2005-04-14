@@ -715,7 +715,7 @@ use base 'Catalyst::Base';
 
 [% IF type == 'C' %]
 sub default : Private {
-    my ( $self, $c ) = \@_;
+    my ( $self, $c ) = @_;
     $c->res->output('Congratulations, [% class %] is on Catalyst!');
 }
 
