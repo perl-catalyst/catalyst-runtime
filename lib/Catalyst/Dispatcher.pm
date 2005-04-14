@@ -115,7 +115,7 @@ sub forward {
     my $caller    = caller(0);
     my $namespace = '/';
     if ( $command =~ /^\// ) {
-        $command =~ /^(.*)\/(\w+)$/;
+        $command =~ /^\/(.*)\/(\w+)$/;
         $namespace = $1 || '/';
         $command = $2;
     }
