@@ -77,11 +77,7 @@ sub import {
     else {
         $class->require;
         my $error = $UNIVERSAL::require::ERROR;
-        die qq/Couldn't load "$class", "$error"/ if $error;
-
-        unless ( $INC{'Test/Builder.pm'} ) {
-            die qq/Couldn't load "$class", "$@"/ if $@;
-        }
+        die qq/Couldn't load "$class", "$error"/ if $@;
 
         $class->import;
 
