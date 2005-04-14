@@ -346,7 +346,7 @@ sub setup_actions {
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            $privates->addRow( "$prefix$action", $class, 37 );
+            $privates->addRow( "$prefix$action", $class );
         }
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
