@@ -128,7 +128,6 @@ sub forward {
         $namespace = $1 || '/';
         $command   = $2 || $command;
         $command =~ s/^\///;
-        warn "NAMESPACE: $namespace COMMAND: $command";
     }
 
     else { $namespace = _class2prefix($caller) || '/' }
