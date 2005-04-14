@@ -1,19 +1,24 @@
-package TestApp::Controller::Action::Absolute;
+package TestApp::Controller::Action::Local;
 
 use strict;
 use base 'TestApp::Controller::Action';
 
-sub action_absolute_one : Action Absolute {
+sub one : Action Relative {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
 
-sub action_absolute_two : Action Global {
+sub two : Action Local {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
 
-sub action_absolute_three : Action Path('/action_absolute_three') {
+sub three : Action Path('three') {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
+sub four : Action Path('four/five/six') {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }

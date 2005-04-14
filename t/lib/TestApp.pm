@@ -14,7 +14,7 @@ TestApp->setup;
 
 #sub execute { return shift->NEXT::execute(@_); } # does not work, bug?
 
-sub main_action : Private {
+sub global_action : Private {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }

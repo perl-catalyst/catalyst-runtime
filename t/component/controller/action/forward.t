@@ -24,10 +24,10 @@ use Catalyst::Test 'TestApp';
     my $expected = join( ", ", @expected );
 
    # Test forward to global private action
-    ok( my $response = request('http://localhost/main_action'), 'Request' );
+    ok( my $response = request('http://localhost/action/forward/global'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
-    is( $response->header('X-Catalyst-Action'), 'main_action', 'Main Class Action' );
+    is( $response->header('X-Catalyst-Action'), 'action/forward/global', 'Main Class Action' );
     # Test forward to chain of actions.
     ok( $response = request('http://localhost/action/forward/one'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );

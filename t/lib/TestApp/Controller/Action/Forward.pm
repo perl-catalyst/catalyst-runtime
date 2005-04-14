@@ -42,4 +42,10 @@ sub inheritance : Relative {
     $c->forward('five');
 }
 
+sub global : Relative {
+    my ( $self, $c ) = @_;
+    $c->forward('/global_action');
+}
+
+
 1;
