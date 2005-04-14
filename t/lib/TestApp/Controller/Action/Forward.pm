@@ -20,13 +20,14 @@ sub three : Relative {
 
 sub four : Private {
     my ( $self, $c ) = @_;
-    $c->forward('five');
+    $c->forward('/action/forward/five');
 }
 
 sub five : Relative {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
+
 
 sub jojo : Relative {
     my ( $self, $c ) = @_;
