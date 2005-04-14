@@ -9,7 +9,6 @@ use HTML::Entities;
 use HTTP::Headers;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Text::ASCIITable;
-use Text::ASCIITable::Wrap 'wrap';
 use Catalyst::Request;
 use Catalyst::Request::Upload;
 use Catalyst::Response;
@@ -354,9 +353,7 @@ sub handler {
             $t->setColWidth( 'Action', 64, 1 );
             $t->setColWidth( 'Time',   9,  1 );
 
-            for my $stat (@stats) {
-                $t->addRow( wrap( $stat->[0], 64 ), wrap( $stat->[1], 9 ) );
-            }
+            for my $stat (@stats) { $t->addRow( $stat->[0], $stat->[1] ) }
             $class->log->info( "Request took $elapsed" . "s ($av/s)",
                 $t->draw );
         }
@@ -425,7 +422,7 @@ sub prepare {
         $t->setColWidth( 'Value', 36, 1 );
         for my $key ( keys %{ $c->req->params } ) {
             my $value = $c->req->params->{$key} || '';
-            $t->addRow( wrap( $key, 37 ), wrap( $value, 36 ) );
+            $t->addRow( $key, $value );
         }
         $c->log->debug( 'Parameters are', $t->draw );
     }
@@ -616,7 +613,7 @@ sub setup_components {
     my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow( wrap( $_, 75 ) ) for keys %{ $self->components };
+    $t->addRow($_) for keys %{ $self->components };
     $self->log->debug( 'Loaded components', $t->draw )
       if ( @{ $t->{tbl_rows} } && $self->debug );
     $self->setup_actions( [ $self, @comps ] );

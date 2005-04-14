@@ -5,7 +5,6 @@ use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
 use Text::ASCIITable;
-use Text::ASCIITable::Wrap 'wrap';
 
 __PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
 
@@ -192,7 +191,7 @@ sub import {
     my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow( wrap( $_, 75 ) ) for @plugins;
+    $t->addRow($_) for @plugins;
     $caller->log->debug( 'Loaded plugins', $t->draw )
       if ( @plugins && $caller->debug );
 

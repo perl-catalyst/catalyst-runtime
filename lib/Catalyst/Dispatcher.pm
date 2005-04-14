@@ -4,7 +4,6 @@ use strict;
 use base 'Class::Data::Inheritable';
 use Memoize;
 use Text::ASCIITable;
-use Text::ASCIITable::Wrap 'wrap';
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 
@@ -115,14 +114,15 @@ sub forward {
     my $caller    = caller(0);
     my $namespace = '/';
     if ( $command =~ /^\// ) {
-        $command =~ /^\/(.*)\/(\w+)$/;
+        $command =~ /^(.*)\/(\w+)$/;
         $namespace = $1 || '/';
+        $namespace = s/^\/// if $namespace ne '/';
         $command = $2;
     }
     else { $namespace = _class2prefix($caller) || '/' }
     my $results = $c->get_action( $command, $namespace );
     unless ( @{$results} ) {
-        my $class = $command;
+        my $class = $command || '';
         if ( $class =~ /[^\w\:]/ ) {
             my $error = qq/Couldn't forward to "$class"/;
             $c->error($error);
@@ -135,7 +135,7 @@ sub forward {
             $results = [ [ [ $class, $code ] ] ];
         }
         else {
-            my $error = qq/Couldn't forward to "$class->$method"/;
+            my $error = qq/Couldn't forward to "$class"/;
             $c->error($error);
             $c->log->debug($error)
               if $c->debug;
@@ -346,8 +346,7 @@ sub setup_actions {
         my $uid = $parent->getUID;
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
             my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            $privates->addRow( wrap( "$prefix$action", 36 ),
-                wrap( $class, 37 ) );
+            $privates->addRow( "$prefix$action", $class, 37 );
         }
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
@@ -362,7 +361,7 @@ sub setup_actions {
         my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
         my $reverse = $self->actions->{reverse}->{$code};
         $reverse = $reverse ? "/$reverse" : $code;
-        $publics->addRow( wrap( "/$plain", 36 ), wrap( $reverse, 37 ) );
+        $publics->addRow( "/$plain", $reverse );
     }
     $self->log->debug( 'Loaded public actions', $publics->draw )
       if ( @{ $publics->{tbl_rows} } && $self->debug );
@@ -374,7 +373,7 @@ sub setup_actions {
         my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
         my $reverse = $self->actions->{reverse}->{$code};
         $reverse = $reverse ? "/$reverse" : $code;
-        $regexes->addRow( wrap( $regex, 36 ), wrap( $reverse, 37 ) );
+        $regexes->addRow( $regex, $reverse );
     }
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
