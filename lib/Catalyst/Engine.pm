@@ -624,8 +624,7 @@ sub setup_components {
 
     if ( my $error = $@ ) {
         chomp $error;
-        $self->log->error(
-            qq/Couldn't initialize "Module::Pluggable::Fast", "$error"/);
+        die qq/Couldn't load components "$error"/;
     }
 
     $self->components( {} );

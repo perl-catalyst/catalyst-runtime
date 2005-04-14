@@ -186,9 +186,7 @@ sub import {
 
             $plugin->require;
 
-            if ($@) {
-                $caller->log->error(qq/Couldn't load plugin "$plugin", "$@"/);
-            }
+            if ($@) { die qq/Couldn't load plugin "$plugin", "$@"/ }
             else {
                 push @plugins, $plugin;
                 no strict 'refs';
