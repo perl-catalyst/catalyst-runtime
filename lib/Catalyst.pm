@@ -156,7 +156,10 @@ sub import {
 
         require mod_perl;
 
-        if ( $mod_perl::VERSION >= 1.99 ) {
+        if ( $mod_perl::VERSION >= 1.999.22 ) {
+            $engine = 'Catalyst::Engine::Apache::MP20';
+        }
+        elsif ( $mod_perl::VERSION >= 1.99 ) {
             $engine = 'Catalyst::Engine::Apache::MP19';
         }
         else {
@@ -164,12 +167,14 @@ sub import {
         }
     }
 
-    $caller->log->info("You are running an old helper script! ".
-             "Please update your scripts by regenerating the ".
-             "application and copying over the new scripts.")
-        if ( $ENV{CATALYST_SCRIPT_GEN} && ( 
-             $ENV{CATALYST_SCRIPT_GEN} < 
-             $Catalyst::Helper::CATALYST_SCRIPT_GEN )) ;
+    $caller->log->info( "You are running an old helper script! "
+          . "Please update your scripts by regenerating the "
+          . "application and copying over the new scripts." )
+      if ( $ENV{CATALYST_SCRIPT_GEN}
+        && (
+            $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::Helper::CATALYST_SCRIPT_GEN )
+      );
+
     # Process options
     my @plugins;
     foreach (@options) {
