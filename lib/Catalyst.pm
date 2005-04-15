@@ -280,6 +280,10 @@ Mailing-Lists:
     http://lists.rawmode.org/mailman/listinfo/catalyst
     http://lists.rawmode.org/mailman/listinfo/catalyst-dev
 
+Web:
+
+    http://catalyst.perl.org
+
 =head1 SEE ALSO
 
 =over 4
