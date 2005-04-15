@@ -21,7 +21,7 @@ memoize('_class2prefix');
 
 =head1 NAME
 
-Catalyst::Dispatch - The Catalyst Dispatcher
+Catalyst::Dispatcher - The Catalyst Dispatcher
 
 =head1 SYNOPSIS
 
