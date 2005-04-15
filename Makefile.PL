@@ -32,7 +32,7 @@ WriteMakefile(
 );
 
 print( '*' x 80, "\n" );
-print( (qw/draven fordmason naughton sri the_jester/)[ int( rand(5) ) ],
+print( (qw/chansen draven fordmason naughton sri the_jester/)[ int( rand(6) ) ],
     " is the greatest and gabb is drunk again!\n" );
 print( '*' x 80, "\n" );
 
