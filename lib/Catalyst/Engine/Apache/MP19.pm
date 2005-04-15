@@ -19,7 +19,7 @@ Apache::Const->import( -compile => ':common' );
 
 =head1 NAME
 
-Catalyst::Engine::Apache::MP2 - Catalyst Apache MP2 Engine
+Catalyst::Engine::Apache::MP19 - Catalyst Apache MP19 Engine
 
 =head1 SYNOPSIS
 
