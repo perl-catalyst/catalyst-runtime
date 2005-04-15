@@ -250,6 +250,13 @@ man page.
 
 =back
 
+=head1 LIMITATIONS
+
+FCGI and mod_perl2 support are considered experimental and may contain bugs.
+
+You may encounter problems accessing the built in test server on public ip
+addresses on the internet, thats because of a bug in HTTP::Daemon.
+
 =head1 SUPPORT
 
 IRC:
