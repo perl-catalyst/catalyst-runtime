@@ -4,7 +4,7 @@ Catalyst::Manual::Intro - Introduction to Catalyst
 
 =head1 DESCRIPTION
 
-This is a brief overview of why and how to use Catalyst. It explains how Catalyst works and shows how to quickly get a simple application up and running.
+This is a brief overview of why and how to use Catalyst. It explains how Catalyst works and shows how to get a simple application up and running quickly.
 
 =head2 What is Catalyst?
 
@@ -12,9 +12,9 @@ Catalyst is an elegant web application framework, extremely flexible yet extreme
 
 =head3 MVC
 
-Catalyst follows the Model-View-Controller (MVC) design pattern, allowing you to easily separate concerns, like content, presentation and flow control, into separate modules. This separation allows you to modify code that handles one concern without affecting code that handles the others. Catalyst promotes re-use of existing Perl modules that already handle common web application concerns well.
+Catalyst follows the Model-View-Controller (MVC) design pattern, allowing you to easily separate concerns, like content, presentation, and flow control, into separate modules. This separation allows you to modify code that handles one concern without affecting code that handles the others. Catalyst promotes the re-use of existing Perl modules that already handle common web application concerns well.
 
-Here's how the M, V and C map to those concerns, with examples of well-known Perl modules you may want to use for each.
+Here's how the M, V, and C map to those concerns, with examples of well-known Perl modules you may want to use for each.
 
 =over 4
 
@@ -36,13 +36,13 @@ If you're unfamiliar with MVC and design patterns, you may want to check out the
 
 =head3 Flexibility
 
-Catalyst is much more flexible than many other frameworks. We'll talk more about this later, but rest assured you can use your favorite perl modules with Catalyst.
+Catalyst is much more flexible than many other frameworks. We'll talk more about this later, but rest assured you can use your favorite Perl modules with Catalyst.
 
 =over 4
 
-=item * B<Multiple Models, Views and Controllers>
+=item * B<Multiple Models, Views, and Controllers>
 
-To build a Catalyst application, you handle each type of concern inside special modules called L</Components>. Often this code will be very simple, just calling out to Perl modules like those listed above under L</MVC>. Catalyst handles these components in a very flexible way. Use as many Models, Views and Controllers as you like, using as many different Perl modules as you like, all in the same application. Want to manipulate multiple databases, and retrieve some data via LDAP? No problem. Want to present data from the same Model using L<Template Toolkit|Template> and L<PDF::Template>? Easy.
+To build a Catalyst application, you handle each type of concern inside special modules called L</Components>. Often this code will be very simple, just calling out to Perl modules like those listed above under L</MVC>. Catalyst handles these components in a very flexible way. Use as many Models, Views, and Controllers as you like, using as many different Perl modules as you like, all in the same application. Want to manipulate multiple databases, and retrieve some data via LDAP? No problem. Want to present data from the same Model using L<Template Toolkit|Template> and L<PDF::Template>? Easy.
 
 =item * B<Reuseable Components>
 
@@ -85,9 +85,9 @@ No need to C<use> all of your components. Catalyst automatically finds and loads
 
 See L<Catalyst::Model::CDBI> for L<Class::DBI>, or L<Catalyst::View::TT> for L<Template Toolkit|Template>. You can even get an instant web database front end with L<Catalyst::Model::CDBI::CRUD>.
 
-=item * B<Builtin Test Framework>
+=item * B<Built-in Test Framework>
 
-Catalyst comes with a builtin, lightweight http server and test framework, making it easy to test applications from the command line.
+Catalyst comes with a built-in, lightweight http server and test framework, making it easy to test applications from the command line.
 
 =item * B<Helper Scripts>
 
@@ -131,7 +131,7 @@ Let's see how Catalyst works, by taking a closer look at the components and othe
 
 =head3 Application Class
 
-In addition to the Model, View and Controller components, there's a single class that represents your application itself. This is where you configure your application, load plugins, define application-wide actions and extend Catalyst.
+In addition to the Model, View, and Controller components, there's a single class that represents your application itself. This is where you configure your application, load plugins, define application-wide actions and extend Catalyst.
 
     package MyApp;
 
@@ -163,7 +163,7 @@ Name of your application.
 
 =item * B<root>
 
-Path to additional files like templates, images or other static data.
+Path to additional files such as templates, images, or other static data.
 
 =back
 
@@ -189,7 +189,7 @@ The Context contains several important objects:
     $c->request
     $c->req # alias
 
-The request object contains all kinds of request-specific information, like query parameters, cookies, uploads, headers and more.
+The request object contains all kinds of request-specific information, like query parameters, cookies, uploads, headers, and more.
 
     $c->req->params->{foo};
     $c->req->cookies->{sessionid};
@@ -244,10 +244,9 @@ The last of these, the stash, is a universal hash for sharing data among applica
 
 =head3 Actions
 
-A Catalyst controller is defined by it's actions. An action is a sub 
-with a special attribute. You've already seen some example of actions
-
-in this document.
+A Catalyst controller is defined by its actions. An action is
+a sub with a special attribute. You've already seen some
+examples of actions in this document.
 
 Catalyst supports several types of actions:
 
@@ -265,9 +264,9 @@ Matches only http://localhost:3000/foo/bar.
 
 Matches any URL that matches the pattern in the action key, e.g. http://localhost:3000/foo23/bar42. The '' around the regexp is optional, but perltidy likes it. :)
 
-If you use capturing parantheses to extract values within the matching URL (23, 42 in the above example), those values are available in the $c->req->snippets array. If you want to pass arguments at the end of your URL, you must use regex action keys. See L</URL Argument Handling> below.
+If you use capturing parentheses to extract values within the matching URL (23, 42 in the above example), those values are available in the $c->req->snippets array. If you want to pass arguments at the end of your URL, you must use regex action keys. See L</URL Argument Handling> below.
 
-=item * B<Toplevel>
+=item * B<Top-level>
 
     package MyApp; 
     sub foo : Global { }
@@ -282,7 +281,7 @@ directly to the application base.
 
 Matches http://localhost:3000/my/controller/foo. 
 
-This action type indicates that the matching URL must be prefixed with a modified form of the component's class (package) name. This modified class name excludes the parts that have a pre-defined meaning in Catalyst ("MyApp::C" in the above example), replaces "::" with "/" and converts the name to lower case. See L</Components> for a full explanation of the pre-defined meaning of Catalyst component class names.
+This action type indicates that the matching URL must be prefixed with a modified form of the component's class (package) name. This modified class name excludes the parts that have a pre-defined meaning in Catalyst ("MyApp::C" in the above example), replaces "::" with "/", and converts the name to lower case. See L</Components> for a full explanation of the pre-defined meaning of Catalyst component class names.
 
 =item * B<Private>
 
@@ -296,12 +295,12 @@ See L</Flow Control> for a full explanation of C<forward>.
 
 =back
 
-B<Note> After seeing these examples, you probably wonder what the point is of defining names for regex and path actions. Actually, every public
-action is also a private one, so you have one unified way of addressing components in your forwards. 
+B<Note:> After seeing these examples, you probably wonder what the point is of defining names for regex and path actions. Actually, every public
+action is also a private one, so you have one unified way of addressing components in your C<forward>s.
 
-=head4 Builtin Private Actions
+=head4 Built-in Private Actions
 
-In response to specific application states, Catalyst will automatically call these built in private actions:
+In response to specific application states, Catalyst will automatically call these built-in private actions:
 
 =over 4
 
@@ -319,18 +318,18 @@ Called at the beginning of a request, before any matching actions are called.
 
 Called at the end of a request, after all matching actions are called.
 
-=head4 B<Builtin actions in controllers/autochaining>
+=head4 B<Built-in actions in controllers/autochaining>
 
     Package MyApp::C::Foo;
     sub begin : Private { }
     sub default : Private { }
 
-You can define the Builtin Private Actions within your controllers as 
+You can define the Built-in Private Actions within your controllers as 
 well. The actions will override the ones in lower level controllers/
 global.
 
-In addition to the normal builtins, you have a special action for 
-making inheritance chains, 'auto'. These will be run after begin, 
+In addition to the normal built-ins, you have a special action for 
+making inheritance chains, 'auto'. These will be run after C<begin>, 
 but before your action is processed.
 
 =over 4
@@ -367,7 +366,7 @@ false, it would look like this:
 
 =back
 
-I<Note:> auto actions have to return a true value to continue processing!
+B<Note:> auto actions have to return a true value to continue processing!
 You can also die in the autochain action, in that case,
 the request will go straight to the finalize stage, without processing
 further actions.
@@ -413,7 +412,7 @@ You control the application flow with the C<forward> method, which accepts the k
         $c->res->output( $c->stash->{message} );
     }
     
-As you can see from these examples, you can just use the method name as long as you are referring to methods in the same controller. If you want to forward to a method in another controller, or the main application, you will have to refer to the method by asbolute path.
+As you can see from these examples, you can just use the method name as long as you are referring to methods in the same controller. If you want to forward to a method in another controller, or the main application, you will have to refer to the method by absolute path.
 
   $c->forward('/my/controller/action');
   $c->forward('/default');
@@ -447,7 +446,7 @@ Catalyst will automatically try to call process() if you omit the method.
 
 =head3 Components
 
-Again, Catalyst has an uncommonly flexible component system. You can define as many L<Models>, L<Views> and L<Controllers> as you like.
+Catalyst has an uncommonly flexible component system. You can define as many L<Models>, L<Views>, and L<Controllers> as you like.
 
 All components must inherit from L<Catalyst::Base>, which provides a simple class structure and some common class methods like C<config> and C<new> (constructor).
 
@@ -460,7 +459,7 @@ All components must inherit from L<Catalyst::Base>, which provides a simple clas
 
     1;
 
-You don't have to C<use> or otherwise register Models, Views and Controllers. Catalyst automatically discovers and instantiates them when you call setup in the main application. All you need to do is put them in directories named for each Component type. Notice that you can use some very terse aliases for each one.
+You don't have to C<use> or otherwise register Models, Views, and Controllers. Catalyst automatically discovers and instantiates them when you call C<setup> in the main application. All you need to do is put them in directories named for each Component type. Notice that you can use some very terse aliases for each one.
 
 =over 4
 
@@ -501,9 +500,9 @@ This gives us a process() method and we can now just do $c->forward('MyApp::V::T
         $c->forward('MyApp::V::TT');
     }
 
-You normally render templates at the end of a request, so it's a perfect use for the global end action.
+You normally render templates at the end of a request, so it's a perfect use for the global C<end> action.
 
-Also, be sure to put the template under the directory specified in C<$c-E<gt>config->{root}>, or you'll be forced to look at our eyecandy debug screen. ;)
+Also, be sure to put the template under the directory specified in C<$c-E<gt>config-E<lt>{root}>, or you'll be forced to look at our eyecandy debug screen. ;)
 
 =head4 Models
 
@@ -573,13 +572,13 @@ Catalyst automatically loads table layouts and relationships. Use the stash to p
 
 =head4 Controllers
 
-Multiple Controllers are a good way to separate logical domains of your application.
+Multiple controllers are a good way to separate logical domains of your application.
 
     package MyApp::C::Login;
 
-    sign-in : Relative { }
-    new-password :Relative { }
-    sign-out : Relative { }
+    sign-in : Local { }
+    new-password : Local { }
+    sign-out : Local { }
 
     package MyApp::C::Catalog;
 
@@ -594,7 +593,7 @@ Multiple Controllers are a good way to separate logical domains of your applicat
 
 =head3 Testing
 
-Catalyst has a built in http server for testing! (Later, you can easily use a more powerful server, e.g. Apache/mod_perl, in a production environment).
+Catalyst has a built-in http server for testing! (Later, you can easily use a more powerful server, e.g. Apache/mod_perl, in a production environment.)
 
 Start your application on the command line...
 
@@ -614,7 +613,7 @@ IRC:
 
     Join #catalyst on irc.perl.org.
 
-Mailing-Lists:
+Mailing-lists:
 
     http://lists.rawmode.org/mailman/listinfo/catalyst
     http://lists.rawmode.org/mailman/listinfo/catalyst-dev
