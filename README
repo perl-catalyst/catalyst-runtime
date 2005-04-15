@@ -25,23 +25,19 @@ SYNOPSIS
 
         use Catalyst qw/-Debug -Engine=CGI/;
 
-        __PACKAGE__->action( '!default' => sub { $_[1]->res->output('Hello') } );
+        sub default : Private { $_[1]->res->output('Hello') } );
 
-        __PACKAGE__->action(
-            'index.html' => sub {
-                my ( $self, $c ) = @_;
-                $c->res->output('Hello');
-                $c->forward('_foo');
-            }
-        );
+        sub index : Path('/index.html') {
+            my ( $self, $c ) = @_;
+            $c->res->output('Hello');
+            $c->forward('_foo');
+        }
 
-        __PACKAGE__->action(
-            '/^product[_]*(\d*).html$/' => sub {
-                my ( $self, $c ) = @_;
-                $c->stash->{template} = 'product.tt';
-                $c->stash->{product} = $c->req->snippets->[0];
-            }
-        );
+        sub product : Regex('/^product[_]*(\d*).html$/') {
+            my ( $self, $c ) = @_;
+            $c->stash->{template} = 'product.tt';
+            $c->stash->{product} = $c->req->snippets->[0];
+        }
 
     See also Catalyst::Manual::Intro
 
@@ -53,38 +49,57 @@ DESCRIPTION
 
     See Catalyst::Manual for more documentation.
 
-    Omit the Catalyst::Plugin:: prefix from plugins. So
-    Catalyst::Plugin::My::Module becomes My::Module.
+    Catalyst plugins can be loaded by naming them as arguments to the "use
+    Catalyst" statement. Omit the "Catalyst::Plugin::" prefix from the
+    plugin name, so "Catalyst::Plugin::My::Module" becomes "My::Module".
 
         use Catalyst 'My::Module';
 
-    You can also set special flags like -Debug and -Engine.
+    Special flags like -Debug and -Engine can also be specifed as arguments
+    when Catalyst is loaded:
 
         use Catalyst qw/-Debug My::Module/;
 
     The position of plugins and flags in the chain is important, because
-    they are loaded in the same order they appear.
+    they are loaded in exactly the order that they appear.
 
-  -Debug
-        use Catalyst '-Debug';
+    The following flags are supported:
 
-    is equivalent to
+    -Debug
+        enables debug output, i.e.:
 
-        use Catalyst;
-        sub debug { 1 }
+            use Catalyst '-Debug';
 
-  -Engine
-    Force Catalyst to use a specific engine. Omit the Catalyst::Engine::
-    prefix.
+        this is equivalent to:
 
-        use Catalyst '-Engine=CGI';
+            use Catalyst;
+            sub debug { 1 }
 
-  METHODS
-   debug
-    Overload to enable debug messages.
+    -Engine
+        Force Catalyst to use a specific engine. Omit the
+        "Catalyst::Engine::" prefix of the engine name, i.e.:
 
-   config
-    Returns a hashref containing your applications settings.
+            use Catalyst '-Engine=CGI';
+
+METHODS
+    debug
+        Overload to enable debug messages.
+
+    config
+        Returns a hashref containing your applications settings.
+
+    $c->engine
+        Contains the engine class.
+
+    $c->log
+        Contains the logging object. Unless it is already set Catalyst sets
+        this up with a "Catalyst::Log" object. To use your own log class:
+
+            $c->log( MyLogger->new );
+            $c->log->info("now logging with my own logger!");
+
+        Your log class should implement the methods described in the
+        "Catalyst::Log" man page.
 
 SUPPORT
     IRC:
@@ -95,18 +110,23 @@ SUPPORT
 
         http://lists.rawmode.org/mailman/listinfo/catalyst
         http://lists.rawmode.org/mailman/listinfo/catalyst-dev
-    
+
 SEE ALSO
-    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
-    Catalyst::Engine
+    Catalyst::Manual - The Catalyst Manual
+    Catalyst::Engine - Core Engine
+    Catalyst::Log - The Log Class.
+    Catalyst::Request - The Request Object
+    Catalyst::Response - The Response Object
+    Catalyst::Test - The test suite.
 
 AUTHOR
     Sebastian Riedel, "sri@oook.de"
 
 THANK YOU
-    Andrew Ruthven, Danijel Milicevic, David Naughton, Gary Ashton Jones,
-    Jesse Sheidlower, Johan Lindstrom, Marcus Ramberg and all the others
-    who've helped.
+    Andrew Ford, Andrew Ruthven, Christian Hansen, Christopher Hicks, Dan
+    Sully, Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse
+    Sheidlower, Johan Lindstrom, Marcus Ramberg, Tatsuhiko Miyagawa and all
+    the others who've helped.
 
 LICENSE
     This library is free software . You can redistribute it and/or modify it
