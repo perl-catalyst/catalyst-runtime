@@ -3,7 +3,6 @@ package Catalyst::Engine::Apache::MP20;
 use strict;
 use base 'Catalyst::Engine::Apache';
 
-use Apache2              ();
 use Apache2::Connection  ();
 use Apache2::Const       ();
 use Apache2::RequestIO   ();
