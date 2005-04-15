@@ -20,20 +20,21 @@ sub global_action : Private {
 }
 
 sub execute {
-    my $c       = shift;
-    my $class   = ref( $c->component($_[0]) ) || $_[0];
-    my $action  = $c->actions->{reverse}->{"$_[1]"} || "$_[1]";
+    my $c      = shift;
+    my $class  = ref( $c->component( $_[0] ) ) || $_[0];
+    my $action = $c->actions->{reverse}->{"$_[1]"} || "$_[1]";
 
     my $method;
 
-    if ( $action =~ /->(\w+)$/ ) { 
-        $method = $1; 
+    if ( $action =~ /->(\w+)$/ ) {
+        $method = $1;
     }
-    elsif ( $action =~ /\/(\w+)$/ ) { 
-        $method = $1; 
+    elsif ( $action =~ /\/(\w+)$/ ) {
+        $method = $1;
     }
 
-    my $executed = sprintf( "%s->%s", $class, $method );
+    my $executed = sprintf( "%s->%s", $class, $method )
+      if ( $class && $method );
 
     $c->response->headers->push_header( 'X-Catalyst-Executed' => $executed );
     return $c->SUPER::execute(@_);
