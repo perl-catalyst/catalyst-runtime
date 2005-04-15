@@ -1,13 +1,16 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.00  XXX XXX XX XX:00:00 2005
-        - whole new core for private action inheritance
-        - whole new syntax for action declaration
+        - new core to support inheritance trees
+        - new syntax for action declaration
+        - new helper system using TT2
         - problems with mod_perl2 fixed
         - added Test::Pod support
         - added new server backend with HTTP/1.1 support
         - added option to run tests against a remote server
+        - renamed errors() to error()
         - more better docs
+        - countless minor improvements
           IMPORTANT: This release is very incompatible to previous ones
           and you have to regenerate the helper scripts again...
 
