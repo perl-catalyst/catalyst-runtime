@@ -156,7 +156,7 @@ sub import {
 
         require mod_perl;
 
-        if ( $mod_perl::VERSION >= 1.999.22 ) {
+        if ( $ENV{MOD_PERL_API_VERSION} == 2 ) {
             $engine = 'Catalyst::Engine::Apache::MP20';
         }
         elsif ( $mod_perl::VERSION >= 1.99 ) {
