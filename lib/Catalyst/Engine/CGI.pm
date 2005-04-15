@@ -119,18 +119,18 @@ sub prepare_parameters {
     
     my ( @params );
 
-    for my $param ( $c->cgi->param ) { 
-        for my $value (  $c->cgi->param($param) ) {
-            push ( @params, $param, $value );
-        }
-    }
-    
     for my $param ( $c->cgi->url_param ) { 
         for my $value (  $c->cgi->url_param($param) ) {
             push ( @params, $param, $value );
         }
     }
-    
+
+    for my $param ( $c->cgi->param ) { 
+        for my $value (  $c->cgi->param($param) ) {
+            push ( @params, $param, $value );
+        }
+    }
+ 
     $c->req->_assign_values( $c->req->parameters, \@params );
 }
 
