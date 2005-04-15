@@ -38,7 +38,7 @@ sub jojo : Relative {
 
 sub inheritance : Relative {
     my ( $self, $c ) = @_;
-    $c->forward('engine/response/cookies/one');
+    $c->forward('/action/inheritance/a/b/default');
     $c->forward('five');
 }
 
