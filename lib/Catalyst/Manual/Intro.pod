@@ -234,10 +234,10 @@ The last of these, the stash, is a universal hash for sharing data among applica
     sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{message} = 'Hello World!';
-        $c->forward('show-message');
+        $c->forward('show_message');
     }
 
-    sub show-message : Private {
+    sub show_message : Private {
         my ( $self, $c ) = @_;
         $c->res->output( $c->stash->{message} );
     }
@@ -399,16 +399,16 @@ You control the application flow with the C<forward> method, which accepts the k
     sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{message} = 'Hello World!';
-        $c->forward('check-message');
+        $c->forward('check_message');
     }
 
-    sub check-message : Private {
+    sub check_message : Private {
         my ( $self, $c ) = @_;
         return unless $c->stash->{message};
-        $c->forward('show-message');
+        $c->forward('show_message');
     }
 
-    sub show-message : Private {
+    sub show_message : Private {
         my ( $self, $c ) = @_;
         $c->res->output( $c->stash->{message} );
     }
