@@ -1,4 +1,4 @@
-package Catalyst::Engine::Apache::MP1;
+package Catalyst::Engine::Apache::MP13;
 
 use strict;
 use base 'Catalyst::Engine::Apache';

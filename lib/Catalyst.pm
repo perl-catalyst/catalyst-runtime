@@ -156,10 +156,10 @@ sub import {
         require mod_perl;
 
         if ( $mod_perl::VERSION >= 1.99 ) {
-            $engine = 'Catalyst::Engine::Apache::MP2';
+            $engine = 'Catalyst::Engine::Apache::MP19';
         }
         else {
-            $engine = 'Catalyst::Engine::Apache::MP1';
+            $engine = 'Catalyst::Engine::Apache::MP13';
         }
     }
 
