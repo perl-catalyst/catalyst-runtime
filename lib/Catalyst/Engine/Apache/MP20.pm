@@ -9,9 +9,9 @@ use Apache2::Const       ();
 use Apache2::RequestIO   ();
 use Apache2::RequestRec  ();
 use Apache2::RequestUtil ();
-use Apache::Request      ();
-use Apache::Cookie       ();
-use Apache::Upload       ();
+use Apache2::Request     ();
+use Apache2::Cookie      ();
+use Apache2::Upload      ();
 use Apache2::URI         ();
 use APR::URI             ();
 
