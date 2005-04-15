@@ -82,7 +82,7 @@ sub prepare_parameters {
 
 =cut
 
-# XXX needs fixing, only work with <Location> directive, 
+# XXX needs fixing, only work with <Location> directive,
 # not <Directory> directive
 sub prepare_path {
     my $c = shift;
@@ -105,7 +105,9 @@ sub prepare_path {
 
 sub prepare_request {
     my ( $c, $r ) = @_;
-    $c->apache( Apache::Request->new($r) );
+    $c->apache( $ENV{MOD_PERL_API_VERSION} == 2
+        ? Apache2::Request->new($r)
+        : Apache::Request->new($r) );
 }
 
 =item $c->run
