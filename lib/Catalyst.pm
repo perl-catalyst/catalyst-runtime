@@ -47,10 +47,10 @@ Catalyst - The Elegant MVC Web Application Framework
     sub index : Path('/index.html') {
         my ( $self, $c ) = @_;
         $c->res->output('Hello');
-        $c->forward('_foo');
+        $c->forward('foo');
     }
 
-    sub product : Regex('/^product[_]*(\d*).html$/') {
+    sub product : Regex('^product[_]*(\d*).html$') {
         my ( $self, $c ) = @_;
         $c->stash->{template} = 'product.tt';
         $c->stash->{product} = $c->req->snippets->[0];
