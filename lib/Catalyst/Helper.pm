@@ -8,6 +8,7 @@ use File::Path;
 use IO::File;
 use FindBin;
 use Template;
+our $CATALYST_SCRIPT_GEN = 2;
 
 my %cache;
 
@@ -58,6 +59,7 @@ sub mk_app {
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
     $self->{startperl} = $Config{startperl};
+    $self->{scriptgen}=$CATALYST_SCRIPT_GEN;
     $self->_mk_dirs;
     $self->_mk_appclass;
     $self->_mk_makefile;
@@ -535,7 +537,10 @@ the same terms as perl itself.
 __server__
 [% startperl %] -w
 
-BEGIN { $ENV{CATALYST_ENGINE} = 'HTTP' }
+BEGIN { 
+    $ENV{CATALYST_ENGINE} = 'HTTP';
+    $ENV{CATALYST_SCRIPT_GEN} = [% scriptgen %];
+}  
 
 use strict;
 use Getopt::Long;

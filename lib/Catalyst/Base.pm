@@ -95,7 +95,7 @@ sub config {
 
 =cut
 
-sub process { die __PACKAGE__." did not override process."; }
+sub process { die ((ref $_[0] || $_[0])." did not override Catalyst::Base::process"); }
 
 =back
 

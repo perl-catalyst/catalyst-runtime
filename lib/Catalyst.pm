@@ -4,6 +4,7 @@ use strict;
 use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
+use Catalyst::Helper;
 use Text::ASCIITable;
 
 __PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
@@ -133,7 +134,7 @@ sub import {
     }
 
     if ( $caller->engine ) {
-        return;    # Catalyst is allready initialized
+        return;    # Catalyst is already initialized
     }
 
     unless ( $caller->log ) {
@@ -163,6 +164,12 @@ sub import {
         }
     }
 
+    $caller->log->info("You are running an old helper script! ".
+             "Please update your scripts by regenerating the ".
+             "application and copying over the new scripts.")
+        if ( $ENV{CATALYST_SCRIPT_GEN} && ( 
+             $ENV{CATALYST_SCRIPT_GEN} < 
+             $Catalyst::Helper::CATALYST_SCRIPT_GEN )) ;
     # Process options
     my @plugins;
     foreach (@options) {

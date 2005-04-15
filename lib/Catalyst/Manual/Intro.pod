@@ -339,7 +339,7 @@ but before your action is processed.
 
   MyApp::begin
   MyApp::auto
-  MyApp::default
+  MyApp::C::Foo::default
   MyApp::end
 
 =item for a request for /foo/bar/foo
