@@ -367,7 +367,8 @@ false, it would look like this:
 
 =back
 
-I<Note:> You can also die in the autochain action, in that case,
+I<Note:> auto actions have to return a true value to continue processing!
+You can also die in the autochain action, in that case,
 the request will go straight to the finalize stage, without processing
 further actions.
 
