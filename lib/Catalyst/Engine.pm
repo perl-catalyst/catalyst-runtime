@@ -179,13 +179,13 @@ sub finalize {
         $c->finalize_error;
     }
 
-    if ( !$c->response->output && $c->response->status !~ /^(1|3)\d\d$/ ) {
+    if ( !$c->response->body && $c->response->status !~ /^(1|3)\d\d$/ ) {
         $c->finalize_error;
     }
 
-    if ( $c->response->output && !$c->response->content_length ) {
+    if ( $c->response->body && !$c->response->content_length ) {
         use bytes;    # play safe with a utf8 aware perl
-        $c->response->content_length( length $c->response->output );
+        $c->response->content_length( length $c->response->body );
     }
 
     my $status = $c->finalize_headers;
@@ -271,7 +271,7 @@ sub finalize_error {
 
         $name = '';
     }
-    $c->res->output( <<"" );
+    $c->res->body( <<"" );
 <html>
 <head>
     <title>$title</title>

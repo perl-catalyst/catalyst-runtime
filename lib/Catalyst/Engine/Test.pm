@@ -55,7 +55,7 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 sub finalize_body {
     my $c = shift;
-    $c->http->response->content( $c->response->output );
+    $c->http->response->content( $c->response->body );
 }
 
 =item $c->finalize_headers
@@ -78,7 +78,7 @@ sub finalize_headers {
 
 sub prepare_body {
     my $c = shift;
-    $c->request->input( $c->http->request->content );
+    $c->request->body( $c->http->request->content );
 }
 
 =item $c->prepare_connection

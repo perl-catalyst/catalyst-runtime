@@ -42,7 +42,7 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 sub finalize_body {
     my $c = shift;
-    $c->apache->print( $c->response->output );
+    $c->apache->print( $c->response->body );
 }
 
 =item $c->prepare_body
@@ -63,7 +63,7 @@ sub prepare_body {
         $content .= $buffer;
     }
     
-    $c->request->input($content);
+    $c->request->body($content);
 }
 
 =item $c->prepare_connection

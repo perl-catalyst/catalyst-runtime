@@ -4,11 +4,12 @@ use strict;
 use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments base cookies headers input hostname match 
+    qw/action address arguments body base cookies headers hostname match
       method parameters path snippets uploads/
 );
 
 *args   = \&arguments;
+*input  = \&body;
 *params = \&parameters;
 
 sub content_encoding { shift->headers->content_encoding(@_) }
@@ -110,7 +111,10 @@ Contains the url base. This will always have a trailing slash.
 
 =item $req->body
 
-Shortcut for $req->input.
+Contains the message body of the request unless Content-Type is
+C<application/x-www-form-urlencoded> or C<multipart/form-data>.
+
+    print $c->request->body
 
 =item $req->content_encoding
 
@@ -148,10 +152,7 @@ Contains the hostname of the remote user.
 
 =item $req->input
 
-Contains the message body of the request unless Content-Type is
-C<application/x-www-form-urlencoded> or C<multipart/form-data>.
-
-    print $c->request->input
+Shortcut for $req->body.
 
 =item $req->match
 

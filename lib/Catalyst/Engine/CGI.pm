@@ -92,7 +92,7 @@ sub prepare_body {
     # application/x-www-form-urlencoded or multipart/form-data
     # CGI.pm will read STDIN into a param, POSTDATA.
 
-    $c->request->input( $c->cgi->param('POSTDATA') );
+    $c->request->body( $c->cgi->param('POSTDATA') );
 }
 
 =item $c->prepare_connection

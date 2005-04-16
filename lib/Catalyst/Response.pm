@@ -3,7 +3,9 @@ package Catalyst::Response;
 use strict;
 use base 'Class::Accessor::Fast';
 
-__PACKAGE__->mk_accessors(qw/cookies headers output redirect status/);
+__PACKAGE__->mk_accessors(qw/cookies body headers redirect status/);
+
+*output = \&body;
 
 sub content_encoding { shift->headers->content_encoding(@_) }
 sub content_length   { shift->headers->content_length(@_)   }
@@ -39,9 +41,11 @@ to response data.
 
 =over 4
 
-=item $resp->body
+=item $resp->body($text)
 
-Shortcut for $resp->output.
+    $c->response->body('Catalyst rocks!');
+
+Contains the final output.
 
 =item $resp->content_encoding
 
@@ -71,11 +75,9 @@ Returns a L<HTTP::Headers> object containing the headers.
 
     $c->response->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
 
-=item $resp->output($text)
+=item $resp->output
 
-Contains the final output.
-
-    $c->response->output('Catalyst rocks!');
+Shortcut to $resp->body
 
 =item $resp->redirect($url)
 
