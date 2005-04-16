@@ -11,7 +11,7 @@ Yummy code like your mum used to bake!
 =head2 Force debug screen
 
 You can force Catalyst to display the debug screen at the end of the request by
-placing a die() call in the _end action.
+placing a C<die()> call in the C<end> action.
 
      sub end : Private {
          my ( $self, $c ) = @_;
@@ -19,7 +19,7 @@ placing a die() call in the _end action.
      }
 
 If you're tired of removing and adding this all the time, you
-can easily add a condition. for example:
+can easily add a condition. For example:
 
   die "Testing" if $c->param->{dump_info};
 
@@ -33,7 +33,7 @@ statistics in your debug messages.
 =head2 Scaffolding
 
 Scaffolding is very simple with Catalyst.
-Just use Catalyst::Model::CDBI::CRUD as baseclass.
+Just use Catalyst::Model::CDBI::CRUD as your base class.
 
     # lib/MyApp/Model/CDBI.pm
     package MyApp::Model::CDBI;
@@ -80,8 +80,7 @@ this:
       <input type="submit" value="Send">
     </form>
 
-It's very important not to forget enctype="multipart/form-data" in form, 
-if it's not there, uploads just don't work.
+It's very important not to forget C<enctype="multipart/form-data"> in form. Uploads will not work without this.
 
 Catalyst Controller module 'upload' action:
 
@@ -140,13 +139,13 @@ Controller:
         $c->stash->{template} = 'file_upload.html';
     }
 
-for my $field ($c->req->upload) loops automatically over all file input
+C<for my $field ($c-E<gt>req->upload)> loops automatically over all file input
 fields and gets input names. After that is basic file saving code, just like in
 single file upload.
 
-Notice: die'ing might not be what you want to do, when error occurs, but
-it works as an example. Better idea would be to store error $! in
-$c->stash->{error} and show custom error template displaying this message.
+Notice: C<die>ing might not be what you want to do, when an error occurs, but
+it works as an example. A better idea would be to store error C<$!> in
+$c->stash->{error} and show a custom error template displaying this message.
 
 For more information about uploads and usable methods look at
 C<Catalyst::Request::Upload> and C<Catalyst::Request>.
@@ -154,7 +153,7 @@ C<Catalyst::Request::Upload> and C<Catalyst::Request>.
 =head2 Authentication with Catalyst::Plugin::Authentication::CDBI
 
 There are (at least) two ways to implement authentication with this plugin:
-1) only checking username and password
+1) only checking username and password;
 2) checking username, password and the roles the user has
 
 For both variants you'll need the following code in your MyApp package:
@@ -167,26 +166,26 @@ For both variants you'll need the following code in your MyApp package:
 
 'user_class' is a Class::DBI class for your users table.
 'user_field' tells which field is used for username lookup (might be 
-email, first name, surname etc).
+email, first name, surname etc.).
 'password_field' is, well, password field in your table and by default 
 password is stored in plain text. Authentication::CDBI looks for 'user' 
 and 'password' fields in table, if they're not defined in the config.
 
-In PostgreSQL users table might be something like:
+In PostgreSQL, the users table might be something like:
 
-CREATE TABLE users (
-  user_id   serial,
-  name      varchar(100),
-  surname   varchar(100),
-  password  varchar(100),
-  email     varchar(100),
-  primary key(user_id)
-);
+ CREATE TABLE users (
+   user_id   serial,
+   name      varchar(100),
+   surname   varchar(100),
+   password  varchar(100),
+   email     varchar(100),
+   primary key(user_id)
+ );
 
 We'll discuss the first variant for now:
-1. user:password login / auth without roles
+1. user:password login/auth without roles
 
-To log in a user you might use a action like this:
+To log in a user you might use an action like this:
 
     sub 'login' : Local {
         my ($self, $c) = @_;
@@ -203,19 +202,18 @@ $c->req->params->{username} and $c->req->params->{password} are html
 form parameters from a login form. If login succeeds, then 
 $c->req->{user} contains the username of the authenticated user.
 
-If you want to remember the users login status inbetween further 
-requests, then just use the $c->session_login method, Catalyst will 
-create a session id, session cookie and automatically append session 
-id to all urls. So all you have to do, is just check $c->req->{user} 
+If you want to remember the user's login status in between further 
+requests, then just use the C<$c-E<gt>session_login> method. Catalyst will 
+create a session id and session cookie and automatically append session 
+id to all urls. So all you have to do is just check $c->req->{user} 
 where needed.
 
-To log out user, just call $c->session_logout.
+To log out a user, just call $c->session_logout.
 
-Now lets take a look at the second variant:
-2. user:password login / auth with roles
+Now let's take a look at the second variant:
+2. user:password login/auth with roles
 
-To use roles you need to add to MyApp->config in the 'authentication' 
-section following parameters:
+To use roles you need to add the following parameters to  MyApp->config in the 'authentication' section:
 
     role_class      => 'MyApp::M::MyApp::Roles',
     user_role_class => 'MyApp::M::MyApp::UserRoles',
@@ -224,26 +222,26 @@ section following parameters:
 
 Corresponding tables in PostgreSQL could look like this:
 
-CREATE TABLE roles (
-  role_id  serial,
-  name     varchar(100),
-  primary key(role_id)
-);
+ CREATE TABLE roles (
+   role_id  serial,
+   name     varchar(100),
+   primary key(role_id)
+ );
 
-CREATE TABLE user_roles (
-  user_role_id  serial,
-  user_id       int,
-  role_id       int,
-  primary key(user_role_id),
-  foreign key(user_id) references users(user_id),
-  foreign key(role_id) references roles(role_id)
-);
+ CREATE TABLE user_roles (
+   user_role_id  serial,
+   user_id       int,
+   role_id       int,
+   primary key(user_role_id),
+   foreign key(user_id) references users(user_id),
+   foreign key(role_id) references roles(role_id)
+ );
 
 The 'roles' table is a list of role names and the 'user_role' table is 
 used for the user -> role lookup.
 
-Now if a logged in user wants to see a location which is allowed only 
-for people with 'admin' role then in you controller you can check it 
+Now if a logged-in user wants to see a location which is allowed only 
+for people with an 'admin' role, in your controller you can check it 
 with:
 
     sub add : Local {
@@ -251,14 +249,14 @@ with:
         if ($c->roles(qw/admin/)) {
             $c->req->output("Your account has the role 'admin.'");
         } else {
-            $c->req->output("You're not allowed to be here");
+            $c->req->output("You're not allowed to be here.");
         }
     }
 
-One thing you might need is to forward non-authenticated users to login 
-form, if they try to access restricted areas. If you want to do this 
-controller-wide (if you have one controller for admin section) then it's 
-best to add user check to '!begin' action:
+One thing you might need is to forward non-authenticated users to a login 
+form if they try to access restricted areas. If you want to do this 
+controller-wide (if you have one controller for your admin section) then it's 
+best to add a user check to a '!begin' action:
 
     sub begin : Private {
         my ($self, $c) = @_;
@@ -268,22 +266,22 @@ best to add user check to '!begin' action:
         }
     }
 
-Pay attention to $c->req->action(undef). This is needed, because of the 
-way $c->forward works - forward to login gets called, but after that 
-Catalyst executes anyway the action defined in the uri (eg. if you 
-tried to watch /add, then first 'begin' forwards to 'login', but after
-that anyway 'add' is executed). So $c->req->action(undef) undefines any 
-actions that were to be called and forwards user where we want him/her 
+Pay attention to $c->req->action(undef). This is needed because of the 
+way $c->forward works - C<forward> to C<login> gets called, but after that 
+Catalyst will still execute the action defined in the URI (e.g. if you 
+tried to go to C</add>, then first 'begin' will forward to 'login', but after
+that 'add' will nonetheless be executed). So $c->req->action(undef) undefines any 
+actions that were to be called and forwards the user where we want him/her 
 to be.
 
-And this is all you need to do, isn't Catalyst wonderful?
+And this is all you need to do. 
 
 
 =head2 How to use Catalyst without mod_perl
 
 Catalyst applications give optimum performance when run under mod_perl.
 However sometimes mod_perl is not an option, and running under CGI is 
-just too slow.  There's also an alternatives to mod_perl that gives
+just too slow.  There's also an alternative to mod_perl that gives
 reasonable performance named FastCGI.
 
 B<Using FastCGI>
@@ -310,7 +308,7 @@ it is done - and it also works as a normal, single-shot CGI script.
 Any initialization code should be included outside the request-accept 
 loop.
 
-There is one little complication, which is that C<MyApp->run> outputs a
+There is one little complication, which is that C<MyApp-E<gt>run> outputs a
 complete HTTP response including the status line (e.g.: 
 "C<HTTP/1.1 200>").
 FastCGI just wants a set of headers, so the sample code captures the 
@@ -336,7 +334,7 @@ or:
 
 C<mod_fastcgi> provides a number of options for controlling the FastCGI
 scripts spawned; it also allows scripts to be run to handle the
-authentication, authorization and access check phases.
+authentication, authorization, and access check phases.
 
 For more information see the FastCGI documentation, the C<FCGI> module 
 and L<http://www.fastcgi.com/>.
