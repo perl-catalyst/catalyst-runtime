@@ -17,6 +17,7 @@ Catalyst::Response - Catalyst Response Class
 =head1 SYNOPSIS
 
     $resp = $c->response;
+    $resp->body;
     $resp->content_encoding;
     $resp->content_length;
     $resp->content_type;
@@ -37,6 +38,10 @@ to response data.
 =head1 METHODS
 
 =over 4
+
+=item $resp->body
+
+Shortcut for $resp->output.
 
 =item $resp->content_encoding
 

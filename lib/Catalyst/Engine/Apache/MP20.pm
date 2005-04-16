@@ -93,6 +93,15 @@ sub prepare_uploads {
     $c->req->_assign_values( $c->req->uploads, \@uploads );
 }
 
+=item $c->prepare_request($r)
+
+=cut
+
+sub prepare_request {
+    my ( $c, $r ) = @_;
+    $c->apache( Apache2::Request->new($r) );
+}
+
 =back
 
 =head1 SEE ALSO

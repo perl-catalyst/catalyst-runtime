@@ -26,6 +26,9 @@ __PACKAGE__->mk_accessors(qw/request response state/);
 *req  = \&request;
 *res  = \&response;
 
+# For backwards compatibility
+*finalize_output = \&finalize_body;
+
 # For statistics
 our $COUNT = 1;
 our $START = time;
@@ -186,9 +189,17 @@ sub finalize {
     }
 
     my $status = $c->finalize_headers;
-    $c->finalize_output;
+    $c->finalize_body;
     return $status;
 }
+
+=item $c->finalize_body
+
+Finalize body.
+
+=cut
+
+sub finalize_body { }
 
 =item $c->finalize_cookies
 
@@ -324,14 +335,6 @@ Finalize headers.
 
 sub finalize_headers { }
 
-=item $c->finalize_output
-
-Finalize output.
-
-=cut
-
-sub finalize_output { }
-
 =item $c->handler( $class, $r )
 
 Handles the request.
@@ -420,19 +423,35 @@ sub prepare {
     $c->prepare_request($r);
     $c->prepare_path;
     $c->prepare_headers;
-    $c->prepare_input;
     $c->prepare_cookies;
     $c->prepare_connection;
+    $c->prepare_action;
 
     my $method   = $c->req->method   || '';
     my $path     = $c->req->path     || '';
     my $hostname = $c->req->hostname || '';
     my $address  = $c->req->address  || '';
+
     $c->log->debug(qq/"$method" request for "$path" from $hostname($address)/)
       if $c->debug;
 
-    $c->prepare_action;
-    $c->prepare_parameters;
+    if ( $c->request->method eq 'POST' and $c->request->content_length ) {
+
+        if ( $c->req->content_type eq 'application/x-www-form-urlencoded' ) {
+            $c->prepare_parameters;
+        }
+        elsif ( $c->req->content_type eq 'multipart/form-data' ) {
+            $c->prepare_parameters;
+            $c->prepare_uploads;
+        }
+        else {
+            $c->prepare_body;
+        }
+    }
+
+    if ( $c->request->method eq 'GET' ) {
+        $c->prepare_parameters;
+    }
 
     if ( $c->debug && keys %{ $c->req->params } ) {
         my $t = Text::ASCIITable->new;
@@ -446,7 +465,6 @@ sub prepare {
         $c->log->debug( 'Parameters are', $t->draw );
     }
 
-    $c->prepare_uploads;
     return $c;
 }
 
@@ -500,6 +518,14 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
+=item $c->prepare_body
+
+Prepare message body.
+
+=cut
+
+sub prepare_body { }
+
 =item $c->prepare_connection
 
 Prepare connection.
@@ -533,14 +559,6 @@ sub prepare_headers { }
 =item $c->prepare_parameters
 
 Prepare parameters.
-
-=cut
-
-sub prepare_input { }
-
-=item $c->prepare_input
-
-Prepare message body.
 
 =cut
 

@@ -49,6 +49,15 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 =over 4
 
+=item $c->finalize_body
+
+=cut
+
+sub finalize_body {
+    my $c = shift;
+    $c->http->response->content( $c->response->output );
+}
+
 =item $c->finalize_headers
 
 =cut
@@ -63,13 +72,13 @@ sub finalize_headers {
     }
 }
 
-=item $c->finalize_output
+=item $c->prepare_body
 
 =cut
 
-sub finalize_output {
+sub prepare_body {
     my $c = shift;
-    $c->http->response->content( $c->response->output );
+    $c->request->input( $c->http->request->content );
 }
 
 =item $c->prepare_connection
@@ -80,22 +89,6 @@ sub prepare_connection {
     my $c = shift;
     $c->req->hostname( $c->http->hostname );
     $c->req->address( $c->http->address );
-}
-
-=item $c->prepare_input
-
-=cut
-
-sub prepare_input {
-    my $c = shift;
- 
-    return unless 
-            $c->request->content_length
-        and $c->request->content_type
-        and $c->request->content_type ne 'application/x-www-form-urlencoded'
-        and $c->request->content_type ne 'multipart/form-data';
-
-    $c->request->input( $c->http->request->content );
 }
 
 =item $c->prepare_headers

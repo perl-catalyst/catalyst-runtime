@@ -42,6 +42,7 @@ t/component/controller/action/local.t
 t/component/controller/action/path.t
 t/component/controller/action/private.t
 t/component/controller/action/regexp.t
+t/engine/request/body.t
 t/engine/request/cookies.t
 t/engine/request/headers.t
 t/engine/request/parameters.t

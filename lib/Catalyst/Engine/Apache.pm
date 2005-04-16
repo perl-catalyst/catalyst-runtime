@@ -36,13 +36,34 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 =over 4
 
-=item $c->finalize_output
+=item $c->finalize_body
 
 =cut
 
-sub finalize_output {
+sub finalize_body {
     my $c = shift;
     $c->apache->print( $c->response->output );
+}
+
+=item $c->prepare_body
+
+=cut
+
+sub prepare_body {
+    my $c = shift;
+
+    my $length = $c->request->content_length;
+    my ( $buffer, $content );
+
+    while ($length) {
+
+        $c->apache->read( $buffer, ( $length < 8192 ) ? $length : 8192 );
+
+        $length  -= length($buffer);
+        $content .= $buffer;
+    }
+    
+    $c->request->input($content);
 }
 
 =item $c->prepare_connection
@@ -97,17 +118,6 @@ sub prepare_path {
     my $path = $c->apache->location;
     $base->path( $path =~ /\/$/ ? $path : "$path/" );
     $c->request->base( $base->as_string );
-}
-
-=item $c->prepare_request($r)
-
-=cut
-
-sub prepare_request {
-    my ( $c, $r ) = @_;
-    $c->apache( $ENV{MOD_PERL_API_VERSION} == 2
-        ? Apache2::Request->new($r)
-        : Apache::Request->new($r) );
 }
 
 =item $c->run

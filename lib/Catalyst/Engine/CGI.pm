@@ -57,6 +57,17 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 =over 4
 
+=item $c->finalize_body
+
+Prints the response output to STDOUT.
+
+=cut
+
+sub finalize_body {
+    my $c = shift;
+    print $c->response->output;
+}
+
 =item $c->finalize_headers
 
 =cut
@@ -70,15 +81,18 @@ sub finalize_headers {
     print "\015\012";
 }
 
-=item $c->finalize_output
-
-Prints the response output to STDOUT.
+=item $c->prepare_body
 
 =cut
 
-sub finalize_output {
+sub prepare_body {
     my $c = shift;
-    print $c->response->output;
+
+    # XXX this is undocumented in CGI.pm. If Content-Type is not
+    # application/x-www-form-urlencoded or multipart/form-data
+    # CGI.pm will read STDIN into a param, POSTDATA.
+
+    $c->request->input( $c->cgi->param('POSTDATA') );
 }
 
 =item $c->prepare_connection

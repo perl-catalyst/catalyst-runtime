@@ -29,7 +29,7 @@ use HTTP::Request::Common;
 
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' ); 
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
     
     {

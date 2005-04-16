@@ -48,6 +48,7 @@ Catalyst::Request - Catalyst Request Class
     $req->args;
     $req->arguments;
     $req->base;
+    $req->body;
     $req->content_encoding;
     $req->content_length;
     $req->content_type;
@@ -106,6 +107,10 @@ Returns a reference to an array containing the arguments.
 =item $req->base
 
 Contains the url base. This will always have a trailing slash.
+
+=item $req->body
+
+Shortcut for $req->input.
 
 =item $req->content_encoding
 

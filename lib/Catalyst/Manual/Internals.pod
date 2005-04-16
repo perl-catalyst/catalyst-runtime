@@ -52,16 +52,17 @@ extend Catalyst.
       prepare
         prepare_request
         prepare_path
-        prepare_cookies
         prepare_headers
+        prepare_cookies
         prepare_connection
         prepare_action
+        prepare_body
         prepare_parameters
         prepare_uploads
       process
       finalize
         finalize_headers
-        finalize_output
+        finalize_body
 
 These steps are normally overloaded from engine classes, and may also be
 extended by plugins.  Extending means using multiple inheritance with L<NEXT>.
