@@ -29,10 +29,11 @@ use URI;
 
     # Query string. I'm not sure the order is consistent in all enviroments,
     # we need to test this with:
-    # [x] C::E::Test and C::E::Daemon
-    # [ ] MP1
-    # [ ] MP2
-    # [x] CGI::Simple
+    # [x] C::E::Test and C::E::HTTP
+    # [x] MP13
+    # [x] MP19
+    # [x] MP20
+    # [x] CGI
 
     unshift( @{ $parameters->{a} }, 1, 2, 3 );
     

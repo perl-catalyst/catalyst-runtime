@@ -1,3 +1,4 @@
+ [x] /engine/request/body.t
  [x] /engine/request/cookies.t
  [x] /engine/request/headers.t
  [ ] /engine/request/method/get.t
@@ -6,7 +7,7 @@
  [ ] /engine/request/method/post/urlencoded.t
  [x] /engine/request/parameters.t
  [ ] /engine/request/unicode.t
- [~] /engine/request/uploads.t
+ [x] /engine/request/uploads.t
 
  [x] /engine/response/cookies.t
  [x] /engine/response/errors.t
@@ -23,17 +24,18 @@
  [ ] /view/subclass.t
  [ ] /view/unicode.t
 
- [ ] /controller/action/absolute.t
- [ ] /controller/action/arguments.t
- [ ] /controller/action/begin.t
- [ ] /controller/action/default.t
- [ ] /controller/action/end.t
- [ ] /controller/action/forward.t
- [ ] /controller/action/inheritance.t
- [ ] /controller/acrion/private.t
- [ ] /controller/action/public.t
- [ ] /controller/action/regexp.t
- [ ] /controller/action/relative.t
+ [ ] /component/controller/action/arguments.t
+ [~] /component/controller/action/begin.t
+ [~] /component/controller/action/default.t
+ [~] /component/controller/action/end.t
+ [~] /component/controller/action/forward.t
+ [~] /component/controller/action/global.t
+ [~] /component/controller/action/inheritance.t
+ [~] /component/controller/action/local.t
+ [~] /component/controller/action/path.t
+ [~] /component/controller/acrion/private.t
+ [ ] /component/controller/action/public.t
+ [~] /component/controller/action/regexp.t
 
  [ ] /plugin/overload/finalize.t
  [ ] /plugin/overload/finalize_output.t

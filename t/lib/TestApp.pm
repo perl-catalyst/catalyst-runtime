@@ -2,6 +2,7 @@ package TestApp;
 
 use strict;
 use Catalyst qw[Test::Errors Test::Headers];
+use Catalyst::Utils;
 
 our $VERSION = '0.01';
 
@@ -33,10 +34,11 @@ sub execute {
         $method = $1;
     }
 
-    my $executed = sprintf( "%s->%s", $class, $method )
-      if ( $class && $method );
-
-    $c->response->headers->push_header( 'X-Catalyst-Executed' => $executed );
+    if ( $class && $method ) {
+        my $executed = sprintf( "%s->%s", $class, $method );
+        $c->response->headers->push_header( 'X-Catalyst-Executed' => $executed );
+    }
+    
     return $c->SUPER::execute(@_);
 }
 
