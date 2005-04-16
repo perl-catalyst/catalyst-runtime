@@ -16,7 +16,7 @@ sub MODIFY_CODE_ATTRIBUTES {
     return ();
 }
 
-sub FETCH_CODE_ATTTRIBUTES { $_[0]->_attrcache->{ $_[1] } || () }
+sub FETCH_CODE_ATTRIBUTES { $_[0]->_attrcache->{ $_[1] } || () }
 
 =head1 NAME
 
