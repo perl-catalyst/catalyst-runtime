@@ -2,6 +2,7 @@ package Catalyst::Engine;
 
 use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
+use attributes ();
 use UNIVERSAL::require;
 use CGI::Cookie;
 use Data::Dumper;
@@ -667,6 +668,9 @@ sub stash {
     }
     return $self->{stash};
 }
+
+# Takes a coderef and returns an arrayref containing attributes
+sub _get_attrs { attributes::get( $_[0] ) || [] }
 
 =back
 

@@ -4,15 +4,19 @@ use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
 use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_cache _config/;
+__PACKAGE__->mk_classdata($_) for qw/_attrcache _cache _config/;
 __PACKAGE__->_cache( [] );
+__PACKAGE__->_attrchache( {} );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {
     my ( $class, $code, @attrs ) = @_;
+    $class->_attrcache->{$code} = [@attrs];
     push @{ $class->_cache }, [ $code, [@attrs] ];
     return ();
 }
+
+sub FETCH_CODE_ATTTRIBUTES { $_[0]->_attrcache->{ $_[1] } || () }
 
 =head1 NAME
 
@@ -95,7 +99,9 @@ sub config {
 
 =cut
 
-sub process { die ((ref $_[0] || $_[0])." did not override Catalyst::Base::process"); }
+sub process {
+    die( ( ref $_[0] || $_[0] ) . " did not override Catalyst::Base::process" );
+}
 
 =back
 
