@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.01  XXX Apr XX XX:00:00 2005
+        - some documentation bugs fixed
+
 5.00  Fri Apr 15 18:00:00 2005
         - new core to support inheritance trees
         - new syntax for action declaration
