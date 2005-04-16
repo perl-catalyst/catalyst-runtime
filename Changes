@@ -7,6 +7,8 @@ This file documents the revision history for Perl extension Catalyst.
         - fixed upload bug with MP19
         - added $c->req->body
         - aliased $c->res->output to $c->res->body
+        - Read AUTHOR from passwd or $ENV{AUTHOR} when 
+          generating code.
 
 5.00  Fri Apr 15 18:00:00 2005
         - new core to support inheritance trees

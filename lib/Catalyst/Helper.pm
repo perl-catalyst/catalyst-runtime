@@ -62,6 +62,8 @@ sub mk_app {
     $self->{dir} =~ s/\:\:/-/g;
     $self->{startperl} = $Config{startperl};
     $self->{scriptgen}=$CATALYST_SCRIPT_GEN;
+    $self->{author}=$self->{author} = $ENV{'AUTHOR'} ||
+                    @{[getpwuid($<)]}[6];
     $self->_mk_dirs;
     $self->_mk_appclass;
     $self->_mk_makefile;
@@ -87,6 +89,8 @@ sub mk_component {
     my $self = shift;
     my $app  = shift;
     $self->{app} = $app;
+    $self->{author}=$self->{author} = $ENV{'AUTHOR'} ||
+                    @{[getpwuid($<)]}[6];
     $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
     unless ( $_[0] =~ /^model|m|view|v|controller|c\$/i ) {
         my $helper = shift;
@@ -360,6 +364,11 @@ All helper classes should be under one of the following namespaces.
     Catalyst::Helper::View::
     Catalyst::Helper::Controller::
 
+=head1 NOTE
+
+The helpers will read author name from /etc/passwd by default.
+To override, please export the AUTHOR variable.
+
 =head1 SEE ALSO
 
 L<Catalyst::Manual>, L<Catalyst::Test>, L<Catalyst::Request>,
@@ -413,7 +422,7 @@ Very nice application.
 
 =head1 AUTHOR
 
-Clever guy
+[%author%]
 
 =head1 LICENSE
 
@@ -749,7 +758,7 @@ Very nice component.
 
 =head1 AUTHOR
 
-Clever guy
+[%author%]
 
 =head1 LICENSE
 
