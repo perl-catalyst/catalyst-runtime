@@ -2,7 +2,7 @@ package Catalyst::Dispatcher;
 
 use strict;
 use base 'Class::Data::Inheritable';
-use Memoize;
+use Catalyst::Utils;
 use Text::ASCIITable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
@@ -16,8 +16,6 @@ __PACKAGE__->actions(
 
 # We use a tree
 __PACKAGE__->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
-
-memoize('_class2prefix');
 
 =head1 NAME
 
@@ -48,7 +46,8 @@ sub dispatch {
 
     unless ($namespace) {
         if ( my $result = $c->get_action($action) ) {
-            $namespace = _class2prefix( $result->[0]->[0]->[0] );
+            $namespace =
+              Catalyst::Utils::class2prefix( $result->[0]->[0]->[0] );
         }
     }
 
@@ -130,7 +129,7 @@ sub forward {
         $command =~ s/^\///;
     }
 
-    else { $namespace = _class2prefix($caller) || '/' }
+    else { $namespace = Catalyst::Utils::class2prefix($caller) || '/' }
 
     my $results = $c->get_action( $command, $namespace );
 
@@ -260,7 +259,7 @@ Set an action in a given namespace.
 sub set_action {
     my ( $c, $method, $code, $namespace, $attrs ) = @_;
 
-    my $prefix = _class2prefix($namespace) || '';
+    my $prefix = Catalyst::Utils::class2prefix($namespace) || '';
     my %flags;
 
     for my $attr ( @{$attrs} ) {
@@ -440,23 +439,6 @@ sub setup_actions {
 
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } && $self->debug );
-}
-
-sub _prefix {
-    my ( $class, $name ) = @_;
-    my $prefix = _class2prefix($class);
-    $name = "$prefix/$name" if $prefix;
-    return $name;
-}
-
-sub _class2prefix {
-    my $class = shift || '';
-    my $prefix;
-    if ( $class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/ ) {
-        $prefix = lc $2;
-        $prefix =~ s/\:\:/\//g;
-    }
-    return $prefix;
 }
 
 =back

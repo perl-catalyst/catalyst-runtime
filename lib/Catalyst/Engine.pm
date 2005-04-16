@@ -678,9 +678,6 @@ sub stash {
     return $self->{stash};
 }
 
-# Takes a coderef and returns an arrayref containing attributes
-sub _get_attrs { attributes::get( $_[0] ) || [] }
-
 =back
 
 =head1 AUTHOR
