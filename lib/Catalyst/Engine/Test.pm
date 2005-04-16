@@ -82,6 +82,22 @@ sub prepare_connection {
     $c->req->address( $c->http->address );
 }
 
+=item $c->prepare_input
+
+=cut
+
+sub prepare_input {
+    my $c = shift;
+ 
+    return unless 
+            $c->request->content_length
+        and $c->request->content_type
+        and $c->request->content_type ne 'application/x-www-form-urlencoded'
+        and $c->request->content_type ne 'multipart/form-data';
+
+    $c->request->input( $c->http->request->content );
+}
+
 =item $c->prepare_headers
 
 =cut
@@ -130,7 +146,7 @@ sub prepare_parameters {
                     tempname => $fh->filename,
                     type     => $part->content_type
                 );
-                
+
                 $fh->close;
 
                 push( @uploads, $parameters{name}, $upload );
@@ -141,7 +157,7 @@ sub prepare_parameters {
             }
         }
     }
-    
+
     $c->req->_assign_values( $c->req->parameters, \@params );
     $c->req->_assign_values( $c->req->uploads, \@uploads );
 }

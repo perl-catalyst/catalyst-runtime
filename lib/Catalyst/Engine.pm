@@ -420,6 +420,7 @@ sub prepare {
     $c->prepare_request($r);
     $c->prepare_path;
     $c->prepare_headers;
+    $c->prepare_input;
     $c->prepare_cookies;
     $c->prepare_connection;
 
@@ -532,6 +533,14 @@ sub prepare_headers { }
 =item $c->prepare_parameters
 
 Prepare parameters.
+
+=cut
+
+sub prepare_input { }
+
+=item $c->prepare_input
+
+Prepare message body.
 
 =cut
 

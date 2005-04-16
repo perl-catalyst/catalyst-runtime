@@ -4,8 +4,8 @@ use strict;
 use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments base cookies headers hostname match method
-      parameters path snippets uploads/
+    qw/action address arguments base cookies headers input hostname match 
+      method parameters path snippets uploads/
 );
 
 *args   = \&arguments;
@@ -55,6 +55,7 @@ Catalyst::Request - Catalyst Request Class
     $req->header;
     $req->headers;
     $req->hostname;
+    $req->input;
     $req->match;
     $req->method;
     $req->param;
@@ -139,6 +140,13 @@ Returns an L<HTTP::Headers> object containing the headers.
 Contains the hostname of the remote user.
 
     print $c->request->hostname
+
+=item $req->input
+
+Contains the message body of the request unless Content-Type is
+C<application/x-www-form-urlencoded> or C<multipart/form-data>.
+
+    print $c->request->input
 
 =item $req->match
 
