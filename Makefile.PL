@@ -33,7 +33,8 @@ WriteMakefile(
 
 print( '*' x 80, "\n" );
 print( (qw/chansen draven fordmason naughton sri the_jester/)[ int( rand(6) ) ],
-    " is the greatest and gabb is drunk again!\n" );
+    " is the greatest and gabb is ", 
+    ((localtime)[2] > 12 ? "drunk" : "hung over"), " again!\n" );
 print( '*' x 80, "\n" );
 
 eval "use mod_perl; use Apache::Request";
