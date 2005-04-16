@@ -216,19 +216,6 @@ sub import {
     $caller->log->debug( 'Loaded plugins', $t->draw )
       if ( @plugins && $caller->debug );
 
-    # Engine
-    $engine = "Catalyst::Engine::$ENV{CATALYST_ENGINE}"
-      if $ENV{CATALYST_ENGINE};
-
-    $engine->require;
-    die qq/Couldn't load engine "$engine", "$@"/ if $@;
-    {
-        no strict 'refs';
-        push @{"$caller\::ISA"}, $engine;
-    }
-    $caller->engine($engine);
-    $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
-
     # Dispatcher
     $dispatcher = "Catalyst::Dispatcher::$ENV{CATALYST_DISPATCHER}"
       if $ENV{CATALYST_DISPATCHER};
@@ -242,6 +229,18 @@ sub import {
     $caller->dispatcher($dispatcher);
     $caller->log->debug(qq/Loaded dispatcher "$dispatcher"/) if $caller->debug;
 
+    # Engine
+    $engine = "Catalyst::Engine::$ENV{CATALYST_ENGINE}"
+      if $ENV{CATALYST_ENGINE};
+
+    $engine->require;
+    die qq/Couldn't load engine "$engine", "$@"/ if $@;
+    {
+        no strict 'refs';
+        push @{"$caller\::ISA"}, $engine;
+    }
+    $caller->engine($engine);
+    $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 }
 
 =item $c->engine
