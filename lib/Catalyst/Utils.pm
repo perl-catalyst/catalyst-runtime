@@ -38,6 +38,21 @@ sub prefix {
     return $name;
 }
 
+=item class2classprefix($class);
+
+Returns the classprefix for class.
+
+=cut
+
+sub class2classprefix {
+    my $class = shift || '';
+    my $prefix;
+    if ( $class =~ /^(.*::[MVC]|Model|View|Controller)?::.*$/ ) {
+        $prefix = $1;
+    }
+    return $prefix;
+}
+
 =item class2prefix($class);
 
 Returns the prefix for class.
