@@ -35,5 +35,5 @@ use HTTP::Request::Common;
     is( $creq->method, 'POST', 'Catalyst::Request method' );
     is( $creq->content_type, 'text/plain', 'Catalyst::Request Content-Type' );
     is( $creq->content_length, $request->content_length, 'Catalyst::Request Content-Length' );
-    is( $creq->input, $request->content, 'Catalyst::Request Content' );
+    is( $creq->body, $request->content, 'Catalyst::Request Content' );
 }

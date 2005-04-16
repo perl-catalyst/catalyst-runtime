@@ -235,13 +235,7 @@ sub get_action {
             my $name  = $c->actions->{compiled}->[$i]->[0];
             my $regex = $c->actions->{compiled}->[$i]->[1];
 
-            if ( $action =~ $regex ) {
-                my @snippets;
-                for my $i ( 1 .. 9 ) {
-                    no strict 'refs';
-                    last unless ${$i};
-                    push @snippets, ${$i};
-                }
+            if ( my @snippets = ( $action =~ $regex ) ) {
                 return [ [ $c->actions->{regex}->{$name}, $name, \@snippets ] ];
             }
 
