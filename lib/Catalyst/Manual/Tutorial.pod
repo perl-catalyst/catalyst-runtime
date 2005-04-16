@@ -195,9 +195,10 @@ this action registered the application will respond to all requests
 with the same message "Congratulations, My::App is on Catalyst!".
 
 As you see, the default action is defined as a Private action. 
-Most private actions are not directly available from a web url. The
-exceptions are the built-in actions, 'default','begin','end' and
-'auto'. The rest can only be reached by using C<forward>.
+Most private actions are not directly available from a web url. This
+also includes the built-in actions, 'default','begin','end' and
+'auto', although they will be called as part of some chains.  
+The rest can only be reached by using C<forward>.
 
 
 The call to the C<setup> method also triggers the second stage of 

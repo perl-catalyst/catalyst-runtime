@@ -22,7 +22,7 @@ See L<Catalyst::Manual::Intro>
 
 =head1 DESCRIPTION
 
-Bootstrap a Catalyst application.
+Bootstrap a Catalyst application. Autogenerates scripts
 
 =head2 METHODS
 
@@ -50,6 +50,8 @@ sub get_file {
 
 =head3 mk_app
 
+Create the main application skeleton.
+
 =cut
 
 sub mk_app {
@@ -75,6 +77,9 @@ sub mk_app {
 }
 
 =head3 mk_component
+
+This method is called by create.pl to make new components
+for your application.
 
 =cut
 
@@ -154,6 +159,8 @@ sub mk_component {
 
 =head3 mk_dir
 
+Surprisingly, this function makes a directory.
+
 =cut
 
 sub mk_dir {
@@ -170,6 +177,8 @@ sub mk_dir {
 }
 
 =head3 mk_file
+
+writes content to a file.
 
 =cut
 
@@ -209,7 +218,8 @@ sub next_test {
 
 =head3 render_file
 
-Render and create a file from a template in DATA.
+Render and create a file from a template in DATA using 
+Template Toolkit.
 
 =cut
 
@@ -361,8 +371,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software . You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -407,8 +417,8 @@ Clever guy
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software . You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -490,8 +500,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software. You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -529,8 +539,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software. You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -588,8 +598,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software. You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -646,8 +656,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software. You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -707,8 +717,8 @@ Sebastian Riedel, C<sri\@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software. You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
@@ -743,8 +753,8 @@ Clever guy
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software . You can redistribute it and/or modify 
+it under the same terms as perl itself.
 
 =cut
 
