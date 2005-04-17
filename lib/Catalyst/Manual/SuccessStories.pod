@@ -50,7 +50,7 @@ or so of public beta testing, I shifted the entire site to the
 new system, e-mailed Slashdot, and waited for the onslaught.
 
 When it hit Slashdot, things held up very nicely. (Some early
-error pages, embarrassedly pointed out by a Slashdot poster,
+error pages, embarrassingly pointed out by a Slashdot poster,
 were in fact caused by a lack of available MySQL connections,
 for which misconfiguration the DB admin was harshly
 criticized, rather than from any app-specific failings.) In

@@ -59,7 +59,7 @@ files.
 =head2 Testing out the sample application
 
 You can test out your new application by running the server script that
-catalyst provides:
+Catalyst provides:
 
     $ cd My-App
     $ script/server.pl 
@@ -69,7 +69,7 @@ catalyst provides:
     .=----------------------+----------------------+---------------=.
     | Private               | Class                | Code           |
     |=----------------------+----------------------+---------------=|
-    | /default              | MyApp                | CODE(0x86f08ac |
+    | /default              | MyApp                | CODE(0x86f08ac)|
     '=----------------------+----------------------+---------------='
      "My::App" defined "!default" as "CODE(0x83fd570)"
     [...] [catalyst] [info] My::App powered by Catalyst 5.00
@@ -186,7 +186,7 @@ the application module).
 The call to C<config> sets up configuration data for the application.  
 The C<name> and C<root> items are the minimum required, and specify 
 the name of the application and the path to the root directory where 
-documents, images and templates can be found.
+documents, images, and templates can be found.
 
 Catalyst associates I<actions> with URLs and on receiving a request 
 dispatches to the action that matches to request URL.  The call to 
@@ -196,10 +196,9 @@ with the same message "Congratulations, My::App is on Catalyst!".
 
 As you see, the default action is defined as a Private action. 
 Most private actions are not directly available from a web url. This
-also includes the built-in actions, 'default','begin','end' and
+also includes the built-in actions, 'default','begin','end', and
 'auto', although they will be called as part of some chains.  
 The rest can only be reached by using C<forward>.
-
 
 The call to the C<setup> method also triggers the second stage of 
 Catalyst's initialization process.  In this phase Catalyst searches 
@@ -230,7 +229,7 @@ You can start extending the application by adding new actions:
     }
 
 
-TODO: explain briefly about plugins, actions and components
+TODO: explain briefly about plugins, actions, and components
 
 regex actions passed subexpression matches in $c->req->snippets
 (array ref).
@@ -244,7 +243,7 @@ Catalyst works well with Template Toolkit.  If you are unfamiliar with
 Template Toolkit then I suggest you look at L<http://tt2.org>, install 
 C<Template>, read the documentation and play around with it, and have 
 a look at the I<Badger Book> (I<Template Toolkit> by Darren 
-Chamberlain, Dave Cross and Andy Wardly, O'Reilly & Associates, 2004).
+Chamberlain, Dave Cross, and Andy Wardley, O'Reilly & Associates, 2004).
 
 You can create a stub Template Toolkit view component using the create 
 script that Catalyst set up as part of the skeleton application:
@@ -299,16 +298,16 @@ document is as follows:
 
 =item 1
 
-expand this document fairly rapidly to cover topics relevant to
-a newcomer to Catalyst in an order that can be read sequentially
+Expand this document fairly rapidly to cover topics relevant to
+a newcomer to Catalyst, in an order that can be read sequentially
 
 =item 2
 
-incorporate feedback 
+Incorporate feedback 
 
 =item 3
 
-revise the text 
+Revise the text 
 
 =back
 
