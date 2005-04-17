@@ -335,7 +335,7 @@ Finalize headers.
 
 sub finalize_headers { }
 
-=item $c->handler( $class, $r )
+=item $c->handler( $class, $engine )
 
 Handles the request.
 
@@ -391,7 +391,7 @@ into a Catalyst context .
 =cut
 
 sub prepare {
-    my ( $class, $r ) = @_;
+    my ( $class, $engine ) = @_;
 
     my $c = bless {
         request => Catalyst::Request->new(
@@ -420,7 +420,7 @@ sub prepare {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
-    $c->prepare_request($r);
+    $c->prepare_request($engine);
     $c->prepare_path;
     $c->prepare_headers;
     $c->prepare_cookies;
