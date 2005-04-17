@@ -623,6 +623,7 @@ Mailing-lists:
 Sebastian Riedel, C<sri@oook.de> 
 David Naughton, C<naughton@umn.edu>
 Marcus Ramberg, C<mramberg@cpan.org>
+Jesse Sheidlower, C<jester@panix.com>
 
 =head1 COPYRIGHT
 
