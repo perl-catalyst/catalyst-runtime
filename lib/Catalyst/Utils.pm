@@ -38,6 +38,21 @@ sub prefix {
     return $name;
 }
 
+=item class2appclass($class);
+
+Returns the appclass for class.
+
+=cut
+
+sub class2appclass {
+    my $class = shift || '';
+    my $appname = '';
+    if ( $class =~ /^(.*)::([MVC]|Model|View|Controller)?::.*$/ ) {
+        $appname = $1;
+    }
+    return $appname;
+}
+
 =item class2classprefix($class);
 
 Returns the classprefix for class.
@@ -51,6 +66,19 @@ sub class2classprefix {
         $prefix = $1;
     }
     return $prefix;
+}
+
+=item class2classsuffix($class);
+
+Returns the classsuffix for class.
+
+=cut
+
+sub class2classsuffix {
+    my $class = shift || '';
+    my $prefix = class2appclass($class) || '';
+    $class =~ s/$prefix\:\://;
+    return $class;
 }
 
 =item class2prefix($class);
