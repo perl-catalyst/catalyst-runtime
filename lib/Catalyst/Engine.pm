@@ -126,7 +126,7 @@ Errors are available via $c->error.
 
 sub execute {
     my ( $c, $class, $code ) = @_;
-    $class = $c->comp($class) || $class;
+    $class = $c->components->{$class} || $class;
     $c->state(0);
     my $callsub = ( caller(1) )[3];
 
