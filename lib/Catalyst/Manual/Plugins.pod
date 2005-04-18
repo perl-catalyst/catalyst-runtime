@@ -4,41 +4,44 @@ Catalyst::Manual::Plugins - Catalyst Plugins (and Components)
 
 =head1 DESCRIPTION
 
-This section lists the some of the plugins and components that are available
-to extend the runtime functionality of the Catalyst. The plugins are not
-distributed with Catalyst but should be available from CPAN.  They mostly
-required additional modules from CPAN.
+This section lists the some of the plugins and components that are 
+available to extend the runtime functionality of the Catalyst. The 
+plugins are not distributed with Catalyst but should be available from 
+CPAN.  They mostly required additional modules from CPAN.
 
 =head1 PLUGINS
 
 =head2 Catalyst::Plugin::Authentication::CDBI
 
-This is a CDBI (C<Class::DBI>) authentication plugin.  Note that it requires a
-session plugin.
+This is a CDBI (C<Class::DBI>) authentication plugin.  Note that it 
+requires a session plugin.
 
 =head2 Catalyst::Plugin::Email
 
-Send emails with Catalyst and L<Email::Send> and L<Email::MIME::Creator>.
+Send emails with Catalyst and L<Email::Send> and 
+L<Email::MIME::Creator>.
 
 =head2 Catalyst::Plugin::FillInForm
 
-Fill-in form plugin for Catalyst based on C<HTML::FillInForm>, which describes
-itself as a module to automatically insert data from a previous HTML form into
-the HTML input, textarea, radio buttons, checkboxes and select tags.
-C<HTML::FillInForm> is a subclass of C<HTML::Parser> and uses it to parse the
-HTML and insert the values into the form tags.
+Fill-in form plugin for Catalyst based on C<HTML::FillInForm>, which 
+describes itself as a module to automatically insert data from a 
+previous HTML form into the HTML input, textarea, radio buttons, 
+checkboxes and select tags.
+C<HTML::FillInForm> is a subclass of C<HTML::Parser> and uses it to 
+parse the HTML and insert the values into the form tags.
 
 =head2 Catalyst::Plugin::FormValidator
 
-A form validator plugin that uses L<Data::FormValidator> to validate and set up
-form data from your request parameters.  It's a quite thin wrapper around that
-module, so most of the relevant information can be found there.
+A form validator plugin that uses L<Data::FormValidator> to validate 
+and set up form data from your request parameters.  It's a quite thin 
+wrapper around that module, so most of the relevant information can be 
+found there.
 
 
 =head2 Catalyst::Plugin::I18N
 
-An internationalization plugin for Catalyst.  Supports C<mo>/C<po> files and
-Maketext classes under your applications I18N namespace.
+An internationalization plugin for Catalyst.  Supports C<mo>/C<po> 
+files and Maketext classes under your applications I18N namespace.
 
 
 =head2 Catalyst::Plugin::Pluggable
@@ -47,29 +50,33 @@ A plugin for pluggable Catalyst applications.
 
 =head2 Catalyst::Plugin::Prototype
 
-Plugin for the Prototype JavaScript library.
+Plugin for the Prototype JavaScript library. This Plugin allows you
+to easily implement AJAX functionality without actually knowing
+Javascript.
 
 =head2 Catalyst::Plugin::Session::FastMmap
 
-A session plugin for Catalyst based on C<Cache::FastMMap>, which uses an
-mmap'ed file to act as a shared memeory interprocess cache.
+A session plugin for Catalyst based on C<Cache::FastMMap>, which uses 
+an mmap'ed file to act as a shared memory interprocess cache.
 
 
 =head2 Catalyst::Plugin::Static
 
-A plugin to serve static files from C<< $c->config->{root} >>.
+A plugin to serve static files from C<< $c->config->{root} 
+>>/<< action >>/.
 
 
 =head2 Catalyst::Plugin::SubRequest
 
 Plugin to allow subrequests to actions to be made within Catalyst.
+Nice for portal software and such.
 
 
 =head2 Catalyst::Plugin::Textile
 
-A persistent Textile processor for Catalyst that uses C<Text::Textile>, a
-Perl-based implementation of Dean Allen's Textile syntax. Textile is shorthand
-for doing common formatting tasks (see L<http://textism.com>).
+A persistent Textile processor for Catalyst that uses C<Text::Textile>,
+a Perl-based implementation of Dean Allen's Textile syntax. Textile is
+shorthand for doing common formatting tasks (see L<http://textism.com>).
 
 
 =head2 Catalyst::Plugin::XMLRPC
@@ -82,10 +89,10 @@ from its own class.
 
 =head2 Catalyst::Model::CDBI
 
-C<Catalyst::Model::CDBI> is the C<Class::DBI> (CDBI) moduel class.  It iss
-built on top of C<Class::DBI::Loader>, which automates the definition of
-C<Class::DBI> sub-classes by scanning the underlying table schemas, setting up
-columns and primary keys.
+C<Catalyst::Model::CDBI> is the C<Class::DBI> (CDBI) moduel class.  It 
+is built on top of C<Class::DBI::Loader>, which automates the 
+definition of C<Class::DBI> sub-classes by scanning the underlying 
+table schemas, setting up columns and primary keys.
 
 =head2 Catalyst::Model::CDBI::CRUD
 
@@ -93,14 +100,15 @@ C<Catalyst::Model::CDBI::CRUD> is a subclass of C<Catalyst::Model::CDBI> with
 additional CRUD (create, replace, update, delete) methods.
 
 
-=head2 Catalyst::View::Template
+=head2 Catalyst::View::TT
 
-A Template Toolkit view class.
+A Template Toolkit view. See L<Template::Manual>
 
 
 =head1 AUTHOR
 
 Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
+Marcus Ramberg E<lt>mramberg@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
