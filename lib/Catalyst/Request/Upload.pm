@@ -8,7 +8,6 @@ use IO::File   ();
 
 __PACKAGE__->mk_accessors(qw/filename size tempname type/);
 
-sub new { shift->SUPER::new( ref( $_[0] ) ? $_[0] : {@_} ) }
 
 =head1 NAME
 
@@ -34,6 +33,14 @@ to the upload data.
 =head1 METHODS
 
 =over 4
+
+=item $upload->new
+
+Constructor. Normally only for engine use.
+
+=cut 
+
+sub new { shift->SUPER::new( ref( $_[0] ) ? $_[0] : {@_} ) }
 
 =item $upload->copy_to
 

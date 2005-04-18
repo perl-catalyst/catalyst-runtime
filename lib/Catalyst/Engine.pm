@@ -193,6 +193,10 @@ sub finalize {
     return $status;
 }
 
+=item $c->finalize_output
+
+alias to finalize_body
+
 =item $c->finalize_body
 
 Finalize body.
