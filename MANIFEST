@@ -18,6 +18,7 @@ lib/Catalyst/Manual/Cookbook.pod
 lib/Catalyst/Manual/FAQ.pod
 lib/Catalyst/Manual/Internals.pod
 lib/Catalyst/Manual/Intro.pod
+lib/Catalyst/Manual/Plugins.pod
 lib/Catalyst/Manual/SuccessStories.pod
 lib/Catalyst/Manual/Troubleshooting.pod
 lib/Catalyst/Manual/Tutorial.pod
