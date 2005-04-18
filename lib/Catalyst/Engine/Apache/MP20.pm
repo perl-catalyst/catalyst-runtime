@@ -26,7 +26,7 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is the Catalyst engine specialized for Apache mod_perl version 2.
+This is the Catalyst engine specialized for Apache mod_perl version 2.0.
 
 =head1 OVERLOADED METHODS
 
@@ -66,6 +66,15 @@ sub handler : method {
     shift->SUPER::handler(@_);
 }
 
+=item $c->prepare_request($r)
+
+=cut
+
+sub prepare_request {
+    my ( $c, $r ) = @_;
+    $c->apache( Apache2::Request->new($r) );
+}
+
 =item $c->prepare_uploads
 
 =cut
@@ -93,15 +102,6 @@ sub prepare_uploads {
     $c->req->_assign_values( $c->req->uploads, \@uploads );
 }
 
-=item $c->prepare_request($r)
-
-=cut
-
-sub prepare_request {
-    my ( $c, $r ) = @_;
-    $c->apache( Apache2::Request->new($r) );
-}
-
 =back
 
 =head1 SEE ALSO
@@ -111,6 +111,7 @@ L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::Apache>.
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Christian Hansen C<ch@ngmedia.com>
 
 =head1 COPYRIGHT
 

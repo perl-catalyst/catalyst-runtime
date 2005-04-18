@@ -6,6 +6,7 @@ lib/Catalyst/Engine.pm
 lib/Catalyst/Engine/Apache.pm
 lib/Catalyst/Engine/Apache/MP13.pm
 lib/Catalyst/Engine/Apache/MP19.pm
+lib/Catalyst/Engine/Apache/MP20.pm
 lib/Catalyst/Engine/CGI.pm
 lib/Catalyst/Engine/FCGI.pm
 lib/Catalyst/Engine/HTTP.pm
@@ -24,6 +25,7 @@ lib/Catalyst/Request.pm
 lib/Catalyst/Request/Upload.pm
 lib/Catalyst/Response.pm
 lib/Catalyst/Test.pm
+lib/Catalyst/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml

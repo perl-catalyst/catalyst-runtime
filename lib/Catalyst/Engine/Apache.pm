@@ -18,7 +18,7 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is the Catalyst engine specialized for Apache (i.e. for mod_perl).
+This is a base class engine specialized for Apache (i.e. for mod_perl).
 
 =head1 METHODS
 
@@ -135,6 +135,7 @@ L<Catalyst>.
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Christian Hansen C<ch@ngmedia.com>
 
 =head1 COPYRIGHT
 
