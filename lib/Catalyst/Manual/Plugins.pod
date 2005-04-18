@@ -60,6 +60,11 @@ mmap'ed file to act as a shared memeory interprocess cache.
 A plugin to serve static files from C<< $c->config->{root} >>.
 
 
+=head2 Catalyst::Plugin::SubRequest
+
+Plugin to allow subrequests to actions to be made within Catalyst.
+
+
 =head2 Catalyst::Plugin::Textile
 
 A persistent Textile processor for Catalyst that uses C<Text::Textile>, a
