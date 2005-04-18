@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.01  XXX Apr XX XX:00:00 2005
+5.02  Mon Apr 18 10:00:00 2005
+        - fixed manifest
+
+5.01  Sun Apr 17 23:00:00 2005
         - some documentation bugs fixed
         - added Catalyst::Utils
         - fixed regexp bug (Matt S Trout)

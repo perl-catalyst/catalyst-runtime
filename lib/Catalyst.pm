@@ -9,7 +9,7 @@ use Text::ASCIITable;
 
 __PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
 
-our $VERSION = '5.01';
+our $VERSION = '5.02';
 our @ISA;
 
 =head1 NAME
