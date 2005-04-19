@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Catalyst
-version:      5.01
+version:      5.03
 version_from: lib/Catalyst.pm
 installdirs:  site
 requires:
