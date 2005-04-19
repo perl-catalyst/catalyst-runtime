@@ -137,7 +137,7 @@ sub forward {
         my $class = $command || '';
 
         if ( $class =~ /[^\w\:]/ ) {
-            my $error = qq/Couldn't forward to "$class"/;
+            my $error = qq/"$class" is an invalid Class name/;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
@@ -151,7 +151,7 @@ sub forward {
         }
 
         else {
-            my $error = qq/Couldn't forward to "$class"/;
+            my $error = qq/Couldn't forward to "$class". Does not implement "$method"/;
             $c->error($error);
             $c->log->debug($error)
               if $c->debug;
