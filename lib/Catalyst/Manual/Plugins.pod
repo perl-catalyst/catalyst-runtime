@@ -96,14 +96,18 @@ table schemas, setting up columns and primary keys.
 
 =head2 Catalyst::Model::CDBI::CRUD
 
-C<Catalyst::Model::CDBI::CRUD> is a subclass of C<Catalyst::Model::CDBI> with
-additional CRUD (create, replace, update, delete) methods.
+C<Catalyst::Model::CDBI::CRUD> is a subclass of 
+C<Catalyst::Model::CDBI> with additional CRUD (create, replace, 
+update, delete) methods.
 
 
 =head2 Catalyst::View::TT
 
 A Template Toolkit view. See L<Template::Manual>
 
+=head2 Catalyst::View::Mason
+
+Render your stash using L<HTML::Mason>. 
 
 =head1 AUTHOR
 
