@@ -463,7 +463,8 @@ sub prepare {
         $t->setColWidth( 'Key',   37, 1 );
         $t->setColWidth( 'Value', 36, 1 );
         for my $key ( keys %{ $c->req->params } ) {
-            my $value = $c->req->params->{$key} || '';
+            my $param = $c->req->params->{$key};
+            my $value = defined($param) ? $param : '';
             $t->addRow( $key, $value );
         }
         $c->log->debug( 'Parameters are', $t->draw );

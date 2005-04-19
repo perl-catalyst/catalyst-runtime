@@ -67,10 +67,12 @@ sub run {
             $request->uri->scheme('http');    # Force URI::http
             $request->uri->host( $request->header('Host') || $base->host );
             $request->uri->port( $base->port );
+            
+            my $hostname = gethostbyaddr( $connection->peeraddr, AF_INET );
 
             my $http = Catalyst::Engine::Test::HTTP->new(
                 address  => $connection->peerhost,
-                hostname => gethostbyaddr( $connection->peeraddr, AF_INET ),
+                hostname => $hostname || $connection->peerhost,
                 request  => $request,
                 response => HTTP::Response->new
             );
