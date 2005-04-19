@@ -119,7 +119,7 @@ Now visit these locations with your favorite browser or user agent to see Cataly
 
 =item http://localhost:3000/
 
-=item http://localhost:3000/my_controller/
+=item http://localhost:3000/my/controller/
 
 =back
 
