@@ -171,9 +171,7 @@ sub import {
           . "Please update your scripts by regenerating the "
           . "application and copying over the new scripts." )
       if ( $ENV{CATALYST_SCRIPT_GEN}
-        && (
-            $ENV{CATALYST_SCRIPT_GEN} < $CATALYST_SCRIPT_GEN )
-      );
+        && ( $ENV{CATALYST_SCRIPT_GEN} < $CATALYST_SCRIPT_GEN ) );
 
     # Process options
     my @plugins;
@@ -258,15 +256,37 @@ C<Catalyst::Log> object.  To use your own log class:
 Your log class should implement the methods described in the C<Catalyst::Log>
 man page.
 
+=item $c->plugin( $name, $class, @args )
+
+Instant plugins for Catalyst.
+Classdata accessor/mutator will be created, class loaded and instantiated.
+
+    MyApp->plugin( 'prototype', 'HTML::Prototype' );
+
+    $c->prototype->define_javascript_functions;
+
+=cut
+
+sub plugin {
+    my ( $class, $name, $plugin, @args ) = @_;
+    $plugin->require;
+    my $error = $UNIVERSAL::require::ERROR;
+    die qq/Couldn't load instant plugin "$plugin", "$error"/ if $error;
+    eval { $plugin->import };
+    $class->mk_classdata($name);
+    my $obj;
+    eval { $obj = $plugin->new(@args) };
+    die qq/Couldn't instantiate instant plugin "$plugin", "$@"/ if $@;
+    $class->$name($obj);
+    $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
+      if $class->debug;
+}
 
 =back
 
 =head1 LIMITATIONS
 
-FCGI and mod_perl2 support are considered experimental and may contain bugs.
-
-You may encounter problems accessing the built in test server on public ip
-addresses on the internet, thats because of a bug in HTTP::Daemon.
+mod_perl2 support are considered experimental and may contain bugs.
 
 =head1 SUPPORT
 
