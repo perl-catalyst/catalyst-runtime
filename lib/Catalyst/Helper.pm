@@ -8,7 +8,7 @@ use File::Path;
 use IO::File;
 use FindBin;
 use Template;
-our $CATALYST_SCRIPT_GEN = 2;
+use Catalyst;
 
 my %cache;
 
@@ -61,7 +61,7 @@ sub mk_app {
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
     $self->{startperl} = $Config{startperl};
-    $self->{scriptgen}=$CATALYST_SCRIPT_GEN;
+    $self->{scriptgen}=$Catalyst::CATALYST_SCRIPT_GEN;
     $self->{author}=$self->{author} = $ENV{'AUTHOR'} ||
                     @{[getpwuid($<)]}[6];
     $self->_mk_dirs;

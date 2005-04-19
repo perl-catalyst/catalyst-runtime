@@ -4,8 +4,8 @@ use strict;
 use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
-use Catalyst::Helper;
 use Text::ASCIITable;
+our $CATALYST_SCRIPT_GEN = 2;
 
 __PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
 
@@ -172,7 +172,7 @@ sub import {
           . "application and copying over the new scripts." )
       if ( $ENV{CATALYST_SCRIPT_GEN}
         && (
-            $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::Helper::CATALYST_SCRIPT_GEN )
+            $ENV{CATALYST_SCRIPT_GEN} < $CATALYST_SCRIPT_GEN )
       );
 
     # Process options

@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Catalyst.
         - Fixed Test example (Torsten Seeman)
         - Added Plugins chapter to manual
         - applied doc patch from Robert Boone <robert@rlb3.com>
+        - Refactored so we don't need to include helper from
+        Catalyst.pm
 
 5.02  Mon Apr 18 10:00:00 2005
         - fixed manifest
