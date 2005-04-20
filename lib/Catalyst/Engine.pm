@@ -462,7 +462,7 @@ sub prepare {
         $t->setCols( 'Key', 'Value' );
         $t->setColWidth( 'Key',   37, 1 );
         $t->setColWidth( 'Value', 36, 1 );
-        for my $key ( keys %{ $c->req->params } ) {
+        for my $key ( sort keys %{ $c->req->params } ) {
             my $param = $c->req->params->{$key};
             my $value = defined($param) ? $param : '';
             $t->addRow( $key, $value );
