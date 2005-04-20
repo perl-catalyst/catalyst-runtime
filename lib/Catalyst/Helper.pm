@@ -452,7 +452,7 @@ my $build = Catalyst::Build->new(
     create_makefile_pl => 'passthrough',
     license            => 'perl',
     module_name        => '[% name %]',
-    requires           => { Catalyst => '5.04' },
+    requires           => { Catalyst => '5.10' },
     script_files       => [ glob('script/*') ],
     test_files         => [ glob('t/*.t'), glob('t/*/*.t') ]
 );
