@@ -410,10 +410,7 @@ use Catalyst qw/-Debug/;
 
 our $VERSION = '0.01';
 
-[% name %]->config(
-    name => '[% name %]',
-    root => '[% base %]/root',
-);
+[% name %]->config( name => '[% name %]' );
 
 [% name %]->setup;
 
