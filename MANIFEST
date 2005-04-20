@@ -81,3 +81,4 @@ t/lib/TestApp/View/Dump/Request.pm
 t/lib/TestApp/View/Dump/Response.pm
 t/plugin/loaded.t
 t/TODO
+Build.PL
