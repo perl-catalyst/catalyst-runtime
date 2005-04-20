@@ -16,6 +16,7 @@ WriteMakefile(
         HTTP::Response                    => 0,
         LWP::UserAgent                    => 0,
         Module::Pluggable::Fast           => 0,
+        Path::Class                       => 0,
         Template                          => 0,
         Text::ASCIITable                  => 0,
         Tree::Simple                      => 0,

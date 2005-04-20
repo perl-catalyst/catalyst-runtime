@@ -1,5 +1,11 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.10  Wed Apr 20 18:00:00 2005
+        - New installer for templates and stuff using Module::Build
+        - scripts are now prefixed, for being installable
+        IMPORTANT: You have to regenerate the script directory,
+        remove Makefile.PL and add Build.PL
+
 5.03  Tue Apr 19 20:35:00 2005 (Revision 462)
         - Fixed Test example (Torsten Seeman)
         - Added Plugins chapter to manual

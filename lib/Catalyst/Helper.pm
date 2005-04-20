@@ -60,12 +60,15 @@ sub mk_app {
     $self->{name} = $name;
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
+    $self->{appprefix} = lc $self->{dir};
+    $self->{appprefix} =~ s/-/_/g;
     $self->{startperl} = $Config{startperl};
-    $self->{scriptgen}=$Catalyst::CATALYST_SCRIPT_GEN;
-    $self->{author}=$self->{author} = $ENV{'AUTHOR'} ||
-                    @{[getpwuid($<)]}[6];
+    $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN;
+    $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
+      || @{ [ getpwuid($<) ] }[6];
     $self->_mk_dirs;
     $self->_mk_appclass;
+    $self->_mk_build;
     $self->_mk_makefile;
     $self->_mk_readme;
     $self->_mk_changes;
@@ -89,8 +92,8 @@ sub mk_component {
     my $self = shift;
     my $app  = shift;
     $self->{app} = $app;
-    $self->{author}=$self->{author} = $ENV{'AUTHOR'} ||
-                    @{[getpwuid($<)]}[6];
+    $self->{author} = $self->{author} = $ENV{'AUTHOR'}
+      || @{ [ getpwuid($<) ] }[6];
     $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
     unless ( $_[0] =~ /^model|m|view|v|controller|c\$/i ) {
         my $helper = shift;
@@ -270,6 +273,12 @@ sub _mk_appclass {
     $self->render_file( 'appclass', "$mod.pm" );
 }
 
+sub _mk_build {
+    my $self = shift;
+    my $dir  = $self->{dir};
+    $self->render_file( 'build', "$dir\/Build.PL" );
+}
+
 sub _mk_makefile {
     my $self = shift;
     my $dir  = $self->{dir};
@@ -300,36 +309,41 @@ sub _mk_apptest {
 sub _mk_cgi {
     my $self   = shift;
     my $script = $self->{script};
-    $self->render_file( 'cgi', "$script\/cgi.pl" );
-    chmod 0700, "$script/cgi.pl";
+    my $appprefix = $self->{appprefix};
+    $self->render_file( 'cgi', "$script\/$appprefix\_cgi.pl" );
+    chmod 0700, "$script/$appprefix\_cgi.pl";
 }
 
 sub _mk_fcgi {
     my $self   = shift;
     my $script = $self->{script};
-    $self->render_file( 'fcgi', "$script\/fcgi.pl" );
-    chmod 0700, "$script/fcgi.pl";
+    my $appprefix = $self->{appprefix};
+    $self->render_file( 'fcgi', "$script\/$appprefix\_fcgi.pl" );
+    chmod 0700, "$script/$appprefix\_fcgi.pl";
 }
 
 sub _mk_server {
     my $self   = shift;
     my $script = $self->{script};
-    $self->render_file( 'server', "$script\/server.pl" );
-    chmod 0700, "$script/server.pl";
+    my $appprefix = $self->{appprefix};
+    $self->render_file( 'server', "$script\/$appprefix\_server.pl" );
+    chmod 0700, "$script/$appprefix\_server.pl";
 }
 
 sub _mk_test {
     my $self   = shift;
     my $script = $self->{script};
-    $self->render_file( 'test', "$script/test.pl" );
-    chmod 0700, "$script/test.pl";
+    my $appprefix = $self->{appprefix};
+    $self->render_file( 'test', "$script/$appprefix\_test.pl" );
+    chmod 0700, "$script/$appprefix\_test.pl";
 }
 
 sub _mk_create {
     my $self   = shift;
     my $script = $self->{script};
-    $self->render_file( 'create', "$script\/create.pl" );
-    chmod 0700, "$script/create.pl";
+    my $appprefix = $self->{appprefix};
+    $self->render_file( 'create', "$script\/$appprefix\_create.pl" );
+    chmod 0700, "$script/$appprefix\_create.pl";
 }
 
 sub _mk_compclass {
@@ -433,18 +447,22 @@ it under the same terms as perl itself.
 
 1;
 
-__makefile__
-use ExtUtils::MakeMaker;
+__build__
+use strict;
+use Catalyst::Build;
 
-WriteMakefile(
-    NAME         => '[% name %]',
-    VERSION_FROM => 'lib/[% class %].pm',
-    PREREQ_PM    => { Catalyst => 5 },
-    test         => { TESTS => join ' ', ( glob('t/*.t'), glob('t/*/*.t') ) }
+my $build = Catalyst::Build->new(
+    create_makefile_pl => 'passthrough',
+    license            => 'perl',
+    module_name        => '[% name %]',
+    requires           => { Catalyst => '5.04' },
+    script_files       => [ glob('script/*') ],
+    test_files         => [ glob('t/*.t'), glob('t/*/*.t') ]
 );
+$build->create_build_script;
 
 __readme__
-Run script/server.pl to test the application.
+Run script/[% apprefix %]_server.pl to test the application.
 
 __changes__
 This file documents the revision history for Perl extension [% name %].

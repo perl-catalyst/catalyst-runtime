@@ -6,8 +6,8 @@ use Catalyst::Utils;
 use NEXT;
 
 __PACKAGE__->mk_classdata($_) for qw/_attrcache _cache _config/;
-__PACKAGE__->_cache( [] );
 __PACKAGE__->_attrcache( {} );
+__PACKAGE__->_cache( [] );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {
