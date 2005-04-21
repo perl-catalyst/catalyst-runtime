@@ -309,7 +309,7 @@ sub plugin {
 
 =head1 LIMITATIONS
 
-mod_perl2 support are considered experimental and may contain bugs.
+mod_perl2 support is considered experimental and may contain bugs.
 
 =head1 SUPPORT
 
