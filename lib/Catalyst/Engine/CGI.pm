@@ -184,8 +184,8 @@ sub prepare_path {
 =cut
 
 sub prepare_request { 
-    my $c = shift;
-    $c->cgi( CGI->new );
+    my ( $c, $cgi ) = @_;
+    $c->cgi( $cgi || CGI->new );
     $c->cgi->_reset_globals;
 }
 

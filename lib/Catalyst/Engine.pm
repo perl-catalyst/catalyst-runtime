@@ -387,7 +387,7 @@ sub handler {
     return $status;
 }
 
-=item $c->prepare($r)
+=item $c->prepare($engine)
 
 Turns the engine-specific request( Apache, CGI ... )
 into a Catalyst context .
