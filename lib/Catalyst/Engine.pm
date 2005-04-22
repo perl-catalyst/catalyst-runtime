@@ -364,7 +364,7 @@ sub handler {
             my $elapsed;
             ( $elapsed, $status ) = $class->benchmark($handler);
             $elapsed = sprintf '%f', $elapsed;
-            my $av = sprintf '%.3f', 1 / $elapsed;
+            my $av = sprintf '%.3f', ( $elapsed == 0 ? '??' : (1 / $elapsed) );
             my $t = Text::ASCIITable->new;
             $t->setCols( 'Action', 'Time' );
             $t->setColWidth( 'Action', 64, 1 );
