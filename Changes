@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.10  Wed Apr 20 18:00:00 2005
+        - Updated dependencies to require latest module::pluggable::fast
         - New installer for templates and stuff using Module::Build
         - scripts are now prefixed, for being installable
         IMPORTANT: You have to regenerate the script directory,
