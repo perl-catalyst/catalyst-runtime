@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Catalyst.
         - scripts are now prefixed, for being installable
         IMPORTANT: You have to regenerate the script directory,
         remove Makefile.PL and add Build.PL
+        - Added compat to install Module::Build if required.
 
 5.03  Tue Apr 19 20:35:00 2005 (Revision 462)
         - Fixed Test example (Torsten Seeman)

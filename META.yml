@@ -1,26 +1,71 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Catalyst
-version:      5.03
-version_from: lib/Catalyst.pm
-installdirs:  site
+---
+name: Catalyst
+version: 5.10
+author:
+  - Sebastian Riedel, C<sri@oook.de>
+abstract: The Elegant MVC Web Application Framework
+license: perl
 requires:
-    CGI::Simple:                   0
-    Class::Accessor::Fast:         0
-    Class::Data::Inheritable:      0
-    HTML::Entities:                0
-    HTTP::Daemon:                  0
-    HTTP::Headers:                 0
-    HTTP::Request:                 0
-    HTTP::Response:                0
-    LWP::UserAgent:                0
-    Module::Pluggable::Fast:       0
-    Template:                      0
-    Text::ASCIITable:              0
-    Tree::Simple:                  0
-    Tree::Simple::Visitor::FindByPath: 0
-    UNIVERSAL::require:            0
-    URI:                           0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  CGI::Simple: 0
+  Class::Accessor::Fast: 0
+  Class::Data::Inheritable: 0
+  HTML::Entities: 0
+  HTTP::Daemon: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  LWP::UserAgent: 0
+  Module::Pluggable::Fast: 0.14
+  Path::Class: 0
+  Template: 0
+  Text::ASCIITable: 0
+  Tree::Simple: 0
+  Tree::Simple::Visitor::FindByPath: 0
+  UNIVERSAL::require: 0
+  URI: 0
+provides:
+  Catalyst:
+    file: lib/Catalyst.pm
+    version: 5.10
+  Catalyst::Base:
+    file: lib/Catalyst/Base.pm
+  Catalyst::Build:
+    file: lib/Catalyst/Build.pm
+  Catalyst::Dispatcher:
+    file: lib/Catalyst/Dispatcher.pm
+  Catalyst::Engine:
+    file: lib/Catalyst/Engine.pm
+  Catalyst::Engine::Apache:
+    file: lib/Catalyst/Engine/Apache.pm
+  Catalyst::Engine::Apache::MP13:
+    file: lib/Catalyst/Engine/Apache/MP13.pm
+  Catalyst::Engine::Apache::MP19:
+    file: lib/Catalyst/Engine/Apache/MP19.pm
+  Catalyst::Engine::Apache::MP20:
+    file: lib/Catalyst/Engine/Apache/MP20.pm
+  Catalyst::Engine::CGI:
+    file: lib/Catalyst/Engine/CGI.pm
+  Catalyst::Engine::FCGI:
+    file: lib/Catalyst/Engine/FCGI.pm
+  Catalyst::Engine::HTTP:
+    file: lib/Catalyst/Engine/HTTP.pm
+  Catalyst::Engine::HTTP::Catalyst:
+    file: lib/Catalyst/Engine/HTTP.pm
+  Catalyst::Engine::Test:
+    file: lib/Catalyst/Engine/Test.pm
+  Catalyst::Helper:
+    file: lib/Catalyst/Helper.pm
+    version: 0.01
+  Catalyst::Log:
+    file: lib/Catalyst/Log.pm
+  Catalyst::Request:
+    file: lib/Catalyst/Request.pm
+  Catalyst::Request::Upload:
+    file: lib/Catalyst/Request/Upload.pm
+  Catalyst::Response:
+    file: lib/Catalyst/Response.pm
+  Catalyst::Test:
+    file: lib/Catalyst/Test.pm
+  Catalyst::Utils:
+    file: lib/Catalyst/Utils.pm
+generated_by: Module::Build version 0.26

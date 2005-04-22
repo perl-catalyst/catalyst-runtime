@@ -107,8 +107,8 @@ sub mk_component {
     }
     else {
         my $type   = shift;
-        my $name   = shift;
-        my $helper = shift;
+        my $name   = shift || "Missing name for model/view/controller";
+        my $helper = shift ;
         my @args   = @_;
         return 0 if $name =~ /[^\w\:]/;
         $type = 'M' if $type =~ /model|m/i;
@@ -453,6 +453,7 @@ my $build = Catalyst::Build->new(
     license            => 'perl',
     module_name        => '[% name %]',
     requires           => { Catalyst => '5.10' },
+    create_makefile_pl => 'passthrough',
     script_files       => [ glob('script/*') ],
     test_files         => [ glob('t/*.t'), glob('t/*/*.t') ]
 );

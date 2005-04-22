@@ -24,6 +24,7 @@ my $build = Module::Build->new(
         'Tree::Simple::Visitor::FindByPath' => 0,
         'URI'                               => 0,
     },
+    create_makefile_pl => 'passthrough',
     script_files => [ glob('script/*') ],
     test_files   => [
         glob('t/*.t'), glob('t/*/*.t'), glob('t/*/*/*.t'), glob('t/*/*/*/*.t')
