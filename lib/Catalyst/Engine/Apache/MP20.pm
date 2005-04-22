@@ -84,22 +84,22 @@ sub prepare_uploads {
 
     my @uploads;
 
-    for my $field ( $c->apache->upload ) {
+    $c->apache->upload->do( sub {
+        my ( $field, $upload ) = @_;
 
-        for my $upload ( $c->apache->upload($field) ) {
+        my $object = Catalyst::Request::Upload->new(
+            filename => $upload->filename,
+            size     => $upload->size,
+            tempname => $upload->tempname,
+            type     => $upload->type
+        );
 
-            my $object = Catalyst::Request::Upload->new(
-                filename => $upload->filename,
-                size     => $upload->size,
-                tempname => $upload->tempname,
-                type     => $upload->type
-            );
+        push( @uploads, $field, $object );
 
-            push( @uploads, $field, $object );
-        }
-    }
+        return 1;
+    });
 
-    $c->req->_assign_values( $c->req->uploads, \@uploads );
+    $c->request->_assign_values( $c->req->uploads, \@uploads );
 }
 
 =back

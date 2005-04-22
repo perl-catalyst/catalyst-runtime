@@ -93,10 +93,15 @@ sub prepare_headers {
 sub prepare_parameters {
     my $c = shift;
 
-    foreach my $key ( $c->apache->param ) {
-        my @values = $c->apache->param($key);
-        $c->req->parameters->{$key} = ( @values == 1 ) ? $values[0] : \@values;
-    }
+    my @params;
+    
+    $c->apache->param->do( sub {
+        my ( $field, $value ) = @_;
+        push( @params, $field, $value );
+        return 1;    
+    });
+    
+    $c->req->_assign_values( $c->req->parameters, \@params );
 }
 
 =item $c->prepare_path

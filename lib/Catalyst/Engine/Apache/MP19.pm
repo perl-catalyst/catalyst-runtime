@@ -83,8 +83,11 @@ sub prepare_request {
 sub prepare_uploads {
     my $c = shift;
 
-    my @uploads;
+    # This is a workaround for a know bug with libapreq <= 2.0.5
+    # http://svn.apache.org/viewcvs.cgi?rev=122925&view=rev
     
+    my @uploads;    
+
     for my $field ( $c->request->param ) {
 
         for my $upload ( $c->apache->upload($field) ) {

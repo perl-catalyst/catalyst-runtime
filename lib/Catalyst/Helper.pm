@@ -65,7 +65,7 @@ sub mk_app {
     $self->{startperl} = $Config{startperl};
     $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
-      || @{ [ getpwuid($<) ] }[6];
+      || eval { @{ [ getpwuid($<) ] }[6] } || 'A clever guy';
     $self->_mk_dirs;
     $self->_mk_appclass;
     $self->_mk_build;
@@ -93,7 +93,7 @@ sub mk_component {
     my $app  = shift;
     $self->{app} = $app;
     $self->{author} = $self->{author} = $ENV{'AUTHOR'}
-      || @{ [ getpwuid($<) ] }[6];
+      || eval { @{ [ getpwuid($<) ] }[6] } || 'A clever guy';
     $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
     unless ( $_[0] =~ /^model|m|view|v|controller|c\$/i ) {
         my $helper = shift;
