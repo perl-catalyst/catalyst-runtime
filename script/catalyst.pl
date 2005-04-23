@@ -50,7 +50,7 @@ L<Catalyst::Engine>
 
 =head1 AUTHOR
 
-Sebastian Riedel Sebastian Riedel, C<sri@oook.de>
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 
