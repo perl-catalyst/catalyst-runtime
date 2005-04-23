@@ -55,7 +55,7 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 sub finalize_body {
     my $c = shift;
-    $c->http->response->content_ref( $c->response->body_ref );
+    $c->http->response->content( $c->response->body );
 }
 
 =item $c->finalize_headers
@@ -151,8 +151,8 @@ sub prepare_parameters {
         }
     }
 
-    $c->request->param(\@params);
-    $c->request->upload(\@uploads);
+    $c->req->_assign_values( $c->req->parameters, \@params );
+    $c->req->_assign_values( $c->req->uploads, \@uploads );
 }
 
 =item $c->prepare_path
