@@ -151,8 +151,8 @@ sub prepare_parameters {
         }
     }
 
-    $c->req->_assign_values( $c->req->parameters, \@params );
-    $c->req->_assign_values( $c->req->uploads, \@uploads );
+    $c->request->param(\@params);
+    $c->request->upload(\@uploads);
 }
 
 =item $c->prepare_path

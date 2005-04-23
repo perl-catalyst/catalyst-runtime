@@ -99,7 +99,7 @@ sub prepare_uploads {
         return 1;
     });
 
-    $c->request->_assign_values( $c->req->uploads, \@uploads );
+    $c->request->upload(\@uploads);
 }
 
 =back

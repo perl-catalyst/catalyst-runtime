@@ -132,10 +132,8 @@ sub prepare_parameters {
     my $c = shift;
     
     my ( @params );
-    
-    
+ 
     if ( $c->request->method eq 'POST' ) {
-
         for my $param ( $c->cgi->url_param ) {
             for my $value (  $c->cgi->url_param($param) ) {
                 push ( @params, $param, $value );
@@ -149,7 +147,7 @@ sub prepare_parameters {
         }
     }
  
-    $c->req->_assign_values( $c->req->parameters, \@params );
+    $c->request->param(\@params);
 }
 
 =item $c->prepare_path
@@ -229,7 +227,7 @@ sub prepare_uploads {
         }
     }
     
-    $c->req->_assign_values( $c->req->uploads, \@uploads );
+    $c->request->upload(\@uploads);
 }
 
 =item $c->run

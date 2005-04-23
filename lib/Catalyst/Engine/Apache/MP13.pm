@@ -92,7 +92,7 @@ sub prepare_uploads {
         push( @uploads, $upload->name, $object );
     }
 
-    $c->req->_assign_values( $c->req->uploads, \@uploads );
+    $c->request->upload(\@uploads);
 }
 
 =back

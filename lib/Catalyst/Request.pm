@@ -19,23 +19,6 @@ sub header           { shift->headers->header(@_)           }
 sub referer          { shift->headers->referer(@_)          }
 sub user_agent       { shift->headers->user_agent(@_)       }
 
-sub _assign_values {
-    my ( $self, $map, $values ) = @_;
-
-    while ( my ( $name, $value ) = splice( @{$values}, 0, 2 ) ) {
-
-        if ( exists $map->{$name} ) {
-            for ( $map->{$name} ) {
-                $_ = [$_] unless ref($_) eq "ARRAY";
-                push( @$_, $value );
-            }
-        }
-        else {
-            $map->{$name} = $value;
-        }
-    }
-}
-
 =head1 NAME
 
 Catalyst::Request - Catalyst Request Class
@@ -184,22 +167,41 @@ sub param {
         return keys %{ $self->parameters };
     }
 
-    my $param = shift;
+    if ( @_ == 1 and ref( $_[0] ) eq 'ARRAY' ) {
 
-    unless ( exists $self->parameters->{$param} ) {
-        return wantarray ? () : undef;
-    }
+        while ( my ( $field, $value ) = splice( @{ $_[0] }, 0, 2 ) ) {
 
-    if ( ref $self->parameters->{$param} eq 'ARRAY' ) {
-        return (wantarray)
-          ? @{ $self->parameters->{$param} }
-          : $self->parameters->{$param}->[0];
+            if ( exists $self->parameters->{$field} ) {
+                for ( $self->parameters->{$field} ) {
+                    $_ = [$_] unless ref($_) eq "ARRAY";
+                    push( @$_, $value );
+                }
+            }
+            else {
+                $self->parameters->{$field} = $value;
+            }
+        }
     }
-    else {
-        return (wantarray)
-          ? ( $self->parameters->{$param} )
-          : $self->parameters->{$param};
-    }
+    
+    if ( @_ == 1 ) {
+
+        my $param = shift;
+
+        unless ( exists $self->parameters->{$param} ) {
+            return wantarray ? () : undef;
+        }
+
+        if ( ref $self->parameters->{$param} eq 'ARRAY' ) {
+            return (wantarray)
+              ? @{ $self->parameters->{$param} }
+              : $self->parameters->{$param}->[0];
+        }
+        else {
+            return (wantarray)
+              ? ( $self->parameters->{$param} )
+              : $self->parameters->{$param};
+        }
+    }    
 }
 
 =item $req->params
@@ -237,7 +239,7 @@ A convenient method to $req->uploads.
     $upload  = $c->request->upload('field');
     @uploads = $c->request->upload('field');
     @fields  = $c->request->upload;
-    
+
     for my $upload ( $c->request->upload('field') ) {
         print $upload->filename;
     }
@@ -251,27 +253,46 @@ sub upload {
         return keys %{ $self->uploads };
     }
 
-    my $upload = shift;
+    if ( @_ == 1 and ref( $_[0] ) eq 'ARRAY' ) {
 
-    unless ( exists $self->uploads->{$upload} ) {
-        return wantarray ? () : undef;
+        while ( my ( $field, $upload ) = splice( @{ $_[0] }, 0, 2 ) ) {
+
+            if ( exists $self->uploads->{$field} ) {
+                for ( $self->uploads->{$field} ) {
+                    $_ = [$_] unless ref($_) eq "ARRAY";
+                    push( @$_, $upload );
+                }
+            }
+            else {
+                $self->uploads->{$field} = $upload;
+            }
+        }
     }
 
-    if ( ref $self->uploads->{$upload} eq 'ARRAY' ) {
-        return (wantarray)
-          ? @{ $self->uploads->{$upload} }
-          : $self->uploads->{$upload}->[0];
-    }
-    else {
-        return (wantarray)
-          ? ( $self->uploads->{$upload} )
-          : $self->uploads->{$upload};
+    if ( @_ == 1 ) {
+
+        my $upload = shift;
+
+        unless ( exists $self->uploads->{$upload} ) {
+            return wantarray ? () : undef;
+        }
+
+        if ( ref $self->uploads->{$upload} eq 'ARRAY' ) {
+            return (wantarray)
+              ? @{ $self->uploads->{$upload} }
+              : $self->uploads->{$upload}->[0];
+        }
+        else {
+            return (wantarray)
+               ? ( $self->uploads->{$upload} )
+               : $self->uploads->{$upload};
+        }
     }
 }
 
 =item $req->uploads
 
-Returns a reference to a hash containing uploads. Values can be either a 
+Returns a reference to a hash containing uploads. Values can be either a
 hashref or a arrayref containing C<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};

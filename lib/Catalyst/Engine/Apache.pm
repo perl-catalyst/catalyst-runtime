@@ -101,7 +101,7 @@ sub prepare_parameters {
         return 1;    
     });
     
-    $c->req->_assign_values( $c->req->parameters, \@params );
+    $c->request->param(\@params);
 }
 
 =item $c->prepare_path
