@@ -6,11 +6,12 @@ use base 'Module::Build';
 use Path::Class;
 use File::Find 'find';
 
+our @ignore =
+  qw/Build Build.PL Changes MANIFEST META.yml Makefile.PL Makefile README
+  _build blib lib script t/;
+
 our $FAKE;
-our $ignore = '^('
-  . join( '|',
-    qw/Build Build.PL Changes Makefile.PL README _build blib lib script t/ )
-  . ')$';
+our $ignore = '^(' . join( '|', @ignore ) . ')$';
 
 =head1 NAME
 
