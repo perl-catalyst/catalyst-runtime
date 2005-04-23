@@ -21,7 +21,7 @@ placing a C<die()> call in the C<end> action.
 If you're tired of removing and adding this all the time, you
 can easily add a condition. For example:
 
-  die "Testing" if $c->param->{dump_info};
+  die "Testing" if $c->params->{dump_info};
 
 =head2 Disable statistics
 

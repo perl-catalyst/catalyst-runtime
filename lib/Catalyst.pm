@@ -251,7 +251,7 @@ sub import {
     my $subdir = dir($home)->subdir($append);
     for ( split '/', $name ) { $home = dir($home)->parent }
     if ( $home =~ /blib$/ ) { $home = dir($home)->parent }
-    elsif ( !-f file( $home, 'Build.PL' ) ) { $home = $subdir }
+    elsif ( !-f file( $home, 'Makefile.PL' ) ) { $home = $subdir }
 
     if ( $caller->debug ) {
         $home
@@ -352,7 +352,7 @@ Sebastian Riedel, C<sri@oook.de>
 
 Andy Grundman, Andrew Ford, Andrew Ruthven, Autrijus Tang, Christian Hansen,
 Christopher Hicks, Dan Sully, Danijel Milicevic, David Naughton,
-Gary Ashton Jones, Jesse Sheidlower, Johan Lindstrom, Leon Brocard,
+Gary Ashton Jones, Jesse Sheidlower, Jody Belka, Johan Lindstrom, Leon Brocard,
 Marcus Ramberg, Tatsuhiko Miyagawa and all the others who've helped.
 
 =head1 LICENSE
