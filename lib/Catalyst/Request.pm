@@ -33,6 +33,8 @@ Catalyst::Request - Catalyst Request Class
     $req->arguments;
     $req->base;
     $req->body;
+    $req->body_length;
+    $req->body_ref;
     $req->content_encoding;
     $req->content_length;
     $req->content_type;
@@ -98,6 +100,34 @@ Contains the message body of the request unless Content-Type is
 C<application/x-www-form-urlencoded> or C<multipart/form-data>.
 
     print $c->request->body
+
+=item $req->body_length
+
+Returns the length of body in bytes.
+
+    print $c->request->body_length
+
+=cut
+
+sub body_length {
+    my $self = shift;
+    
+    use bytes;
+    
+    return 0 unless $self->body;
+    return length($self->body);
+}
+
+=item $req->body_ref
+
+Returns a reference to body.
+
+=cut
+
+sub body_ref {
+    my $self = shift;    
+    return \$self->{body};
+}
 
 =item $req->content_encoding
 

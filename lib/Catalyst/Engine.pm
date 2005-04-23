@@ -179,13 +179,12 @@ sub finalize {
         $c->finalize_error;
     }
 
-    if ( !$c->response->body && $c->response->status !~ /^(1|3)\d\d$/ ) {
+    if ( !$c->response->body_length && $c->response->status !~ /^(1|3)\d\d$/ ) {
         $c->finalize_error;
     }
 
-    if ( $c->response->body && !$c->response->content_length ) {
-        use bytes;    # play safe with a utf8 aware perl
-        $c->response->content_length( length $c->response->body );
+    if ( $c->response->body_length && !$c->response->content_length ) {
+        $c->response->content_length( $c->response->body_length );
     }
 
     my $status = $c->finalize_headers;
@@ -401,6 +400,7 @@ sub prepare {
         request => Catalyst::Request->new(
             {
                 arguments  => [],
+                body       => undef,
                 cookies    => {},
                 headers    => HTTP::Headers->new,
                 parameters => {},
@@ -409,7 +409,12 @@ sub prepare {
             }
         ),
         response => Catalyst::Response->new(
-            { cookies => {}, headers => HTTP::Headers->new, status => 200 }
+            { 
+                body       => undef,
+                cookies    => {},
+                headers    => HTTP::Headers->new,
+                status     => 200
+            }
         ),
         stash => {},
         state => 0
@@ -425,10 +430,10 @@ sub prepare {
     }
 
     $c->prepare_request($engine);
-    $c->prepare_path;
+    $c->prepare_connection;
     $c->prepare_headers;
     $c->prepare_cookies;
-    $c->prepare_connection;
+    $c->prepare_path;
     $c->prepare_action;
 
     my $method   = $c->req->method   || '';

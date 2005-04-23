@@ -55,7 +55,7 @@ This class overloads some methods from C<Catalyst::Engine>.
 
 sub finalize_body {
     my $c = shift;
-    $c->http->response->content( $c->response->body );
+    $c->http->response->content_ref( $c->response->body_ref );
 }
 
 =item $c->finalize_headers

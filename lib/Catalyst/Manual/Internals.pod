@@ -53,10 +53,10 @@ extend Catalyst.
     handler
       prepare
         prepare_request
-        prepare_path
+        prepare_connection
         prepare_headers
         prepare_cookies
-        prepare_connection
+        prepare_path
         prepare_action
         prepare_body
         prepare_parameters

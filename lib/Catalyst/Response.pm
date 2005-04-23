@@ -20,6 +20,8 @@ Catalyst::Response - Catalyst Response Class
 
     $resp = $c->response;
     $resp->body;
+    $resp->body_length;
+    $resp->body_ref;
     $resp->content_encoding;
     $resp->content_length;
     $resp->content_type;
@@ -46,6 +48,34 @@ to response data.
     $c->response->body('Catalyst rocks!');
 
 Contains the final output.
+
+=item $resp->body_length
+
+Returns the length of body in bytes.
+
+    print $c->response->body_length
+
+=cut
+
+sub body_length {
+    my $self = shift;
+    
+    use bytes;
+    
+    return 0 unless $self->body;
+    return length($self->body);
+}
+
+=item $resp->body_ref
+
+Returns a reference to body.
+
+=cut
+
+sub body_ref {
+    my $self = shift;    
+    return \$self->{body};
+}
 
 =item $resp->content_encoding
 
