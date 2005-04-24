@@ -169,6 +169,10 @@ sub prepare_path {
         my $port   = $ENV{SERVER_PORT} || 80;
         my $path   = $ENV{SCRIPT_NAME} || '/';
 
+        unless ( $path =~ /\/$/ ) {
+            $path .= '/';
+        }
+
         $base = URI->new;
         $base->scheme($scheme);
         $base->host($host);

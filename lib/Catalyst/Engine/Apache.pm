@@ -76,7 +76,7 @@ sub prepare_connection {
     $c->request->hostname( $c->apache->connection->remote_host );
     $c->request->protocol( $c->apache->protocol );
     
-    if ( $ENV{HTTPS} ) {
+    if ( $ENV{HTTPS} || $c->apache->get_server_port == 443 ) {
         $c->request->secure(1);
     }
 }
@@ -117,17 +117,34 @@ sub prepare_parameters {
 # not <Directory> directive
 sub prepare_path {
     my $c = shift;
-    $c->request->path( $c->apache->uri );
-    my $loc = $c->apache->location;
-    no warnings 'uninitialized';
-    $c->req->{path} =~ s/^($loc)?\///;
-    my $base = URI->new;
-    $base->scheme( $ENV{HTTPS} ? 'https' : 'http' );
-    $base->host( $c->apache->hostname );
-    $base->port( $c->apache->get_server_port );
-    my $path = $c->apache->location;
-    $base->path( $path =~ /\/$/ ? $path : "$path/" );
-    $c->request->base( $base->as_string );
+    
+    my $base;
+    {
+        my $scheme = $c->request->secure ? 'https' : 'http';
+        my $host   = $c->apache->hostname;
+        my $port   = $c->apache->get_server_port;
+        my $path   = $c->apache->location || '/';
+        
+        unless ( $path =~ /\/$/ ) {
+            $path .= '/';
+        }
+
+        $base = URI->new;
+        $base->scheme($scheme);
+        $base->host($host);
+        $base->port($port);
+        $base->path($path);
+
+        $base = $base->canonical->as_string;
+    }
+    
+    my $location = $c->apache->location || '/';
+    my $path = $c->apache->uri || '/';
+    $path =~ s/^($location)?\///;
+    $path =~ s/^\///;
+
+    $c->req->base($base);
+    $c->req->path($path);
 }
 
 =item $c->run
