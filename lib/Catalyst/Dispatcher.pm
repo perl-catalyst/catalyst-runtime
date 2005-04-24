@@ -139,7 +139,7 @@ sub forward {
         $path =~ s/::/\//g;
 
         unless ( $INC{ $path } ) {
-            my $error = qq/Unknown class "$class"/;
+            my $error = qq/Couldn't forward to "$class". Invalid or not loaded./;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
