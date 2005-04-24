@@ -145,6 +145,7 @@ sub forward {
 
         my $method = shift || 'process';
 
+        require $class;
         if ( my $code = $class->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
             $results = [ [ [ $class, $code ] ] ];
