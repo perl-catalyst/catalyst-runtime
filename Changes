@@ -1,19 +1,23 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.11  Sun Apr 24 17:00:00 2005
+        - improved uploads and parameters
+        - added $c->req->protocol and $c->req->secure
+
 5.10  Wed Apr 20 18:00:00 2005
-        - Updated dependencies to require latest module::pluggable::fast
-        - New installer for templates and stuff using Module::Build
+        - updated dependencies to require latest module::pluggable::fast
+        - new installer for templates and stuff using Module::Build
         - scripts are now prefixed, for being installable
         IMPORTANT: You have to regenerate the script directory,
         remove Makefile.PL and add Build.PL
         - Added compat to install Module::Build if required.
 
 5.03  Tue Apr 19 20:35:00 2005 (Revision 462)
-        - Fixed Test example (Torsten Seeman)
-        - Added Plugins chapter to manual
+        - fixed Test example (Torsten Seeman)
+        - added Plugins chapter to manual
         - applied doc patch from Robert Boone <robert@rlb3.com>
-        - Improved Dispatcher error messages.
-        - Refactored so we don't need to include helper from
+        - improved Dispatcher error messages.
+        - refactored so we don't need to include helper from
           Catalyst.pm - Fixes issues with FindBin
         - applied HTTP.pm patch from Andy Grundman <andy@hybridized.org>
         - added plugin() method for instant plugins

@@ -10,7 +10,7 @@ our $CATALYST_SCRIPT_GEN = 3;
 
 __PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
 
-our $VERSION = '5.10';
+our $VERSION = '5.11';
 our @ISA;
 
 =head1 NAME
