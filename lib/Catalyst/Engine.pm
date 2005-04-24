@@ -404,12 +404,18 @@ sub prepare {
                 cookies    => {},
                 headers    => HTTP::Headers->new,
                 parameters => {},
+                secure     => 0,
                 snippets   => [],
                 uploads    => {}
             }
         ),
         response => Catalyst::Response->new(
-            { cookies => {}, headers => HTTP::Headers->new, status => 200 }
+            {
+                body    => undef,
+                cookies => {},
+                headers => HTTP::Headers->new,
+                status => 200
+            }
         ),
         stash => {},
         state => 0
@@ -425,10 +431,10 @@ sub prepare {
     }
 
     $c->prepare_request($engine);
-    $c->prepare_path;
+    $c->prepare_connection;
     $c->prepare_headers;
     $c->prepare_cookies;
-    $c->prepare_connection;
+    $c->prepare_path;
     $c->prepare_action;
 
     my $method   = $c->req->method   || '';

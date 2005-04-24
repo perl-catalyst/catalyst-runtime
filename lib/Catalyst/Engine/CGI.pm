@@ -101,8 +101,13 @@ sub prepare_body {
 
 sub prepare_connection {
     my $c = shift;
-    $c->req->hostname( $ENV{REMOTE_HOST} );
-    $c->req->address( $ENV{REMOTE_ADDR} );
+    $c->request->address( $ENV{REMOTE_ADDR} );
+    $c->request->hostname( $ENV{REMOTE_HOST} );
+    $c->request->protocol( $ENV{SERVER_PROTOCOL} );
+
+    if ( $ENV{HTTPS} || $ENV{SERVER_PORT} == 443 ) {
+        $c->request->secure(1);
+    }
 }
 
 =item $c->prepare_headers
@@ -130,9 +135,9 @@ sub prepare_headers {
 
 sub prepare_parameters {
     my $c = shift;
-    
+
     my ( @params );
- 
+
     if ( $c->request->method eq 'POST' ) {
         for my $param ( $c->cgi->url_param ) {
             for my $value (  $c->cgi->url_param($param) ) {
@@ -141,13 +146,13 @@ sub prepare_parameters {
         }
     }
 
-    for my $param ( $c->cgi->param ) { 
+    for my $param ( $c->cgi->param ) {
         for my $value (  $c->cgi->param($param) ) {
             push ( @params, $param, $value );
         }
     }
- 
-    $c->request->param(\@params);
+
+    $c->request->param(@params);
 }
 
 =item $c->prepare_path
@@ -159,7 +164,7 @@ sub prepare_path {
 
     my $base;
     {
-        my $scheme = $ENV{HTTPS} ? 'https' : 'http';
+        my $scheme = $c->request->secure ? 'https' : 'http';
         my $host   = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
         my $port   = $ENV{SERVER_PORT} || 80;
         my $path   = $ENV{SCRIPT_NAME} || '/';
@@ -185,7 +190,7 @@ sub prepare_path {
 
 =cut
 
-sub prepare_request { 
+sub prepare_request {
     my ( $c, $cgi ) = @_;
     $c->cgi( $cgi || CGI->new );
     $c->cgi->_reset_globals;
@@ -199,9 +204,9 @@ sub prepare_uploads {
     my $c = shift;
 
     my @uploads;
-    
+
     for my $param ( $c->cgi->param ) {
-    
+
         my @values = $c->cgi->param($param);
 
         next unless ref( $values[0] );
@@ -222,12 +227,12 @@ sub prepare_uploads {
                 tempname => $tempname,
                 type     => $type
             );
-            
+
             push( @uploads, $param, $upload );
         }
     }
-    
-    $c->request->upload(\@uploads);
+
+    $c->request->upload(@uploads);
 }
 
 =item $c->run

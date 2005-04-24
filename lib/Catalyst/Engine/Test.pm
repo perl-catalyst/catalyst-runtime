@@ -87,8 +87,9 @@ sub prepare_body {
 
 sub prepare_connection {
     my $c = shift;
-    $c->req->hostname( $c->http->hostname );
-    $c->req->address( $c->http->address );
+    $c->request->address( $c->http->address );
+    $c->request->hostname( $c->http->hostname );
+    $c->request->protocol( $c->http->request->protocol );
 }
 
 =item $c->prepare_headers
@@ -97,8 +98,8 @@ sub prepare_connection {
 
 sub prepare_headers {
     my $c = shift;
-    $c->req->method( $c->http->request->method );
-    $c->req->headers( $c->http->request->headers );
+    $c->request->method( $c->http->request->method );
+    $c->request->headers( $c->http->request->headers );
 }
 
 =item $c->prepare_parameters
@@ -151,8 +152,8 @@ sub prepare_parameters {
         }
     }
 
-    $c->req->_assign_values( $c->req->parameters, \@params );
-    $c->req->_assign_values( $c->req->uploads, \@uploads );
+    $c->request->param(@params);
+    $c->request->upload(@uploads);
 }
 
 =item $c->prepare_path

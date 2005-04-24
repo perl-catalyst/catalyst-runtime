@@ -83,7 +83,7 @@ sub prepare_request {
 sub prepare_uploads {
     my $c = shift;
 
-    # This is a workaround for a know bug with libapreq <= 2.0.5
+    # This is a workaround for a know bug with libapreq <= 2.0.4
     # http://svn.apache.org/viewcvs.cgi?rev=122925&view=rev
     
     my @uploads;    
@@ -103,7 +103,7 @@ sub prepare_uploads {
         }
     }
 
-    $c->request->upload(\@uploads);
+    $c->request->upload(@uploads);
 }
 
 =back

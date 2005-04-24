@@ -72,8 +72,13 @@ sub prepare_body {
 
 sub prepare_connection {
     my $c = shift;
-    $c->request->hostname( $c->apache->connection->remote_host );
     $c->request->address( $c->apache->connection->remote_ip );
+    $c->request->hostname( $c->apache->connection->remote_host );
+    $c->request->protocol( $c->apache->protocol );
+    
+    if ( $ENV{HTTPS} ) {
+        $c->request->secure(1);
+    }
 }
 
 =item $c->prepare_headers
@@ -101,7 +106,7 @@ sub prepare_parameters {
         return 1;    
     });
     
-    $c->request->param(\@params);
+    $c->request->param(@params);
 }
 
 =item $c->prepare_path
