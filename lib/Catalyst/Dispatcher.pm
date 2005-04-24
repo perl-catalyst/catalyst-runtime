@@ -135,9 +135,11 @@ sub forward {
 
     unless ( @{$results} ) {
         my $class = $command || '';
+        my $path  = $class . '.pm';
+        $path =~ s/::/\//g;
 
-        if ( $class =~ /[^\w\:]/ ) {
-            my $error = qq/"$class" is an invalid Class name/;
+        unless ( $INC{ $path } ) {
+            my $error = qq/Unknown class "$class"/;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
@@ -145,7 +147,6 @@ sub forward {
 
         my $method = shift || 'process';
 
-        require $class;
         if ( my $code = $class->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
             $results = [ [ [ $class, $code ] ] ];
