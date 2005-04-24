@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 39;
+use Test::More tests => 43;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -98,4 +98,20 @@ use HTTP::Request::Common;
         is( $upload->filename, $parameters{filename}, 'Upload filename' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
     }
+}
+
+{
+    my $creq;
+
+    my $request = POST( 'http://localhost/engine/request/uploads/slurp',
+        'Content-Type' => 'multipart/form-data',
+        'Content'      => [
+            'slurp' => [ "$FindBin::Bin/uploads.t" ],
+         ]
+    );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    is( $response->content, ($request->parts)[0]->content, 'Content' );
 }

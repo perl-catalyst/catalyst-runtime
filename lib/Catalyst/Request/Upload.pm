@@ -20,6 +20,7 @@ Catalyst::Request::Upload - Catalyst Request Upload Class
     $upload->filename;
     $upload->link_to;
     $upload->size;
+    $upload->slurp;
     $upload->tempname;
     $upload->type;
 
@@ -91,6 +92,31 @@ sub link_to {
 =item $upload->size
 
 Contains size of the file in bytes.
+
+=item $upload->slurp
+
+Returns a scalar containing contents of tempname.
+
+=cut
+
+sub slurp {
+    my ( $self, $layer ) = @_;
+
+    unless ( $layer ) {
+        $layer = ':raw';
+    }
+
+    my $content = undef;
+    my $handle  = $self->fh;
+
+    binmode( $handle, $layer );
+
+    while ( $handle->sysread( my $buffer, 8192 ) ) {
+        $content .= $buffer;
+    }
+
+    return $content;
+}
 
 =item $upload->tempname
 
