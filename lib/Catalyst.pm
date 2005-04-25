@@ -6,11 +6,11 @@ use UNIVERSAL::require;
 use Catalyst::Log;
 use Text::ASCIITable;
 use Path::Class;
-our $CATALYST_SCRIPT_GEN = 3;
+our $CATALYST_SCRIPT_GEN = 4;
 
 __PACKAGE__->mk_classdata($_) for qw/dispatcher engine log/;
 
-our $VERSION = '5.11';
+our $VERSION = '5.20';
 our @ISA;
 
 =head1 NAME
@@ -218,6 +218,8 @@ sub import {
     # Dispatcher
     $dispatcher = "Catalyst::Dispatcher::$ENV{CATALYST_DISPATCHER}"
       if $ENV{CATALYST_DISPATCHER};
+    my $appdis = $ENV{ uc($caller) . '_DISPATCHER' };
+    $dispatcher = "Catalyst::Dispatcher::$appdis" if $appdis;
 
     $dispatcher->require;
     die qq/Couldn't load dispatcher "$dispatcher", "$@"/ if $@;
@@ -231,6 +233,8 @@ sub import {
     # Engine
     $engine = "Catalyst::Engine::$ENV{CATALYST_ENGINE}"
       if $ENV{CATALYST_ENGINE};
+    my $appeng = $ENV{ uc($caller) . '_ENGINE' };
+    $engine = "Catalyst::Engine::$appeng" if $appeng;
 
     $engine->require;
     die qq/Couldn't load engine "$engine", "$@"/ if $@;

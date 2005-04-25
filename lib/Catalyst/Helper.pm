@@ -527,7 +527,7 @@ all_pod_coverage_ok();
 
 __cgi__
 [% startperl %] -w
-BEGIN { $ENV{CATALYST_ENGINE} = 'CGI' }
+BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
 
 use strict;
 use FindBin;
@@ -566,7 +566,7 @@ it under the same terms as perl itself.
 __fastcgi__
 [% startperl %] -w
 
-BEGIN { $ENV{CATALYST_ENGINE} = 'FastCGI' }
+BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
 
 use strict;
 use FindBin;
@@ -606,7 +606,7 @@ __server__
 [% startperl %] -w
 
 BEGIN { 
-    $ENV{CATALYST_ENGINE} = 'HTTP';
+    $ENV{CATALYST_ENGINE} ||= 'HTTP';
     $ENV{CATALYST_SCRIPT_GEN} = [% scriptgen %];
 }  
 
@@ -664,7 +664,7 @@ it under the same terms as perl itself.
 __test__
 [% startperl %] -w
 
-BEGIN { $ENV{CATALYST_ENGINE} = 'Test' }
+BEGIN { $ENV{CATALYST_ENGINE} ||= 'Test' }
 
 use strict;
 use Getopt::Long;
