@@ -3,6 +3,7 @@ package Catalyst::Engine::CGI::Base;
 use strict;
 use base 'Catalyst::Engine';
 
+use IO::File ();
 use URI;
 use URI::http;
 
@@ -54,6 +55,23 @@ sub finalize_headers {
 
     print $c->response->headers->as_string("\015\012");
     print "\015\012";
+}
+
+=item $c->prepare_body
+
+=cut
+
+sub prepare_body {
+    my $c = shift;
+    
+    my $handle = IO::File->new_from_fd( fileno(STDIN), IO::File::O_RDONLY );
+    my $body   = undef;  
+    
+    while ( $handle->sysread( my $buffer, 8192 ) ) {
+        $body .= $buffer;
+    }
+    
+    $c->request->body($body);
 }
 
 =item $c->prepare_connection
