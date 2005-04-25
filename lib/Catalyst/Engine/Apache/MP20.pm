@@ -9,10 +9,7 @@ use Apache2::RequestIO   ();
 use Apache2::RequestRec  ();
 use Apache2::RequestUtil ();
 use Apache2::Request     ();
-use Apache2::Cookie      ();
 use Apache2::Upload      ();
-use Apache2::URI         ();
-use APR::URI             ();
 
 Apache2::Const->import( -compile => ':common' );
 

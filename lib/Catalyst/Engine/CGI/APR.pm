@@ -97,7 +97,8 @@ sub prepare_uploads {
 
 =head1 SEE ALSO
 
-L<Catalyst> L<Catalyst::Engine> L<Catalyst::Engine::CGI::Base> L<APR::Request>.
+L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::CGI::Base>, 
+sL<APR::Request>.
 
 =head1 AUTHOR
 

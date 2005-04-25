@@ -6,7 +6,6 @@ use base 'Catalyst::Engine::Apache::Base';
 use Apache            ();
 use Apache::Constants ();
 use Apache::Request   ();
-use Apache::Cookie    ();
 
 Apache::Constants->import(':common');
 
