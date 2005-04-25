@@ -411,10 +411,10 @@ sub prepare {
         ),
         response => Catalyst::Response->new(
             {
-                body    => undef,
+                body    => '',
                 cookies => {},
                 headers => HTTP::Headers->new,
-                status => 200
+                status  => 200
             }
         ),
         stash => {},

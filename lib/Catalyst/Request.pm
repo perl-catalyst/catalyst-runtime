@@ -189,7 +189,7 @@ sub param {
         }
     }
 
-    if ( @_ > 1  ) {
+    if ( @_ > 1 ) {
 
         while ( my ( $field, $value ) = splice( @_, 0, 2 ) ) {
 
