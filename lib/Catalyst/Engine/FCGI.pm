@@ -1,8 +1,7 @@
 package Catalyst::Engine::FCGI;
 
 use strict;
-use base 'Catalyst::Engine::CGI';
-use FCGI;
+use base qw(Catalyst::Engine::FCGI::Base Catalyst::Engine::CGI);
 
 =head1 NAME
 
@@ -28,33 +27,14 @@ A script using the Catalyst::Engine::FCGI module might look like:
 
 This is the Catalyst engine for FastCGI.
 
-=head1 OVERLOADED METHODS
-
-This class overloads some methods from C<Catalyst::Engine::CGI>.
-
-=over 4
-
-=item $c->run
-
-=cut
-
-sub run {
-    my $class   = shift;
-    my $request = FCGI::Request();
-    while ( $request->Accept() >= 0 ) {
-        $class->handler;
-    }
-}
-
-=back
-
 =head1 SEE ALSO
 
-L<Catalyst>.
+L<Catalyst>, L<Catalyst::Engine::CGI>.
 
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Christian Hansen, C<ch@ngmedia.com>
 
 =head1 COPYRIGHT
 

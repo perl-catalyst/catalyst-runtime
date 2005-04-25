@@ -1,7 +1,7 @@
 package Catalyst::Engine::Apache::MP19;
 
 use strict;
-use base 'Catalyst::Engine::Apache';
+use base 'Catalyst::Engine::Apache::Base';
 
 use Apache2             ();
 use Apache::Connection  ();
@@ -31,7 +31,7 @@ This is the Catalyst engine specialized for Apache mod_perl version 1.9x.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::Apache>.
+This class overloads some methods from C<Catalyst::Engine::Apache::Base>.
 
 =over 4
 
@@ -110,7 +110,7 @@ sub prepare_uploads {
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::Apache>.
+L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::Apache::Base>.
 
 =head1 AUTHOR
 
