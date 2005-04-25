@@ -1,11 +1,11 @@
-package Catalyst::Engine::FCGI::Base;
+package Catalyst::Engine::FastCGI::Base;
 
 use strict;
 use FCGI;
 
 =head1 NAME
 
-Catalyst::Engine::FCGI::Base - Base class for FastCGI Engines
+Catalyst::Engine::FastCGI::Base - Base class for FastCGI Engines
 
 =head1 DESCRIPTION
 

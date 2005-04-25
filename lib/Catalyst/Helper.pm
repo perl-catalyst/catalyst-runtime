@@ -564,7 +564,7 @@ it under the same terms as perl itself.
 __fcgi__
 [% startperl %] -w
 
-BEGIN { $ENV{CATALYST_ENGINE} = 'FCGI' }
+BEGIN { $ENV{CATALYST_ENGINE} = 'FastCGI' }
 
 use strict;
 use FindBin;

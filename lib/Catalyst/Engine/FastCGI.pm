@@ -1,20 +1,20 @@
-package Catalyst::Engine::FCGI;
+package Catalyst::Engine::FastCGI;
 
 use strict;
-use base qw(Catalyst::Engine::FCGI::Base Catalyst::Engine::CGI);
+use base qw(Catalyst::Engine::FastCGI::Base Catalyst::Engine::CGI);
 
 =head1 NAME
 
-Catalyst::Engine::FCGI - Catalyst FCGI Engine
+Catalyst::Engine::FastCGI - Catalyst FastCGI Engine
 
 =head1 SYNOPSIS
 
-A script using the Catalyst::Engine::FCGI module might look like:
+A script using the Catalyst::Engine::FastCGI module might look like:
 
     #!/usr/bin/perl -w
 
     BEGIN { 
-       $ENV{CATALYST_ENGINE} = 'FCGI';
+       $ENV{CATALYST_ENGINE} = 'FastCGI';
     }
 
     use strict;
