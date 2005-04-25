@@ -189,7 +189,7 @@ sub param {
         }
     }
 
-    if ( @_ => 2  ) {
+    if ( @_ > 1  ) {
 
         while ( my ( $field, $value ) = splice( @_, 0, 2 ) ) {
 
@@ -283,7 +283,7 @@ sub upload {
         }
     }
 
-    if ( @_ => 2 ) {
+    if ( @_ > 1 ) {
 
         while ( my ( $field, $upload ) = splice( @_, 0, 2 ) ) {
 
