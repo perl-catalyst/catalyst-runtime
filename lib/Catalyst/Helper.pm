@@ -65,7 +65,8 @@ sub mk_app {
     $self->{startperl} = $Config{startperl};
     $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
-      || eval { @{ [ getpwuid($<) ] }[6] } || 'A clever guy';
+      || eval { @{ [ getpwuid($<) ] }[6] }
+      || 'A clever guy';
     $self->_mk_dirs;
     $self->_mk_appclass;
     $self->_mk_build;
@@ -74,7 +75,7 @@ sub mk_app {
     $self->_mk_changes;
     $self->_mk_apptest;
     $self->_mk_cgi;
-    $self->_mk_fcgi;
+    $self->_mk_fastcgi;
     $self->_mk_server;
     $self->_mk_test;
     $self->_mk_create;
@@ -93,7 +94,8 @@ sub mk_component {
     my $app  = shift;
     $self->{app} = $app;
     $self->{author} = $self->{author} = $ENV{'AUTHOR'}
-      || eval { @{ [ getpwuid($<) ] }[6] } || 'A clever guy';
+      || eval { @{ [ getpwuid($<) ] }[6] }
+      || 'A clever guy';
     $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
     unless ( $_[0] =~ /^model|m|view|v|controller|c\$/i ) {
         my $helper = shift;
@@ -108,7 +110,7 @@ sub mk_component {
     else {
         my $type   = shift;
         my $name   = shift || "Missing name for model/view/controller";
-        my $helper = shift ;
+        my $helper = shift;
         my @args   = @_;
         return 0 if $name =~ /[^\w\:]/;
         $type = 'M' if $type =~ /model|m/i;
@@ -307,40 +309,40 @@ sub _mk_apptest {
 }
 
 sub _mk_cgi {
-    my $self   = shift;
-    my $script = $self->{script};
+    my $self      = shift;
+    my $script    = $self->{script};
     my $appprefix = $self->{appprefix};
     $self->render_file( 'cgi', "$script\/$appprefix\_cgi.pl" );
     chmod 0700, "$script/$appprefix\_cgi.pl";
 }
 
-sub _mk_fcgi {
-    my $self   = shift;
-    my $script = $self->{script};
+sub _mk_fastcgi {
+    my $self      = shift;
+    my $script    = $self->{script};
     my $appprefix = $self->{appprefix};
-    $self->render_file( 'fcgi', "$script\/$appprefix\_fcgi.pl" );
-    chmod 0700, "$script/$appprefix\_fcgi.pl";
+    $self->render_file( 'fastcgi', "$script\/$appprefix\_fastcgi.pl" );
+    chmod 0700, "$script/$appprefix\_fastcgi.pl";
 }
 
 sub _mk_server {
-    my $self   = shift;
-    my $script = $self->{script};
+    my $self      = shift;
+    my $script    = $self->{script};
     my $appprefix = $self->{appprefix};
     $self->render_file( 'server', "$script\/$appprefix\_server.pl" );
     chmod 0700, "$script/$appprefix\_server.pl";
 }
 
 sub _mk_test {
-    my $self   = shift;
-    my $script = $self->{script};
+    my $self      = shift;
+    my $script    = $self->{script};
     my $appprefix = $self->{appprefix};
     $self->render_file( 'test', "$script/$appprefix\_test.pl" );
     chmod 0700, "$script/$appprefix\_test.pl";
 }
 
 sub _mk_create {
-    my $self   = shift;
-    my $script = $self->{script};
+    my $self      = shift;
+    my $script    = $self->{script};
     my $appprefix = $self->{appprefix};
     $self->render_file( 'create', "$script\/$appprefix\_create.pl" );
     chmod 0700, "$script/$appprefix\_create.pl";
@@ -561,7 +563,7 @@ it under the same terms as perl itself.
 
 =cut
 
-__fcgi__
+__fastcgi__
 [% startperl %] -w
 
 BEGIN { $ENV{CATALYST_ENGINE} = 'FastCGI' }
@@ -577,7 +579,7 @@ use [% name %];
 
 =head1 NAME
 
-fcgi - Catalyst FCGI
+fastcgi - Catalyst FastCGI
 
 =head1 SYNOPSIS
 
@@ -585,7 +587,7 @@ See L<Catalyst::Manual>
 
 =head1 DESCRIPTION
 
-Run a Catalyst application as fcgi.
+Run a Catalyst application as fastcgi.
 
 =head1 AUTHOR
 
