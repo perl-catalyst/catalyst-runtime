@@ -29,6 +29,8 @@ sub attrs { attributes::get( $_[0] ) || [] }
 
 Returns a prefixed action.
 
+    MyApp::C::Foo::Bar, yada becomes /foo/bar/yada
+
 =cut
 
 sub prefix {
@@ -41,6 +43,9 @@ sub prefix {
 =item class2appclass($class);
 
 Returns the appclass for class.
+
+    MyApp::C::Foo::Bar becomes MyApp
+    My::App::C::Foo::Bar becomes My::App
 
 =cut
 
@@ -57,6 +62,9 @@ sub class2appclass {
 
 Returns the classprefix for class.
 
+    MyApp::C::Foo::Bar becomes MyApp::C
+    My::App::C::Foo::Bar becomes My::App::C
+
 =cut
 
 sub class2classprefix {
@@ -72,6 +80,8 @@ sub class2classprefix {
 
 Returns the classsuffix for class.
 
+    MyApp::C::Foo::Bar becomes C::Foo::Bar
+
 =cut
 
 sub class2classsuffix {
@@ -84,6 +94,8 @@ sub class2classsuffix {
 =item class2prefix($class);
 
 Returns the prefix for class.
+
+    My::App::C::Foo::Bar becomes /foo/bar
 
 =cut
 
