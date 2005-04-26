@@ -3,7 +3,7 @@ package Catalyst::Response;
 use strict;
 use base 'Class::Accessor::Fast';
 
-__PACKAGE__->mk_accessors(qw/cookies body headers redirect status/);
+__PACKAGE__->mk_accessors(qw/cookies body headers location status/);
 
 *output = \&body;
 
@@ -79,11 +79,28 @@ Returns a L<HTTP::Headers> object containing the headers.
 
 Shortcut to $resp->body
 
-=item $resp->redirect($url)
+=item $resp->redirect( $url, $status )
 
 Contains a location to redirect to.
 
-    $c->response->redirect('http://slashdot.org');
+    $c->response->redirect( 'http://slashdot.org' );
+    $c->response->redirect( 'http://slashdot.org', 307 );
+
+=cut
+
+sub redirect {
+    my $self = shift;
+    
+    if ( @_ ) {
+        my $location = shift;
+        my $status   = shift || 302;
+
+        $self->location($location);
+        $self->status($status);
+    }
+
+    return $self->location;
+}
 
 =item status
 
