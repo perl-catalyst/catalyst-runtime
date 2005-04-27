@@ -80,18 +80,24 @@ Regex search for a component.
 =cut
 
 sub component {
-    my ( $c, $name ) = @_;
+    my $c = shift;
 
-    if ( my $component = $c->components->{$name} ) {
-        return $component;
-    }
+    if ( @_ ) {
 
-    else {
-        for my $component ( keys %{ $c->components } ) {
-            return $c->components->{$component} if $component =~ /$name/i;
+        my $name = shift;
+
+        if ( my $component = $c->components->{$name} ) {
+            return $component;
+        }
+
+        else {
+            for my $component ( keys %{ $c->components } ) {
+                return $c->components->{$component} if $component =~ /$name/i;
+            }
         }
     }
 
+    return sort keys %{ $c->components };
 }
 
 =item $c->error
@@ -595,6 +601,39 @@ Prepare uploads.
 
 sub prepare_uploads { }
 
+=item $c->retrieve_components
+
+Retrieve Components.
+
+=cut
+
+sub retrieve_components {
+    my $self = shift;
+
+    my $class = ref $self || $self;
+    eval <<"";
+        package $class;
+        import Module::Pluggable::Fast
+          name    => '_components',
+          search  => [
+            '$class\::Controller', '$class\::C',
+            '$class\::Model',      '$class\::M',
+            '$class\::View',       '$class\::V'
+          ],
+          require => 1;
+
+    if ( my $error = $@ ) {
+        chomp $error;
+        die qq/Couldn't load components "$error"/;
+    }
+
+    $self->components( {} );
+
+    for my $component ( $self->_components ) {
+        $self->components->{$component} = $component;
+    }
+}
+
 =item $c->run
 
 Starts the engine.
@@ -629,6 +668,7 @@ Setup.
 
 sub setup {
     my $self = shift;
+    $self->retrieve_components;
     $self->setup_components;
     if ( $self->debug ) {
         my $name = $self->config->{name} || 'Application';
@@ -645,38 +685,34 @@ Setup components.
 sub setup_components {
     my $self = shift;
 
-    # Components
-    my $class = ref $self || $self;
-    eval <<"";
-        package $class;
-        import Module::Pluggable::Fast
-          name   => '_components',
-          search => [
-            '$class\::Controller', '$class\::C',
-            '$class\::Model',      '$class\::M',
-            '$class\::View',       '$class\::V'
-          ];
+    my @components;
+    for my $component ( keys %{ $self->components } ) {
 
-    if ( my $error = $@ ) {
-        chomp $error;
-        die qq/Couldn't load components "$error"/;
+        unless ( UNIVERSAL::isa( $component, 'Catalyst::Base' ) ) {
+            next;
+        }
+
+        my $instance;
+
+        eval { $instance = $component->new($self) };
+
+        if ( $@ ) {
+            die( qq/Couldn't instantiate "$component", "$@"/ );
+        }
+
+        $self->components->{$component} = $instance;
+
+        push @components, $component;
     }
-
-    $self->components( {} );
-    my @comps;
-    for my $comp ( $self->_components($self) ) {
-        $self->components->{ ref $comp } = $comp;
-        push @comps, $comp;
-    }
-
+    
     my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow($_) for keys %{ $self->components };
+    $t->addRow($_) for sort keys %{ $self->components };
     $self->log->debug( 'Loaded components', $t->draw )
       if ( @{ $t->{tbl_rows} } && $self->debug );
 
-    $self->setup_actions( [ $self, @comps ] );
+    $self->setup_actions( [ $self, @components ] );
 }
 
 =item $c->state

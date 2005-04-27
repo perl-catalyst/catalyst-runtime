@@ -144,6 +144,13 @@ sub forward {
             $c->log->debug($error) if $c->debug;
             return 0;
         }
+        
+        unless ( UNIVERSAL::isa( $class, 'Catalyst::Base' ) ) {
+            my $error = qq/Can't forward to "$class". Class is not a Catalyst component./;
+            $c->error($error);
+            $c->log->debug($error) if $c->debug;
+            return 0;            
+        }
 
         my $method = shift || 'process';
 
