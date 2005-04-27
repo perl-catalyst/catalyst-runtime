@@ -92,8 +92,8 @@ sub new {
 sub config {
     my $self = shift;
     $self->_config( {} ) unless $self->_config;
-    if ( $_[0] ) {
-        my $config = $_[1] ? {@_} : $_[0];
+    if ( @_ ) {
+        my $config = @_ > 1 ? {@_} : $_[0];
         while ( my ( $key, $val ) = each %$config ) {
             $self->_config->{$key} = $val;
         }

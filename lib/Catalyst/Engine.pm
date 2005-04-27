@@ -698,8 +698,8 @@ Returns a hashref containing all your data.
 
 sub stash {
     my $self = shift;
-    if ( $_[0] ) {
-        my $stash = $_[1] ? {@_} : $_[0];
+    if ( @_ ) {
+        my $stash = @_ > 1 ? {@_} : $_[0];
         while ( my ( $key, $val ) = each %$stash ) {
             $self->{stash}->{$key} = $val;
         }
