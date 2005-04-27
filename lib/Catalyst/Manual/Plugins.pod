@@ -98,6 +98,15 @@ is built on top of C<Class::DBI::Loader>, which automates the
 definition of C<Class::DBI> sub-classes by scanning the underlying 
 table schemas, setting up columns and primary keys.
 
+=head2 Catalyst::Model::CDBI::Plain
+
+L<Catalyst::Model::CDBI::Plain> is a neutral interface to the
+C<Class::DBI> module, which does not attempt to automate table
+setup. It allows the user to manually set up C<Class::DBI>
+classes, either by doing so within the Catalyst model classes
+themselves, or by inheriting from existing C<Class::DBI>
+classes.
+
 =head2 Catalyst::Model::CDBI::CRUD
 
 L<Catalyst::Model::CDBI::CRUD> is a subclass of 
