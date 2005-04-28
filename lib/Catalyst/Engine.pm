@@ -627,11 +627,7 @@ sub retrieve_components {
         die qq/Couldn't load components "$error"/;
     }
 
-    $self->components( {} );
-
-    for my $component ( $self->_components ) {
-        $self->components->{$component} = $component;
-    }
+    return $self->_components;
 }
 
 =item $c->run
@@ -668,7 +664,6 @@ Setup.
 
 sub setup {
     my $self = shift;
-    $self->retrieve_components;
     $self->setup_components;
     if ( $self->debug ) {
         my $name = $self->config->{name} || 'Application';
@@ -684,11 +679,14 @@ Setup components.
 
 sub setup_components {
     my $self = shift;
+    
+    $self->components( {} );
 
     my @components;
-    for my $component ( keys %{ $self->components } ) {
+    for my $component ( $self->retrieve_components ) {
 
         unless ( UNIVERSAL::isa( $component, 'Catalyst::Base' ) ) {
+            $self->components->{$component} = $component;
             next;
         }
 
