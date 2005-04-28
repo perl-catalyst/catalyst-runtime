@@ -27,7 +27,7 @@ L<Module::Build> extension for Catalyst.
 
 =head1 METHODS
 
-=over4
+=over 4
 
 =item ACTION_install
 
