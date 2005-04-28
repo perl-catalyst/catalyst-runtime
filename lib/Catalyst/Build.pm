@@ -55,14 +55,12 @@ sub ACTION_fakeinstall {
 =cut
 
 sub ACTION_install_extras {
-    my $self   = shift;
-    my $prefix = $self->{properties}{destdir} || '';
-    my $path   = dir(
-        $prefix,
-        $self->{config}{installsitelib},
-        split( '::', $self->{properties}{module_name} )
-    );
-    my @files = $self->_find_extras;
+    my $self    = shift;
+    my $prefix  = $self->{properties}{destdir} || undef;
+    my $sitelib = $self->{config}{installsitelib};
+    my @path    = defined $prefix ? ( $prefix, $sitelib ) : ($sitelib);
+    my $path    = dir( @path, split( '::', $self->{properties}{module_name} ) );
+    my @files   = $self->_find_extras;
     print "Installing extras to $path\n";
     for (@files) {
         $FAKE

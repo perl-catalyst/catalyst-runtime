@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Catalyst.
         - improved uploads and parameters
         - added $c->req->protocol and $c->req->secure
         - improved error message when forwarding to unknown module
+        - fixed win32 installer
 
 5.10  Sat Apr 23 11:16:00 2005
         - updated dependencies to require latest module::pluggable::fast
