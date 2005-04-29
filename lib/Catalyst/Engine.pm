@@ -679,30 +679,31 @@ Setup components.
 
 sub setup_components {
     my $self = shift;
-    
-    $self->components( {} );
 
-    my @components;
-    for my $component ( $self->retrieve_components ) {
+    # Components
+    my $class = ref $self || $self;
+    eval <<"";
+        package $class;
+        import Module::Pluggable::Fast
+          name   => '_components',
+          search => [
+            '$class\::Controller', '$class\::C',
+            '$class\::Model',      '$class\::M',
+            '$class\::View',       '$class\::V'
+          ];
 
-        unless ( UNIVERSAL::isa( $component, 'Catalyst::Base' ) ) {
-            $self->components->{$component} = $component;
-            next;
-        }
-
-        my $instance;
-
-        eval { $instance = $component->new($self) };
-
-        if ( $@ ) {
-            die( qq/Couldn't instantiate "$component", "$@"/ );
-        }
-
-        $self->components->{$component} = $instance;
-
-        push @components, $component;
+    if ( my $error = $@ ) {
+        chomp $error;
+        die qq/Couldn't load components "$error"/;
     }
-    
+
+    $self->components( {} );
+    my @comps;
+    for my $comp ( $self->_components($self) ) {
+        $self->components->{ ref $comp } = $comp;
+        push @comps, $comp;
+    }
+
     my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
     $t->setCols('Class');
     $t->setColWidth( 'Class', 75, 1 );
@@ -710,7 +711,7 @@ sub setup_components {
     $self->log->debug( 'Loaded components', $t->draw )
       if ( @{ $t->{tbl_rows} } && $self->debug );
 
-    $self->setup_actions( [ $self, @components ] );
+    $self->setup_actions( [ $self, @comps ] );
 }
 
 =item $c->state
