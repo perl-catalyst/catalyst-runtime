@@ -2,6 +2,7 @@ package Catalyst::Utils;
 
 use strict;
 use attributes ();
+use Path::Class;
 
 =head1 NAME
 
@@ -24,21 +25,6 @@ Returns attributes for coderef in a arrayref
 =cut
 
 sub attrs { attributes::get( $_[0] ) || [] }
-
-=item prefix($class, $name);
-
-Returns a prefixed action.
-
-    MyApp::C::Foo::Bar, yada becomes /foo/bar/yada
-
-=cut
-
-sub prefix {
-    my ( $class, $name ) = @_;
-    my $prefix = &class2prefix($class);
-    $name = "$prefix/$name" if $prefix;
-    return $name;
-}
 
 =item class2appclass($class);
 
@@ -107,6 +93,57 @@ sub class2prefix {
         $prefix =~ s/\:\:/\//g;
     }
     return $prefix;
+}
+
+=item home($class)
+
+Returns home directory for given class.
+
+=cut
+
+sub home {
+    my $name = shift;
+    $name =~ s/\:\:/\//g;
+    my $home = 0;
+    if ( my $path = $INC{"$name.pm"} ) {
+        $home = file($path)->absolute->dir;
+        $name =~ /(\w+)$/;
+        my $append = $1;
+        my $subdir = dir($home)->subdir($append);
+        for ( split '/', $name ) { $home = dir($home)->parent }
+        if ( $home =~ /blib$/ ) { $home = dir($home)->parent }
+        elsif ( !-f file( $home, 'Makefile.PL' ) ) { $home = $subdir }
+    }
+    return $home;
+}
+
+=item prefix($class, $name);
+
+Returns a prefixed action.
+
+    MyApp::C::Foo::Bar, yada becomes /foo/bar/yada
+
+=cut
+
+sub prefix {
+    my ( $class, $name ) = @_;
+    my $prefix = &class2prefix($class);
+    $name = "$prefix/$name" if $prefix;
+    return $name;
+}
+
+=item reflect_actions($class);
+
+Returns an arrayref containing all actions of a component class.
+
+=cut
+
+sub reflect_actions {
+    my $class   = shift;
+    my $actions = [];
+    eval '$actions = $class->_action_cache';
+    die qq/Couldn't reflect actions of component "$class", "$@"/ if $@;
+    return $actions;
 }
 
 =back

@@ -5,19 +5,19 @@ use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
 use Catalyst::Utils;
 use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_attrcache _cache _config/;
-__PACKAGE__->_attrcache( {} );
-__PACKAGE__->_cache( [] );
+__PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache _config/;
+__PACKAGE__->_attr_cache( {} );
+__PACKAGE__->_action_cache( [] );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {
     my ( $class, $code, @attrs ) = @_;
-    $class->_attrcache->{$code} = [@attrs];
-    push @{ $class->_cache }, [ $code, [@attrs] ];
+    $class->_attr_cache->{$code} = [@attrs];
+    push @{ $class->_action_cache }, [ $code, [@attrs] ];
     return ();
 }
 
-sub FETCH_CODE_ATTRIBUTES { $_[0]->_attrcache->{ $_[1] } || () }
+sub FETCH_CODE_ATTRIBUTES { $_[0]->_attr_cache->{ $_[1] } || () }
 
 =head1 NAME
 
@@ -92,7 +92,7 @@ sub new {
 sub config {
     my $self = shift;
     $self->_config( {} ) unless $self->_config;
-    if ( @_ ) {
+    if (@_) {
         my $config = @_ > 1 ? {@_} : $_[0];
         while ( my ( $key, $val ) = each %$config ) {
             $self->_config->{$key} = $val;

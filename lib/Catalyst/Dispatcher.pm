@@ -135,21 +135,23 @@ sub forward {
 
     unless ( @{$results} ) {
         my $class = $command || '';
-        my $path  = $class . '.pm';
+        my $path = $class . '.pm';
         $path =~ s/::/\//g;
 
-        unless ( $INC{ $path } ) {
-            my $error = qq/Couldn't forward to "$class". Invalid or not loaded./;
+        unless ( $INC{$path} ) {
+            my $error =
+              qq/Couldn't forward to "$class". Invalid or not loaded./;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
         }
-        
+
         unless ( UNIVERSAL::isa( $class, 'Catalyst::Base' ) ) {
-            my $error = qq/Can't forward to "$class". Class is not a Catalyst component./;
+            my $error =
+              qq/Can't forward to "$class". Class is not a Catalyst component./;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
-            return 0;            
+            return 0;
         }
 
         my $method = shift || 'process';
@@ -160,7 +162,8 @@ sub forward {
         }
 
         else {
-            my $error = qq/Couldn't forward to "$class". Does not implement "$method"/;
+            my $error =
+              qq/Couldn't forward to "$class". Does not implement "$method"/;
             $c->error($error);
             $c->log->debug($error)
               if $c->debug;
@@ -354,7 +357,7 @@ sub setup_actions {
     for my $comp (@$comps) {
         $comp = ref $comp || $comp;
 
-        for my $action ( @{ $comp->_cache } ) {
+        for my $action ( @{ Catalyst::Utils::reflect_actions($comp) } ) {
             my ( $code, $attrs ) = @{$action};
             my $name = '';
             no strict 'refs';

@@ -4,6 +4,7 @@ use strict;
 use base 'Catalyst::Base';
 use UNIVERSAL::require;
 use Catalyst::Log;
+use Catalyst::Utils;
 use Text::ASCIITable;
 use Path::Class;
 our $CATALYST_SCRIPT_GEN = 4;
@@ -246,19 +247,7 @@ sub import {
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 
     # Find home
-    my $name = $caller;
-    $name =~ s/\:\:/\//g;
-    my $home;
-    if ( my $path = $INC{"$name.pm"} ) {
-        $home = file($path)->absolute->dir;
-        $name =~ /(\w+)$/;
-        my $append = $1;
-        my $subdir = dir($home)->subdir($append);
-        for ( split '/', $name ) { $home = dir($home)->parent }
-        if ( $home =~ /blib$/ ) { $home = dir($home)->parent }
-        elsif ( !-f file( $home, 'Makefile.PL' ) ) { $home = $subdir }
-    }
-
+    my $home = Catalyst::Utils::home($caller);
     if ( $caller->debug ) {
         $home
           ? ( -d $home )
