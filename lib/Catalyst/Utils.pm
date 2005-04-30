@@ -112,7 +112,11 @@ sub home {
         my $subdir = dir($home)->subdir($append);
         for ( split '/', $name ) { $home = dir($home)->parent }
         if ( $home =~ /blib$/ ) { $home = dir($home)->parent }
-        elsif ( !-f file( $home, 'Makefile.PL' ) ) { $home = $subdir }
+        elsif (!-f file( $home, 'Makefile.PL' )
+            && !-f file( $home, 'Build.PL' ) )
+        {
+            $home = $subdir;
+        }
     }
     return $home;
 }
