@@ -64,7 +64,7 @@ sub ACTION_install_extras {
     print "Installing extras to $path\n";
     for (@files) {
         $FAKE
-          ? print "$_ -> $path/$_ (FAKE)\n"
+          ? print "$_ -> $path (FAKE)\n"
           : $self->copy_if_modified( $_, $path );
     }
 }
