@@ -109,6 +109,10 @@ sub process {
     die( ( ref $_[0] || $_[0] ) . " did not override Catalyst::Base::process" );
 }
 
+=item FETCH_CODE_ATTRIBUTES
+
+=item MODIFY_CODE_ATTRIBUTES
+
 =back
 
 =head1 SEE ALSO
