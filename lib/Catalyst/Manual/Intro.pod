@@ -242,6 +242,8 @@ The last of these, the stash, is a universal hash for sharing data among applica
         $c->res->output( $c->stash->{message} );
     }
 
+Note that the stash should be used only for passing data in an individual request cycle; it gets cleared at a new request. If you need to maintain more persistent data, use a session.
+
 =head3 Actions
 
 A Catalyst controller is defined by its actions. An action is
