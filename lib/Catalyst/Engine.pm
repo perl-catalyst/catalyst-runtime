@@ -20,7 +20,7 @@ require Module::Pluggable::Fast;
 $Data::Dumper::Terse = 1;
 
 __PACKAGE__->mk_classdata('components');
-__PACKAGE__->mk_accessors(qw/request response state/);
+__PACKAGE__->mk_accessors(qw/counter request response state/);
 
 *comp = \&component;
 *req  = \&request;
@@ -30,8 +30,9 @@ __PACKAGE__->mk_accessors(qw/request response state/);
 *finalize_output = \&finalize_body;
 
 # For statistics
-our $COUNT = 1;
-our $START = time;
+our $COUNT     = 1;
+our $START     = time;
+our $RECURSION = 1000;
 
 =head1 NAME
 
@@ -82,7 +83,7 @@ Regex search for a component.
 sub component {
     my $c = shift;
 
-    if ( @_ ) {
+    if (@_) {
 
         my $name = shift;
 
@@ -99,6 +100,11 @@ sub component {
 
     return sort keys %{ $c->components };
 }
+
+=item $c->counter
+
+Returns a hashref containing coderefs and execution counts.
+(Needed for deep recursion detection)
 
 =item $c->error
 
@@ -136,12 +142,26 @@ sub execute {
     $c->state(0);
     my $callsub = ( caller(1) )[3];
 
+    my $action = '';
+    if ( $c->debug ) {
+        $action = $c->actions->{reverse}->{"$code"};
+        $action = "/$action" unless $action =~ /\-\>/;
+        $c->counter->{"$code"}++;
+
+        if ( $c->counter->{"$code"} > $RECURSION ) {
+            my $error = qq/Deep recursion detected in "$action"/;
+            $c->log->error($error);
+            $c->error($error);
+            $c->state(0);
+            return $c->state;
+        }
+
+        $action = "-> $action" if $callsub =~ /forward$/;
+    }
+
     eval {
         if ( $c->debug )
         {
-            my $action = $c->actions->{reverse}->{"$code"};
-            $action = "/$action" unless $action =~ /\-\>/;
-            $action = "-> $action" if $callsub =~ /forward$/;
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
@@ -366,7 +386,8 @@ sub handler {
             my $elapsed;
             ( $elapsed, $status ) = $class->benchmark($handler);
             $elapsed = sprintf '%f', $elapsed;
-            my $av = sprintf '%.3f', ( $elapsed == 0 ? '??' : (1 / $elapsed) );
+            my $av = sprintf '%.3f',
+              ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
             my $t = Text::ASCIITable->new;
             $t->setCols( 'Action', 'Time' );
             $t->setColWidth( 'Action', 64, 1 );
@@ -400,6 +421,7 @@ sub prepare {
     my ( $class, $engine ) = @_;
 
     my $c = bless {
+        counter => {},
         request => Catalyst::Request->new(
             {
                 arguments  => [],
@@ -729,7 +751,7 @@ Returns a hashref containing all your data.
 
 sub stash {
     my $self = shift;
-    if ( @_ ) {
+    if (@_) {
         my $stash = @_ > 1 ? {@_} : $_[0];
         while ( my ( $key, $val ) = each %$stash ) {
             $self->{stash}->{$key} = $val;
