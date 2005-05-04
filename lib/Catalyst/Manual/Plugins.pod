@@ -73,6 +73,11 @@ L<Catalyst::Plugin::I18N> is an internationalization plugin for
 Catalyst.  Supports C<mo>/C<po> files and Maketext classes under your
 application's I18N namespace.
 
+=head2 Catalyst::Plugin::Observe
+
+L<Catalyst::Plugin::Observe> provides the ability to register AOP-like
+callbacks to specific Engine events. Subclasses L<Class::Publisher>.
+
 =head2 Catalyst::Plugin::Pluggable
 
 L<Catalyst::Plugin::Pluggable> is a plugin for pluggable Catalyst
