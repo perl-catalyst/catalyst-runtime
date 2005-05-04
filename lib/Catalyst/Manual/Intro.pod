@@ -24,7 +24,7 @@ Access and modify content (data). L<Class::DBI>, L<Plucene>, L<Net::LDAP>...
 
 =item * B<View>
 
-Present content to the user. L<Template Toolkit|Template>, L<Mason|HTML::Mason>...
+Present content to the user. L<Template Toolkit|Template>, L<Mason|HTML::Mason>, L<HTML::Template>...
 
 =item * B<Controller>
 
@@ -131,7 +131,7 @@ Let's see how Catalyst works, by taking a closer look at the components and othe
 
 =head3 Application Class
 
-In addition to the Model, View, and Controller components, there's a single class that represents your application itself. This is where you configure your application, load plugins, define application-wide actions and extend Catalyst.
+In addition to the Model, View, and Controller components, there's a single class that represents your application itself. This is where you configure your application, load plugins, define application-wide actions, and extend Catalyst.
 
     package MyApp;
 
@@ -171,7 +171,9 @@ However, you can define as many parameters as you want for plugins or whatever y
 
 =head3 Context
 
-Catalyst automatically blesses a Context object into your application class and makes it available everywhere in your application. Use the Context to directly interact with Catalyst and glue your L<Components> together. 
+Catalyst automatically blesses a Context object into your application class and makes it available everywhere in your application. Use the Context to directly interact with Catalyst and glue your L<Components> together. For example, if you need to use the Context from within a Template Toolkit template, it's already there:
+
+    <h1>Welcome to [% c.config.name %]!</h1>
 
 As illustrated earlier in our URL-to-Action dispatching example, the Context is always the second method parameter, behind the Component object reference or class name itself. Previously we called it C<$context> for clarity, but most Catalyst developers just call it C<$c>:
 
