@@ -1,20 +1,20 @@
-package Catalyst::Engine::FastCGI;
+package Catalyst::Engine::SpeedyCGI;
 
 use strict;
-use base qw(Catalyst::Engine::FastCGI::Base Catalyst::Engine::CGI);
+use base qw(Catalyst::Engine::SpeedyCGI::Base Catalyst::Engine::CGI);
 
 =head1 NAME
 
-Catalyst::Engine::FastCGI - Catalyst FastCGI Engine
+Catalyst::Engine::SpeedyCGI - Catalyst SpeedyCGI Engine
 
 =head1 SYNOPSIS
 
-A script using the Catalyst::Engine::FastCGI module might look like:
+A script using the Catalyst::Engine::SpeedyCGI module might look like:
 
-    #!/usr/bin/perl -w
+    #!/usr/bin/speedy -w
 
     BEGIN { 
-       $ENV{CATALYST_ENGINE} = 'FastCGI';
+       $ENV{CATALYST_ENGINE} = 'SpeedyCGI';
     }
 
     use strict;
@@ -25,11 +25,11 @@ A script using the Catalyst::Engine::FastCGI module might look like:
 
 =head1 DESCRIPTION
 
-This is the Catalyst engine for FastCGI.
+This is the Catalyst engine for SpeedyCGI.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::FastCGI::Base>.
+This class overloads some methods from C<Catalyst::Engine::SpeedyCGI::Base>.
 
 =over 4
 
@@ -54,8 +54,8 @@ sub prepare_parameters {
 =cut
 
 sub prepare_request {
-    my ( $c, $fastcgi, @arguments ) = @_;
-    $c->SUPER::prepare_request($fastcgi);
+    my ( $c, $speedycgi, @arguments ) = @_;
+    $c->SUPER::prepare_request($speedycgi);
     $c->Catalyst::Engine::CGI::prepare_request(@arguments);
 }
 
@@ -69,7 +69,7 @@ sub prepare_uploads {
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine::FastCGI::Base>, L<Catalyst::Engine::CGI>.
+L<Catalyst>, L<Catalyst::Engine::SpeedyCGI::Base>, L<Catalyst::Engine::CGI>.
 
 =head1 AUTHOR
 

@@ -43,7 +43,7 @@ sub run {
     my $class = shift;
     my $port  = shift || 3000;
 
-    my $daemon = Catalyst::Engine::HTTP::Base::struct->new(
+    my $daemon = Catalyst::Engine::HTTP::Catalyst->new(
         Listen    => SOMAXCONN,
         LocalPort => $port,
         ReuseAddr => 1,

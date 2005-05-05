@@ -5,6 +5,8 @@ use base 'Catalyst::Engine::CGI::Base';
 
 use CGI;
 
+__PACKAGE__->mk_accessors('cgi');
+
 =head1 NAME
 
 Catalyst::Engine::CGI - The CGI Engine
@@ -36,6 +38,16 @@ application module:
 
 The performance of this way of using Catalyst is not expected to be
 useful in production applications, but it may be helpful for development.
+
+=head1 METHODS
+
+=over 4
+
+=item $c->cgi
+
+Contains the C<CGI> object.
+
+=back
 
 =head1 OVERLOADED METHODS
 

@@ -3,11 +3,8 @@ package Catalyst::Engine::CGI::Base;
 use strict;
 use base 'Catalyst::Engine';
 
-use IO::File ();
 use URI;
 use URI::http;
-
-__PACKAGE__->mk_accessors('cgi');
 
 =head1 NAME
 
@@ -16,16 +13,6 @@ Catalyst::Engine::CGI::Base - Base class for CGI Engines
 =head1 DESCRIPTION
 
 This is a base class for CGI engines.
-
-=head1 METHODS
-
-=over 4
-
-=item $c->cgi
-
-This config parameter contains the C<CGI> object.
-
-=back
 
 =head1 OVERLOADED METHODS
 
@@ -64,10 +51,9 @@ sub finalize_headers {
 sub prepare_body {
     my $c = shift;
     
-    my $handle = IO::File->new_from_fd( fileno(STDIN), IO::File::O_RDONLY );
-    my $body   = undef;  
+    my $body = undef;
     
-    while ( $handle->sysread( my $buffer, 8192 ) ) {
+    while ( read( STDIN, my $buffer, 8192 ) ) {
         $body .= $buffer;
     }
     

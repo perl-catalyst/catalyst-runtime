@@ -9,6 +9,8 @@ use APR::Request;
 use APR::Request::CGI;
 use APR::Request::Param;
 
+__PACKAGE__->mk_accessors('apr');
+
 =head1 NAME
 
 Catalyst::Engine::CGI::APR - The CGI APR Engine
@@ -31,7 +33,17 @@ A script using the Catalyst::Engine::CGI::APR module might look like:
 
 =head1 DESCRIPTION
 
-This Catalyst engine uses C<APR::Request> for parsing of message body.
+This Catalyst engine uses C<APR::Request::CGI> for parsing of message body.
+
+=head1 METHODS
+
+=over 4
+
+=item $c->apr
+
+Contains the C<APR::Request::CGI> object.
+
+=back
 
 =head1 OVERLOADED METHODS
 
@@ -48,7 +60,7 @@ sub prepare_parameters {
 
     my @params;
 
-    $c->cgi->param->do( sub {
+    $c->apr->param->do( sub {
         my ( $field, $value ) = @_;
         push( @params, $field, $value );
         return 1;    
@@ -63,7 +75,7 @@ sub prepare_parameters {
 
 sub prepare_request {
     my $c = shift;
-    $c->cgi( APR::Request::CGI->new( APR::Pool->new ) );
+    $c->apr( APR::Request::CGI->handle( APR::Pool->new ) );
 }
 
 =item $c->prepare_uploads
@@ -75,7 +87,7 @@ sub prepare_uploads {
 
     my @uploads;
 
-    $c->cgi->upload->do( sub {
+    $c->apr->upload->do( sub {
         my ( $field, $upload ) = @_;
 
         my $object = Catalyst::Request::Upload->new(
@@ -97,8 +109,7 @@ sub prepare_uploads {
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::CGI::Base>, 
-sL<APR::Request>.
+L<Catalyst>, L<APR::Request::CGI>, L<Catalyst::Engine::CGI::Base>.
 
 =head1 AUTHOR
 

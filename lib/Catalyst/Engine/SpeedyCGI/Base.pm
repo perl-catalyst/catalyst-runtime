@@ -1,27 +1,27 @@
-package Catalyst::Engine::FastCGI::Base;
+package Catalyst::Engine::SpeedyCGI::Base;
 
 use strict;
 use base 'Catalyst::Engine::CGI::Base';
 
-use FCGI;
+use CGI::SpeedyCGI;
 
-__PACKAGE__->mk_accessors('fastcgi');
+__PACKAGE__->mk_accessors('speedycgi');
 
 =head1 NAME
 
-Catalyst::Engine::FastCGI::Base - Base class for FastCGI Engines
+Catalyst::Engine::SpeedyCGI::Base - Base class for SpeedyCGI Engines
 
 =head1 DESCRIPTION
 
-This is a base class for FastCGI engines.
+This is a base class for SpeedyCGI engines.
 
 =head1 METHODS
 
 =over 4
 
-=item $c->fastcgi
+=item $c->speedycgi
 
-Contains the C<FCGI::Request> object.
+Contains the C<CGI::SpeedyCGI> object.
 
 =back
 
@@ -36,8 +36,8 @@ This class overloads some methods from C<Catalyst::Engine::CGI::Base>.
 =cut
 
 sub prepare_request {
-    my ( $c, $fastcgi ) = @_;
-    $c->fastcgi($fastcgi);
+    my ( $c, $speedycgi ) = @_;
+    $c->speedycgi($speedycgi);
 }
 
 =item $c->run
@@ -45,20 +45,15 @@ sub prepare_request {
 =cut
 
 sub run {
-    my ( $class, @arguments ) = @_;
-    
-    my $request = FCGI::Request();
-    
-    while ( $request->Accept >= 0 ) {
-        $class->handler( $request, @arguments );
-    }
+    my ( $class, @arguments ) = @_; 
+    $class->handler( CGI::SpeedyCGI->new, @arguments );
 }
 
 =back
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<FCGI>, L<Catalyst::Engine::CGI::Base>.
+L<Catalyst>, L<CGI::SpeedyCGI>, L<Catalyst::Engine::CGI::Base>.
 
 =head1 AUTHOR
 

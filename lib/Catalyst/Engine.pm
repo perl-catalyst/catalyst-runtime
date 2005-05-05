@@ -361,14 +361,14 @@ Finalize headers.
 
 sub finalize_headers { }
 
-=item $c->handler( $class, $engine )
+=item $c->handler( $class, @arguments )
 
 Handles the request.
 
 =cut
 
 sub handler {
-    my ( $class, $engine ) = @_;
+    my ( $class, @arguments ) = @_;
 
     # Always expect worst case!
     my $status = -1;
@@ -376,7 +376,7 @@ sub handler {
         my @stats = ();
 
         my $handler = sub {
-            my $c = $class->prepare($engine);
+            my $c = $class->prepare(@arguments);
             $c->{stats} = \@stats;
             $c->dispatch;
             return $c->finalize;
@@ -410,7 +410,7 @@ sub handler {
     return $status;
 }
 
-=item $c->prepare($engine)
+=item $c->prepare(@arguments)
 
 Turns the engine-specific request( Apache, CGI ... )
 into a Catalyst context .
@@ -418,7 +418,7 @@ into a Catalyst context .
 =cut
 
 sub prepare {
-    my ( $class, $engine ) = @_;
+    my ( $class, @arguments ) = @_;
 
     my $c = bless {
         counter => {},
@@ -454,7 +454,7 @@ sub prepare {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
-    $c->prepare_request($engine);
+    $c->prepare_request(@arguments);
     $c->prepare_connection;
     $c->prepare_headers;
     $c->prepare_cookies;
