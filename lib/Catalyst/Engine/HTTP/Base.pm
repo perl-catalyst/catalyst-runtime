@@ -12,7 +12,7 @@ use URI;
 
 __PACKAGE__->mk_accessors(qw/http/);
 
-Class::Struct::struct 'Catalyst::Engine::Test::HTTP' => {
+Class::Struct::struct 'Catalyst::Engine::HTTP::Base::struct' => {
     request  => 'HTTP::Request',
     response => 'HTTP::Response',
     hostname => '$',

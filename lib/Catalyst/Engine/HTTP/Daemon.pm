@@ -43,7 +43,7 @@ sub run {
     my $class = shift;
     my $port  = shift || 3000;
 
-    my $daemon = Catalyst::Engine::HTTP::Catalyst->new(
+    my $daemon = Catalyst::Engine::HTTP::Base::struct->new(
         Listen    => SOMAXCONN,
         LocalPort => $port,
         ReuseAddr => 1,
@@ -70,7 +70,7 @@ sub run {
             
             my $hostname = gethostbyaddr( $connection->peeraddr, AF_INET );
 
-            my $http = Catalyst::Engine::Test::HTTP->new(
+            my $http = Catalyst::Engine::HTTP::Base::struct->new(
                 address  => $connection->peerhost,
                 hostname => $hostname || $connection->peerhost,
                 request  => $request,

@@ -1,7 +1,7 @@
 package Catalyst::Engine::Apache::Base;
 
 use strict;
-use base 'Catalyst::Engine';
+use base qw[Catalyst::Engine Catalyst::Engine::Apache];
 
 use URI;
 use URI::http;

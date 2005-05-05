@@ -2,7 +2,9 @@ package Catalyst::Utils;
 
 use strict;
 use attributes ();
+use HTTP::Request;
 use Path::Class;
+use URI;
 
 =head1 NAME
 
@@ -148,6 +150,34 @@ sub reflect_actions {
     eval '$actions = $class->_action_cache';
     die qq/Couldn't reflect actions of component "$class", "$@"/ if $@;
     return $actions;
+}
+
+=back
+
+=item request($string);
+
+Returns an C<HTTP::Request> from a string.
+
+=cut
+
+sub request {
+    my $request = shift;
+
+    unless ( ref $request ) {
+
+        if ( $request =~ m/http/i ) {
+            $request = URI->new($request)->canonical;
+        }
+        else {
+            $request = URI->new( 'http://localhost' . $request )->canonical;
+        }
+    }
+
+    unless ( ref $request eq 'HTTP::Request' ) {
+        $request = HTTP::Request->new( 'GET', $request );
+    }
+
+    return $request;
 }
 
 =back

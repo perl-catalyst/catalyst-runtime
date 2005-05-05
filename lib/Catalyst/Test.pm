@@ -1,6 +1,8 @@
 package Catalyst::Test;
 
 use strict;
+
+use Catalyst::Utils;
 use UNIVERSAL::require;
 
 $ENV{CATALYST_ENGINE} = 'Test';
@@ -100,25 +102,12 @@ Do an actual remote rquest using LWP.
 =cut
 
 sub remote_request {
-    my $request = shift;
 
-    require LWP::UserAgent;
+    require LWP::UserAgent; 
+    
+    my $request = Catalyst::Utils::request( shift(@_) );
 
-    unless ( ref $request ) {
-
-        my $uri =
-          ( $request =~ m/http/i )
-          ? URI->new($request)
-          : URI->new( 'http://localhost' . $request );
-
-        $request = $uri->canonical;
-    }
-
-    unless ( ref $request eq 'HTTP::Request' ) {
-        $request = HTTP::Request->new( 'GET', $request );
-    }
-
-    my $server = URI->new( $ENV{CATALYST_SERVER} );
+    my $server  = URI->new( $ENV{CATALYST_SERVER} );
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         $server->path("$1");    # need to be quoted
@@ -129,14 +118,14 @@ sub remote_request {
     $request->uri->port( $server->port );
     $request->uri->path( $server->path . $request->uri->path );
 
-    unless ($agent) {
-        $agent = LWP::UserAgent->new(
+    unless ( $agent ) {
 
-            #  cookie_jar   => {},
+        $agent = LWP::UserAgent->new(
             keep_alive   => 1,
             max_redirect => 0,
             timeout      => 60,
         );
+
         $agent->env_proxy;
     }
 

@@ -153,19 +153,24 @@ sub import {
     my $engine     = 'Catalyst::Engine::CGI';
     my $dispatcher = 'Catalyst::Dispatcher';
 
-    # Detect mod_perl
     if ( $ENV{MOD_PERL} ) {
+    
+        mod_perl->require;
 
-        require mod_perl;
-
-        if ( $ENV{MOD_PERL_API_VERSION} == 2 ) {
+        if ( $mod_perl::VERSION >= 1.99_90_22 ) {
             $engine = 'Catalyst::Engine::Apache::MP20';
         }
-        elsif ( $mod_perl::VERSION >= 1.99 ) {
+
+        elsif ( $mod_perl::VERSION >= 1.99_01 ) {
             $engine = 'Catalyst::Engine::Apache::MP19';
         }
-        else {
+
+        elsif ( $mod_perl::VERSION >= 1.27 ) {
             $engine = 'Catalyst::Engine::Apache::MP13';
+        }
+
+        else {
+            die( qq/Unsupported mod_perl version: "$mod_perl::VERSION"/ );
         }
     }
 
@@ -239,10 +244,12 @@ sub import {
 
     $engine->require;
     die qq/Couldn't load engine "$engine", "$@"/ if $@;
+
     {
         no strict 'refs';
         push @{"$caller\::ISA"}, $engine;
     }
+
     $caller->engine($engine);
     $caller->log->debug(qq/Loaded engine "$engine"/) if $caller->debug;
 

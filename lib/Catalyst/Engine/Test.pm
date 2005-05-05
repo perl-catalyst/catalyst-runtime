@@ -3,6 +3,8 @@ package Catalyst::Engine::Test;
 use strict;
 use base 'Catalyst::Engine::HTTP::Base';
 
+use Catalyst::Utils;
+
 =head1 NAME
 
 Catalyst::Engine::Test - Catalyst Test Engine
@@ -38,27 +40,15 @@ This class overloads some methods from C<Catalyst::Engine::HTTP::Base>.
 =cut
 
 sub run {
-    my $class   = shift;
-    my $request = shift || '/';
+    my ( $class, $request ) = @_;
+    
+    $request = Catalyst::Utils::request($request);
 
-    unless ( ref $request ) {
+    $request->header( 
+        'Host' => sprintf( '%s:%d', $request->uri->host, $request->uri->port )
+    );
 
-        my $uri =
-          ( $request =~ m/http/i )
-          ? URI->new($request)
-          : URI->new( 'http://localhost' . $request );
-
-        $request = $uri->canonical;
-    }
-
-    unless ( ref $request eq 'HTTP::Request' ) {
-        $request = HTTP::Request->new( 'GET', $request );
-    }
-
-    my $host = sprintf( '%s:%d', $request->uri->host, $request->uri->port );
-    $request->header( 'Host' => $host );
-
-    my $http = Catalyst::Engine::Test::HTTP->new(
+    my $http = Catalyst::Engine::HTTP::Base::struct->new(
         address  => '127.0.0.1',
         hostname => 'localhost',
         request  => $request,
