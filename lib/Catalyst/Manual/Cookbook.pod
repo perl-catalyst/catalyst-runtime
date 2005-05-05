@@ -127,6 +127,7 @@ Controller:
 
             for my $field ( $c->req->upload ) {
 
+                my $upload   = $c->req->upload($field);
                 my $filename = $upload->filename;
                 my $target   = "/tmp/upload/$filename";
                 
