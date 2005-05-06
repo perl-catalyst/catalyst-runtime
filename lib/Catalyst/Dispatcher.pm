@@ -52,21 +52,21 @@ sub dispatch {
     }
 
     my $default = $action eq 'default' ? $namespace : undef;
-    my $results = $c->get_action( $action, $default );
+    my $results = $c->get_action( $action, $default, $default ? 1 : 0 );
     $namespace ||= '/';
 
     if ( @{$results} ) {
 
         # Execute last begin
         $c->state(1);
-        if ( my $begin = @{ $c->get_action( 'begin', $namespace ) }[-1] ) {
+        if ( my $begin = @{ $c->get_action( 'begin', $namespace, 1 ) }[-1] ) {
             $c->execute( @{ $begin->[0] } );
             return if scalar @{ $c->error };
         }
 
         # Execute the auto chain
         my $auto;
-        for $auto ( @{ $c->get_action( 'auto', $namespace ) } ) {
+        for $auto ( @{ $c->get_action( 'auto', $namespace, 1 ) } ) {
             $c->execute( @{ $auto->[0] } );
             return if scalar @{ $c->error };
             last unless $c->state;
@@ -75,13 +75,14 @@ sub dispatch {
         # Execute the action or last default
         my $mkay = defined $auto ? $c->state ? 1 : 0 : 1;
         if ( ( my $action = $c->req->action ) && $mkay ) {
-            if ( my $result = @{ $c->get_action( $action, $default ) }[-1] ) {
+            if ( my $result = @{ $c->get_action( $action, $default, 1 ) }[-1] )
+            {
                 $c->execute( @{ $result->[0] } );
             }
         }
 
         # Execute last end
-        if ( my $end = @{ $c->get_action( 'end', $namespace ) }[-1] ) {
+        if ( my $end = @{ $c->get_action( 'end', $namespace, 1 ) }[-1] ) {
             $c->execute( @{ $end->[0] } );
             return if scalar @{ $c->error };
         }
@@ -180,24 +181,24 @@ sub forward {
     return $c->state;
 }
 
-=item $c->get_action( $action, $namespace )
+=item $c->get_action( $action, $namespace, $inherit )
 
 Get an action in a given namespace.
 
 =cut
 
 sub get_action {
-    my ( $c, $action, $namespace ) = @_;
+    my ( $c, $action, $namespace, $inherit ) = @_;
     return [] unless $action;
     $namespace ||= '';
+    $inherit   ||= 0;
 
     if ($namespace) {
         $namespace = '' if $namespace eq '/';
         my $parent = $c->tree;
         my @results;
-        my %allowed = ( begin => 1, auto => 1, default => 1, end => 1 );
 
-        if ( $allowed{$action} ) {
+        if ($inherit) {
             my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
             push @results, [$result] if $result;
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
