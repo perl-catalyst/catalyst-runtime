@@ -506,7 +506,7 @@ This gives us a process() method and we can now just do $c->forward('MyApp::V::T
 
 You normally render templates at the end of a request, so it's a perfect use for the global C<end> action.
 
-Also, be sure to put the template under the directory specified in C<$c-E<gt>config-E<lt>{root}>, or you'll be forced to look at our eyecandy debug screen. ;)
+Also, be sure to put the template under the directory specified in C<$c-E<gt>config-E<gt>{root}>, or you'll be forced to look at our eyecandy debug screen. ;)
 
 =head4 Models
 
