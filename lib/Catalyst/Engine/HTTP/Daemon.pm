@@ -111,6 +111,8 @@ package Catalyst::Engine::HTTP::Catalyst;
 use strict;
 use base 'HTTP::Daemon';
 
+$HTTP::Daemon::PROTO = 'HTTP/0.9';
+
 sub product_tokens {
     "Catalyst/$Catalyst::VERSION";
 }
