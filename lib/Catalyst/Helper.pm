@@ -781,7 +781,7 @@ use base 'Catalyst::Base';
 
 =head1 NAME
 
-[% class %] - A Component
+[% class %] - Catalyst component
 
 =head1 SYNOPSIS
 
