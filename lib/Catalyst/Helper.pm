@@ -430,7 +430,7 @@ Catalyst based application.
 
 =head1 METHODS
 
-=over4
+=over 4
 
 =item default
 
@@ -440,6 +440,8 @@ sub default : Private {
     my ( $self, $c ) = @_;
     $c->res->output('Congratulations, [% name %] is on Catalyst!');
 }
+
+=back
 
 =head1 AUTHOR
 
@@ -793,7 +795,7 @@ Catalyst component.
 [% IF type == 'C' %]
 =head1 METHODS
 
-=over4
+=over 4
 
 =item default
 
@@ -803,6 +805,8 @@ sub default : Private {
     my ( $self, $c ) = @_;
     $c->res->output('Congratulations, [% class %] is on Catalyst!');
 }
+
+=back
 [% END %]
 =head1 AUTHOR
 
