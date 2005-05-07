@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Catalyst.
         - allow whitespaces between brackets and quoted string
           in Path and Regex attributes
         - new helper templates
+        - installer now supports install_base and destdir
 
 5.10  Sat Apr 23 11:16:00 2005
         - updated dependencies to require latest module::pluggable::fast

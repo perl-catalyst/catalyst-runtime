@@ -57,7 +57,7 @@ sub ACTION_fakeinstall {
 sub ACTION_install_extras {
     my $self    = shift;
     my $prefix  = $self->{properties}{destdir} || undef;
-    my $sitelib = $self->{config}{installsitelib};
+    my $sitelib = $self->install_destination('lib');
     my @path    = defined $prefix ? ( $prefix, $sitelib ) : ($sitelib);
     my $path    = dir( @path, split( '::', $self->{properties}{module_name} ) );
     my @files   = $self->_find_extras;

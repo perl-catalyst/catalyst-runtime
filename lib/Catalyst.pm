@@ -355,8 +355,8 @@ Sebastian Riedel, C<sri@oook.de>
 Andy Grundman, Andrew Ford, Andrew Ruthven, Autrijus Tang, Christian Hansen,
 Christopher Hicks, Dan Sully, Danijel Milicevic, David Naughton,
 Gary Ashton Jones, Geoff Richards, Jesse Sheidlower, Jody Belka,
-Johan Lindstrom, Leon Brocard, Marcus Ramberg, Tatsuhiko Miyagawa
-and all the others who've helped.
+Johan Lindstrom, Juan Camacho, Leon Brocard, Marcus Ramberg,
+Tatsuhiko Miyagawa and all the others who've helped.
 
 =head1 LICENSE
 
