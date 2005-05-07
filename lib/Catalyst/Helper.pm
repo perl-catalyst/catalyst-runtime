@@ -66,7 +66,7 @@ sub mk_app {
     $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }
-      || 'A clever guy';
+      || 'Catalyst developer';
     $self->_mk_dirs;
     $self->_mk_appclass;
     $self->_mk_build;
