@@ -3,7 +3,7 @@ package Catalyst::Engine::HTTP::Daemon;
 use strict;
 use base 'Catalyst::Engine::HTTP::Base';
 
-use IO::Socket qw(AF_INET INADDR_ANY SOCK_STREAM SOMAXCONN);
+use IO::Socket qw(AF_INET INADDR_ANY SOCK_STREAM SOMAXCONN );
 
 =head1 NAME
 
@@ -42,8 +42,11 @@ $SIG{'PIPE'} = 'IGNORE';
 sub run {
     my $class = shift;
     my $port  = shift || 3000;
+    
+    $HTTP::Daemon::PROTO = 'HTTP/1.0'; # For now until we resolve the blocking 
+                                       # issues with HTTP 1.1
 
-    my $daemon = Catalyst::Engine::HTTP::Catalyst->new(
+    my $daemon = Catalyst::Engine::HTTP::Daemon::Catalyst->new(
         Listen    => SOMAXCONN,
         LocalPort => $port,
         ReuseAddr => 1,
@@ -79,7 +82,6 @@ sub run {
 
             $class->handler($http);
             $connection->send_response( $http->response );
-
         }
 
         $connection->close;
@@ -106,12 +108,10 @@ the same terms as Perl itself.
 
 =cut
 
-package Catalyst::Engine::HTTP::Catalyst;
+package Catalyst::Engine::HTTP::Daemon::Catalyst;
 
 use strict;
 use base 'HTTP::Daemon';
-
-$HTTP::Daemon::PROTO = 'HTTP/0.9';
 
 sub product_tokens {
     "Catalyst/$Catalyst::VERSION";
