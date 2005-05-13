@@ -106,12 +106,13 @@ Here's how to install Catalyst and get a simple application up and running, usin
 =head3 Setup
 
     $ catalyst.pl MyApp
+    # output omitted
     $ cd MyApp
-    $ script/create.pl controller My::Controller
+    $ script/myapp_create.pl controller My::Controller
 
 =head3 Run
 
-    $ script/server.pl
+    $ script/myapp_server.pl
 
 Now visit these locations with your favorite browser or user agent to see Catalyst in action:
 
@@ -142,8 +143,8 @@ In addition to the Model, View, and Controller components, there's a single clas
         name => 'My Application',
         root => '/home/joeuser/myapp/root',
 
-        # You can put whatever you want in here:
-        # my_param_name => $my_param_value,
+        # You can put anything else you want in here:
+        my_configuration_variable => 'something',
     );
 
     sub default : Private {
@@ -248,9 +249,9 @@ Note that the stash should be used only for passing data in an individual reques
 
 =head3 Actions
 
-A Catalyst controller is defined by its actions. An action is
-a sub with a special attribute. You've already seen some
-examples of actions in this document.
+A Catalyst controller is defined by its actions. An action is a sub with
+a special attribute. You've already seen some examples of actions in
+this document.
 
 Catalyst supports several types of actions:
 
@@ -264,9 +265,11 @@ Matches only http://localhost:3000/foo/bar.
 
 =item * B<Regex>
 
-    sub bar : Regex('^foo(\d+)/bar(\d+)$') { }
+    sub bar : Regex('^item(\d+)/order(\d+)$') { }
 
-Matches any URL that matches the pattern in the action key, e.g. http://localhost:3000/foo23/bar42. The '' around the regexp is optional, but perltidy likes it. :)
+Matches any URL that matches the pattern in the action key, e.g. http://localhost:3000/item23/order42. The '' around the regexp is optional, but perltidy likes it. :)
+
+Regex matches act globally, i.e. without reference to the namespace from which it is called, so that a C<bar> method in the C<MyApp::Controller::Catalog::Order::Process> namespace won't match any form of C<bar>, C<Catalog>, C<Order>, or C<Process> unless you explicitly put this in the regex.
 
 If you use capturing parentheses to extract values within the matching URL (23, 42 in the above example), those values are available in the $c->req->snippets array. If you want to pass arguments at the end of your URL, you must use regex action keys. See L</URL Argument Handling> below.
 
@@ -275,8 +278,8 @@ If you use capturing parentheses to extract values within the matching URL (23, 
     package MyApp; 
     sub foo : Global { }
 
-Matches http://localhost:3000/foo. The function name is mapped 
-directly to the application base.
+Matches http://localhost:3000/foo. The function name is mapped directly
+to the application base.
 
 =item * B<Namespace-Prefixed>
 
@@ -295,12 +298,14 @@ Matches no URL, and cannot be executed by requesting a URL that corresponds to t
 
     $c->forward('foo');
 
-See L</Flow Control> for a full explanation of C<forward>.
+See L</Flow Control> for a full explanation of C<forward>. Note that, as discussed there, when forwarding from another component, you must use the absolute path to the method, so that a private C<bar> method in your C<MyApp::Controller::Catalog::Order::Process> controller must, if called from elsewhere, be reach with C<$c-E<gt>forward('/catalog/order/process/bar')>.
 
 =back
 
-B<Note:> After seeing these examples, you probably wonder what the point is of defining names for regex and path actions. Actually, every public
-action is also a private one, so you have one unified way of addressing components in your C<forward>s.
+B<Note:> After seeing these examples, you probably wonder what the point
+is of defining names for regex and path actions. Actually, every public
+action is also a private one, so you have one unified way of addressing
+components in your C<forward>s.
 
 =head4 Built-in Private Actions
 
@@ -329,8 +334,8 @@ Called at the end of a request, after all matching actions are called.
     sub default : Private { }
 
 You can define the Built-in Private Actions within your controllers as 
-well. The actions will override the ones in lower level controllers/
-global.
+well. The actions will override the ones in lower level controllers or
+your global application.
 
 In addition to the normal built-ins, you have a special action for 
 making inheritance chains, 'auto'. These will be run after C<begin>, 
@@ -370,9 +375,9 @@ false, it would look like this:
 
 =back
 
-B<Note:> auto actions have to return a true value to continue processing!
-You can also die in the autochain action, in that case,
-the request will go straight to the finalize stage, without processing
+B<Note:> auto actions have to return a true value to continue
+processing!  You can also die in the autochain action, in that case, the
+request will go straight to the finalize stage, without processing
 further actions.
 
 
@@ -492,6 +497,13 @@ To show how to define views, we'll use an already-existing base class for the L<
 
     1;
 
+(You can also generate this automatically by using the helper script:
+
+    script/myapp_create.pl view TT TT
+
+where the first C<TT> tells the script to create a Template Toolkit
+view, and the second tells the script that its name should be C<TT>.)
+
 This gives us a process() method and we can now just do $c->forward('MyApp::V::TT') to render our templates. The base class makes process() implicit, so we don't have to say C<$c-E<gt>forward(qw/MyApp::V::TT process/)>.
 
     sub hello : Global {
@@ -601,13 +613,13 @@ Catalyst has a built-in http server for testing! (Later, you can easily use a mo
 
 Start your application on the command line...
 
-    script/server.pl
+    script/myapp_server.pl
 
 ...then visit http://localhost:3000/ in a browser to view the output.
 
 You can also do it all from the command line:
 
-    script/test.pl http://localhost/
+    script/myapp_test.pl http://localhost/
 
 Have fun!
 

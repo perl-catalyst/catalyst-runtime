@@ -25,7 +25,6 @@ install them for you.
 Catalyst includes a helper script, C<catalyst.pl>, that will set up a 
 skeleton application for you:
 
-    $ catalyst.pl My::App
     created "My-App"
     created "My-App/script"
     created "My-App/lib"
@@ -39,17 +38,18 @@ skeleton application for you:
     created "My-App/lib/My/App/V"
     created "My-App/lib/My/App/C"
     created "My-App/lib/My/App.pm"
+    created "My-App/Build.PL"
     created "My-App/Makefile.PL"
     created "My-App/README"
     created "My-App/Changes"
     created "My-App/t/01app.t"
-    created "My-App/t/02podcoverage.t"
-    created "My-App/script/cgi.pl"
-    created "My-App/script/nph-cgi.pl"
-    created "My-App/script/fcgi.pl"
-    created "My-App/script/server.pl"
-    created "My-App/script/test.pl"
-    created "My-App/script/create.pl"
+    created "My-App/t/02pod.t"
+    created "My-App/t/03podcoverage.t"
+    created "My-App/script/my_app_cgi.pl"
+    created "My-App/script/my_app_fastcgi.pl"
+    created "My-App/script/my_app_server.pl"
+    created "My-App/script/my_app_test.pl"
+    created "My-App/script/my_app_create.pl"
 
 This creates the directory structure shown, populated with skeleton 
 files.
@@ -62,20 +62,23 @@ You can test out your new application by running the server script that
 Catalyst provides:
 
     $ cd My-App
-    $ script/server.pl 
-    [...] [catalyst] [debug] Debug messages enabled
-    [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [...] [catalyst] [debug] Loaded private actions
-    .=----------------------+----------------------+---------------=.
-    | Private               | Class                | Code           |
-    |=----------------------+----------------------+---------------=|
-    | /default              | MyApp                | CODE(0x86f08ac)|
-    '=----------------------+----------------------+---------------='
-     "My::App" defined "!default" as "CODE(0x83fd570)"
-    [...] [catalyst] [info] My::App powered by Catalyst 5.00
-    You can connect to your server at http://localhost:3000
+    $ script/my_app_server.pl 
 
-(Note that each line logged by Catalyst includes a timestamp, which has
+    [...] [catalyst] [debug] Debug messages enabled
+    [...] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [...] [catalyst] [debug] Found home "/usr/home/jester/foo/My-App/script/.."
+    [...] [catalyst] [debug] Loaded private actions
+    .=--------------------------------+------------------------------------=.
+    | Private                         | Class                               |
+    |=--------------------------------+------------------------------------=|
+    | /default                        | My::App                             |
+    '=--------------------------------+------------------------------------='
+
+    [....] [catalyst] [info] My::App powered by Catalyst 5.20
+    You can connect to your server at http://localhost:3000/
+
+(Note that each line logged by Catalyst begins with a timestamp, which has
 been replaced here with "C<...>" so that the text fits onto the lines.)
 
 The server is now waiting for you to make requests of it.  Try using 
@@ -90,10 +93,10 @@ and hit return twice):
     GET / HTTP/1.0
     
     HTTP/1.0 200
-    Server: Catalyst/5.00
+    Server: Catalyst/5.20
     Status: 200
-    Date: Sun, 20 Mar 2005 12:31:55 GMT
-    X-catalyst: 5.00
+    Date: Fri May 13 14:15:46 EDT 2005
+    X-catalyst: 5.20
     Content-length: 40
     Content-Type: text/html; charset=ISO-8859-1
 
@@ -117,7 +120,7 @@ More trace messages will appear in the original terminal window:
 The server will continue running until you interrupt it.
 
 The application can also be tested from the command line using the generated
-helper script, C<script/test.pl>.
+helper script, C<script/my_app_test.pl>.
 
 
 =head2 Getting your application invoked
