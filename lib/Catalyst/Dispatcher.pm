@@ -9,14 +9,6 @@ use Tree::Simple::Visitor::FindByPath;
 
 __PACKAGE__->mk_classdata($_) for qw/actions tree/;
 
-# These are the core structures
-__PACKAGE__->actions(
-    { plain => {}, private => {}, regex => {}, compiled => [], reverse => {} }
-);
-
-# We use a tree
-__PACKAGE__->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
-
 =head1 NAME
 
 Catalyst::Dispatcher - The Catalyst Dispatcher
@@ -355,6 +347,20 @@ Setup actions for a component.
 
 sub setup_actions {
     my ( $self, $comps ) = @_;
+
+    # These are the core structures
+    $self->actions(
+        {
+            plain    => {},
+            private  => {},
+            regex    => {},
+            compiled => [],
+            reverse  => {}
+        }
+    );
+
+    # We use a tree
+    $self->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
 
     for my $comp (@$comps) {
         $comp = ref $comp || $comp;
