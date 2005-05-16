@@ -55,6 +55,7 @@ sub prepare_parameters {
 
 sub prepare_request {
     my ( $c, $speedycgi, @arguments ) = @_;
+    $speedycgi->register_cleanup( \&CGI::_reset_globals );
     $c->SUPER::prepare_request($speedycgi);
     $c->Catalyst::Engine::CGI::prepare_request(@arguments);
 }

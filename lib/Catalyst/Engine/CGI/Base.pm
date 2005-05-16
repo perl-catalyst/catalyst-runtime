@@ -121,7 +121,9 @@ sub prepare_path {
         $base = $base->canonical->as_string;
     }
 
+    my $location = $ENV{SCRIPT_NAME} || '/';
     my $path = $ENV{PATH_INFO} || '/';
+    $path =~ s/^($location)?\///;
     $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~ s/^\///;
 

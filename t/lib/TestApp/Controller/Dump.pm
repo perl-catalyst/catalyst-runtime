@@ -8,6 +8,12 @@ sub default : Action Private {
     $c->forward('TestApp::View::Dump');
 }
 
+sub env : Action Relative {
+    my ( $self, $c ) = @_;
+    $c->stash( env => \%ENV );
+    $c->forward('TestApp::View::Dump');
+}
+
 sub parameters : Action Relative {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Parameters');

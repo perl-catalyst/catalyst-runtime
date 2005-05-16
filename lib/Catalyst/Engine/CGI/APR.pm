@@ -9,7 +9,7 @@ use APR::Request;
 use APR::Request::CGI;
 use APR::Request::Param;
 
-__PACKAGE__->mk_accessors('apr');
+__PACKAGE__->mk_accessors( qw[apr pool] );
 
 =head1 NAME
 
@@ -43,6 +43,10 @@ This Catalyst engine uses C<APR::Request::CGI> for parsing of message body.
 
 Contains the C<APR::Request::CGI> object.
 
+=item $c->pool
+
+Contains the C<APR::Pool> object.
+
 =back
 
 =head1 OVERLOADED METHODS
@@ -59,14 +63,17 @@ sub prepare_parameters {
     my $c = shift;
 
     my @params;
-
-    $c->apr->param->do( sub {
-        my ( $field, $value ) = @_;
-        push( @params, $field, $value );
-        return 1;    
-    });
-
-    $c->request->param(@params);
+    
+    if ( my $table = $c->apr->param ) {
+    
+        $table->do( sub {
+            my ( $field, $value ) = @_;
+            push( @params, $field, $value );
+            return 1;    
+        });
+    
+        $c->request->param(@params);
+    }
 }
 
 =item $c->prepare_request
@@ -75,7 +82,8 @@ sub prepare_parameters {
 
 sub prepare_request {
     my $c = shift;
-    $c->apr( APR::Request::CGI->handle( APR::Pool->new ) );
+    $c->pool(  APR::Pool->new );
+    $c->apr( APR::Request::CGI->handle( $c->pool ) );
 }
 
 =item $c->prepare_uploads
@@ -86,23 +94,28 @@ sub prepare_uploads {
     my $c = shift;
 
     my @uploads;
+    
+    if ( my $body = $c->apr->body ) {
+    
+        $body->param_class('APR::Request::Param');
 
-    $c->apr->upload->do( sub {
-        my ( $field, $upload ) = @_;
+        $body->uploads( $c->pool )->do( sub {
+            my ( $field, $upload ) = @_;
 
-        my $object = Catalyst::Request::Upload->new(
-            filename => $upload->filename,
-            size     => $upload->size,
-            tempname => $upload->tempname,
-            type     => $upload->type
-        );
+            my $object = Catalyst::Request::Upload->new(
+                filename => $upload->upload_filename,
+                size     => $upload->upload_size,
+                tempname => $upload->upload_tempname,
+                type     => $upload->upload_type
+            );
 
-        push( @uploads, $field, $object );
+            push( @uploads, $field, $object );
 
-        return 1;
-    });
+            return 1;
+        });
 
-    $c->request->upload(@uploads);
+        $c->request->upload(@uploads);
+    }
 }
 
 =back

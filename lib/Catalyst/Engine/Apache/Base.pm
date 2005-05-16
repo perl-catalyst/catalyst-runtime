@@ -91,24 +91,6 @@ sub prepare_headers {
     $c->request->header( %{ $c->apache->headers_in } );
 }
 
-=item $c->prepare_parameters
-
-=cut
-
-sub prepare_parameters {
-    my $c = shift;
-
-    my @params;
-    
-    $c->apache->param->do( sub {
-        my ( $field, $value ) = @_;
-        push( @params, $field, $value );
-        return 1;    
-    });
-    
-    $c->request->param(@params);
-}
-
 =item $c->prepare_path
 
 =cut
@@ -145,6 +127,15 @@ sub prepare_path {
 
     $c->req->base($base);
     $c->req->path($path);
+}
+
+=item $c->prepare_request($r)
+
+=cut
+
+sub prepare_request {
+    my ( $c, $r ) = @_;
+    $c->apache($r);
 }
 
 =item $c->run

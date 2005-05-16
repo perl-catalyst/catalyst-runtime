@@ -100,9 +100,35 @@ sub prepare_parameters {
 =cut
 
 sub prepare_request {
-    my ( $c, $cgi ) = @_;
+    my ( $c, $object ) = @_;
+
+    my $cgi;
+
+    if ( defined($object) && ref($object) ) {
+
+        if ( $object->isa('Apache') ) {                   # MP 1.3
+            $cgi = CGI->new($object);
+        }
+
+        elsif ( $object->isa('Apache::RequestRec') ) {    # MP 1.99
+            $cgi = CGI->new($object);
+        }
+
+        elsif ( $object->isa('Apache2::RequestRec') ) {   # MP 2.00
+            $cgi = CGI->new($object);
+        }
+
+        elsif ( $object->isa('CGI') ) {
+            $cgi = $object;
+        }
+
+        else {
+            my $class = ref($object);
+            die( qq/Invalid argument $object/ );
+        }
+    }
+
     $c->cgi( $cgi || CGI->new );
-    $c->cgi->_reset_globals;
 }
 
 =item $c->prepare_uploads

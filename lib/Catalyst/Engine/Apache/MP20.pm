@@ -1,17 +1,7 @@
 package Catalyst::Engine::Apache::MP20;
 
 use strict;
-use base 'Catalyst::Engine::Apache::Base';
-
-use Apache2::Connection  ();
-use Apache2::Const       ();
-use Apache2::RequestIO   ();
-use Apache2::RequestRec  ();
-use Apache2::RequestUtil ();
-use Apache2::Request     ();
-use Apache2::Upload      ();
-
-Apache2::Const->import( -compile => ':common' );
+use base qw[Catalyst::Engine::Apache::MP20::Base Catalyst::Engine::CGI];
 
 =head1 NAME
 
@@ -27,76 +17,49 @@ This is the Catalyst engine specialized for Apache mod_perl version 2.0.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::Apache::Base>.
+This class overloads some methods from C<Catalyst::Engine::Apache::MP20::Base>
+and C<Catalyst::Engine::CGI>.
 
 =over 4
 
-=item $c->finalize_headers
+=item $c->prepare_body
 
 =cut
 
-sub finalize_headers {
-    my $c = shift;
-
-    for my $name ( $c->response->headers->header_field_names ) {
-        next if $name =~ /Content-Type/i;
-        my @values = $c->response->header($name);
-        $c->apache->headers_out->add( $name => $_ ) for @values;
-    }
-
-    if ( $c->response->header('Set-Cookie') && $c->response->status >= 300 ) {
-        my @values = $c->response->header('Set-Cookie');
-        $c->apache->err_headers_out->add( 'Set-Cookie' => $_ ) for @values;
-    }
-
-    $c->apache->status( $c->response->status );
-    $c->apache->content_type( $c->response->header('Content-Type') );
-
-    return 0;
+sub prepare_body { 
+    shift->Catalyst::Engine::CGI::prepare_body(@_);
 }
 
-=item $c->handler
+=item $c->prepare_parameters
 
 =cut
 
-sub handler : method {
-    shift->SUPER::handler(@_);
+sub prepare_parameters { 
+    shift->Catalyst::Engine::CGI::prepare_parameters(@_);
 }
 
-=item $c->prepare_request($r)
+=item $c->prepare_request
 
 =cut
 
 sub prepare_request {
-    my ( $c, $r ) = @_;
-    $c->apache( Apache2::Request->new($r) );
+    my ( $c, $r, @arguments ) = @_;
+
+    $ENV{CONTENT_TYPE}   = $r->headers_in->get("Content-Type");
+    $ENV{CONTENT_LENGTH} = $r->headers_in->get("Content-Length");
+    $ENV{QUERY_STRING}   = $r->args;
+    $ENV{REQUEST_METHOD} = $r->method;
+
+    $c->SUPER::prepare_request($r);
+    $c->Catalyst::Engine::CGI::prepare_request( $r, @arguments );
 }
 
 =item $c->prepare_uploads
 
 =cut
 
-sub prepare_uploads {
-    my $c = shift;
-
-    my @uploads;
-
-    $c->apache->upload->do( sub {
-        my ( $field, $upload ) = @_;
-
-        my $object = Catalyst::Request::Upload->new(
-            filename => $upload->filename,
-            size     => $upload->size,
-            tempname => $upload->tempname,
-            type     => $upload->type
-        );
-
-        push( @uploads, $field, $object );
-
-        return 1;
-    });
-
-    $c->request->upload(@uploads);
+sub prepare_uploads { 
+    shift->Catalyst::Engine::CGI::prepare_uploads(@_);
 }
 
 =back

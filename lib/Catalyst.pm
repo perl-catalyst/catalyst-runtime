@@ -154,23 +154,52 @@ sub import {
     my $dispatcher = 'Catalyst::Dispatcher';
 
     if ( $ENV{MOD_PERL} ) {
-    
-        mod_perl->require;
 
-        if ( $mod_perl::VERSION >= 1.99_90_22 ) {
-            $engine = 'Catalyst::Engine::Apache::MP20';
+        my ( $software, $version ) = $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
+
+        $version =~ s/_//g;
+        $version =~ s/(\.[^.]+)\./$1/g;
+
+        if ( $software eq 'mod_perl') {
+
+            if ( $version >= 1.99922 ) {
+
+                $engine = 'Catalyst::Engine::Apache::MP20';
+
+                if ( Apache2::Request->require ) {
+                    $engine = 'Catalyst::Engine::Apache::MP20::APR';
+                }
+            }
+
+            elsif ( $version >= 1.9901 ) {
+
+                $engine = 'Catalyst::Engine::Apache::MP19';
+
+                if ( Apache::Request->require ) {
+                    $engine = 'Catalyst::Engine::Apache::MP19::APR';
+                }
+            }
+
+            elsif ( $version >= 1.24 ) {
+
+                $engine = 'Catalyst::Engine::Apache::MP13';
+
+                if ( Apache::Request->require ) {
+                    $engine = 'Catalyst::Engine::Apache::MP13::APR';
+                }
+            }
+
+            else {
+                die( qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
+            }
         }
 
-        elsif ( $mod_perl::VERSION >= 1.99_01 ) {
-            $engine = 'Catalyst::Engine::Apache::MP19';
-        }
-
-        elsif ( $mod_perl::VERSION >= 1.27 ) {
-            $engine = 'Catalyst::Engine::Apache::MP13';
+        elsif ( $software eq 'Zeus-Perl' ) {
+            $engine = 'Catalyst::Engine::Zeus';
         }
 
         else {
-            die( qq/Unsupported mod_perl version: "$mod_perl::VERSION"/ );
+            die( qq/Unsupported mod_perl: $ENV{MOD_PERL}/ );
         }
     }
 
