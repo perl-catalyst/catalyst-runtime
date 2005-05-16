@@ -8,8 +8,14 @@ lib/Catalyst/Engine.pm
 lib/Catalyst/Engine/Apache.pm
 lib/Catalyst/Engine/Apache/Base.pm
 lib/Catalyst/Engine/Apache/MP13.pm
+lib/Catalyst/Engine/Apache/MP13/APR.pm
+lib/Catalyst/Engine/Apache/MP13/Base.pm
 lib/Catalyst/Engine/Apache/MP19.pm
+lib/Catalyst/Engine/Apache/MP19/APR.pm
+lib/Catalyst/Engine/Apache/MP19/Base.pm
 lib/Catalyst/Engine/Apache/MP20.pm
+lib/Catalyst/Engine/Apache/MP20/APR.pm
+lib/Catalyst/Engine/Apache/MP20/Base.pm
 lib/Catalyst/Engine/CGI.pm
 lib/Catalyst/Engine/CGI/APR.pm
 lib/Catalyst/Engine/CGI/Base.pm
@@ -19,6 +25,8 @@ lib/Catalyst/Engine/FastCGI/Base.pm
 lib/Catalyst/Engine/HTTP.pm
 lib/Catalyst/Engine/HTTP/Base.pm
 lib/Catalyst/Engine/HTTP/Daemon.pm
+lib/Catalyst/Engine/SpeedyCGI.pm
+lib/Catalyst/Engine/SpeedyCGI/Base.pm
 lib/Catalyst/Engine/Test.pm
 lib/Catalyst/Helper.pm
 lib/Catalyst/Log.pm
