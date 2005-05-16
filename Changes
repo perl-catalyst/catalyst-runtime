@@ -12,6 +12,8 @@ This file documents the revision history for Perl extension Catalyst.
           in Path and Regex attributes
         - new helper templates
         - installer now supports install_base and destdir
+        - allow multiple Catalyst apps to run on the same mod_perl instance
+          (not the same app!)
 
 5.10  Sat Apr 23 11:16:00 2005
         - updated dependencies to require latest module::pluggable::fast
