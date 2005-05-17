@@ -53,6 +53,7 @@ Catalyst::Request - Catalyst Request Class
     $req->snippets;
     $req->upload;
     $req->uploads;
+    $req->uri;
     $req->user;
     $req->user_agent;
 
@@ -308,6 +309,18 @@ hashref or a arrayref containing C<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
+
+=item $req->uri
+
+Shortcut for C<< $req->base . $req->path >>.
+
+=cut
+
+sub uri {
+    my $self = shift;
+    my $path = shift || $self->path || '';
+    return $self->base . $path;
+}
 
 =item $req->user
 
