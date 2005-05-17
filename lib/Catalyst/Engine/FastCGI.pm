@@ -29,7 +29,8 @@ This is the Catalyst engine for FastCGI.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::FastCGI::Base>.
+This class overloads some methods from C<Catalyst::Engine::FastCGI::Base>
+and C<Catalyst::Engine::CGI>.
 
 =over 4
 

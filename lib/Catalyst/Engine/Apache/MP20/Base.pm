@@ -8,6 +8,7 @@ use Apache2::Const       ();
 use Apache2::RequestIO   ();
 use Apache2::RequestRec  ();
 use Apache2::RequestUtil ();
+use Apache2::Response    ();
 
 Apache2::Const->import( -compile => ':common' );
 
@@ -37,7 +38,7 @@ sub finalize_headers {
     my $c = shift;
 
     for my $name ( $c->response->headers->header_field_names ) {
-        next if $name =~ /Content-Type/i;
+        next if $name =~ /^Content-(Length|Type)$/i;
         my @values = $c->response->header($name);
         $c->apache->headers_out->add( $name => $_ ) for @values;
     }
@@ -48,7 +49,14 @@ sub finalize_headers {
     }
 
     $c->apache->status( $c->response->status );
-    $c->apache->content_type( $c->response->header('Content-Type') );
+
+    if ( my $type = $c->response->header('Content-Type') ) {
+        $c->apache->content_type($type);
+    }
+
+    if ( my $length = $c->response->content_length ) {
+        $c->apache->set_content_length($length);
+    }
 
     return 0;
 }

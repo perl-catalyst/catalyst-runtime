@@ -1,14 +1,13 @@
-package Catalyst::Engine::Apache::MP20::APR;
+package Catalyst::Engine::Apache::MP13::Apreq;
 
 use strict;
-use base 'Catalyst::Engine::Apache::MP20::Base';
+use base 'Catalyst::Engine::Apache::MP13::Base';
 
-use Apache2::Request ();
-use Apache2::Upload  ();
+use Apache::Request ();
 
 =head1 NAME
 
-Catalyst::Engine::Apache::MP20 - APR class for MP 2.0 Engines
+Catalyst::Engine::Apache::MP13::Apreq - Apreq class for MP 1.3 Engines
 
 =head1 SYNOPSIS
 
@@ -16,11 +15,11 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is the Catalyst engine specialized for Apache mod_perl version 2.0.
+This is the Catalyst engine specialized for Apache mod_perl version 1.3x.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::Apache::MP20::Base>.
+This class overloads some methods from C<Catalyst::Engine::Apache::MP13::Base>.
 
 =over 4
 
@@ -33,16 +32,13 @@ sub prepare_parameters {
 
     my @params;
 
-    if ( my $table = $c->apache->param ) {
+    $c->apache->param->do( sub {
+        my ( $field, $value ) = @_;
+        push( @params, $field, $value );
+        return 1;
+    });
 
-        $table->do( sub {
-            my ( $field, $value ) = @_;
-            push( @params, $field, $value );
-            return 1;
-        });
-
-        $c->request->param(@params);
-    }
+    $c->request->param(@params);
 }
 
 =item $c->prepare_request($r)
@@ -51,7 +47,7 @@ sub prepare_parameters {
 
 sub prepare_request {
     my ( $c, $r ) = @_;
-    $c->apache( Apache2::Request->new($r) );
+    $c->apache( Apache::Request->new($r) );
 }
 
 =item $c->prepare_uploads
@@ -63,8 +59,7 @@ sub prepare_uploads {
 
     my @uploads;
 
-    $c->apache->upload->do( sub {
-        my ( $field, $upload ) = @_;
+    for my $upload ( $c->apache->upload ) {
 
         my $object = Catalyst::Request::Upload->new(
             filename => $upload->filename,
@@ -73,10 +68,8 @@ sub prepare_uploads {
             type     => $upload->type
         );
 
-        push( @uploads, $field, $object );
-
-        return 1;
-    });
+        push( @uploads, $upload->name, $object );
+    }
 
     $c->request->upload(@uploads);
 }
@@ -85,7 +78,7 @@ sub prepare_uploads {
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::Apache::MP20::Base>.
+L<Catalyst>, L<Catalyst::Engine>, L<Catalyst::Engine::Apache::MP13::Base>.
 
 =head1 AUTHOR
 

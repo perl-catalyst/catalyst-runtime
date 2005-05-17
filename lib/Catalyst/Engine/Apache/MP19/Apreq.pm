@@ -1,4 +1,4 @@
-package Catalyst::Engine::Apache::MP19::APR;
+package Catalyst::Engine::Apache::MP19::Apreq;
 
 use strict;
 use base 'Catalyst::Engine::Apache::MP19::Base';
@@ -8,7 +8,7 @@ use Apache::Upload  ();
 
 =head1 NAME
 
-Catalyst::Engine::Apache::MP19::APR - APR class for MP 1.9 Engines
+Catalyst::Engine::Apache::MP19::Apreq - Apreq class for MP 1.9 Engines
 
 =head1 SYNOPSIS
 

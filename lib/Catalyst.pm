@@ -167,7 +167,7 @@ sub import {
                 $engine = 'Catalyst::Engine::Apache::MP20';
 
                 if ( Apache2::Request->require ) {
-                    $engine = 'Catalyst::Engine::Apache::MP20::APR';
+                    $engine = 'Catalyst::Engine::Apache::MP20::Apreq';
                 }
             }
 
@@ -176,7 +176,7 @@ sub import {
                 $engine = 'Catalyst::Engine::Apache::MP19';
 
                 if ( Apache::Request->require ) {
-                    $engine = 'Catalyst::Engine::Apache::MP19::APR';
+                    $engine = 'Catalyst::Engine::Apache::MP19::Apreq';
                 }
             }
 
@@ -185,7 +185,7 @@ sub import {
                 $engine = 'Catalyst::Engine::Apache::MP13';
 
                 if ( Apache::Request->require ) {
-                    $engine = 'Catalyst::Engine::Apache::MP13::APR';
+                    $engine = 'Catalyst::Engine::Apache::MP13::Apreq';
                 }
             }
 

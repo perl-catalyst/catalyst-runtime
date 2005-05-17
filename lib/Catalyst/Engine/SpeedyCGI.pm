@@ -29,7 +29,8 @@ This is the Catalyst engine for SpeedyCGI.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::SpeedyCGI::Base>.
+This class overloads some methods from C<Catalyst::Engine::SpeedyCGI::Base>
+and C<Catalyst::Engine::CGI>.
 
 =over 4
 
