@@ -5,6 +5,22 @@ use base 'Catalyst::Engine::CGI::Base';
 
 use CGI;
 
+our @compile = qw[
+    delete
+    http
+    new_MultipartBuffer
+    param
+    parse_keywordlist
+    read_from_client
+    read_multipart
+    tmpFileName
+    uploadInfo
+    url_param
+    user_agent
+];
+
+CGI->compile(@compile);
+
 __PACKAGE__->mk_accessors('cgi');
 
 =head1 NAME
@@ -29,15 +45,7 @@ appropriate engine module.
 =head1 DESCRIPTION
 
 This is the Catalyst engine specialized for the CGI environment (using the
-C<CGI> and C<CGI::Cookie> modules).  Normally Catalyst will select the
-appropriate engine according to the environment that it detects, however you
-can force Catalyst to use the CGI engine by specifying the following in your
-application module:
-
-    use Catalyst qw(-Engine=CGI);
-
-The performance of this way of using Catalyst is not expected to be
-useful in production applications, but it may be helpful for development.
+C<CGI> and C<CGI::Cookie> modules).
 
 =head1 METHODS
 

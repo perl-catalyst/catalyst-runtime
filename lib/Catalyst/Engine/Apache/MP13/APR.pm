@@ -23,16 +23,6 @@ This class overloads some methods from C<Catalyst::Engine::Apache::MP13::Base>.
 
 =over 4
 
-=item $c->prepare_request($r)
-
-=cut
-
-sub prepare_request {
-    my ( $c, $r ) = @_;
-    $c->apache( Apache::Request->new($r) );
-}
-
-
 =item $c->prepare_parameters
 
 =cut
@@ -49,6 +39,15 @@ sub prepare_parameters {
     });
 
     $c->request->param(@params);
+}
+
+=item $c->prepare_request($r)
+
+=cut
+
+sub prepare_request {
+    my ( $c, $r ) = @_;
+    $c->apache( Apache::Request->new($r) );
 }
 
 =item $c->prepare_uploads

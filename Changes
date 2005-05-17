@@ -2,7 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
 5.20  Sun Apr 24 17:00:00 2005
         - improved uploads and parameters
-        - added $c->req->protocol and $c->req->secure
+        - added $c->req->protocol, $c->req->secure and $c->req->user
         - improved error message when forwarding to unknown module
         - fixed win32 installer
         - added deep recursion detection

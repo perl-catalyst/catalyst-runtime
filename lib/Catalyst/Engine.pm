@@ -623,35 +623,6 @@ Prepare uploads.
 
 sub prepare_uploads { }
 
-=item $c->retrieve_components
-
-Retrieve Components.
-
-=cut
-
-sub retrieve_components {
-    my $self = shift;
-
-    my $class = ref $self || $self;
-    eval <<"";
-        package $class;
-        import Module::Pluggable::Fast
-          name    => '_components',
-          search  => [
-            '$class\::Controller', '$class\::C',
-            '$class\::Model',      '$class\::M',
-            '$class\::View',       '$class\::V'
-          ],
-          require => 1;
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        die qq/Couldn't load components "$error"/;
-    }
-
-    return $self->_components;
-}
-
 =item $c->run
 
 Starts the engine.
@@ -701,7 +672,7 @@ Setup components.
 
 sub setup_components {
     my $self = shift;
-
+    
     # Components
     my $class = ref $self || $self;
     eval <<"";

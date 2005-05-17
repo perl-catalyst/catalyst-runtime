@@ -5,7 +5,7 @@ use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(
     qw/action address arguments body base cookies headers hostname match
-      method parameters path protocol secure snippets uploads/
+      method parameters path protocol secure snippets uploads user/
 );
 
 *args   = \&arguments;
@@ -53,7 +53,8 @@ Catalyst::Request - Catalyst Request Class
     $req->snippets;
     $req->upload;
     $req->uploads;
-    $req->user_agent
+    $req->user;
+    $req->user_agent;
 
 See also L<Catalyst>.
 
@@ -307,6 +308,10 @@ hashref or a arrayref containing C<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
+
+=item $req->user
+
+Contains the user name of user if authentication check was successful.
 
 =item $req->user_agent
 

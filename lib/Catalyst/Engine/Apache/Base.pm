@@ -75,7 +75,8 @@ sub prepare_connection {
     $c->request->address( $c->apache->connection->remote_ip );
     $c->request->hostname( $c->apache->connection->remote_host );
     $c->request->protocol( $c->apache->protocol );
-    
+    $c->request->user( $c->apache->user );
+
     if ( $ENV{HTTPS} || $c->apache->get_server_port == 443 ) {
         $c->request->secure(1);
     }
