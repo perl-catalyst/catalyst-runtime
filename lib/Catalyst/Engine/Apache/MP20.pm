@@ -26,7 +26,7 @@ and C<Catalyst::Engine::CGI>.
 
 =cut
 
-sub prepare_body { 
+sub prepare_body {
     shift->Catalyst::Engine::CGI::prepare_body(@_);
 }
 
@@ -34,7 +34,7 @@ sub prepare_body {
 
 =cut
 
-sub prepare_parameters { 
+sub prepare_parameters {
     shift->Catalyst::Engine::CGI::prepare_parameters(@_);
 }
 
@@ -45,10 +45,22 @@ sub prepare_parameters {
 sub prepare_request {
     my ( $c, $r, @arguments ) = @_;
 
-    $ENV{CONTENT_TYPE}   = $r->headers_in->get("Content-Type");
-    $ENV{CONTENT_LENGTH} = $r->headers_in->get("Content-Length");
-    $ENV{QUERY_STRING}   = $r->args;
-    $ENV{REQUEST_METHOD} = $r->method;
+    unless ( $ENV{REQUEST_METHOD} ) {
+
+        $ENV{CONTENT_TYPE}   = $r->headers_in->get("Content-Type");
+        $ENV{CONTENT_LENGTH} = $r->headers_in->get("Content-Length");
+        $ENV{QUERY_STRING}   = $r->args;
+        $ENV{REQUEST_METHOD} = $r->method;
+
+        my $cleanup = sub {
+            delete( $ENV{$_} ) for qw( CONTENT_TYPE
+                                       CONTENT_LENGTH
+                                       QUERY_STRING
+                                       REQUEST_METHOD );
+        };
+
+        $r->pool->cleanup_register($cleanup);
+    }
 
     $c->SUPER::prepare_request($r);
     $c->Catalyst::Engine::CGI::prepare_request( $r, @arguments );
@@ -58,7 +70,7 @@ sub prepare_request {
 
 =cut
 
-sub prepare_uploads { 
+sub prepare_uploads {
     shift->Catalyst::Engine::CGI::prepare_uploads(@_);
 }
 

@@ -3,6 +3,7 @@ package Catalyst::Engine::Apache::Base;
 use strict;
 use base qw[Catalyst::Engine Catalyst::Engine::Apache];
 
+use File::Spec;
 use URI;
 use URI::http;
 
@@ -101,33 +102,55 @@ sub prepare_headers {
 sub prepare_path {
     my $c = shift;
     
-    my $base;
+    {
+        my $path = $c->apache->uri;
+
+        if ( my $location = $c->apache->location ) {
+
+            if ( index( $path, $location ) == 0 ) {
+                $path = substr( $path, length($location) );
+            }
+        }
+
+        $path =~ s/^\///;
+
+        if ( my $filename = $c->apache->filename ) {
+
+            $filename = ( File::Spec->splitpath($filename) )[2];
+
+            if ( index( $path, $filename ) == 0 ) {
+                $path = substr( $path, length($filename) );
+            }
+        }
+
+        $path =~ s/^\///;
+
+        $c->request->path($path);
+    }
+
     {
         my $scheme = $c->request->secure ? 'https' : 'http';
         my $host   = $c->apache->hostname;
         my $port   = $c->apache->get_server_port;
-        my $path   = $c->apache->location || '/';
+        my $path   = $c->apache->uri;
         
+        if ( length( $c->request->path ) ) {
+            $path =~ s/\/$//;
+            $path = substr( $path, 0, length($path) - length($c->req->path) );
+        }
+
         unless ( $path =~ /\/$/ ) {
             $path .= '/';
         }
 
-        $base = URI->new;
+        my $base = URI->new;
         $base->scheme($scheme);
         $base->host($host);
         $base->port($port);
         $base->path($path);
-
-        $base = $base->canonical->as_string;
+        
+        $c->request->base( $base->canonical->as_string );
     }
-    
-    my $location = $c->apache->location || '/';
-    my $path = $c->apache->uri || '/';
-    $path =~ s/^($location)?\///;
-    $path =~ s/^\///;
-
-    $c->req->base($base);
-    $c->req->path($path);
 }
 
 =item $c->prepare_request($r)
@@ -143,7 +166,7 @@ sub prepare_request {
 
 =cut
 
-sub run { }
+sub run { shift->handler(@_) }
 
 =back
 

@@ -16,7 +16,9 @@ This file documents the revision history for Perl extension Catalyst.
         - allow multiple Catalyst apps to run on the same mod_perl instance
           (not the same app!)
         - fixed MP2 engines
-        - removed apreq dependency from all MP engines.
+        - removed apreq dependency from all MP engines
+        - added support for MP registry scripts
+        - added support for LocationMatch and ScriptAliasMatch in MP engines
         - added SpeedyCGI engine
 
 5.10  Sat Apr 23 11:16:00 2005

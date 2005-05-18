@@ -136,7 +136,7 @@ sub prepare_path {
 
 =cut
 
-sub run { shift->handler }
+sub run { shift->handler(@_) }
 
 =back
 
