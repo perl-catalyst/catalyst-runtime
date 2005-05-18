@@ -8,13 +8,13 @@ lib/Catalyst/Engine.pm
 lib/Catalyst/Engine/Apache.pm
 lib/Catalyst/Engine/Apache/Base.pm
 lib/Catalyst/Engine/Apache/MP13.pm
-lib/Catalyst/Engine/Apache/MP13/APR.pm
+lib/Catalyst/Engine/Apache/MP13/Apreq.pm
 lib/Catalyst/Engine/Apache/MP13/Base.pm
 lib/Catalyst/Engine/Apache/MP19.pm
-lib/Catalyst/Engine/Apache/MP19/APR.pm
+lib/Catalyst/Engine/Apache/MP19/Apreq.pm
 lib/Catalyst/Engine/Apache/MP19/Base.pm
 lib/Catalyst/Engine/Apache/MP20.pm
-lib/Catalyst/Engine/Apache/MP20/APR.pm
+lib/Catalyst/Engine/Apache/MP20/Apreq.pm
 lib/Catalyst/Engine/Apache/MP20/Base.pm
 lib/Catalyst/Engine/CGI.pm
 lib/Catalyst/Engine/CGI/APR.pm
