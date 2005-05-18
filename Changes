@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.20  Sun Apr 24 17:00:00 2005
+5.20  2005-05-18 19:52:00
         - improved uploads and parameters
         - added $c->req->protocol and $c->req->secure
         - added $c->req->user and $c->req->uri
@@ -13,15 +13,15 @@ This file documents the revision history for Perl extension Catalyst.
           in Path and Regex attributes
         - new helper templates
         - installer now supports install_base and destdir
-        - allow multiple Catalyst apps to run on the same mod_perl instance
-          (not the same app!)
+        - allow multiple Catalyst apps to run on the same mod_perl
+          instance (not the same app!)
         - fixed MP2 engines
         - removed apreq dependency from all MP engines
         - added support for MP registry scripts
         - added support for LocationMatch and ScriptAliasMatch in MP engines
         - added SpeedyCGI engine
 
-5.10  Sat Apr 23 11:16:00 2005
+5.10  2005-04-23 11:16:00
         - updated dependencies to require latest module::pluggable::fast
         - new installer for templates and stuff using Module::Build
         - scripts are now prefixed, for being installable
@@ -32,7 +32,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Fixed: Params handling on POST with CGI engine (Andy Grundman)
         - Fixed: Helper.pm on Win32 (Matt S Trout)
 
-5.03  Tue Apr 19 20:35:00 2005 (Revision 462)
+5.03  2005-04-19 20:35:00 (Revision 462)
         - fixed Test example (Torsten Seeman)
         - added Plugins chapter to manual
         - applied doc patch from Robert Boone <robert@rlb3.com>
@@ -43,10 +43,10 @@ This file documents the revision history for Perl extension Catalyst.
         - added plugin() method for instant plugins
         - FCGI is no more considered experimental
 
-5.02  Mon Apr 18 10:00:00 2005
+5.02  2005-04-18 10:00:00 
         - fixed manifest
 
-5.01  Sun Apr 17 23:00:00 2005
+5.01  2005-04-17 23:00:00 
         - some documentation bugs fixed
         - added Catalyst::Utils
         - fixed regexp bug (Matt S Trout)
@@ -58,7 +58,7 @@ This file documents the revision history for Perl extension Catalyst.
         - extended attribute handling
         - added global config for components
 
-5.00  Fri Apr 15 18:00:00 2005
+5.00  2005-04-15 18:00:00
         - new core to support inheritance trees
         - new syntax for action declaration
         - new helper system using TT2
@@ -72,7 +72,7 @@ This file documents the revision history for Perl extension Catalyst.
           IMPORTANT: This release is very incompatible to previous ones
           and you have to regenerate the helper scripts again...
 
-4.34  Wed Mar 23 07:00:00 2005
+4.34  2005-03-23 07:00:00 2005
         - added some messages to Makefile.PL
         - added Catalyst::Engine::Test
         - added Catalyst::Engine::CGI::NPH
@@ -83,7 +83,7 @@ This file documents the revision history for Perl extension Catalyst.
           IMPORTANT: this will be the last time you'll have to regenerate
           the script directory. We promise!
 
-4.33  Wed Mar 23 01:00:00 2005
+4.33  2005-03-23 01:00:00 2005
         - documented the log() accessor method in Catalyst (Andrew Ford)
         - added optional arguments to Catalyst::Log methods (Andrew Ford)
         - removed cgi-server.pl
@@ -92,15 +92,15 @@ This file documents the revision history for Perl extension Catalyst.
         - new path test (Christian Hansen)
           IMPORTANT: you have to regenerate the script directory again
 
-4.32  Tue Mar 22 02:10:00 2005
+4.32  2005-03-22 02:10:00 2005
         - made a damn typo *AAAAAAAAAAAAAAHHHH!!!*
 
-4.31  Tue Mar 22 02:00:00 2005
+4.31  2005-03-22 02:00:00
         - fixed inheritance (Christian Hansen)
         - previous release was borked!
           fixed that, but you have to regenerate the scripts again :(
 
-4.30  Mon Mar 21 23:00:00 2005
+4.30  2005-03-21 23:00:00 
         - more documentation (Andrew Ford)
         - added connection informations (Christian Hansen)
         - HTTP::Request support in Catalyst::Test (Christian Hansen)
@@ -111,74 +111,74 @@ This file documents the revision history for Perl extension Catalyst.
           IMPORTANT: note that you have to regenerate script/server.pl,
           script/cgi-server.pl and script/cgi.pl (now nph-cgi.pl)
 
-4.28  Sat Mar 19 22:00:00 2005
+4.28  2005-03-19 22:00:00
         - fixed isa tree (Christian Hansen)
         - added script/cgi-server.pl, so no more server restarting after
           code changes
         - reworked documentation (Andrew Ford <A.Ford@ford-mason.co.uk>)
 
-4.27  Sat Mar 19 01:00:00 2005
+4.27  2005-03-19 01:00:00
         - debug message for parameters
         - Fix redirects (Christian Hansen <ch@ngmedia.com>)
         - some random fixes
         - new helper api for Catalyst::Helper::* support
           you have to update script/create.pl to use it
 
-4.26  Wed Mar 16 10:00:00 2005
+4.26  2005-03-16 10:00:00
         - fixed the weird bug that caused regex actions to fail on every
           second request
         - more debug messages
         - 100% pod coverage.
 
-4.25  Sat Mar 12 18:00:00 2005
+4.25  2005-03-12 18:00:00
         - correct perl pathes for helper generated scripts (Tatsuhiko Miyagawa)
         - improved cgi engine docs (Christoper Hicks)
 
-4.24  Sat Mar 12 01:00:00 2005
+4.24  2005-03-12 01:00:00
         - updated cookbook example  
         - fixed base for apache and https (Andrew Ruthven)
         
-4.23  Wed Mar 09 20:00:00 2005
+4.23  2005-03-09 20:00:00
         - no more regex actions in forward
         - added support for test directories t/m, t/v and t/c
 
-4.22  Tue Mar 08 20:00:00 2005
+4.22  2005-03-08 20:00:00
         - catch errors in application class
         - handle die properly.
 
-4.21  Sat Mar 05 17:00:00 2005
+4.21  2005-03-05 17:00:00
         - fixed docs
 
-4.20  Fri Mar 04 22:00:00 2005
+4.20  2005-03-04 22:00:00
         - moved bin to script
 
-4.13  Thu Mar 03 11:00:00 2005
+4.13  2005-03-03 11:00:00
         - improved documentation
         - pod coverage test for helper generated apps
         - new helper api
 
-4.12  Wed Mar 02 11:00:00 2005
+4.12  2005-03-02 11:00:00 2005
         - server_base sucks, removed
         - added $c->log->dump()
 
-4.11  Wed Mar 02 11:00:00 2005
+4.11  2005-03-02 11:00:00 2005
         - removed some warnings
         - improved docs
         - private prefixed actions override private non prefixed actions
         - added server_base
         - updated Catalyst::Manual::Intro
 
-4.10  Wed Mar 02 10:00:00 2005
+4.10  2005-03-02 10:00:00 2005
         - improved documentation
         - fixed upload bug
         - fixed prefixed private actions bug
         - fixed more little bugs
 
-4.01  Tue Mar 01 10:00:00 2005
+4.01  2005-03-01 10:00:00 2005
         - improved documentation
         - documentation fixes (Johan Lindstrom)
 
-4.00  Sun Feb 27 22:00:00 2005
+4.00  2005-02-27 22:00:00
         - more verbose debug messages, especially for forward()
         - implemented prefixed prvate actions, icluding built in
           !?default, !?begin and !?end
@@ -186,37 +186,37 @@ This file documents the revision history for Perl extension Catalyst.
         - new helpers, bin/catalyst
         - helper api
 
-3.11  Wed Feb 23 21:00:00 2005
+3.11  2005-02-23 21:00:00
         - added dependency to UNIVERSAL::require (Marcus Ramberg)
         - added a little workaround for a warning in Catalyst::Test
           (Marcus Ramberg)
         - improved documentation for actions
 
-3.10  Thu Feb 19 20:00:00 2005
+3.10  2005-02-19 20:00:00
         - removed roles management from Catalyst::Engine
           and added it to Catalyst::Plugin::Authentication::CDBI
 
-3.04  Thu Feb 17 21:00:00 2005
+3.04  2005-02-17 21:00:00 
         - error reporting for app class
         - no more engine debug messages
         - class->method forwards get resolved now
 
-3.03  Wed Feb 16 23:00:00 2005
+3.03  2005-02-16 23:00:00 
         - friendlier statistics
 
-3.02  Wed Feb 16 22:00:00 2005
+3.02  2005-02-16 22:00:00
         - fixed unintialized actions (Marcus Ramberg)
 
-3.01  Wed Feb 16 20:30:00 2005
+3.01  2005-02-16 20:30:00
         - better statistics
 
-3.00  Wed Feb 16 20:00:00 2005
+3.00  2005-02-16 20:00:00
         - real version number for CPAN.pm
         - fixed redirect in CGI engine
         - more statistics in debug logs
         - ? prefix for forward()
 
-2.99_15  Wed Feb 02 22:00:00 2005
+2.99_15  2005-02-02 22:00:00
         - support for short namespaces, MyApp::M, MyApp::V and MyApp::C
         - Replaced "Catched" with "Caught" in Catalyst::Engine
           (Gary Ashton Jones)
@@ -224,13 +224,13 @@ This file documents the revision history for Perl extension Catalyst.
         - added ? for prefixed actions
         - misc improvememts
 
-2.99_14  Mon Jan 31 22:00:00 2005
+2.99_14  2005-01-31 22:00:00 2005
         - arguments for _default
         - $c->entrance removed for more flexibility
         - added $c->req->method
 
-2.99_13  Sun Jan 30 18:00:00 2005
+2.99_13  2005-01-30 18:00:00 2005
         - POD fixes and improvements
 
-2.99_12  Fri Jan 28 22:00:00 2005
+2.99_12  2005-01-28 22:00:00 2005
         - first development release

@@ -1,21 +1,22 @@
 ---
 name: Catalyst
-version: 5.10
+version: 5.20
 author:
   - Sebastian Riedel, C<sri@oook.de>
 abstract: The Elegant MVC Web Application Framework
 license: perl
 requires:
-  CGI::Simple: 0
+  CGI: 0
   Class::Accessor::Fast: 0
   Class::Data::Inheritable: 0
+  File::Temp: 0.14
   HTML::Entities: 0
   HTTP::Daemon: 0
   HTTP::Headers: 0
   HTTP::Request: 0
   HTTP::Response: 0
   LWP::UserAgent: 0
-  Module::Pluggable::Fast: 0.14
+  Module::Pluggable::Fast: 0.15
   Path::Class: 0
   Template: 0
   Text::ASCIITable: 0
@@ -23,10 +24,11 @@ requires:
   Tree::Simple::Visitor::FindByPath: 0
   UNIVERSAL::require: 0
   URI: 0
+  perl: 5.8.1
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.10
+    version: 5.20
   Catalyst::Base:
     file: lib/Catalyst/Base.pm
   Catalyst::Build:
@@ -37,20 +39,50 @@ provides:
     file: lib/Catalyst/Engine.pm
   Catalyst::Engine::Apache:
     file: lib/Catalyst/Engine/Apache.pm
+  Catalyst::Engine::Apache::Base:
+    file: lib/Catalyst/Engine/Apache/Base.pm
   Catalyst::Engine::Apache::MP13:
     file: lib/Catalyst/Engine/Apache/MP13.pm
+  Catalyst::Engine::Apache::MP13::Apreq:
+    file: lib/Catalyst/Engine/Apache/MP13/Apreq.pm
+  Catalyst::Engine::Apache::MP13::Base:
+    file: lib/Catalyst/Engine/Apache/MP13/Base.pm
   Catalyst::Engine::Apache::MP19:
     file: lib/Catalyst/Engine/Apache/MP19.pm
+  Catalyst::Engine::Apache::MP19::Apreq:
+    file: lib/Catalyst/Engine/Apache/MP19/Apreq.pm
+  Catalyst::Engine::Apache::MP19::Base:
+    file: lib/Catalyst/Engine/Apache/MP19/Base.pm
   Catalyst::Engine::Apache::MP20:
     file: lib/Catalyst/Engine/Apache/MP20.pm
+  Catalyst::Engine::Apache::MP20::Apreq:
+    file: lib/Catalyst/Engine/Apache/MP20/Apreq.pm
+  Catalyst::Engine::Apache::MP20::Base:
+    file: lib/Catalyst/Engine/Apache/MP20/Base.pm
   Catalyst::Engine::CGI:
     file: lib/Catalyst/Engine/CGI.pm
-  Catalyst::Engine::FCGI:
-    file: lib/Catalyst/Engine/FCGI.pm
+  Catalyst::Engine::CGI::APR:
+    file: lib/Catalyst/Engine/CGI/APR.pm
+  Catalyst::Engine::CGI::Base:
+    file: lib/Catalyst/Engine/CGI/Base.pm
+  Catalyst::Engine::FastCGI:
+    file: lib/Catalyst/Engine/FastCGI.pm
+  Catalyst::Engine::FastCGI::APR:
+    file: lib/Catalyst/Engine/FastCGI/APR.pm
+  Catalyst::Engine::FastCGI::Base:
+    file: lib/Catalyst/Engine/FastCGI/Base.pm
   Catalyst::Engine::HTTP:
     file: lib/Catalyst/Engine/HTTP.pm
-  Catalyst::Engine::HTTP::Catalyst:
-    file: lib/Catalyst/Engine/HTTP.pm
+  Catalyst::Engine::HTTP::Base:
+    file: lib/Catalyst/Engine/HTTP/Base.pm
+  Catalyst::Engine::HTTP::Daemon:
+    file: lib/Catalyst/Engine/HTTP/Daemon.pm
+  Catalyst::Engine::HTTP::Daemon::Catalyst:
+    file: lib/Catalyst/Engine/HTTP/Daemon.pm
+  Catalyst::Engine::SpeedyCGI:
+    file: lib/Catalyst/Engine/SpeedyCGI.pm
+  Catalyst::Engine::SpeedyCGI::Base:
+    file: lib/Catalyst/Engine/SpeedyCGI/Base.pm
   Catalyst::Engine::Test:
     file: lib/Catalyst/Engine/Test.pm
   Catalyst::Helper:
