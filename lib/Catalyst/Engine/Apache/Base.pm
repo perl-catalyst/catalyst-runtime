@@ -101,7 +101,7 @@ sub prepare_headers {
 # not <Directory> directive
 sub prepare_path {
     my $c = shift;
-    
+
     {
         my $path = $c->apache->uri;
 
@@ -114,9 +114,9 @@ sub prepare_path {
 
         $path =~ s/^\///;
 
-        if ( my $filename = $c->apache->filename ) {
+        if ( $c->apache->filename && -e $c->apache->filename ) {
 
-            $filename = ( File::Spec->splitpath($filename) )[2];
+            my $filename = ( File::Spec->splitpath( $c->apache->filename ) )[2];
 
             if ( index( $path, $filename ) == 0 ) {
                 $path = substr( $path, length($filename) );
@@ -133,7 +133,7 @@ sub prepare_path {
         my $host   = $c->apache->hostname;
         my $port   = $c->apache->get_server_port;
         my $path   = $c->apache->uri;
-        
+
         if ( length( $c->request->path ) ) {
             $path =~ s/\/$//;
             $path = substr( $path, 0, length($path) - length($c->req->path) );
@@ -148,7 +148,7 @@ sub prepare_path {
         $base->host($host);
         $base->port($port);
         $base->path($path);
-        
+
         $c->request->base( $base->canonical->as_string );
     }
 }
