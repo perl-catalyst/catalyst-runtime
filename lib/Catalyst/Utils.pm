@@ -152,8 +152,6 @@ sub reflect_actions {
     return $actions;
 }
 
-=back
-
 =item request($string);
 
 Returns an C<HTTP::Request> from a string.

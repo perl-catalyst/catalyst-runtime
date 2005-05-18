@@ -807,6 +807,7 @@ sub default : Private {
 }
 
 =back
+
 [% END %]
 =head1 AUTHOR
 

@@ -36,6 +36,10 @@ to the upload data.
 
 =over 4
 
+=item $upload->new
+
+simple constructor.
+
 =item $upload->copy_to
 
 Copies tempname using C<File::Copy>. Returns true for success, false otherwise.

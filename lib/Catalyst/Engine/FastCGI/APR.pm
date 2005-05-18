@@ -67,6 +67,8 @@ sub prepare_uploads {
     shift->Catalyst::Engine::CGI::APR::prepare_uploads(@_);
 }
 
+=back
+
 =head1 SEE ALSO
 
 L<Catalyst>, L<Catalyst::Engine::FastCGI::Base>, L<Catalyst::Engine::CGI::APR>.
