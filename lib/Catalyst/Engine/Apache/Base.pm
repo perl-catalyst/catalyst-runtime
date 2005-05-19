@@ -78,7 +78,11 @@ sub prepare_connection {
     $c->request->protocol( $c->apache->protocol );
     $c->request->user( $c->apache->user );
 
-    if ( $ENV{HTTPS} || $c->apache->get_server_port == 443 ) {
+    if ( $ENV{HTTPS} && uc( $ENV{HTTPS} ) eq 'ON' ) {
+        $c->request->secure(1);
+    }
+
+    if ( $c->apache->get_server_port == 443 ) {
         $c->request->secure(1);
     }
 }

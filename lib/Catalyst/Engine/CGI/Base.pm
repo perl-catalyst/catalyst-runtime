@@ -71,7 +71,11 @@ sub prepare_connection {
     $c->request->protocol( $ENV{SERVER_PROTOCOL} );
     $c->request->user( $ENV{REMOTE_USER} );
 
-    if ( $ENV{HTTPS} || $ENV{SERVER_PORT} == 443 ) {
+    if ( $ENV{HTTPS} && uc( $ENV{HTTPS} ) eq 'ON' ) {
+        $c->request->secure(1);
+    }
+
+    if ( $ENV{SERVER_PORT} == 443 ) {
         $c->request->secure(1);
     }
 }
