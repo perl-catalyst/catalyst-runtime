@@ -11,14 +11,14 @@ sub prepare {
     $c->response->header( 'X-Catalyst-Debug' => $c->debug ? 1 : 0 );
     
     {
-        my @components = sort keys %{ $c->components };
-        $c->response->headers->push_header( 'X-Catalyst-Components' => [ @components ] );
+        my $components = join( ', ', sort keys %{ $c->components } );
+        $c->response->header( 'X-Catalyst-Components' => $components );
     }
 
     {
         no strict 'refs';
-        my @plugins = sort grep { m/^Catalyst::Plugin/ } @{ $class . '::ISA' };
-        $c->response->headers->push_header( 'X-Catalyst-Plugins' => [ @plugins ] );
+        my $plugins = join( ', ', sort grep { m/^Catalyst::Plugin/ } @{ $class . '::ISA' } );
+        $c->response->header( 'X-Catalyst-Plugins' => $plugins );
     }
 
     return $c;

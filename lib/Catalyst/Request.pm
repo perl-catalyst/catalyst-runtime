@@ -194,6 +194,8 @@ sub param {
     if ( @_ > 1 ) {
 
         while ( my ( $field, $value ) = splice( @_, 0, 2 ) ) {
+        
+            next unless defined $field;
 
             if ( exists $self->parameters->{$field} ) {
                 for ( $self->parameters->{$field} ) {
