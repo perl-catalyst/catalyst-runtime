@@ -108,7 +108,7 @@ Here's how to install Catalyst and get a simple application up and running, usin
     $ catalyst.pl MyApp
     # output omitted
     $ cd MyApp
-    $ script/myapp_create.pl controller My::Controller
+    $ script/myapp_create.pl controller Library::Login
 
 =head3 Run
 
@@ -120,7 +120,7 @@ Now visit these locations with your favorite browser or user agent to see Cataly
 
 =item http://localhost:3000/
 
-=item http://localhost:3000/my/controller/
+=item http://localhost:3000/library/login/
 
 =back
 
@@ -459,7 +459,7 @@ Catalyst has an uncommonly flexible component system. You can define as many L<M
 
 All components must inherit from L<Catalyst::Base>, which provides a simple class structure and some common class methods like C<config> and C<new> (constructor).
 
-    package MyApp::C::MyController;
+    package MyApp::C::Catalog;
 
     use strict;
     use base 'Catalyst::Base';
