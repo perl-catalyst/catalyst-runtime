@@ -33,15 +33,47 @@ This class overloads some methods from C<Catalyst::Engine::HTTP::Base>.
 
 =over 4
 
+=item $c->handler
+
+=cut
+
+sub handler {
+    my ( $class, $client ) = @_;
+
+    $client->timeout(5);
+
+    while ( my $request = $client->get_request ) {
+
+        $request->uri->scheme('http');    # Force URI::http
+        $request->uri->host( $request->header('Host') || $client->sockhost );
+        $request->uri->port( $client->sockport );
+
+        my $hostname = gethostbyaddr( $client->peeraddr, AF_INET );
+
+        my $http = Catalyst::Engine::HTTP::Base::struct->new(
+            address  => $client->peerhost,
+            hostname => $hostname || $client->peerhost,
+            request  => $request,
+            response => HTTP::Response->new
+        );
+
+        $class->SUPER::handler($http);
+
+        $client->send_response( $http->response );
+    }
+
+    $client->close;
+}
+
 =item $c->run
 
 =cut
 
-$SIG{'PIPE'} = 'IGNORE';
-
 sub run {
     my $class = shift;
     my $port  = shift || 3000;
+    
+    $SIG{'PIPE'} = 'IGNORE';
     
     $HTTP::Daemon::PROTO = 'HTTP/1.0'; # For now until we resolve the blocking 
                                        # issues with HTTP 1.1
@@ -53,39 +85,12 @@ sub run {
         Type      => SOCK_STREAM,
     );
 
-    unless ($daemon) {
-        die("Failed to create daemon: $!\n");
-    }
-
     my $base = URI->new( $daemon->url )->canonical;
 
     printf( "You can connect to your server at %s\n", $base );
 
-    while ( my $connection = $daemon->accept ) {
-
-        $connection->timeout(5);
-
-        while ( my $request = $connection->get_request ) {
-
-            $request->uri->scheme('http');    # Force URI::http
-            $request->uri->host( $request->header('Host') || $base->host );
-            $request->uri->port( $base->port );
-            
-            my $hostname = gethostbyaddr( $connection->peeraddr, AF_INET );
-
-            my $http = Catalyst::Engine::HTTP::Base::struct->new(
-                address  => $connection->peerhost,
-                hostname => $hostname || $connection->peerhost,
-                request  => $request,
-                response => HTTP::Response->new
-            );
-
-            $class->handler($http);
-            $connection->send_response( $http->response );
-        }
-
-        $connection->close;
-        undef($connection);
+    while ( my $client = $daemon->accept ) {
+        $class->handler($client);
     }
 }
 
