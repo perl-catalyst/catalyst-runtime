@@ -3,7 +3,7 @@ package Catalyst::Engine::HTTP::Daemon;
 use strict;
 use base 'Catalyst::Engine::HTTP::Base';
 
-use IO::Socket qw(AF_INET INADDR_ANY SOCK_STREAM SOMAXCONN );
+use IO::Socket qw( SOCK_STREAM SOMAXCONN );
 
 =head1 NAME
 
@@ -48,11 +48,8 @@ sub handler {
         $request->uri->host( $request->header('Host') || $client->sockhost );
         $request->uri->port( $client->sockport );
 
-        my $hostname = gethostbyaddr( $client->peeraddr, AF_INET );
-
         my $http = Catalyst::Engine::HTTP::Base::struct->new(
             address  => $client->peerhost,
-            hostname => $hostname || $client->peerhost,
             request  => $request,
             response => HTTP::Response->new
         );
@@ -84,6 +81,10 @@ sub run {
         ReuseAddr => 1,
         Type      => SOCK_STREAM,
     );
+    
+    unless ( defined $daemon ) {
+        die( qq/Failed to create daemon. Reason: '$!'/ );
+    }
 
     my $base = URI->new( $daemon->url )->canonical;
 

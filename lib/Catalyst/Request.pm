@@ -3,9 +3,11 @@ package Catalyst::Request;
 use strict;
 use base 'Class::Accessor::Fast';
 
+use IO::Socket qw[AF_INET inet_aton];
+
 __PACKAGE__->mk_accessors(
-    qw/action address arguments body base cookies headers hostname match
-      method parameters path protocol secure snippets uploads user/
+    qw/action address arguments body base cookies headers match method 
+       parameters path protocol secure snippets uploads user/
 );
 
 *args   = \&arguments;
@@ -133,9 +135,25 @@ Returns an L<HTTP::Headers> object containing the headers.
 
 =item $req->hostname
 
-Contains the hostname of the remote user.
+Lookup the current users DNS hostname.
 
     print $c->request->hostname
+    
+=cut
+
+sub hostname {
+    my $self = shift;
+
+    if ( @_ ) {
+        $self->{hostname} = shift;
+    }
+
+    unless ( $self->{hostname} ) {
+         $self->{hostname} = gethostbyaddr( inet_aton( $self->address ), AF_INET );
+    }
+
+    return $self->{hostname};
+}
 
 =item $req->input
 

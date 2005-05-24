@@ -467,10 +467,9 @@ sub prepare {
 
     my $method   = $c->req->method   || '';
     my $path     = $c->req->path     || '';
-    my $hostname = $c->req->hostname || '';
     my $address  = $c->req->address  || '';
 
-    $c->log->debug(qq/"$method" request for "$path" from $hostname($address)/)
+    $c->log->debug(qq/"$method" request for "$path" from $address/)
       if $c->debug;
 
     if ( $c->request->method eq 'POST' and $c->request->content_length ) {
