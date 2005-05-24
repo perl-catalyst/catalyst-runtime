@@ -66,7 +66,7 @@ sub dispatch {
         }
 
         # Execute the action or last default
-        my $mkay = defined $autorun ? $c->state ? 1 : 0 : 1;
+        my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
         if ( ( my $action = $c->req->action ) && $mkay ) {
             if ( my $result = @{ $c->get_action( $action, $default, 1 ) }[-1] )
             {
