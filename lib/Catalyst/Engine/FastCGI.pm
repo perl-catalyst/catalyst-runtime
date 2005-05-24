@@ -55,9 +55,9 @@ sub prepare_parameters {
 =cut
 
 sub prepare_request {
-    my ( $c, $fastcgi, @arguments ) = @_;
+    my ( $c, $request, @arguments ) = @_;
     CGI::_reset_globals();
-    $c->SUPER::prepare_request($fastcgi);
+    $c->SUPER::prepare_request($request);
     $c->Catalyst::Engine::CGI::prepare_request(@arguments);
 }
 

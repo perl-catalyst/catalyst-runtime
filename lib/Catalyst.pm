@@ -284,6 +284,35 @@ sub import {
 
     # Find home
     my $home = Catalyst::Utils::home($caller);
+
+    if ( my $h = $ENV{CATALYST_HOME} ) {
+
+        $home = $h if -d $h;
+
+        unless ( -e _ ) {
+            $caller->log->warn(qq/CATALYST_HOME does not exist "$h"/);
+        }
+
+        unless ( -e _ && -d _ ) {
+            $caller->log->warn(qq/CATALYST_HOME is not a directory "$h"/);
+        }
+    }
+
+    if ( my $h = $ENV{ uc($caller) . '_HOME' } ) {
+
+        $home = $h if -d $h;
+
+        unless ( -e _ ) {
+            my $e = uc($caller) . '_HOME';
+            $caller->log->warn(qq/$e does not exist "$h"/)
+        }
+
+        unless ( -e _ && -d _ ) {
+            my $e = uc($caller) . '_HOME';
+            $caller->log->warn(qq/$e is not a directory "$h"/);
+        }
+    }
+
     if ( $caller->debug ) {
         $home
           ? ( -d $home )

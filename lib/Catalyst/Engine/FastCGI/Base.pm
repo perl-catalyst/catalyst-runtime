@@ -36,8 +36,8 @@ This class overloads some methods from C<Catalyst::Engine::CGI::Base>.
 =cut
 
 sub prepare_request {
-    my ( $c, $fastcgi ) = @_;
-    $c->fastcgi($fastcgi);
+    my ( $c, $request ) = @_;
+    $c->fastcgi($request);
 }
 
 =item $c->run
