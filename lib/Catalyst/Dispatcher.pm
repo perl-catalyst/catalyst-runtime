@@ -57,7 +57,7 @@ sub dispatch {
         }
 
         # Execute the auto chain
-        my $autorun;
+        my $autorun = 0;
         for my $auto ( @{ $c->get_action( 'auto', $namespace, 1 ) } ) {
             $autorun++;
             $c->execute( @{ $auto->[0] } );
