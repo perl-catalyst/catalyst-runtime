@@ -146,6 +146,7 @@ sub hostname {
 
     if ( @_ ) {
         $self->{hostname} = shift;
+        return $self->{hostname};
     }
 
     unless ( $self->{hostname} ) {

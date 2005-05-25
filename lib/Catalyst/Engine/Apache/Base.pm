@@ -118,7 +118,7 @@ sub prepare_path {
 
         $path =~ s/^\///;
 
-        if ( $c->apache->filename && -e $c->apache->filename ) {
+        if ( $c->apache->filename && -x $c->apache->filename ) {
 
             my $filename = ( File::Spec->splitpath( $c->apache->filename ) )[2];
 
