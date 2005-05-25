@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
 5.22  2005-00-00 00:00:00
         - Improved base locating in MP engines
+        - Improved error messages in C::E::HTTP::Daemon
         - Hostnames are now resolved on demand unless provided by engine
 
 5.21  2005-05-24 14:56:00
