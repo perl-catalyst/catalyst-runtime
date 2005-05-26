@@ -167,7 +167,7 @@ sub execute {
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
             $c->state(@state);
         }
-        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ) }
+        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) ? 1 : 0 ) }
     };
 
     if ( my $error = $@ ) {
