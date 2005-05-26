@@ -162,8 +162,7 @@ sub execute {
     eval {
         if ( $c->debug )
         {
-            my ( $elapsed, @state ) =
-              $c->benchmark( $code, $class, $c, @{ $c->req->args } );
+            my ( $elapsed, @state ) = $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
             $c->state(@state);
         }

@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Improved base locating in MP engines
         - Improved error messages in C::E::HTTP::Daemon
         - Hostnames are now resolved on demand unless provided by engine
+        - Fixed memory leak in $c->execute (Michael Reece, Matt S Trout)
 
 5.21  2005-05-24 14:56:00
         - fixed a bug in https detection
