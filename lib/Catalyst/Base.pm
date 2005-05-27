@@ -2,7 +2,6 @@ package Catalyst::Base;
 
 use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
-use Catalyst::Utils;
 use NEXT;
 
 __PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache _config/;
@@ -70,12 +69,11 @@ component loader with config() support and a process() method placeholder.
 
 sub new {
     my ( $self, $c ) = @_;
-    my $class     = ref $self || $self;
-    my $appname   = Catalyst::Utils::class2appclass($class);
-    my $suffix    = Catalyst::Utils::class2classsuffix($class);
-    my $appconfig = $appname->config->{$suffix} || {};
-    my $config    = { %{ $self->config }, %{$appconfig} };
-    return $self->NEXT::new($config);
+ 
+    # Temporary fix, some components does not pass context to constructor
+    my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
+
+    return $self->NEXT::new( { %{ $self->config }, %{ $arguments } } );
 }
 
 # remember to leave blank lines between the consecutive =item's

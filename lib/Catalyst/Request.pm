@@ -144,13 +144,12 @@ Lookup the current users DNS hostname.
 sub hostname {
     my $self = shift;
 
-    if ( @_ ) {
-        $self->{hostname} = shift;
-        return $self->{hostname};
+    if ( @_ == 0 && not $self->{hostname} ) {
+         $self->{hostname} = gethostbyaddr( inet_aton( $self->address ), AF_INET );
     }
 
-    unless ( $self->{hostname} ) {
-         $self->{hostname} = gethostbyaddr( inet_aton( $self->address ), AF_INET );
+    if ( @_ == 1 ) {
+        $self->{hostname} = shift;
     }
 
     return $self->{hostname};

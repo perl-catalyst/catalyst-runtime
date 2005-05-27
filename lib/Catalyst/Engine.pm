@@ -13,6 +13,7 @@ use Text::ASCIITable;
 use Catalyst::Request;
 use Catalyst::Request::Upload;
 use Catalyst::Response;
+use Catalyst::Utils;
 
 require Module::Pluggable::Fast;
 
@@ -659,7 +660,28 @@ Setup.
 
 sub setup {
     my $self = shift;
+
+    # Initialize our data structure
+    $self->components( {} );    
+
     $self->setup_components;
+
+    if ( $self->debug ) {
+        my $t = Text::ASCIITable->new;
+        $t->setOptions( 'hide_HeadRow', 1 );
+        $t->setOptions( 'hide_HeadLine', 1 );
+        $t->setCols('Class');
+        $t->setColWidth( 'Class', 75, 1 );
+        $t->addRow($_) for sort keys %{ $self->components };
+        $self->log->debug( 'Loaded components', $t->draw )
+          if ( @{ $t->{tbl_rows} } );
+    }
+    
+    # Add our self to components, since we are also a component
+    $self->components->{ $self } = $self;
+
+    $self->setup_actions;
+
     if ( $self->debug ) {
         my $name = $self->config->{name} || 'Application';
         $self->log->info("$name powered by Catalyst $Catalyst::VERSION");
@@ -675,38 +697,49 @@ Setup components.
 sub setup_components {
     my $self = shift;
     
-    # Components
-    my $class = ref $self || $self;
-    eval <<"";
-        package $class;
-        import Module::Pluggable::Fast
-          name   => '_components',
-          search => [
-            '$class\::Controller', '$class\::C',
-            '$class\::Model',      '$class\::M',
-            '$class\::View',       '$class\::V'
-          ];
+    my $callback = sub {
+        my ( $component, $context ) = @_;
+
+        unless ( $component->isa('Catalyst::Base') ) {
+            return $component;
+        }
+
+        my $suffix = Catalyst::Utils::class2classsuffix($component);
+        my $config = $self->config->{$suffix} || {};
+
+        my $instance;
+
+        eval { 
+            $instance = $component->new( $context, $config );
+        };
+
+        if ( $@ ) {
+            die qq/Couldn't instantiate component "$component", "$@"/;
+        }
+
+        return $instance;
+    };
+
+    eval {
+        Module::Pluggable::Fast->import(
+            name     => '_components',
+            search   => [
+                "$self\::Controller", "$self\::C",
+                "$self\::Model",      "$self\::M",
+                "$self\::View",       "$self\::V"
+            ],
+            callback => $callback
+        );
+    };
 
     if ( my $error = $@ ) {
         chomp $error;
         die qq/Couldn't load components "$error"/;
     }
 
-    $self->components( {} );
-    my @comps;
-    for my $comp ( $self->_components($self) ) {
-        $self->components->{ ref $comp } = $comp;
-        push @comps, $comp;
+    for my $component ( $self->_components($self) ) {
+        $self->components->{ ref $component || $component } = $component;
     }
-
-    my $t = Text::ASCIITable->new( { hide_HeadRow => 1, hide_HeadLine => 1 } );
-    $t->setCols('Class');
-    $t->setColWidth( 'Class', 75, 1 );
-    $t->addRow($_) for sort keys %{ $self->components };
-    $self->log->debug( 'Loaded components', $t->draw )
-      if ( @{ $t->{tbl_rows} } && $self->debug );
-
-    $self->setup_actions( [ $self, @comps ] );
 }
 
 =item $c->state

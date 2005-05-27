@@ -347,7 +347,7 @@ Setup actions for a component.
 =cut
 
 sub setup_actions {
-    my ( $self, $comps ) = @_;
+    my $self = shift;
 
     # These are the core structures
     $self->actions(
@@ -362,9 +362,11 @@ sub setup_actions {
 
     # We use a tree
     $self->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
-
-    for my $comp (@$comps) {
-        $comp = ref $comp || $comp;
+    
+    for my $comp ( keys %{ $self->components } ) {
+    
+        # We only setup components that inherit from Catalyst::Base  
+        next unless $comp->isa('Catalyst::Base');
 
         for my $action ( @{ Catalyst::Utils::reflect_actions($comp) } ) {
             my ( $code, $attrs ) = @{$action};
@@ -400,6 +402,8 @@ sub setup_actions {
         }
 
     }
+    
+    return unless $self->debug;
 
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
@@ -423,7 +427,7 @@ sub setup_actions {
 
     $walker->( $walker, $self->tree, '' );
     $self->log->debug( 'Loaded private actions', $privates->draw )
-      if ( @{ $privates->{tbl_rows} } && $self->debug );
+      if ( @{ $privates->{tbl_rows} } );
 
     my $publics = Text::ASCIITable->new;
     $publics->setCols( 'Public', 'Private' );
@@ -438,7 +442,7 @@ sub setup_actions {
     }
 
     $self->log->debug( 'Loaded public actions', $publics->draw )
-      if ( @{ $publics->{tbl_rows} } && $self->debug );
+      if ( @{ $publics->{tbl_rows} } );
 
     my $regexes = Text::ASCIITable->new;
     $regexes->setCols( 'Regex', 'Private' );
@@ -453,7 +457,7 @@ sub setup_actions {
     }
 
     $self->log->debug( 'Loaded regex actions', $regexes->draw )
-      if ( @{ $regexes->{tbl_rows} } && $self->debug );
+      if ( @{ $regexes->{tbl_rows} } );
 }
 
 =back

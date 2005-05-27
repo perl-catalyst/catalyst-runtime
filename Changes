@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.23  2005-00-00 00:00:00
+        - added support for non Catalyst::Base components to live in namespace.
+
 5.22  2005-05-26 14:24:00
         - Improved base locating in MP engines
         - Improved error messages in C::E::HTTP::Daemon
