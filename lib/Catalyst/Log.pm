@@ -4,15 +4,21 @@ use strict;
 use base 'Class::Accessor::Fast';
 use Data::Dumper;
 
-our @levels = qw[ debug info warn error fatal ];
+our %LEVELS = ();
+
+__PACKAGE__->mk_accessors('level');
 
 {
-    no strict 'refs';
+    my @levels = qw[ debug info warn error fatal ];
 
     for ( my $i = 0 ; $i < @levels ; $i++ ) {
 
         my $name  = $levels[$i];
         my $level = 1 << $i;
+
+        $LEVELS{$name} = $level;
+
+        no strict 'refs';
 
         *{$name} = sub {
             my $self = shift;
@@ -24,23 +30,35 @@ our @levels = qw[ debug info warn error fatal ];
 
         *{"is_$name"} = sub {
             my $self = shift;
-
-            if (@_) {
-                if ( $_[0] ) {
-                    $self->{level} |= $level;
-                }
-                else {
-                    $self->{level} &= ~$level;
-                }
-            }
             return $self->{level} & $level;
         };
     }
-
-    *new = sub { bless( { level => ( 1 << @levels ) - 1 }, shift ) }
 }
 
-sub _dump { 
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new;
+    $self->levels( scalar(@_) ? @_ : keys %LEVELS );
+    return $self;
+}
+
+sub levels {
+    my ( $self, @levels ) = @_;
+    $self->level(0);
+    $self->enable(@levels);
+}
+
+sub enable {
+    my ( $self, @levels ) = @_;
+    $self->{level} |= $_ for map { $LEVELS{$_} } @levels;
+}
+
+sub disable {
+    my ( $self, @levels ) = @_;
+    $self->{level} &= ~$_ for map { $LEVELS{$_} } @levels;
+}
+
+sub _dump {
     my $self = shift;
     local $Data::Dumper::Terse = 1;
     $self->info( Dumper( $_[0] ) );
@@ -70,50 +88,85 @@ Catalyst::Log - Catalyst Log Class
     $log->warn($message);
     $log->error($message);
     $log->fatal($message);
-    
-    $log->is_debug;   # true if debug messages is enabled
-    $log->is_info;    # true if info messages is enabled
-    $log->is_warn;    # true if warn messages is enabled 
-    $log->is_error;   # true if error messages is enabled
-    $log->is_fatal;   # true if fatal messages is enabled
 
     if ( $log->is_debug ) {
          # expensive debugging
     }
 
+
 See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This module provides the default, simple logging functionality for 
+This module provides the default, simple logging functionality for
 Catalyst.
-If you want something different set C<$c->log> in your application 
+If you want something different set C<$c->log> in your application
 module, e.g.:
 
     $c->log( MyLogger->new );
 
 Your logging object is expected to provide the interface described here.
 
+=head1 LOG LEVELS
+
+=over 4
+
+=item debug
+
+    $log->is_debug;
+    $log->debug($message);
+
+=item info
+
+    $log->is_info;
+    $log->info($message);
+
+=item warn
+
+    $log->is_warn;
+    $log->warn($message);
+
+=item error
+
+    $log->is_error;
+    $log->error($message);
+
+=item fatal
+
+    $log->is_fatal;
+    $log->fatal($message);
+
+=back
 
 =head1 METHODS
 
 =over 4
 
-=item $log->debug($message)
+=item new
 
-Logs a debugging message.
+Constructor, defaults to enable all levels unless levels a provieded in
+arguments.
 
-=item $log->error($message)
+    $log = Catalyst::Log->new;
+    $log = Catalyst::Log->new( 'warn', 'error', 'fatal' );
 
-Logs an error message.
+=item levels
 
-=item $log->info($message)
+Set log levels
 
-Logs an informational message.
+    $log->levels( 'warn', 'error', 'fatal' );
 
-=item $log->warn($message)
+=item enable
 
-Logs a warning message.
+Enable log levels
+
+    $log->enable( 'warn', 'error' );
+
+=item disable
+
+Disable log levels
+
+    $log->disable( 'warn', 'error' );
 
 =back
 
@@ -125,10 +178,11 @@ L<Catalyst>.
 
 Sebastian Riedel, C<sri@cpan.org>
 Marcus Ramberg, C<mramberg@cpan.org>
+Christian Hansen, C<ch@ngmedia.com>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify 
+This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
