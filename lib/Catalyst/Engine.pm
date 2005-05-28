@@ -713,8 +713,9 @@ sub setup_components {
             $instance = $component->new( $context, $config );
         };
 
-        if ( $@ ) {
-            die qq/Couldn't instantiate component "$component", "$@"/;
+        if ( my $error = $@ ) {
+            chomp $error;
+            die qq/Couldn't instantiate component "$component", "$error"/;
         }
 
         return $instance;
