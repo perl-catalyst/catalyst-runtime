@@ -71,13 +71,13 @@ Catalyst::Log - Catalyst Log Class
     $log->error($message);
     $log->fatal($message);
     
-    $log->is_debug;   # true if dubug messages is enabled
+    $log->is_debug;   # true if debug messages is enabled
     $log->is_info;    # true if info messages is enabled
     $log->is_warn;    # true if warn messages is enabled 
     $log->is_error;   # true if error messages is enabled
     $log->is_fatal;   # true if fatal messages is enabled
 
-    if ( $log->is_info ) {
+    if ( $log->is_debug ) {
          # expensive debugging
     }
 
