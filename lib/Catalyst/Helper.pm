@@ -500,7 +500,7 @@ my $build = Catalyst::Build->new(
 );
 $build->create_build_script;
 __readme__
-Run script/[% apprefix %]_server.pl to test the application.
+Run script/[% appprefix %]_server.pl to test the application.
 __changes__
 This file documents the revision history for Perl extension [% name %].
 0.01  [% time %]
