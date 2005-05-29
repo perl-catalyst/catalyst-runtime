@@ -82,7 +82,7 @@ sub run {
 
     while (1) {
 
-        for my $client ( $select->can_read ) {
+        for my $client ( $select->can_read(0.1) ) {
 
             if ( $client == $daemon ) {
                 $client = $daemon->accept;
@@ -95,17 +95,17 @@ sub run {
                 next if $client->response;
 
                 my $read = $client->sysread( my $buf, 4096 );
-                
+
                 unless ( defined($read) && length($buf) ) {
-             
+
                     $select->remove($client);
                     $client->close;
 
                     next;
                 }
 
-                $client->read_buffer($buf);
-                $client->request( $client->get_request );
+                $client->request_buffer .= $buf;
+                $client->request = $client->get_request;
             }
         }
 
@@ -115,25 +115,47 @@ sub run {
             next if $client->response;
             next unless $client->request;
 
-            $client->response( HTTP::Response->new );
-            $class->handler( $client->request, $client->response, $client );    
+            $client->response = HTTP::Response->new;
+            $client->response->protocol( $client->request->protocol );
+            $class->handler( $client->request, $client->response, $client );
         }
 
         for my $client ( $select->can_write(0) ) {
 
             next unless $client->response;
 
-            $client->send_response( $client->response );
-
-            my $connection = $client->request->header('Connection');
-
-            unless ( $connection && $connection =~ /Keep-Alive/i ) {
-                $select->remove($client);
-                $client->close;
+            unless ( $client->response_buffer ) {
+                $client->response_buffer = $client->response->as_string;
+                $client->response_offset = 0;
             }
 
-            $client->request(undef);
-            $client->response(undef);
+            my $write = $client->syswrite( $client->response_buffer,
+                                           $client->response_length,
+                                           $client->response_offset );
+
+            $client->response_offset += $write;
+
+            unless ( defined($write) ) {
+
+                $select->remove($client);
+                $client->close;
+
+                next;
+            }
+
+            if ( $client->response_offset == $client->response_length ) {
+
+                my $connection = $client->request->header('Connection');
+
+                unless ( $connection && $connection =~ /Keep-Alive/i ) {
+                    $select->remove($client);
+                    $client->close;
+                }
+
+                $client->response        = undef;
+                $client->request         = undef;
+                $client->response_buffer = undef;
+            }
         }
     }
 }
@@ -175,34 +197,35 @@ package Catalyst::Engine::HTTP::Daemon::Client;
 use strict;
 use base 'HTTP::Daemon::ClientConn';
 
-sub read_buffer {
+sub request : lvalue {
     my $self = shift;
-
-    if (@_) {
-        ${*$self}{'httpd_rbuf'} .= shift;
-    }
-
-    return ${*$self}{'httpd_rbuf'};
+    ${*$self}{'request'};
 }
 
-sub request {
+sub request_buffer : lvalue {
     my $self = shift;
-
-    if (@_) {
-        ${*$self}{'request'} = shift;
-    }
-
-    return ${*$self}{'request'};
+    ${*$self}{'httpd_rbuf'};
 }
 
-sub response {
+sub response : lvalue {
     my $self = shift;
-
-    if (@_) {
-        ${*$self}{'response'} = shift;
-    }
-
-    return ${*$self}{'response'};
+    ${*$self}{'response'};
 }
+
+sub response_buffer : lvalue {
+    my $self = shift;
+    ${*$self}{'httpd_wbuf'};
+}
+
+sub response_length {
+    my $self = shift;
+    return length( $self->response_buffer );
+}
+
+sub response_offset : lvalue {
+    my $self = shift;
+    ${*$self}{'httpd_woffset'};
+}
+
 
 1;
