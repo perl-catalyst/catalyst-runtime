@@ -82,10 +82,11 @@ sub run {
 
     while (1) {
 
-        for my $client ( $select->can_read(0.1) ) {
+        for my $client ( $select->can_read(0.01) ) {
 
             if ( $client == $daemon ) {
                 $client = $daemon->accept;
+                $client->timestamp = time;
                 $client->blocking(0);
                 $select->add($client);
             }
@@ -105,18 +106,32 @@ sub run {
                 }
 
                 $client->request_buffer .= $buf;
-                $client->request = $client->get_request;
+
+                if ( my $request = $client->get_request ) {
+                    $client->request   = $request;
+                    $client->timestamp = time
+                }
             }
         }
 
         for my $client ( $select->handles ) {
 
             next if $client == $daemon;
+
+            if ( ( time - $client->timestamp ) > 60 ) {
+
+                $select->remove($client);
+                $client->close;
+
+                next;
+            }
+
             next if $client->response;
             next unless $client->request;
 
             $client->response = HTTP::Response->new;
             $client->response->protocol( $client->request->protocol );
+
             $class->handler( $client->request, $client->response, $client );
         }
 
@@ -133,8 +148,6 @@ sub run {
                                            $client->response_length,
                                            $client->response_offset );
 
-            $client->response_offset += $write;
-
             unless ( defined($write) ) {
 
                 $select->remove($client);
@@ -142,6 +155,8 @@ sub run {
 
                 next;
             }
+
+            $client->response_offset += $write;
 
             if ( $client->response_offset == $client->response_length ) {
 
@@ -227,5 +242,9 @@ sub response_offset : lvalue {
     ${*$self}{'httpd_woffset'};
 }
 
+sub timestamp : lvalue {
+    my $self = shift;
+    ${*$self}{'timestamp'};
+}
 
 1;
