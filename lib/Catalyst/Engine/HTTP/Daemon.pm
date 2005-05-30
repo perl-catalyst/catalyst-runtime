@@ -4,6 +4,7 @@ use strict;
 use base 'Catalyst::Engine::HTTP::Base';
 
 use IO::Select;
+use IO::Socket;
 
 BEGIN {
 
@@ -86,7 +87,7 @@ sub run {
     $SIG{'PIPE'} = 'IGNORE';
 
     my $daemon = Catalyst::Engine::HTTP::Daemon::Catalyst->new(
-        Listen    => 1,
+        Listen    => SOMAXCONN,
         LocalPort => $port,
         ReuseAddr => 1,
         Timeout   => 5
@@ -104,7 +105,7 @@ sub run {
 
     while (1) {
 
-        for my $client ( $select->can_read(0.01) ) {
+        for my $client ( $select->can_read(1) ) {
 
             if ( $client == $daemon ) {
                 $client = $daemon->accept;
@@ -157,7 +158,7 @@ sub run {
             $class->handler( $client->request, $client->response, $client );
         }
 
-        for my $client ( $select->can_write(0.01) ) {
+        for my $client ( $select->can_write(1) ) {
 
             next unless $client->response;
 
