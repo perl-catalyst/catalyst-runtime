@@ -82,7 +82,7 @@ sub run {
 
     while (1) {
 
-        for my $client ( $select->can_read(1) ) {
+        for my $client ( $select->can_read(0.01) ) {
 
             if ( $client == $daemon ) {
                 $client = $daemon->accept;
@@ -135,7 +135,7 @@ sub run {
             $class->handler( $client->request, $client->response, $client );
         }
 
-        for my $client ( $select->can_write(1) ) {
+        for my $client ( $select->can_write(0.01) ) {
 
             next unless $client->response;
 
