@@ -105,7 +105,7 @@ sub run {
 
     while (1) {
 
-        for my $client ( $select->can_read(1) ) {
+        for my $client ( $select->can_read(0.01) ) {
 
             if ( $client == $daemon ) {
                 $client = $daemon->accept;
@@ -158,11 +158,19 @@ sub run {
             $class->handler( $client->request, $client->response, $client );
         }
 
-        for my $client ( $select->can_write(1) ) {
+        for my $client ( $select->can_write(0.01) ) {
 
             next unless $client->response;
 
             unless ( $client->response_buffer ) {
+
+                my $connection = $client->request->header('Connection');
+
+                if ( $connection && $connection =~ /Keep-Alive/i ) {
+                    $client->response->header( 'Connection' => 'Keep-Alive' );
+                    $client->response->header( 'Keep-Alive' => 'timeout=60, max=100' );
+                }
+
                 $client->response_buffer = $client->response->as_string;
                 $client->response_offset = 0;
             }
