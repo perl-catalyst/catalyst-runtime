@@ -82,7 +82,7 @@ sub run {
 
     while (1) {
 
-        for my $client ( $select->can_read(0.01) ) {
+        for my $client ( $select->can_read(1) ) {
 
             if ( $client == $daemon ) {
                 $client = $daemon->accept;
@@ -95,9 +95,9 @@ sub run {
                 next if $client->request;
                 next if $client->response;
 
-                my $read = $client->sysread( my $buf, 4096 );
+                my $nread = $client->sysread( my $buf, 4096 );
 
-                unless ( defined($read) && length($buf) ) {
+                unless ( defined($nread) && length($buf) ) {
 
                     $select->remove($client);
                     $client->close;
@@ -135,7 +135,7 @@ sub run {
             $class->handler( $client->request, $client->response, $client );
         }
 
-        for my $client ( $select->can_write(0) ) {
+        for my $client ( $select->can_write(1) ) {
 
             next unless $client->response;
 
@@ -144,11 +144,11 @@ sub run {
                 $client->response_offset = 0;
             }
 
-            my $write = $client->syswrite( $client->response_buffer,
-                                           $client->response_length,
-                                           $client->response_offset );
+            my $nwrite = $client->syswrite( $client->response_buffer,
+                                            $client->response_length,
+                                            $client->response_offset );
 
-            unless ( defined($write) ) {
+            unless ( defined($nwrite) ) {
 
                 $select->remove($client);
                 $client->close;
@@ -156,7 +156,7 @@ sub run {
                 next;
             }
 
-            $client->response_offset += $write;
+            $client->response_offset += $nwrite;
 
             if ( $client->response_offset == $client->response_length ) {
 
