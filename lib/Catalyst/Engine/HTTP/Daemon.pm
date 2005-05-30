@@ -5,6 +5,28 @@ use base 'Catalyst::Engine::HTTP::Base';
 
 use IO::Select;
 
+BEGIN {
+
+    if ( $^O eq 'MSWin32' ) {
+
+       *EINPROGRESS = sub { 10036 };
+       *EWOULDBLOCK = sub { 10035 };
+       *F_GETFL     = sub {     0 };
+       *F_SETFL     = sub {     0 };
+
+       *IO::Socket::blocking = sub {
+           my ( $self, $blocking ) = @_;
+           my $nonblocking = $blocking ? 0 : 1;
+           ioctl( $self, 0x8004667e, \$nonblocking );
+       };
+    }
+
+    else {
+        Errno->require;
+        Errno->import( qw[EWOULDBLOCK EINPROGRESS] );
+    }
+}
+
 =head1 NAME
 
 Catalyst::Engine::HTTP::Daemon - Catalyst HTTP Daemon Engine
