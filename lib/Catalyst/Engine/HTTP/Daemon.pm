@@ -121,7 +121,11 @@ sub run {
 
                 my $nread = $client->sysread( my $buf, 4096 );
 
-                unless ( defined($nread) && length($buf) ) {
+                unless ( $nread ) {
+                
+                    next if $! == EWOULDBLOCK;
+                    next if $! == EINPROGRESS;
+                    next if $! == EINTR;                
 
                     $select->remove($client);
                     $client->close;
@@ -180,7 +184,11 @@ sub run {
                                             $client->response_length,
                                             $client->response_offset );
 
-            unless ( defined($nwrite) ) {
+            unless ( $nwrite ) {
+            
+                next if $! == EWOULDBLOCK;
+                next if $! == EINPROGRESS;
+                next if $! == EINTR;            
 
                 $select->remove($client);
                 $client->close;
