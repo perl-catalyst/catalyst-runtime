@@ -204,14 +204,22 @@ sub finalize {
     if ( $#{ $c->error } >= 0 ) {
         $c->finalize_error;
     }
-
-    if ( !$c->response->body && $c->response->status !~ /^(1|3)\d\d$/ ) {
+    
+    if ( !$c->response->body && $c->response->status == 200 ) {
         $c->finalize_error;
     }
 
     if ( $c->response->body && !$c->response->content_length ) {
-        use bytes;    # play safe with a utf8 aware perl
-        $c->response->content_length( length $c->response->body );
+        $c->response->content_length( bytes::length( $c->response->body ) );
+    }
+    
+    if ( $c->response->status =~ /^(1\d\d|[23]04)$/ ) {
+        $c->response->headers->remove_header("Content-Length");
+        $c->response->body('');
+    }
+    
+    if ( $c->request->method eq 'HEAD' ) {
+        $c->response->body('');
     }
 
     my $status = $c->finalize_headers;
@@ -441,7 +449,7 @@ sub prepare {
             {
                 body    => '',
                 cookies => {},
-                headers => HTTP::Headers->new,
+                headers => HTTP::Headers->new( 'Content-Length' => 0 ),
                 status  => 200
             }
         ),
@@ -699,7 +707,7 @@ sub setup_components {
     
     my $callback = sub {
         my ( $component, $context ) = @_;
-
+        
         unless ( $component->isa('Catalyst::Base') ) {
             return $component;
         }

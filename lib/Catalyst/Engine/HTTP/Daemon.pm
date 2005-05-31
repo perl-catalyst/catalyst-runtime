@@ -122,10 +122,10 @@ sub run {
                 my $nread = $client->sysread( my $buf, 4096 );
 
                 unless ( $nread ) {
-                
+
                     next if $! == EWOULDBLOCK;
                     next if $! == EINPROGRESS;
-                    next if $! == EINTR;                
+                    next if $! == EINTR;
 
                     $select->remove($client);
                     $client->close;
@@ -169,6 +169,8 @@ sub run {
 
             unless ( $client->response_buffer ) {
 
+                $client->response->header( Server => $daemon->product_tokens );
+
                 my $connection = $client->request->header('Connection');
 
                 if ( $connection && $connection =~ /Keep-Alive/i ) {
@@ -176,7 +178,11 @@ sub run {
                     $client->response->header( 'Keep-Alive' => 'timeout=60, max=100' );
                 }
 
-                $client->response_buffer = $client->response->as_string;
+                if ( $connection && $connection =~ /close/i ) {
+                    $client->response->header( 'Connection' => 'close' );
+                }
+
+                $client->response_buffer = $client->response->as_string("\x0D\x0A");
                 $client->response_offset = 0;
             }
 
@@ -185,10 +191,10 @@ sub run {
                                             $client->response_offset );
 
             unless ( $nwrite ) {
-            
+
                 next if $! == EWOULDBLOCK;
                 next if $! == EINPROGRESS;
-                next if $! == EINTR;            
+                next if $! == EINTR;
 
                 $select->remove($client);
                 $client->close;
@@ -200,9 +206,28 @@ sub run {
 
             if ( $client->response_offset == $client->response_length ) {
 
-                my $connection = $client->request->header('Connection');
+                my $persistent = 0;
 
-                unless ( $connection && $connection =~ /Keep-Alive/i ) {
+                my $connection = $client->request->header('Connection');
+                my $protocol   = $client->request->protocol;
+
+                if ( $protocol eq 'HTTP/1.1' ) {
+
+                    $persistent++;
+
+                    if ( $connection && $connection =~ /close/i ) {
+                        $persistent--;
+                    }
+                }
+
+                else {
+
+                    if ( $connection && $connection =~ /Keep-Alive/i ) {
+                        $persistent++;
+                    }
+                }
+
+                unless ( $persistent ) {
                     $select->remove($client);
                     $client->close;
                 }
