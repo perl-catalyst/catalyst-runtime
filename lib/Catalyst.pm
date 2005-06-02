@@ -314,7 +314,7 @@ sub import {
     }
     
     if ( -d $home ) {
-        $home = dir($home)->absolute;
+        $home = dir($home)->absolute->stringify;
     }
 
     if ( $caller->debug ) {
