@@ -171,14 +171,14 @@ sub run {
 
                 $client->response->header( Server => $daemon->product_tokens );
 
-                my $connection = $client->request->header('Connection');
+                my $connection = $client->request->header('Connection') || '';
 
-                if ( $connection && $connection =~ /Keep-Alive/i ) {
+                if ( $connection =~ /Keep-Alive/i ) {
                     $client->response->header( 'Connection' => 'Keep-Alive' );
                     $client->response->header( 'Keep-Alive' => 'timeout=60, max=100' );
                 }
 
-                if ( $connection && $connection =~ /close/i ) {
+                if ( $connection =~ /close/i ) {
                     $client->response->header( 'Connection' => 'close' );
                 }
 
@@ -206,25 +206,16 @@ sub run {
 
             if ( $client->response_offset == $client->response_length ) {
 
+                my $connection = $client->request->header('Connection') || '';
+                my $protocol   = $client->request->protocol;
                 my $persistent = 0;
 
-                my $connection = $client->request->header('Connection');
-                my $protocol   = $client->request->protocol;
-
-                if ( $protocol eq 'HTTP/1.1' ) {
-
+                if ( $protocol eq 'HTTP/1.1' && $connection !~ /close/i ) {
                     $persistent++;
-
-                    if ( $connection && $connection =~ /close/i ) {
-                        $persistent--;
-                    }
                 }
 
-                else {
-
-                    if ( $connection && $connection =~ /Keep-Alive/i ) {
-                        $persistent++;
-                    }
+                if ( $protocol ne 'HTTP/1.1' && $connection =~ /Keep-Alive/i ) {
+                    $persistent++;
                 }
 
                 unless ( $persistent ) {
