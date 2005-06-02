@@ -312,6 +312,10 @@ sub import {
             $caller->log->warn(qq/$e is not a directory "$h"/);
         }
     }
+    
+    if ( -d $home ) {
+        $home = dir($home)->absolute;
+    }
 
     if ( $caller->debug ) {
         $home
