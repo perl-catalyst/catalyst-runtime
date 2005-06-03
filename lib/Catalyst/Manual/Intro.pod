@@ -259,7 +259,7 @@ Catalyst supports several types of actions:
 
 =item * B<Literal>
 
-    sub bar : Path('/foo/bar') { }
+    sub bar : Path('foo/bar') { }
 
 Matches only http://localhost:3000/foo/bar.
 
@@ -389,8 +389,8 @@ If you want to pass variable arguments at the end of a URL, you must use regex a
 
 But what if you also defined actions for /foo/boo and /foo/boo/hoo ?
 
-    sub boo : Path('/foo/boo') { .. }
-    sub hoo : Path('/foo/boo/hoo') { .. }
+    sub boo : Path('foo/boo') { .. }
+    sub hoo : Path('foo/boo/hoo') { .. }
 
 Catalyst matches actions in most specific to least specific order:
 
