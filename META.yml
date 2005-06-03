@@ -1,12 +1,12 @@
 ---
 name: Catalyst
-version: 5.22
+version: 5.23
 author:
   - Sebastian Riedel, C<sri@oook.de>
 abstract: The Elegant MVC Web Application Framework
 license: perl
 requires:
-  CGI: 0
+  CGI: 3.06
   Class::Accessor::Fast: 0
   Class::Data::Inheritable: 0
   File::Temp: 0.14
@@ -16,7 +16,7 @@ requires:
   HTTP::Request: 0
   HTTP::Response: 0
   LWP::UserAgent: 0
-  Module::Pluggable::Fast: 0.15
+  Module::Pluggable::Fast: 0.16
   Path::Class: 0
   Template: 0
   Text::ASCIITable: 0
@@ -28,7 +28,7 @@ requires:
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.22
+    version: 5.23
   Catalyst::Base:
     file: lib/Catalyst/Base.pm
   Catalyst::Build:
@@ -78,6 +78,8 @@ provides:
   Catalyst::Engine::HTTP::Daemon:
     file: lib/Catalyst/Engine/HTTP/Daemon.pm
   Catalyst::Engine::HTTP::Daemon::Catalyst:
+    file: lib/Catalyst/Engine/HTTP/Daemon.pm
+  Catalyst::Engine::HTTP::Daemon::Client:
     file: lib/Catalyst/Engine/HTTP/Daemon.pm
   Catalyst::Engine::SpeedyCGI:
     file: lib/Catalyst/Engine/SpeedyCGI.pm

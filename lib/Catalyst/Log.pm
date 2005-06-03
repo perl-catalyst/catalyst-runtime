@@ -168,6 +168,14 @@ Disable log levels
 
     $log->disable( 'warn', 'error' );
 
+=item is_debug
+=item is_error
+=item is_fatal
+=item is_info
+=item is_warn
+
+Is the log level active?
+
 =back
 
 =head1 SEE ALSO
