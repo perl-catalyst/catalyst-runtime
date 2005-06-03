@@ -313,10 +313,6 @@ sub import {
         }
     }
     
-    if ( -d $home ) {
-        $home = dir($home)->absolute->stringify;
-    }
-
     if ( $caller->debug ) {
         $home
           ? ( -d $home )
