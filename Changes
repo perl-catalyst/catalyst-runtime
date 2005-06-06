@@ -1,10 +1,12 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.24  2005-06-03 02:30:00
+        - win32 compatibility for scripts (Andy Grundman)
+        IMPORTANT: You have to regenerate the script directory!
+
 5.23  2005-06-03 02:30:00
         - added support for non Catalyst::Base components to live in namespace
         - improved concurrency connections in Catalyst::Engine::HTTP::Daemon
-        - win32 compatibility for scripts (Andy Grundman)
-        IMPORTANT: You have to regenerate the script directory!
 
 5.22  2005-05-26 14:24:00
         - Improved base locating in MP engines
