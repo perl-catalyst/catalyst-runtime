@@ -528,11 +528,16 @@ plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 all_pod_coverage_ok();
 __cgi__
 [% startperl %] -w
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use Path::Class;
+
+BEGIN {
+    $ENV{CATALYST_ENGINE} ||= 'CGI';
+    use lib dir($FindBin::Bin)->parent->subdir('lib')->stringify;
+}
+
 use [% name %];
 
 [% name %]->run;
@@ -566,11 +571,15 @@ it under the same terms as perl itself.
 __fastcgi__
 [% startperl %] -w
 
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
-
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use Path::Class;
+
+BEGIN {
+    $ENV{CATALYST_ENGINE} ||= 'FastCGI';
+    use lib dir($FindBin::Bin)->parent->subdir('lib')->stringify;
+}
+
 use [% name %];
 
 [% name %]->run;
@@ -604,16 +613,18 @@ it under the same terms as perl itself.
 __server__
 [% startperl %] -w
 
-BEGIN { 
-    $ENV{CATALYST_ENGINE} ||= 'HTTP';
-    $ENV{CATALYST_SCRIPT_GEN} = [% scriptgen %];
-}  
-
 use strict;
 use Getopt::Long;
 use Pod::Usage;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use Path::Class;
+
+BEGIN {
+    $ENV{CATALYST_ENGINE} ||= 'HTTP';
+    $ENV{CATALYST_SCRIPT_GEN} = [% scriptgen %];
+    use lib dir($FindBin::Bin)->parent->subdir('lib')->stringify;
+}
+
 use [% name %];
 
 my $help = 0;
@@ -662,13 +673,17 @@ it under the same terms as perl itself.
 __test__
 [% startperl %] -w
 
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'Test' }
-
 use strict;
 use Getopt::Long;
 use Pod::Usage;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use Path::Class;
+
+BEGIN {
+    $ENV{CATALYST_ENGINE} ||= 'Test';
+    use lib dir($FindBin::Bin)->parent->subdir('lib')->stringify;
+}
+
 use [% name %];
 
 my $help = 0;
