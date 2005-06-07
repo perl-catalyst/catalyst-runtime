@@ -119,6 +119,12 @@ sub home {
         {
             $home = $subdir;
         }
+        # clean up relative path:
+        # MyApp/script/.. -> MyApp
+        my ($lastdir) = $home->dir_list( -1, 1 );
+        if ( $lastdir eq '..' ) {
+            $home = dir($home)->parent->parent;
+        }
     }
     return $home;
 }
