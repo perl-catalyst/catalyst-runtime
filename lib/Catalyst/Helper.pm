@@ -97,7 +97,7 @@ sub mk_component {
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'A clever guy';
     $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
-    unless ( $_[0] =~ /^model|m|view|v|controller|c\$/i ) {
+    unless ( $_[0] =~ /^(?:model|m|view|v|controller|c)$/i ) {
         my $helper = shift;
         my @args   = @_;
         my $class  = "Catalyst::Helper::$helper";
