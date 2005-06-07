@@ -61,8 +61,9 @@ extend Catalyst.
         prepare_body
         prepare_parameters
         prepare_uploads
-      process
+      dispatch
       finalize
+        finalize_cookies
         finalize_headers
         finalize_body
 
