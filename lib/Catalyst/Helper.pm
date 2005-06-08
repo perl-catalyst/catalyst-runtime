@@ -215,13 +215,13 @@ sub next_test {
     else {
         my $name   = $self->{name};
         my $prefix = $name;
-        $prefix =~ s/::/_/g;
-        $prefix         = lc $prefix;
+        $prefix =~ s/::/-/g;
+        $prefix         = $prefix;
         $tname          = $prefix . '.t';
         $self->{prefix} = $prefix;
     }
     my $dir  = $self->{test_dir};
-    my $type = lc $self->{type};
+    my $type = $self->{type};
     return File::Spec->catfile( $dir, $type, $tname );
 }
 
@@ -254,9 +254,9 @@ sub _mk_dirs {
     $self->mk_dir( $self->{root} );
     $self->{t} = File::Spec->catdir( $self->{dir}, 't' );
     $self->mk_dir( $self->{t} );
-    $self->mk_dir( File::Spec->catdir( $self->{t}, 'm' ) );
-    $self->mk_dir( File::Spec->catdir( $self->{t}, 'v' ) );
-    $self->mk_dir( File::Spec->catdir( $self->{t}, 'c' ) );
+    $self->mk_dir( File::Spec->catdir( $self->{t}, 'M' ) );
+    $self->mk_dir( File::Spec->catdir( $self->{t}, 'V' ) );
+    $self->mk_dir( File::Spec->catdir( $self->{t}, 'C' ) );
     $self->{class} = File::Spec->catdir( split( /\:\:/, $self->{name} ) );
     $self->{mod} = File::Spec->catdir( $self->{lib}, $self->{class} );
     $self->mk_dir( $self->{mod} );
@@ -528,6 +528,7 @@ plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 all_pod_coverage_ok();
 __cgi__
 [% startperl %] -w
+
 BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
 
 use strict;
@@ -541,7 +542,7 @@ use [% name %];
 
 =head1 NAME
 
-cgi - Catalyst CGI
+[% appprefix %]_cgi.pl - Catalyst CGI
 
 =head1 SYNOPSIS
 
@@ -579,7 +580,7 @@ use [% name %];
 
 =head1 NAME
 
-fastcgi - Catalyst FastCGI
+[% appprefix %]_fastcgi.pl - Catalyst FastCGI
 
 =head1 SYNOPSIS
 
@@ -629,11 +630,11 @@ pod2usage(1) if $help;
 
 =head1 NAME
 
-server - Catalyst Testserver
+[% appprefix %]_server.pl - Catalyst Testserver
 
 =head1 SYNOPSIS
 
-server.pl [options]
+[% appprefix %]_server.pl [options]
 
  Options:
    -? -help    display this help and exits
@@ -683,18 +684,18 @@ print [% name %]->run($ARGV[0])->content . "\n";
 
 =head1 NAME
 
-test - Catalyst Test
+[% appprefix %]_test.pl - Catalyst Test
 
 =head1 SYNOPSIS
 
-test.pl [options] uri
+[% appprefix %]_test.pl [options] uri
 
  Options:
    -help    display this help and exits
 
  Examples:
-   test.pl http://localhost/some_action
-   test.pl /some_action
+   [% appprefix %]_test.pl http://localhost/some_action
+   [% appprefix %]_test.pl /some_action
 
  See also:
    perldoc Catalyst::Manual
@@ -737,23 +738,23 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
 =head1 NAME
 
-create - Create a new Catalyst Component
+[% appprefix %]_create.pl - Create a new Catalyst Component
 
 =head1 SYNOPSIS
 
-create.pl [options] model|view|controller name [helper] [options]
+[% appprefix %]_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
    -help    display this help and exits
 
  Examples:
-   create.pl controller My::Controller
-   create.pl view My::View
-   create.pl view MyView TT
-   create.pl view TT TT
-   create.pl model My::Model
-   create.pl model SomeDB CDBI dbi:SQLite:/tmp/my.db
-   create.pl model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
+   [% appprefix %]_create.pl controller My::Controller
+   [% appprefix %]_create.pl view My::View
+   [% appprefix %]_create.pl view MyView TT
+   [% appprefix %]_create.pl view TT TT
+   [% appprefix %]_create.pl model My::Model
+   [% appprefix %]_create.pl model SomeDB CDBI dbi:SQLite:/tmp/my.db
+   [% appprefix %]_create.pl model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
 
  See also:
    perldoc Catalyst::Manual

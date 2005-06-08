@@ -43,8 +43,5 @@ print(
 );
 print( '*' x 80, "\n" );
 
-eval "use mod_perl; use Apache::Request";
-print qq/Install "mod_perl" and "Apache::Request" for Apache support.\n/ if $@;
-
 eval "use FCGI";
 print qq/Install "FCGI" for FastCGI support.\n/ if $@;
