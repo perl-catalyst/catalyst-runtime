@@ -38,8 +38,8 @@ sub dispatch {
 
     unless ($namespace) {
         if ( my $result = $c->get_action($action) ) {
-            $namespace =
-              Catalyst::Utils::class2prefix( $result->[0]->[0]->[0] );
+            $namespace = Catalyst::Utils::class2prefix( $result->[0]->[0]->[0],
+                $c->config->{case_sensitive} );
         }
     }
 
@@ -122,7 +122,11 @@ sub forward {
         $command =~ s/^\///;
     }
 
-    else { $namespace = Catalyst::Utils::class2prefix($caller) || '/' }
+    else {
+        $namespace =
+          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} )
+          || '/';
+    }
 
     my $results = $c->get_action( $command, $namespace );
 
@@ -258,7 +262,9 @@ Set an action in a given namespace.
 sub set_action {
     my ( $c, $method, $code, $namespace, $attrs ) = @_;
 
-    my $prefix = Catalyst::Utils::class2prefix($namespace) || '';
+    my $prefix =
+      Catalyst::Utils::class2prefix( $namespace, $c->config->{case_sensitive} )
+      || '';
     my %flags;
 
     for my $attr ( @{$attrs} ) {
@@ -362,10 +368,10 @@ sub setup_actions {
 
     # We use a tree
     $self->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
-    
+
     for my $comp ( keys %{ $self->components } ) {
-    
-        # We only setup components that inherit from Catalyst::Base  
+
+        # We only setup components that inherit from Catalyst::Base
         next unless $comp->isa('Catalyst::Base');
 
         for my $action ( @{ Catalyst::Utils::reflect_actions($comp) } ) {
@@ -402,7 +408,7 @@ sub setup_actions {
         }
 
     }
-    
+
     return unless $self->debug;
 
     my $actions  = $self->actions;

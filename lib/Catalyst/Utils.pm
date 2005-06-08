@@ -79,7 +79,7 @@ sub class2classsuffix {
     return $class;
 }
 
-=item class2prefix($class);
+=item class2prefix( $class, $case );
 
 Returns the prefix for class.
 
@@ -89,9 +89,10 @@ Returns the prefix for class.
 
 sub class2prefix {
     my $class = shift || '';
+    my $case  = shift || 0;
     my $prefix;
     if ( $class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/ ) {
-        $prefix = lc $2;
+        $prefix = $case ? $2 : lc $2;
         $prefix =~ s/\:\:/\//g;
     }
     return $prefix;
