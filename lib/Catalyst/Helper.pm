@@ -220,7 +220,7 @@ sub next_test {
         $tname          = $prefix . '.t';
         $self->{prefix} = $prefix;
         $prefix = lc $prefix;
-        $prefix =~ s/-/\//g
+        $prefix =~ s/-/\//g;
         $self->{uri} = $prefix;
     }
     my $dir  = $self->{test_dir};
