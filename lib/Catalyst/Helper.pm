@@ -219,6 +219,9 @@ sub next_test {
         $prefix         = $prefix;
         $tname          = $prefix . '.t';
         $self->{prefix} = $prefix;
+        $prefix = lc $prefix;
+        $prefix =~ s/-/\//g
+        $self->{uri} = $prefix;
     }
     my $dir  = $self->{test_dir};
     my $type = $self->{type};
@@ -828,7 +831,7 @@ use Test::More tests => 3;
 use_ok( Catalyst::Test, '[% app %]' );
 use_ok('[% class %]');
 
-ok( request('[% prefix %]')->is_success );
+ok( request('[% uri %]')->is_success );
 [% ELSE %]
 use Test::More tests => 1;
 use_ok('[% class %]');
