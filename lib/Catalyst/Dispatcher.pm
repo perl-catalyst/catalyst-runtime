@@ -23,6 +23,18 @@ See L<Catalyst>.
 
 =over 4
 
+=item $c->detach($command)
+
+Like C<forward> but doesn't return.
+
+=cut
+
+sub detach {
+    my ( $c, $command ) = @_;
+    $c->forward($command) if $command;
+    die $Catalyst::Engine::DETACH;
+}
+
 =item $c->dispatch
 
 Dispatch request to actions.

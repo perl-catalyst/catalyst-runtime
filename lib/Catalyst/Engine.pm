@@ -21,7 +21,7 @@ require Module::Pluggable::Fast;
 $Data::Dumper::Terse = 1;
 
 __PACKAGE__->mk_classdata('components');
-__PACKAGE__->mk_accessors(qw/counter request response state/);
+__PACKAGE__->mk_accessors(qw/counter depth request response state/);
 
 *comp = \&component;
 *req  = \&request;
@@ -34,6 +34,7 @@ __PACKAGE__->mk_accessors(qw/counter request response state/);
 our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
+our $DETACH    = "catalyst_detach\n";
 
 =head1 NAME
 
@@ -107,6 +108,10 @@ sub component {
 Returns a hashref containing coderefs and execution counts.
 (Needed for deep recursion detection)
 
+=item $c->depth
+
+Returns the actual forward depth.
+
 =item $c->error
 
 =item $c->error($error, ...)
@@ -160,26 +165,32 @@ sub execute {
         $action = "-> $action" if $callsub =~ /forward$/;
     }
 
+    $c->{depth}++;
     eval {
         if ( $c->debug )
         {
-            my ( $elapsed, @state ) = $c->benchmark( $code, $class, $c, @{ $c->req->args } );
+            my ( $elapsed, @state ) =
+              $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
             $c->state(@state);
         }
         else { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) }
     };
+    $c->{depth}--;
 
     if ( my $error = $@ ) {
 
-        unless ( ref $error ) {
-            chomp $error;
-            $error = qq/Caught exception "$error"/;
-        }
+        if ( $error eq $DETACH ) { die $DETACH if $c->{depth} > 1 }
+        else {
+            unless ( ref $error ) {
+                chomp $error;
+                $error = qq/Caught exception "$error"/;
+            }
 
-        $c->log->error($error);
-        $c->error($error);
-        $c->state(0);
+            $c->log->error($error);
+            $c->error($error);
+            $c->state(0);
+        }
     }
     return $c->state;
 }
@@ -204,7 +215,7 @@ sub finalize {
     if ( $#{ $c->error } >= 0 ) {
         $c->finalize_error;
     }
-    
+
     if ( !$c->response->body && $c->response->status == 200 ) {
         $c->finalize_error;
     }
@@ -212,12 +223,12 @@ sub finalize {
     if ( $c->response->body && !$c->response->content_length ) {
         $c->response->content_length( bytes::length( $c->response->body ) );
     }
-    
+
     if ( $c->response->status =~ /^(1\d\d|[23]04)$/ ) {
         $c->response->headers->remove_header("Content-Length");
         $c->response->body('');
     }
-    
+
     if ( $c->request->method eq 'HEAD' ) {
         $c->response->body('');
     }
@@ -434,6 +445,7 @@ sub prepare {
 
     my $c = bless {
         counter => {},
+        depth   => 0,
         request => Catalyst::Request->new(
             {
                 arguments  => [],
@@ -473,9 +485,9 @@ sub prepare {
     $c->prepare_path;
     $c->prepare_action;
 
-    my $method   = $c->req->method   || '';
-    my $path     = $c->req->path     || '';
-    my $address  = $c->req->address  || '';
+    my $method  = $c->req->method  || '';
+    my $path    = $c->req->path    || '';
+    my $address = $c->req->address || '';
 
     $c->log->debug(qq/"$method" request for "$path" from $address/)
       if $c->debug;
@@ -670,13 +682,13 @@ sub setup {
     my $self = shift;
 
     # Initialize our data structure
-    $self->components( {} );    
+    $self->components( {} );
 
     $self->setup_components;
 
     if ( $self->debug ) {
         my $t = Text::ASCIITable->new;
-        $t->setOptions( 'hide_HeadRow', 1 );
+        $t->setOptions( 'hide_HeadRow',  1 );
         $t->setOptions( 'hide_HeadLine', 1 );
         $t->setCols('Class');
         $t->setColWidth( 'Class', 75, 1 );
@@ -684,9 +696,9 @@ sub setup {
         $self->log->debug( 'Loaded components', $t->draw )
           if ( @{ $t->{tbl_rows} } );
     }
-    
+
     # Add our self to components, since we are also a component
-    $self->components->{ $self } = $self;
+    $self->components->{$self} = $self;
 
     $self->setup_actions;
 
@@ -704,10 +716,10 @@ Setup components.
 
 sub setup_components {
     my $self = shift;
-    
+
     my $callback = sub {
         my ( $component, $context ) = @_;
-        
+
         unless ( $component->isa('Catalyst::Base') ) {
             return $component;
         }
@@ -717,9 +729,7 @@ sub setup_components {
 
         my $instance;
 
-        eval { 
-            $instance = $component->new( $context, $config );
-        };
+        eval { $instance = $component->new( $context, $config ); };
 
         if ( my $error = $@ ) {
             chomp $error;
@@ -731,8 +741,8 @@ sub setup_components {
 
     eval {
         Module::Pluggable::Fast->import(
-            name     => '_components',
-            search   => [
+            name   => '_components',
+            search => [
                 "$self\::Controller", "$self\::C",
                 "$self\::Model",      "$self\::M",
                 "$self\::View",       "$self\::V"
