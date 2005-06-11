@@ -30,10 +30,10 @@ SYNOPSIS
         sub index : Path('/index.html') {
             my ( $self, $c ) = @_;
             $c->res->output('Hello');
-            $c->forward('_foo');
+            $c->forward('foo');
         }
 
-        sub product : Regex('/^product[_]*(\d*).html$/') {
+        sub product : Regex('^product[_]*(\d*).html$') {
             my ( $self, $c ) = @_;
             $c->stash->{template} = 'product.tt';
             $c->stash->{product} = $c->req->snippets->[0];
@@ -101,12 +101,16 @@ METHODS
         Your log class should implement the methods described in the
         "Catalyst::Log" man page.
 
-LIMITATIONS
-    FCGI and mod_perl2 support are considered experimental and may contain
-    bugs.
+    $c->plugin( $name, $class, @args )
+        Instant plugins for Catalyst. Classdata accessor/mutator will be
+        created, class loaded and instantiated.
 
-    You may encounter problems accessing the built in test server on public
-    ip addresses on the internet, thats because of a bug in HTTP::Daemon.
+            MyApp->plugin( 'prototype', 'HTML::Prototype' );
+
+            $c->prototype->define_javascript_functions;
+
+LIMITATIONS
+    mod_perl2 support is considered experimental and may contain bugs.
 
 SUPPORT
     IRC:
@@ -117,6 +121,10 @@ SUPPORT
 
         http://lists.rawmode.org/mailman/listinfo/catalyst
         http://lists.rawmode.org/mailman/listinfo/catalyst-dev
+
+    Web:
+
+        http://catalyst.perl.org
 
 SEE ALSO
     Catalyst::Manual - The Catalyst Manual
@@ -130,10 +138,11 @@ AUTHOR
     Sebastian Riedel, "sri@oook.de"
 
 THANK YOU
-    Andrew Ford, Andrew Ruthven, Christian Hansen, Christopher Hicks, Dan
-    Sully, Danijel Milicevic, David Naughton, Gary Ashton Jones, Jesse
-    Sheidlower, Johan Lindstrom, Marcus Ramberg, Tatsuhiko Miyagawa and all
-    the others who've helped.
+    Andy Grundman, Andrew Ford, Andrew Ruthven, Autrijus Tang, Christian
+    Hansen, Christopher Hicks, Dan Sully, Danijel Milicevic, David Naughton,
+    Gary Ashton Jones, Geoff Richards, Jesse Sheidlower, Jody Belka, Johan
+    Lindstrom, Juan Camacho, Leon Brocard, Marcus Ramberg, Tatsuhiko
+    Miyagawa and all the others who've helped.
 
 LICENSE
     This library is free software . You can redistribute it and/or modify it

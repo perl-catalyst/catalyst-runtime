@@ -27,6 +27,7 @@ my $build = Module::Build->new(
         'URI'                               => 0,
     },
     create_makefile_pl => 'passthrough',
+    create_readme => 1,
     script_files => [ glob('script/*') ],
     test_files   => [
         glob('t/*.t'), glob('t/*/*.t'), glob('t/*/*/*.t'), glob('t/*/*/*/*.t')

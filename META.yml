@@ -1,8 +1,8 @@
 ---
 name: Catalyst
-version: 5.23
+version: 5.24
 author:
-  - Sebastian Riedel, C<sri@oook.de>
+  - 'Sebastian Riedel, C<sri@oook.de>'
 abstract: The Elegant MVC Web Application Framework
 license: perl
 requires:
@@ -12,12 +12,12 @@ requires:
   File::Temp: 0.14
   HTML::Entities: 0
   HTTP::Daemon: 0
-  HTTP::Headers: 0
+  HTTP::Headers: 1.59
   HTTP::Request: 0
   HTTP::Response: 0
   LWP::UserAgent: 0
   Module::Pluggable::Fast: 0.16
-  Path::Class: 0
+  Path::Class: 0.09
   Template: 0
   Text::ASCIITable: 0
   Tree::Simple: 0
@@ -28,7 +28,7 @@ requires:
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.23
+    version: 5.24
   Catalyst::Base:
     file: lib/Catalyst/Base.pm
   Catalyst::Build:
