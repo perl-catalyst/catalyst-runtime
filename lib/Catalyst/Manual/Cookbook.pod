@@ -188,7 +188,7 @@ We'll discuss the first variant for now:
 
 To log in a user you might use an action like this:
 
-    sub 'login' : Local {
+    sub login : Local {
         my ($self, $c) = @_;
         if ($c->req->params->{username}) {
             $c->session_login($c->req->params->{username}, 
@@ -198,6 +198,10 @@ To log in a user you might use an action like this:
             }
         }
     }
+
+This action should not go in your MyApp class...if it does, it will
+conflict with the built-in method of the same name.  Instead, put it
+in a Controller class.
 
 $c->req->params->{username} and $c->req->params->{password} are html 
 form parameters from a login form. If login succeeds, then 
