@@ -281,6 +281,21 @@ to be.
 
 And this is all you need to do. 
 
+=head2 Pass-through login (and other actions)
+
+An easy way of having assorted actions that occur during the processing of
+a request that are orthogonal to its actual purpose - logins, silent
+commands etc. Provide actions for these, but when they're required for
+something else fill e.g. a form variable __login and have a sub begin like so:
+
+sub begin : Private {
+  my ($self, $c) = @_;
+  foreach my $action (qw/login docommand foo bar whatever/) {
+    if ($c->req->params->{"__${action}"}) {
+      $c->forward($action);
+    }
+  }
+}
 
 =head2 How to use Catalyst without mod_perl
 
