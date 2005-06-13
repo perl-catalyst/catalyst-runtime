@@ -25,15 +25,15 @@ Catalyst - The Elegant MVC Web Application Framework
     cd MyApp
 
     # add models, views, controllers
-    script/create.pl model Something
-    script/create.pl view Stuff
-    script/create.pl controller Yada
+    script/myapp_create.pl model Something
+    script/myapp_create.pl view Stuff
+    script/myapp_create.pl controller Yada
 
     # built in testserver
-    script/server.pl
+    script/myapp_server.pl
 
     # command line interface
-    script/test.pl /yada
+    script/myapp_test.pl /yada
 
 
     use Catalyst;
@@ -61,9 +61,6 @@ Catalyst - The Elegant MVC Web Application Framework
 See also L<Catalyst::Manual::Intro>
 
 =head1 DESCRIPTION
-
-Catalyst is based upon L<Maypole>, which you should consider for smaller
-projects.
 
 The key concept of Catalyst is DRY (Don't Repeat Yourself).
 
