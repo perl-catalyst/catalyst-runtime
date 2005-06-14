@@ -1,11 +1,12 @@
 package Catalyst::Exception;
 
-BEGIN { 
-    push( @ISA, $CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base' );
-}
-
 use strict;
 use vars qw[@ISA $CATALYST_EXCEPTION_CLASS];
+use UNIVERSAL::require;
+
+BEGIN {
+    push( @ISA, $CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base' );
+}
 
 package Catalyst::Exception::Base;
 
@@ -30,7 +31,11 @@ This is the Catalyst Exception class.
 
 =over 4
 
-=item throw($message)
+=item throw( $message )
+
+=item throw( message => $message )
+
+=item throw( error => $error )
 
 Throws a fatal exception.
 

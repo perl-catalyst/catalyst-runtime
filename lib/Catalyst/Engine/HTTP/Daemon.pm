@@ -98,7 +98,7 @@ sub run {
     unless ( defined $daemon ) {
 
         Catalyst::Exception->throw(
-            message =>  qq/Failed to create daemon. Reason: '$!'/
+            message => qq/Failed to create daemon. Reason: '$!'/
         );
     }
 
