@@ -3,6 +3,7 @@ package Catalyst::Engine::HTTP::Daemon;
 use strict;
 use base 'Catalyst::Engine::HTTP::Base';
 
+use Catalyst::Exception;
 use IO::Select;
 use IO::Socket;
 
@@ -95,7 +96,10 @@ sub run {
     );
 
     unless ( defined $daemon ) {
-        die(qq/Failed to create daemon. Reason: '$!'/);
+
+        Catalyst::Exception->throw(
+            message =>  qq/Failed to create daemon. Reason: '$!'/
+        );
     }
 
     my $base = URI->new( $daemon->url )->canonical;

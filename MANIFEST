@@ -28,6 +28,7 @@ lib/Catalyst/Engine/HTTP/Daemon.pm
 lib/Catalyst/Engine/SpeedyCGI.pm
 lib/Catalyst/Engine/SpeedyCGI/Base.pm
 lib/Catalyst/Engine/Test.pm
+lib/Catalyst/Exception.pm
 lib/Catalyst/Helper.pm
 lib/Catalyst/Log.pm
 lib/Catalyst/Manual.pod

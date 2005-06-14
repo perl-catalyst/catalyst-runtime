@@ -3,6 +3,7 @@ package Catalyst::Request::Upload;
 use strict;
 use base 'Class::Accessor::Fast';
 
+use Catalyst::Exception;
 use File::Copy ();
 use IO::File   ();
 
@@ -62,8 +63,16 @@ Opens tempname and returns a C<IO::File> handle.
 sub fh {
     my $self = shift;
 
-    my $fh = IO::File->new( $self->tempname, IO::File::O_RDONLY )
-      or die( "Can't open ", $self->tempname, ": ", $! );
+    my $fh = IO::File->new( $self->tempname, IO::File::O_RDONLY );
+    
+    unless ( defined $fh ) {
+        
+        my $filename = $self->tempname;
+        
+        Catalyst::Exception->throw(
+            message => qq/Can't open '$filename': '$!'/
+        );
+    }
 
     return $fh;
 }

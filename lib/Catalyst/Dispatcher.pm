@@ -2,6 +2,7 @@ package Catalyst::Dispatcher;
 
 use strict;
 use base 'Class::Data::Inheritable';
+use Catalyst::Exception;
 use Catalyst::Utils;
 use Text::ASCIITable;
 use Tree::Simple;

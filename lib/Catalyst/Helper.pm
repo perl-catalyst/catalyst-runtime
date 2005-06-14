@@ -9,6 +9,7 @@ use IO::File;
 use FindBin;
 use Template;
 use Catalyst;
+use Catalyst::Exception;
 
 my %cache;
 
@@ -102,7 +103,13 @@ sub mk_component {
         my @args   = @_;
         my $class  = "Catalyst::Helper::$helper";
         eval "require $class";
-        die qq/Couldn't load helper "$class", "$@"/ if $@;
+        
+        if ( $@ ) {
+            Catalyst::Exception->throw( 
+                message => qq/Couldn't load helper "$class", "$@"/
+            );
+        }
+        
         if ( $class->can('mk_stuff') ) {
             return 1 unless $class->mk_stuff( $self, @args );
         }
@@ -145,7 +152,13 @@ sub mk_component {
             $comp = 'Controller' if $type eq 'C';
             my $class = "Catalyst::Helper::$comp\::$helper";
             eval "require $class";
-            die qq/Couldn't load helper "$class", "$@"/ if $@;
+            
+            if ( $@ ) {
+                Catalyst::Exception->throw( 
+                    message => qq/Couldn't load helper "$class", "$@"/
+                );
+            }            
+        
             if ( $class->can('mk_compclass') ) {
                 return 1 unless $class->mk_compclass( $self, @args );
             }
@@ -182,7 +195,10 @@ sub mk_dir {
         print qq/created "$dir"\n/;
         return 1;
     }
-    die qq/Couldn't create "$dir", "$!"/;
+    
+    Catalyst::Exception->throw( 
+        message => qq/Couldn't create "$dir", "$!"/
+    );    
 }
 
 =head3 mk_file
@@ -202,7 +218,10 @@ sub mk_file {
         print qq/created "$file"\n/;
         return 1;
     }
-    die qq/Couldn't create "$file", "$!"/;
+    
+    Catalyst::Exception->throw( 
+        message => qq/Couldn't create "$file", "$!"/
+    );       
 }
 
 =head3 next_test

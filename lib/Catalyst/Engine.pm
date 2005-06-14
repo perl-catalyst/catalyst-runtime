@@ -10,6 +10,7 @@ use HTML::Entities;
 use HTTP::Headers;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Text::ASCIITable;
+use Catalyst::Exception;
 use Catalyst::Request;
 use Catalyst::Request::Upload;
 use Catalyst::Response;
@@ -732,8 +733,12 @@ sub setup_components {
         eval { $instance = $component->new( $context, $config ); };
 
         if ( my $error = $@ ) {
+            
             chomp $error;
-            die qq/Couldn't instantiate component "$component", "$error"/;
+            
+            Catalyst::Exception->throw( 
+                message => qq/Couldn't instantiate component "$component", "$error"/
+            );
         }
 
         return $instance;
@@ -752,8 +757,12 @@ sub setup_components {
     };
 
     if ( my $error = $@ ) {
+        
         chomp $error;
-        die qq/Couldn't load components "$error"/;
+        
+        Catalyst::Exception->throw( 
+            message => qq/Couldn't load components "$error"/ 
+        );
     }
 
     for my $component ( $self->_components($self) ) {

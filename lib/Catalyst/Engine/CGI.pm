@@ -3,6 +3,7 @@ package Catalyst::Engine::CGI;
 use strict;
 use base 'Catalyst::Engine::CGI::Base';
 
+use Catalyst::Exception;
 use CGI;
 
 our @compile = qw[
@@ -132,7 +133,10 @@ sub prepare_request {
 
         else {
             my $class = ref($object);
-            die( qq/Invalid argument $object/ );
+            
+            Catalyst::Exception->throw(
+                message => qq/Unknown object '$object'/
+            );
         }
     }
 

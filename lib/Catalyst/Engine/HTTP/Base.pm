@@ -3,6 +3,7 @@ package Catalyst::Engine::HTTP::Base;
 use strict;
 use base 'Catalyst::Engine';
 
+use Catalyst::Exception;
 use Class::Struct ();
 use HTTP::Headers::Util 'split_header_words';
 use HTTP::Request;
@@ -115,8 +116,14 @@ sub prepare_parameters {
             if ( $parameters{filename} ) {
 
                 my $fh = File::Temp->new( UNLINK => 0 );
-                $fh->write( $part->content ) or die $!;
-                $fh->flush or die $!;
+                
+                unless ( $fh->write( $part->content ) ) {
+                    Catalyst::Exception->throw( message => $! );
+                }
+                
+                unless ( $fh->flush ) {
+                    Catalyst::Exception->throw( message => $! );
+                }
 
                 my $upload = Catalyst::Request::Upload->new(
                     filename => $parameters{filename},
@@ -125,7 +132,9 @@ sub prepare_parameters {
                     type     => $part->content_type
                 );
 
-                $fh->close;
+                unless ( $fh->close ) {
+                    Catalyst::Exception->throw( message => $! );
+                }
 
                 push( @uploads, $parameters{name}, $upload );
                 push( @params,  $parameters{name}, $parameters{filename} );

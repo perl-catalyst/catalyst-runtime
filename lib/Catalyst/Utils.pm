@@ -2,6 +2,7 @@ package Catalyst::Utils;
 
 use strict;
 use attributes ();
+use Catalyst::Exception;
 use HTTP::Request;
 use Path::Class;
 use URI;
@@ -155,7 +156,13 @@ sub reflect_actions {
     my $class   = shift;
     my $actions = [];
     eval '$actions = $class->_action_cache';
-    die qq/Couldn't reflect actions of component "$class", "$@"/ if $@;
+    
+    if ( $@ ) {
+        Catalyst::Exception->throw(
+            message => qq/Couldn't reflect actions of component "$class", "$@"/
+        );
+    }
+    
     return $actions;
 }
 

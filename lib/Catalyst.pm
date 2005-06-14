@@ -3,6 +3,7 @@ package Catalyst;
 use strict;
 use base 'Catalyst::Base';
 use UNIVERSAL::require;
+use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Utils;
 use Text::ASCIITable;
@@ -187,7 +188,9 @@ sub import {
             }
 
             else {
-                die( qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
+                Catalyst::Exception->throw(
+                    message => qq/Unsupported mod_perl version: $ENV{MOD_PERL}/
+                );
             }
         }
 
@@ -196,7 +199,9 @@ sub import {
         }
 
         else {
-            die( qq/Unsupported mod_perl: $ENV{MOD_PERL}/ );
+            Catalyst::Exception->throw(
+                message => qq/Unsupported mod_perl: $ENV{MOD_PERL}/
+            );
         }
     }
 
@@ -229,7 +234,11 @@ sub import {
 
             $plugin->require;
 
-            if ($@) { die qq/Couldn't load plugin "$plugin", "$@"/ }
+            if ( $@ ) { 
+                Catalyst::Exception->throw(
+                    message => qq/Couldn't load plugin "$plugin", "$@"/
+                );
+            }
             else {
                 push @plugins, $plugin;
                 no strict 'refs';
@@ -254,7 +263,13 @@ sub import {
     $dispatcher = "Catalyst::Dispatcher::$appdis" if $appdis;
 
     $dispatcher->require;
-    die qq/Couldn't load dispatcher "$dispatcher", "$@"/ if $@;
+    
+    if ( $@ ) {
+        Catalyst::Exception->throw(
+            message => qq/Couldn't load dispatcher "$dispatcher", "$@"/
+        );
+    }
+
     {
         no strict 'refs';
         push @{"$caller\::ISA"}, $dispatcher;
@@ -269,7 +284,12 @@ sub import {
     $engine = "Catalyst::Engine::$appeng" if $appeng;
 
     $engine->require;
-    die qq/Couldn't load engine "$engine", "$@"/ if $@;
+    
+    if ( $@ ) {
+        Catalyst::Exception->throw(
+            message => qq/Couldn't load engine "$engine", "$@"/
+        );
+    }
 
     {
         no strict 'refs';
@@ -350,13 +370,24 @@ Classdata accessor/mutator will be created, class loaded and instantiated.
 sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
     $plugin->require;
-    my $error = $UNIVERSAL::require::ERROR;
-    die qq/Couldn't load instant plugin "$plugin", "$error"/ if $error;
+    
+    if ( my $error = $UNIVERSAL::require::ERROR ) {
+        Catalyst::Exception->throw(
+            message => qq/Couldn't load instant plugin "$plugin", "$error"/
+        );
+    }    
+    
     eval { $plugin->import };
     $class->mk_classdata($name);
     my $obj;
     eval { $obj = $plugin->new(@args) };
-    die qq/Couldn't instantiate instant plugin "$plugin", "$@"/ if $@;
+
+    if ( $@ ) {
+        Catalyst::Exception->throw(
+            message => qq/Couldn't instantiate instant plugin "$plugin", "$@"/
+        );
+    }
+
     $class->$name($obj);
     $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
       if $class->debug;

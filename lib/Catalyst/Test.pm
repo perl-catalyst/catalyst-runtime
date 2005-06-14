@@ -2,6 +2,7 @@ package Catalyst::Test;
 
 use strict;
 
+use Catalyst::Exception;
 use Catalyst::Utils;
 use UNIVERSAL::require;
 
@@ -78,8 +79,15 @@ sub import {
 
     else {
         $class->require;
-        my $error = $UNIVERSAL::require::ERROR;
-        die qq/Couldn't load "$class", "$error"/ if $@;
+        
+        if ( $@ ) {
+            
+            my $error = $UNIVERSAL::require::ERROR;
+            
+            Catalyst::Exception->throw(
+                message => qq/Couldn't load "$class", "$error"/
+            );
+        }
 
         $class->import;
 

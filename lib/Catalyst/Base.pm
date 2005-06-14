@@ -2,6 +2,8 @@ package Catalyst::Base;
 
 use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
+
+use Catalyst::Exception;
 use NEXT;
 
 __PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache _config/;
@@ -104,7 +106,10 @@ sub config {
 =cut
 
 sub process {
-    die( ( ref $_[0] || $_[0] ) . " did not override Catalyst::Base::process" );
+
+    Catalyst::Exception->throw( 
+        message => ( ref $_[0] || $_[0] ) . " did not override Catalyst::Base::process"
+    );
 }
 
 =item FETCH_CODE_ATTRIBUTES
