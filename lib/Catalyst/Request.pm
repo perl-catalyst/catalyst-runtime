@@ -161,8 +161,8 @@ Shortcut for $req->body.
 
 =item $req->match
 
-This contains be the matching part of a regexp action. Otherwise it
-returns the same as 'action'.
+This contains the matching part of a regexp action. Otherwise
+it returns the same as 'action'.
 
     print $c->request->match;
 
