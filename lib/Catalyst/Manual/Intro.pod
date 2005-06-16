@@ -485,6 +485,22 @@ Catalyst matches actions in most specific to least specific order:
 
 So Catalyst would never mistakenly dispatch the first two URLs to the '^foo$' action.
 
+=head4 B<Parameter Processing>
+
+Parameters are handled with methods in the L<Catalyst::Request>
+class. The C<param> method is functionally equivalent to the C<param>
+method of C<CGI.pm> and can be used in modules that require this.
+
+    # http://localhost:3000/catalog/view/?category=hardware&page=3
+    my $category = $c->req->param('category');
+    my $current_page = $c->req->param('page') || 1;
+
+    # multiple values for single parameter name
+    my @values = $c->req->param('scrolling_list');	    
+
+    # DFV requires a CGI.pm-like input hash
+    my $results = Data::FormValidator->check($c->req->params, \%dfv_profile);
+
 =head3 Flow Control
 
 You control the application flow with the C<forward> method, which accepts the

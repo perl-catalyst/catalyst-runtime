@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Added support for case sensitivity, MyApp->config->{case_sensitive}
         - Added $c->detach for non returning forwards
         - Added unified error handling, Catalyst::Exception
+        - Added section on param handling in Intro.pod
 
 5.23  2005-06-03 02:30:00
         - added support for non Catalyst::Base components to live in namespace

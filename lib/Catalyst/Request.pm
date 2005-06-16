@@ -161,7 +161,7 @@ Shortcut for $req->body.
 
 =item $req->match
 
-This contains be the matching part of a regexp action. otherwise it
+This contains be the matching part of a regexp action. Otherwise it
 returns the same as 'action'.
 
     print $c->request->match;
@@ -174,7 +174,8 @@ Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
 =item $req->param
 
-Get request parameters with a CGI.pm like param method.
+Get request parameters with a CGI.pm-compatible param method. This 
+is a method for accessing parameters in $c->req->parameters.
 
     $value  = $c->request->param('foo');
     @values = $c->request->param('foo');
