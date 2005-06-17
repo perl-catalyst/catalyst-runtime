@@ -149,7 +149,7 @@ sub import {
     foreach (@arguments) {
 
         if ( /^-Debug$/ ) {
-            $flags->{log} = 1
+            $flags->{log} = ( $flags->{log} ) ? 'debug,' . $flags->{log} : 'debug';
         }
         elsif (/^-(\w+)=?(.*)$/) {
             $flags->{ lc $1 } = $2;
