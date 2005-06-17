@@ -134,7 +134,11 @@ sub import {
     }
 
     if ( $caller->engine ) {
-        $caller->log->warn( qq/Attempt to re-initialize "$caller"/ );
+
+        unless ( $caller eq 'main' ) {
+            $caller->log->warn( qq/Attempt to re-initialize "$caller"/ );
+        }
+
         return;
     }
 
