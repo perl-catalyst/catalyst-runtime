@@ -125,20 +125,21 @@ Returns a hashref containing your applications settings.
 
 sub import {
     my ( $class, @arguments ) = @_;
+    
     my $caller = caller(0);
+    
+    if ( $caller eq 'main' ) {
+        return;
+    }
 
     # Prepare inheritance
     unless ( $caller->isa($class) ) {
         no strict 'refs';
         push @{"$caller\::ISA"}, $class;
     }
-
+    
     if ( $caller->engine ) {
-
-        unless ( $caller eq 'main' ) {
-            $caller->log->warn( qq/Attempt to re-initialize "$caller"/ );
-        }
-
+        $caller->log->warn( qq/Attempt to re-initialize "$caller"/ );
         return;
     }
 
