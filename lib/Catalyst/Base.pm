@@ -2,11 +2,10 @@ package Catalyst::Base;
 
 use strict;
 use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
-use Catalyst::Utils;
+
 use Catalyst::Exception;
 use NEXT;
 
-# Some caches...
 __PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache _config/;
 __PACKAGE__->_attr_cache( {} );
 __PACKAGE__->_action_cache( [] );
@@ -72,22 +71,11 @@ component loader with config() support and a process() method placeholder.
 
 sub new {
     my ( $self, $c ) = @_;
-
-    # You'll find yourself naked and strung from a tree if you ever
-    # remove this again, k? :)
-    my $class     = ref $self || $self;
-    my $appname   = Catalyst::Utils::class2appclass($class);
-    my $suffix    = Catalyst::Utils::class2classsuffix($class);
-    my $appconfig = {};
-
-    # Not catched, for compatibility with non Catalyst apps
-    eval '$appconfig = $appname->config->{$suffix} || {}';
-    my $config = { %{ $self->config }, %{$appconfig} };
-
+ 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( { %{$config}, %{$arguments} } );
+    return $self->NEXT::new( { %{ $self->config }, %{ $arguments } } );
 }
 
 # remember to leave blank lines between the consecutive =item's
@@ -119,8 +107,9 @@ sub config {
 
 sub process {
 
-    Catalyst::Exception->throw( message => ( ref $_[0] || $_[0] )
-          . " did not override Catalyst::Base::process" );
+    Catalyst::Exception->throw( 
+        message => ( ref $_[0] || $_[0] ) . " did not override Catalyst::Base::process"
+    );
 }
 
 =item FETCH_CODE_ATTRIBUTES
