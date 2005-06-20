@@ -445,7 +445,7 @@ sub setup_actions {
     };
 
     $walker->( $walker, $self->tree, '' );
-    $self->log->debug( 'Loaded private actions', $privates->draw )
+    $self->log->debug( "Loaded private actions:\n" . $privates->draw )
       if ( @{ $privates->{tbl_rows} } );
 
     my $publics = Text::ASCIITable->new;
@@ -460,7 +460,7 @@ sub setup_actions {
         $publics->addRow( "/$plain", $reverse );
     }
 
-    $self->log->debug( 'Loaded public actions', $publics->draw )
+    $self->log->debug( "Loaded public actions:\n" . $publics->draw )
       if ( @{ $publics->{tbl_rows} } );
 
     my $regexes = Text::ASCIITable->new;
@@ -475,7 +475,7 @@ sub setup_actions {
         $regexes->addRow( $regex, $reverse );
     }
 
-    $self->log->debug( 'Loaded regex actions', $regexes->draw )
+    $self->log->debug( "Loaded regex actions:\n" . $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } );
 }
 

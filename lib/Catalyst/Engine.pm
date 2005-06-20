@@ -521,7 +521,7 @@ sub prepare {
             my $value = defined($param) ? $param : '';
             $t->addRow( $key, $value );
         }
-        $c->log->debug( 'Parameters are', $t->draw );
+        $c->log->debug( "Parameters are:\n" . $t->draw );
     }
 
     return $c;
@@ -694,7 +694,7 @@ sub setup {
         $t->setCols('Class');
         $t->setColWidth( 'Class', 75, 1 );
         $t->addRow($_) for sort keys %{ $self->components };
-        $self->log->debug( 'Loaded components', $t->draw )
+        $self->log->debug( "Loaded components:\n" . $t->draw )
           if ( @{ $t->{tbl_rows} } );
     }
 
