@@ -8,7 +8,7 @@ our %LEVELS = ();
 
 __PACKAGE__->mk_accessors('level');
 
-BEGIN {
+{
     my @levels = qw[ debug info warn error fatal ];
 
     for ( my $i = 0 ; $i < @levels ; $i++ ) {
