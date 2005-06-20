@@ -418,8 +418,7 @@ sub handler {
             $t->setColWidth( 'Time',   9,  1 );
 
             for my $stat (@stats) { $t->addRow( $stat->[0], $stat->[1] ) }
-            $class->log->info( "Request took $elapsed" . "s ($av/s)",
-                $t->draw );
+            $class->log->info( "Request took ${elapsed}s ($av/s)\n" . $t->draw );
         }
         else { $status = &$handler }
 
