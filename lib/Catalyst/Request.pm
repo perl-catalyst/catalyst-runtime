@@ -117,6 +117,34 @@ Shortcut to $req->headers->content_length
 
 Shortcut to $req->headers->content_type
 
+=item $req->cookie
+
+A convenient method to $req->cookies.
+
+    $cookie  = $c->request->cookie('name');
+    @cookies = $c->request->cookie;
+
+=cut
+
+sub cookie {
+    my $self = shift;
+
+    if ( @_ == 0 ) {
+        return keys %{ $self->cookie };
+    }
+
+    if ( @_ == 1 ) {
+
+        my $name = shift;
+
+        unless ( exists $self->cookie->{$name} ) {
+            return undef;
+        }
+        
+        return $self->cookie->{$name};
+    }
+}
+
 =item $req->cookies
 
 Returns a reference to a hash containing the cookies.

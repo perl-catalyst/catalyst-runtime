@@ -80,6 +80,21 @@ sub class2classsuffix {
     return $class;
 }
 
+=item class2env($class);
+
+Returns the enviroment name for class.
+
+    MyApp becomes MYAPP
+    My::App becomes MY_APP
+
+=cut
+
+sub class2env {
+    my $class = shift || '';
+    my $class =~ s/\:\:/_/g;
+    return uc($class);
+}
+
 =item class2prefix( $class, $case );
 
 Returns the prefix for class.
