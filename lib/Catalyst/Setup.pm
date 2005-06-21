@@ -1,14 +1,13 @@
 package Catalyst::Setup;
 
 use strict;
-use base qw/Class::Data::Inheritable/;
 use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Utils;
 use Path::Class;
 use Text::ASCIITable;
 
-__PACKAGE__->mk_classdata($_) for qw/arguments dispatcher engine log/;
+require Module::Pluggable::Fast;
 
 =head1 NAME
 
@@ -33,7 +32,90 @@ Setup.
 =cut
 
 sub setup {
-    my $class = shift;
+    my ( $class, @arguments ) = @_;
+
+    unless ( $class->isa('Catalyst') ) {
+
+        Catalyst::Exception->throw(
+            message => qq/'$class' does not inherit from Catalyst/
+        );
+    }
+    
+    if ( $class->arguments ) {
+        @arguments = ( @arguments, @{ $class->arguments } );
+    }
+
+    # Process options
+    my $flags = { };
+
+    foreach (@arguments) {
+
+        if ( /^-Debug$/ ) {
+            $flags->{log} = ( $flags->{log} ) ? 'debug,' . $flags->{log} : 'debug';
+        }
+        elsif (/^-(\w+)=?(.*)$/) {
+            $flags->{ lc $1 } = $2;
+        }
+        else {
+            push @{ $flags->{plugins} }, $_;
+        }
+    }
+
+    $class->setup_log        ( delete $flags->{log}        );
+    $class->setup_plugins    ( delete $flags->{plugins}    );
+    $class->setup_dispatcher ( delete $flags->{dispatcher} );
+    $class->setup_engine     ( delete $flags->{engine}     );
+    $class->setup_home       ( delete $flags->{home}       );
+
+    for my $flag ( sort keys %{ $flags } ) {
+
+        if ( my $code = $class->can( 'setup_' . $flag ) ) {
+            &$code( $class, delete $flags->{$flag} );
+        }
+        else {
+            $class->log->warn(qq/Unknown flag "$flag"/);
+        }
+    }
+
+    $class->log->warn( "You are running an old helper script! "
+          . "Please update your scripts by regenerating the "
+          . "application and copying over the new scripts." )
+      if ( $ENV{CATALYST_SCRIPT_GEN}
+        && ( $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::CATALYST_SCRIPT_GEN ) );
+
+
+    if ( $class->debug ) {
+
+        my @plugins = ();
+
+        {
+            no strict 'refs';
+            @plugins = grep { /^Catalyst::Plugin/ } @{"$class\::ISA"};
+        }
+
+        if ( @plugins ) {
+            my $t = Text::ASCIITable->new;
+            $t->setOptions( 'hide_HeadRow',  1 );
+            $t->setOptions( 'hide_HeadLine', 1 );
+            $t->setCols('Class');
+            $t->setColWidth( 'Class', 75, 1 );
+            $t->addRow($_) for @plugins;
+            $class->log->debug( "Loaded plugins:\n" . $t->draw );
+        }
+
+        my $dispatcher = $class->dispatcher;
+        my $engine     = $class->engine;
+        my $home       = $class->config->{home};
+
+        $class->log->debug(qq/Loaded dispatcher "$dispatcher"/);
+        $class->log->debug(qq/Loaded engine "$engine"/);
+
+        $home
+          ? ( -d $home )
+          ? $class->log->debug(qq/Found home "$home"/)
+          : $class->log->debug(qq/Home "$home" doesn't exist/)
+          : $class->log->debug(q/Couldn't find home/);
+    }
 
     # Call plugins setup
     $class->NEXT::setup;

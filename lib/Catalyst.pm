@@ -11,6 +11,8 @@ use Text::ASCIITable;
 use Path::Class;
 our $CATALYST_SCRIPT_GEN = 4;
 
+__PACKAGE__->mk_classdata($_) for qw/arguments dispatcher engine log/;
+
 our $VERSION = '5.24';
 our @ISA;
 
@@ -124,95 +126,20 @@ Returns a hashref containing your applications settings.
 
 sub import {
     my ( $class, @arguments ) = @_;
-    
+
     my $caller = caller(0);
     
-    if ( $caller eq 'main' ) {
-        return;
-    }
-
     # Prepare inheritance
     unless ( $caller->isa($class) ) {
+        
         no strict 'refs';
         push @{"$caller\::ISA"}, $class;
-    }
-    
-    if ( $caller->engine ) {
-        $caller->log->warn( qq/Attempt to re-initialize "$caller"/ );
-        return;
+        
+        *{"$caller\::import"} = sub { 1 };
     }
 
-    # Process options
-    my $flags = { };
-
-    foreach (@arguments) {
-
-        if ( /^-Debug$/ ) {
-            $flags->{log} = ( $flags->{log} ) ? 'debug,' . $flags->{log} : 'debug';
-        }
-        elsif (/^-(\w+)=?(.*)$/) {
-            $flags->{ lc $1 } = $2;
-        }
-        else {
-            push @{ $flags->{plugins} }, $_;
-        }
-    }
-
-    $caller->setup_log        ( delete $flags->{log}        );
-    $caller->setup_plugins    ( delete $flags->{plugins}    );
-    $caller->setup_dispatcher ( delete $flags->{dispatcher} );
-    $caller->setup_engine     ( delete $flags->{engine}     );
-    $caller->setup_home       ( delete $flags->{home}       );
-
-    for my $flag ( sort keys %{ $flags } ) {
-
-        if ( my $code = $caller->can( 'setup_' . $flag ) ) {
-            &$code( $caller, delete $flags->{$flag} );
-        }
-        else {
-            $caller->log->warn(qq/Unknown flag "$flag"/);
-        }
-    }
-
-    $caller->log->warn( "You are running an old helper script! "
-          . "Please update your scripts by regenerating the "
-          . "application and copying over the new scripts." )
-      if ( $ENV{CATALYST_SCRIPT_GEN}
-        && ( $ENV{CATALYST_SCRIPT_GEN} < $CATALYST_SCRIPT_GEN ) );
-
-
-    if ( $caller->debug ) {
-
-        my @plugins = ();
-
-        {
-            no strict 'refs';
-            @plugins = grep { /^Catalyst::Plugin/ } @{"$caller\::ISA"};
-        }
-
-        if ( @plugins ) {
-            my $t = Text::ASCIITable->new;
-            $t->setOptions( 'hide_HeadRow',  1 );
-            $t->setOptions( 'hide_HeadLine', 1 );
-            $t->setCols('Class');
-            $t->setColWidth( 'Class', 75, 1 );
-            $t->addRow($_) for @plugins;
-            $caller->log->debug( "Loaded plugins:\n" . $t->draw );
-        }
-
-        my $dispatcher = $caller->dispatcher;
-        my $engine     = $caller->engine;
-        my $home       = $caller->config->{home};
-
-        $caller->log->debug(qq/Loaded dispatcher "$dispatcher"/);
-        $caller->log->debug(qq/Loaded engine "$engine"/);
-
-        $home
-          ? ( -d $home )
-          ? $caller->log->debug(qq/Found home "$home"/)
-          : $caller->log->debug(qq/Home "$home" doesn't exist/)
-          : $caller->log->debug(q/Couldn't find home/);
-    }
+    $caller->arguments( [ @arguments ] );
+    $caller->setup_home;
 }
 
 =item $c->engine

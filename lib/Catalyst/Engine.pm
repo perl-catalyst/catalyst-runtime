@@ -16,8 +16,6 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 
-require Module::Pluggable::Fast;
-
 # For pretty dumps
 $Data::Dumper::Terse = 1;
 
