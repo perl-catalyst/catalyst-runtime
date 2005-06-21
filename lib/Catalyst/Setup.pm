@@ -21,7 +21,7 @@ See L<Catalyst>.
 
 =over 4
 
-=item $class->setup_components
+=item $c->setup_components
 
 Setup components.
 
