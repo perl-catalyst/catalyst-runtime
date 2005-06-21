@@ -91,7 +91,7 @@ Returns the enviroment name for class.
 
 sub class2env {
     my $class = shift || '';
-    my $class =~ s/\:\:/_/g;
+    $class =~ s/\:\:/_/g;
     return uc($class);
 }
 
