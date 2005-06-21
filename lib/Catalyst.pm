@@ -11,8 +11,6 @@ use Text::ASCIITable;
 use Path::Class;
 our $CATALYST_SCRIPT_GEN = 4;
 
-__PACKAGE__->mk_classdata($_) for qw/arguments dispatcher engine log/;
-
 our $VERSION = '5.24';
 our @ISA;
 
@@ -267,47 +265,6 @@ sub plugin {
     $class->$name($obj);
     $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
       if $class->debug;
-}
-
-=item $class->setup
-
-Setup.
-
-    MyApp->setup;
-
-=cut
-
-sub setup {
-    my $class = shift;
-    
-    # Call plugins setup
-    $class->NEXT::setup;
-
-    # Initialize our data structure
-    $class->components( {} );
-
-    $class->setup_components;
-
-    if ( $class->debug ) {
-        my $t = Text::ASCIITable->new;
-        $t->setOptions( 'hide_HeadRow',  1 );
-        $t->setOptions( 'hide_HeadLine', 1 );
-        $t->setCols('Class');
-        $t->setColWidth( 'Class', 75, 1 );
-        $t->addRow($_) for sort keys %{ $class->components };
-        $class->log->debug( "Loaded components:\n" . $t->draw )
-          if ( @{ $t->{tbl_rows} } );
-    }
-
-    # Add our self to components, since we are also a component
-    $class->components->{$class} = $class;
-
-    $class->setup_actions;
-
-    if ( $class->debug ) {
-        my $name = $class->config->{name} || 'Application';
-        $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
-    }
 }
 
 =back
