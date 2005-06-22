@@ -43,6 +43,7 @@ lib/Catalyst/Manual/Tutorial.pod
 lib/Catalyst/Request.pm
 lib/Catalyst/Request/Upload.pm
 lib/Catalyst/Response.pm
+lib/Catalyst/Setup.pm
 lib/Catalyst/Test.pm
 lib/Catalyst/Utils.pm
 Makefile.PL

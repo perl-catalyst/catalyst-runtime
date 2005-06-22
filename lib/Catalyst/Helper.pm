@@ -430,13 +430,13 @@ __appclass__
 package [% name %];
 
 use strict;
-use Catalyst qw/-Debug/;
+use base 'Catalyst';
 
 our $VERSION = '0.01';
 
 [% name %]->config( name => '[% name %]' );
 
-[% name %]->setup;
+[% name %]->setup( qw/-Debug/ );
 
 =head1 NAME
 
