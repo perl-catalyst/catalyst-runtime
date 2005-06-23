@@ -15,13 +15,13 @@ placing a C<die()> call in the C<end> action.
 
      sub end : Private {
          my ( $self, $c ) = @_;
-         die "testing";
+         die "forced debug";
      }
 
 If you're tired of removing and adding this all the time, you
 can easily add a condition. For example:
 
-  die "Testing" if $c->params->{dump_info};
+  die "force debug" if $c->req->params->{dump_info};
 
 =head2 Disable statistics
 
@@ -358,6 +358,14 @@ authentication, authorization, and access check phases.
 
 For more information see the FastCGI documentation, the C<FCGI> module 
 and L<http://www.fastcgi.com/>.
+
+=head1 Forwarding with a parameter
+
+Sometimes you want to pass along an argument when forward to another
+action. This can easily be accomplished like this:
+ 
+  $c->req->args([qw/arg1 arg2 arg3/]);
+  $c->forward('/wherever');
 
 =head1 AUTHOR
 
