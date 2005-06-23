@@ -361,7 +361,7 @@ and L<http://www.fastcgi.com/>.
 
 =head1 Forwarding with a parameter
 
-Sometimes you want to pass along an argument when forward to another
+Sometimes you want to pass along arguments when forwarding to another
 action. This can easily be accomplished like this:
  
   $c->req->args([qw/arg1 arg2 arg3/]);
