@@ -64,7 +64,7 @@ sub mk_app {
     $self->{appprefix} = lc $self->{dir};
     $self->{appprefix} =~ s/-/_/g;
     $self->{startperl} = $Config{startperl};
-    $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN;
+    $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN || 4;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'Catalyst developer';
@@ -830,6 +830,7 @@ sub default : Private {
 }
 
 =back
+
 [% END %]
 =head1 AUTHOR
 
