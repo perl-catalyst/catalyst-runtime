@@ -286,7 +286,7 @@ sub finalize_error {
 
     my ( $title, $error, $infos );
     if ( $c->debug ) {
-        $error = join '<br/>', @{ $c->error };
+        $error = join '', map { '<code class="error">'  .  encode_entities($_) . '</code>' } @{ $c->error };
         $error ||= 'No output';
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
         my $req   = encode_entities Dumper $c->req;
@@ -361,6 +361,12 @@ sub finalize_error {
             padding: 8px;
             margin: 4px;
             -moz-border-radius: 10px;
+        }
+        code.error {
+            display: block;
+            margin: 1em 0;
+            overflow: auto;
+            white-space: pre;
         }
     </style>
 </head>
