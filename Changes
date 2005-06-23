@@ -1,27 +1,28 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.24  2005-00-00 00:00:00
-        - Make module build cons README automatically.
-        - Prettify home path by resolving '..' (Andy Grundman)
-        - Improved helper templates a bit, new naming scheme for tests...
-        - Added support for case sensitivity, MyApp->config->{case_sensitive}
-        - Added $c->detach for non returning forwards
-        - Added unified error handling, Catalyst::Exception
-        - Added section on param handling in Intro.pod
-        - Added $c->request->cookie
-        - Added Catalyst::Setup
-        - Refactored Catalyst::import()
-        - Improved rendering of error messages in debug mode
+        - make module build cons README automatically.
+        - prettify home path by resolving '..' (Andy Grundman)
+        - improved helper templates a bit, new naming scheme for tests...
+        - added support for case sensitivity, MyApp->config->{case_sensitive}
+        - added $c->detach for non returning forwards
+        - added unified error handling, Catalyst::Exception
+        - added section on param handling in Intro.pod
+        - added $c->request->cookie
+        - added Catalyst::Setup
+        - refactored Catalyst::import()
+        - improved rendering of error messages in debug mode
+        - fixed a bug in Catalyst::Helper::mk_dir
 
 5.23  2005-06-03 02:30:00
         - added support for non Catalyst::Base components to live in namespace
         - improved concurrency connections in Catalyst::Engine::HTTP::Daemon
 
 5.22  2005-05-26 14:24:00
-        - Improved base locating in MP engines
-        - Improved error messages in C::E::HTTP::Daemon
-        - Hostnames are now resolved on demand unless provided by engine
-        - Fixed memory leak in $c->execute (Michael Reece, Matt S Trout)
+        - improved base locating in MP engines
+        - improved error messages in C::E::HTTP::Daemon
+        - hostnames are now resolved on demand unless provided by engine
+        - fixed memory leak in $c->execute (Michael Reece, Matt S Trout)
 
 5.21  2005-05-24 14:56:00
         - fixed a bug in https detection

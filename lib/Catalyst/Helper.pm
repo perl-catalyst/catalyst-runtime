@@ -191,7 +191,7 @@ sub mk_dir {
         print qq/ exists "$dir"\n/;
         return 0;
     }
-    if ( mkpath $dir) {
+    if ( mkpath [$dir] ) {
         print qq/created "$dir"\n/;
         return 1;
     }
@@ -430,13 +430,13 @@ __appclass__
 package [% name %];
 
 use strict;
-use base 'Catalyst';
+use Catalyst qw/-Debug/;
 
 our $VERSION = '0.01';
 
 [% name %]->config( name => '[% name %]' );
 
-[% name %]->setup( qw/-Debug/ );
+[% name %]->setup;
 
 =head1 NAME
 

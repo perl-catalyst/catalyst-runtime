@@ -196,6 +196,15 @@ sub plugin {
 
 =back
 
+=head1 CASE SENSITIVITY
+
+By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> becomes
+C</foo/bar>.
+
+But you can activate case sensitivity with a config parameter.
+
+    MyApp->config->{case_sensitive} = 1;
+
 =head1 LIMITATIONS
 
 mod_perl2 support is considered experimental and may contain bugs.
