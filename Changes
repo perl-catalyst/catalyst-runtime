@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.24  2005-00-00 00:00:00
+5.30  2005-00-00 00:00:00
+        - Allow overriding home/root in config.
         - make module build cons README automatically.
         - prettify home path by resolving '..' (Andy Grundman)
         - improved helper templates a bit, new naming scheme for tests...

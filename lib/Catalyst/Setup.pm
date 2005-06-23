@@ -360,8 +360,8 @@ sub setup_home {
     }
 
     if ( $home ) {
-        $class->config->{home} = $home;
-        $class->config->{root} = dir($home)->subdir('root');
+        $class->config->{home} ||= $home;
+        $class->config->{root} ||= dir($home)->subdir('root');
     }
 }
 
