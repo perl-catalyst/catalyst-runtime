@@ -67,7 +67,9 @@ Just use Catalyst::Model::CDBI::CRUD as your base class.
     1;
 
 Modify the $c->form() parameters to match your needs, and don't forget to copy
-the templates. ;)
+the templates into the template root. Can't find the templates? They were in the
+CRUD model distribution, so you can do B<look Catalyst::Model::CDBI::CRUD> from 
+the CPAN shell to find them.
 
 =head2 Single file upload with Catalyst
 
