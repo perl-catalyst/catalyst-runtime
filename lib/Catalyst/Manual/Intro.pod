@@ -504,7 +504,9 @@ method of C<CGI.pm> and can be used in modules that require this.
 =head3 Flow Control
 
 You control the application flow with the C<forward> method, which accepts the
-key of an action to execute.
+key of an action to execute. A forward is like a method call, only it wraps the 
+call in an eval to allow exception handling, and to pass along the context object,
+and allow profiling of each method.
 
     sub hello : Global {
         my ( $self, $c ) = @_;
@@ -522,6 +524,19 @@ key of an action to execute.
         my ( $self, $c ) = @_;
         $c->res->output( $c->stash->{message} );
     }
+
+As opposed to a redirect, your request object will remain unchanged, as no actual
+new request is started, unless you pass along new args like this:
+
+
+    sub hello : Global {
+        my ( $self, $c ) = @_;
+        $c->stash->{message} = 'Hello World!';
+        $c->forward('check_message',[qw/test1/);
+    }
+
+In that case, $c->request->argumentss will be changed until you return from the 
+forward.  test1 will also be passed as an argument to check_message after $c.
     
 As you can see from these examples, you can just use the method name as long as
 you are referring to methods in the same controller. If you want to forward to a
