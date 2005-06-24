@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 18;
+use Test::More tests => 24;
 use Catalyst::Test 'TestApp';
 
 
@@ -63,4 +63,16 @@ use Catalyst::Test 'TestApp';
     is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Forward', 'Test Class' );
     is( $response->header('X-Catalyst-Executed'), $expected, 'Executed actions' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
+}
+
+{
+    ok( my $response = request('http://localhost/action/forward/with_args/old'), 'Request with args' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content,'old');
+}
+
+{
+    ok( my $response = request('http://localhost/action/forward/with_method_and_args/old'), 'Request with args and method' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content,'old');
 }
