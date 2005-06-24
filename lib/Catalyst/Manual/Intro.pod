@@ -503,15 +503,22 @@ method of C<CGI.pm> and can be used in modules that require this.
 
 =head3 Flow Control
 
-You control the application flow with the C<forward> method, which accepts the
-key of an action to execute. A forward is like a method call, only it wraps the 
-call in an eval to allow exception handling, and to pass along the context object,
-and allow profiling of each method.
+You control the application flow with the C<forward> method, which
+accepts the key of an action to execute. This can be an action in the
+same or another Catalyst controller, or a Class name, optionally
+followed by a method name. After a C<forward>, the control flow will
+return to the method from which the C<forward> was issued.
+
+A C<forward> is similar to a method call. The main differences are that
+it wraps the call in an C<eval> to allow exception handling; it
+automatically passes along the context object (C<$c> or C<$context>);
+and it allows profiling of each call (displayed in the log with
+debugging enabled).
 
     sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{message} = 'Hello World!';
-        $c->forward('check_message');
+        $c->forward('check_message'); # $c is automatically included
     }
 
     sub check_message : Private {
@@ -525,28 +532,39 @@ and allow profiling of each method.
         $c->res->output( $c->stash->{message} );
     }
 
-As opposed to a redirect, your request object will remain unchanged, as no actual
-new request is started, unless you pass along new args like this:
+A C<forward> does not create a new request, so your request
+object (C<$c-E<gt>req>) will remain unchanged. This is a
+key difference between using C<forward> and issuing a
+redirect.
 
+You can pass new arguments to a C<forward> by adding them
+in an anonymous array. In this case C<$c-E<gt>req-E<gt>args>
+will be changed for the duration of the C<forward> only; upon
+return, the original value of C<$c-E<gt>req-E<gt>args> will
+be reset.
 
     sub hello : Global {
         my ( $self, $c ) = @_;
         $c->stash->{message} = 'Hello World!';
-        $c->forward('check_message',[qw/test1/);
+        $c->forward('check_message',[qw/test1/]);
+        # now $c->req->args is back to what it was before
     }
 
-In that case, $c->request->argumentss will be changed until you return from the 
-forward.  test1 will also be passed as an argument to check_message after $c.
+    sub check_message : Private {
+        my ( $self, $c ) = @_;
+        my $first_argument = $c->req->args[0]; # now = 'test1'
+        # do something...
+    }
     
-As you can see from these examples, you can just use the method name as long as
-you are referring to methods in the same controller. If you want to forward to a
-method in another controller, or the main application, you will have to refer to
-the method by absolute path.
+As you can see from these examples, you can just use the method name as
+long as you are referring to methods in the same controller. If you want
+to forward to a method in another controller, or the main application,
+you will have to refer to the method by absolute path.
 
   $c->forward('/my/controller/action');
-  $c->forward('/default');
+  $c->forward('/default'); # calls default in main application
 
-You can also forward to classes and methods.
+Here are some examples of how to forward to classes and methods.
 
     sub hello : Global {
         my ( $self, $c ) = @_;
@@ -555,7 +573,7 @@ You can also forward to classes and methods.
 
     sub bye : Global {
         my ( $self, $c ) = @_;
-        $c->forward('MyApp::M::Hello');
+        $c->forward('MyApp::M::Hello'); # no method: will try 'process'
     }
 
     package MyApp::M::Hello;
@@ -570,9 +588,9 @@ You can also forward to classes and methods.
         $c->res->output('Goodbye World!');
     }
 
-Note that C<forward> returns to the calling action and continues processing
-after the action finishes.  Catalyst will automatically try to call process() if
-you omit the method.
+Note that C<forward> returns to the calling action and continues
+processing after the action finishes.  Catalyst will automatically try
+to call process() if you omit the method.
 
 =head3 Components
 

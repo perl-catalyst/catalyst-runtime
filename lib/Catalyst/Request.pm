@@ -264,7 +264,7 @@ Shortcut for $req->parameters.
 =item $req->parameters
 
 Returns a reference to a hash containing parameters. Values can
-be either a scalar or a arrayref containing scalars.
+be either a scalar or an arrayref containing scalars.
 
     print $c->request->parameters->{field};
     print $c->request->parameters->{field}->[0];
