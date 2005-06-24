@@ -104,7 +104,7 @@ sub dispatch {
     }
 }
 
-=item $c->forward($command [args]))
+=item $c->forward( $command [, \@arguments ] )
 
 Forward processing to a private action or a method from a class.
 If you define a class without method it will default to process().
@@ -130,15 +130,7 @@ sub forward {
 
     my $caller    = caller(0);
     my $namespace = '/';
-    my $args;
-
-    if ( ref( $_[0] ) eq 'ARRAY' ) {
-        $args=$c->req->args();
-        $c->req->args( shift );
-    } elsif ( ref( $_[1] ) eq 'ARRAY' ) {
-        $args=$c->req->args();
-        $c->req->args( $_[1] );
-    }
+    my $arguments = ( ref( $_[-1] ) eq 'ARRAY' ) ? pop(@_) : $c->req->args;
 
     if ( $command =~ /^\// ) {
         $command =~ /^\/(.*)\/(\w+)$/;
@@ -193,15 +185,15 @@ sub forward {
         }
 
     }
+    
+    local $c->request->{arguments} = $arguments;
 
     for my $result ( @{$results} ) {
         $c->execute( @{ $result->[0] } );
-        last if scalar @{ $c->error };
+        return if scalar @{ $c->error };
         last unless $c->state;
     }
-    $c->req->args( $args ) if $args;
 
-    return if scalar @{ $c->error };
     return $c->state;
 }
 
