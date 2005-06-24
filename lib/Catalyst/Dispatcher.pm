@@ -186,7 +186,7 @@ sub forward {
 
     }
     
-    local $c->request->{arguments} = $arguments;
+    local $c->request->{arguments} = [ @{ $arguments } ];
 
     for my $result ( @{$results} ) {
         $c->execute( @{ $result->[0] } );
