@@ -376,10 +376,11 @@ application, by calling the C<forward> method:
     $c->forward('foo');
 
 See L</Flow Control> for a full explanation of C<forward>. Note that, as
-discussed there, when forwarding from another component, you must use the
-absolute path to the method, so that a private C<bar> method in your
-C<MyApp::Controller::Catalog::Order::Process> controller must, if called from
-elsewhere, be reach with C<$c-E<gt>forward('/catalog/order/process/bar')>.
+discussed there, when forwarding from another component, you must use
+the absolute path to the method, so that a private C<bar> method in your
+C<MyApp::Controller::Catalog::Order::Process> controller must, if called
+from elsewhere, be reached with
+C<$c-E<gt>forward('/catalog/order/process/bar')>.
 
 =back
 
@@ -390,24 +391,27 @@ components in your C<forward>s.
 
 =head4 Built-in Private Actions
 
-In response to specific application states, Catalyst will automatically call
-these built-in private actions:
+In response to specific application states, Catalyst will automatically
+call these built-in private actions in your application class:
 
 =over 4
 
 =item * B<default : Private>
 
-Called when no other action matches.
+Called when no other action matches. Could be used, for example, for
+displaying a generic frontpage for the main app, or an error page for
+individual controllers.
 
 =item * B<begin : Private>
 
-Called at the beginning of a request, before any matching actions are called.
+Called at the beginning of a request, before any matching actions are
+called.
 
 =item * B<end : Private>
 
-=back
-
 Called at the end of a request, after all matching actions are called.
+
+=back
 
 =head4 B<Built-in actions in controllers/autochaining>
 
@@ -415,41 +419,55 @@ Called at the end of a request, after all matching actions are called.
     sub begin : Private { }
     sub default : Private { }
 
-You can define the Built-in Private Actions within your controllers as 
-well. The actions will override the ones in lower level controllers or
-your global application.
+You can define built-in private actions within your controllers as
+well. The actions will override the ones in less-specific controllers,
+or your application class. In other words, for each of the three
+built-in private actions, only one will be run in any request
+cycle. Thus, if C<MyApp::C::Catalog::begin> exists, it will be run in
+place of C<MyApp::begin> if you're in the C<catalog> namespace, and
+C<MyApp::C::Catalog::Order::begin> would override this in turn.
 
-In addition to the normal built-ins, you have a special action for 
-making inheritance chains, 'auto'. These will be run after C<begin>, 
-but before your action is processed.
+In addition to the normal built-ins, you have a special action for
+making chains, C<auto>. Such C<auto> actions will be run after any
+C<begin>, but before your action is processed. Unlike the other
+built-ins, C<auto> actions I<do not> override each other; they will
+be called in turn, starting with the application class and going
+through to the I<most> specific class. I<This is the reverse of the
+order in which the normal built-ins override each other>.
+
+Here are some examples of the order in which the various built-ins
+would be called:
 
 =over 4
 
-=item for a request for /foo/foo
+=item for a request for C</foo/foo>
 
   MyApp::begin
   MyApp::auto
-  MyApp::C::Foo::default
+  MyApp::C::Foo::default # in the absence of MyApp::C::Foo::Foo
   MyApp::end
 
-=item for a request for /foo/bar/foo
+=item for a request for C</foo/bar/foo>
 
   MyApp::C::Foo::Bar::begin
   MyApp::auto
   MyApp::C::Foo::auto
-  MyApp::C::Foo::Bar::default
+  MyApp::C::Foo::Bar::auto
+  MyApp::C::Foo::Bar::default # for MyApp::C::Foo::Bar::foo
   MyApp::C::Foo::Bar::end
 
 =back
 
-Also, if you need to break out of the chain in one of your auto 
-actions, you can return 0, if so, your action will not be processed,
-but the end will, so for the request above, if the first auto returns
-false, it would look like this:
+The C<auto> action is also distinguished by the fact that you can break
+out of the processing chain by returning 0. If an C<auto> action returns
+0, any remaining actions will be skipped, except for C<end>. So, for the
+request above, if the first auto returns false, the chain would look
+like this:
 
 =over 4
 
-=item for a request for /foo/bar/foo where auto returns false
+=item for a request for C</foo/bar/foo> where first C<auto> returns
+false
 
   MyApp::C::Foo::Bar::begin
   MyApp::auto
@@ -457,22 +475,28 @@ false, it would look like this:
 
 =back
 
-B<Note:> auto actions have to return a true value to continue
-processing!  You can also die in the autochain action, in that case, the
-request will go straight to the finalize stage, without processing
-further actions.
+An example of why one might use this is an authentication action: you
+could set up a C<auto> action to handle authentication in your
+application class (which will always be called first), and if
+authentication fails, returning 0 would skip any remaining methods
+for that URL.
 
+B<Note:> Looking at it another way, C<auto> actions have to return a
+true value to continue processing! You can also C<die> in the autochain
+action; in that case, the request will go straight to the finalize
+stage, without processing further actions.
 
-=head4 B<URL Argument Handling>
+=head4 B<URL Path Handling>
 
-If you want to pass variable arguments at the end of a URL, you must use regex
-actions keys with '^' and '$' anchors, and the arguments must be separated with
-forward slashes (/) in the URL. For example, suppose you want to handle
-/foo/$bar/$baz, where $bar and $baz may vary:
+You can pass variable arguments as part of the URL path. In this case,
+you must use regex action keys with '^' and '$' anchors, and the
+arguments must be separated with forward slashes (/) in the URL. For
+example, suppose you want to handle C</foo/$bar/$baz>, where C<$bar> and
+C<$baz> may vary:
 
     sub foo : Regex('^foo$') { my ($self, $context, $bar, $baz) = @_; }
 
-But what if you also defined actions for /foo/boo and /foo/boo/hoo ?
+But what if you also defined actions for C</foo/boo> and C</foo/boo/hoo>?
 
     sub boo : Path('foo/boo') { .. }
     sub hoo : Path('foo/boo/hoo') { .. }
@@ -481,15 +505,17 @@ Catalyst matches actions in most specific to least specific order:
 
     /foo/boo/hoo
     /foo/boo
-    /foo # might be /foo/bar/baz
+    /foo # might be /foo/bar/baz but won't be /foo/boo/hoo
 
-So Catalyst would never mistakenly dispatch the first two URLs to the '^foo$' action.
+So Catalyst would never mistakenly dispatch the first two URLs to the
+'^foo$' action.
 
 =head4 B<Parameter Processing>
 
-Parameters are handled with methods in the L<Catalyst::Request>
-class. The C<param> method is functionally equivalent to the C<param>
-method of C<CGI.pm> and can be used in modules that require this.
+Parameters passed in the URL query string are handled with methods in
+the L<Catalyst::Request> class. The C<param> method is functionally
+equivalent to the C<param> method of C<CGI.pm> and can be used in
+modules that require this.
 
     # http://localhost:3000/catalog/view/?category=hardware&page=3
     my $category = $c->req->param('category');
