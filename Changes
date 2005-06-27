@@ -9,7 +9,7 @@ This file documents the revision history for Perl extension Catalyst.
         - prettify home path by resolving '..' (Andy Grundman)
         - improved helper templates a bit, new naming scheme for tests...
         - added support for case sensitivity, MyApp->config->{case_sensitive}
-        - added $c->detach for non returning forwards
+        - added $c->detach for non-returning forwards
         - added unified error handling, Catalyst::Exception
         - added section on param handling in Intro.pod
         - added $c->request->cookie
@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Catalyst.
         - refactored Catalyst::import()
         - improved rendering of error messages in debug mode
         - fixed a bug in Catalyst::Helper::mk_dir
+        - further doc changes, esp. to Intro.pod
 
 5.23  2005-06-03 02:30:00
         - added support for non Catalyst::Base components to live in namespace
