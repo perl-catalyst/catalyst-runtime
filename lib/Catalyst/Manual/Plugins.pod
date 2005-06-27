@@ -78,6 +78,14 @@ application's I18N namespace.
 L<Catalyst::Plugin::Observe> provides the ability to register AOP-like
 callbacks to specific Engine events. Subclasses L<Class::Publisher>.
 
+=head2 Catalyst::Plugin::PageCache
+
+L<Catalyst::Plugin::PageCache> helps improve the performance of slow or
+frequently accessed pages by caching the entire output of your page.
+Subsequent requests to the page will receive the page very quickly from
+cache. Note: At the moment it should be regarded as I<highly
+experimental>.
+
 =head2 Catalyst::Plugin::Pluggable
 
 L<Catalyst::Plugin::Pluggable> is a plugin for pluggable Catalyst
@@ -89,6 +97,13 @@ L<Catalyst::Plugin::Prototype> is a plugin for the Prototype JavaScript
 library. This Plugin allows you to easily implement AJAX functionality
 without actually knowing Javascript.
 
+=head2 Catalyst::Plugin::RequireSSL
+
+Use L<Catalyst::Plugin::RequireSSL> if you would like to force visitors
+to access certain pages using only SSL mode. An attempt to access the
+page in non-SSL mode will receive a redirect into SSL mode. Useful for
+shopping carts, user registration forms, and other sensitive data.
+
 =head2 Catalyst::Plugin::Session::FastMmap
 
 L<Catalyst::Plugin::Session::FastMmap> is a session plugin for Catalyst
@@ -98,8 +113,9 @@ shared memory interprocess cache.
 
 =head2 Catalyst::Plugin::Static
 
-L<Catalyst::Plugin::Static> is a plugin to serve static files from C<<
-$c->config->{root} >>/<< action >>/.
+L<Catalyst::Plugin::Static> is a plugin to serve static files from
+C<$c-E<gt>config-E<gt>{root}>. Intended chiefly for development
+purposes.
 
 
 =head2 Catalyst::Plugin::SubRequest
