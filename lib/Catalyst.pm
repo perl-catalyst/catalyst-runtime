@@ -127,6 +127,8 @@ Returns a hashref containing your applications settings.
 sub import {
     my ( $class, @arguments ) = @_;
 
+    return unless $class eq 'Catalyst';
+
     my $caller = caller(0);
     
     # Prepare inheritance
@@ -135,7 +137,6 @@ sub import {
         no strict 'refs';
         push @{"$caller\::ISA"}, $class;
         
-        *{"$caller\::import"} = sub { 1 };
     }
 
     $caller->arguments( [ @arguments ] );

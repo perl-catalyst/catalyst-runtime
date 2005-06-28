@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
 5.30  2005-00-00 00:00:00
 
+        - Fix for inheritance bug.
         - Allow forward with arguments.
         - Updated cookbook
         - Allow overriding home/root in config.
