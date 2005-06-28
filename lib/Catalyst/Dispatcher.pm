@@ -148,36 +148,24 @@ sub forward {
     my $results = $c->get_action( $command, $namespace );
 
     unless ( @{$results} ) {
-        my $class = $command || '';
-        my $path = $class . '.pm';
-        $path =~ s/::/\//g;
-
-        unless ( $INC{$path} ) {
-            my $error =
-              qq/Couldn't forward to "$class". Invalid or not loaded./;
+        
+        unless ( $c->components->{$command} ) {
+            my $error = qq/Couldn't forward to command "$command". Invalid action or component./;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
         }
-
-        unless ( UNIVERSAL::isa( $class, 'Catalyst::Base' ) ) {
-            my $error =
-              qq/Can't forward to "$class". Class is not a Catalyst component./;
-            $c->error($error);
-            $c->log->debug($error) if $c->debug;
-            return 0;
-        }
-
+        
+        my $class  = $command;
         my $method = shift || 'process';
 
-        if ( my $code = $class->can($method) ) {
+        if ( my $code = $c->components->{$class}->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
             $results = [ [ [ $class, $code ] ] ];
         }
 
         else {
-            my $error =
-              qq/Couldn't forward to "$class". Does not implement "$method"/;
+            my $error = qq/Couldn't forward to "$class". Does not implement "$method"/;
             $c->error($error);
             $c->log->debug($error)
               if $c->debug;
