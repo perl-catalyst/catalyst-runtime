@@ -38,6 +38,7 @@ Catalyst::Request - Catalyst Request Class
     $req->content_encoding;
     $req->content_length;
     $req->content_type;
+    $req->cookie;
     $req->cookies;
     $req->header;
     $req->headers;
@@ -130,18 +131,18 @@ sub cookie {
     my $self = shift;
 
     if ( @_ == 0 ) {
-        return keys %{ $self->cookie };
+        return keys %{ $self->cookies };
     }
 
     if ( @_ == 1 ) {
 
         my $name = shift;
 
-        unless ( exists $self->cookie->{$name} ) {
+        unless ( exists $self->cookies->{$name} ) {
             return undef;
         }
         
-        return $self->cookie->{$name};
+        return $self->cookies->{$name};
     }
 }
 

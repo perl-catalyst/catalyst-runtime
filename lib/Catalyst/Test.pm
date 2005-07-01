@@ -105,7 +105,7 @@ my $agent;
 
 =item remote_request
 
-Do an actual remote rquest using LWP.
+Do an actual remote request using LWP.
 
 =cut
 
