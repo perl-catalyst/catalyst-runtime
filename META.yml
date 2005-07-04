@@ -1,6 +1,6 @@
 ---
 name: Catalyst
-version: 5.24
+version: 5.30
 author:
   - 'Sebastian Riedel, C<sri@oook.de>'
 abstract: The Elegant MVC Web Application Framework
@@ -28,7 +28,7 @@ requires:
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.24
+    version: 5.30
   Catalyst::Base:
     file: lib/Catalyst/Base.pm
   Catalyst::Build:
@@ -87,6 +87,10 @@ provides:
     file: lib/Catalyst/Engine/SpeedyCGI/Base.pm
   Catalyst::Engine::Test:
     file: lib/Catalyst/Engine/Test.pm
+  Catalyst::Exception:
+    file: lib/Catalyst/Exception.pm
+  Catalyst::Exception::Base:
+    file: lib/Catalyst/Exception.pm
   Catalyst::Helper:
     file: lib/Catalyst/Helper.pm
     version: 0.01
@@ -98,6 +102,8 @@ provides:
     file: lib/Catalyst/Request/Upload.pm
   Catalyst::Response:
     file: lib/Catalyst/Response.pm
+  Catalyst::Setup:
+    file: lib/Catalyst/Setup.pm
   Catalyst::Test:
     file: lib/Catalyst/Test.pm
   Catalyst::Utils:

@@ -1,8 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.30  2005-00-00 00:00:00
+5.30  2005-06-04 12:35:00
 
-        - Fixed a bug where it was not possible to $c->forward to a component 
+        - Fixed a bug where it was not possible to $c->forward to a 
+          component 
           that was not inheriting from Catalyst::Base.
         - Fix for inheritance bug.
         - Allow forward with arguments.
@@ -10,7 +11,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Allow overriding home/root in config.
         - make module build cons README automatically.
         - prettify home path by resolving '..' (Andy Grundman)
-        - improved helper templates a bit, new naming scheme for tests...
+        - improved helper templates a bit, new naming scheme for tests.
         - added support for case sensitivity, MyApp->config->{case_sensitive}
         - added $c->detach for non-returning forwards
         - added unified error handling, Catalyst::Exception

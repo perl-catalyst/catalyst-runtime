@@ -7,15 +7,15 @@ SYNOPSIS
         cd MyApp
 
         # add models, views, controllers
-        script/create.pl model Something
-        script/create.pl view Stuff
-        script/create.pl controller Yada
+        script/myapp_create.pl model Something
+        script/myapp_create.pl view Stuff
+        script/myapp_create.pl controller Yada
 
         # built in testserver
-        script/server.pl
+        script/myapp_server.pl
 
         # command line interface
-        script/test.pl /yada
+        script/myapp_test.pl /yada
 
         use Catalyst;
 
@@ -42,9 +42,6 @@ SYNOPSIS
     See also Catalyst::Manual::Intro
 
 DESCRIPTION
-    Catalyst is based upon Maypole, which you should consider for smaller
-    projects.
-
     The key concept of Catalyst is DRY (Don't Repeat Yourself).
 
     See Catalyst::Manual for more documentation.
@@ -108,6 +105,14 @@ METHODS
             MyApp->plugin( 'prototype', 'HTML::Prototype' );
 
             $c->prototype->define_javascript_functions;
+
+CASE SENSITIVITY
+    By default Catalyst is not case sensitive, so "MyApp::C::FOO::Bar"
+    becomes "/foo/bar".
+
+    But you can activate case sensitivity with a config parameter.
+
+        MyApp->config->{case_sensitive} = 1;
 
 LIMITATIONS
     mod_perl2 support is considered experimental and may contain bugs.
