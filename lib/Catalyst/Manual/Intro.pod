@@ -615,8 +615,11 @@ Here are some examples of how to forward to classes and methods.
     }
 
 Note that C<forward> returns to the calling action and continues
-processing after the action finishes.  Catalyst will automatically try
-to call process() if you omit the method.
+processing after the action finishes. If you want all further processing
+in the calling action to stop, use C<detach> instead, which will execute
+the C<detach>ed action and not return to the calling sub. In both cases,
+Catalyst will automatically try to call process() if you omit the
+method.
 
 =head3 Components
 
