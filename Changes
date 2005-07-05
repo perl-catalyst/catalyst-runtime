@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.31  2005-06-04 12:35:00
+
+        - fixed $Data::Dumper::Terse (Robin Berjon)
+
 5.30  2005-06-04 12:35:00
 
         - Fixed a bug where it was not possible to $c->forward to a 

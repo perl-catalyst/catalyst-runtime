@@ -16,9 +16,6 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 
-# For pretty dumps
-$Data::Dumper::Terse = 1;
-
 __PACKAGE__->mk_classdata('components');
 __PACKAGE__->mk_accessors(qw/counter depth request response state/);
 
@@ -286,7 +283,12 @@ sub finalize_error {
 
     my ( $title, $error, $infos );
     if ( $c->debug ) {
-        $error = join '', map { '<code class="error">'  .  encode_entities($_) . '</code>' } @{ $c->error };
+
+        # For pretty dumps
+        local $Data::Dumper::Terse = 1;
+        $error = join '',
+          map { '<code class="error">' . encode_entities($_) . '</code>' }
+          @{ $c->error };
         $error ||= 'No output';
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
         my $req   = encode_entities Dumper $c->req;
@@ -422,7 +424,8 @@ sub handler {
             $t->setColWidth( 'Time',   9,  1 );
 
             for my $stat (@stats) { $t->addRow( $stat->[0], $stat->[1] ) }
-            $class->log->info( "Request took ${elapsed}s ($av/s)\n" . $t->draw );
+            $class->log->info(
+                "Request took ${elapsed}s ($av/s)\n" . $t->draw );
         }
         else { $status = &$handler }
 
