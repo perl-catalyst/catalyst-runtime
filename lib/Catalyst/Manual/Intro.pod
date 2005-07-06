@@ -418,6 +418,7 @@ Called at the end of a request, after all matching actions are called.
     Package MyApp::C::Foo;
     sub begin : Private { }
     sub default : Private { }
+    sub auto : Private { }
 
 You can define built-in private actions within your controllers as
 well. The actions will override the ones in less-specific controllers,
@@ -427,13 +428,13 @@ cycle. Thus, if C<MyApp::C::Catalog::begin> exists, it will be run in
 place of C<MyApp::begin> if you're in the C<catalog> namespace, and
 C<MyApp::C::Catalog::Order::begin> would override this in turn.
 
-In addition to the normal built-ins, you have a special action for
-making chains, C<auto>. Such C<auto> actions will be run after any
+In addition to the normal built-in actions, you have a special action
+for making chains, C<auto>. Such C<auto> actions will be run after any
 C<begin>, but before your action is processed. Unlike the other
-built-ins, C<auto> actions I<do not> override each other; they will
-be called in turn, starting with the application class and going
-through to the I<most> specific class. I<This is the reverse of the
-order in which the normal built-ins override each other>.
+built-ins, C<auto> actions I<do not> override each other; they will be
+called in turn, starting with the application class and going through to
+the I<most> specific class. I<This is the reverse of the order in which
+the normal built-ins override each other>.
 
 Here are some examples of the order in which the various built-ins
 would be called:

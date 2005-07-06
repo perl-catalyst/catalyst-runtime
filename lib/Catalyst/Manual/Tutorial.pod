@@ -209,13 +209,15 @@ for any component modules, locating and registering any actions it
 finds in those modules.
 
 Component modules have names prefixed with the application module name,
-followed by C<Model>, C<View> or C<Controller> (or the default short
-forms: C<M>, C<V> or C<C>) followed by the component name, for example:
+followed by C<M>, C<V> or C<C> (or the optional long
+forms: C<Model>, C<View> or C<Controller>) followed by the component
+name, for example:
 
+    My::App::C::ShoppingCart           # short (default) version 
     My::App::Controller::ShoppingCart  # long version
-    My::App::C::ShoppingCart           # short version 
 
-
+    My::App::M::User                   # short (default) version
+    My::App::Model::User               # long version
 
 =head2 Extending the generated code
 
@@ -231,11 +233,22 @@ You can start extending the application by adding new actions:
       $c->res->output('Congratulations, My::App is on Catalyst!');
     }
 
+    # called like '/article/2005/06'
+    sub archive_month : Regex('^article/(\d{4})/(\d{2})$') {
+      my ( $self, $c ) = @_;
+
+      my $datetime = DateTime->new(
+          year  => $c->request->snippets->[0],
+          month => $c->request->snippets->[1]
+      );
+    }
 
 TODO: explain briefly about plugins, actions, and components
 
-regex actions passed subexpression matches in $c->req->snippets
-(array ref).
+If the action is a Regex type, you can use capturing parentheses to
+extract values within the matching URL (2005, 06 in the above
+example). Those values are available in the $c->req->snippets
+anonymous array. See L<Catalyst::Manual::Intro#Actions> for details.
 
 
 =head2 Hooking in to Template Toolkit
