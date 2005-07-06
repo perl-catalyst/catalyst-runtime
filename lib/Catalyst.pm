@@ -246,13 +246,45 @@ Web:
 
 Sebastian Riedel, C<sri@oook.de>
 
-=head1 THANK YOU
+=head1 CREDITS
 
-Andy Grundman, Andrew Ford, Andrew Ruthven, Autrijus Tang, Christian Hansen,
-Christopher Hicks, Dan Sully, Danijel Milicevic, David Naughton,
-Gary Ashton Jones, Geoff Richards, Jesse Sheidlower, Jody Belka,
-Johan Lindstrom, Juan Camacho, Leon Brocard, Marcus Ramberg,
-Tatsuhiko Miyagawa and all the others who've helped.
+Andy Grundman
+
+Andrew Ford
+
+Andrew Ruthven
+
+Autrijus Tang
+
+Christian Hansen
+
+Christopher Hicks
+
+Dan Sully
+
+Danijel Milicevic
+
+David Naughton
+
+Gary Ashton Jones
+
+Geoff Richards
+
+Jesse Sheidlower
+
+Jody Belka
+
+Johan Lindstrom
+
+Juan Camacho
+
+Leon Brocard
+
+Marcus Ramberg
+
+Matt S Trout
+
+Tatsuhiko Miyagawa
 
 =head1 LICENSE
 
