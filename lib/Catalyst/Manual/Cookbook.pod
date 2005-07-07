@@ -588,6 +588,20 @@ This is equivalent to:
 
 See also L<YAML>.
 
+=head2 Using existing CDBI (etc.) classes with Catalyst
+
+Many people have existing Model classes that they would like to use with
+Catalyst (or, conversely, they want to write Catalyst models that can be
+used outside of Catalyst, e.g.  in a cron job). It's trivial to write a
+simple component in Catalyst that slurps in an outside Model:
+
+    package MyApp::M::Catalog;
+    use base qw/Catalyst::Base Some::Other::CDBI::Module::Catalog/;
+    1;
+
+and that's it! Now C<Some::Other::CDBI::Module::Catalog> is part of your
+Cat app as C<MyApp::M::Catalog>.
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
@@ -596,8 +610,7 @@ Viljo Marrandi, C<vilts@yahoo.com>
 Marcus Ramberg, C<mramberg@cpan.org>
 Jesse Sheidlower, C<jester@panix.com>
 Andy Grundman, C<andy@hybridized.org> 
-Marcus Ramberg C<mramberg@cpan.org>
-Chisel Wright C<pause@herlpacker.co.uk>
+Chisel Wright, C<pause@herlpacker.co.uk>
 
 =head1 COPYRIGHT
 
