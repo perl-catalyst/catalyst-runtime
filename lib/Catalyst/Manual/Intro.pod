@@ -413,7 +413,7 @@ Called at the end of a request, after all matching actions are called.
 
 =back
 
-=head4 B<Built-in actions in controllers/autochaining>
+=head4 Built-in actions in controllers/autochaining
 
     Package MyApp::C::Foo;
     sub begin : Private { }
@@ -487,7 +487,7 @@ true value to continue processing! You can also C<die> in the autochain
 action; in that case, the request will go straight to the finalize
 stage, without processing further actions.
 
-=head4 B<URL Path Handling>
+=head4 URL Path Handling
 
 You can pass variable arguments as part of the URL path. In this case,
 you must use regex action keys with '^' and '$' anchors, and the
@@ -511,7 +511,7 @@ Catalyst matches actions in most specific to least specific order:
 So Catalyst would never mistakenly dispatch the first two URLs to the
 '^foo$' action.
 
-=head4 B<Parameter Processing>
+=head4 Parameter Processing
 
 Parameters passed in the URL query string are handled with methods in
 the L<Catalyst::Request> class. The C<param> method is functionally
@@ -640,11 +640,11 @@ class structure and some common class methods like C<config> and C<new>
 
     1;
 
-You don't have to C<use> or otherwise register Models, Views, and Controllers.
-Catalyst automatically discovers and instantiates them when you call C<setup> in
-the main application. All you need to do is put them in directories named for
-each Component type. Notice that you can use some very terse aliases for each
-one.
+You don't have to C<use> or otherwise register Models, Views, and
+Controllers.  Catalyst automatically discovers and instantiates them
+when you call C<setup> in the main application. All you need to do is
+put them in directories named for each Component type. Notice that you
+can use some very terse aliases for each one.
 
 =over 4
 
@@ -697,12 +697,12 @@ process/)>.
         $c->forward('MyApp::V::TT');
     }
 
-You normally render templates at the end of a request, so it's a perfect use for
-the global C<end> action.
+You normally render templates at the end of a request, so it's a perfect
+use for the global C<end> action.
 
 Also, be sure to put the template under the directory specified in
-C<$c-E<gt>config-E<gt>{root}>, or you'll be forced to look at our eyecandy debug
-screen. ;)
+C<$c-E<gt>config-E<gt>{root}>, or you'll be forced to look at our
+eyecandy debug screen. ;)
 
 =head4 Models
 
@@ -770,7 +770,40 @@ pass data to your templates.
 
     1;
 
+    # Then, in a TT template:
     The id is [% item.data %]
+
+Models do not have to be part of your Catalyst application; you
+can always call an outside module that serves as your Model:
+
+    # in a Controller
+    sub list : Local {
+      my ( $self, $c ) = @_;
+      $c->stash->{template} = 'list.tt';
+      use Some::Outside::CDBI::Module;
+      my @records = Some::Outside::CDBI::Module->retrieve_all;
+      $c->stash->{records} = \@records;
+    }
+
+But by using a Model that is part of your Catalyst application, you gain
+several things: you don't have to C<use> each component, Catalyst will
+find and load it automatically at compile-time; you can C<forward> to
+the module, which can only be done to Catalyst componenents; and only
+Catalyst components can be fetched with
+C<$c-E<gt>comp('MyApp::M::SomeModel')>.
+
+Happily, since many people have existing Model classes that they
+would like to use with Catalyst (or, conversely, they want to
+write Catalyst models that can be used outside of Catalyst, e.g.
+in a cron job), it's trivial to write a simple component in
+Catalyst that slurps in an outside Model:
+
+    package MyApp::M::Catalog;
+    use base qw/Catalyst::Base Some::Other::CDBI::Module::Catalog/;
+    1;
+
+and that's it! Now C<Some::Other::CDBI::Module::Catalog> is part of your
+Cat app as C<MyApp::M::Catalog>.
 
 =head4 Controllers
 
