@@ -10,9 +10,20 @@ Frequently Asked Questions
 
 Create a new app with the same name and copy scripts/ to app directory
 
-=head1 AUTHOR
+=head2 I have added tables to my DB - how to autogenerate the classes?
+
+Just run the _create.pl script again with the same parameters, it will ignore
+the existing classes and create missing ones based on your DB layout.
+
+=head2 What is the difference between $c->forward and $c->response->redirect ?
+
+Forward will modify the flow control and neither reset the context object nor
+end the request cycle while a redirect will. See L<Catalyst::Manual::Intro>.
+
+=head1 AUTHORS
 
 Sebastian Riedel, C<sri@oook.de>
+Danijel Milicevic, C<me@danijel.de>
 
 =head1 COPYRIGHT
 
