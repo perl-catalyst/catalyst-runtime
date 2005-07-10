@@ -15,10 +15,16 @@ Create a new app with the same name and copy scripts/ to app directory
 Just run the _create.pl script again with the same parameters, it will ignore
 the existing classes and create missing ones based on your DB layout.
 
-=head2 What is the difference between $c->forward and $c->response->redirect ?
+=head2 What is the difference between $c->forward and $c->response->redirect?
 
 Forward will modify the flow control and neither reset the context object nor
 end the request cycle while a redirect will. See L<Catalyst::Manual::Intro>.
+
+=head2 How can I get rid of those timer comments when using TT as my view?
+
+This config line in MyApp::V::TT will disable this for you:
+
+    __PACKAGE__->config->{CONTEXT} = undef;
 
 =head1 AUTHORS
 
