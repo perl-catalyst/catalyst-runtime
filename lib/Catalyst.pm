@@ -242,10 +242,6 @@ Web:
 
 =back
 
-=head1 AUTHOR
-
-Sebastian Riedel, C<sri@oook.de>
-
 =head1 CREDITS
 
 Andy Grundman
@@ -284,7 +280,15 @@ Marcus Ramberg
 
 Matt S Trout
 
+Sebastian Riedel
+
 Tatsuhiko Miyagawa
+
+Ulf Edvinsson
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 LICENSE
 

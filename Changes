@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Catalyst.
 
         - fixed $Data::Dumper::Terse (Robin Berjon)
         - added arguments for detach
+        - new credits section in pod
 
 5.30  2005-06-04 12:35:00
 
