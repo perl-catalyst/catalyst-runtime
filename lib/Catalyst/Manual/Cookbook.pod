@@ -602,6 +602,21 @@ simple component in Catalyst that slurps in an outside Model:
 and that's it! Now C<Some::Other::CDBI::Module::Catalog> is part of your
 Cat app as C<MyApp::M::Catalog>.
 
+=head1 Serving static files with Apache.
+
+When deploying your application it's a waste to serve static files 
+with Catalyst. Instead, set up something like this:
+
+    Alias /static/ "/my/static/files/"
+    <Location "/static">
+    SetHandler none
+    </Location>
+
+To match the location of your static files. 
+
+
+=cut
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
