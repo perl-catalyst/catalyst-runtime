@@ -131,19 +131,28 @@ Here's a simple example Plugin that shows how to overload C<prepare>
 to add a unique ID to every request:
 
     package Catalyst::Plugin::RequestUUID;
+    
     use warnings;
     use strict;
-  
-    use NEXT;
+    
+    use Catalyst::Request;
     use Data::UUID;
+    use NEXT;    
+
     our $VERSION = 0.01;
+    
+    {   # create a uuid accessor
+        package Catalyst::Request;
+        __PACKAGE__->mk_accessors('uuid');
+    }
 
     sub prepare {
-      my $c = shift;
-      $c = $c->NEXT::prepare( @_ );
+      my $class = shift;
+      
+      my $c = $class->NEXT::prepare( @_ );
 
-      $c->req->{req_uuid} = Data::UUID->new->create_str;
-      $c->log->debug( 'Request UUID "'. $c->req->{req_uuid} .'"' );
+      $c->request->uuid( Data::UUID->new->create_str );
+      $c->log->debug( 'Request UUID "'. $c->request->uuid .'"' );
 
       return $c;
     }
