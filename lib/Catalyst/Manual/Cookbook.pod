@@ -485,8 +485,7 @@ When using Apache, you can completely bypass Catalyst and the Static
 controller by intercepting requests for the C<root/static> path at the
 server level. All that is required is to define a DocumentRoot and add a
 separate Location block for your static content. Here is a complete
-config for this application under mod_perl 1.x; variations, some of
-which could be simpler, are left as an exercise for the reader:
+config for this application under mod_perl 1.x:
 
     <Perl>
         use lib qw(/var/www/MyApp/lib);
@@ -504,6 +503,13 @@ which could be simpler, are left as an exercise for the reader:
             SetHandler default-handler
         </LocationMatch>
     </VirtualHost>
+
+And here's a simpler example that'll get you started:
+
+    Alias /static/ "/my/static/files/"
+    <Location "/static">
+        SetHandler none
+    </Location>
 
 =head2 Forwarding with arguments
 
@@ -602,20 +608,43 @@ simple component in Catalyst that slurps in an outside Model:
 and that's it! Now C<Some::Other::CDBI::Module::Catalog> is part of your
 Cat app as C<MyApp::M::Catalog>.
 
-=head1 Serving static files with Apache.
+=head2 Delivering a Custom Error Page
 
-When deploying your application it's a waste to serve static files 
-with Catalyst. Instead, set up something like this:
+By default, Catalyst will display its own error page whenever it
+encounters an error in your application. When running under C<-Debug>
+mode, the error page is a useful screen including the error message and
+a full Data::Dumper output of the C<$c> context object. When not in
+C<-Debug>, users see a simple "Please come back later" screen.
 
-    Alias /static/ "/my/static/files/"
-    <Location "/static">
-    SetHandler none
-    </Location>
+To use a custom error page, use a special C<end> method to short-circut
+the error processing. The following is an example; you might want to
+adjust it further depending on the needs of your application (for
+example, any calls to C<fillform> will probably need to go into this
+C<end> method; see L<Catalyst::Plugin::FillInForm>).
 
-To match the location of your static files. 
+    sub end : Private {
+        my ( $self, $c ) = @_;
+    
+        if ( scalar @{ $c->error } ) {
+            $c->stash->{errors}   = $c->error;
+            $c->stash->{template} = 'errors.tt';
+            $c->forward('MyApp::View::TT');
+            $c->{error} = [];
+        }
+    
+        return 1 if $c->response->status =~ /^3\d\d$/;
+        return 1 if $c->response->body;
+    
+        unless ( $c->response->content_type ) {
+            $c->response->content_type('text/html; charset=utf-8');
+        }
+    
+        $c->forward('MyApp::View::TT');
+    }
 
+You can manually set errors in your code to trigger this page by calling
 
-=cut
+    $c->error( 'You broke me!' );
 
 =head1 AUTHOR
 
