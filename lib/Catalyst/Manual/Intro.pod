@@ -679,8 +679,8 @@ inherit from this class:
 
     script/myapp_create.pl view TT TT
 
-where the first C<TT> tells the script to create a Template Toolkit
-view, and the second tells the script that its name should be C<TT>.)
+where the first C<TT> tells the script that the name of the view should
+be C<TT>, and the second that it should be a Template Toolkit view.)
 
 This gives us a process() method and we can now just do
 $c->forward('MyApp::V::TT') to render our templates. The base class makes
@@ -812,9 +812,9 @@ application.
 
     package MyApp::C::Login;
 
-    sign-in : Local { }
-    new-password : Local { }
-    sign-out : Local { }
+    sub sign-in : Local { }
+    sub new-password : Local { }
+    sub sign-out : Local { }
 
     package MyApp::C::Catalog;
 
