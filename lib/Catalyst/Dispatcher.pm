@@ -128,7 +128,10 @@ sub forward {
         return 0;
     }
 
-    my $caller    = caller(0);
+    # Relative forwards from detach
+    my $caller = ( caller(0) )[0]->isa('Catalyst::Dispatcher')
+      && ( ( caller(1) )[3] =~ /::detach$/ ) ? caller(1) : caller(0);
+
     my $namespace = '/';
     my $arguments = ( ref( $_[-1] ) eq 'ARRAY' ) ? pop(@_) : $c->req->args;
 
@@ -320,15 +323,15 @@ sub set_action {
     if ( $flags{path} ) {
         $flags{path} =~ s/^\w+//;
         $flags{path} =~ s/\w+$//;
-        if ( $flags{path} =~ /^'(.*)'$/ ) { $flags{path} = $1 }
-        if ( $flags{path} =~ /^"(.*)"$/ ) { $flags{path} = $1 }
+        if ( $flags{path} =~ /^\s*'(.*)'\s*$/ ) { $flags{path} = $1 }
+        if ( $flags{path} =~ /^\s*"(.*)"\s*$/ ) { $flags{path} = $1 }
     }
 
     if ( $flags{regex} ) {
         $flags{regex} =~ s/^\w+//;
         $flags{regex} =~ s/\w+$//;
-        if ( $flags{regex} =~ /^'(.*)'$/ ) { $flags{regex} = $1 }
-        if ( $flags{regex} =~ /^"(.*)"$/ ) { $flags{regex} = $1 }
+        if ( $flags{regex} =~ /^\s*'(.*)'\s*$/ ) { $flags{regex} = $1 }
+        if ( $flags{regex} =~ /^\s*"(.*)"\s*$/ ) { $flags{regex} = $1 }
     }
 
     my $reverse = $prefix ? "$prefix/$method" : $method;
