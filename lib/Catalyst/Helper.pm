@@ -211,7 +211,12 @@ sub mk_file {
     my ( $self, $file, $content ) = @_;
     if ( -e $file ) {
         print qq/ exists "$file"\n/;
-        return 0;
+        return 0 unless $self->{'.newfiles'};
+	if ( my $f = IO::File->new("< $file") ) {
+	    my $oldcontent = join('', (<$f>));
+	    return 0 if $content eq $oldcontent;
+	}
+	$file .= '.new';
     }
     if ( my $f = IO::File->new("> $file") ) {
         print $f $content;
@@ -748,12 +753,14 @@ use Pod::Usage;
 use Catalyst::Helper;
 
 my $help = 0;
+my $nonew = 0;
 
-GetOptions( 'help|?' => \$help );
+GetOptions( 'help|?' => \$help,
+	    'nonew'  => \$nonew );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new;
+my $helper = Catalyst::Helper->new({'.newfiles' => !$nonew});
 pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
 1;
@@ -768,6 +775,7 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
  Options:
    -help    display this help and exits
+   -nonew   don't create a .new file where a file to be created exists
 
  Examples:
    [% appprefix %]_create.pl controller My::Controller
@@ -785,6 +793,10 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 =head1 DESCRIPTION
 
 Create a new Catalyst Component.
+
+Existing component files are not overwritten.  If any of the component files
+to be created already exist the file will be written with a '.new' suffix.
+This behaviour can be supressed with the C<-nonew> option.
 
 =head1 AUTHOR
 

@@ -5,13 +5,15 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
 
-my $help = 0;
+my $help  = 0;
+my $nonew = 0;
 
-GetOptions( 'help|?' => \$help );
+GetOptions( 'help|?' => \$help,
+	    'nonew'  => \$nonew );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new;
+my $helper = Catalyst::Helper->new({'.newfiles' => !$nonew});
 pod2usage(1) unless $helper->mk_app( $ARGV[0] );
 
 1;
@@ -27,6 +29,7 @@ catalyst.pl [options] application-name
 
  Options:
    -help        display this help and exits
+   -nonew       don't create a .new file where a file to be created exists
 
  application-name has to be a valid Perl module name and can include ::
 
