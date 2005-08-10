@@ -28,6 +28,11 @@ sub five : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub six : Local {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::False');
+}
+
 
 sub jojo : Local {
     my ( $self, $c ) = @_;

@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 24;
+use Test::More tests => 31;
 use Catalyst::Test 'TestApp';
 
 
@@ -33,6 +33,24 @@ use Catalyst::Test 'TestApp';
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->header('X-Catalyst-Action'), 'action/forward/one', 'Test Action' );
+    is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Forward', 'Test Class' );
+    is( $response->header('X-Catalyst-Executed'), $expected, 'Executed actions' );
+    like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
+}
+
+{
+    my @expected = qw[
+        TestApp::Controller::Action::Forward->begin
+        TestApp::Controller::Action::Forward->six
+        TestApp::View::Dump::False->process
+    ];
+
+    my $expected = join( ", ", @expected );
+
+    ok( my $response = request('http://localhost/action/forward/six'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    is( $response->header('X-Catalyst-Action'), 'action/forward/six', 'Main Class Action' );
     is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Forward', 'Test Class' );
     is( $response->header('X-Catalyst-Executed'), $expected, 'Executed actions' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );

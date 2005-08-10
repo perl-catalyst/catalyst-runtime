@@ -152,7 +152,7 @@ sub forward {
 
     unless ( @{$results} ) {
 
-        unless ( $c->components->{$command} ) {
+        unless ( defined( $c->components->{$command} ) ) {
             my $error =
 qq/Couldn't forward to command "$command". Invalid action or component./;
             $c->error($error);
