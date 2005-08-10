@@ -5,7 +5,7 @@ This file documents the revision history for Perl extension Catalyst.
 5.32  2005-08-10 15:10:00
 	- Dispatcher might fail if object returns false. (Florian Ragwitz)
 
-5.31  2005-06-04 12:35:00
+5.31  2005-06-04 12:35:00 (never released to CPAN)
 
         - helpers now create .new files where files already exist and differ
         - fixed $Data::Dumper::Terse (Robin Berjon)
