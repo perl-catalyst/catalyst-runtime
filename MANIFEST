@@ -40,6 +40,7 @@ lib/Catalyst/Manual/Plugins.pod
 lib/Catalyst/Manual/SuccessStories.pod
 lib/Catalyst/Manual/Troubleshooting.pod
 lib/Catalyst/Manual/Tutorial.pod
+lib/Catalyst/Manual/WritingPlugins.pod
 lib/Catalyst/Request.pm
 lib/Catalyst/Request/Upload.pm
 lib/Catalyst/Response.pm
@@ -74,6 +75,7 @@ t/engine/response/errors.t
 t/engine/response/headers.t
 t/engine/response/redirect.t
 t/engine/response/status.t
+t/engine/setup/basics.t
 t/lib/Catalyst/Plugin/Test/Errors.pm
 t/lib/Catalyst/Plugin/Test/Headers.pm
 t/lib/TestApp.pm
@@ -96,6 +98,7 @@ t/lib/TestApp/Controller/Engine/Response/Headers.pm
 t/lib/TestApp/Controller/Engine/Response/Redirect.pm
 t/lib/TestApp/Controller/Engine/Response/Status.pm
 t/lib/TestApp/View/Dump.pm
+t/lib/TestApp/View/Dump/False.pm
 t/lib/TestApp/View/Dump/Parameters.pm
 t/lib/TestApp/View/Dump/Request.pm
 t/lib/TestApp/View/Dump/Response.pm

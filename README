@@ -139,15 +139,53 @@ SEE ALSO
     Catalyst::Response - The Response Object
     Catalyst::Test - The test suite.
 
+CREDITS
+    Andy Grundman
+
+    Andrew Ford
+
+    Andrew Ruthven
+
+    Autrijus Tang
+
+    Christian Hansen
+
+    Christopher Hicks
+
+    Dan Sully
+
+    Danijel Milicevic
+
+    David Naughton
+
+    Gary Ashton Jones
+
+    Geoff Richards
+
+    Jesse Sheidlower
+
+    Jody Belka
+
+    Johan Lindstrom
+
+    Juan Camacho
+
+    Leon Brocard
+
+    Marcus Ramberg
+
+    Matt S Trout
+
+    Robert Sedlacek
+
+    Sebastian Riedel
+
+    Tatsuhiko Miyagawa
+
+    Ulf Edvinsson
+
 AUTHOR
     Sebastian Riedel, "sri@oook.de"
-
-THANK YOU
-    Andy Grundman, Andrew Ford, Andrew Ruthven, Autrijus Tang, Christian
-    Hansen, Christopher Hicks, Dan Sully, Danijel Milicevic, David Naughton,
-    Gary Ashton Jones, Geoff Richards, Jesse Sheidlower, Jody Belka, Johan
-    Lindstrom, Juan Camacho, Leon Brocard, Marcus Ramberg, Tatsuhiko
-    Miyagawa and all the others who've helped.
 
 LICENSE
     This library is free software . You can redistribute it and/or modify it
