@@ -136,7 +136,7 @@ sub mk_component {
             my @path = split /\:\:/, $name;
             $file = pop @path;
             $path = File::Spec->catdir( $path, @path );
-            mkpath $path;
+            mkpath [$path];
         }
         $file = File::Spec->catfile( $path, "$file.pm" );
         $self->{file} = $file;

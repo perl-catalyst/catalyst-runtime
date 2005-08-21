@@ -1,7 +1,11 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.34  2005-08-21 00:00:00
+        - Fixed mkpath in Catalyst::Helper (Autrijus Tang)
+
 5.33  2005-08-10 15:25:00
 	- Now with updated manifest.
+
 5.32  2005-08-10 15:10:00
 	- Dispatcher might fail if object returns false. (Florian Ragwitz)
 
