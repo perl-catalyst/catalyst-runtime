@@ -2,7 +2,6 @@ use strict;
 use Module::Build;
 
 my $build = Module::Build->new(
-    create_makefile_pl => 'passthrough',
     license            => 'perl',
     module_name        => 'Catalyst',
     requires           => {
@@ -25,13 +24,13 @@ my $build = Module::Build->new(
         'Tree::Simple'                      => 0,
         'Tree::Simple::Visitor::FindByPath' => 0,
         'URI'                               => 0,
+	'Time::HiRes'			    => 0,
     },
-    create_makefile_pl => 'passthrough',
-    create_readme => 1,
-    script_files => [ glob('script/*') ],
-    test_files   => [
-        glob('t/*.t'), glob('t/*/*.t'), glob('t/*/*/*.t'), glob('t/*/*/*/*.t')
-    ]
+    create_makefile_pl   => 'passthrough',
+    create_readme        => 1,
+    script_files         => [ glob('script/*') ],
+    test_files           => "t/",
+    recursive_test_files => 1
 );
 $build->create_build_script;
 
