@@ -33,6 +33,7 @@ Like C<forward> but doesn't return.
 sub detach {
     my ( $c, $command, @args ) = @_;
     $c->forward( $command, @args ) if $command;
+    # die with DETACH signal, which will be caught in dispatching.
     die $Catalyst::Engine::DETACH;
 }
 
@@ -92,9 +93,7 @@ sub dispatch {
             $c->execute( @{ $end->[0] } );
             return if scalar @{ $c->error };
         }
-    }
-
-    else {
+    } else {
         my $path  = $c->req->path;
         my $error = $path
           ? qq/Unknown resource "$path"/
@@ -166,9 +165,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
         if ( my $code = $c->components->{$class}->can($method) ) {
             $c->actions->{reverse}->{"$code"} = "$class->$method";
             $results = [ [ [ $class, $code ] ] ];
-        }
-
-        else {
+        } else {
             my $error =
               qq/Couldn't forward to "$class". Does not implement "$method"/;
             $c->error($error);
