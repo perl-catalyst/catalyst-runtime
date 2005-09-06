@@ -149,6 +149,7 @@ to add a unique ID to every request:
     sub prepare {
       my $class = shift;
       
+      # Turns the engine-specific request into a Catalyst context .
       my $c = $class->NEXT::prepare( @_ );
 
       $c->request->uuid( Data::UUID->new->create_str );
