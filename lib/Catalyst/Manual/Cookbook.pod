@@ -266,9 +266,9 @@ with:
     sub add : Local {
         my ($self, $c) = @_;
         if ($c->roles(qw/admin/)) {
-            $c->req->output("Your account has the role 'admin.'");
+            $c->res->output("Your account has the role 'admin.'");
         } else {
-            $c->req->output("You're not allowed to be here.");
+            $c->res->output("You're not allowed to be here.");
         }
     }
 
