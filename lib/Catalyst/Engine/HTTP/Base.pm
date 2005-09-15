@@ -75,6 +75,7 @@ sub prepare_connection {
     $c->request->address( $c->http->address );
     $c->request->hostname( $c->http->hostname );
     $c->request->protocol( $c->http->request->protocol );
+    $c->request->secure(1) if ( $c->http->request->uri->port == 443 );
 }
 
 =item $c->prepare_headers
