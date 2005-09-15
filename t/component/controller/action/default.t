@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests=>7 ;
+use Test::More tests=>9 ;
 use Catalyst::Test 'TestApp';
 
 
@@ -26,4 +26,7 @@ use Catalyst::Test 'TestApp';
     is( $response->header('X-Test-Class'), 'TestApp::Controller::Action::Default', 'Test Class' );
     is( $response->header('X-Catalyst-Executed'), $expected, 'Executed actions' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
+
+    ok( $response = request('http://localhost/foo/bar/action'), 'Request' );
+    is( $response->code, 404, 'Invalid URI returned 404' );
 }

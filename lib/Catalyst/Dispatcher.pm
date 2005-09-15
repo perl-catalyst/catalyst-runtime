@@ -209,6 +209,7 @@ sub get_action {
             push @results, [$result] if $result;
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
 
+            SEARCH:
             for my $part ( split '/', $namespace ) {
                 $visitor->setSearchPath($part);
                 $parent->accept($visitor);
@@ -216,7 +217,12 @@ sub get_action {
                 my $uid   = $child->getUID if $child;
                 my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
                 push @results, [$match] if $match;
-                $parent = $child if $child;
+                if ($child) {
+                    $parent = $child;
+                }
+                else {
+                    last SEARCH;
+                }
             }
 
         }
