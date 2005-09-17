@@ -40,6 +40,7 @@ Catalyst::Request - Catalyst Request Class
     $req->content_type;
     $req->cookie;
     $req->cookies;
+    $req->full_uri;
     $req->header;
     $req->headers;
     $req->hostname;
@@ -151,6 +152,32 @@ sub cookie {
 Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
+
+=item $req->full_uri
+
+Returns the complete URI, with the parameter query string.
+
+=cut
+
+sub full_uri {
+  my $self = shift;
+  my $uri = $self->uri;
+  my $full_uri = $uri;
+
+  if ( scalar $self->param ) {
+    my @params;
+    foreach my $arg ( sort keys %{ $self->params } ) {
+      if ( ref $self->params->{$arg} ) {
+        my $list = $self->params->{$arg};
+        push @params, map { "$arg=" . $_  } sort @{$list};
+      } else {
+        push @params, "$arg=" . $self->params->{$arg};
+      }
+    }
+    $full_uri .= '?' . join( '&', @params );
+  }       
+  return $full_uri;
+}
 
 =item $req->header
 
