@@ -161,8 +161,7 @@ Returns the complete URI, with the parameter query string.
 
 sub full_uri {
   my $self = shift;
-  my $uri = $self->uri;
-  my $full_uri = $uri;
+  my $full_uri = $self->uri;
 
   if ( scalar $self->param ) {
     my @params;
