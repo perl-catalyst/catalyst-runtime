@@ -40,7 +40,7 @@ sub get_file {
         $cache{$class} = eval "package $class; <DATA>";
     }
     my $data = $cache{$class};
-    my @files = split /^__(.+)__\n/m, $data;
+    my @files = split /^__(.+)__\r?\n/m, $data;
     shift @files;
     while (@files) {
         my ( $name, $content ) = splice @files, 0, 2;
