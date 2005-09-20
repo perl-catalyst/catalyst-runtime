@@ -68,3 +68,25 @@ use URI;
     is_deeply( $creq->uploads, {}, 'Catalyst::Request uploads' );
     is_deeply( $creq->cookies, {}, 'Catalyst::Request cookie' );
 }
+
+__END__
+# http://dev.catalyst.perl.org/ticket/37
+# multipart/form-data parameters that contain 'http://'
+# Not testing in trunk because this is an HTTP::Message bug
+# http://rt.cpan.org/NoAuth/Bug.html?id=13025
+{
+    my $creq;
+
+    my $parameters = {
+        'url' => 'http://www.google.com',
+    };
+
+    my $request = POST( 'http://localhost/dump/request',
+        'Content-Type' => 'multipart/form-data',
+        'Content'      => $parameters,
+    );
+
+    ok( my $response = request($request), 'Request' );
+    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
+    is_deeply( $creq->parameters, $parameters, 'Catalyst::Request parameters' );
+}
