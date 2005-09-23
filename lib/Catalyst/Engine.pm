@@ -419,6 +419,7 @@ sub handler {
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
             my $t = Text::ASCIITable->new;
+            undef $t->{tiedarr};    # work-around for a memory leak
             $t->setCols( 'Action', 'Time' );
             $t->setColWidth( 'Action', 64, 1 );
             $t->setColWidth( 'Time',   9,  1 );
@@ -519,6 +520,7 @@ sub prepare {
 
     if ( $c->debug && keys %{ $c->req->params } ) {
         my $t = Text::ASCIITable->new;
+        undef $t->{tiedarr};    # work-around for a memory leak
         $t->setCols( 'Key', 'Value' );
         $t->setColWidth( 'Key',   37, 1 );
         $t->setColWidth( 'Value', 36, 1 );

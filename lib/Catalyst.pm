@@ -7,7 +7,6 @@ use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Utils;
 use NEXT;
-use Text::ASCIITable;
 use Path::Class;
 our $CATALYST_SCRIPT_GEN = 4;
 

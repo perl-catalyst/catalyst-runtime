@@ -428,6 +428,7 @@ sub setup_actions {
 
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
+    undef $privates->{tiedarr};    # work-around for a memory leak
     $privates->setCols( 'Private', 'Class' );
     $privates->setColWidth( 'Private', 36, 1 );
     $privates->setColWidth( 'Class',   37, 1 );
@@ -451,6 +452,7 @@ sub setup_actions {
       if ( @{ $privates->{tbl_rows} } );
 
     my $publics = Text::ASCIITable->new;
+    undef $publics->{tiedarr};    # work-around for a memory leak
     $publics->setCols( 'Public', 'Private' );
     $publics->setColWidth( 'Public',  36, 1 );
     $publics->setColWidth( 'Private', 37, 1 );
@@ -466,6 +468,7 @@ sub setup_actions {
       if ( @{ $publics->{tbl_rows} } );
 
     my $regexes = Text::ASCIITable->new;
+    undef $regexes->{tiedarr};    # work-around for a memory leak
     $regexes->setCols( 'Regex', 'Private' );
     $regexes->setColWidth( 'Regex',   36, 1 );
     $regexes->setColWidth( 'Private', 37, 1 );

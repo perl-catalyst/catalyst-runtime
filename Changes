@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Catalyst.
         - Fixed bug in dispatcher where an invalid path could call a valid
           action. (Andy Grundman)
         - Fixed Helper so it works with CRLF line-endings. (Andy Grundman)
+        - Added workaround for debug mode memory leak in Text::ASCIITable.
+          (Andy Grundman)
 
 5.33  2005-08-10 15:25:00
         - Now with updated manifest.
