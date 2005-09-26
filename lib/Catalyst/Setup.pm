@@ -95,7 +95,6 @@ sub setup {
 
         if ( @plugins ) {
             my $t = Text::ASCIITable->new;
-            undef $t->{tiedarr};    # work-around for a memory leak
             $t->setOptions( 'hide_HeadRow',  1 );
             $t->setOptions( 'hide_HeadLine', 1 );
             $t->setCols('Class');
@@ -128,7 +127,6 @@ sub setup {
 
     if ( $class->debug ) {
         my $t = Text::ASCIITable->new;
-        undef $t->{tiedarr};    # work-around for a memory leak
         $t->setOptions( 'hide_HeadRow',  1 );
         $t->setOptions( 'hide_HeadLine', 1 );
         $t->setCols('Class');
