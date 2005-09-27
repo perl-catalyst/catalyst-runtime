@@ -23,7 +23,7 @@ Catalyst::Test - Test Catalyst applications
     get('index.html');
 
     # Run tests against a remote server
-    CATALYST_SERVER='http://localhost:3000/' prove -l lib/ t/
+    CATALYST_SERVER='http://localhost:3000/' prove -r -l lib/ t/
 
     # Tests with inline apps need to use Catalyst::Engine::Test
     package TestApp;
