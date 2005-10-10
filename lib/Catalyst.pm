@@ -392,7 +392,7 @@ sub uri_for {
     my $base     = $c->request->base->clone;
     my $basepath = $base->path;
     $basepath =~ s/\/$//;
-    $basepath .= '/' if $basepath;
+    $basepath .= '/';
     my $match = $c->request->match;
     $match =~ s/^\///;
     $match .= '/' if $match;

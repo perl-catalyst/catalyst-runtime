@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::MockObject;
 use URI;
 
@@ -28,3 +28,12 @@ is(
 
 is( Catalyst::uri_for( $context, '../quux' )->as_string,
     'http://127.0.0.1/foo/quux', 'URI for relative dot path' );
+
+# bug found by drewbie
+$request->mock('base', sub { URI->new('http://localhost:3000/') } );
+$request->mock('match', sub { 'orderentry/contract' } );
+is(
+    Catalyst::uri_for( $context, '/Orderentry/saveContract' )->as_string,
+    'http://localhost:3000/Orderentry/saveContract',
+    'URI for absolute path'
+);
