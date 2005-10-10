@@ -1,84 +1,67 @@
 package Catalyst::Engine::FastCGI;
 
 use strict;
-use base qw(Catalyst::Engine::FastCGI::Base Catalyst::Engine::CGI);
+use base 'Catalyst::Engine::CGI';
+use FCGI;
 
 =head1 NAME
 
-Catalyst::Engine::FastCGI - Catalyst FastCGI Engine
-
-=head1 SYNOPSIS
-
-A script using the Catalyst::Engine::FastCGI module might look like:
-
-    #!/usr/bin/perl -w
-
-    BEGIN { 
-       $ENV{CATALYST_ENGINE} = 'FastCGI';
-    }
-
-    use strict;
-    use lib '/path/to/MyApp/lib';
-    use MyApp;
-
-    MyApp->run;
+Catalyst::Engine::FastCGI - FastCGI Engine
 
 =head1 DESCRIPTION
 
-This is the Catalyst engine for FastCGI.
+This is the FastCGI engine.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::FastCGI::Base>
-and C<Catalyst::Engine::CGI>.
+This class overloads some methods from C<Catalyst::Engine::CGI>.
 
 =over 4
 
-=item $c->prepare_body
+=item $self->run($c)
 
 =cut
 
-sub prepare_body { 
-    shift->Catalyst::Engine::CGI::prepare_body(@_);
+sub run {
+    my ( $self, $class ) = @_;
+
+    my $request = FCGI::Request();
+
+    while ( $request->Accept >= 0 ) {
+        $class->handle_request;
+    }
 }
 
-=item $c->prepare_parameters
+=item $self->write($c, $buffer)
 
 =cut
 
-sub prepare_parameters { 
-    shift->Catalyst::Engine::CGI::prepare_parameters(@_);
+sub write {
+    my ( $self, $c, $buffer ) = @_;
+    
+    unless ( $self->{_prepared_write} ) {
+        $self->prepare_write( $c );
+        $self->{_prepared_write} = 1;
+    }
+    
+    # FastCGI does not stream data properly if using 'print $handle',
+    # but a syswrite appears to work properly.
+    $c->response->handle->syswrite( $buffer );
 }
 
-=item $c->prepare_request
-
-=cut
-
-sub prepare_request {
-    my ( $c, $request, @arguments ) = @_;
-    CGI::_reset_globals();
-    $c->SUPER::prepare_request($request);
-    $c->Catalyst::Engine::CGI::prepare_request(@arguments);
-}
-
-=item $c->prepare_uploads
-
-=cut
-
-sub prepare_uploads { 
-    shift->Catalyst::Engine::CGI::prepare_uploads(@_);
-}
-
-=back 
+=back
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine::FastCGI::Base>, L<Catalyst::Engine::CGI>.
+L<Catalyst>, L<FCGI>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Christian Hansen, C<ch@ngmedia.com>
+Sebastian Riedel, <sri@cpan.org>
+
+Christian Hansen, <ch@ngmedia.com>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 COPYRIGHT
 

@@ -8,9 +8,9 @@ __PACKAGE__->mk_accessors(qw/cookies body headers location status/);
 *output = \&body;
 
 sub content_encoding { shift->headers->content_encoding(@_) }
-sub content_length   { shift->headers->content_length(@_)   }
-sub content_type     { shift->headers->content_type(@_)     }
-sub header           { shift->headers->header(@_)           }
+sub content_length   { shift->headers->content_length(@_) }
+sub content_type     { shift->headers->content_type(@_) }
+sub header           { shift->headers->header(@_) }
 
 =head1 NAME
 
@@ -18,17 +18,19 @@ Catalyst::Response - Catalyst Response Class
 
 =head1 SYNOPSIS
 
-    $resp = $c->response;
-    $resp->body;
-    $resp->content_encoding;
-    $resp->content_length;
-    $resp->content_type;
-    $resp->cookies;
-    $resp->header;
-    $resp->headers;
-    $resp->output;
-    $resp->redirect;
-    $resp->status;
+    $res = $c->response;
+    $res->body;
+    $res->content_encoding;
+    $res->content_length;
+    $res->content_type;
+    $res->cookies;
+    $res->handle;
+    $res->header;
+    $res->headers;
+    $res->output;
+    $res->redirect;
+    $res->status;
+    $res->write;
 
 See also L<Catalyst::Application>.
 
@@ -41,45 +43,67 @@ to response data.
 
 =over 4
 
-=item $resp->body($text)
+=item $res->body($text)
 
     $c->response->body('Catalyst rocks!');
 
 Contains the final output.
 
-=item $resp->content_encoding
+=item $res->content_encoding
 
-Shortcut to $resp->headers->content_encoding
+Shortcut to $res->headers->content_encoding
 
-=item $resp->content_length
+=item $res->content_length
 
-Shortcut to $resp->headers->content_length
+Shortcut to $res->headers->content_length
 
-=item $resp->content_type
+=item $res->content_type
 
-Shortcut to $resp->headers->content_type
+Shortcut to $res->headers->content_type
 
-=item $resp->cookies
+=item $res->cookies
 
 Returns a reference to a hash containing the cookies to be set.
 
     $c->response->cookies->{foo} = { value => '123' };
 
-=item $resp->header
+=item $res->handle
 
-Shortcut to $resp->headers->header
+Response IO handle.
 
-=item $resp->headers
+=cut
+
+sub handle {
+    my ( $self, $handle ) = @_;
+    
+    if ($handle) { 
+        $self->{handle} = $handle;
+    }
+    else {
+        # Finalize headers if someone touches the output handle
+        if ( $self->{_context} ) {
+            $self->{_context}->finalize_headers;
+        }
+    }
+    
+    return $self->{handle};
+}
+
+=item $res->header
+
+Shortcut to $res->headers->header
+
+=item $res->headers
 
 Returns a L<HTTP::Headers> object containing the headers.
 
     $c->response->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
 
-=item $resp->output
+=item $res->output
 
-Shortcut to $resp->body
+Shortcut to $res->body
 
-=item $resp->redirect( $url, $status )
+=item $res->redirect( $url, $status )
 
 Contains a location to redirect to.
 
@@ -90,8 +114,8 @@ Contains a location to redirect to.
 
 sub redirect {
     my $self = shift;
-    
-    if ( @_ ) {
+
+    if (@_) {
         my $location = shift;
         my $status   = shift || 302;
 
@@ -102,11 +126,19 @@ sub redirect {
     return $self->location;
 }
 
-=item status
+=item $res->status
 
 Contains the HTTP status.
 
     $c->response->status(404);
+    
+=item $res->write( $data )
+
+Writes $data to the output stream.
+
+=cut
+
+sub write { shift->{_context}->write(@_); }
 
 =back
 

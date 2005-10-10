@@ -1,36 +1,18 @@
 package Catalyst::Engine;
 
 use strict;
-use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
-use attributes ();
-use UNIVERSAL::require;
+use base 'Class::Accessor::Fast';
 use CGI::Cookie;
 use Data::Dumper;
 use HTML::Entities;
+use HTTP::Body;
 use HTTP::Headers;
-use Time::HiRes qw/gettimeofday tv_interval/;
-use Text::ASCIITable;
-use Catalyst::Exception;
-use Catalyst::Request;
-use Catalyst::Request::Upload;
-use Catalyst::Response;
-use Catalyst::Utils;
 
-__PACKAGE__->mk_classdata('components');
-__PACKAGE__->mk_accessors(qw/counter depth request response state/);
+# input position and length
+__PACKAGE__->mk_accessors( qw/read_position read_length/ );
 
-*comp = \&component;
-*req  = \&request;
-*res  = \&response;
-
-# For backwards compatibility
-*finalize_output = \&finalize_body;
-
-# For statistics
-our $COUNT     = 1;
-our $START     = time;
-our $RECURSION = 1000;
-our $DETACH    = "catalyst_detach\n";
+# Stringify to class
+use overload '""' => sub { return ref shift }, fallback => 1;
 
 =head1 NAME
 
@@ -46,216 +28,32 @@ See L<Catalyst>.
 
 =over 4
 
-=item $c->benchmark($coderef)
-
-Takes a coderef with arguments and returns elapsed time as float.
-
-    my ( $elapsed, $status ) = $c->benchmark( sub { return 1 } );
-    $c->log->info( sprintf "Processing took %f seconds", $elapsed );
-
-=cut
-
-sub benchmark {
-    my $c       = shift;
-    my $code    = shift;
-    my $time    = [gettimeofday];
-    my @return  = &$code(@_);
-    my $elapsed = tv_interval $time;
-    return wantarray ? ( $elapsed, @return ) : $elapsed;
-}
-
-=item $c->comp($name)
-
-=item $c->component($name)
-
-Get a component object by name.
-
-    $c->comp('MyApp::Model::MyModel')->do_stuff;
-
-Regex search for a component.
-
-    $c->comp('mymodel')->do_stuff;
-
-=cut
-
-sub component {
-    my $c = shift;
-
-    if (@_) {
-
-        my $name = shift;
-
-        if ( my $component = $c->components->{$name} ) {
-            return $component;
-        }
-
-        else {
-            for my $component ( keys %{ $c->components } ) {
-                return $c->components->{$component} if $component =~ /$name/i;
-            }
-        }
-    }
-
-    return sort keys %{ $c->components };
-}
-
-=item $c->counter
-
-Returns a hashref containing coderefs and execution counts.
-(Needed for deep recursion detection)
-
-=item $c->depth
-
-Returns the actual forward depth.
-
-=item $c->error
-
-=item $c->error($error, ...)
-
-=item $c->error($arrayref)
-
-Returns an arrayref containing error messages.
-
-    my @error = @{ $c->error };
-
-Add a new error.
-
-    $c->error('Something bad happened');
-
-=cut
-
-sub error {
-    my $c = shift;
-    my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-    push @{ $c->{error} }, @$error;
-    return $c->{error};
-}
-
-=item $c->execute($class, $coderef)
-
-Execute a coderef in given class and catch exceptions.
-Errors are available via $c->error.
-
-=cut
-
-sub execute {
-    my ( $c, $class, $code ) = @_;
-    $class = $c->components->{$class} || $class;
-    $c->state(0);
-    my $callsub = ( caller(1) )[3];
-
-    my $action = '';
-    if ( $c->debug ) {
-        $action = $c->actions->{reverse}->{"$code"};
-        $action = "/$action" unless $action =~ /\-\>/;
-        $c->counter->{"$code"}++;
-
-        if ( $c->counter->{"$code"} > $RECURSION ) {
-            my $error = qq/Deep recursion detected in "$action"/;
-            $c->log->error($error);
-            $c->error($error);
-            $c->state(0);
-            return $c->state;
-        }
-
-        $action = "-> $action" if $callsub =~ /forward$/;
-    }
-
-    $c->{depth}++;
-    eval {
-        if ( $c->debug )
-        {
-            my ( $elapsed, @state ) =
-              $c->benchmark( $code, $class, $c, @{ $c->req->args } );
-            push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
-            $c->state(@state);
-        }
-        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) }
-    };
-    $c->{depth}--;
-
-    if ( my $error = $@ ) {
-
-        if ( $error eq $DETACH ) { die $DETACH if $c->{depth} > 1 }
-        else {
-            unless ( ref $error ) {
-                chomp $error;
-                $error = qq/Caught exception "$error"/;
-            }
-
-            $c->log->error($error);
-            $c->error($error);
-            $c->state(0);
-        }
-    }
-    return $c->state;
-}
-
-=item $c->finalize
-
-Finalize request.
-
-=cut
-
-sub finalize {
-    my $c = shift;
-
-    $c->finalize_cookies;
-
-    if ( my $location = $c->response->redirect ) {
-        $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
-        $c->response->header( Location => $location );
-        $c->response->status(302) if $c->response->status !~ /^3\d\d$/;
-    }
-
-    if ( $#{ $c->error } >= 0 ) {
-        $c->finalize_error;
-    }
-
-    if ( !$c->response->body && $c->response->status == 200 ) {
-        $c->finalize_error;
-    }
-
-    if ( $c->response->body && !$c->response->content_length ) {
-        $c->response->content_length( bytes::length( $c->response->body ) );
-    }
-
-    if ( $c->response->status =~ /^(1\d\d|[23]04)$/ ) {
-        $c->response->headers->remove_header("Content-Length");
-        $c->response->body('');
-    }
-
-    if ( $c->request->method eq 'HEAD' ) {
-        $c->response->body('');
-    }
-
-    my $status = $c->finalize_headers;
-    $c->finalize_body;
-    return $status;
-}
-
-=item $c->finalize_output
+=item $self->finalize_output
 
 <obsolete>, see finalize_body
 
-=item $c->finalize_body
+=item $self->finalize_body($c)
 
-Finalize body.
+Finalize body.  Prints the response output.
 
 =cut
 
-sub finalize_body { }
+sub finalize_body {
+    my ( $self, $c ) = @_;
+    
+    $self->write( $c, $c->response->output );
+}
 
-=item $c->finalize_cookies
-
-Finalize cookies.
+=item $self->finalize_cookies($c)
 
 =cut
 
 sub finalize_cookies {
-    my $c = shift;
+    my ( $self, $c ) = @_;
 
+    my @cookies;
     while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
+
         my $cookie = CGI::Cookie->new(
             -name    => $name,
             -value   => $cookie->{value},
@@ -265,18 +63,20 @@ sub finalize_cookies {
             -secure  => $cookie->{secure} || 0
         );
 
-        $c->res->headers->push_header( 'Set-Cookie' => $cookie->as_string );
+        push @cookies, $cookie->as_string;
+    }
+
+    if (@cookies) {
+        $c->res->headers->push_header( 'Set-Cookie' => join ',', @cookies );
     }
 }
 
-=item $c->finalize_error
-
-Finalize error.
+=item $self->finalize_error($c)
 
 =cut
 
 sub finalize_error {
-    my $c = shift;
+    my ( $self, $c ) = @_;
 
     $c->res->headers->content_type('text/html');
     my $name = $c->config->{name} || 'Catalyst Application';
@@ -291,6 +91,17 @@ sub finalize_error {
           @{ $c->error };
         $error ||= 'No output';
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
+
+        # Don't show context in the dump
+        delete $c->req->{_context};
+        delete $c->res->{_context};
+
+        # Don't show body parser in the dump
+        delete $c->req->{_body};
+
+        # Don't show response header state in dump
+        delete $c->res->{_finalized_headers};
+
         my $req   = encode_entities Dumper $c->req;
         my $res   = encode_entities Dumper $c->res;
         my $stash = encode_entities Dumper $c->stash;
@@ -316,7 +127,7 @@ sub finalize_error {
 (fr) Veuillez revenir plus tard
 (es) Vuelto por favor mas adelante
 (pt) Voltado por favor mais tarde
-(it) Ritornato prego più successivamente
+(it) Ritornato prego piÃ¹ successivamente
 </pre>
 
         $name = '';
@@ -383,329 +194,263 @@ sub finalize_error {
 
 }
 
-=item $c->finalize_headers
-
-Finalize headers.
+=item $self->finalize_headers($c)
 
 =cut
 
 sub finalize_headers { }
 
-=item $c->handler( $class, @arguments )
-
-Handles the request.
+=item $self->finalize_read($c)
 
 =cut
 
-sub handler {
-    my ( $class, @arguments ) = @_;
-
-    # Always expect worst case!
-    my $status = -1;
-    eval {
-        my @stats = ();
-
-        my $handler = sub {
-            my $c = $class->prepare(@arguments);
-            $c->{stats} = \@stats;
-            $c->dispatch;
-            return $c->finalize;
-        };
-
-        if ( $class->debug ) {
-            my $elapsed;
-            ( $elapsed, $status ) = $class->benchmark($handler);
-            $elapsed = sprintf '%f', $elapsed;
-            my $av = sprintf '%.3f',
-              ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
-            my $t = Text::ASCIITable->new;
-            $t->setCols( 'Action', 'Time' );
-            $t->setColWidth( 'Action', 64, 1 );
-            $t->setColWidth( 'Time',   9,  1 );
-
-            for my $stat (@stats) { $t->addRow( $stat->[0], $stat->[1] ) }
-            $class->log->info(
-                "Request took ${elapsed}s ($av/s)\n" . $t->draw );
-        }
-        else { $status = &$handler }
-
-    };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        $class->log->error(qq/Caught exception in engine "$error"/);
-    }
-
-    $COUNT++;
-    return $status;
+sub finalize_read {
+    my ( $self, $c ) = @_;
+    
+    undef $self->{_prepared_read};
 }
 
-=item $c->prepare(@arguments)
-
-Turns the engine-specific request( Apache, CGI ... )
-into a Catalyst context .
+=item $self->finalize_uploads($c)
 
 =cut
 
-sub prepare {
-    my ( $class, @arguments ) = @_;
+sub finalize_uploads {
+    my ( $self, $c ) = @_;
 
-    my $c = bless {
-        counter => {},
-        depth   => 0,
-        request => Catalyst::Request->new(
-            {
-                arguments  => [],
-                cookies    => {},
-                headers    => HTTP::Headers->new,
-                parameters => {},
-                secure     => 0,
-                snippets   => [],
-                uploads    => {}
-            }
-        ),
-        response => Catalyst::Response->new(
-            {
-                body    => '',
-                cookies => {},
-                headers => HTTP::Headers->new( 'Content-Length' => 0 ),
-                status  => 200
-            }
-        ),
-        stash => {},
-        state => 0
-    }, $class;
-
-    if ( $c->debug ) {
-        my $secs = time - $START || 1;
-        my $av = sprintf '%.3f', $COUNT / $secs;
-        $c->log->debug('**********************************');
-        $c->log->debug("* Request $COUNT ($av/s) [$$]");
-        $c->log->debug('**********************************');
-        $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
-    }
-
-    $c->prepare_request(@arguments);
-    $c->prepare_connection;
-    $c->prepare_headers;
-    $c->prepare_cookies;
-    $c->prepare_path;
-    $c->prepare_action;
-
-    my $method  = $c->req->method  || '';
-    my $path    = $c->req->path    || '';
-    my $address = $c->req->address || '';
-
-    $c->log->debug(qq/"$method" request for "$path" from $address/)
-      if $c->debug;
-
-    if ( $c->request->method eq 'POST' and $c->request->content_length ) {
-
-        if ( $c->req->content_type eq 'application/x-www-form-urlencoded' ) {
-            $c->prepare_parameters;
-        }
-        elsif ( $c->req->content_type eq 'multipart/form-data' ) {
-            $c->prepare_parameters;
-            $c->prepare_uploads;
-        }
-        else {
-            $c->prepare_body;
+    if ( keys %{ $c->request->uploads } ) {
+        for my $key ( keys %{ $c->request->uploads } ) {
+            my $upload = $c->request->uploads->{$key};
+            unlink map { $_->tempname }
+              grep     { -e $_->tempname }
+              ref $upload eq 'ARRAY' ? @{$upload} : ($upload);
         }
     }
-
-    if ( $c->request->method eq 'GET' ) {
-        $c->prepare_parameters;
-    }
-
-    if ( $c->debug && keys %{ $c->req->params } ) {
-        my $t = Text::ASCIITable->new;
-        $t->setCols( 'Key', 'Value' );
-        $t->setColWidth( 'Key',   37, 1 );
-        $t->setColWidth( 'Value', 36, 1 );
-        for my $key ( sort keys %{ $c->req->params } ) {
-            my $param = $c->req->params->{$key};
-            my $value = defined($param) ? $param : '';
-            $t->addRow( $key, $value );
-        }
-        $c->log->debug( "Parameters are:\n" . $t->draw );
-    }
-
-    return $c;
 }
 
-=item $c->prepare_action
-
-Prepare action.
+=item $self->prepare_body($c)
 
 =cut
 
-sub prepare_action {
-    my $c    = shift;
-    my $path = $c->req->path;
-    my @path = split /\//, $c->req->path;
-    $c->req->args( \my @args );
+sub prepare_body {
+    my ( $self, $c ) = @_;
 
-    while (@path) {
-        $path = join '/', @path;
-        if ( my $result = ${ $c->get_action($path) }[0] ) {
+    $self->read_length( $c->request->header('Content-Length') || 0 );
+    my $type = $c->request->header('Content-Type');
 
-            # It's a regex
-            if ($#$result) {
-                my $match    = $result->[1];
-                my @snippets = @{ $result->[2] };
-                $c->log->debug(
-                    qq/Requested action is "$path" and matched "$match"/)
-                  if $c->debug;
-                $c->log->debug(
-                    'Snippets are "' . join( ' ', @snippets ) . '"' )
-                  if ( $c->debug && @snippets );
-                $c->req->action($match);
-                $c->req->snippets( \@snippets );
-            }
-
-            else {
-                $c->req->action($path);
-                $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
-            }
-
-            $c->req->match($path);
-            last;
+    unless ( $c->request->{_body} ) {
+        $c->request->{_body} = HTTP::Body->new( $type, $self->read_length );
+    }
+    
+    if ( $self->read_length > 0 ) {
+        while ( my $buffer = $self->read( $c ) ) {
+            $c->request->{_body}->add( $buffer );
         }
-        unshift @args, pop @path;
     }
-
-    unless ( $c->req->action ) {
-        $c->req->action('default');
-        $c->req->match('');
-    }
-
-    $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
-      if ( $c->debug && @args );
 }
 
-=item $c->prepare_body
-
-Prepare message body.
+=item $self->prepare_body_parameters($c)
 
 =cut
 
-sub prepare_body { }
+sub prepare_body_parameters {
+    my ( $self, $c ) = @_;
+    $c->request->body_parameters( $c->request->{_body}->param );
+}
 
-=item $c->prepare_connection
-
-Prepare connection.
+=item $self->prepare_connection($c)
 
 =cut
 
 sub prepare_connection { }
 
-=item $c->prepare_cookies
-
-Prepare cookies.
+=item $self->prepare_cookies($c)
 
 =cut
 
 sub prepare_cookies {
-    my $c = shift;
+    my ( $self, $c ) = @_;
 
     if ( my $header = $c->request->header('Cookie') ) {
         $c->req->cookies( { CGI::Cookie->parse($header) } );
     }
 }
 
-=item $c->prepare_headers
-
-Prepare headers.
+=item $self->prepare_headers($c)
 
 =cut
 
 sub prepare_headers { }
 
-=item $c->prepare_parameters
-
-Prepare parameters.
+=item $self->prepare_parameters($c)
 
 =cut
 
-sub prepare_parameters { }
+sub prepare_parameters {
+    my ( $self, $c ) = @_;
 
-=item $c->prepare_path
+    # We copy, no references
+    while ( my ( $name, $param ) = each %{ $c->request->query_parameters } ) {
+        $param = ref $param eq 'ARRAY' ? [ @{$param} ] : $param;
+        $c->request->parameters->{$name} = $param;
+    }
 
-Prepare path and base.
+    # Merge query and body parameters
+    while ( my ( $name, $param ) = each %{ $c->request->body_parameters } ) {
+        $param = ref $param eq 'ARRAY' ? [ @{$param} ] : $param;
+        if ( my $old_param = $c->request->parameters->{$name} ) {
+            if ( ref $old_param eq 'ARRAY' ) {
+                push @{ $c->request->parameters->{$name} },
+                  ref $param eq 'ARRAY' ? @$param : $param;
+            }
+            else { $c->request->parameters->{$name} = [ $old_param, $param ] }
+        }
+        else { $c->request->parameters->{$name} = $param }
+    }
+}
+
+=item $self->prepare_path($c)
 
 =cut
 
 sub prepare_path { }
 
-=item $c->prepare_request
+=item $self->prepare_request($c)
 
-Prepare the engine request.
+=item $self->prepare_query_parameters($c)
+
+=cut
+
+sub prepare_query_parameters { }
+
+=item $self->prepare_read($c)
+
+=cut
+
+sub prepare_read {
+    my ( $self, $c ) = @_;
+    
+    # Reset the read position
+    $self->read_position( 0 );
+}
+
+=item $self->prepare_request(@arguments)
 
 =cut
 
 sub prepare_request { }
 
-=item $c->prepare_uploads
-
-Prepare uploads.
+=item $self->prepare_uploads($c)
 
 =cut
 
-sub prepare_uploads { }
+sub prepare_uploads {
+    my ( $self, $c ) = @_;
+    my $uploads = $c->request->{_body}->upload;
+    for my $name ( keys %$uploads ) {
+        my $files = $uploads->{$name};
+        $files = ref $files eq 'ARRAY' ? $files : [$files];
+        my @uploads;
+        for my $upload (@$files) {
+            my $u = Catalyst::Request::Upload->new;
+            $u->headers( HTTP::Headers->new( %{ $upload->{headers} } ) );
+            $u->type( $u->headers->content_type );
+            $u->tempname( $upload->{tempname} );
+            $u->size( $upload->{size} );
+            $u->filename( $upload->{filename} );
+            push @uploads, $u;
+        }
+        $c->request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
+    }
+}
 
-=item $c->run
+=item $self->prepare_write($c)
 
-Starts the engine.
+=cut
+
+sub prepare_write { }
+
+=item $self->read($c, [$maxlength])
+
+=cut
+
+sub read {
+    my ( $self, $c, $maxlength ) = @_;
+    
+    unless ( $self->{_prepared_read} ) {
+        $self->prepare_read( $c );
+        $self->{_prepared_read} = 1;
+    }
+    
+    my $remaining = $self->read_length - $self->read_position;
+    $maxlength ||= $self->read_length;
+    
+    # Are we done reading?
+    if ( $remaining <= 0 ) {
+        $self->finalize_read( $c );
+        return;
+    }
+
+    my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
+    my $rc = $self->read_chunk( $c, my $buffer, $readlen );
+    if ( defined $rc ) {
+        $self->read_position( $self->read_position + $rc );
+        return $buffer;
+    }
+    else {
+        Catalyst::Exception->throw( 
+            message => "Unknown error reading input: $!"
+        );
+    }
+}
+
+=item $self->read_chunk($c, $buffer, $length)
+
+Each engine inplements read_chunk as its preferred way of reading a chunk
+of data.
+
+=cut
+
+sub read_chunk { }
+
+=item $self->read_length
+
+The length of input data to be read.  This is obtained from the Content-Length
+header.
+
+=item $self->read_position
+
+The amount of input data that has already been read.
+
+=item $self->run($c)
 
 =cut
 
 sub run { }
 
-=item $c->request
-
-=item $c->req
-
-Returns a C<Catalyst::Request> object.
-
-    my $req = $c->req;
-
-=item $c->response
-
-=item $c->res
-
-Returns a C<Catalyst::Response> object.
-
-    my $res = $c->res;
-
-=item $c->state
-
-Contains the return value of the last executed action.
-
-=item $c->stash
-
-Returns a hashref containing all your data.
-
-    $c->stash->{foo} ||= 'yada';
-    print $c->stash->{foo};
+=item $self->write($c, $buffer)
 
 =cut
 
-sub stash {
-    my $self = shift;
-    if (@_) {
-        my $stash = @_ > 1 ? {@_} : $_[0];
-        while ( my ( $key, $val ) = each %$stash ) {
-            $self->{stash}->{$key} = $val;
-        }
+sub write {
+    my ( $self, $c, $buffer ) = @_;
+    
+    unless ( $self->{_prepared_write} ) {
+        $self->prepare_write( $c );
+        $self->{_prepared_write} = 1;
     }
-    return $self->{stash};
+    
+    my $handle = $c->response->handle;
+    
+    print $handle $buffer;
 }
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
+Sebastian Riedel, <sri@cpan.org>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 COPYRIGHT
 

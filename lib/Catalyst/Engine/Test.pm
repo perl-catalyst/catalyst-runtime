@@ -1,9 +1,11 @@
 package Catalyst::Engine::Test;
 
 use strict;
-use base 'Catalyst::Engine::HTTP::Base';
-
+use base 'Catalyst::Engine::CGI';
 use Catalyst::Utils;
+use HTTP::Response;
+use HTTP::Status;
+use NEXT;
 
 =head1 NAME
 
@@ -31,36 +33,88 @@ This is the Catalyst engine specialized for testing.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::HTTP::Base>.
+This class overloads some methods from C<Catalyst::Engine::CGI>.
 
 =over 4
 
-=item $c->run
+=item finalize_headers
+
+=cut
+
+sub finalize_headers {
+    my ( $self, $c ) = @_;
+    my $protocol = $c->request->protocol;
+    my $status   = $c->response->status;
+    my $message  = status_message($status);
+    print "$protocol $status $message\n";
+    $c->response->headers->date(time);
+    $self->NEXT::finalize_headers($c);
+}
+
+=item $self->run($c)
 
 =cut
 
 sub run {
-    my ( $class, $request ) = @_;
-    
+    my ( $self, $class, $request ) = @_;
+
     $request = Catalyst::Utils::request($request);
 
-    $request->header( 
+    $request->header(
         'Host' => sprintf( '%s:%d', $request->uri->host, $request->uri->port )
     );
 
-    my $http = Catalyst::Engine::HTTP::Base::struct->new(
-        address  => '127.0.0.1',
-        hostname => 'localhost',
-        request  => $request,
-        response => HTTP::Response->new
+    # We emulate CGI
+    local %ENV = (
+        PATH_INFO       => $request->uri->path  || '',
+        QUERY_STRING    => $request->uri->query || '',
+        REMOTE_ADDR     => '127.0.0.1',
+        REMOTE_HOST     => 'localhost',
+        REQUEST_METHOD  => $request->method,
+        SERVER_NAME     => 'localhost',
+        SERVER_PORT     => $request->uri->port,
+        SERVER_PROTOCOL => 'HTTP/1.1',
+        %ENV,
     );
 
-    $http->response->date(time);
+    # Headers
+    for my $header ( $request->header_field_names ) {
+        my $name = uc $header;
+        $name = 'COOKIE' if $name eq 'COOKIES';
+        $name =~ tr/-/_/;
+        $name = 'HTTP_' . $name
+            unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
+        my $value = $request->header($header);
+        if ( exists $ENV{$name} ) {
+            $ENV{$name} .= "; $value";
+        }
+        else {
+            $ENV{$name} = $value;
+        }
+    }
 
-    $class->handler($http);
+    # STDIN
+    local *STDIN;
+    my $input = $request->content;
+    open STDIN, '<', \$input;
 
-    return $http->response;
+    # STDOUT
+    local *STDOUT;
+    my $output = '';
+    open STDOUT, '>', \$output;
+
+    # Process
+    $class->handle_request;
+
+    # Response
+    return HTTP::Response->parse($output);
 }
+
+=item $self->read_chunk($c, $buffer, $length)
+
+=cut
+
+sub read_chunk { shift; shift->request->handle->read( @_ ); }
 
 =back
 
@@ -68,10 +122,13 @@ sub run {
 
 L<Catalyst>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Christian Hansen, C<ch@ngmedia.com>
+Sebastian Riedel, <sri@cpan.org>
+
+Christian Hansen, <ch@ngmedia.com>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 COPYRIGHT
 

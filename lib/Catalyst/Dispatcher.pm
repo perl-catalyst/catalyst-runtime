@@ -1,14 +1,18 @@
 package Catalyst::Dispatcher;
 
 use strict;
-use base 'Class::Data::Inheritable';
+use base 'Class::Accessor::Fast';
 use Catalyst::Exception;
 use Catalyst::Utils;
+use Catalyst::Action;
 use Text::ASCIITable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 
-__PACKAGE__->mk_classdata($_) for qw/actions tree/;
+# Stringify to class
+use overload '""' => sub { return ref shift }, fallback => 1;
+
+__PACKAGE__->mk_accessors(qw/actions tree/);
 
 =head1 NAME
 
@@ -24,27 +28,22 @@ See L<Catalyst>.
 
 =over 4
 
-=item $c->detach( $command [, \@arguments ] )
-
-Like C<forward> but doesn't return.
+=item $self->detach( $c, $command [, \@arguments ] )
 
 =cut
 
 sub detach {
-    my ( $c, $command, @args ) = @_;
+    my ( $self, $c, $command, @args ) = @_;
     $c->forward( $command, @args ) if $command;
-    # die with DETACH signal, which will be caught in dispatching.
-    die $Catalyst::Engine::DETACH;
+    die $Catalyst::DETACH;
 }
 
-=item $c->dispatch
-
-Dispatch request to actions.
+=item $self->dispatch($c)
 
 =cut
 
 sub dispatch {
-    my $c         = shift;
+    my ( $self, $c ) = @_;
     my $action    = $c->req->action;
     my $namespace = '';
     $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
@@ -52,7 +51,8 @@ sub dispatch {
 
     unless ($namespace) {
         if ( my $result = $c->get_action($action) ) {
-            $namespace = Catalyst::Utils::class2prefix( $result->[0]->[0]->[0],
+            $namespace =
+              Catalyst::Utils::class2prefix( $result->[0]->[0]->namespace,
                 $c->config->{case_sensitive} );
         }
     }
@@ -63,37 +63,46 @@ sub dispatch {
 
     if ( @{$results} ) {
 
+        # Errors break the normal flow and the end action is instantly run
+        my $error = 0;
+
         # Execute last begin
         $c->state(1);
         if ( my $begin = @{ $c->get_action( 'begin', $namespace, 1 ) }[-1] ) {
-            $c->execute( @{ $begin->[0] } );
-            return if scalar @{ $c->error };
+            $begin->[0]->execute($c);
+            $error++ if scalar @{ $c->error };
         }
 
         # Execute the auto chain
         my $autorun = 0;
         for my $auto ( @{ $c->get_action( 'auto', $namespace, 1 ) } ) {
+            last if $error;
             $autorun++;
-            $c->execute( @{ $auto->[0] } );
-            return if scalar @{ $c->error };
+            $auto->[0]->execute($c);
+            $error++ if scalar @{ $c->error };
             last unless $c->state;
         }
 
         # Execute the action or last default
         my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
         if ( ( my $action = $c->req->action ) && $mkay ) {
-            if ( my $result = @{ $c->get_action( $action, $default, 1 ) }[-1] )
-            {
-                $c->execute( @{ $result->[0] } );
+            unless ($error) {
+                if ( my $result =
+                    @{ $c->get_action( $action, $default, 1 ) }[-1] )
+                {
+                    $result->[0]->execute($c);
+                    $error++ if scalar @{ $c->error };
+                }
             }
         }
 
         # Execute last end
         if ( my $end = @{ $c->get_action( 'end', $namespace, 1 ) }[-1] ) {
-            $c->execute( @{ $end->[0] } );
-            return if scalar @{ $c->error };
+            $end->[0]->execute($c);
         }
-    } else {
+    }
+
+    else {
         my $path  = $c->req->path;
         my $error = $path
           ? qq/Unknown resource "$path"/
@@ -103,22 +112,12 @@ sub dispatch {
     }
 }
 
-=item $c->forward( $command [, \@arguments ] )
-
-Forward processing to a private action or a method from a class.
-If you define a class without method it will default to process().
-also takes an optional arrayref containing arguments to be passed
-to the new function. $c->req->args will be reset upon returning 
-from the function.
-
-    $c->forward('/foo');
-    $c->forward('index');
-    $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
-    $c->forward('MyApp::View::TT');
+=item $self->forward( $c, $command [, \@arguments ] )
 
 =cut
 
 sub forward {
+    my $self    = shift;
     my $c       = shift;
     my $command = shift;
 
@@ -128,16 +127,32 @@ sub forward {
     }
 
     # Relative forwards from detach
-    my $caller = ( caller(0) )[0]->isa('Catalyst::Dispatcher')
-      && ( ( caller(1) )[3] =~ /::detach$/ ) ? caller(1) : caller(0);
+    my $caller = ( caller(1) )[0]->isa('Catalyst::Dispatcher')
+      && ( ( caller(2) )[3] =~ /::detach$/ ) ? caller(3) : caller(1);
 
     my $namespace = '/';
     my $arguments = ( ref( $_[-1] ) eq 'ARRAY' ) ? pop(@_) : $c->req->args;
 
+    my $results = [];
+
     if ( $command =~ /^\// ) {
-        $command =~ /^\/(.*)\/(\w+)$/;
-        $namespace = $1 || '/';
-        $command   = $2 || $command;
+        if ( $command =~ /^\/(\w+)$/ ) {
+            $results = $c->get_action( $1, $namespace );
+        }
+        else {
+            my $command_copy = $command;
+            my @extra_args;
+          DESCEND: while ( $command_copy =~ s/^\/(.*)\/(\w+)$/\/$1/ ) {
+                my $tail = $2;
+                if ( $results = $c->get_action( $tail, $1 ) ) {
+                    $command   = $tail;
+                    $namespace = $command_copy;
+                    push( @{$arguments}, @extra_args );
+                    last DESCEND;
+                }
+                unshift( @extra_args, $tail );
+            }
+        }
         $command =~ s/^\///;
     }
 
@@ -145,13 +160,12 @@ sub forward {
         $namespace =
           Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} )
           || '/';
+        $results = $c->get_action( $command, $namespace );
     }
-
-    my $results = $c->get_action( $command, $namespace );
 
     unless ( @{$results} ) {
 
-        unless ( defined( $c->components->{$command} ) ) {
+        unless ( $c->components->{$command} ) {
             my $error =
 qq/Couldn't forward to command "$command". Invalid action or component./;
             $c->error($error);
@@ -163,9 +177,17 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
         my $method = shift || 'process';
 
         if ( my $code = $c->components->{$class}->can($method) ) {
-            $c->actions->{reverse}->{"$code"} = "$class->$method";
-            $results = [ [ [ $class, $code ] ] ];
-        } else {
+            my $action = Catalyst::Action->new(
+                {
+                    code      => $code,
+                    reverse   => "$class->$method",
+                    namespace => $class,
+                }
+            );
+            $results = [ [$action] ];
+        }
+
+        else {
             my $error =
               qq/Couldn't forward to "$class". Does not implement "$method"/;
             $c->error($error);
@@ -179,7 +201,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
     local $c->request->{arguments} = [ @{$arguments} ];
 
     for my $result ( @{$results} ) {
-        $c->execute( @{ $result->[0] } );
+        $result->[0]->execute($c);
         return if scalar @{ $c->error };
         last unless $c->state;
     }
@@ -187,35 +209,83 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
     return $c->state;
 }
 
-=item $c->get_action( $action, $namespace, $inherit )
+=item $self->prepare_action($c)
 
-Get an action in a given namespace.
+=cut
+
+sub prepare_action {
+    my ( $self, $c ) = @_;
+    my $path = $c->req->path;
+    my @path = split /\//, $c->req->path;
+    $c->req->args( \my @args );
+
+    while (@path) {
+        $path = join '/', @path;
+        if ( my $result = ${ $c->get_action($path) }[0] ) {
+
+            # It's a regex
+            if ($#$result) {
+                my $match    = $result->[1];
+                my @snippets = @{ $result->[2] };
+                $c->log->debug(
+                    qq/Requested action is "$path" and matched "$match"/)
+                  if $c->debug;
+                $c->log->debug(
+                    'Snippets are "' . join( ' ', @snippets ) . '"' )
+                  if ( $c->debug && @snippets );
+                $c->req->action($match);
+                $c->req->snippets( \@snippets );
+            }
+
+            else {
+                $c->req->action($path);
+                $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
+            }
+
+            $c->req->match($path);
+            last;
+        }
+        unshift @args, pop @path;
+    }
+
+    unless ( $c->req->action ) {
+        $c->req->action('default');
+        $c->req->match('');
+    }
+
+    $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
+      if ( $c->debug && @args );
+}
+
+=item $self->get_action( $c, $action, $namespace, $inherit )
 
 =cut
 
 sub get_action {
-    my ( $c, $action, $namespace, $inherit ) = @_;
+    my ( $self, $c, $action, $namespace, $inherit ) = @_;
     return [] unless $action;
     $namespace ||= '';
     $inherit   ||= 0;
 
     if ($namespace) {
         $namespace = '' if $namespace eq '/';
-        my $parent = $c->tree;
+        my $parent = $self->tree;
         my @results;
 
         if ($inherit) {
-            my $result = $c->actions->{private}->{ $parent->getUID }->{$action};
+            my $result =
+              $self->actions->{private}->{ $parent->getUID }->{$action};
             push @results, [$result] if $result;
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
 
-            SEARCH:
+          SEARCH:
             for my $part ( split '/', $namespace ) {
                 $visitor->setSearchPath($part);
                 $parent->accept($visitor);
                 my $child = $visitor->getResult;
                 my $uid   = $child->getUID if $child;
-                my $match = $c->actions->{private}->{$uid}->{$action} if $uid;
+                my $match = $self->actions->{private}->{$uid}->{$action}
+                  if $uid;
                 push @results, [$match] if $match;
                 if ($child) {
                     $parent = $child;
@@ -235,14 +305,14 @@ sub get_action {
                 $parent->accept($visitor);
                 my $child = $visitor->getResult;
                 my $uid   = $child->getUID if $child;
-                my $match = $c->actions->{private}->{$uid}->{$action}
+                my $match = $self->actions->{private}->{$uid}->{$action}
                   if $uid;
                 push @results, [$match] if $match;
             }
 
             else {
                 my $result =
-                  $c->actions->{private}->{ $parent->getUID }->{$action};
+                  $self->actions->{private}->{ $parent->getUID }->{$action};
                 push @results, [$result] if $result;
             }
 
@@ -250,17 +320,18 @@ sub get_action {
         return \@results;
     }
 
-    elsif ( my $p = $c->actions->{plain}->{$action} ) { return [ [$p] ] }
-    elsif ( my $r = $c->actions->{regex}->{$action} ) { return [ [$r] ] }
+    elsif ( my $p = $self->actions->{plain}->{$action} ) { return [ [$p] ] }
+    elsif ( my $r = $self->actions->{regex}->{$action} ) { return [ [$r] ] }
 
     else {
 
-        for my $i ( 0 .. $#{ $c->actions->{compiled} } ) {
-            my $name  = $c->actions->{compiled}->[$i]->[0];
-            my $regex = $c->actions->{compiled}->[$i]->[1];
+        for my $i ( 0 .. $#{ $self->actions->{compiled} } ) {
+            my $name  = $self->actions->{compiled}->[$i]->[0];
+            my $regex = $self->actions->{compiled}->[$i]->[1];
 
             if ( my @snippets = ( $action =~ $regex ) ) {
-                return [ [ $c->actions->{regex}->{$name}, $name, \@snippets ] ];
+                return [
+                    [ $self->actions->{regex}->{$name}, $name, \@snippets ] ];
             }
 
         }
@@ -268,14 +339,12 @@ sub get_action {
     return [];
 }
 
-=item $c->set_action( $action, $code, $namespace, $attrs )
-
-Set an action in a given namespace.
+=item $self->set_action( $c, $action, $code, $namespace, $attrs )
 
 =cut
 
 sub set_action {
-    my ( $c, $method, $code, $namespace, $attrs ) = @_;
+    my ( $self, $c, $method, $code, $namespace, $attrs ) = @_;
 
     my $prefix =
       Catalyst::Utils::class2prefix( $namespace, $c->config->{case_sensitive} )
@@ -301,7 +370,7 @@ sub set_action {
     }
     return unless keys %flags;
 
-    my $parent  = $c->tree;
+    my $parent  = $self->tree;
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
 
     for my $part ( split '/', $prefix ) {
@@ -319,9 +388,20 @@ sub set_action {
         $parent = $child;
     }
 
-    my $uid = $parent->getUID;
-    $c->actions->{private}->{$uid}->{$method} = [ $namespace, $code ];
     my $forward = $prefix ? "$prefix/$method" : $method;
+
+    my $reverse = $prefix ? "$prefix/$method" : $method;
+
+    my $action = Catalyst::Action->new(
+        {
+            code      => $code,
+            reverse   => $reverse,
+            namespace => $namespace,
+        }
+    );
+
+    my $uid = $parent->getUID;
+    $self->actions->{private}->{$uid}->{$method} = $action;
 
     if ( $flags{path} ) {
         $flags{path} =~ s/^\w+//;
@@ -337,8 +417,6 @@ sub set_action {
         if ( $flags{regex} =~ /^\s*"(.*)"\s*$/ ) { $flags{regex} = $1 }
     }
 
-    my $reverse = $prefix ? "$prefix/$method" : $method;
-
     if ( $flags{local} || $flags{global} || $flags{path} ) {
         my $path     = $flags{path} || $method;
         my $absolute = 0;
@@ -350,25 +428,21 @@ sub set_action {
 
         $absolute = 1 if $flags{global};
         my $name = $absolute ? $path : $prefix ? "$prefix/$path" : $path;
-        $c->actions->{plain}->{$name} = [ $namespace, $code ];
+        $self->actions->{plain}->{$name} = $action;
     }
 
     if ( my $regex = $flags{regex} ) {
-        push @{ $c->actions->{compiled} }, [ $regex, qr#$regex# ];
-        $c->actions->{regex}->{$regex} = [ $namespace, $code ];
+        push @{ $self->actions->{compiled} }, [ $regex, qr#$regex# ];
+        $self->actions->{regex}->{$regex} = $action;
     }
-
-    $c->actions->{reverse}->{"$code"} = $reverse;
 }
 
-=item $class->setup_actions($component)
-
-Setup actions for a component.
+=item $self->setup_actions( $class, $component )
 
 =cut
 
 sub setup_actions {
-    my $self = shift;
+    my ( $self, $class ) = @_;
 
     # These are the core structures
     $self->actions(
@@ -376,15 +450,14 @@ sub setup_actions {
             plain    => {},
             private  => {},
             regex    => {},
-            compiled => [],
-            reverse  => {}
+            compiled => []
         }
     );
 
     # We use a tree
     $self->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
 
-    for my $comp ( keys %{ $self->components } ) {
+    for my $comp ( keys %{ $class->components } ) {
 
         # We only setup components that inherit from Catalyst::Base
         next unless $comp->isa('Catalyst::Base');
@@ -412,7 +485,7 @@ sub setup_actions {
                     if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
 
                         $name = *{$sym}{NAME};
-                        $self->set_action( $name, $code, $comp, $attrs );
+                        $class->set_action( $name, $code, $comp, $attrs );
                         last;
                     }
 
@@ -424,7 +497,7 @@ sub setup_actions {
 
     }
 
-    return unless $self->debug;
+    return unless $class->debug;
 
     my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
@@ -439,15 +512,15 @@ sub setup_actions {
         my $uid = $parent->getUID;
 
         for my $action ( keys %{ $actions->{private}->{$uid} } ) {
-            my ( $class, $code ) = @{ $actions->{private}->{$uid}->{$action} };
-            $privates->addRow( "$prefix$action", $class );
+            my $action_obj = $actions->{private}->{$uid}->{$action};
+            $privates->addRow( "$prefix$action", $action_obj->namespace );
         }
 
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
 
     $walker->( $walker, $self->tree, '' );
-    $self->log->debug( "Loaded private actions:\n" . $privates->draw )
+    $class->log->debug( "Loaded private actions:\n" . $privates->draw )
       if ( @{ $privates->{tbl_rows} } );
 
     my $publics = Text::ASCIITable->new;
@@ -456,13 +529,11 @@ sub setup_actions {
     $publics->setColWidth( 'Private', 37, 1 );
 
     for my $plain ( sort keys %{ $actions->{plain} } ) {
-        my ( $class, $code ) = @{ $actions->{plain}->{$plain} };
-        my $reverse = $self->actions->{reverse}->{$code};
-        $reverse = $reverse ? "/$reverse" : $code;
-        $publics->addRow( "/$plain", $reverse );
+        my $action = $actions->{plain}->{$plain};
+        $publics->addRow( "/$plain", "/$action" );
     }
 
-    $self->log->debug( "Loaded public actions:\n" . $publics->draw )
+    $class->log->debug( "Loaded public actions:\n" . $publics->draw )
       if ( @{ $publics->{tbl_rows} } );
 
     my $regexes = Text::ASCIITable->new;
@@ -471,13 +542,11 @@ sub setup_actions {
     $regexes->setColWidth( 'Private', 37, 1 );
 
     for my $regex ( sort keys %{ $actions->{regex} } ) {
-        my ( $class, $code ) = @{ $actions->{regex}->{$regex} };
-        my $reverse = $self->actions->{reverse}->{$code};
-        $reverse = $reverse ? "/$reverse" : $code;
-        $regexes->addRow( $regex, $reverse );
+        my $action = $actions->{regex}->{$regex};
+        $regexes->addRow( $regex, "/$action" );
     }
 
-    $self->log->debug( "Loaded regex actions:\n" . $regexes->draw )
+    $class->log->debug( "Loaded regex actions:\n" . $regexes->draw )
       if ( @{ $regexes->{tbl_rows} } );
 }
 

@@ -6,20 +6,23 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments body base cookies headers match method 
-       parameters path protocol secure snippets uploads user/
+    qw/action address arguments base cookies handle headers match method
+      protocol query_parameters secure snippets uri user/
 );
 
-*args   = \&arguments;
-*input  = \&body;
-*params = \&parameters;
+*args         = \&arguments;
+*body_params  = \&body_parameters;
+*input        = \&body;
+*params       = \&parameters;
+*query_params = \&query_parameters;
+*path_info    = \&path;
 
 sub content_encoding { shift->headers->content_encoding(@_) }
-sub content_length   { shift->headers->content_length(@_)   }
-sub content_type     { shift->headers->content_type(@_)     }
-sub header           { shift->headers->header(@_)           }
-sub referer          { shift->headers->referer(@_)          }
-sub user_agent       { shift->headers->user_agent(@_)       }
+sub content_length   { shift->headers->content_length(@_) }
+sub content_type     { shift->headers->content_type(@_) }
+sub header           { shift->headers->header(@_) }
+sub referer          { shift->headers->referer(@_) }
+sub user_agent       { shift->headers->user_agent(@_) }
 
 =head1 NAME
 
@@ -35,12 +38,13 @@ Catalyst::Request - Catalyst Request Class
     $req->arguments;
     $req->base;
     $req->body;
+    $req->body_parameters;
     $req->content_encoding;
     $req->content_length;
     $req->content_type;
     $req->cookie;
     $req->cookies;
-    $req->full_uri;
+    $req->handle;
     $req->header;
     $req->headers;
     $req->hostname;
@@ -52,6 +56,8 @@ Catalyst::Request - Catalyst Request Class
     $req->parameters;
     $req->path;
     $req->protocol;
+    $req->query_parameters;
+    $req->read;
     $req->referer;
     $req->secure;
     $req->snippets;
@@ -107,6 +113,35 @@ C<application/x-www-form-urlencoded> or C<multipart/form-data>.
 
     print $c->request->body
 
+=cut
+
+sub body {
+    my ( $self, $body ) = @_;
+    $self->{_context}->prepare_body;
+    return $self->{_body}->body;
+}
+
+=item $req->body_parameters
+
+Returns a reference to a hash containing body parameters. Values can
+be either a scalar or an arrayref containing scalars.
+
+    print $c->request->body_parameters->{field};
+    print $c->request->body_parameters->{field}->[0];
+    
+=item $req->body_params
+
+An alias for body_parameters.
+
+=cut
+
+sub body_parameters {
+    my ( $self, $params ) = @_;
+    $self->{_context}->prepare_body;
+    $self->{body_parameters} = $params if $params;
+    return $self->{body_parameters};
+}
+
 =item $req->content_encoding
 
 Shortcut to $req->headers->content_encoding
@@ -142,7 +177,7 @@ sub cookie {
         unless ( exists $self->cookies->{$name} ) {
             return undef;
         }
-        
+
         return $self->cookies->{$name};
     }
 }
@@ -153,30 +188,9 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-=item $req->full_uri
+=item $req->handle
 
-Returns the complete URI, with the parameter query string.
-
-=cut
-
-sub full_uri {
-  my $self = shift;
-  my $full_uri = $self->uri;
-
-  if ( scalar $self->param ) {
-    my @params;
-    foreach my $arg ( sort keys %{ $self->params } ) {
-      if ( ref $self->params->{$arg} ) {
-        my $list = $self->params->{$arg};
-        push @params, map { "$arg=" . $_  } sort @{$list};
-      } else {
-        push @params, "$arg=" . $self->params->{$arg};
-      }
-    }
-    $full_uri .= '?' . join( '&', @params );
-  }       
-  return $full_uri;
-}
+Request IO handle.
 
 =item $req->header
 
@@ -200,7 +214,8 @@ sub hostname {
     my $self = shift;
 
     if ( @_ == 0 && not $self->{hostname} ) {
-         $self->{hostname} = gethostbyaddr( inet_aton( $self->address ), AF_INET );
+        $self->{hostname} =
+          gethostbyaddr( inet_aton( $self->address ), AF_INET );
     }
 
     if ( @_ == 1 ) {
@@ -268,7 +283,7 @@ sub param {
     if ( @_ > 1 ) {
 
         while ( my ( $field, $value ) = splice( @_, 0, 2 ) ) {
-        
+
             next unless defined $field;
 
             if ( exists $self->parameters->{$field} ) {
@@ -296,15 +311,68 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->parameters->{field};
     print $c->request->parameters->{field}->[0];
 
+=cut
+
+sub parameters {
+    my ( $self, $params ) = @_;
+    $self->{_context}->prepare_body;
+    $self->{parameters} = $params if $params;
+    return $self->{parameters};
+}
+
 =item $req->path
 
 Contains the path.
 
     print $c->request->path;
 
+=item $req->path_info
+
+alias for path, added for compability with L<CGI>
+
+=cut
+
+sub path {
+    my ( $self, $params ) = @_;
+    
+    if ( $params ) {
+        # base must always have a trailing slash
+        $params .= '/' unless ( $params =~ /\/$/ );
+        $self->uri->path( $params );
+    }
+
+    my $path = $self->uri->path;
+    my $location = $self->base->path;
+    $path =~ s/^(\Q$location\E)?//;
+    $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+    $path =~ s/^\///;
+    
+    return $path;
+}
+
 =item $req->protocol
 
 Contains the protocol.
+
+=item $req->query_parameters
+
+Returns a reference to a hash containing query parameters. Values can
+be either a scalar or an arrayref containing scalars.
+
+    print $c->request->query_parameters->{field};
+    print $c->request->query_parameters->{field}->[0];
+    
+=item $req->read( [$maxlength] )
+
+Read a chunk of data from the request body.  This method is designed to be
+used in a while loop, reading $maxlength bytes on every call.  $maxlength
+defaults to the size of the request if not specified.
+
+You have to set MyApp->config->{parse_on_demand} to use this directly.
+
+=cut
+
+sub read { shift->{_context}->read(@_); }
 
 =item $req->referer
 
@@ -356,8 +424,8 @@ sub upload {
         }
         else {
             return (wantarray)
-               ? ( $self->uploads->{$upload} )
-               : $self->uploads->{$upload};
+              ? ( $self->uploads->{$upload} )
+              : $self->uploads->{$upload};
         }
     }
 
@@ -386,17 +454,18 @@ hashref or a arrayref containing C<Catalyst::Request::Upload> objects.
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
 
-=item $req->uri
-
-Shortcut for C<< $req->base . $req->path >>.
-
 =cut
 
-sub uri {
-    my $self = shift;
-    my $path = shift || $self->path || '';
-    return $self->base . $path;
+sub uploads {
+    my ( $self, $uploads ) = @_;
+    $self->{_context}->prepare_body;
+    $self->{uploads} = $uploads if $uploads;
+    return $self->{uploads};
 }
+
+=item $req->uri
+
+Returns a URI object for the request.
 
 =item $req->user
 

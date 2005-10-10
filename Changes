@@ -1,12 +1,45 @@
-This file documents the revision history for Perl extension Catalyst.
+Tis file documents the revision history for Perl extension Catalyst.
 
-5.34
+5.49_01 2005-10-10 10:15:00 
+        - Refactored all internals, should be 99% compatible to previous
+          versions.
+        - *IMPORTANT* The Apache engines have been moved to a separate package
+          for this release.  Please install Catalyst::Engine::Apache if you
+          need Apache support.
+
+        - Added support for calling forward with arguments in the path, i.e.
+          $c->forward('/foo/bar/arg1/arg2')
+        - Made $c->req->uri a URI object, added req->path_info for CGI compat.
+          Raw query string is available as $c->req->uri->query.
+        - Made $c->req->base a URI object.
+        - Parameters with multiple values (?a=1&a=2) now display properly
+          in the debug output.
+        - Semi-colon separators in query strings now work properly.
+        - Expanded documentation of catalyst.pl (Andrew Ford)
+        - Added support for running as a backend server behind a frontend
+          proxy so req->base and req->address are set properly.
+        - Added an 'abort' method to the Log api, so that you can
+          kill loggging for a whole request.
+        - Added $c->uri_for method to simplify url handling.
+        - Added more tests and reorganized the t directory.
+        - Reimplemented core engines, all are now CGI based for better test
+          coverage and maintainability.
+        - Added fork support to built in test server.
+        - Fixed all memory leaks.
+        - Thread-related bug fixes and tests.  We now believe the Catalyst
+          core to be thread-safe.
+        - Added streaming IO support through $c->req->read() and
+          $c->res->write()
+        - Added MyApp->config->{parse_on_demand} (streaming input)
+        - Added $c->req->handle and $c->res->handle
+        - Improved documentation
+
+5.34  (not released)
         - Fixed mkpath in Catalyst::Helper (Autrijus Tang)
         - added $c->req->full_uri method (Jesse Sheidlower)
         - Fixed bug in dispatcher where an invalid path could call a valid
           action. (Andy Grundman)
         - Fixed Helper so it works with CRLF line-endings. (Andy Grundman)
-        - Require Text::ASCIITable 0.17 to fix memory leak in debug mode.
 
 5.33  2005-08-10 15:25:00
         - Now with updated manifest.

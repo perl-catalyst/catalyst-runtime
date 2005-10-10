@@ -103,13 +103,12 @@ sub mk_component {
         my @args   = @_;
         my $class  = "Catalyst::Helper::$helper";
         eval "require $class";
-        
-        if ( $@ ) {
-            Catalyst::Exception->throw( 
-                message => qq/Couldn't load helper "$class", "$@"/
-            );
+
+        if ($@) {
+            Catalyst::Exception->throw(
+                message => qq/Couldn't load helper "$class", "$@"/ );
         }
-        
+
         if ( $class->can('mk_stuff') ) {
             return 1 unless $class->mk_stuff( $self, @args );
         }
@@ -152,13 +151,12 @@ sub mk_component {
             $comp = 'Controller' if $type eq 'C';
             my $class = "Catalyst::Helper::$comp\::$helper";
             eval "require $class";
-            
-            if ( $@ ) {
-                Catalyst::Exception->throw( 
-                    message => qq/Couldn't load helper "$class", "$@"/
-                );
-            }            
-        
+
+            if ($@) {
+                Catalyst::Exception->throw(
+                    message => qq/Couldn't load helper "$class", "$@"/ );
+            }
+
             if ( $class->can('mk_compclass') ) {
                 return 1 unless $class->mk_compclass( $self, @args );
             }
@@ -195,10 +193,8 @@ sub mk_dir {
         print qq/created "$dir"\n/;
         return 1;
     }
-    
-    Catalyst::Exception->throw( 
-        message => qq/Couldn't create "$dir", "$!"/
-    );    
+
+    Catalyst::Exception->throw( message => qq/Couldn't create "$dir", "$!"/ );
 }
 
 =head3 mk_file
@@ -212,21 +208,19 @@ sub mk_file {
     if ( -e $file ) {
         print qq/ exists "$file"\n/;
         return 0 unless $self->{'.newfiles'};
-	if ( my $f = IO::File->new("< $file") ) {
-	    my $oldcontent = join('', (<$f>));
-	    return 0 if $content eq $oldcontent;
-	}
-	$file .= '.new';
+        if ( my $f = IO::File->new("< $file") ) {
+            my $oldcontent = join( '', (<$f>) );
+            return 0 if $content eq $oldcontent;
+        }
+        $file .= '.new';
     }
     if ( my $f = IO::File->new("> $file") ) {
         print $f $content;
         print qq/created "$file"\n/;
         return 1;
     }
-    
-    Catalyst::Exception->throw( 
-        message => qq/Couldn't create "$file", "$!"/
-    );       
+
+    Catalyst::Exception->throw( message => qq/Couldn't create "$file", "$!"/ );
 }
 
 =head3 next_test
@@ -243,7 +237,7 @@ sub next_test {
         $prefix         = $prefix;
         $tname          = $prefix . '.t';
         $self->{prefix} = $prefix;
-        $prefix = lc $prefix;
+        $prefix         = lc $prefix;
         $prefix =~ s/-/\//g;
         $self->{uri} = $prefix;
     }
@@ -266,7 +260,9 @@ sub render_file {
     my $template = $self->get_file( ( caller(0) )[0], $file );
     return 0 unless $template;
     my $output;
-    $t->process( \$template, { %{$self}, %$vars }, \$output );
+    $t->process( \$template, { %{$self}, %$vars }, \$output )
+      || Catalyst::Exception->throw(
+        message => qq/Couldn't process "$file", / . $t->error() );
     $self->mk_file( $path, $output );
 }
 
@@ -465,14 +461,27 @@ Catalyst based application.
 
 sub default : Private {
     my ( $self, $c ) = @_;
-    $c->res->output('Congratulations, [% name %] is on Catalyst!');
+
+    # Hello World
+    $c->response->output('Congratulations, [% name %] is on Catalyst!');
 }
+
+#=item end
+#
+#=cut
+#
+#sub end : Private {
+#    my ( $self, $c ) = @_;
+#
+#    # Forward to View unless response body is already defined
+#    $c->forward('MyApp::V::') unless $c->response->body;
+#}
 
 =back
 
 =head1 AUTHOR
 
-[%author%]
+[% author %]
 
 =head1 LICENSE
 
@@ -644,14 +653,21 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use [% name %];
 
+my $fork = 0;
 my $help = 0;
+my $host = undef;
 my $port = 3000;
 
-GetOptions( 'help|?' => \$help, 'port=s' => \$port );
+GetOptions(
+    'fork'   => \$fork,
+    'help|?' => \$help,
+    'host=s' => \$host,
+    'port=s' => \$port
+);
 
 pod2usage(1) if $help;
 
-[% name %]->run($port);
+[% name %]->run( $port, $host, $fork );
 
 1;
 
@@ -664,7 +680,9 @@ pod2usage(1) if $help;
 [% appprefix %]_server.pl [options]
 
  Options:
+   -f -fork    handle each request in a new process
    -? -help    display this help and exits
+      -host    host (defaults to all)
    -p -port    port (defaults to 3000)
 
  See also:
@@ -838,7 +856,9 @@ Catalyst component.
 
 sub default : Private {
     my ( $self, $c ) = @_;
-    $c->res->output('Congratulations, [% class %] is on Catalyst!');
+
+    # Hello World
+    $c->response->output('Congratulations, [% class %] is on Catalyst!');
 }
 
 =back

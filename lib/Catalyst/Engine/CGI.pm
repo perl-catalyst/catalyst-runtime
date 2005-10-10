@@ -1,28 +1,10 @@
 package Catalyst::Engine::CGI;
 
 use strict;
-use base 'Catalyst::Engine::CGI::Base';
-
-use Catalyst::Exception;
-use CGI;
-
-our @compile = qw[
-    delete
-    http
-    new_MultipartBuffer
-    param
-    parse_keywordlist
-    read_from_client
-    read_multipart
-    tmpFileName
-    uploadInfo
-    url_param
-    user_agent
-];
-
-CGI->compile(@compile);
-
-__PACKAGE__->mk_accessors('cgi');
+use base 'Catalyst::Engine';
+use NEXT;
+use URI;
+use URI::Query;
 
 =head1 NAME
 
@@ -45,153 +27,179 @@ appropriate engine module.
 
 =head1 DESCRIPTION
 
-This is the Catalyst engine specialized for the CGI environment (using the
-C<CGI> and C<CGI::Cookie> modules).
-
-=head1 METHODS
-
-=over 4
-
-=item $c->cgi
-
-Contains the C<CGI> object.
-
-=back
+This is the Catalyst engine specialized for the CGI environment.
 
 =head1 OVERLOADED METHODS
 
-This class overloads some methods from C<Catalyst::Engine::CGI::Base>.
+This class overloads some methods from C<Catalyst::Engine>.
 
 =over 4
 
-=item $c->prepare_body
+=item $self->finalize_headers($c)
 
 =cut
 
-sub prepare_body {
-    my $c = shift;
+sub finalize_headers {
+    my ( $self, $c ) = @_;
 
-    # XXX this is undocumented in CGI.pm. If Content-Type is not
-    # application/x-www-form-urlencoded or multipart/form-data
-    # CGI.pm will read STDIN into a param, POSTDATA.
+    $c->response->header( Status => $c->response->status );
 
-    $c->request->body( $c->cgi->param('POSTDATA') );
+    print $c->response->headers->as_string("\015\012");
+    print "\015\012";
 }
 
-=item $c->prepare_parameters
+=item $self->prepare_connection($c)
 
 =cut
 
-sub prepare_parameters {
-    my $c = shift;
-
-    my ( @params );
-
-    if ( $c->request->method eq 'POST' ) {
-        for my $param ( $c->cgi->url_param ) {
-            for my $value (  $c->cgi->url_param($param) ) {
-                push ( @params, $param, $value );
-            }
+sub prepare_connection {
+    my ( $self, $c ) = @_;
+    
+    $c->request->address( $ENV{REMOTE_ADDR} );
+    
+    PROXY_CHECK:
+    {
+        unless ( $c->config->{using_frontend_proxy} ) {
+            last PROXY_CHECK if $ENV{REMOTE_ADDR} ne '127.0.0.1';
+            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
         }
+        last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_FOR};
+   
+        # If we are running as a backend server, the user will always appear
+        # as 127.0.0.1. Select the most recent upstream IP (last in the list)
+        my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
+        $c->request->address( $ip );
     }
 
-    for my $param ( $c->cgi->param ) {
-        for my $value (  $c->cgi->param($param) ) {
-            push ( @params, $param, $value );
-        }
+    $c->request->hostname( $ENV{REMOTE_HOST} );
+    $c->request->protocol( $ENV{SERVER_PROTOCOL} );
+    $c->request->user( $ENV{REMOTE_USER} );
+    $c->request->method( $ENV{REQUEST_METHOD} );
+
+    if ( $ENV{HTTPS} && uc( $ENV{HTTPS} ) eq 'ON' ) {
+        $c->request->secure(1);
     }
 
-    $c->request->param(@params);
+    if ( $ENV{SERVER_PORT} == 443 ) {
+        $c->request->secure(1);
+    }
 }
 
-=item $c->prepare_request
+=item $self->prepare_headers($c)
 
 =cut
 
-sub prepare_request {
-    my ( $c, $object ) = @_;
+sub prepare_headers {
+    my ( $self, $c ) = @_;
 
-    my $cgi;
-
-    if ( defined($object) && ref($object) ) {
-
-        if ( $object->isa('Apache') ) {                   # MP 1.3
-            $cgi = CGI->new($object);
-        }
-
-        elsif ( $object->isa('Apache::RequestRec') ) {    # MP 1.99
-            $cgi = CGI->new($object);
-        }
-
-        elsif ( $object->isa('Apache2::RequestRec') ) {   # MP 2.00
-            $cgi = CGI->new($object);
-        }
-
-        elsif ( $object->isa('CGI') ) {
-            $cgi = $object;
-        }
-
-        else {
-            my $class = ref($object);
-            
-            Catalyst::Exception->throw(
-                message => qq/Unknown object '$object'/
-            );
-        }
+    # Read headers from %ENV
+    while ( my ( $header, $value ) = each %ENV ) {
+        next unless $header =~ /^(?:HTTP|CONTENT|COOKIE)/i;
+        ( my $field = $header ) =~ s/^HTTPS?_//;
+        $c->req->headers->header( $field => $value );
     }
-
-    $c->cgi( $cgi || CGI->new );
 }
 
-=item $c->prepare_uploads
+=item $self->prepare_path($c)
 
 =cut
 
-sub prepare_uploads {
-    my $c = shift;
+sub prepare_path {
+    my ( $self, $c ) = @_;
 
-    my @uploads;
-
-    for my $param ( $c->cgi->param ) {
-
-        my @values = $c->cgi->param($param);
-
-        next unless ref( $values[0] );
-
-        for my $fh (@values) {
-
-            next unless my $size = ( stat $fh )[7];
-
-            my $info        = $c->cgi->uploadInfo($fh);
-            my $tempname    = $c->cgi->tmpFileName($fh);
-            my $type        = $info->{'Content-Type'};
-            my $disposition = $info->{'Content-Disposition'};
-            my $filename    = ( $disposition =~ / filename="([^;]*)"/ )[0];
-
-            my $upload = Catalyst::Request::Upload->new(
-                filename => $filename,
-                size     => $size,
-                tempname => $tempname,
-                type     => $type
-            );
-
-            push( @uploads, $param, $upload );
+    my $scheme    = $c->request->secure ? 'https' : 'http';
+    my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
+    my $port      = $ENV{SERVER_PORT} || 80;
+    my $base_path = $ENV{SCRIPT_NAME} || '/';
+    
+    # If we are running as a backend proxy, get the true hostname
+    PROXY_CHECK:
+    {
+        unless ( $c->config->{using_frontend_proxy} ) {
+            last PROXY_CHECK if $host !~ /localhost|127.0.0.1/;
+            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
         }
+        last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_HOST};
+
+        $host = $ENV{HTTP_X_FORWARDED_HOST};
+        # backend could be on any port, so 
+        # assume frontend is on the default port
+        $port = $c->request->secure ? 443 : 80;
     }
 
-    $c->request->upload(@uploads);
+    my $path = $base_path . $ENV{PATH_INFO};
+    $path =~ s{^/+}{};
+    
+    my $uri = URI->new;
+    $uri->scheme( $scheme );
+    $uri->host( $host );
+    $uri->port( $port );    
+    $uri->path( $path );
+    $uri->query( $ENV{QUERY_STRING} ) if $ENV{QUERY_STRING};
+    
+    # sanitize the URI
+    $uri = $uri->canonical;
+    $c->request->uri( $uri );
+
+    # set the base URI
+    # base must end in a slash
+    $base_path .= '/' unless ( $base_path =~ /\/$/ );    
+    my $base = $uri->clone;
+    $base->path_query( $base_path );
+    $c->request->base( $base );
 }
+
+=item $self->prepare_query_parameters($c)
+
+=cut
+
+sub prepare_query_parameters {
+    my ( $self, $c ) = @_;
+    
+    my $u = URI::Query->new( $ENV{QUERY_STRING} );
+    $c->request->query_parameters( { $u->hash } );
+}
+
+=item $self->prepare_write($c)
+
+Enable autoflush on the output handle for CGI-based engines.
+
+=cut
+
+sub prepare_write {
+    my ( $self, $c ) = @_;
+    
+    # Set the output handle to autoflush
+    $c->response->handle->autoflush(1);
+    
+    $self->NEXT::prepare_write( $c );
+}
+
+=item $self->read_chunk($c, $buffer, $length)
+
+=cut
+
+sub read_chunk { shift; shift->request->handle->sysread( @_ ); }
+
+=item $self->run
+
+=cut
+
+sub run { shift; shift->handle_request(@_) }
 
 =back
 
 =head1 SEE ALSO
 
-L<Catalyst> L<Catalyst::Engine> L<Catalyst::Engine::CGI::Base>.
+L<Catalyst> L<Catalyst::Engine>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Christian Hansen, C<ch@ngmedia.com>
+Sebastian Riedel, <sri@cpan.org>
+
+Christian Hansen, <ch@ngmedia.com>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 COPYRIGHT
 

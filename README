@@ -72,21 +72,75 @@ DESCRIPTION
             use Catalyst;
             sub debug { 1 }
 
+    -Dispatcher
+        Force Catalyst to use a specific dispatcher.
+
     -Engine
         Force Catalyst to use a specific engine. Omit the
         "Catalyst::Engine::" prefix of the engine name, i.e.:
 
             use Catalyst '-Engine=CGI';
 
+    -Home
+        Force Catalyst to use a specific home directory.
+
+    -Log
+        Specify log level.
+
 METHODS
-    debug
-        Overload to enable debug messages.
+    $c->comp($name)
+    $c->component($name)
+        Get a component object by name.
+
+            $c->comp('MyApp::Model::MyModel')->do_stuff;
 
     config
         Returns a hashref containing your applications settings.
 
+    debug
+        Overload to enable debug messages.
+
+    $c->detach( $command [, \@arguments ] )
+        Like "forward" but doesn't return.
+
+    $c->dispatcher
+        Contains the dispatcher instance. Stringifies to class.
+
+    $c->forward( $command [, \@arguments ] )
+        Forward processing to a private action or a method from a class. If
+        you define a class without method it will default to process(). also
+        takes an optional arrayref containing arguments to be passed to the
+        new function. $c->req->args will be reset upon returning from the
+        function.
+
+            $c->forward('/foo');
+            $c->forward('index');
+            $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
+            $c->forward('MyApp::View::TT');
+
+    $c->setup
+        Setup.
+
+            $c->setup;
+
+    $c->uri_for($path)
+        Merges path with $c->request->base for absolute uri's and with
+        $c->request->match for relative uri's, then returns a normalized URI
+        object.
+
+    $c->error
+    $c->error($error, ...)
+    $c->error($arrayref)
+        Returns an arrayref containing error messages.
+
+            my @error = @{ $c->error };
+
+        Add a new error.
+
+            $c->error('Something bad happened');
+
     $c->engine
-        Contains the engine class.
+        Contains the engine instance. Stringifies to the class.
 
     $c->log
         Contains the logging object. Unless it is already set Catalyst sets
@@ -106,6 +160,154 @@ METHODS
 
             $c->prototype->define_javascript_functions;
 
+    $c->request
+    $c->req
+        Returns a "Catalyst::Request" object.
+
+            my $req = $c->req;
+
+    $c->response
+    $c->res
+        Returns a "Catalyst::Response" object.
+
+            my $res = $c->res;
+
+    $c->state
+        Contains the return value of the last executed action.
+
+    $c->stash
+        Returns a hashref containing all your data.
+
+            $c->stash->{foo} ||= 'yada';
+            print $c->stash->{foo};
+
+INTERNAL METHODS
+    $c->benchmark($coderef)
+        Takes a coderef with arguments and returns elapsed time as float.
+
+            my ( $elapsed, $status ) = $c->benchmark( sub { return 1 } );
+            $c->log->info( sprintf "Processing took %f seconds", $elapsed );
+
+    $c->components
+        Contains the components.
+
+    $c->counter
+        Returns a hashref containing coderefs and execution counts. (Needed
+        for deep recursion detection)
+
+    $c->depth
+        Returns the actual forward depth.
+
+    $c->dispatch
+        Dispatch request to actions.
+
+    $c->execute($class, $coderef)
+        Execute a coderef in given class and catch exceptions. Errors are
+        available via $c->error.
+
+    $c->finalize
+        Finalize request.
+
+    $c->finalize_body
+        Finalize body.
+
+    $c->finalize_cookies
+        Finalize cookies.
+
+    $c->finalize_error
+        Finalize error.
+
+    $c->finalize_headers
+        Finalize headers.
+
+    $c->finalize_output
+        An alias for finalize_body.
+
+    $c->finalize_read
+        Finalize the input after reading is complete.
+
+    $c->finalize_uploads
+        Finalize uploads. Cleans up any temporary files.
+
+    $c->get_action( $action, $namespace, $inherit )
+        Get an action in a given namespace.
+
+    handle_request( $class, @arguments )
+        Handles the request.
+
+    $c->prepare(@arguments)
+        Turns the engine-specific request( Apache, CGI ... ) into a Catalyst
+        context .
+
+    $c->prepare_action
+        Prepare action.
+
+    $c->prepare_body
+        Prepare message body.
+
+    $c->prepare_body_parameters
+        Prepare body parameters.
+
+    $c->prepare_connection
+        Prepare connection.
+
+    $c->prepare_cookies
+        Prepare cookies.
+
+    $c->prepare_headers
+        Prepare headers.
+
+    $c->prepare_parameters
+        Prepare parameters.
+
+    $c->prepare_path
+        Prepare path and base.
+
+    $c->prepare_query_parameters
+        Prepare query parameters.
+
+    $c->prepare_read
+        Prepare the input for reading.
+
+    $c->prepare_request
+        Prepare the engine request.
+
+    $c->prepare_uploads
+        Prepare uploads.
+
+    $c->prepare_write
+        Prepare the output for writing.
+
+    $c->read( [$maxlength] )
+        Read a chunk of data from the request body. This method is designed
+        to be used in a while loop, reading $maxlength bytes on every call.
+        $maxlength defaults to the size of the request if not specified.
+
+        You have to set MyApp->config->{parse_on_demand} to use this
+        directly.
+
+    $c->run
+        Starts the engine.
+
+    $c->set_action( $action, $code, $namespace, $attrs )
+        Set an action in a given namespace.
+
+    $c->setup_actions($component)
+        Setup actions for a component.
+
+    $c->setup_components
+        Setup components.
+
+    $c->setup_dispatcher
+    $c->setup_engine
+    $c->setup_home
+    $c->setup_log
+    $c->setup_plugins
+    $c->write( $data )
+        Writes $data to the output stream. When using this method directly,
+        you will need to manually set the Content-Length header to the
+        length of your output data, if known.
+
 CASE SENSITIVITY
     By default Catalyst is not case sensitive, so "MyApp::C::FOO::Bar"
     becomes "/foo/bar".
@@ -114,8 +316,55 @@ CASE SENSITIVITY
 
         MyApp->config->{case_sensitive} = 1;
 
-LIMITATIONS
-    mod_perl2 support is considered experimental and may contain bugs.
+    So "MyApp::C::Foo::Bar" becomes "/Foo/Bar".
+
+ON-DEMAND PARSER
+    The request body is usually parsed at the beginning of a request, but if
+    you want to handle input yourself or speed things up a bit you can
+    enable on-demand parsing with a config parameter.
+
+        MyApp->config->{parse_on_demand} = 1;
+    
+PROXY SUPPORT
+    Many production servers operate using the common double-server approach,
+    with a lightweight frontend web server passing requests to a larger
+    backend server. An application running on the backend server must deal
+    with two problems: the remote user always appears to be '127.0.0.1' and
+    the server's hostname will appear to be 'localhost' regardless of the
+    virtual host the user connected through.
+
+    Catalyst will automatically detect this situation when you are running
+    both the frontend and backend servers on the same machine. The following
+    changes are made to the request.
+
+        $c->req->address is set to the user's real IP address, as read from the
+        HTTP_X_FORWARDED_FOR header.
+    
+        The host value for $c->req->base and $c->req->uri is set to the real host,
+        as read from the HTTP_X_FORWARDED_HOST header.
+
+    Obviously, your web server must support these 2 headers for this to
+    work.
+
+    In a more complex server farm environment where you may have your
+    frontend proxy server(s) on different machines, you will need to set a
+    configuration option to tell Catalyst to read the proxied data from the
+    headers.
+
+        MyApp->config->{using_frontend_proxy} = 1;
+    
+    If you do not wish to use the proxy support at all, you may set:
+
+        MyApp->config->{ignore_frontend_proxy} = 1;
+
+THREAD SAFETY
+    Catalyst has been tested under Apache 2's threading mpm_worker,
+    mpm_winnt, and the standalone forking HTTP server on Windows. We believe
+    the Catalyst core to be thread-safe.
+
+    If you plan to operate in a threaded environment, remember that all
+    other modules you are using must also be thread-safe. Some modules, most
+    notably DBD::SQLite, are not thread-safe.
 
 SUPPORT
     IRC:
@@ -142,9 +391,13 @@ SEE ALSO
 CREDITS
     Andy Grundman
 
+    Andy Wardley
+
     Andrew Ford
 
     Andrew Ruthven
+
+    Arthur Bergman
 
     Autrijus Tang
 
@@ -164,6 +417,8 @@ CREDITS
 
     Jesse Sheidlower
 
+    Jesse Vincent
+
     Jody Belka
 
     Johan Lindstrom
@@ -177,8 +432,6 @@ CREDITS
     Matt S Trout
 
     Robert Sedlacek
-
-    Sebastian Riedel
 
     Tatsuhiko Miyagawa
 
