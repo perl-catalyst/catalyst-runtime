@@ -14,6 +14,9 @@ __PACKAGE__->mk_accessors( qw/read_position read_length/ );
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
 
+# Amount of data to read from input on each pass
+our $CHUNKSIZE = 4096;
+
 =head1 NAME
 
 Catalyst::Engine - The Catalyst Engine
@@ -243,9 +246,19 @@ sub prepare_body {
     
     if ( $self->read_length > 0 ) {
         while ( my $buffer = $self->read( $c ) ) {
-            $c->request->{_body}->add( $buffer );
+            $c->prepare_body_chunk( $buffer );
         }
     }
+}
+
+=item $self->prepare_body_chunk($c)
+
+=cut
+
+sub prepare_body_chunk {
+    my ( $self, $c, $chunk ) = @_;
+    
+    $c->request->{_body}->add( $chunk );
 }
 
 =item $self->prepare_body_parameters($c)
@@ -382,7 +395,7 @@ sub read {
     }
     
     my $remaining = $self->read_length - $self->read_position;
-    $maxlength ||= $self->read_length;
+    $maxlength ||= $CHUNKSIZE;
     
     # Are we done reading?
     if ( $remaining <= 0 ) {

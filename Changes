@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added prepare_body_chunk method as a hook for upload progress.
         - Fixed bug in uri_for method when base has no path.
 
 5.49_01 2005-10-10 10:15:00 

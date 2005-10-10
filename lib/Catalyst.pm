@@ -904,6 +904,17 @@ sub prepare_body {
     }
 }
 
+=item $c->prepare_body_chunk( $chunk )
+
+Prepare a chunk of data before sending it to HTTP::Body.
+
+=cut
+
+sub prepare_body_chunk { 
+    my $c = shift; 
+    $c->engine->prepare_body_chunk( $c, @_ );
+}
+
 =item $c->prepare_body_parameters
 
 Prepare body parameters.
