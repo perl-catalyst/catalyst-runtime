@@ -7,6 +7,8 @@ use Data::Dumper;
 our %LEVELS = ();
 
 __PACKAGE__->mk_accessors('level');
+__PACKAGE__->mk_accessors('body');
+__PACKAGE__->mk_accessors('abort');
 
 {
     my @levels = qw[ debug info warn error fatal ];
@@ -69,7 +71,18 @@ sub _log {
     my $level   = shift;
     my $time    = localtime(time);
     my $message = join( "\n", @_ );
-    printf( STDERR "[%s] [catalyst] [%s] %s\n", $time, $level, $message );
+    $self->{body} .= sprintf( "[%s] [catalyst] [%s] %s\n", 
+		     $time, $level, $message ) ;
+}
+
+sub _flush {
+    my $self    = shift;
+    if ( $self->abort || ! $self->body ) {
+	$self->abort(undef);
+    } else {
+	print( STDERR $self->body);
+    }
+    $self->body(undef);
 }
 
 1;
@@ -180,7 +193,19 @@ Disable log levels
 
 Is the log level active?
 
+=item abort
+
+Should Catalyst emit logs for this request? Will be reset at the end of 
+each request. 
+
+*NOTE* This method is not compatible with other log apis, so if you plan
+to use Log4Perl or another logger, you should call it like this:
+
+    $c->log->abort(1) if $c->log->can('abort');
+
 =back
+
+
 
 =head1 SEE ALSO
 

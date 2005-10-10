@@ -127,18 +127,17 @@ Returns a tempdir for class. If create is true it will try to create the path.
 sub class2tempdir {
     my $class  = shift || '';
     my $create = shift || 0;
-    my @parts  = split '::', lc $class;
+    my @parts = split '::', lc $class;
 
     my $tmpdir = dir( File::Spec->tmpdir, @parts )->cleanup;
 
-    if ( $create && ! -e $tmpdir ) {
+    if ( $create && !-e $tmpdir ) {
 
         eval { $tmpdir->mkpath };
 
-        if ( $@ ) {
+        if ($@) {
             Catalyst::Exception->throw(
-                message => qq/Couldn't create tmpdir '$tmpdir', "$@"/
-            );
+                message => qq/Couldn't create tmpdir '$tmpdir', "$@"/ );
         }
     }
 
@@ -167,6 +166,7 @@ sub home {
         {
             $home = $subdir;
         }
+
         # clean up relative path:
         # MyApp/script/.. -> MyApp
         my ($lastdir) = $home->dir_list( -1, 1 );
@@ -202,13 +202,12 @@ sub reflect_actions {
     my $class   = shift;
     my $actions = [];
     eval '$actions = $class->_action_cache';
-    
-    if ( $@ ) {
-        Catalyst::Exception->throw(
-            message => qq/Couldn't reflect actions of component "$class", "$@"/
-        );
+
+    if ($@) {
+        Catalyst::Exception->throw( message =>
+              qq/Couldn't reflect actions of component "$class", "$@"/ );
     }
-    
+
     return $actions;
 }
 

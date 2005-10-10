@@ -7,7 +7,7 @@ use Catalyst::Exception;
 use File::Copy ();
 use IO::File   ();
 
-__PACKAGE__->mk_accessors(qw/filename size tempname type/);
+__PACKAGE__->mk_accessors(qw/filename headers size tempname type/);
 
 sub new { shift->SUPER::new( ref( $_[0] ) ? $_[0] : {@_} ) }
 
@@ -20,6 +20,7 @@ Catalyst::Request::Upload - Catalyst Request Upload Class
     $upload->copy_to
     $upload->fh
     $upload->filename;
+    $upload->headers;
     $upload->link_to;
     $upload->size;
     $upload->slurp;
@@ -64,14 +65,13 @@ sub fh {
     my $self = shift;
 
     my $fh = IO::File->new( $self->tempname, IO::File::O_RDONLY );
-    
+
     unless ( defined $fh ) {
-        
+
         my $filename = $self->tempname;
-        
+
         Catalyst::Exception->throw(
-            message => qq/Can't open '$filename': '$!'/
-        );
+            message => qq/Can't open '$filename': '$!'/ );
     }
 
     return $fh;
@@ -80,6 +80,10 @@ sub fh {
 =item $upload->filename
 
 Contains client supplied filename.
+
+=item $upload->headers
+
+Returns a C<HTTP::Headers> object.
 
 =item $upload->link_to
 
@@ -108,7 +112,7 @@ Returns a scalar containing contents of tempname.
 sub slurp {
     my ( $self, $layer ) = @_;
 
-    unless ( $layer ) {
+    unless ($layer) {
         $layer = ':raw';
     }
 
