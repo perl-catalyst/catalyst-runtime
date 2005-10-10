@@ -1,5 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
+5.50
+        - Fixed bug in uri_for method when base has no path.
+
 5.49_01 2005-10-10 10:15:00 
         - Refactored all internals, should be 99% compatible to previous
           versions.
