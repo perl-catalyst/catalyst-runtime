@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added multiple paths support to dispatcher
         - Fixed bug in req->path where changing the path added a trailing
           slash.
         - Removed req->handle and res->handle

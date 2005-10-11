@@ -354,10 +354,12 @@ sub set_action {
     for my $attr ( @{$attrs} ) {
         if    ( $attr =~ /^(Local|Relative)$/ )    { $flags{local}++ }
         elsif ( $attr =~ /^(Global|Absolute)$/ )   { $flags{global}++ }
-        elsif ( $attr =~ /^Path\(\s*(.+)\s*\)$/i ) { $flags{path} = $1 }
-        elsif ( $attr =~ /^Private$/i )            { $flags{private}++ }
+        elsif ( $attr =~ /^Path\(\s*(.+)\s*\)$/i ) {
+            push @{ $flags{path} }, $1;
+        }
+        elsif ( $attr =~ /^Private$/i ) { $flags{private}++ }
         elsif ( $attr =~ /^(Regex|Regexp)\(\s*(.+)\s*\)$/i ) {
-            $flags{regex} = $2;
+            push @{ $flags{regex} }, $2;
         }
     }
 
@@ -388,8 +390,6 @@ sub set_action {
         $parent = $child;
     }
 
-    my $forward = $prefix ? "$prefix/$method" : $method;
-
     my $reverse = $prefix ? "$prefix/$method" : $method;
 
     my $action = Catalyst::Action->new(
@@ -403,35 +403,40 @@ sub set_action {
     my $uid = $parent->getUID;
     $self->actions->{private}->{$uid}->{$method} = $action;
 
-    if ( $flags{path} ) {
-        $flags{path} =~ s/^\w+//;
-        $flags{path} =~ s/\w+$//;
-        if ( $flags{path} =~ /^\s*'(.*)'\s*$/ ) { $flags{path} = $1 }
-        if ( $flags{path} =~ /^\s*"(.*)"\s*$/ ) { $flags{path} = $1 }
+    my @path;
+    for my $path ( @{ $flags{path} } ) {
+        $path =~ s/^\w+//;
+        $path =~ s/\w+$//;
+        if ( $path =~ /^\s*'(.*)'\s*$/ ) { $path = $1 }
+        if ( $path =~ /^\s*"(.*)"\s*$/ ) { $path = $1 }
+        push @path, $path;
+    }
+    $flags{path} = \@path;
+
+    my @regex;
+    for my $regex ( @{ $flags{regex} } ) {
+        $regex =~ s/^\w+//;
+        $regex =~ s/\w+$//;
+        if ( $regex =~ /^\s*'(.*)'\s*$/ ) { $regex = $1 }
+        if ( $regex =~ /^\s*"(.*)"\s*$/ ) { $regex = $1 }
+        push @regex, $regex;
+    }
+    $flags{regex} = \@regex;
+
+    if ( $flags{local} || $flags{global} ) {
+        push( @{ $flags{path} }, $prefix ? "/$prefix/$method" : "/$method" )
+          if $flags{local};
+
+        push( @{ $flags{path} }, "/$method" ) if $flags{global};
     }
 
-    if ( $flags{regex} ) {
-        $flags{regex} =~ s/^\w+//;
-        $flags{regex} =~ s/\w+$//;
-        if ( $flags{regex} =~ /^\s*'(.*)'\s*$/ ) { $flags{regex} = $1 }
-        if ( $flags{regex} =~ /^\s*"(.*)"\s*$/ ) { $flags{regex} = $1 }
+    for my $path ( @{ $flags{path} } ) {
+        if ( $path =~ /^\// ) { $path =~ s/^\/// }
+        else { $path = $prefix ? "$prefix/$path" : $path }
+        $self->actions->{plain}->{$path} = $action;
     }
 
-    if ( $flags{local} || $flags{global} || $flags{path} ) {
-        my $path     = $flags{path} || $method;
-        my $absolute = 0;
-
-        if ( $path =~ /^\/(.+)/ ) {
-            $path     = $1;
-            $absolute = 1;
-        }
-
-        $absolute = 1 if $flags{global};
-        my $name = $absolute ? $path : $prefix ? "$prefix/$path" : $path;
-        $self->actions->{plain}->{$name} = $action;
-    }
-
-    if ( my $regex = $flags{regex} ) {
+    for my $regex ( @{ $flags{regex} } ) {
         push @{ $self->actions->{compiled} }, [ $regex, qr#$regex# ];
         $self->actions->{regex}->{$regex} = $action;
     }
