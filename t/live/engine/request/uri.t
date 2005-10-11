@@ -17,7 +17,7 @@ my $creq;
     ok( my $response = request('http://localhost/engine/request/uri/change_path'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    like( $creq->uri, qr{/my/app/lives/here}, 'URI contains new path' );
+    like( $creq->uri, qr{/my/app/lives/here$}, 'URI contains new path' );
 }
 
 # test that path properly removes the base location

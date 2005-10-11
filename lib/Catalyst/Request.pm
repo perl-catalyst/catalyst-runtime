@@ -331,9 +331,6 @@ sub path {
     my ( $self, $params ) = @_;
 
     if ($params) {
-
-        # base must always have a trailing slash
-        $params .= '/' unless ( $params =~ /\/$/ );
         $self->uri->path($params);
     }
 
