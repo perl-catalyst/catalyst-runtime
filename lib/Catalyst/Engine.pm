@@ -373,6 +373,11 @@ sub prepare_uploads {
             push @uploads, $u;
         }
         $c->request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
+        
+        # support access to the filename as a normal param
+        my @filenames = map { $_->{filename} } @uploads;
+        $c->request->parameters->{$name} 
+            = @filenames > 1 ? \@filenames : $filenames[0];
     }
 }
 

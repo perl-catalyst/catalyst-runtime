@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 49;
+use Test::More tests => 52;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -63,6 +63,9 @@ use HTTP::Request::Common;
 
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
+        
+        # make sure upload is accessible via legacy params->{$file}
+        is( $creq->{parameters}->{ $upload->filename }, $upload->filename, 'legacy param method ok' ); 
         
         ok( ! -e $upload->tempname, 'Upload temp file was deleted' );
     }
