@@ -380,7 +380,7 @@ Shortcut to $req->headers->referer. Referring page.
 
 =item $req->secure
 
-Contains a boolean whether the communciation is secure.
+Contains a boolean denoting whether the communication is secure.
 
 =item $req->snippets
 

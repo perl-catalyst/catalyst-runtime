@@ -119,7 +119,7 @@ so C<Catalyst::Plugin::My::Module> becomes C<My::Module>.
 
     use Catalyst 'My::Module';
 
-Special flags like -Debug and -Engine can also be specifed as arguments when
+Special flags like -Debug and -Engine can also be specified as arguments when
 Catalyst is loaded:
 
     use Catalyst qw/-Debug My::Module/;

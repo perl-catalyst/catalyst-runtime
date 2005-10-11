@@ -43,11 +43,11 @@ control. Catalyst!
 
 =back
 
-If you're unfamiliar with MVC and design patterns, you may want to check out the
-original book on the subject, I<Design Patterns>, by Gamma, Helm, Johson and
-Vlissides, also known as the Gang of Four (GoF). You can also just google it.
-Many, many web application frameworks are based on MVC, including all those
-listed above.
+If you're unfamiliar with MVC and design patterns, you may want to check
+out the original book on the subject, I<Design Patterns>, by Gamma,
+Helm, Johnson, and Vlissides, also known as the Gang of Four (GoF). You
+can also just Google it.  Many, many web application frameworks are
+based on MVC, including all those listed above.
 
 =head3 Flexibility
 
@@ -788,7 +788,7 @@ can always call an outside module that serves as your Model:
 But by using a Model that is part of your Catalyst application, you gain
 several things: you don't have to C<use> each component, Catalyst will
 find and load it automatically at compile-time; you can C<forward> to
-the module, which can only be done to Catalyst componenents; and only
+the module, which can only be done to Catalyst components; and only
 Catalyst components can be fetched with
 C<$c-E<gt>comp('MyApp::M::SomeModel')>.
 

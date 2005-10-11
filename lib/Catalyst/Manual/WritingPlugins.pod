@@ -25,7 +25,7 @@ This technique is the usual way to plug a module into Catalyst.
 
 =head1 INTEGRATING YOUR PLUGIN
 
-You can use L<NEXT> for your lugin by overloading certain methods which
+You can use L<NEXT> for your plugin by overloading certain methods which
 are called by Catalyst during a request.
 
 =head2 The request life-cycle
@@ -249,6 +249,6 @@ under the same terms as Perl itself.
 =head1 AUTHOR
 
 S<Robert Sedlacek, C<phaylon@dunkelheit.at>> with a lot of help from the
-poeple on #catalyst.
+people on #catalyst.
 
 =cut

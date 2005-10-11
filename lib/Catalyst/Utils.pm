@@ -83,7 +83,7 @@ sub class2classsuffix {
 
 =item class2env($class);
 
-Returns the enviroment name for class.
+Returns the environment name for class.
 
     MyApp becomes MYAPP
     My::App becomes MY_APP

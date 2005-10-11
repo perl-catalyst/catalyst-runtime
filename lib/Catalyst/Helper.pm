@@ -748,7 +748,7 @@ print [% name %]->run($ARGV[0])->content . "\n";
 
 =head1 DESCRIPTION
 
-Run a Catalyst action from the comand line.
+Run a Catalyst action from the command line.
 
 =head1 AUTHOR
 
@@ -814,7 +814,7 @@ Create a new Catalyst Component.
 
 Existing component files are not overwritten.  If any of the component files
 to be created already exist the file will be written with a '.new' suffix.
-This behaviour can be supressed with the C<-nonew> option.
+This behavior can be suppressed with the C<-nonew> option.
 
 =head1 AUTHOR
 

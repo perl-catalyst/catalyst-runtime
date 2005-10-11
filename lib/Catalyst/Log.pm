@@ -157,11 +157,11 @@ Your logging object is expected to provide the interface described here.
 
 =item new
 
-Constructor, defaults to enable all levels unless levels a provieded in
+Constructor. Defaults to enable all levels unless levels are provided in
 arguments.
 
     $log = Catalyst::Log->new;
-    $log = Catalyst::Log->new( 'warn', 'error', 'fatal' );
+    $log = Catalyst::Log->new( 'warn', 'error' );
 
 =item levels
 

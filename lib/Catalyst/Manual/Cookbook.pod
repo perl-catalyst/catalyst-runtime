@@ -84,7 +84,7 @@ Other Scaffolding modules are in development at the time of writing.
 
 =head3 Single file upload with Catalyst
 
-To implement uploads in Catalyst you need to have a HTML form similiar to
+To implement uploads in Catalyst, you need to have a HTML form similar to
 this:
 
     <form action="/upload" method="post" enctype="multipart/form-data">
@@ -285,13 +285,13 @@ best to add a user check to a 'begin' action:
         }
     }
 
-Pay attention to $c->req->action(undef). This is needed because of the 
-way $c->forward works - C<forward> to C<login> gets called, but after that 
-Catalyst will still execute the action defined in the URI (e.g. if you 
-tried to go to C</add>, then first 'begin' will forward to 'login', but after
-that 'add' will nonetheless be executed). So $c->req->action(undef) undefines any 
-actions that were to be called and forwards the user where we want him/her 
-to be.
+Pay attention to $c->req->action(undef). This is needed because of the
+way $c->forward works - C<forward> to C<login> gets called, but after
+that Catalyst will still execute the action defined in the URI (e.g. if
+you tried to go to C</add>, then first 'begin' will forward to 'login',
+but after that 'add' will nonetheless be executed). So
+$c->req->action(undef) undefines any actions that were to be called and
+forwards the user where we want him/her to be.
 
 And this is all you need to do. 
 
@@ -463,7 +463,7 @@ favicon.ico by using this in your HTML header:
 
 The Static plugin makes use of the C<shared-mime-info> package to
 automatically determine MIME types. This package is notoriously
-difficult to install, especially on win32 and OSX. For OSX the easiest
+difficult to install, especially on win32 and OS X. For OS X the easiest
 path might be to install Fink, then use C<apt-get install
 shared-mime-info>. Restart the server, and everything should be fine.
 
@@ -616,7 +616,7 @@ mode, the error page is a useful screen including the error message and
 a full Data::Dumper output of the C<$c> context object. When not in
 C<-Debug>, users see a simple "Please come back later" screen.
 
-To use a custom error page, use a special C<end> method to short-circut
+To use a custom error page, use a special C<end> method to short-circuit
 the error processing. The following is an example; you might want to
 adjust it further depending on the needs of your application (for
 example, any calls to C<fillform> will probably need to go into this
