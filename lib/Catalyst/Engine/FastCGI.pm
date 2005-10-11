@@ -38,15 +38,15 @@ sub run {
 
 sub write {
     my ( $self, $c, $buffer ) = @_;
-    
+
     unless ( $self->{_prepared_write} ) {
-        $self->prepare_write( $c );
+        $self->prepare_write($c);
         $self->{_prepared_write} = 1;
     }
-    
+
     # FastCGI does not stream data properly if using 'print $handle',
     # but a syswrite appears to work properly.
-    $c->response->handle->syswrite( $buffer );
+    *STDOUT->syswrite($buffer);
 }
 
 =back

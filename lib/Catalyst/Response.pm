@@ -24,7 +24,6 @@ Catalyst::Response - Catalyst Response Class
     $res->content_length;
     $res->content_type;
     $res->cookies;
-    $res->handle;
     $res->header;
     $res->headers;
     $res->output;
@@ -66,28 +65,6 @@ Shortcut to $res->headers->content_type
 Returns a reference to a hash containing the cookies to be set.
 
     $c->response->cookies->{foo} = { value => '123' };
-
-=item $res->handle
-
-Response IO handle.
-
-=cut
-
-sub handle {
-    my ( $self, $handle ) = @_;
-    
-    if ($handle) { 
-        $self->{handle} = $handle;
-    }
-    else {
-        # Finalize headers if someone touches the output handle
-        if ( $self->{_context} ) {
-            $self->{_context}->finalize_headers;
-        }
-    }
-    
-    return $self->{handle};
-}
 
 =item $res->header
 

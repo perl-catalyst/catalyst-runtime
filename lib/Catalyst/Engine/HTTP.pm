@@ -56,7 +56,7 @@ sub finalize_read {
 
     # Never ever remove this, it would result in random length output
     # streams if STDIN eq STDOUT (like in the HTTP engine)
-    $c->request->handle->blocking(1);
+    *STDIN->blocking(1);
 
     return $self->NEXT::finalize_read($c);
 }
@@ -69,7 +69,7 @@ sub prepare_read {
     my ( $self, $c ) = @_;
 
     # Set the input handle to non-blocking
-    $c->request->handle->blocking(0);
+    *STDIN->blocking(0);
 
     return $self->NEXT::prepare_read($c);
 }
@@ -83,14 +83,13 @@ sub read_chunk {
     my $c    = shift;
 
     # support for non-blocking IO
-    my $handle = $c->request->handle;
-    my $rin    = '';
-    vec( $rin, $handle->fileno, 1 ) = 1;
+    my $rin = '';
+    vec( $rin, *STDIN->fileno, 1 ) = 1;
 
   READ:
     {
         select( $rin, undef, undef, undef );
-        my $rc = $handle->sysread(@_);
+        my $rc = *STDIN->sysread(@_);
         if ( defined $rc ) {
             return $rc;
         }
@@ -144,7 +143,7 @@ sub run {
 
         # Ignore broken pipes as an HTTP server should
         local $SIG{PIPE} = sub { close Remote };
-        local $SIG{HUP} = (defined $pid ? 'IGNORE' : $SIG{HUP});
+        local $SIG{HUP} = ( defined $pid ? 'IGNORE' : $SIG{HUP} );
 
         local *STDIN  = \*Remote;
         local *STDOUT = \*Remote;

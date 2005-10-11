@@ -9,7 +9,7 @@ use HTTP::Body;
 use HTTP::Headers;
 
 # input position and length
-__PACKAGE__->mk_accessors( qw/read_position read_length/ );
+__PACKAGE__->mk_accessors(qw/read_position read_length/);
 
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
@@ -43,7 +43,7 @@ Finalize body.  Prints the response output.
 
 sub finalize_body {
     my ( $self, $c ) = @_;
-    
+
     $self->write( $c, $c->response->output );
 }
 
@@ -209,7 +209,7 @@ sub finalize_headers { }
 
 sub finalize_read {
     my ( $self, $c ) = @_;
-    
+
     undef $self->{_prepared_read};
 }
 
@@ -243,10 +243,10 @@ sub prepare_body {
     unless ( $c->request->{_body} ) {
         $c->request->{_body} = HTTP::Body->new( $type, $self->read_length );
     }
-    
+
     if ( $self->read_length > 0 ) {
-        while ( my $buffer = $self->read( $c ) ) {
-            $c->prepare_body_chunk( $buffer );
+        while ( my $buffer = $self->read($c) ) {
+            $c->prepare_body_chunk($buffer);
         }
     }
 }
@@ -257,8 +257,8 @@ sub prepare_body {
 
 sub prepare_body_chunk {
     my ( $self, $c, $chunk ) = @_;
-    
-    $c->request->{_body}->add( $chunk );
+
+    $c->request->{_body}->add($chunk);
 }
 
 =item $self->prepare_body_parameters($c)
@@ -341,9 +341,9 @@ sub prepare_query_parameters { }
 
 sub prepare_read {
     my ( $self, $c ) = @_;
-    
+
     # Reset the read position
-    $self->read_position( 0 );
+    $self->read_position(0);
 }
 
 =item $self->prepare_request(@arguments)
@@ -388,18 +388,18 @@ sub prepare_write { }
 
 sub read {
     my ( $self, $c, $maxlength ) = @_;
-    
+
     unless ( $self->{_prepared_read} ) {
-        $self->prepare_read( $c );
+        $self->prepare_read($c);
         $self->{_prepared_read} = 1;
     }
-    
+
     my $remaining = $self->read_length - $self->read_position;
     $maxlength ||= $CHUNKSIZE;
-    
+
     # Are we done reading?
     if ( $remaining <= 0 ) {
-        $self->finalize_read( $c );
+        $self->finalize_read($c);
         return;
     }
 
@@ -410,9 +410,8 @@ sub read {
         return $buffer;
     }
     else {
-        Catalyst::Exception->throw( 
-            message => "Unknown error reading input: $!"
-        );
+        Catalyst::Exception->throw(
+            message => "Unknown error reading input: $!" );
     }
 }
 
@@ -446,15 +445,13 @@ sub run { }
 
 sub write {
     my ( $self, $c, $buffer ) = @_;
-    
+
     unless ( $self->{_prepared_write} ) {
-        $self->prepare_write( $c );
+        $self->prepare_write($c);
         $self->{_prepared_write} = 1;
     }
-    
-    my $handle = $c->response->handle;
-    
-    print $handle $buffer;
+
+    print STDOUT $buffer;
 }
 
 =back

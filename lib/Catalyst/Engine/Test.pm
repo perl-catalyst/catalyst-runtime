@@ -66,10 +66,10 @@ sub run {
 
     # We emulate CGI
     local %ENV = (
-        PATH_INFO       => $request->uri->path  || '',
-        QUERY_STRING    => $request->uri->query || '',
-        REMOTE_ADDR     => '127.0.0.1',
-        REMOTE_HOST     => 'localhost',
+        PATH_INFO    => $request->uri->path  || '',
+        QUERY_STRING => $request->uri->query || '',
+        REMOTE_ADDR  => '127.0.0.1',
+        REMOTE_HOST  => 'localhost',
         REQUEST_METHOD  => $request->method,
         SERVER_NAME     => 'localhost',
         SERVER_PORT     => $request->uri->port,
@@ -83,7 +83,7 @@ sub run {
         $name = 'COOKIE' if $name eq 'COOKIES';
         $name =~ tr/-/_/;
         $name = 'HTTP_' . $name
-            unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
+          unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
         my $value = $request->header($header);
         if ( exists $ENV{$name} ) {
             $ENV{$name} .= "; $value";
@@ -114,7 +114,7 @@ sub run {
 
 =cut
 
-sub read_chunk { shift; shift->request->handle->read( @_ ); }
+sub read_chunk { shift; shift; *STDIN->read(@_); }
 
 =back
 

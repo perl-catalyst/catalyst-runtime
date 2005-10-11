@@ -805,7 +805,6 @@ sub prepare {
                 arguments        => [],
                 body_parameters  => {},
                 cookies          => {},
-                handle           => \*STDIN,
                 headers          => HTTP::Headers->new,
                 parameters       => {},
                 query_parameters => {},
@@ -818,7 +817,6 @@ sub prepare {
             {
                 body    => '',
                 cookies => {},
-                handle  => \*STDOUT,
                 headers => HTTP::Headers->new(),
                 status  => 200
             }
@@ -910,8 +908,8 @@ Prepare a chunk of data before sending it to HTTP::Body.
 
 =cut
 
-sub prepare_body_chunk { 
-    my $c = shift; 
+sub prepare_body_chunk {
+    my $c = shift;
     $c->engine->prepare_body_chunk( $c, @_ );
 }
 
@@ -1353,7 +1351,14 @@ data, if known.
 
 =cut
 
-sub write { my $c = shift; return $c->engine->write( $c, @_ ) }
+sub write {
+    my $c = shift;
+
+    # Finalize headers if someone manually writes output
+    $c->finalize_headers;
+
+    return $c->engine->write( $c, @_ );
+}
 
 =back
 

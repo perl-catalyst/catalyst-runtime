@@ -54,21 +54,21 @@ sub finalize_headers {
 
 sub prepare_connection {
     my ( $self, $c ) = @_;
-    
+
     $c->request->address( $ENV{REMOTE_ADDR} );
-    
-    PROXY_CHECK:
+
+  PROXY_CHECK:
     {
         unless ( $c->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $ENV{REMOTE_ADDR} ne '127.0.0.1';
             last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_FOR};
-   
+
         # If we are running as a backend server, the user will always appear
         # as 127.0.0.1. Select the most recent upstream IP (last in the list)
         my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
-        $c->request->address( $ip );
+        $c->request->address($ip);
     }
 
     $c->request->hostname( $ENV{REMOTE_HOST} );
@@ -107,13 +107,13 @@ sub prepare_headers {
 sub prepare_path {
     my ( $self, $c ) = @_;
 
-    my $scheme    = $c->request->secure ? 'https' : 'http';
+    my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
     my $port      = $ENV{SERVER_PORT} || 80;
     my $base_path = $ENV{SCRIPT_NAME} || '/';
-    
+
     # If we are running as a backend proxy, get the true hostname
-    PROXY_CHECK:
+  PROXY_CHECK:
     {
         unless ( $c->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $host !~ /localhost|127.0.0.1/;
@@ -122,31 +122,32 @@ sub prepare_path {
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_HOST};
 
         $host = $ENV{HTTP_X_FORWARDED_HOST};
-        # backend could be on any port, so 
+
+        # backend could be on any port, so
         # assume frontend is on the default port
         $port = $c->request->secure ? 443 : 80;
     }
 
     my $path = $base_path . $ENV{PATH_INFO};
     $path =~ s{^/+}{};
-    
+
     my $uri = URI->new;
-    $uri->scheme( $scheme );
-    $uri->host( $host );
-    $uri->port( $port );    
-    $uri->path( $path );
+    $uri->scheme($scheme);
+    $uri->host($host);
+    $uri->port($port);
+    $uri->path($path);
     $uri->query( $ENV{QUERY_STRING} ) if $ENV{QUERY_STRING};
-    
+
     # sanitize the URI
     $uri = $uri->canonical;
-    $c->request->uri( $uri );
+    $c->request->uri($uri);
 
     # set the base URI
     # base must end in a slash
-    $base_path .= '/' unless ( $base_path =~ /\/$/ );    
+    $base_path .= '/' unless ( $base_path =~ /\/$/ );
     my $base = $uri->clone;
-    $base->path_query( $base_path );
-    $c->request->base( $base );
+    $base->path_query($base_path);
+    $c->request->base($base);
 }
 
 =item $self->prepare_query_parameters($c)
@@ -155,7 +156,7 @@ sub prepare_path {
 
 sub prepare_query_parameters {
     my ( $self, $c ) = @_;
-    
+
     my $u = URI::Query->new( $ENV{QUERY_STRING} );
     $c->request->query_parameters( { $u->hash } );
 }
@@ -168,18 +169,18 @@ Enable autoflush on the output handle for CGI-based engines.
 
 sub prepare_write {
     my ( $self, $c ) = @_;
-    
+
     # Set the output handle to autoflush
-    $c->response->handle->autoflush(1);
-    
-    $self->NEXT::prepare_write( $c );
+    *STDOUT->autoflush(1);
+
+    $self->NEXT::prepare_write($c);
 }
 
 =item $self->read_chunk($c, $buffer, $length)
 
 =cut
 
-sub read_chunk { shift; shift->request->handle->sysread( @_ ); }
+sub read_chunk { shift; shift; *STDIN->sysread(@_); }
 
 =item $self->run
 

@@ -6,7 +6,7 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments base cookies handle headers match method
+    qw/action address arguments base cookies headers match method
       protocol query_parameters secure snippets uri user/
 );
 
@@ -44,7 +44,6 @@ Catalyst::Request - Catalyst Request Class
     $req->content_type;
     $req->cookie;
     $req->cookies;
-    $req->handle;
     $req->header;
     $req->headers;
     $req->hostname;
@@ -188,10 +187,6 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-=item $req->handle
-
-Request IO handle.
-
 =item $req->header
 
 Shortcut to $req->headers->header
@@ -334,19 +329,20 @@ alias for path, added for compability with L<CGI>
 
 sub path {
     my ( $self, $params ) = @_;
-    
-    if ( $params ) {
+
+    if ($params) {
+
         # base must always have a trailing slash
         $params .= '/' unless ( $params =~ /\/$/ );
-        $self->uri->path( $params );
+        $self->uri->path($params);
     }
 
-    my $path = $self->uri->path;
+    my $path     = $self->uri->path;
     my $location = $self->base->path;
     $path =~ s/^(\Q$location\E)?//;
     $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~ s/^\///;
-    
+
     return $path;
 }
 
