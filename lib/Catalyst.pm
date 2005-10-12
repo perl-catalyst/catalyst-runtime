@@ -1027,15 +1027,16 @@ sub prepare_uploads {
 
     if ( $c->debug && keys %{ $c->request->uploads } ) {
         my $t = Text::ASCIITable->new;
-        $t->setCols( 'Filename', 'Type', 'Size' );
-        $t->setColWidth( 'Filename', 37, 1 );
-        $t->setColWidth( 'Type',     24, 1 );
+        $t->setCols( 'Key', 'Filename', 'Type', 'Size' );
+        $t->setColWidth( 'Key',      12, 1 );
+        $t->setColWidth( 'Filename', 28, 1 );
+        $t->setColWidth( 'Type',     18, 1 );
         $t->setColWidth( 'Size',     9,  1 );
         $t->alignCol( 'Size', 'left' );
         for my $key ( sort keys %{ $c->request->uploads } ) {
             my $upload = $c->request->uploads->{$key};
             for my $u ( ref $upload eq 'ARRAY' ? @{$upload} : ($upload) ) {
-                $t->addRow( $key, $u->type, $u->size );
+                $t->addRow( $key, $u->filename, $u->type, $u->size );
             }
         }
         $c->log->debug( "File Uploads are:\n" . $t->draw );

@@ -1,6 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added filename to debug output for uploaded files.
+        - Fixed forwarding with embedded arguments.
         - Fixed handling of escaped query strings.
         - Added upload parameters back into $c->req->params.
         - Added multiple paths support to dispatcher
