@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Fixed handling of escaped query strings.
         - Added upload parameters back into $c->req->params.
         - Added multiple paths support to dispatcher
         - Fixed bug in req->path where changing the path added a trailing

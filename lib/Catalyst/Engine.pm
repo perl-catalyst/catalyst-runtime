@@ -7,6 +7,7 @@ use Data::Dumper;
 use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
+use URI::QueryParam;
 
 # input position and length
 __PACKAGE__->mk_accessors(qw/read_position read_length/);
@@ -333,7 +334,19 @@ sub prepare_path { }
 
 =cut
 
-sub prepare_query_parameters { }
+sub prepare_query_parameters {
+    my ( $self, $c, $query_string ) = @_;
+
+    # replace semi-colons
+    $query_string =~ s/;/&/g;
+
+    my $u = URI->new( '', 'http' );
+        $u->query( $query_string );
+        for my $key ( $u->query_param ) {
+        my @vals = $u->query_param($key);  
+        $c->request->query_parameters->{$key} = @vals > 1 ? [@vals] : $vals[0];  
+    }
+}
 
 =item $self->prepare_read($c)
 

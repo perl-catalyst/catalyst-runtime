@@ -4,7 +4,6 @@ use strict;
 use base 'Catalyst::Engine';
 use NEXT;
 use URI;
-use URI::Query;
 
 =head1 NAME
 
@@ -156,9 +155,8 @@ sub prepare_path {
 
 sub prepare_query_parameters {
     my ( $self, $c ) = @_;
-
-    my $u = URI::Query->new( $ENV{QUERY_STRING} );
-    $c->request->query_parameters( { $u->hash } );
+    
+    $self->SUPER::prepare_query_parameters( $c, $ENV{QUERY_STRING} );
 }
 
 =item $self->prepare_write($c)
