@@ -1505,6 +1505,8 @@ Tatsuhiko Miyagawa
 
 Ulf Edvinsson
 
+Yuval Kogman
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
