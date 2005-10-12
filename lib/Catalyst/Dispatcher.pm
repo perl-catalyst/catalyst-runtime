@@ -144,7 +144,8 @@ sub forward {
             my @extra_args;
           DESCEND: while ( $command_copy =~ s/^\/(.*)\/(\w+)$/\/$1/ ) {
                 my $tail = $2;
-                if ( $results = $c->get_action( $tail, $1 ) ) {
+                $results = $c->get_action( $tail, $1 );
+                if ( @{$results} ) {
                     $command   = $tail;
                     $namespace = $command_copy;
                     push( @{$arguments}, @extra_args );
