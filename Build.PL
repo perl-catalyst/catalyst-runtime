@@ -27,7 +27,6 @@ my $build = Module::Build->new(
         'Tree::Simple'                      => 0,
         'Tree::Simple::Visitor::FindByPath' => 0,
         'URI'                               => 1.35,
-        'URI::Query'                        => 0,
     },
     recommends         => { 'Catalyst::Engine::Apache' => 0, },
     create_makefile_pl => 'passthrough',
