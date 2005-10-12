@@ -130,38 +130,33 @@ sub forward {
     my $caller = ( caller(1) )[0]->isa('Catalyst::Dispatcher')
       && ( ( caller(2) )[3] =~ /::detach$/ ) ? caller(3) : caller(1);
 
-    my $namespace = '/';
     my $arguments = ( ref( $_[-1] ) eq 'ARRAY' ) ? pop(@_) : $c->req->args;
 
     my $results = [];
 
-    if ( $command =~ /^\// ) {
-        if ( $command =~ /^\/(\w+)$/ ) {
-            $results = $c->get_action( $1, $namespace );
-        }
-        else {
-            my $command_copy = $command;
-            my @extra_args;
-          DESCEND: while ( $command_copy =~ s/^\/(.*)\/(\w+)$/\/$1/ ) {
-                my $tail = $2;
-                $results = $c->get_action( $tail, $1 );
-                if ( @{$results} ) {
-                    $command   = $tail;
-                    $namespace = $command_copy;
-                    push( @{$arguments}, @extra_args );
-                    last DESCEND;
-                }
-                unshift( @extra_args, $tail );
-            }
-        }
-        $command =~ s/^\///;
+    my $command_copy = $command;
+
+    unless ( $command_copy =~ s/^\/// ) {
+        $command_copy =
+          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} )
+          . "/${command}";
     }
 
+    unless ( $command_copy =~ /\// ) {
+        $results = $c->get_action( $command_copy, '/' );
+    }
     else {
-        $namespace =
-          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} )
-          || '/';
-        $results = $c->get_action( $command, $namespace );
+        my @extra_args;
+      DESCEND: while ( $command_copy =~ s/^(.*)\/(\w+)$/$1/ ) {
+            my $tail = $2;
+            $results = $c->get_action( $tail, $1 );
+            if ( @{$results} ) {
+                $command = $tail;
+                push( @{$arguments}, @extra_args );
+                last DESCEND;
+            }
+            unshift( @extra_args, $tail );
+        }
     }
 
     unless ( @{$results} ) {
