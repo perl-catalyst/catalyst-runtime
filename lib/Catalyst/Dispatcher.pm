@@ -137,9 +137,9 @@ sub forward {
     my $command_copy = $command;
 
     unless ( $command_copy =~ s/^\/// ) {
-        $command_copy =
-          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} )
-          . "/${command}";
+        my $namespace =
+          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} ) || '';
+        $command_copy = "${namespace}/${command}";
     }
 
     unless ( $command_copy =~ /\// ) {
