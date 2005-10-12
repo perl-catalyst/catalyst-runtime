@@ -63,4 +63,21 @@ sub args : Local {
     die "passed argument does not match args" unless $val eq $c->req->args->[0];
 }
 
+sub args_embed_relative : Local {
+    my ( $self, $c ) = @_;
+    $c->forward( 'embed/ok' );
+}
+
+sub args_embed_absolute : Local {
+    my ( $self, $c ) = @_;
+    $c->forward( '/action/forward/embed/ok' );
+}
+
+sub embed : Local {
+    my ( $self, $c, $ok ) = @_;
+    
+    $ok ||= 'not ok';
+    $c->res->body( $ok );
+}
+
 1;

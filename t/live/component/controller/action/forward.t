@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 24;
+use Test::More tests => 30;
 use Catalyst::Test 'TestApp';
 
 
@@ -68,11 +68,22 @@ use Catalyst::Test 'TestApp';
 {
     ok( my $response = request('http://localhost/action/forward/with_args/old'), 'Request with args' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->content,'old');
+    is( $response->content, 'old' );
 }
 
 {
     ok( my $response = request('http://localhost/action/forward/with_method_and_args/old'), 'Request with args and method' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->content,'old');
+    is( $response->content, 'old' );
+}
+
+# test forward with embedded args
+{
+    ok( my $response = request('http://localhost/action/forward/args_embed_relative'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content, 'ok' ); 
+    
+    ok( my $response = request('http://localhost/action/forward/args_embed_absolute'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content, 'ok' );
 }
