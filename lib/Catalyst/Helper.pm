@@ -661,6 +661,8 @@ my $restart       = 0;
 my $restart_delay = 1;
 my $restart_regex = '\.yml$|\.yaml$|\.pm$';
 
+my @argv = @ARGV;
+
 GetOptions(
     'fork'              => \$fork,
     'help|?'            => \$help,
@@ -674,6 +676,7 @@ GetOptions(
 pod2usage(1) if $help;
 
 [% name %]->run( $port, $host, {
+    argv   => \@argv,
     'fork' => $fork,
     restart => $restart,
     restart_delay => $restart_delay,

@@ -144,7 +144,7 @@ sub run {
                         next unless $file =~ /\.pm$/;
                         if ( my $error = _test($file) ) {
                             print STDERR
-                              qq/File "$file" modified, not restarting\n/;
+                              qq/File "$file" modified, not restarting\n\n/;
                             print STDERR '*' x 80, "\n";
                             print STDERR $error;
                             print STDERR '*' x 80, "\n";
@@ -154,7 +154,7 @@ sub run {
 
                     # Restart
                     my $files = join ', ', @$changes;
-                    print STDERR qq/File(s) "$files" modified, restarting\n/;
+                    print STDERR qq/File(s) "$files" modified, restarting\n\n/;
                     kill( 1, $parent );
                     exit;
                 }
@@ -267,7 +267,8 @@ sub run {
 
     if ($GOT_HUP) {
         $SIG{CHLD} = 'DEFAULT';
-        exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @ARGV );
+        wait;
+        exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @{ $options->{argv} } );
     }
 }
 
@@ -321,6 +322,7 @@ sub _index {
 
 sub _test {
     my $file = shift;
+    delete $INC{$file};
     local $SIG{__WARN__} = sub { };
     open my $olderr, '>&STDERR';
     open STDERR, '>', File::Spec->devnull;
