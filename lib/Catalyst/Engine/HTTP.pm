@@ -3,6 +3,9 @@ package Catalyst::Engine::HTTP;
 use strict;
 use base 'Catalyst::Engine::CGI';
 use Errno 'EWOULDBLOCK';
+use FindBin;
+use File::Find;
+use File::Spec;
 use HTTP::Status;
 use NEXT;
 use Socket;
@@ -106,14 +109,35 @@ sub read_chunk {
 
 # A very very simple HTTP server that initializes a CGI environment
 sub run {
-    my ( $self, $class, $port, $host, $fork ) = @_;
+    my ( $self, $class, $port, $host, $options ) = @_;
 
     our $GOT_HUP;
     local $GOT_HUP = 0;
 
     local $SIG{HUP} = sub { $GOT_HUP = 1; };
 
-    local $SIG{CHLD} = 'IGNORE';
+    # Setup restarter
+    my $restarter;
+    if ( $options->{restart} ) {
+        my $parent = $$;
+        unless ( $restarter = fork ) {
+
+            # Index parent directory
+            my $dir = File::Spec->catdir( $FindBin::Bin, '..' );
+
+            my $regex = $options->{restart_regex};
+            my $one = _index( $dir, $regex );
+            while (1) {
+                sleep $options->{restart_delay};
+                my $two = _index( $dir, $regex );
+                if ( my $file = _compare_index( $one, $two ) ) {
+                    print STDERR qq/File "$file" modified, restarting\n/;
+                    kill( 1, $parent );
+                    $one = $two;
+                }
+            }
+        }
+    }
 
     # Handle requests
 
@@ -137,7 +161,7 @@ sub run {
     while ( accept( Remote, HTTPDaemon ) ) {
 
         # Fork
-        if ($fork) { next if $pid = fork }
+        if ( $options->{fork} ) { next if $pid = fork }
 
         close HTTPDaemon if defined $pid;
 
@@ -217,7 +241,21 @@ sub run {
         close Remote;
     }
     close HTTPDaemon;
+
     exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @ARGV ) if $GOT_HUP;
+}
+
+sub _compare_index {
+    my ( $one, $two ) = @_;
+    my %clone = %$two;
+    while ( my ( $key, $val ) = each %$one ) {
+        return $key if ( !$clone{$key} || ( $clone{$key} ne $val ) );
+        delete $clone{$key};
+    }
+    if ( keys %clone ) {
+        return join ' ', keys %clone;
+    }
+    return 0;
 }
 
 sub _get_line {
@@ -233,6 +271,25 @@ sub _get_line {
     1 while $line =~ s/\s\z//;
 
     return $line;
+}
+
+sub _index {
+    my ( $dir, $regex ) = @_;
+    my %index;
+    finddepth(
+        {
+            wanted => sub {
+                my $file = File::Spec->rel2abs($File::Find::name);
+                return unless $file =~ /$regex/;
+                return unless -f $file;
+                my $time = ( stat $file )[9];
+                $index{$file} = $time;
+            },
+            no_chdir => 1
+        },
+        $dir
+    );
+    return \%index;
 }
 
 =back

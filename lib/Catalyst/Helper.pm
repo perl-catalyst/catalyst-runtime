@@ -653,21 +653,32 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use [% name %];
 
-my $fork = 0;
-my $help = 0;
-my $host = undef;
-my $port = 3000;
+my $fork          = 0;
+my $help          = 0;
+my $host          = undef;
+my $port          = 3000;
+my $restart       = 0;
+my $restart_delay = 1;
+my $restart_regex = '\.yml$|\.yaml$|\.pm$';
 
 GetOptions(
-    'fork'   => \$fork,
-    'help|?' => \$help,
-    'host=s' => \$host,
-    'port=s' => \$port
+    'fork'              => \$fork,
+    'help|?'            => \$help,
+    'host=s'            => \$host,
+    'port=s'            => \$port,
+    'restart|r'         => \$restart,
+    'restartdelay|rd=s' => \$restart_delay,
+    'restartregex|rr=s' => \$restart_regex
 );
 
 pod2usage(1) if $help;
 
-[% name %]->run( $port, $host, $fork );
+[% name %]->run( $port, $host, {
+    'fork' => $fork,
+    restart => $restart,
+    restart_delay => $restart_delay,
+    restart_regex => qr/$restart_regex/
+} );
 
 1;
 
@@ -680,10 +691,17 @@ pod2usage(1) if $help;
 [% appprefix %]_server.pl [options]
 
  Options:
-   -f -fork    handle each request in a new process
-   -? -help    display this help and exits
-      -host    host (defaults to all)
-   -p -port    port (defaults to 3000)
+   -f -fork           handle each request in a new process
+                      (defaults to false)
+   -? -help           display this help and exits
+      -host           host (defaults to all)
+   -p -port           port (defaults to 3000)
+   -r -restart        restart when files got modified
+                      (defaults to false)
+   -rd -restartdelay  delay between file checks
+   -rr -restartregex  regex match files that trigger
+                      a restart when modified
+                      (defaults to '\.yml$|\.yaml$|\.pm$')
 
  See also:
    perldoc Catalyst::Manual
