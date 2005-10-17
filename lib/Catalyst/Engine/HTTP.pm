@@ -123,18 +123,40 @@ sub run {
         my $parent = $$;
         unless ( $restarter = fork ) {
 
+            # Prepare
+            close STDIN;
+            close STDOUT;
+
             # Index parent directory
             my $dir = File::Spec->catdir( $FindBin::Bin, '..' );
 
             my $regex = $options->{restart_regex};
-            my $one = _index( $dir, $regex );
-            while (1) {
+            my $one   = _index( $dir, $regex );
+          RESTART: while (1) {
                 sleep $options->{restart_delay};
-                my $two = _index( $dir, $regex );
-                if ( my $file = _compare_index( $one, $two ) ) {
-                    print STDERR qq/File "$file" modified, restarting\n/;
-                    kill( 1, $parent );
+                my $two     = _index( $dir,         $regex );
+                my $changes = _compare_index( $one, $two );
+                if (@$changes) {
                     $one = $two;
+
+                    # Test modified pm's
+                    for my $file (@$changes) {
+                        next unless $file =~ /\.pm$/;
+                        if ( my $error = _test($file) ) {
+                            print STDERR
+                              qq/File "$file" modified, not restarting\n/;
+                            print STDERR '*' x 80, "\n";
+                            print STDERR $error;
+                            print STDERR '*' x 80, "\n";
+                            next RESTART;
+                        }
+                    }
+
+                    # Restart
+                    my $files = join ', ', @$changes;
+                    print STDERR qq/File(s) "$files" modified, restarting\n/;
+                    kill( 1, $parent );
+                    exit;
                 }
             }
         }
@@ -252,14 +274,15 @@ sub run {
 sub _compare_index {
     my ( $one, $two ) = @_;
     my %clone = %$two;
+    my @changes;
     while ( my ( $key, $val ) = each %$one ) {
-        return $key if ( !$clone{$key} || ( $clone{$key} ne $val ) );
+        if ( !$clone{$key} || ( $clone{$key} ne $val ) ) {
+            push @changes, $key;
+        }
         delete $clone{$key};
     }
-    if ( keys %clone ) {
-        return join ' ', keys %clone;
-    }
-    return 0;
+    for my $key ( keys %clone ) { push @changes, $key }
+    return \@changes;
 }
 
 sub _get_line {
@@ -294,6 +317,17 @@ sub _index {
         $dir
     );
     return \%index;
+}
+
+sub _test {
+    my $file = shift;
+    local $SIG{__WARN__} = sub { };
+    open my $olderr, '>&STDERR';
+    open STDERR, '>', File::Spec->devnull;
+    eval "require '$file'";
+    open STDERR, '>&', $olderr;
+    return $@ if $@;
+    return 0;
 }
 
 =back
