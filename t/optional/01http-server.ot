@@ -1,0 +1,37 @@
+#!perl
+
+use strict;
+use warnings;
+
+use File::Copy::Recursive;
+use File::Path;
+use FindBin;
+
+# clean up
+rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
+
+# create a TestApp and copy the test libs into it
+mkdir "$FindBin::Bin/../../t/var";
+chdir "$FindBin::Bin/../../t/var";
+system "$FindBin::Bin/../../script/catalyst.pl TestApp";
+chdir "$FindBin::Bin/../..";
+File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
+
+# spawn the standalone HTTP server
+my $pid = open SERVER, 
+    "$FindBin::Bin/../../t/var/TestApp/script/testapp_server.pl 2>&1 |"
+    or die "Unable to spawn standalone HTTP server: $!";
+    
+# wait for it to start
+sleep 2;
+    
+# run the testsuite against the HTTP server
+$ENV{CATALYST_SERVER} = 'http://localhost:3000';
+system( 'prove -r -Ilib/ t/live/' );
+
+# shut it down
+kill 2, $pid;
+close SERVER;
+
+# clean up
+rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
