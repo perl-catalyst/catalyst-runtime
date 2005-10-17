@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added self restarting test server
         - Added filename to debug output for uploaded files.
         - Fixed forwarding with embedded arguments.
         - Fixed handling of escaped query strings.
