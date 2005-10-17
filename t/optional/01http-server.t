@@ -8,8 +8,8 @@ use FindBin;
 use Test::More;
 eval "use File::Copy::Recursive";
 
-plan skip_all => 'File::Copy::Recursive required' if $@;
 plan skip_all => 'set TEST_HTTP to enable this test' unless $ENV{TEST_HTTP};
+plan skip_all => 'File::Copy::Recursive required' if $@;
 
 # clean up
 rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
