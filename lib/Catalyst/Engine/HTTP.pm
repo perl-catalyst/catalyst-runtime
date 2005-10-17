@@ -111,6 +111,8 @@ sub read_chunk {
 sub run {
     my ( $self, $class, $port, $host, $options ) = @_;
 
+    $options ||= {};
+
     our $GOT_HUP;
     local $GOT_HUP = 0;
 
