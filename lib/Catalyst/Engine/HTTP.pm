@@ -115,6 +115,7 @@ sub run {
     local $GOT_HUP = 0;
 
     local $SIG{HUP} = sub { $GOT_HUP = 1; };
+    local $SIG{CHLD} = 'IGNORE';
 
     # Setup restarter
     my $restarter;
@@ -242,7 +243,10 @@ sub run {
     }
     close HTTPDaemon;
 
-    exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @ARGV ) if $GOT_HUP;
+    if ($GOT_HUP) {
+        $SIG{CHLD} = 'DEFAULT';
+        exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @ARGV );
+    }
 }
 
 sub _compare_index {
