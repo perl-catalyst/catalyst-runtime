@@ -5,6 +5,7 @@ use warnings;
 
 use File::Path;
 use FindBin;
+use IO::Socket;
 use Test::More;
 eval "use File::Copy::Recursive";
 
@@ -22,20 +23,41 @@ chdir "$FindBin::Bin/../..";
 File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
 
 # spawn the standalone HTTP server
-my $pid = open SERVER, 
-    "$FindBin::Bin/../../t/var/TestApp/script/testapp_server.pl 2>&1 |"
+my $port = 30000 + int rand(1 + 10000);
+my $pid = open my $server, 
+    "$FindBin::Bin/../../t/var/TestApp/script/testapp_server.pl -port $port 2>&1 |"
     or die "Unable to spawn standalone HTTP server: $!";
-    
+
 # wait for it to start
-sleep 2;
+print "Waiting for server to start...\n";
+while ( check_port( 'localhost', $port ) != 1 ) {
+    sleep 1;
+}
     
 # run the testsuite against the HTTP server
-$ENV{CATALYST_SERVER} = 'http://localhost:3000';
+$ENV{CATALYST_SERVER} = "http://localhost:$port";
 system( 'prove -r -Ilib/ t/live/' );
 
 # shut it down
 kill 2, $pid;
-close SERVER;
+close $server;
 
 # clean up
 rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
+
+sub check_port {
+    my ( $host, $port ) = @_;
+
+    my $remote = IO::Socket::INET->new(
+        Proto    => "tcp",
+        PeerAddr => $host,
+        PeerPort => $port
+    );
+    if ($remote) {
+        close $remote;
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
