@@ -31,3 +31,4 @@ t/conf/httpd.conf
 t/conf/mime.types
 t/htdocs
 t/logs
+t/var
