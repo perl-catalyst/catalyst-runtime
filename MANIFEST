@@ -36,6 +36,7 @@ script/catalyst.pl
 t/01use.t
 t/02pod.t
 t/03podcoverage.t
+t/conf/extra.conf.in
 t/live/component/controller/action/begin.t
 t/live/component/controller/action/default.t
 t/live/component/controller/action/detach.t
