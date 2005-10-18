@@ -12,6 +12,7 @@ Tis file documents the revision history for Perl extension Catalyst.
         - Removed req->handle and res->handle
         - Added prepare_body_chunk method as a hook for upload progress.
         - Fixed bug in uri_for method when base has no path.
+        - Added automated tests for HTTP, CGI, and FastCGI servers.
 
 5.49_01 2005-10-10 10:15:00 
         - Refactored all internals, should be 99% compatible to previous

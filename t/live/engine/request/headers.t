@@ -43,7 +43,7 @@ use URI;
             skip "Using remote server", 2;
         }
     
-        is( $creq->base, 'http://frontend.server.com/', 'Catalyst::Request proxied base' );
+        is( $creq->base->host, 'frontend.server.com', 'Catalyst::Request proxied base' );
         is( $creq->address, '1.2.3.4', 'Catalyst::Request proxied address' );
     }
 
