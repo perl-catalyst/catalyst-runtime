@@ -30,8 +30,7 @@ File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
 # remove TestApp's tests so Apache::Test doesn't try to run them
 rmtree 't/var/TestApp/t';
 
-my $cfg  = Apache::Test::config();
-$ENV{CATALYST_SERVER} = 'http://' . $cfg->hostport . '/fastcgi';
+$ENV{CATALYST_SERVER} = 'http://localhost:8529/fastcgi';
 
 Apache::TestRun->new->run(@ARGV);
 
