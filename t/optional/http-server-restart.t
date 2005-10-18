@@ -78,7 +78,6 @@ for ( 1..20 ) {
     close $pm;
     
     # give the server time to notice the change
-    my $count = 0;
     sleep 1;
     if ( check_port( 'localhost', $port ) != 1 ) {
         die "Server appears to have died";

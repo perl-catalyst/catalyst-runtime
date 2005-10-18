@@ -11,6 +11,7 @@ eval "use File::Copy::Recursive";
 
 plan skip_all => 'set TEST_HTTP to enable this test' unless $ENV{TEST_HTTP};
 plan skip_all => 'File::Copy::Recursive required' if $@;
+plan tests => 28;
 
 # clean up
 rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
@@ -36,7 +37,13 @@ while ( check_port( 'localhost', $port ) != 1 ) {
     
 # run the testsuite against the HTTP server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
-system( 'prove -r -Ilib/ t/live/' );
+my $output = `prove -r -Ilib/ t/live/`;
+
+foreach my $line ( split /\n/, $output ) {
+    if ( $line !~ /skipped|wallclock/ ) {
+        like( $line, qr/ok$/, 'test ok' );
+    }
+}
 
 # shut it down
 kill 2, $pid;
