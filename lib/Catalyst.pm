@@ -653,17 +653,17 @@ perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Int
                          <a href="http://lists.rawmode.org/mailman/listinfo/catalyst">Mailing-List</a>
                      </li>
                      <li>
-                         <a href="irc://irc.perl.org/catalyst">IRC channel</a>
+                         <a href="irc://irc.perl.org/catalyst">IRC channel #catalyst on irc.perl.org</a>
                      </li>
                  </ul>
                  <h2>In conclusion</h2>
-                 <p>The Catalyst team hope you will enjoy using  Catalyst as much 
+                 <p>The Catalyst team hope you will enjoy using Catalyst as much 
                     as we enjoyed making it, and rest assured that any and all
-                    feedback is welcomed</p>
+                    feedback is welcomed.</p>
                  <p class="signature">-- #1. the first rule of the Cabal is, you do not 
                                          talk about the Cabal.<br/>
                                          #2. the second rule of the Cabal is, you DO NOT
-                                         talkk about the Cabal.</p>
+                                         talk about the Cabal.</p>
              </div>
          </div>
     </body>
