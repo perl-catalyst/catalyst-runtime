@@ -634,7 +634,7 @@ perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Int
                     check out the vast array of plugins for Catalyst.
                     They can handle everything from A to Z
                     , and a whole lot in  between.</p>
-                 <h2>Support</h2>
+                 <h2>Need help?</h2>
                  <p>Catalyst has a very active community. The main places to get
                     in touch are these.</p>
                  <ul>
