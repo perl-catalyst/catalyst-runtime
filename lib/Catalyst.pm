@@ -551,13 +551,22 @@ sub welcome_message {
                 margin-right: 20px;
                 font-family: garamond, verdana, tahoma, sans-serif;
             }
+            :link, :visited {
+                    text-decoration: none;
+                    color: #b00;
+                    border-bottom: 1px dotted #bbb;
+            }
+            :link:hover, :visited:hover {
+                    background-color: #fff;
+                    color: #555;
+            }
             div#topbar {
                 margin: 0px;
             }
             div#answers {
                 padding: 8px;
                 margin: 10px;
-                background-color: #eee;
+                background-color: #fff;
                 border: 1px solid #aaa;
                 -moz-border-radius: 10px;
             }
