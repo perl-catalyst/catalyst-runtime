@@ -533,6 +533,7 @@ Returns the Catalyst welcome HTML page.
 sub welcome_message {
     my $c    = shift;
     my $name = $c->config->{name};
+    my $logo = $c->uri_for('/static/images/catalyst_logo.png');
     return <<"EOF";
 <html>
     <head>
@@ -574,7 +575,6 @@ sub welcome_message {
                 margin: 0px;
             }
             pre {
-                border: 1px dotted #555;
                 margin: 10px;
                 padding: 8px;
             }
@@ -613,7 +613,7 @@ sub welcome_message {
              </div>
              <div id="answers">
                  <p>
-                 <img src="static/images/catalyst_logo.png"/>
+                 <img src="$logo"/>
                  </p>
                  <p>Welcome to the wonderful world of Catalyst.
                     This MVC framework will make web development
