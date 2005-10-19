@@ -595,6 +595,10 @@ sub welcome_message {
             p {
                 font-size: 0.9em;
             }
+            p img {
+                float: right;
+                margin-left: 10px;
+            }
             p.signature {
                 text-align: right;
                 font-style: italic;
@@ -608,6 +612,9 @@ sub welcome_message {
                     $VERSION</h1>
              </div>
              <div id="answers">
+                 <p>
+                 <img src="static/images/catalyst_logo.png"/>
+                 </p>
                  <p>Welcome to the wonderful world of Catalyst.
                     This MVC framework will make web development
                     something you had never expected it to be:
