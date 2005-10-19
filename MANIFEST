@@ -23,6 +23,7 @@ lib/Catalyst/Manual/SuccessStories.pod
 lib/Catalyst/Manual/Troubleshooting.pod
 lib/Catalyst/Manual/Tutorial.pod
 lib/Catalyst/Manual/WritingPlugins.pod
+lib/Catalyst/Plugin/Static/Simple.pm
 lib/Catalyst/Request.pm
 lib/Catalyst/Request/Upload.pm
 lib/Catalyst/Response.pm

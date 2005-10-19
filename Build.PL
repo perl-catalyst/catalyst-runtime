@@ -17,6 +17,7 @@ my $build = Module::Build->new(
         'HTTP::Request'                     => 0,
         'HTTP::Response'                    => 0,
         'LWP::UserAgent'                    => 0,
+        'MIME::Types'                       => 0,
         'Module::Pluggable::Fast'           => 0.16,
         'NEXT'                              => 0,
         'Path::Class'                       => 0.09,

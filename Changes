@@ -1,6 +1,9 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added a new welcome screen.
+        - Included Catalyst buttons and icons in helper.
+        - Added Static::Simple plugin to core.
         - Added self restarting test server
         - Added filename to debug output for uploaded files.
         - Fixed forwarding with embedded arguments.
