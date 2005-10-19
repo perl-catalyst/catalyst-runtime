@@ -549,7 +549,7 @@ sub welcome_message {
             p, h1, h2, a {
                 margin-left: 20px;
                 margin-right: 20px;
-                font-family: garamond, verdana, tahoma, sans-serif;
+                font-family: verdana, tahoma, sans-serif;
             }
             :link, :visited {
                     text-decoration: none;
@@ -628,12 +628,26 @@ perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Int
                      </li>
                  </ul>
                  <h2>What to do next?</h2>
-                 <p>Next you need to create an actuall application. Use the
+                 <p>Next you need to create an actual application. Use the
                     helper scripts for what they are worth, they can save you
                     alot of work getting everything set up. Also, be sure to
                     check out the vast array of plugins for Catalyst.
-                    They can handle everything from Authentication to Static
-                    files, and a whole lot in  between.</p>
+                    They can handle everything from A to Z
+                    , and a whole lot in  between.</p>
+                 <h2>Support</h2>
+                 <p>Catalyst has a very active community. The main places to get
+                    in touch are these.</p>
+                 <ul>
+                     <li>
+                         <a href="http://dev.catalyst.org">Wiki</a>
+                     </li>
+                     <li>
+                         <a href="http://lists.rawmode.org/mailman/listinfo/catalyst">Mailing-List</a>
+                     </li>
+                     <li>
+                         <a href="irc://irc.perl.org/catalyst">IRC channel</a>
+                     </li>
+                 </ul>
                  <h2>In conclusion</h2>
                  <p>The Catalyst team hope you will enjoy Catalyst as much as we                    enjoyed making it, and that rest asure that any and all
                     feedback is welcomed</p>
