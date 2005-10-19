@@ -639,7 +639,7 @@ perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Int
                     in touch are these.</p>
                  <ul>
                      <li>
-                         <a href="http://dev.catalyst.org">Wiki</a>
+                         <a href="http://dev.catalyst.perl.org">Wiki</a>
                      </li>
                      <li>
                          <a href="http://lists.rawmode.org/mailman/listinfo/catalyst">Mailing-List</a>
