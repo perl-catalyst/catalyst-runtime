@@ -907,16 +907,17 @@ Catalyst component.
 
 =over 4
 
-=item default
-
-=cut
-
-sub default : Private {
-    my ( $self, $c ) = @_;
-
-    # Hello World
-    $c->response->output('Congratulations, [% class %] is on Catalyst!');
-}
+# Uncomment, modify and add new actions to fit your needs
+#=item default
+#
+#=cut
+#
+#sub default : Private {
+#    my ( $self, $c ) = @_;
+#
+#    # Hello World
+#    $c->response->body('[% class %] is on Catalyst!');
+#}
 
 =back
 
