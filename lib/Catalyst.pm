@@ -563,6 +563,11 @@ sub welcome_message {
             div#topbar {
                 margin: 0px;
             }
+            pre {
+                border: 1px dotted #555;
+                margin: 10px;
+                padding: 8px;
+            }
             div#answers {
                 padding: 8px;
                 margin: 10px;
@@ -603,7 +608,12 @@ sub welcome_message {
                     you might want to check out the following links.</p>
                  <ul>
                      <li>
-                         <a href="http://catalyst.perl.org">
+                         <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">
+                             Catalyst::Manual
+                         </a>
+                     </li>
+                     <li>
+                         <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">
                              Catalyst::Manual::Intro
                          </a>
                      </li>
@@ -612,21 +622,25 @@ sub welcome_message {
                     MVC-pattern, theese links might be able to help you out.</p>
                  <ul>
                      <li>
-                         <a href="http://catalyst.perl.org">
+                         <a href="http://dev.catalyst.perl.org/wiki/Models">
                              Introduction to Models
                          </a>
                      </li>
                      <li>
-                         <a href="http://catalyst.perl.org">
+                         <a href="http://dev.catalyst.perl.org/wiki/Views">
                              Introduction to Views
                          </a>
                      </li>
                      <li>
-                         <a href="http://catalyst.perl.org">
+                         <a href="http://dev.catalyst.perl.org/wiki/Controllers">
                              Introduction to Controllers
                          </a>
                      </li>
                  </ul>
+                 <p>You may also want to check the local installed
+                    documentation.</p>
+                 <pre><code>perldoc Catalyst::Manual
+perldoc Catalyst::Manual::Intro</code></pre>
                  <h2>What to do next?</h2>
                  <p>Next you need to create an actuall application. Use the
                     helper scripts for what they are worth, they can save you
