@@ -516,6 +516,126 @@ sub stash {
     return $c->{stash};
 }
 
+=head1 $c->welcome_message
+
+Returns the Catalyst welcome HTML page.
+
+=cut
+
+sub welcome_message {
+    my $c    = shift;
+    my $name = $c->config->{name};
+    return <<"EOF";
+<html>
+    <head>
+        <title>$name on Catalyst $VERSION</title>
+        <style type="text/css">
+            body {
+                text-align: center;
+                padding-left: 50%;
+                color: #000;
+                background-color: #eee;
+            }
+            div#content {
+                width: 640px;
+                margin-left: -320px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                text-align: left;
+                background-color: #ccc;
+                border: 1px solid #aaa;
+                -moz-border-radius: 10px;
+            }
+            p, h1, h2, a {
+                margin-left: 20px;
+                margin-right: 20px;
+                font-family: garamond, verdana, tahoma, sans-serif;
+            }
+            div#topbar {
+                margin: 0px;
+            }
+            div#answers {
+                padding: 8px;
+                margin: 10px;
+                background-color: #eee;
+                border: 1px solid #aaa;
+                -moz-border-radius: 10px;
+            }
+            h1 {
+                font-size: 1.2em;
+                text-align: center;
+            }
+            h2 {
+                font-size: 1.0em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            p.signature {
+                text-align: right;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            <div id="topbar">
+                <h1>$name on Catalyst $VERSION</h1>
+             </div>
+             <div id="answers">
+                 <p>Welcome to the wonderfull world of Catalyst.
+                    This MVC framework will make webdevelopment
+                    something you had never expected it to be:
+                    Fun, rewarding and quick.</p>
+                 <h2>What to do now?</h2>
+                 <p>That all depends really, on what <b>you</b> want to do.
+                    We do, however, provide you with a few starting points.</p>
+                 <p>If you want to jump right into web development with Catalyst
+                    you might want to check out the following links.</p>
+                 <ul>
+                     <li>
+                         <a href="http://catalyst.perl.org">
+                             Catalyst::Manual::Intro
+                         </a>
+                     </li>
+                 </ul>
+                 <p>If you would like some background information on the
+                    MVC-pattern, theese links might be able to help you out.</p>
+                 <ul>
+                     <li>
+                         <a href="http://catalyst.perl.org">
+                             Introduction to Models
+                         </a>
+                     </li>
+                     <li>
+                         <a href="http://catalyst.perl.org">
+                             Introduction to Views
+                         </a>
+                     </li>
+                     <li>
+                         <a href="http://catalyst.perl.org">
+                             Introduction to Controllers
+                         </a>
+                     </li>
+                 </ul>
+                 <h2>What to do next?</h2>
+                 <p>Next you need to create an actuall application. Use the
+                    helper scripts for what they are worth, they can save you
+                    alot of work getting everything set up. Also, be sure to
+                    check out the vast array of plugins for Catalyst.
+                    They can handle everything from Authentication to Static
+                    files, and a whole lot in  between.</p>
+                 <h2>In conclusion</h2>
+                 <p>The Catalyst team hope you will enjoy Catalyst as much as we                    enjoyed making it, and that rest asure that any and all
+                    feedback is welcomed</p>
+                 <p class="signature">-- there is no cabal, 2005</p>
+             </div>
+         </div>
+    </body>
+</html>
+EOF
+}
+
 =back
 
 =head1 INTERNAL METHODS

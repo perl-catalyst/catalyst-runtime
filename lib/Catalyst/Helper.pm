@@ -463,7 +463,7 @@ sub default : Private {
     my ( $self, $c ) = @_;
 
     # Hello World
-    $c->response->output('Congratulations, [% name %] is on Catalyst!');
+    $c->response->output( $c->welcome_message );
 }
 
 #=item end
