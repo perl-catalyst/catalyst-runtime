@@ -554,9 +554,12 @@ sub welcome_message {
                 border: 1px solid #aaa;
                 -moz-border-radius: 10px;
             }
-            p, h1, h2, a {
+            p, h1, h2 {
                 margin-left: 20px;
                 margin-right: 20px;
+                font-family: verdana, tahoma, sans-serif;
+            }
+            a {
                 font-family: verdana, tahoma, sans-serif;
             }
             :link, :visited {
@@ -565,7 +568,6 @@ sub welcome_message {
                     border-bottom: 1px dotted #bbb;
             }
             :link:hover, :visited:hover {
-                    background-color: #fff;
                     color: #555;
             }
             div#topbar {
@@ -602,7 +604,8 @@ sub welcome_message {
     <body>
         <div id="content">
             <div id="topbar">
-                <h1>$name on Catalyst $VERSION</h1>
+                <h1>$name on <a href="http://catalyst.perl.org">Catalyst</a>
+                    $VERSION</h1>
              </div>
              <div id="answers">
                  <p>Welcome to the wonderful world of Catalyst.
@@ -614,8 +617,8 @@ sub welcome_message {
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
                     you might want to check out the documentation.</p>
-                 <pre><code>perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a>
-perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a></code></pre>
+                 <pre><code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a>
+perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a></code></pre>
                  <p>If you would like some background information on the
                     MVC-pattern, these links might be of help to you.</p>
                  <ul>
