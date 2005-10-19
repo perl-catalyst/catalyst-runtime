@@ -19,14 +19,14 @@ rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
 # create a TestApp and copy the test libs into it
 mkdir "$FindBin::Bin/../../t/var";
 chdir "$FindBin::Bin/../../t/var";
-system "$FindBin::Bin/../../script/catalyst.pl TestApp";
+system "perl $FindBin::Bin/../../script/catalyst.pl TestApp";
 chdir "$FindBin::Bin/../..";
 File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
 
 # spawn the standalone HTTP server
 my $port = 30000 + int rand(1 + 10000);
 my $pid = open my $server, 
-    "$FindBin::Bin/../../t/var/TestApp/script/testapp_server.pl -port $port 2>&1 |"
+    "perl -I$FindBin::Bin/../../lib $FindBin::Bin/../../t/var/TestApp/script/testapp_server.pl -port $port 2>&1 |"
     or die "Unable to spawn standalone HTTP server: $!";
 
 # wait for it to start
@@ -40,7 +40,7 @@ $ENV{CATALYST_SERVER} = "http://localhost:$port";
 system( 'prove -r -Ilib/ t/live/' );
 
 # shut it down
-kill 2, $pid;
+kill 'INT', $pid;
 close $server;
 
 # clean up
