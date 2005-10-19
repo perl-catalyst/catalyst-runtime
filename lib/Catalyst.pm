@@ -500,8 +500,16 @@ Contains the return value of the last executed action.
 
 Returns a hashref containing all your data.
 
-    $c->stash->{foo} ||= 'yada';
     print $c->stash->{foo};
+
+Keys may be set in the stash by assigning to the hash reference, or by passing
+either a single hash reference or a list of key/value pairs as arguments.
+
+For example:
+
+    $c->stash->{foo} ||= 'yada';
+    $c->stash( { moose => 'majestic', qux => 0 } );
+    $c->stash( bar => 1, gorch => 2 );
 
 =cut
 
