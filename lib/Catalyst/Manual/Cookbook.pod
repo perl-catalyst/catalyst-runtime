@@ -40,45 +40,15 @@ statistics in your debug messages.
 =head2 Scaffolding
 
 Scaffolding is very simple with Catalyst.
-Just use Catalyst::Model::CDBI::CRUD as your base class.
 
-    # lib/MyApp/Model/CDBI.pm
-    package MyApp::Model::CDBI;
+The recommended way is to use Catalyst::Helper::Controller::Scaffold.
 
-    use strict;
-    use base 'Catalyst::Model::CDBI::CRUD';
+Just install this module, and to scaffold a Class::DBI Model class, do the following:
 
-    __PACKAGE__->config(
-        dsn           => 'dbi:SQLite:/tmp/myapp.db',
-        relationships => 1
-    );
+./script/myapp_create controller <name> Scaffold <CDBI::Class>Scaffolding
 
-    1;
 
-    # lib/MyApp.pm
-    package MyApp;
 
-    use Catalyst 'FormValidator';
-
-    __PACKAGE__->config(
-        name => 'My Application',
-        root => '/home/joeuser/myapp/root'
-    );
-
-    sub my_table : Global {
-        my ( $self, $c ) = @_;
-        $c->form( optional => [ MyApp::Model::CDBI::Table->columns ] );
-        $c->forward('MyApp::Model::CDBI::Table');
-    }
-
-    1;
-
-Modify the C<$c-E<gt>form()> parameters to match your needs, and don't
-forget to copy the templates into the template root. Can't find the
-templates?  They were in the CRUD model distribution, so you can do
-B<look Catalyst::Model::CDBI::CRUD> from the CPAN shell to find them.
-
-Other Scaffolding modules are in development at the time of writing.
 
 =head2 File uploads
 

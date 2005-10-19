@@ -597,19 +597,19 @@ sub welcome_message {
                 <h1>$name on Catalyst $VERSION</h1>
              </div>
              <div id="answers">
-                 <p>Welcome to the wonderfull world of Catalyst.
-                    This MVC framework will make webdevelopment
+                 <p>Welcome to the wonderful world of Catalyst.
+                    This MVC framework will make web development
                     something you had never expected it to be:
                     Fun, rewarding and quick.</p>
                  <h2>What to do now?</h2>
-                 <p>That all depends really, on what <b>you</b> want to do.
+                 <p>That really depends  on what <b>you</b> want to do.
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
                     you might want to check out the documentation.</p>
                  <pre><code>perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a>
 perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a></code></pre>
                  <p>If you would like some background information on the
-                    MVC-pattern, theese links might be able to help you out.</p>
+                    MVC-pattern, these links might be of help to you.</p>
                  <ul>
                      <li>
                          <a href="http://dev.catalyst.perl.org/wiki/Models">
@@ -630,8 +630,8 @@ perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Int
                  <h2>What to do next?</h2>
                  <p>Next you need to create an actual application. Use the
                     helper scripts for what they are worth, they can save you
-                    alot of work getting everything set up. Also, be sure to
-                    check out the vast array of plugins for Catalyst.
+                    a lot of work getting everything set up. Also, be sure to
+                    check out the vast array of plugins for Catalyst on CPAN.
                     They can handle everything from A to Z
                     , and a whole lot in  between.</p>
                  <h2>Need help?</h2>
@@ -649,9 +649,13 @@ perldoc<a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Int
                      </li>
                  </ul>
                  <h2>In conclusion</h2>
-                 <p>The Catalyst team hope you will enjoy Catalyst as much as we                    enjoyed making it, and that rest asure that any and all
+                 <p>The Catalyst team hope you will enjoy using  Catalyst as much 
+                    as we enjoyed making it, and rest assured that any and all
                     feedback is welcomed</p>
-                 <p class="signature">-- there is no cabal, 2005</p>
+                 <p class="signature">-- #1. the first rule of the Cabal is, you do not 
+                                         talk about the Cabal.<br/>
+                                         #2. the second rule of the Cabal is, you DO NOT
+                                         talkk about the Cabal.</p>
              </div>
          </div>
     </body>
