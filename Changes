@@ -1,6 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added support for passing an IO::Handle object to $c->res->body.
+          (Andrew Bramble)
         - Added a new welcome screen.
         - Included Catalyst buttons and icons in helper.
         - Added Static::Simple plugin to core.

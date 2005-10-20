@@ -45,14 +45,14 @@ Finalize body.  Prints the response output.
 sub finalize_body {
     my ( $self, $c ) = @_;
     if ( ref $c->response->body && $c->response->body->can('read') ) {
-        my $buffer;
         while ( !$c->response->body->eof() ) {
-            $c->response->body->read( $buffer, $CHUNKSIZE );
+            $c->response->body->read( my $buffer, $CHUNKSIZE );
             $self->write( $c, $buffer );
         }
+        $c->response->body->close();
     }
     else {
-        $self->write( $c, $c->response->output );
+        $self->write( $c, $c->response->body );
     }
 }
 
