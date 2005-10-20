@@ -19,7 +19,7 @@ rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
 # create a TestApp and copy the test libs into it
 mkdir "$FindBin::Bin/../../t/var";
 chdir "$FindBin::Bin/../../t/var";
-system "perl $FindBin::Bin/../../script/catalyst.pl TestApp";
+system "perl -I$FindBin::Bin/../../lib $FindBin::Bin/../../script/catalyst.pl TestApp";
 chdir "$FindBin::Bin/../..";
 File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
 
@@ -34,6 +34,8 @@ print "Waiting for server to start...\n";
 while ( check_port( 'localhost', $port ) != 1 ) {
     sleep 1;
 }
+
+sleep 60;
     
 # run the testsuite against the HTTP server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
