@@ -217,7 +217,7 @@ sub mk_file {
         $file .= '.new';
     }
     if ( my $f = IO::File->new("> $file") ) {
-        $f->binmode;
+        binmode $f;
         print $f $content;
         print qq/created "$file"\n/;
         return 1;
