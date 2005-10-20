@@ -8,18 +8,12 @@ use IO::File;
 use MIME::Types;
 use NEXT;
 
-if ( Catalyst->VERSION le '5.33' ) {
-    require File::Slurp;
-}
-
 our $VERSION = '0.11';
 
 __PACKAGE__->mk_classdata( qw/_static_mime_types/ );
 __PACKAGE__->mk_accessors( qw/_static_file
                               _static_debug_message/ );
 
-# prepare_action is used to first check if the request path is a static file.
-# If so, we skip all other prepare_action steps to improve performance.
 sub prepare_action {
     my $c = shift;
     my $path = $c->req->path;
@@ -53,7 +47,6 @@ sub prepare_action {
     return $c->NEXT::ACTUAL::prepare_action(@_);
 }
 
-# dispatch takes the file found during prepare_action and serves it
 sub dispatch {
     my $c = shift;
     
@@ -70,7 +63,6 @@ sub dispatch {
     }
 }
 
-# finalize serves up final header information
 sub finalize {
     my $c = shift;
     
@@ -92,6 +84,10 @@ sub setup {
     
     $c->NEXT::setup(@_);
     
+    if ( Catalyst->VERSION le '5.33' ) {
+        require File::Slurp;
+    }
+    
     $c->config->{static}->{dirs} ||= [];
     $c->config->{static}->{include_path} ||= [ $c->config->{root} ];
     $c->config->{static}->{mime_types} ||= {};
@@ -100,7 +96,7 @@ sub setup {
     $c->config->{static}->{debug} ||= $c->debug;
     if ( ! defined $c->config->{static}->{no_logs} ) {
         $c->config->{static}->{no_logs} = 1;
-    }
+    }    
     
     # load up a MIME::Types object, only loading types with
     # at least 1 file extension
@@ -198,7 +194,7 @@ sub _serve_static {
         # new method, pass an IO::File object to body
         my $fh = IO::File->new( $full_path, 'r' );
         if ( defined $fh ) {
-            $fh->binmode;
+            binmode $fh;
             $c->res->body( $fh );
         }
         else {
@@ -414,6 +410,28 @@ directory.  This approach is recommended for production installations.
     <Location /static>
         SetHandler default-handler
     </Location>
+
+=head1 INTERNAL EXTENDED METHODS
+
+Static::Simple extends the following steps in the Catalyst process.
+
+=head2 prepare_action 
+
+prepare_action is used to first check if the request path is a static file.
+If so, we skip all other prepare_action steps to improve performance.
+
+=head2 dispatch
+
+dispatch takes the file found during prepare_action and writes it to the
+output.
+
+=head2 finalize
+
+finalize serves up final header information and displays any log messages.
+
+=head2 setup
+
+setup initializes all default values.
 
 =head1 SEE ALSO
 
