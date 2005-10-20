@@ -586,7 +586,8 @@ sub welcome_message {
                 -moz-border-radius: 10px;
             }
             h1 {
-                font-size: 1.2em;
+                font-size: 0.9em;
+                font-weight: normal;
                 text-align: center;
             }
             h2 {
@@ -599,16 +600,15 @@ sub welcome_message {
                 float: right;
                 margin-left: 10px;
             }
-            p.signature {
-                text-align: right;
-                font-style: italic;
+            b#appname {
+                font-size: 1.6em;
             }
         </style>
     </head>
     <body>
         <div id="content">
             <div id="topbar">
-                <h1>$name on <a href="http://catalyst.perl.org">Catalyst</a>
+                <h1><b id="appname">$name</b> on <a href="http://catalyst.perl.org">Catalyst</a>
                     $VERSION</h1>
              </div>
              <div id="answers">
@@ -670,10 +670,6 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/In
                  <p>The Catalyst team hope you will enjoy using Catalyst as much 
                     as we enjoyed making it, and rest assured that any and all
                     feedback is welcomed.</p>
-                 <p class="signature">-- #1. the first rule of the Cabal is, you do not 
-                                         talk about the Cabal.<br/>
-                                         #2. the second rule of the Cabal is, you DO NOT
-                                         talk about the Cabal.</p>
              </div>
          </div>
     </body>
@@ -1626,6 +1622,8 @@ Web:
 Andy Grundman
 
 Andy Wardley
+
+Andreas Marienborg
 
 Andrew Ford
 
