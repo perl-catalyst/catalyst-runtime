@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use File::stat;
+use IO::File;
 use MIME::Types;
 use NEXT;
 
@@ -11,7 +12,7 @@ if ( Catalyst->VERSION le '5.33' ) {
     require File::Slurp;
 }
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 __PACKAGE__->mk_classdata( qw/_static_mime_types/ );
 __PACKAGE__->mk_accessors( qw/_static_file
@@ -191,17 +192,18 @@ sub _serve_static {
     if ( Catalyst->VERSION le '5.33' ) {
         # old File::Slurp method
         my $content = File::Slurp::read_file( $full_path );
-        $c->res->output( $content );
+        $c->res->body( $content );
     }
     else {
-        # new write method
-        open my $fh, '<', $full_path 
-            or Catalyst::Exception->throw( 
-                message => "Unable to open $full_path for reading" );
-        while ( $fh->read( my $buffer, 4096 ) ) {
-            $c->res->write( $buffer );
+        # new method, pass an IO::File object to body
+        my $fh = IO::File->new( $full_path, 'r' );
+        if ( defined $fh ) {
+            $c->res->body( $fh );
         }
-        close $fh;
+        else {
+            Catalyst::Exception->throw( 
+                message => "Unable to open $full_path for reading" );
+        }
     }
     
     return 1;
@@ -220,7 +222,7 @@ sub _ext_to_type {
         if ( $type ) {
             $c->_debug_msg( "as $type" )
                 if ( $c->config->{static}->{debug} );            
-            return $type;
+            return ( ref $type ) ? $type->type : $type;
         }
         else {
             $c->_debug_msg( "as text/plain (unknown extension $ext)" )
