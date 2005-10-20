@@ -22,7 +22,12 @@ EOF
 }
 
 # test streaming by passing a handle to $c->res->body
+SKIP:
 {
+    if ( $ENV{CATALYST_SERVER} ) {
+        skip "Using remote server", 4;
+    }
+    
     my $file = "$FindBin::Bin/../../../../01use.t";
     my $fh = IO::File->new( $file, 'r' );
     my $buffer;
