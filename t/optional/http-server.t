@@ -35,8 +35,6 @@ while ( check_port( 'localhost', $port ) != 1 ) {
     sleep 1;
 }
 
-sleep 60;
-    
 # run the testsuite against the HTTP server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
 system( 'prove -r -Ilib/ t/live/' );
