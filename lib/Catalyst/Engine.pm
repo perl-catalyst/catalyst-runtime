@@ -44,8 +44,16 @@ Finalize body.  Prints the response output.
 
 sub finalize_body {
     my ( $self, $c ) = @_;
-
-    $self->write( $c, $c->response->output );
+    if ( ref $c->response->body && $c->response->body->can('read') ) {
+        my $buffer;
+        while ( !$c->response->body->eof() ) {
+            $c->response->body->read( $buffer, $CHUNKSIZE );
+            $self->write( $c, $buffer );
+        }
+    }
+    else {
+        $self->write( $c, $c->response->output );
+    }
 }
 
 =item $self->finalize_cookies($c)
@@ -341,10 +349,10 @@ sub prepare_query_parameters {
     $query_string =~ s/;/&/g;
 
     my $u = URI->new( '', 'http' );
-        $u->query( $query_string );
-        for my $key ( $u->query_param ) {
-        my @vals = $u->query_param($key);  
-        $c->request->query_parameters->{$key} = @vals > 1 ? [@vals] : $vals[0];  
+    $u->query($query_string);
+    for my $key ( $u->query_param ) {
+        my @vals = $u->query_param($key);
+        $c->request->query_parameters->{$key} = @vals > 1 ? [@vals] : $vals[0];
     }
 }
 
@@ -386,11 +394,11 @@ sub prepare_uploads {
             push @uploads, $u;
         }
         $c->request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
-        
+
         # support access to the filename as a normal param
         my @filenames = map { $_->{filename} } @uploads;
-        $c->request->parameters->{$name} 
-            = @filenames > 1 ? \@filenames : $filenames[0];
+        $c->request->parameters->{$name} =
+          @filenames > 1 ? \@filenames : $filenames[0];
     }
 }
 
