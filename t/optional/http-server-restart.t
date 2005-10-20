@@ -19,19 +19,22 @@ plan skip_all => 'File::Copy::Recursive required' if $@;
 plan tests => 40;
 
 # clean up
-rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
+rmtree "$FindBin::Bin/../../t/tmp" if -d "$FindBin::Bin/../../t/tmp";
 
 # create a TestApp and copy the test libs into it
-mkdir "$FindBin::Bin/../../t/var";
-chdir "$FindBin::Bin/../../t/var";
+mkdir "$FindBin::Bin/../../t/tmp";
+chdir "$FindBin::Bin/../../t/tmp";
 system "perl -I$FindBin::Bin/../../lib $FindBin::Bin/../../script/catalyst.pl TestApp";
 chdir "$FindBin::Bin/../..";
-File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
+File::Copy::Recursive::dircopy( 't/live/lib', 't/tmp/TestApp/lib' );
+
+# remove TestApp's tests
+rmtree 't/tmp/TestApp/t';
 
 # spawn the standalone HTTP server
 my $port = 30000 + int rand(1 + 10000);
 my $pid = open my $server, 
-    "perl -I$FindBin::Bin/../../lib $FindBin::Bin/../../t/var/TestApp/script/testapp_server.pl -port $port -restart 2>&1 |"
+    "perl -I$FindBin::Bin/../../lib $FindBin::Bin/../../t/tmp/TestApp/script/testapp_server.pl -port $port -restart 2>&1 |"
     or die "Unable to spawn standalone HTTP server: $!";
 
 # wait for it to start
@@ -42,9 +45,9 @@ while ( check_port( 'localhost', $port ) != 1 ) {
 
 # change various files
 my @files = (
-    "$FindBin::Bin/../../t/var/TestApp/lib/TestApp.pm",
-    "$FindBin::Bin/../../t/var/TestApp/lib/TestApp/Controller/Action/Begin.pm",
-    "$FindBin::Bin/../../t/var/TestApp/lib/TestApp/Controller/Engine/Request/URI.pm",
+    "$FindBin::Bin/../../t/tmp/TestApp/lib/TestApp.pm",
+    "$FindBin::Bin/../../t/tmp/TestApp/lib/TestApp/Controller/Action/Begin.pm",
+    "$FindBin::Bin/../../t/tmp/TestApp/lib/TestApp/Controller/Engine/Request/URI.pm",
 );
 
 # change some files and make sure the server restarts itself
@@ -93,7 +96,7 @@ kill 'INT', $pid;
 close $server;
 
 # clean up
-rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
+rmtree "$FindBin::Bin/../../t/tmp" if -d "$FindBin::Bin/../../t/tmp";
 
 sub check_port {
     my ( $host, $port ) = @_;

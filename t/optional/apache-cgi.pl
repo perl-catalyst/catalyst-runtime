@@ -18,21 +18,21 @@ use File::Copy::Recursive;
 use FindBin;
 
 # clean up
-rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
+rmtree "$FindBin::Bin/../../t/tmp" if -d "$FindBin::Bin/../../t/tmp";
 
 # create a TestApp and copy the test libs into it
-mkdir "$FindBin::Bin/../../t/var";
-chdir "$FindBin::Bin/../../t/var";
+mkdir "$FindBin::Bin/../../t/tmp";
+chdir "$FindBin::Bin/../../t/tmp";
 system "$FindBin::Bin/../../script/catalyst.pl TestApp";
 chdir "$FindBin::Bin/../..";
-File::Copy::Recursive::dircopy( 't/live/lib', 't/var/TestApp/lib' );
+File::Copy::Recursive::dircopy( 't/live/lib', 't/tmp/TestApp/lib' );
 
 # remove TestApp's tests so Apache::Test doesn't try to run them
-rmtree 't/var/TestApp/t';
+rmtree 't/tmp/TestApp/t';
 
 $ENV{CATALYST_SERVER} = 'http://localhost:8529/cgi';
 
 Apache::TestRun->new->run(@ARGV);
 
 # clean up
-rmtree "$FindBin::Bin/../../t/var" if -d "$FindBin::Bin/../../t/var";
+rmtree "$FindBin::Bin/../../t/tmp" if -d "$FindBin::Bin/../../t/tmp";
