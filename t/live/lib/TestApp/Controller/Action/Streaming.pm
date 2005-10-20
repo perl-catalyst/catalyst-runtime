@@ -14,4 +14,17 @@ EOF
     }
 }
 
+sub body : Local {
+    my ( $self, $c ) = @_;
+    
+    my $file = "$FindBin::Bin/../../../../01use.t";
+    my $fh = IO::File->new( $file, 'r' );
+    if ( defined $fh ) {
+        $c->res->body( $fh );
+    }
+    else {
+        $c->res->body( "Unable to read $file" );
+    }
+}
+
 1;
