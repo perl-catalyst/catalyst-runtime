@@ -524,7 +524,7 @@ sub stash {
     return $c->{stash};
 }
 
-=head1 $c->welcome_message
+=item $c->welcome_message
 
 Returns the Catalyst welcome HTML page.
 
