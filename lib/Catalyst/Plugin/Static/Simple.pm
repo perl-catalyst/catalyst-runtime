@@ -198,6 +198,7 @@ sub _serve_static {
         # new method, pass an IO::File object to body
         my $fh = IO::File->new( $full_path, 'r' );
         if ( defined $fh ) {
+            $fh->binmode;
             $c->res->body( $fh );
         }
         else {
