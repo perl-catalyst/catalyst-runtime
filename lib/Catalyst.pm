@@ -646,15 +646,16 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/In
                      </li>
                  </ul>
                  <h2>What to do next?</h2>
-                 <p>Next you need to create an actual application. Use the
-                    helper scripts for what they are worth, they can save you
-                    a lot of work getting everything set up. Also, be sure to
-                    check out the vast array of plugins for Catalyst on CPAN.
-                    They can handle everything from A to Z
-                    , and a whole lot in  between.</p>
+                 <p>Next it's time to write an actual application. Use the
+                    helper scripts to generate controllers, models and views, they 
+                    can save you a lot of work. Also, be sure to check out the vast 
+                    and growing collection of plugins for Catalyst on CPAN, you are 
+                    likely to find what you need there.
+                    </p>
+
                  <h2>Need help?</h2>
-                 <p>Catalyst has a very active community. The main places to get
-                    in touch are these.</p>
+                 <p>Catalyst has a very active community. Here are the main places to
+                    get in touch with us.</p>
                  <ul>
                      <li>
                          <a href="http://dev.catalyst.perl.org">Wiki</a>
@@ -668,8 +669,8 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/In
                  </ul>
                  <h2>In conclusion</h2>
                  <p>The Catalyst team hope you will enjoy using Catalyst as much 
-                    as we enjoyed making it, and rest assured that any and all
-                    feedback is welcomed.</p>
+                    as we enjoyed making it. Please contact us if you have ideas
+                    for improvement or other feedback.</p>
              </div>
          </div>
     </body>
