@@ -38,6 +38,7 @@ t/01use.t
 t/02pod.t
 t/03podcoverage.t
 t/conf/extra.conf.in
+t/live/component/controller/action/auto.t
 t/live/component/controller/action/begin.t
 t/live/component/controller/action/default.t
 t/live/component/controller/action/detach.t
@@ -70,6 +71,9 @@ t/live/lib/Catalyst/Plugin/Test/Headers.pm
 t/live/lib/Catalyst/Plugin/Test/Plugin.pm
 t/live/lib/TestApp.pm
 t/live/lib/TestApp/Controller/Action.pm
+t/live/lib/TestApp/Controller/Action/Auto.pm
+t/live/lib/TestApp/Controller/Action/Auto/Abort.pm
+t/live/lib/TestApp/Controller/Action/Auto/Deep.pm
 t/live/lib/TestApp/Controller/Action/Begin.pm
 t/live/lib/TestApp/Controller/Action/Default.pm
 t/live/lib/TestApp/Controller/Action/Detach.pm
