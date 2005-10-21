@@ -461,6 +461,7 @@ __appclass__
 package [% name %];
 
 use strict;
+use warnings;
 
 # -Debug activates the debug mode for very useful log messages
 # Static::Simple will serve static files from the root directory
@@ -469,10 +470,10 @@ use Catalyst qw/-Debug Static::Simple/;
 our $VERSION = '0.01';
 
 # Configure the application
-[% name %]->config( name => '[% name %]' );
+__PACKAGE__->config( name => '[% name %]' );
 
 # Start the application
-[% name %]->setup;
+__PACKAGE__->setup;
 
 =head1 NAME
 
@@ -890,6 +891,7 @@ __compclass__
 package [% class %];
 
 use strict;
+use warnings;
 use base 'Catalyst::Base';
 
 =head1 NAME
