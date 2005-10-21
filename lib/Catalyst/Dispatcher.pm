@@ -264,78 +264,43 @@ sub get_action {
     $inherit   ||= 0;
 
     if ($namespace) {
-        $namespace = '' if $namespace eq '/';
+
         my $parent = $self->tree;
-        my @results;
+        my @match;
 
-        if ($inherit) {
-            #my $result =
-            #  $self->actions->{private}->{ $parent->getUID }->{$action};
-            #push @results, [$result] if $result;
+        if ($namespace ne '/') {
+
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
-
-            #warn "${namespace} ${action}";
-            my @path = split(/\//, $namespace);
+            my @path = split('/', $namespace);
             $visitor->setSearchPath( @path );
             $parent->accept($visitor);
 
-            #warn join(', ', map { $_->getNodeValue } $visitor->getResults);
+            if ($inherit) {
 
-            my @match = $visitor->getResults;
-            @match = ($parent) unless @match;
+                @match = $visitor->getResults;
+                @match = ($parent) unless @match;
 
-            if (!defined $visitor->getResult) {
-                my $extra = $path[(scalar @match) - 1];
-                last unless $extra;
-                $visitor->setSearchPath($extra);
-                $match[-1]->accept($visitor);
-                push(@match, $visitor->getResult) if defined $visitor->getResult;
+                if (!defined $visitor->getResult) {
+                    my $extra = $path[(scalar @match) - 1];
+                    last unless $extra;
+                    $visitor->setSearchPath($extra);
+                    $match[-1]->accept($visitor);
+                    push(@match, $visitor->getResult) if defined $visitor->getResult;
+                }
+            } else {
+                @match = ($visitor->getResult) if $visitor->getResult;
             }
-
-            foreach my $child (@match) {
-                my $node = $self->actions->{private}->{$child->getUID};
-                next unless $node;
-                push(@results, [ $node->{$action} ]) if defined $node->{$action};
-            }
-
-          #SEARCH:
-          #  for my $part ( split '/', $namespace ) {
-          #      $visitor->setSearchPath($part);
-          #      $parent->accept($visitor);
-          #      my $child = $visitor->getResult;
-          #      my $uid   = $child->getUID if $child;
-          #      my $match = $self->actions->{private}->{$uid}->{$action}
-          #        if $uid;
-          #      push @results, [$match] if $match;
-          #      if ($child) {
-          #          $parent = $child;
-          #      }
-          #      else {
-          #          last SEARCH;
-          #      }
-          #  }
 
         }
 
-        else {
+        @match = ($parent) unless @match;
 
-            if ($namespace) {
-                my $visitor = Tree::Simple::Visitor::FindByPath->new;
-                $visitor->setSearchPath( split '/', $namespace );
-                $parent->accept($visitor);
-                my $child = $visitor->getResult;
-                my $uid   = $child->getUID if $child;
-                my $match = $self->actions->{private}->{$uid}->{$action}
-                  if $uid;
-                push @results, [$match] if $match;
-            }
+        my @results;
 
-            else {
-                my $result =
-                  $self->actions->{private}->{ $parent->getUID }->{$action};
-                push @results, [$result] if $result;
-            }
-
+        foreach my $child (@match) {
+            my $node = $self->actions->{private}->{$child->getUID};
+            next unless $node;
+            push(@results, [ $node->{$action} ]) if defined $node->{$action};
         }
         return \@results;
     }
