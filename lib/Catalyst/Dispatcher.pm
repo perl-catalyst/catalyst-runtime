@@ -5,6 +5,7 @@ use base 'Class::Accessor::Fast';
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Catalyst::Action;
+use Catalyst::ActionContainer;
 use Text::ASCIITable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
@@ -298,8 +299,7 @@ sub get_action {
         my @results;
 
         foreach my $child (@match) {
-            my $node = $self->actions->{private}->{$child->getUID};
-            next unless $node;
+            my $node = $child->getNodeValue->actions;
             push(@results, [ $node->{$action} ]) if defined $node->{$action};
         }
         return \@results;
@@ -360,19 +360,23 @@ sub set_action {
     my $parent  = $self->tree;
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
 
-    for my $part ( split '/', $prefix ) {
-        $visitor->setSearchPath($part);
-        $parent->accept($visitor);
-        my $child = $visitor->getResult;
-
-        unless ($child) {
-            $child = $parent->addChild( Tree::Simple->new($part) );
+    if ($prefix) {
+        for my $part ( split '/', $prefix ) {
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
-            $child = $visitor->getResult;
+            my $child = $visitor->getResult;
+    
+            unless ($child) {
+                my $container = Catalyst::ActionContainer->new(
+                                    { part => $part, actions => {} });
+                $child = $parent->addChild( Tree::Simple->new($container) );
+                $visitor->setSearchPath($part);
+                $parent->accept($visitor);
+                $child = $visitor->getResult;
+            }
+    
+            $parent = $child;
         }
-
-        $parent = $child;
     }
 
     my $reverse = $prefix ? "$prefix/$method" : $method;
@@ -385,8 +389,7 @@ sub set_action {
         }
     );
 
-    my $uid = $parent->getUID;
-    $self->actions->{private}->{$uid}->{$method} = $action;
+    $parent->getNodeValue->actions->{$method} = $action;
 
     my @path;
     for my $path ( @{ $flags{path} } ) {
@@ -445,7 +448,9 @@ sub setup_actions {
     );
 
     # We use a tree
-    $self->tree( Tree::Simple->new( 0, Tree::Simple->ROOT ) );
+    my $container = Catalyst::ActionContainer->new(
+                        { part => '/', actions => {} } );
+    $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 
     for my $comp ( keys %{ $class->components } ) {
 
@@ -499,10 +504,10 @@ sub setup_actions {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
         $prefix .= '/' unless $prefix =~ /\/$/;
-        my $uid = $parent->getUID;
+        my $node = $parent->getNodeValue->actions;
 
-        for my $action ( keys %{ $actions->{private}->{$uid} } ) {
-            my $action_obj = $actions->{private}->{$uid}->{$action};
+        for my $action ( keys %{ $node } ) {
+            my $action_obj = $node->{$action};
             $privates->addRow( "$prefix$action", $action_obj->namespace );
         }
 
