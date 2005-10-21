@@ -224,6 +224,32 @@ sub reflect_actions {
     return $actions;
 }
 
+=item request($request)
+
+Returns a HTTP::Request object.
+
+=cut
+
+sub request {
+    my $request = shift;
+    unless ( ref $request ) {
+        if ( $request =~ m/http/i ) {
+            $request = URI->new($request)->canonical;
+        }
+        else {
+            $request = URI->new( 'http://localhost' . $request )->canonical;
+        }
+    }
+    unless ( ref $request eq 'HTTP::Request' ) {
+        $request = HTTP::Request->new( 'GET', $request );
+    }
+
+    $request->header(
+        'Host' => sprintf( '%s:%d', $request->uri->host, $request->uri->port )
+    );
+    return $request;
+}
+
 =back
 
 =head1 AUTHOR

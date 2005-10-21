@@ -2,7 +2,7 @@ package Catalyst::Engine::Test;
 
 use strict;
 use base 'Catalyst::Engine::CGI';
-use HTTP::Request;
+use Catalyst::Utils;
 use HTTP::Response;
 use HTTP::Status;
 use NEXT;
@@ -58,22 +58,7 @@ sub finalize_headers {
 sub run {
     my ( $self, $class, $request ) = @_;
 
-    # Construct request
-    unless ( ref $request ) {
-        if ( $request =~ m/http/i ) {
-            $request = URI->new($request)->canonical;
-        }
-        else {
-            $request = URI->new( 'http://localhost' . $request )->canonical;
-        }
-    }
-    unless ( ref $request eq 'HTTP::Request' ) {
-        $request = HTTP::Request->new( 'GET', $request );
-    }
-
-    $request->header(
-        'Host' => sprintf( '%s:%d', $request->uri->host, $request->uri->port )
-    );
+    $request = Catalyst::Utils::request($request);
 
     # We emulate CGI
     local %ENV = (
