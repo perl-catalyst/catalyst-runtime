@@ -531,9 +531,10 @@ Returns the Catalyst welcome HTML page.
 =cut
 
 sub welcome_message {
-    my $c    = shift;
-    my $name = $c->config->{name};
-    my $logo = $c->uri_for('/static/images/catalyst_logo.png');
+    my $c      = shift;
+    my $name   = $c->config->{name};
+    my $logo   = $c->uri_for('/static/images/catalyst_logo.png');
+    my $prefix = Catalyst::Utils::appprefix( ref $c );
     return <<"EOF";
 <html>
     <head>
@@ -624,33 +625,18 @@ sub welcome_message {
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
                     you might want to check out the documentation.</p>
-                 <pre><code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a>
-perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a></code></pre>
-                 <p>If you would like some background information on the
-                    MVC-pattern, these links might be of help to you.</p>
-                 <ul>
-                     <li>
-                         <a href="http://dev.catalyst.perl.org/wiki/Models">
-                             Introduction to Models
-                         </a>
-                     </li>
-                     <li>
-                         <a href="http://dev.catalyst.perl.org/wiki/Views">
-                             Introduction to Views
-                         </a>
-                     </li>
-                     <li>
-                         <a href="http://dev.catalyst.perl.org/wiki/Controllers">
-                             Introduction to Controllers
-                         </a>
-                     </li>
-                 </ul>
+                 <pre><code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
+perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a></code></pre>
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
-                    helper scripts to generate controllers, models and views, they 
-                    can save you a lot of work. Also, be sure to check out the vast 
-                    and growing collection of plugins for Catalyst on CPAN, you are 
-                    likely to find what you need there.
+                    helper scripts to generate <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AController%3A%3A&mode=all">controllers</a>,
+                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&mode=all">models</a> and
+                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&mode=all">views</a>,
+                    they can save you a lot of work.</p>
+                    <pre><code>script/${prefix}_create.pl -help</code></pre>
+                    <p>Also, be sure to check out the vast and growing
+                    collection of <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3APlugin%3A%3A&mode=all">plugins for Catalyst on CPAN</a>,
+                    you are likely to find what you need there.
                     </p>
 
                  <h2>Need help?</h2>
