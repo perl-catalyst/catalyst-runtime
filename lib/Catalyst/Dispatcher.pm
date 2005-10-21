@@ -269,27 +269,51 @@ sub get_action {
         my @results;
 
         if ($inherit) {
-            my $result =
-              $self->actions->{private}->{ $parent->getUID }->{$action};
-            push @results, [$result] if $result;
+            #my $result =
+            #  $self->actions->{private}->{ $parent->getUID }->{$action};
+            #push @results, [$result] if $result;
             my $visitor = Tree::Simple::Visitor::FindByPath->new;
 
-          SEARCH:
-            for my $part ( split '/', $namespace ) {
-                $visitor->setSearchPath($part);
-                $parent->accept($visitor);
-                my $child = $visitor->getResult;
-                my $uid   = $child->getUID if $child;
-                my $match = $self->actions->{private}->{$uid}->{$action}
-                  if $uid;
-                push @results, [$match] if $match;
-                if ($child) {
-                    $parent = $child;
-                }
-                else {
-                    last SEARCH;
-                }
+            #warn "${namespace} ${action}";
+            my @path = split(/\//, $namespace);
+            $visitor->setSearchPath( @path );
+            $parent->accept($visitor);
+
+            #warn join(', ', map { $_->getNodeValue } $visitor->getResults);
+
+            my @match = $visitor->getResults;
+            @match = ($parent) unless @match;
+
+            if (!defined $visitor->getResult) {
+                my $extra = $path[(scalar @match) - 1];
+                last unless $extra;
+                $visitor->setSearchPath($extra);
+                $match[-1]->accept($visitor);
+                push(@match, $visitor->getResult) if defined $visitor->getResult;
             }
+
+            foreach my $child (@match) {
+                my $node = $self->actions->{private}->{$child->getUID};
+                next unless $node;
+                push(@results, [ $node->{$action} ]) if defined $node->{$action};
+            }
+
+          #SEARCH:
+          #  for my $part ( split '/', $namespace ) {
+          #      $visitor->setSearchPath($part);
+          #      $parent->accept($visitor);
+          #      my $child = $visitor->getResult;
+          #      my $uid   = $child->getUID if $child;
+          #      my $match = $self->actions->{private}->{$uid}->{$action}
+          #        if $uid;
+          #      push @results, [$match] if $match;
+          #      if ($child) {
+          #          $parent = $child;
+          #      }
+          #      else {
+          #          last SEARCH;
+          #      }
+          #  }
 
         }
 
