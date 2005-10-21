@@ -60,6 +60,10 @@ sub run {
 
     $request = Catalyst::Utils::request($request);
 
+    $request->header(
+        'Host' => sprintf( '%s:%d', $request->uri->host, $request->uri->port )
+    );
+
     # We emulate CGI
     local %ENV = (
         PATH_INFO    => $request->uri->path  || '',

@@ -243,10 +243,6 @@ sub request {
     unless ( ref $request eq 'HTTP::Request' ) {
         $request = HTTP::Request->new( 'GET', $request );
     }
-
-    $request->header(
-        'Host' => sprintf( '%s:%d', $request->uri->host, $request->uri->port )
-    );
     return $request;
 }
 
