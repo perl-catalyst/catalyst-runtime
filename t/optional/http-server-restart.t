@@ -67,7 +67,7 @@ for ( 1..20 ) {
         die "Server appears to have died" if $count++ > 50;
     }
     my $response = get("http://localhost:$port/action/default");
-    like( $response, qr/Catalyst::Request/, 'Request OK' );
+    like( $response, qr/Catalyst::Request/, 'Non-error restart, request OK' );
     
     #print $server->getline;
 }
@@ -86,7 +86,7 @@ for ( 1..20 ) {
         die "Server appears to have died";
     }
     my $response = get("http://localhost:$port/action/default");
-    like( $response, qr/Catalyst::Request/, 'Request OK' );
+    like( $response, qr/Catalyst::Request/, 'Syntax error, no restart, request OK' );
     
     #print $server->getline;
 }
