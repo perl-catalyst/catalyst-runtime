@@ -9,6 +9,7 @@ use IO::File;
 use FindBin;
 use Template;
 use Catalyst;
+use Catalyst::Utils;
 use Catalyst::Exception;
 
 my %cache;
@@ -61,8 +62,7 @@ sub mk_app {
     $self->{name} = $name;
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
-    $self->{appprefix} = lc $self->{dir};
-    $self->{appprefix} =~ s/-/_/g;
+    $self->{appprefix} = Catalyst::Utils::appprefix($name);
     $self->{startperl} = $Config{startperl};
     $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN || 4;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
@@ -449,8 +449,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
@@ -522,8 +522,8 @@ sub default : Private {
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
@@ -633,8 +633,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 __fastcgi__
@@ -671,8 +671,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 __server__
@@ -759,8 +759,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 __test__
@@ -816,8 +816,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 __create__
@@ -882,8 +882,8 @@ Sebastian Riedel, C<sri\@oook.de>
 
 Copyright 2004 Sebastian Riedel. All rights reserved.
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 __compclass__
@@ -929,8 +929,8 @@ Catalyst component.
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

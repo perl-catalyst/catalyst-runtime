@@ -97,8 +97,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut
 
