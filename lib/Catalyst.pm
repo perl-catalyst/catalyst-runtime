@@ -617,9 +617,9 @@ sub welcome_message {
                  <img src="$logo"/>
                  </p>
                  <p>Welcome to the wonderful world of Catalyst.
-                    This MVC framework will make web development
-                    something you had never expected it to be:
-                    Fun, rewarding and quick.</p>
+                    This <a href="http://en.wikipedia.org/wiki/MVC">MVC</a>
+                    framework will make web development something you had
+                    never expected it to be: Fun, rewarding and quick.</p>
                  <h2>What to do now?</h2>
                  <p>That really depends  on what <b>you</b> want to do.
                     We do, however, provide you with a few starting points.</p>
