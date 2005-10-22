@@ -7,6 +7,7 @@ use Catalyst::Utils;
 use Catalyst::Action;
 use Catalyst::ActionContainer;
 use Catalyst::DispatchType::Default;
+use Catalyst::DispatchType::Index;
 use Text::ASCIITable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
@@ -249,7 +250,7 @@ sub prepare_action {
 sub get_action {
     my ( $self, $c, $action, $namespace, $inherit ) = @_;
     return [] unless $action;
-    $namespace ||= '/';
+    $namespace ||= '';
     $inherit   ||= 0;
 
     my @match = $self->get_containers($namespace);
@@ -258,6 +259,14 @@ sub get_action {
 
     foreach my $child ( $inherit ? @match : $match[-1] ) {
         my $node = $child->actions;
+        unless ($inherit) {
+            $namespace = '' if $namespace eq '/';
+            my $reverse = $node->{$action}->reverse;
+            my $name    = $namespace
+              ? $namespace =~ /\/$/ ? "$namespace$action" : "$namespace/$action"
+              : $action;
+            last unless $name eq $reverse;
+        }
         push( @results, [ $node->{$action} ] ) if defined $node->{$action};
     }
     return \@results;
@@ -456,6 +465,7 @@ sub setup_actions {
     }
 
     # Default actions are always last in the chain
+    push @{ $self->dispatch_types }, Catalyst::DispatchType::Index->new;
     push @{ $self->dispatch_types }, Catalyst::DispatchType::Default->new;
 
     return unless $class->debug;
