@@ -474,34 +474,11 @@ sub setup_actions {
     };
 
     $walker->( $walker, $self->tree, '' );
-    $class->log->debug( "Loaded private actions:\n" . $privates->draw )
+    $class->log->debug( "Loaded Private actions:\n" . $privates->draw )
       if ( @{ $privates->{tbl_rows} } );
 
-    my $publics = Text::ASCIITable->new;
-    $publics->setCols( 'Public', 'Private' );
-    $publics->setColWidth( 'Public',  36, 1 );
-    $publics->setColWidth( 'Private', 37, 1 );
-
-    for my $plain ( sort keys %{ $actions->{plain} } ) {
-        my $action = $actions->{plain}->{$plain};
-        $publics->addRow( "/$plain", "/$action" );
-    }
-
-    $class->log->debug( "Loaded public actions:\n" . $publics->draw )
-      if ( @{ $publics->{tbl_rows} } );
-
-    my $regexes = Text::ASCIITable->new;
-    $regexes->setCols( 'Regex', 'Private' );
-    $regexes->setColWidth( 'Regex',   36, 1 );
-    $regexes->setColWidth( 'Private', 37, 1 );
-
-    for my $regex ( sort keys %{ $actions->{regex} } ) {
-        my $action = $actions->{regex}->{$regex};
-        $regexes->addRow( $regex, "/$action" );
-    }
-
-    $class->log->debug( "Loaded regex actions:\n" . $regexes->draw )
-      if ( @{ $regexes->{tbl_rows} } );
+    # List all public actions
+    $_->list($class) for @{ $self->dispatch_types };
 }
 
 =back

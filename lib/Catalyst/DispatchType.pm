@@ -17,6 +17,12 @@ See L<Catalyst>.
 
 =over 4
 
+=item $self->list($c)
+
+=cut
+
+sub list { }
+
 =item $self->match( $c, $path )
 
 =cut
@@ -27,7 +33,7 @@ sub match { die "Abstract method!" }
 
 =cut
 
-sub register { return }
+sub register { }
 
 =back
 

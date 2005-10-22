@@ -2,6 +2,7 @@ package Catalyst::DispatchType::Path;
 
 use strict;
 use base qw/Catalyst::DispatchType/;
+use Text::ASCIITable;
 
 =head1 NAME
 
@@ -16,6 +17,24 @@ See L<Catalyst>.
 =head1 METHODS
 
 =over 4
+
+=item $self->list($c)
+
+=cut
+
+sub list {
+    my ( $self, $c ) = @_;
+    my $paths = Text::ASCIITable->new;
+    $paths->setCols( 'Public', 'Private' );
+    $paths->setColWidth( 'Public',  36, 1 );
+    $paths->setColWidth( 'Private', 37, 1 );
+    for my $path ( sort keys %{ $self->{paths} } ) {
+        my $action = $self->{paths}->{$path};
+        $paths->addRow( "/$path", "/$action" );
+    }
+    $c->log->debug( "Loaded Path actions:\n" . $paths->draw )
+      if ( @{ $paths->{tbl_rows} } );
+}
 
 =item $self->match( $c, $path )
 
