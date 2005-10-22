@@ -50,12 +50,12 @@ for ( 1 .. 1 ) {
         ok( my $response = request('http://localhost/action/index/'), 'second-level controller index' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'Action::Index index', 'second-level controller index ok' );
+        is( $response->content, 'Action-Index index', 'second-level controller index ok' );
         
         ok( $response = request('http://localhost/action/index'), 'second-level controller index no slash' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'Action::Index index', 'second-level controller index no slash ok' );        
+        is( $response->content, 'Action-Index index', 'second-level controller index no slash ok' );        
     }
     
     # test controller default when index is present
