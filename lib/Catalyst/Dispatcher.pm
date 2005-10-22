@@ -259,15 +259,19 @@ sub get_action {
 
     foreach my $child ( $inherit ? @match : $match[-1] ) {
         my $node = $child->actions;
-        unless ($inherit) {
-            $namespace = '' if $namespace eq '/';
-            my $reverse = $node->{$action}->reverse;
-            my $name    = $namespace
-              ? $namespace =~ /\/$/ ? "$namespace$action" : "$namespace/$action"
-              : $action;
-            last unless $name eq $reverse;
+        if ( defined $node->{$action} ) {
+            unless ($inherit) {
+                $namespace = '' if $namespace eq '/';
+                my $reverse = $node->{$action}->reverse;
+                my $name    = $namespace
+                  ? $namespace =~ /\/$/
+                  ? "$namespace$action"
+                  : "$namespace/$action"
+                  : $action;
+                last unless $name eq $reverse;
+            }
+            push( @results, [ $node->{$action} ] );
         }
-        push( @results, [ $node->{$action} ] ) if defined $node->{$action};
     }
     return \@results;
 }
