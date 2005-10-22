@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 10;
+use Test::More tests => 14;
 use Catalyst::Test 'TestApp';
     
 for ( 1 .. 1 ) {
@@ -19,13 +19,22 @@ for ( 1 .. 1 ) {
         is( $response->content, 'root index', 'root index no slash ok' );
     }
     
-    # test controller index
+    # test first-level controller index
     {
-        ok( my $response = request('http://localhost/action/index/'), 'controller index' );
-        is( $response->content, 'Action::Index index', 'controller index ok' );
+        ok( my $response = request('http://localhost/action/'), 'first-level controller index' );
+        is( $response->content, 'Action index', 'first-level controller index ok' );
         
-        ok( $response = request('http://localhost/action/index'), 'controller index no slash' );
-        is( $response->content, 'Action::Index index', 'controller index no slash ok' );        
+        ok( $response = request('http://localhost/action'), 'first-level controller index no slash' );
+        is( $response->content, 'Action index', 'first-level controller index no slash ok' );        
+    }    
+    
+    # test second-level controller index
+    {
+        ok( my $response = request('http://localhost/action/index/'), 'second-level controller index' );
+        is( $response->content, 'Action::Index index', 'second-level controller index ok' );
+        
+        ok( $response = request('http://localhost/action/index'), 'second-level controller index no slash' );
+        is( $response->content, 'Action::Index index', 'second-level controller index no slash ok' );        
     }
     
     # test controller default when index is present
