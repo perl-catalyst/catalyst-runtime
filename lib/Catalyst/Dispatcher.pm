@@ -6,6 +6,8 @@ use Catalyst::Exception;
 use Catalyst::Utils;
 use Catalyst::Action;
 use Catalyst::ActionContainer;
+use Catalyst::DispatchType::Regex;
+use Catalyst::DispatchType::Default;
 use Text::ASCIITable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
@@ -13,7 +15,7 @@ use Tree::Simple::Visitor::FindByPath;
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
 
-__PACKAGE__->mk_accessors(qw/actions tree/);
+__PACKAGE__->mk_accessors(qw/actions tree dispatch_types/);
 
 =head1 NAME
 
@@ -87,7 +89,7 @@ sub dispatch {
 
         # Execute the action or last default
         my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
-        if ( ( my $action = $c->req->action ) && $mkay ) {
+        if ( $mkay ) {
             unless ($error) {
                 $c->action->execute($c);
                 $error++ if scalar @{ $c->error };
@@ -214,7 +216,7 @@ sub prepare_action {
     my @path = split /\//, $c->req->path;
     $c->req->args( \my @args );
 
-    while (@path) {
+  DESCEND: while (@path) {
         $path = join '/', @path;
         if ( my $result = ${ $c->get_action($path) }[0] ) {
 
@@ -240,19 +242,17 @@ sub prepare_action {
             $c->req->match($path);
             $c->action($result->[0]);
             $c->namespace($result->[0]->prefix);
-            last;
+            last DESCEND;
         }
-        unshift @args, pop @path;
-    }
 
-    unless ( $c->req->action ) {
-        my $result = @{$c->get_action('default', $c->req->path, 1) || []}[-1];
-        if ($result) {
-            $c->action( $result->[0] );
-            $c->namespace( $c->req->path );
-            $c->req->action('default');
-            $c->req->match('');
+        unless ( $c->action ) {
+            foreach my $type (@{$self->dispatch_types}) {
+                last DESCEND if $type->prepare_action($c, $path);
+                #last DESCEND if $c->action;
+            }
         }
+
+        unshift @args, pop @path;
     }
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
@@ -283,21 +283,21 @@ sub get_action {
     }
 
     elsif ( my $p = $self->actions->{plain}->{$action} ) { return [ [$p] ] }
-    elsif ( my $r = $self->actions->{regex}->{$action} ) { return [ [$r] ] }
+    #elsif ( my $r = $self->actions->{regex}->{$action} ) { return [ [$r] ] }
 
-    else {
+    #else {
 
-        for my $i ( 0 .. $#{ $self->actions->{compiled} } ) {
-            my $name  = $self->actions->{compiled}->[$i]->[0];
-            my $regex = $self->actions->{compiled}->[$i]->[1];
+    #    for my $i ( 0 .. $#{ $self->actions->{compiled} } ) {
+    #        my $name  = $self->actions->{compiled}->[$i]->[0];
+    #        my $regex = $self->actions->{compiled}->[$i]->[1];
 
-            if ( my @snippets = ( $action =~ $regex ) ) {
-                return [
-                    [ $self->actions->{regex}->{$name}, $name, \@snippets ] ];
-            }
+    #        if ( my @snippets = ( $action =~ $regex ) ) {
+    #            return [
+    #                [ $self->actions->{regex}->{$name}, $name, \@snippets ] ];
+    #        }
 
-        }
-    }
+    #    }
+    #}
     return [];
 }
 
@@ -353,6 +353,7 @@ sub set_action {
       Catalyst::Utils::class2prefix( $namespace, $c->config->{case_sensitive} )
       || '';
     my %flags;
+    my %attributes;
 
     for my $attr ( @{$attrs} ) {
         if    ( $attr =~ /^(Local|Relative)$/ )    { $flags{local}++ }
@@ -363,6 +364,12 @@ sub set_action {
         elsif ( $attr =~ /^Private$/i ) { $flags{private}++ }
         elsif ( $attr =~ /^(Regex|Regexp)\(\s*(.+)\s*\)$/i ) {
             push @{ $flags{regex} }, $2;
+        }
+        if ( my ($key, $value) = ($attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/) ) {
+            if ( defined $value ) {
+                ($value =~ s/^'(.*)'$/$1/) || ($value =~ s/^"(.*)"/$1/);
+            }
+            push(@{$attributes{$key}}, $value);
         }
     }
 
@@ -405,10 +412,11 @@ sub set_action {
 
     my $action = Catalyst::Action->new(
         {
-            code      => $code,
-            reverse   => $reverse,
-            namespace => $namespace,
-            prefix    => $prefix,
+            code       => $code,
+            reverse    => $reverse,
+            namespace  => $namespace,
+            prefix     => $prefix,
+            attributes => \%attributes,
         }
     );
 
@@ -452,6 +460,10 @@ sub set_action {
         push @{ $self->actions->{compiled} }, [ $regex, qr#$regex# ];
         $self->actions->{regex}->{$regex} = $action;
     }
+
+    foreach my $type ( @{ $self->dispatch_types } ) {
+        $type->register_action($c, $action);
+    }
 }
 
 =item $self->setup_actions( $class, $component )
@@ -470,6 +482,10 @@ sub setup_actions {
             compiled => []
         }
     );
+
+    $self->dispatch_types([
+        map { "Catalyst::DispatchType::$_"->new }
+            qw/Regex Default/ ]);
 
     # We use a tree
     my $container = Catalyst::ActionContainer->new(

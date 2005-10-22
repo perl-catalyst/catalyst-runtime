@@ -3,7 +3,7 @@ package Catalyst::Action;
 use strict;
 use base qw/Class::Accessor::Fast/;
 
-__PACKAGE__->mk_accessors(qw/code namespace reverse prefix/);
+__PACKAGE__->mk_accessors(qw/code namespace reverse prefix attributes/);
 
 use overload (
 
@@ -28,6 +28,8 @@ See L<Catalyst>.
 =head1 METHODS
 
 =over 4
+
+=item attributes
 
 =item code
 
