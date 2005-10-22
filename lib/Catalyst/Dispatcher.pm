@@ -61,10 +61,9 @@ sub dispatch {
             # appropriate name registered to the namespace
 
             $actions{$name} = [
-                map { $_->{$name} }
-                grep { exists $_->{$name} }
-                map { $_->actions }
-                @containers
+                map    { $_->{$name} }
+                  grep { exists $_->{$name} }
+                  map  { $_->actions } @containers
             ];
         }
 
@@ -90,7 +89,7 @@ sub dispatch {
 
         # Execute the action or last default
         my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
-        if ( $mkay ) {
+        if ($mkay) {
             unless ($error) {
                 $c->action->execute($c);
                 $error++ if scalar @{ $c->error };
@@ -139,7 +138,8 @@ sub forward {
 
     unless ( $command_copy =~ s/^\/// ) {
         my $namespace =
-          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} ) || '';
+          Catalyst::Utils::class2prefix( $caller, $c->config->{case_sensitive} )
+          || '';
         $command_copy = "${namespace}/${command}";
     }
 
@@ -218,14 +218,18 @@ sub prepare_action {
     my @path = split /\//, $c->req->path;
     $c->req->args( \my @args );
 
+    push( @path, '/' ) unless @path;    # Root action
+
   DESCEND: while (@path) {
         $path = join '/', @path;
+
+        $path = '' if $path eq '/';     # Root action
 
         # Check out dispatch types to see if any will handle the path at
         # this level
 
-        foreach my $type (@{$self->dispatch_types}) {
-            last DESCEND if $type->prepare_action($c, $path);
+        foreach my $type ( @{ $self->dispatch_types } ) {
+            last DESCEND if $type->prepare_action( $c, $path );
         }
 
         # If not, move the last part path to args
@@ -244,23 +248,18 @@ sub prepare_action {
 sub get_action {
     my ( $self, $c, $action, $namespace, $inherit ) = @_;
     return [] unless $action;
-    $namespace ||= '';
+    $namespace ||= '/';
     $inherit   ||= 0;
 
-    if ($namespace) {
+    my @match = $self->get_containers($namespace);
 
-        my @match = $self->get_containers( $namespace );
+    my @results;
 
-        my @results;
-
-        foreach my $child ($inherit ? @match: $match[-1]) {
-            my $node = $child->actions;
-            push(@results, [ $node->{$action} ]) if defined $node->{$action};
-        }
-        return \@results;
+    foreach my $child ( $inherit ? @match : $match[-1] ) {
+        my $node = $child->actions;
+        push( @results, [ $node->{$action} ] ) if defined $node->{$action};
     }
-
-    return [];
+    return \@results;
 }
 
 =item $self->get_containers( $namespace )
@@ -272,20 +271,21 @@ sub get_containers {
 
     # If the namespace is / just return the root ActionContainer
 
-    return ($self->tree->getNodeValue) if $namespace eq '/';
+    return ( $self->tree->getNodeValue )
+      if ( !$namespace || ( $namespace eq '/' ) );
 
     # Use a visitor to recurse down the tree finding the ActionContainers
     # for each namespace in the chain.
 
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
-    my @path = split('/', $namespace);
-    $visitor->setSearchPath( @path );
+    my @path = split( '/', $namespace );
+    $visitor->setSearchPath(@path);
     $self->tree->accept($visitor);
 
     my @match = $visitor->getResults;
-    @match = ($self->tree) unless @match;
+    @match = ( $self->tree ) unless @match;
 
-    if (!defined $visitor->getResult) {
+    if ( !defined $visitor->getResult ) {
 
         # If we don't manage to match, the visitor doesn't return the last
         # node is matched, so foo/bar/baz would only find the 'foo' node,
@@ -294,11 +294,11 @@ sub get_containers {
         # should catch any failures - or short-circuit this if this *is* a
         # bug in the visitor and gets fixed.
 
-        my $extra = $path[(scalar @match) - 1];
+        my $extra = $path[ ( scalar @match ) - 1 ];
         last unless $extra;
         $visitor->setSearchPath($extra);
         $match[-1]->accept($visitor);
-        push(@match, $visitor->getResult) if defined $visitor->getResult;
+        push( @match, $visitor->getResult ) if defined $visitor->getResult;
     }
 
     return map { $_->getNodeValue } @match;
@@ -320,11 +320,11 @@ sub set_action {
 
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
 
-        if ( my ($key, $value) = ($attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/) ) {
+        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/ ) ) {
             if ( defined $value ) {
-                ($value =~ s/^'(.*)'$/$1/) || ($value =~ s/^"(.*)"/$1/);
+                ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
             }
-            push(@{$attributes{$key}}, $value);
+            push( @{ $attributes{$key} }, $value );
         }
     }
 
@@ -345,20 +345,21 @@ sub set_action {
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
             my $child = $visitor->getResult;
-    
+
             unless ($child) {
 
                 # Create a new tree node and an ActionContainer to form
                 # its value.
 
-                my $container = Catalyst::ActionContainer->new(
-                                    { part => $part, actions => {} });
+                my $container =
+                  Catalyst::ActionContainer->new(
+                    { part => $part, actions => {} } );
                 $child = $parent->addChild( Tree::Simple->new($container) );
                 $visitor->setSearchPath($part);
                 $parent->accept($visitor);
                 $child = $visitor->getResult;
             }
-    
+
             $parent = $child;
         }
     }
@@ -381,7 +382,7 @@ sub set_action {
 
     # Pass the action to our dispatch types so they can register it if reqd.
     foreach my $type ( @{ $self->dispatch_types } ) {
-        $type->register_action($c, $action);
+        $type->register_action( $c, $action );
     }
 }
 
@@ -402,13 +403,12 @@ sub setup_actions {
         }
     );
 
-    $self->dispatch_types([
-        map { "Catalyst::DispatchType::$_"->new }
-            qw/Path Regex Default/ ]);
+    $self->dispatch_types(
+        [ map { "Catalyst::DispatchType::$_"->new } qw/Path Regex Default/ ] );
 
     # We use a tree
-    my $container = Catalyst::ActionContainer->new(
-                        { part => '/', actions => {} } );
+    my $container =
+      Catalyst::ActionContainer->new( { part => '/', actions => {} } );
     $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 
     for my $comp ( keys %{ $class->components } ) {
@@ -465,7 +465,7 @@ sub setup_actions {
         $prefix .= '/' unless $prefix =~ /\/$/;
         my $node = $parent->getNodeValue->actions;
 
-        for my $action ( keys %{ $node } ) {
+        for my $action ( keys %{$node} ) {
             my $action_obj = $node->{$action};
             $privates->addRow( "$prefix$action", $action_obj->namespace );
         }
