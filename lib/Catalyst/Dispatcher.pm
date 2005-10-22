@@ -45,40 +45,26 @@ sub detach {
 
 sub dispatch {
     my ( $self, $c ) = @_;
-    my $action    = $c->req->action;
-    my $namespace = '';
-    $namespace = ( join( '/', @{ $c->req->args } ) || '/' )
-      if $action eq 'default';
 
-    unless ($namespace) {
-        if ( my $result = $c->get_action($action) ) {
-            $namespace = $result->[0]->[0]->prefix;
+    if ( $c->action ) {
+
+        my @containers = $self->get_containers( $c->namespace );
+        my %actions;
+        foreach my $name (qw/begin auto end/) {
+            $actions{$name} = [
+                map { $_->{$name} }
+                grep { exists $_->{$name} }
+                map { $_->actions }
+                @containers
+            ];
         }
-    }
-
-    my $default = $action eq 'default' ? $namespace : undef;
-    my $results = $c->get_action( $action, $default, $default ? 1 : 0 );
-    $namespace ||= '/';
-
-    my @containers = $self->get_containers( $namespace );
-    my %actions;
-    foreach my $name (qw/begin auto end/) {
-        $actions{$name} = [
-            map { $_->{$name} }
-            grep { exists $_->{$name} }
-            map { $_->actions }
-            @containers
-        ];
-    }
-
-    if ( @{$results} ) {
 
         # Errors break the normal flow and the end action is instantly run
         my $error = 0;
 
         # Execute last begin
         $c->state(1);
-        if ( my $begin = @{ $actions{begin}  }[-1] ) {
+        if ( my $begin = @{ $actions{begin} }[-1] ) {
             $begin->execute($c);
             $error++ if scalar @{ $c->error };
         }
@@ -97,12 +83,8 @@ sub dispatch {
         my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
         if ( ( my $action = $c->req->action ) && $mkay ) {
             unless ($error) {
-                if ( my $result =
-                    @{ $c->get_action( $action, $default, 1 ) }[-1] )
-                {
-                    $result->[0]->execute($c);
-                    $error++ if scalar @{ $c->error };
-                }
+                $c->action->execute($c);
+                $error++ if scalar @{ $c->error };
             }
         }
 
@@ -250,14 +232,21 @@ sub prepare_action {
             }
 
             $c->req->match($path);
+            $c->action($result->[0]);
+            $c->namespace($result->[0]->prefix);
             last;
         }
         unshift @args, pop @path;
     }
 
     unless ( $c->req->action ) {
-        $c->req->action('default');
-        $c->req->match('');
+        my $result = @{$c->get_action('default', $c->req->path, 1) || []}[-1];
+        if ($result) {
+            $c->action( $result->[0] );
+            $c->namespace( $c->req->path );
+            $c->req->action('default');
+            $c->req->match('');
+        }
     }
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )

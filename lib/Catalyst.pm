@@ -17,7 +17,9 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
 use Scalar::Util qw/weaken/;
 
-__PACKAGE__->mk_accessors(qw/counter depth request response state/);
+__PACKAGE__->mk_accessors(
+    qw/counter depth request response state action namespace/
+);
 
 # Laziness++
 *comp = \&component;
@@ -167,6 +169,10 @@ Specify log level.
 
 =over 4
 
+=item $c->action
+
+Accessor for the current action
+
 =item $c->comp($name)
 
 =item $c->component($name)
@@ -250,6 +256,10 @@ from the function.
 =cut
 
 sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
+
+=item $c->namespace
+
+Accessor to the namespace of the current action
 
 =item $c->setup
 
