@@ -6,8 +6,6 @@ use Catalyst::Exception;
 use Catalyst::Utils;
 use Catalyst::Action;
 use Catalyst::ActionContainer;
-use Catalyst::DispatchType::Path;
-use Catalyst::DispatchType::Regex;
 use Catalyst::DispatchType::Default;
 use Text::ASCIITable;
 use Tree::Simple;
@@ -16,7 +14,10 @@ use Tree::Simple::Visitor::FindByPath;
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
 
-__PACKAGE__->mk_accessors(qw/actions tree dispatch_types/);
+__PACKAGE__->mk_accessors(qw/tree dispatch_types/);
+
+# Preload these action types
+our @PRELOAD = qw/Path Regex/;
 
 =head1 NAME
 
@@ -320,7 +321,19 @@ sub set_action {
 
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
 
+        my %initialized;
+        $initialized{ ref $_ }++ for @{ $self->dispatch_types };
+
         if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/ ) ) {
+
+            # Initialize types
+            my $class = "Catalyst::DispatchType::$key";
+            unless ( $initialized{$class} ) {
+                eval "require $class";
+                push( @{ $self->dispatch_types }, $class->new ) unless $@;
+                $initialized{$class}++;
+            }
+
             if ( defined $value ) {
                 ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
             }
@@ -393,18 +406,16 @@ sub set_action {
 sub setup_actions {
     my ( $self, $class ) = @_;
 
-    # These are the core structures
-    $self->actions(
-        {
-            plain    => {},
-            private  => {},
-            regex    => {},
-            compiled => []
-        }
-    );
+    $self->dispatch_types( [] );
 
-    $self->dispatch_types(
-        [ map { "Catalyst::DispatchType::$_"->new } qw/Path Regex Default/ ] );
+    # Preload action types
+    for my $type (@PRELOAD) {
+        my $class = "Catalyst::DispatchType::$type";
+        eval "require $class";
+        Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
+          if $@;
+        push @{ $self->dispatch_types }, $class->new;
+    }
 
     # We use a tree
     my $container =
@@ -433,27 +444,22 @@ sub setup_actions {
             }
 
             for my $namespace ( keys %namespaces ) {
-
                 for my $sym ( values %{ $namespace . '::' } ) {
-
                     if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
-
                         $name = *{$sym}{NAME};
                         $class->set_action( $name, $code, $comp, $attrs );
                         last;
                     }
-
                 }
-
             }
-
         }
-
     }
+
+    # Default actions are always last in the chain
+    push @{ $self->dispatch_types }, Catalyst::DispatchType::Default->new;
 
     return unless $class->debug;
 
-    my $actions  = $self->actions;
     my $privates = Text::ASCIITable->new;
     $privates->setCols( 'Private', 'Class' );
     $privates->setColWidth( 'Private', 36, 1 );
