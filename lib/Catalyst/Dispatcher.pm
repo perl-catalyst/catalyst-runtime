@@ -221,9 +221,14 @@ sub prepare_action {
   DESCEND: while (@path) {
         $path = join '/', @path;
 
+        # Check out dispatch types to see if any will handle the path at
+        # this level
+
         foreach my $type (@{$self->dispatch_types}) {
             last DESCEND if $type->prepare_action($c, $path);
         }
+
+        # If not, move the last part path to args
 
         unshift @args, pop @path;
     }
@@ -312,6 +317,9 @@ sub set_action {
     my %attributes;
 
     for my $attr ( @{$attrs} ) {
+
+        # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
+
         if ( my ($key, $value) = ($attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/) ) {
             if ( defined $value ) {
                 ($value =~ s/^'(.*)'$/$1/) || ($value =~ s/^"(.*)"/$1/);
@@ -371,6 +379,7 @@ sub set_action {
     # Set the method value
     $parent->getNodeValue->actions->{$method} = $action;
 
+    # Pass the action to our dispatch types so they can register it if reqd.
     foreach my $type ( @{ $self->dispatch_types } ) {
         $type->register_action($c, $action);
     }

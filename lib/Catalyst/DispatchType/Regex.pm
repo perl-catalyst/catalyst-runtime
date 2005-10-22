@@ -7,6 +7,7 @@ sub prepare_action {
     my ($self, $c, $path) = @_;
 
     return if $self->SUPER::prepare_action($c, $path);
+        # Check path against plain text first
 
     foreach my $compiled (@{$self->{compiled}||[]}) {
         if ( my @snippets = ( $path =~ $compiled->{re} ) ) {
@@ -27,8 +28,8 @@ sub register_action {
     my $attrs = $action->attributes;
     my @register = map { @{$_ || []} } @{$attrs}{'Regex', 'Regexp'};
     foreach my $r (@register) {
-        $self->{paths}{$r} = $action;
-        push(@{$self->{compiled}},
+        $self->{paths}{$r} = $action; # Register path for superclass
+        push(@{$self->{compiled}},    # and compiled regex for us
             {
                 re => qr#$r#,
                 action => $action,

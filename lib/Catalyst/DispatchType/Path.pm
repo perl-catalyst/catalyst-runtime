@@ -19,21 +19,24 @@ sub prepare_action {
 
 sub register_action {
     my ( $self, $c, $action ) = @_;
+
     my $attrs = $action->attributes;
     my @register;
+
     foreach my $r (@{$attrs->{Path} || []}) {
-        unless ($r =~ m!^/!) {
+        unless ($r =~ m!^/!) {    # It's a relative path
             $r = $action->prefix."/$r";
         }
         push(@register, $r);
     }
 
     if ($attrs->{Global} || $attrs->{Absolute}) {
-        push(@register, $action->name);
+        push(@register, $action->name); # Register sub name against root
     }
 
     if ($attrs->{Local} || $attrs->{Relative}) {
         push(@register, join('/', $action->prefix, $action->name));
+            # Register sub name as a relative path
     }
 
     foreach my $r (@register) {
