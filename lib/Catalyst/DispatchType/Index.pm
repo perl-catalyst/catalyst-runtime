@@ -23,7 +23,6 @@ See L<Catalyst>.
 
 sub match {
     my ( $self, $c, $path ) = @_;
-    return if $path =~ m!/!;
     return if @{ $c->req->args };
     my $result = @{ $c->get_action( 'index', $c->req->path ) || [] }[-1];
 
