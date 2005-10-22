@@ -6,6 +6,11 @@ lib/Catalyst/ActionContainer.pm
 lib/Catalyst/Base.pm
 lib/Catalyst/Build.pm
 lib/Catalyst/Dispatcher.pm
+lib/Catalyst/DispatchType.pm
+lib/Catalyst/DispatchType/Default.pm
+lib/Catalyst/DispatchType/Index.pm
+lib/Catalyst/DispatchType/Path.pm
+lib/Catalyst/DispatchType/Regex.pm
 lib/Catalyst/Engine.pm
 lib/Catalyst/Engine/CGI.pm
 lib/Catalyst/Engine/FastCGI.pm
