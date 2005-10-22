@@ -32,7 +32,7 @@ sub match {
         $c->namespace( $c->req->path );
         $c->req->action('default');
         # default methods receive the controller name as the first argument
-        unshift @{ $c->req->args }, ( split /\//, $result->[0] )[0];
+        unshift @{ $c->req->args }, ( split /\//, $result->[0], 2 )[0];
         $c->req->match('');
         return 1;
     }
