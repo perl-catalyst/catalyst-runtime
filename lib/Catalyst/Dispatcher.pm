@@ -51,6 +51,12 @@ sub dispatch {
         my @containers = $self->get_containers( $c->namespace );
         my %actions;
         foreach my $name (qw/begin auto end/) {
+
+            # Go down the container list representing each part of the
+            # current namespace inheritance tree, grabbing the actions hash
+            # of the ActionContainer object and looking for actions of the
+            # appropriate name registered to the namespace
+
             $actions{$name} = [
                 map { $_->{$name} }
                 grep { exists $_->{$name} }
@@ -302,7 +308,12 @@ sub get_action {
 sub get_containers {
     my ( $self, $namespace ) = @_;
 
+    # If the namespace is / just return the root ActionContainer
+
     return ($self->tree->getNodeValue) if $namespace eq '/';
+
+    # Use a visitor to recurse down the tree finding the ActionContainers
+    # for each namespace in the chain.
 
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
     my @path = split('/', $namespace);
@@ -313,6 +324,14 @@ sub get_containers {
     @match = ($self->tree) unless @match;
 
     if (!defined $visitor->getResult) {
+
+        # If we don't manage to match, the visitor doesn't return the last
+        # node is matched, so foo/bar/baz would only find the 'foo' node,
+        # not the foo and foo/bar nodes as it should. This does another
+        # single-level search to see if that's the case, and the 'last unless'
+        # should catch any failures - or short-circuit this if this *is* a
+        # bug in the visitor and gets fixed.
+
         my $extra = $path[(scalar @match) - 1];
         last unless $extra;
         $visitor->setSearchPath($extra);
@@ -366,6 +385,10 @@ sub set_action {
             my $child = $visitor->getResult;
     
             unless ($child) {
+
+                # Create a new tree node and an ActionContainer to form
+                # its value.
+
                 my $container = Catalyst::ActionContainer->new(
                                     { part => $part, actions => {} });
                 $child = $parent->addChild( Tree::Simple->new($container) );
@@ -389,6 +412,7 @@ sub set_action {
         }
     );
 
+    # Set the method value
     $parent->getNodeValue->actions->{$method} = $action;
 
     my @path;
