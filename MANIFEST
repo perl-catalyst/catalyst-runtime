@@ -2,6 +2,7 @@ Build.PL
 Changes
 lib/Catalyst.pm
 lib/Catalyst/Action.pm
+lib/Catalyst/ActionContainer.pm
 lib/Catalyst/Base.pm
 lib/Catalyst/Build.pm
 lib/Catalyst/Dispatcher.pm

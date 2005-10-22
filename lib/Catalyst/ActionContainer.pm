@@ -14,7 +14,7 @@ use overload (
 
 =head1 NAME
 
-Catalyst::Action - Catalyst Action
+Catalyst::ActionContainer - Catalyst Action Container
 
 =head1 SYNOPSIS
 
