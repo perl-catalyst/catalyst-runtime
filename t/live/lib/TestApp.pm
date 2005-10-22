@@ -10,6 +10,11 @@ TestApp->config( name => 'TestApp', root => '/some/dir' );
 
 TestApp->setup;
 
+sub index : Private {
+    my ( $self, $c ) = @_;
+    $c->res->body( 'root index' );
+}
+
 sub global_action : Private {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
