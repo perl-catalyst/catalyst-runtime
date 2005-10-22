@@ -229,7 +229,7 @@ sub prepare_action {
         # this level
 
         foreach my $type ( @{ $self->dispatch_types } ) {
-            last DESCEND if $type->prepare_action( $c, $path );
+            last DESCEND if $type->match( $c, $path );
         }
 
         # If not, move the last part path to args
@@ -382,7 +382,7 @@ sub set_action {
 
     # Pass the action to our dispatch types so they can register it if reqd.
     foreach my $type ( @{ $self->dispatch_types } ) {
-        $type->register_action( $c, $action );
+        $type->register( $c, $action );
     }
 }
 

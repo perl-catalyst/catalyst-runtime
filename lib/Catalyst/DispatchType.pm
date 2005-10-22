@@ -1,14 +1,46 @@
 package Catalyst::DispatchType;
 
 use strict;
+use base 'Class::Accessor::Fast';
 
-sub new {        # Dumbass constructor
-    my ( $class, $attrs ) = @_;
-    return bless { %{ $attrs || {} } }, $class;
-}
+=head1 NAME
 
-sub prepare_action { die "Abstract method!"; }
+Catalyst::DispatchType - DispatchType Base Class
 
-sub register_action { return; }
+=head1 SYNOPSIS
+
+See L<Catalyst>.
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=over 4
+
+=item $self->match( $c, $path )
+
+=cut
+
+sub match { die "Abstract method!" }
+
+=item $self->register( $c, $action )
+
+=cut
+
+sub register { return }
+
+=back
+
+=head1 AUTHOR
+
+Matt S Trout
+Sebastian Riedel, C<sri@cpan.org>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
 
 1;

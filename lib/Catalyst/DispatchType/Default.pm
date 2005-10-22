@@ -3,7 +3,25 @@ package Catalyst::DispatchType::Default;
 use strict;
 use base qw/Catalyst::DispatchType/;
 
-sub prepare_action {
+=head1 NAME
+
+Catalyst::DispatchType::Default - Default DispatchType
+
+=head1 SYNOPSIS
+
+See L<Catalyst>.
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=over 4
+
+=item $self->match( $c, $path )
+
+=cut
+
+sub match {
     my ( $self, $c, $path ) = @_;
     return if $path =~ m!/!;    # Not at root yet, wait for it ...
     my $result = @{ $c->get_action( 'default', $c->req->path, 1 ) || [] }[-1];
@@ -18,5 +36,19 @@ sub prepare_action {
     }
     return 0;
 }
+
+=back
+
+=head1 AUTHOR
+
+Matt S Trout
+Sebastian Riedel, C<sri@cpan.org>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
 
 1;
