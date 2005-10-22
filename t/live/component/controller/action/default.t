@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 90;
+use Test::More tests => 120;
 use Catalyst::Test 'TestApp';
 
 for ( 1 .. 10 ) {
@@ -39,5 +39,15 @@ for ( 1 .. 10 ) {
 
         ok( $response = request('http://localhost/foo/bar/action'), 'Request' );
         is( $response->code, 404, 'Invalid URI returned 404' );
+    }
+    
+    # test that args are passed properly to default
+    {
+        my $creq;
+        my $expected = [ qw/action default arg1 arg2/ ];
+        
+        ok( my $response = request('http://localhost/action/default/arg1/arg2'), 'Request' );
+        ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
+        is_deeply( $creq->{arguments}, $expected, 'Arguments ok' );
     }
 }
