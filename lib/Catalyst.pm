@@ -750,14 +750,15 @@ sub execute {
     }
     $c->{depth}++;
     eval {
-        if ( $c->debug )
-        {
+        if ( $c->debug ) {
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
             $c->state(@state);
         }
-        else { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) }
+        else {
+            $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 )
+        }
     };
     $c->{depth}--;
 
