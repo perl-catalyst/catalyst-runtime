@@ -220,24 +220,8 @@ sub prepare_action {
         $path = join '/', @path;
         if ( my $result = ${ $c->get_action($path) }[0] ) {
 
-            # It's a regex
-            if ($#$result) {
-                my $match    = $result->[1];
-                my @snippets = @{ $result->[2] };
-                $c->log->debug(
-                    qq/Requested action is "$path" and matched "$match"/)
-                  if $c->debug;
-                $c->log->debug(
-                    'Snippets are "' . join( ' ', @snippets ) . '"' )
-                  if ( $c->debug && @snippets );
-                $c->req->action($match);
-                $c->req->snippets( \@snippets );
-            }
-
-            else {
-                $c->req->action($path);
-                $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
-            }
+            $c->req->action($path);
+            $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
 
             $c->req->match($path);
             $c->action($result->[0]);
@@ -283,21 +267,7 @@ sub get_action {
     }
 
     elsif ( my $p = $self->actions->{plain}->{$action} ) { return [ [$p] ] }
-    #elsif ( my $r = $self->actions->{regex}->{$action} ) { return [ [$r] ] }
 
-    #else {
-
-    #    for my $i ( 0 .. $#{ $self->actions->{compiled} } ) {
-    #        my $name  = $self->actions->{compiled}->[$i]->[0];
-    #        my $regex = $self->actions->{compiled}->[$i]->[1];
-
-    #        if ( my @snippets = ( $action =~ $regex ) ) {
-    #            return [
-    #                [ $self->actions->{regex}->{$name}, $name, \@snippets ] ];
-    #        }
-
-    #    }
-    #}
     return [];
 }
 
@@ -433,16 +403,6 @@ sub set_action {
     }
     $flags{path} = \@path;
 
-    my @regex;
-    for my $regex ( @{ $flags{regex} } ) {
-        $regex =~ s/^\w+//;
-        $regex =~ s/\w+$//;
-        if ( $regex =~ /^\s*'(.*)'\s*$/ ) { $regex = $1 }
-        if ( $regex =~ /^\s*"(.*)"\s*$/ ) { $regex = $1 }
-        push @regex, $regex;
-    }
-    $flags{regex} = \@regex;
-
     if ( $flags{local} || $flags{global} ) {
         push( @{ $flags{path} }, $prefix ? "/$prefix/$method" : "/$method" )
           if $flags{local};
@@ -454,11 +414,6 @@ sub set_action {
         if ( $path =~ /^\// ) { $path =~ s/^\/// }
         else { $path = $prefix ? "$prefix/$path" : $path }
         $self->actions->{plain}->{$path} = $action;
-    }
-
-    for my $regex ( @{ $flags{regex} } ) {
-        push @{ $self->actions->{compiled} }, [ $regex, qr#$regex# ];
-        $self->actions->{regex}->{$regex} = $action;
     }
 
     foreach my $type ( @{ $self->dispatch_types } ) {
