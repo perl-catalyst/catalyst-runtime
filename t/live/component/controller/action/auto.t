@@ -9,7 +9,22 @@ use lib "$FindBin::Bin/../../../lib";
 use Test::More tests => 180;
 use Catalyst::Test 'TestApp';
 
-for ( 1 .. 10 ) {
+if ( $ENV{CAT_BENCHMARK} ) {
+    require Benchmark;
+    Benchmark::timethis( -10, \&run_tests );
+    
+    # new dispatcher:
+    # 11 wallclock secs (10.14 usr +  0.20 sys = 10.34 CPU) @ 15.18/s (n=157)
+    # old dispatcher (r1486):
+    # 11 wallclock secs (10.34 usr +  0.20 sys = 10.54 CPU) @ 13.76/s (n=145)
+}
+else {
+    for ( 1 .. 10 ) {
+        run_tests();
+    }
+}
+    
+sub run_tests {
     # test auto + local method
     {
         my @expected = qw[
