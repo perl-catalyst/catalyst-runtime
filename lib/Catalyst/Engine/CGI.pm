@@ -156,7 +156,9 @@ sub prepare_path {
 sub prepare_query_parameters {
     my ( $self, $c ) = @_;
     
-    $self->SUPER::prepare_query_parameters( $c, $ENV{QUERY_STRING} );
+    if ( $ENV{QUERY_STRING} ) {
+        $self->SUPER::prepare_query_parameters( $c, $ENV{QUERY_STRING} );
+    }
 }
 
 =item $self->prepare_write($c)
