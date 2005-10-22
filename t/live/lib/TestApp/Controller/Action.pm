@@ -9,11 +9,6 @@ sub begin : Private {
     $c->response->content_type('text/plain; charset=utf-8');
 }
 
-sub index : Private {
-    my ( $self, $c ) = @_;
-    $c->res->body( 'Action index' );
-}
-
 sub default : Private {
     my ( $self, $c ) = @_;
     $c->res->output("Error - TestApp::Controller::Action\n");

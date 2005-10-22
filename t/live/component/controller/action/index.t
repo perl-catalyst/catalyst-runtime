@@ -21,11 +21,11 @@ for ( 1 .. 1 ) {
     
     # test first-level controller index
     {
-        ok( my $response = request('http://localhost/action/'), 'first-level controller index' );
-        is( $response->content, 'Action index', 'first-level controller index ok' );
+        ok( my $response = request('http://localhost/index/'), 'first-level controller index' );
+        is( $response->content, 'Index index', 'first-level controller index ok' );
         
-        ok( $response = request('http://localhost/action'), 'first-level controller index no slash' );
-        is( $response->content, 'Action index', 'first-level controller index no slash ok' );        
+        ok( $response = request('http://localhost/index'), 'first-level controller index no slash' );
+        is( $response->content, 'Index index', 'first-level controller index no slash ok' );        
     }    
     
     # test second-level controller index
