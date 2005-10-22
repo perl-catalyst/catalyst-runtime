@@ -1,17 +1,14 @@
-package Catalyst::Action;
+package Catalyst::ActionContainer;
 
 use strict;
 use base qw/Class::Accessor::Fast/;
 
-__PACKAGE__->mk_accessors(qw/code namespace reverse prefix/);
+__PACKAGE__->mk_accessors(qw/part actions/);
 
 use overload (
 
-    # Stringify to reverse for debug output etc.
-    q{""} => sub { shift->{reverse} },
-
-    # Codulate to encapsulated action coderef
-    '&{}' => sub { shift->{code} },
+    # Stringify to path part for tree search
+    q{""} => sub { shift->{part} },
 
 );
 
@@ -29,20 +26,9 @@ See L<Catalyst>.
 
 =over 4
 
-=item code
+=item part
 
-=item execute
-
-=cut
-
-sub execute {    # Execute ourselves against a context
-    my ( $self, $c ) = @_;
-    return $c->execute( $self->namespace, $self );
-}
-
-=item namespace
-
-=item reverse
+=item actions
 
 =item new
 

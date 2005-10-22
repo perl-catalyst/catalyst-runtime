@@ -52,15 +52,24 @@ sub dispatch {
 
     unless ($namespace) {
         if ( my $result = $c->get_action($action) ) {
-            $namespace =
-              Catalyst::Utils::class2prefix( $result->[0]->[0]->namespace,
-                $c->config->{case_sensitive} );
+            $namespace = $result->[0]->[0]->prefix;
         }
     }
 
     my $default = $action eq 'default' ? $namespace : undef;
     my $results = $c->get_action( $action, $default, $default ? 1 : 0 );
     $namespace ||= '/';
+
+    my @containers = $self->get_containers( $namespace );
+    my %actions;
+    foreach my $name (qw/begin auto end/) {
+        $actions{$name} = [
+            map { $_->{$name} }
+            grep { exists $_->{$name} }
+            map { $_->actions }
+            @containers
+        ];
+    }
 
     if ( @{$results} ) {
 
@@ -69,17 +78,17 @@ sub dispatch {
 
         # Execute last begin
         $c->state(1);
-        if ( my $begin = @{ $c->get_action( 'begin', $namespace, 1 ) }[-1] ) {
-            $begin->[0]->execute($c);
+        if ( my $begin = @{ $actions{begin}  }[-1] ) {
+            $begin->execute($c);
             $error++ if scalar @{ $c->error };
         }
 
         # Execute the auto chain
         my $autorun = 0;
-        for my $auto ( @{ $c->get_action( 'auto', $namespace, 1 ) } ) {
+        for my $auto ( @{ $actions{auto} } ) {
             last if $error;
             $autorun++;
-            $auto->[0]->execute($c);
+            $auto->execute($c);
             $error++ if scalar @{ $c->error };
             last unless $c->state;
         }
@@ -98,8 +107,8 @@ sub dispatch {
         }
 
         # Execute last end
-        if ( my $end = @{ $c->get_action( 'end', $namespace, 1 ) }[-1] ) {
-            $end->[0]->execute($c);
+        if ( my $end = @{ $actions{end} }[-1] ) {
+            $end->execute($c);
         }
     }
 
@@ -179,6 +188,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
                     code      => $code,
                     reverse   => "$class->$method",
                     namespace => $class,
+                    prefix    => $class,
                 }
             );
             $results = [ [$action] ];
@@ -266,40 +276,12 @@ sub get_action {
 
     if ($namespace) {
 
-        my $parent = $self->tree;
-        my @match;
-
-        if ($namespace ne '/') {
-
-            my $visitor = Tree::Simple::Visitor::FindByPath->new;
-            my @path = split('/', $namespace);
-            $visitor->setSearchPath( @path );
-            $parent->accept($visitor);
-
-            if ($inherit) {
-
-                @match = $visitor->getResults;
-                @match = ($parent) unless @match;
-
-                if (!defined $visitor->getResult) {
-                    my $extra = $path[(scalar @match) - 1];
-                    last unless $extra;
-                    $visitor->setSearchPath($extra);
-                    $match[-1]->accept($visitor);
-                    push(@match, $visitor->getResult) if defined $visitor->getResult;
-                }
-            } else {
-                @match = ($visitor->getResult) if $visitor->getResult;
-            }
-
-        }
-
-        @match = ($parent) unless @match;
+        my @match = $self->get_containers( $namespace );
 
         my @results;
 
-        foreach my $child (@match) {
-            my $node = $child->getNodeValue->actions;
+        foreach my $child ($inherit ? @match: $match[-1]) {
+            my $node = $child->actions;
             push(@results, [ $node->{$action} ]) if defined $node->{$action};
         }
         return \@results;
@@ -322,6 +304,34 @@ sub get_action {
         }
     }
     return [];
+}
+
+=item $self->get_containers( $namespace )
+
+=cut
+
+sub get_containers {
+    my ( $self, $namespace ) = @_;
+
+    return ($self->tree->getNodeValue) if $namespace eq '/';
+
+    my $visitor = Tree::Simple::Visitor::FindByPath->new;
+    my @path = split('/', $namespace);
+    $visitor->setSearchPath( @path );
+    $self->tree->accept($visitor);
+
+    my @match = $visitor->getResults;
+    @match = ($self->tree) unless @match;
+
+    if (!defined $visitor->getResult) {
+        my $extra = $path[(scalar @match) - 1];
+        last unless $extra;
+        $visitor->setSearchPath($extra);
+        $match[-1]->accept($visitor);
+        push(@match, $visitor->getResult) if defined $visitor->getResult;
+    }
+
+    return map { $_->getNodeValue } @match;
 }
 
 =item $self->set_action( $c, $action, $code, $namespace, $attrs )
@@ -386,6 +396,7 @@ sub set_action {
             code      => $code,
             reverse   => $reverse,
             namespace => $namespace,
+            prefix    => $prefix,
         }
     );
 
