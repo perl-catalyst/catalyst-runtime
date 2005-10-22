@@ -6,6 +6,7 @@ use Catalyst::Exception;
 use Catalyst::Utils;
 use Catalyst::Action;
 use Catalyst::ActionContainer;
+use Catalyst::DispatchType::Path;
 use Catalyst::DispatchType::Regex;
 use Catalyst::DispatchType::Default;
 use Text::ASCIITable;
@@ -175,6 +176,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
         if ( my $code = $c->components->{$class}->can($method) ) {
             my $action = Catalyst::Action->new(
                 {
+                    name      => $method,
                     code      => $code,
                     reverse   => "$class->$method",
                     namespace => $class,
@@ -218,22 +220,9 @@ sub prepare_action {
 
   DESCEND: while (@path) {
         $path = join '/', @path;
-        if ( my $result = ${ $c->get_action($path) }[0] ) {
 
-            $c->req->action($path);
-            $c->log->debug(qq/Requested action is "$path"/) if $c->debug;
-
-            $c->req->match($path);
-            $c->action($result->[0]);
-            $c->namespace($result->[0]->prefix);
-            last DESCEND;
-        }
-
-        unless ( $c->action ) {
-            foreach my $type (@{$self->dispatch_types}) {
-                last DESCEND if $type->prepare_action($c, $path);
-                #last DESCEND if $c->action;
-            }
+        foreach my $type (@{$self->dispatch_types}) {
+            last DESCEND if $type->prepare_action($c, $path);
         }
 
         unshift @args, pop @path;
@@ -265,8 +254,6 @@ sub get_action {
         }
         return \@results;
     }
-
-    elsif ( my $p = $self->actions->{plain}->{$action} ) { return [ [$p] ] }
 
     return [];
 }
@@ -322,19 +309,9 @@ sub set_action {
     my $prefix =
       Catalyst::Utils::class2prefix( $namespace, $c->config->{case_sensitive} )
       || '';
-    my %flags;
     my %attributes;
 
     for my $attr ( @{$attrs} ) {
-        if    ( $attr =~ /^(Local|Relative)$/ )    { $flags{local}++ }
-        elsif ( $attr =~ /^(Global|Absolute)$/ )   { $flags{global}++ }
-        elsif ( $attr =~ /^Path\(\s*(.+)\s*\)$/i ) {
-            push @{ $flags{path} }, $1;
-        }
-        elsif ( $attr =~ /^Private$/i ) { $flags{private}++ }
-        elsif ( $attr =~ /^(Regex|Regexp)\(\s*(.+)\s*\)$/i ) {
-            push @{ $flags{regex} }, $2;
-        }
         if ( my ($key, $value) = ($attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/) ) {
             if ( defined $value ) {
                 ($value =~ s/^'(.*)'$/$1/) || ($value =~ s/^"(.*)"/$1/);
@@ -343,14 +320,14 @@ sub set_action {
         }
     }
 
-    if ( $flags{private} && ( keys %flags > 1 ) ) {
+    if ( $attributes{Private} && ( keys %attributes > 1 ) ) {
         $c->log->debug( 'Bad action definition "'
               . join( ' ', @{$attrs} )
               . qq/" for "$namespace->$method"/ )
           if $c->debug;
         return;
     }
-    return unless keys %flags;
+    return unless keys %attributes;
 
     my $parent  = $self->tree;
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
@@ -382,6 +359,7 @@ sub set_action {
 
     my $action = Catalyst::Action->new(
         {
+            name       => $method,
             code       => $code,
             reverse    => $reverse,
             namespace  => $namespace,
@@ -392,29 +370,6 @@ sub set_action {
 
     # Set the method value
     $parent->getNodeValue->actions->{$method} = $action;
-
-    my @path;
-    for my $path ( @{ $flags{path} } ) {
-        $path =~ s/^\w+//;
-        $path =~ s/\w+$//;
-        if ( $path =~ /^\s*'(.*)'\s*$/ ) { $path = $1 }
-        if ( $path =~ /^\s*"(.*)"\s*$/ ) { $path = $1 }
-        push @path, $path;
-    }
-    $flags{path} = \@path;
-
-    if ( $flags{local} || $flags{global} ) {
-        push( @{ $flags{path} }, $prefix ? "/$prefix/$method" : "/$method" )
-          if $flags{local};
-
-        push( @{ $flags{path} }, "/$method" ) if $flags{global};
-    }
-
-    for my $path ( @{ $flags{path} } ) {
-        if ( $path =~ /^\// ) { $path =~ s/^\/// }
-        else { $path = $prefix ? "$prefix/$path" : $path }
-        $self->actions->{plain}->{$path} = $action;
-    }
 
     foreach my $type ( @{ $self->dispatch_types } ) {
         $type->register_action($c, $action);
@@ -440,7 +395,7 @@ sub setup_actions {
 
     $self->dispatch_types([
         map { "Catalyst::DispatchType::$_"->new }
-            qw/Regex Default/ ]);
+            qw/Path Regex Default/ ]);
 
     # We use a tree
     my $container = Catalyst::ActionContainer->new(

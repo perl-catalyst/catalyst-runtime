@@ -3,7 +3,7 @@ package Catalyst::Action;
 use strict;
 use base qw/Class::Accessor::Fast/;
 
-__PACKAGE__->mk_accessors(qw/code namespace reverse prefix attributes/);
+__PACKAGE__->mk_accessors(qw/code namespace reverse prefix attributes name/);
 
 use overload (
 
@@ -45,6 +45,8 @@ sub execute {    # Execute ourselves against a context
 =item namespace
 
 =item reverse
+
+=item name
 
 =item new
 

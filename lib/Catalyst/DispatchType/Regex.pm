@@ -1,18 +1,12 @@
 package Catalyst::DispatchType::Regex;
 
 use strict;
-use base qw/Catalyst::DispatchType/;
+use base qw/Catalyst::DispatchType::Path/;
 
 sub prepare_action {
     my ($self, $c, $path) = @_;
 
-    if ( my $action = $self->{paths}->{$path} ) {
-        $c->req->action($path);
-        $c->req->match($path);
-        $c->action($action);
-        $c->namespace($action->prefix);
-        return 1;
-    }
+    return if $self->SUPER::prepare_action($c, $path);
 
     foreach my $compiled (@{$self->{compiled}||[]}) {
         if ( my @snippets = ( $path =~ $compiled->{re} ) ) {
