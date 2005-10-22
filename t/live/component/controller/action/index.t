@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 14;
+use Test::More tests => 19;
 use Catalyst::Test 'TestApp';
     
 for ( 1 .. 1 ) {
@@ -21,25 +21,55 @@ for ( 1 .. 1 ) {
     
     # test first-level controller index
     {
+        my @expected = qw[
+          TestApp::Controller::Index->index
+        ];
+    
+        my $expected = join( ", ", @expected );
+        
         ok( my $response = request('http://localhost/index/'), 'first-level controller index' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
         is( $response->content, 'Index index', 'first-level controller index ok' );
         
         ok( $response = request('http://localhost/index'), 'first-level controller index no slash' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
         is( $response->content, 'Index index', 'first-level controller index no slash ok' );        
     }    
     
     # test second-level controller index
     {
+        my @expected = qw[
+          TestApp::Controller::Action::Index->begin
+          TestApp::Controller::Action::Index->index
+        ];
+    
+        my $expected = join( ", ", @expected );
+        
         ok( my $response = request('http://localhost/action/index/'), 'second-level controller index' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
         is( $response->content, 'Action::Index index', 'second-level controller index ok' );
         
         ok( $response = request('http://localhost/action/index'), 'second-level controller index no slash' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
         is( $response->content, 'Action::Index index', 'second-level controller index no slash ok' );        
     }
     
     # test controller default when index is present
     {
+        my @expected = qw[
+          TestApp::Controller::Action::Index->begin
+          TestApp::Controller::Action::Index->default
+        ];
+    
+        my $expected = join( ", ", @expected );
+        
         ok( my $response = request('http://localhost/action/index/foo'), 'default with index' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
         is( $response->content, "Error - TestApp::Controller::Action\n", 'default with index ok' );
     }
 }

@@ -51,6 +51,7 @@ t/live/component/controller/action/detach.t
 t/live/component/controller/action/end.t
 t/live/component/controller/action/forward.t
 t/live/component/controller/action/global.t
+t/live/component/controller/action/index.t
 t/live/component/controller/action/inheritance.t
 t/live/component/controller/action/local.t
 t/live/component/controller/action/multipath.t
@@ -86,6 +87,7 @@ t/live/lib/TestApp/Controller/Action/Detach.pm
 t/live/lib/TestApp/Controller/Action/End.pm
 t/live/lib/TestApp/Controller/Action/Forward.pm
 t/live/lib/TestApp/Controller/Action/Global.pm
+t/live/lib/TestApp/Controller/Action/Index.pm
 t/live/lib/TestApp/Controller/Action/Inheritance.pm
 t/live/lib/TestApp/Controller/Action/Local.pm
 t/live/lib/TestApp/Controller/Action/Multipath.pm
@@ -102,6 +104,7 @@ t/live/lib/TestApp/Controller/Engine/Response/Headers.pm
 t/live/lib/TestApp/Controller/Engine/Response/Large.pm
 t/live/lib/TestApp/Controller/Engine/Response/Redirect.pm
 t/live/lib/TestApp/Controller/Engine/Response/Status.pm
+t/live/lib/TestApp/Controller/Index.pm
 t/live/lib/TestApp/View/Dump.pm
 t/live/lib/TestApp/View/Dump/Parameters.pm
 t/live/lib/TestApp/View/Dump/Request.pm
