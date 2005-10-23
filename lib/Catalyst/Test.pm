@@ -79,16 +79,6 @@ sub import {
 
     else {
         $class->require;
-        
-        if ( $@ ) {
-            
-            my $error = $UNIVERSAL::require::ERROR;
-            
-            Catalyst::Exception->throw(
-                message => qq/Couldn't load "$class", "$error"/
-            );
-        }
-
         $class->import;
 
         $request = sub { $class->run(@_) };
@@ -111,11 +101,11 @@ Do an actual remote request using LWP.
 
 sub remote_request {
 
-    require LWP::UserAgent; 
-    
+    require LWP::UserAgent;
+
     my $request = Catalyst::Utils::request( shift(@_) );
 
-    my $server  = URI->new( $ENV{CATALYST_SERVER} );
+    my $server = URI->new( $ENV{CATALYST_SERVER} );
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         $server->path("$1");    # need to be quoted
@@ -126,7 +116,7 @@ sub remote_request {
     $request->uri->port( $server->port );
     $request->uri->path( $server->path . $request->uri->path );
 
-    unless ( $agent ) {
+    unless ($agent) {
 
         $agent = LWP::UserAgent->new(
             keep_alive   => 1,
