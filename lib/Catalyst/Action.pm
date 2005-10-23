@@ -48,15 +48,6 @@ sub execute {    # Execute ourselves against a context
 
 =item name
 
-=item new
-
-=cut
-
-sub new {        # Dumbass constructor
-    my ( $class, $attrs ) = @_;
-    return bless { %{ $attrs || {} } }, $class;
-}
-
 =back
 
 =head1 AUTHOR
