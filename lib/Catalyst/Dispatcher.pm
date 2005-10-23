@@ -20,6 +20,9 @@ __PACKAGE__->mk_accessors(qw/tree dispatch_types/);
 # Preload these action types
 our @PRELOAD = qw/Path Regex/;
 
+# Postload these action types
+our @POSTLOAD = qw/Index Default/;
+
 =head1 NAME
 
 Catalyst::Dispatcher - The Catalyst Dispatcher
@@ -468,9 +471,14 @@ sub setup_actions {
         }
     }
 
-    # Default actions are always last in the chain
-    push @{ $self->dispatch_types }, Catalyst::DispatchType::Index->new;
-    push @{ $self->dispatch_types }, Catalyst::DispatchType::Default->new;
+    # Postload action types
+    for my $type (@POSTLOAD) {
+        my $class = "Catalyst::DispatchType::$type";
+        eval "require $class";
+        Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
+          if $@;
+        push @{ $self->dispatch_types }, $class->new;
+    }
 
     return unless $class->debug;
 
