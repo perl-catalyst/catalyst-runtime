@@ -26,7 +26,7 @@ sub list {
     my ( $self, $c ) = @_;
     my $paths = Text::ASCIITable->new;
     $paths->setCols( 'Path', 'Private' );
-    $paths->setColWidth( 'Public',  36, 1 );
+    $paths->setColWidth( 'Path',  36, 1 );
     $paths->setColWidth( 'Private', 37, 1 );
     for my $path ( sort keys %{ $self->{paths} } ) {
         my $action = $self->{paths}->{$path};
