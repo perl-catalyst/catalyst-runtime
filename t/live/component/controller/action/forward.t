@@ -15,7 +15,7 @@ use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
     require Benchmark;
-    Benchmark::timethis( -$iters, \&run_tests );
+    Benchmark::timethis( $iters, \&run_tests );
 }
 else {
     for ( 1 .. $iters ) {
