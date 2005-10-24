@@ -254,29 +254,31 @@ sub get_action {
     my ( $self, $c, $action, $namespace, $inherit ) = @_;
     return [] unless $action;
     $namespace ||= '';
-    $inherit   ||= 0;
+    $namespace = '' if $namespace eq '/';
+    $inherit ||= 0;
 
     my @match = $self->get_containers($namespace);
 
-    my @results;
+    if ($inherit) {    # Return [ [ $act_obj ], ... ] for valid containers
+        return [
+            map    { [ $_->{$action} ] }        # Make [ $action_obj ]
+              grep { defined $_->{$action} }    # If it exists in the container
+              map  { $_->actions }              # Get action hash for container
+              @match
+        ];
+    }
+    else {
+        my $node = $match[-1]->actions;    # Only bother looking at the last one
 
-    foreach my $child ( $inherit ? @match : $match[-1] ) {
-        my $node = $child->actions;
-        if ( defined $node->{$action} ) {
-            unless ($inherit) {
-                $namespace = '' if $namespace eq '/';
-                my $reverse = $node->{$action}->reverse;
-                my $name    = $namespace
-                  ? $namespace =~ /\/$/
-                  ? "$namespace$action"
-                  : "$namespace/$action"
-                  : $action;
-                last unless $name eq $reverse;
-            }
-            push( @results, [ $node->{$action} ] );
+        if ( defined $node->{$action}
+            && ( $node->{$action}->prefix eq $namespace ) )
+        {
+            return [ [ $node->{$action} ] ];
+        }
+        else {
+            return [];
         }
     }
-    return \@results;
 }
 
 =item $self->get_containers( $namespace )

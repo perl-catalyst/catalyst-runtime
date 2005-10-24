@@ -24,7 +24,7 @@ See L<Catalyst>.
 sub match {
     my ( $self, $c, $path ) = @_;
     return if @{ $c->req->args };
-    my $result = @{ $c->get_action( 'index', $c->req->path ) || [] }[-1];
+    my $result = @{ $c->get_action( 'index', $path ) || [] }[-1];
 
     # Find default on namespace or super
     if ($result) {
