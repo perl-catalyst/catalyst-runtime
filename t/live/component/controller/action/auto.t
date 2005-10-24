@@ -6,12 +6,16 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 180;
+our $iters;
+
+BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
+
+use Test::More tests => 18*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
     require Benchmark;
-    Benchmark::timethis( -10, \&run_tests );
+    Benchmark::timethis( $iters, \&run_tests );
     
     # new dispatcher:
     # 11 wallclock secs (10.14 usr +  0.20 sys = 10.34 CPU) @ 15.18/s (n=157)
@@ -19,7 +23,7 @@ if ( $ENV{CAT_BENCHMARK} ) {
     # 11 wallclock secs (10.34 usr +  0.20 sys = 10.54 CPU) @ 13.76/s (n=145)
 }
 else {
-    for ( 1 .. 10 ) {
+    for ( 1 .. $iters ) {
         run_tests();
     }
 }

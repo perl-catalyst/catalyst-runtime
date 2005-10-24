@@ -6,16 +6,29 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 160;
-use Catalyst::Test 'TestApp';
-
 my $content = q/foo
 bar
 baz
 /;
 
-for ( 1 .. 10 ) {
+our $iters;
 
+BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
+
+use Test::More tests => 16*$iters;
+use Catalyst::Test 'TestApp';
+
+if ( $ENV{CAT_BENCHMARK} ) {
+    require Benchmark;
+    Benchmark::timethis( -$iters, \&run_tests );
+}
+else {
+    for ( 1 .. $iters ) {
+        run_tests();
+    }
+}
+
+sub run_tests {
     # Local
     {
         ok(

@@ -6,10 +6,24 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Test::More tests => 120;
+our $iters;
+
+BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
+
+use Test::More tests => 12*$iters;
 use Catalyst::Test 'TestApp';
 
-for ( 1 .. 10 ) {
+if ( $ENV{CAT_BENCHMARK} ) {
+    require Benchmark;
+    Benchmark::timethis( -$iters, \&run_tests );
+}
+else {
+    for ( 1 .. $iters ) {
+        run_tests();
+    }
+}
+
+sub run_tests {
     {
         ok( my $response = request('http://localhost/action/regexp/10/hello'),
             'Request' );
