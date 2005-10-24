@@ -54,10 +54,7 @@ component/controller/action/multipath:
   - http://localhost/multipath1
   - http://localhost/action/multipath/multipath2
 component/controller/action/path:
-  - http://localhost/action/path/a
-  - path
-  - with
-  - spaces
+  - http://localhost/action/path/a path with spaces
   - http://localhost/action/path/åäö
 component/controller/action/private:
   - http://localhost/action/private/one
