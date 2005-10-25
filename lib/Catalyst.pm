@@ -696,7 +696,7 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.po
                      </li>
                  </ul>
                  <h2>In conclusion</h2>
-                 <p>The Catalyst team hope you will enjoy using Catalyst as much 
+                 <p>The Catalyst team hopes you will enjoy using Catalyst as much 
                     as we enjoyed making it. Please contact us if you have ideas
                     for improvement or other feedback.</p>
              </div>
