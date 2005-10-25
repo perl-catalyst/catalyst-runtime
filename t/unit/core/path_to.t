@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More;
 use Test::MockObject;
 
 my %non_unix = (
@@ -17,7 +17,12 @@ my %non_unix = (
 
 my $os = $non_unix{$^O} ? $^O : 'Unix';
 
-plan skip_all => 'tests require Unix' unless $os eq 'Unix';
+if(  $os ne 'Unix' ) {
+	plan skip_all => 'tests require Unix';
+}
+else {
+	plan tests => 3;
+}
 
 my $context = Test::MockObject->new;
 
