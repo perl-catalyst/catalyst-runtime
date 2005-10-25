@@ -45,6 +45,8 @@ __PACKAGE__->mk_classdata($_)
 
 our $VERSION = '5.49_01';
 
+sub version { return $Catalyst::VERSION }
+
 sub import {
     my ( $class, @arguments ) = @_;
 
@@ -389,26 +391,30 @@ sub setup {
     $class->log->_flush() if $class->log->can('_flush');
 }
 
-=item $c->uri_for($path)
+=item $c->uri_for($path,[@args])
 
 Merges path with $c->request->base for absolute uri's and with
 $c->request->match for relative uri's, then returns a normalized
-L<URI> object.
+L<URI> object. If any args are passed, they are added at the end
+of the path.
 
 =cut
 
 sub uri_for {
-    my ( $c, $path ) = @_;
+    my ( $c, $path , @args) = @_;
     my $base     = $c->request->base->clone;
     my $basepath = $base->path;
     $basepath =~ s/\/$//;
     $basepath .= '/';
     my $match = $c->request->match;
+    # massage match, empty if absolute path
     $match =~ s/^\///;
     $match .= '/' if $match;
     $match = '' if $path =~ /^\//;
     $path =~ s/^\///;
-    return URI->new_abs( URI->new_abs( $path, "$basepath$match" ), $base )
+    # join args with '/', or a blank string
+    my $args=(scalar @args ? '/'.join('/',@args) : '');
+    return URI->new_abs( URI->new_abs( "$path$args", "$basepath$match" ), $base )
       ->canonical;
 }
 
