@@ -43,9 +43,7 @@ our $CATALYST_SCRIPT_GEN = 8;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log/;
 
-our $VERSION = '5.49_01';
-
-sub version { return $Catalyst::VERSION }
+our $VERSION = '5.49_02';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1552,6 +1550,15 @@ sub write {
 
     return $c->engine->write( $c, @_ );
 }
+
+=item version
+
+Returns the Catalyst version number. mostly useful for powered by messages
+in template systems.
+
+=cut
+
+sub version { return $Catalyst::VERSION }
 
 =back
 
