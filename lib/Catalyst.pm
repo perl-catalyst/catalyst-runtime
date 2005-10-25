@@ -401,21 +401,23 @@ of the path.
 =cut
 
 sub uri_for {
-    my ( $c, $path , @args) = @_;
+    my ( $c, $path, @args ) = @_;
     my $base     = $c->request->base->clone;
     my $basepath = $base->path;
     $basepath =~ s/\/$//;
     $basepath .= '/';
     my $match = $c->request->match;
+
     # massage match, empty if absolute path
     $match =~ s/^\///;
     $match .= '/' if $match;
     $match = '' if $path =~ /^\//;
     $path =~ s/^\///;
+
     # join args with '/', or a blank string
-    my $args=(scalar @args ? '/'.join('/',@args) : '');
-    return URI->new_abs( URI->new_abs( "$path$args", "$basepath$match" ), $base )
-      ->canonical;
+    my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
+    return URI->new_abs( URI->new_abs( "$path$args", "$basepath$match" ),
+        $base )->canonical;
 }
 
 =item $c->error
@@ -432,13 +434,20 @@ Add a new error.
 
     $c->error('Something bad happened');
 
+Clean errors.
+
+    $c->error(0);
+
 =cut
 
 sub error {
     my $c = shift;
-    my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-    push @{ $c->{error} }, @$error;
-    return $c->{error};
+    if ( $_[0] ) {
+        my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+        push @{ $c->{error} }, @$error;
+    }
+    elsif ( defined $_[0] ) { $c->{error} = undef }
+    return $c->{error} || [];
 }
 
 =item $c->engine
@@ -756,14 +765,15 @@ sub execute {
     }
     $c->{depth}++;
     eval {
-        if ( $c->debug ) {
+        if ( $c->debug )
+        {
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
             $c->state(@state);
         }
         else {
-            $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 )
+            $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 );
         }
     };
     $c->{depth}--;
