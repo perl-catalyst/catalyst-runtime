@@ -263,6 +263,23 @@ sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
 
 Accessor to the namespace of the current action
 
+=item $c->path_to(@path)
+
+Merges C<@path> with $c->config->{home} and returns a L<Path::Class> object.
+
+For example:
+
+    $c->path_to( 'db', 'sqlite.db' );
+
+=cut
+
+sub path_to {
+    my ( $c, @path ) = @_;
+    my $path = dir( $c->config->{home}, @path );
+    if ( -d $path ) { return $path }
+    else { return file( $c->config->{home}, @path ) }
+}
+
 =item $c->setup
 
 Setup.

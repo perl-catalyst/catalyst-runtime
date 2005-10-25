@@ -3,6 +3,7 @@ Tis file documents the revision history for Perl extension Catalyst.
 5.50
         - Whole new dispatcher!
         - Added index action
+        - Added path_to method
         - Added support for passing an IO::Handle object to $c->res->body.
           (Andrew Bramble)
         - Added a new welcome screen.
