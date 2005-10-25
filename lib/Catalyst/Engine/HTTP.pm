@@ -168,10 +168,14 @@ sub run {
 
     # Setup socket
     $host = $host ? inet_aton($host) : INADDR_ANY;
-    socket( HTTPDaemon, PF_INET, SOCK_STREAM, getprotobyname('tcp') );
-    setsockopt( HTTPDaemon, SOL_SOCKET, SO_REUSEADDR, pack( "l", 1 ) );
-    bind( HTTPDaemon, sockaddr_in( $port, $host ) );
-    listen( HTTPDaemon, SOMAXCONN );
+    socket( HTTPDaemon, PF_INET, SOCK_STREAM, getprotobyname('tcp') )
+        || die "Couldn't assign TCP socket: $!";
+    setsockopt( HTTPDaemon, SOL_SOCKET, SO_REUSEADDR, pack( "l", 1 ) )
+        || die "Couldn't set TCP socket options: $!";
+    bind( HTTPDaemon, sockaddr_in( $port, $host ) )
+        || die "Couldn't bind socket to $port on $host: $!";
+    listen( HTTPDaemon, SOMAXCONN )
+	|| die "Couldn't listen to socket on $port on $host: $!";
     my $url = 'http://';
     if ( $host eq INADDR_ANY ) {
         require Sys::Hostname;
