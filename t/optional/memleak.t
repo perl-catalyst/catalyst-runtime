@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../live/lib";
 
 use Test::More;
 use Catalyst::Test 'TestApp';
-eval "use GTop2";
+eval "use GTop";
 
 plan skip_all => 'set TEST_MEMLEAK to enable this test'
     unless $ENV{TEST_MEMLEAK};
