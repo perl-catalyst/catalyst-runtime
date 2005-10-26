@@ -22,17 +22,17 @@ plan tests => 1;
     
     my $gtop = GTop->new;
     my $initial = $gtop->proc_mem($$)->size;
-    print "Initial Size: $initial\n";
+    print "Initial Size: " . GTop::size_string($initial) . "\n";
     
     for ( 1 .. 1000 ) {
         request('http://localhost');
     }
     
     my $final = $gtop->proc_mem($$)->size;
-    print "Final Size:   $final\n";
+    print "Final Size:   " . GTop::size_string($final) . "\n";
     
     if ( $final > $initial ) {
-        print "Leaked Bytes: " . ( $final - $initial ) . "\n";
+        print "Leaked Bytes: " . GTop::size_string($final - $initial) . "\n";
     }
     
     is( $final, $initial, 'memory is not leaking' );
