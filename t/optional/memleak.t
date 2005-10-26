@@ -20,12 +20,22 @@ our ( $initial, $final ) = ( 0, 0 );
 our $tests = YAML::LoadFile("$FindBin::Bin/stress.yml");
 
 my $total_tests = 0;
-map { $total_tests += scalar @{ $tests->{$_} } } keys %{$tests};
-plan tests => $total_tests;
 
-foreach my $test_group ( keys %{$tests} ) {
-    foreach my $test ( @{ $tests->{$test_group} } ) {
-        run_test( $test );
+# let the user specify a single uri to test
+my $user_test = shift;
+if ( $user_test ) {
+    plan tests => 1;
+    run_test( $user_test );
+}
+# otherwise, run all tests
+else {
+    map { $total_tests += scalar @{ $tests->{$_} } } keys %{$tests};
+    plan tests => $total_tests;
+    
+    foreach my $test_group ( keys %{$tests} ) {
+        foreach my $test ( @{ $tests->{$test_group} } ) {
+            run_test( $test );
+        }
     }
 }
 
