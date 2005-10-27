@@ -311,23 +311,44 @@ sub _get_line {
     return $line;
 }
 
+# The list of files we check for modification
+our $file_index;
+
 sub _index {
     my ( $dir, $regex ) = @_;
-    my %index;
-    finddepth(
-        {
-            wanted => sub {
-                my $file = File::Spec->rel2abs($File::Find::name);
-                return unless $file =~ /$regex/;
-                return unless -f $file;
-                my $time = ( stat $file )[9];
-                $index{$file} = $time;
+    
+    if ( ref $file_index ) {
+        # don't run a File::Find, but just check file mod times
+        my %index = %{$file_index};
+        foreach my $file ( keys %index ) {
+            if ( my @stat = stat $file ) {
+                $index{$file} = $stat[9];
+            }
+            else {
+                delete $index{$file};
+            }
+        }
+        return \%index;
+    }
+    else {
+        # first time, run a File::Find to locate files to watch
+        my $index = {};
+        finddepth(
+            {
+                wanted => sub {
+                    my $file = File::Spec->rel2abs($File::Find::name);
+                    return unless $file =~ /$regex/;
+                    return unless -f $file;
+                    my $time = ( stat $file )[9];
+                    $index->{$file} = $time;
+                },
+                no_chdir => 1
             },
-            no_chdir => 1
-        },
-        $dir
-    );
-    return \%index;
+            $dir
+        );
+        $file_index = $index;
+        return $file_index;
+    }
 }
 
 sub _test {
