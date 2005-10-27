@@ -2,7 +2,13 @@ Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
         - Restarter process in HTTP engine now properly exits when the
-          parent app is shut down.
+          parent app is shut down.  
+        - Improved performance of restarter loop while watching for
+          changed files.
+        - Restarter will now detect new files added to an app on systems
+          that change directory mtimes when new files are created.
+        - Restarter now properly handles modules that are deleted from an
+          application.
         - Fixed memory leak in TestApp.
 
 5.49_02 2005-10-26 12:39:00 

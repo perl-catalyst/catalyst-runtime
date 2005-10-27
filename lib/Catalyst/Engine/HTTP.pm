@@ -340,15 +340,13 @@ sub _index {
                     $file =~ s{/script/..}{};
                     return unless $file =~ /$regex/;
                     return unless -f $file;
-                    my $time = ( stat $file )[9];
-                    $index->{$file} = $time;
+                    $index->{$file} = ( stat $file )[9];
                     
                     # also watch the directory the file is in
                     my $cur_dir = File::Spec->rel2abs($File::Find::dir);
                     $cur_dir =~ s{/script/..}{};
                     unless ( $index->{$cur_dir} ) {
-                        my $time = ( stat $cur_dir )[9];
-                        $index->{$cur_dir} = $time;
+                        $index->{$cur_dir} = ( stat $cur_dir )[9];
                     }
                 },
                 no_chdir => 1
