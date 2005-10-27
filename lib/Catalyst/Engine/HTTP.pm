@@ -154,7 +154,7 @@ sub run {
 
                     # Restart
                     my $files = join ', ', @$changes;
-                    print STDERR qq/File(s) "$files" modified, restarting\n\n/;
+                    print STDERR qq/"$files" modified, restarting\n\n/;
                     kill( 1, $parent );
                     exit;
                 }
@@ -311,14 +311,14 @@ sub _get_line {
     return $line;
 }
 
-# The list of files we check for modification
+# The list of files/directories we check for modification
 our $file_index;
 
 sub _index {
     my ( $dir, $regex ) = @_;
     
     if ( ref $file_index ) {
-        # don't run a File::Find, but just check file mod times
+        # don't run a File::Find, but just check file/dir mod times
         my %index = %{$file_index};
         foreach my $file ( keys %index ) {
             if ( my @stat = stat $file ) {
@@ -331,16 +331,25 @@ sub _index {
         return \%index;
     }
     else {
-        # first time, run a File::Find to locate files to watch
+        # first time, run a File::Find to locate files and dirs to watch
         my $index = {};
         finddepth(
             {
                 wanted => sub {
                     my $file = File::Spec->rel2abs($File::Find::name);
+                    $file =~ s{/script/..}{};
                     return unless $file =~ /$regex/;
                     return unless -f $file;
                     my $time = ( stat $file )[9];
                     $index->{$file} = $time;
+                    
+                    # also watch the directory the file is in
+                    my $cur_dir = File::Spec->rel2abs($File::Find::dir);
+                    $cur_dir =~ s{/script/..}{};
+                    unless ( $index->{$cur_dir} ) {
+                        my $time = ( stat $cur_dir )[9];
+                        $index->{$cur_dir} = $time;
+                    }
                 },
                 no_chdir => 1
             },
@@ -354,6 +363,10 @@ sub _index {
 sub _test {
     my $file = shift;
     delete $INC{$file};
+    
+    # if the file has been deleted, don't try to test it
+    return 0 unless -f $file;
+    
     local $SIG{__WARN__} = sub { };
     open my $olderr, '>&STDERR';
     open STDERR, '>', File::Spec->devnull;
