@@ -113,12 +113,6 @@ sub run {
 
     $options ||= {};
 
-    our $GOT_HUP;
-    local $GOT_HUP = 0;
-
-    local $SIG{HUP} = sub { $GOT_HUP = 1; };
-    local $SIG{CHLD} = 'IGNORE';
-
     # Setup restarter
     my $restarter;
     if ( $options->{restart} ) {
@@ -135,7 +129,11 @@ sub run {
             my $regex = $options->{restart_regex};
             my $one   = _index( $dir, $regex );
           RESTART: while (1) {
-                sleep $options->{restart_delay};
+                sleep $options->{restart_delay} || 1;
+                
+                # check if our parent has died
+                exit if ( getppid == 1 );
+                
                 my $two     = _index( $dir,         $regex );
                 my $changes = _compare_index( $one, $two );
                 if (@$changes) {
@@ -163,6 +161,12 @@ sub run {
             }
         }
     }
+    
+    our $GOT_HUP;
+    local $GOT_HUP = 0;
+    
+    local $SIG{HUP} = sub { $GOT_HUP = 1; };
+    local $SIG{CHLD} = 'IGNORE';
 
     # Handle requests
 
