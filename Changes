@@ -55,10 +55,7 @@ Tis file documents the revision history for Perl extension Catalyst.
         - Added MyApp->config->{parse_on_demand} (streaming input)
         - Added $c->req->handle and $c->res->handle
         - Improved documentation
-
-5.34  (not released)
         - Fixed mkpath in Catalyst::Helper (Autrijus Tang)
-        - added $c->req->full_uri method (Jesse Sheidlower)
         - Fixed bug in dispatcher where an invalid path could call a valid
           action. (Andy Grundman)
         - Fixed Helper so it works with CRLF line-endings. (Andy Grundman)
