@@ -4,6 +4,7 @@ use strict;
 use base 'Catalyst::Base';
 
 use Data::Dumper ();
+use Scalar::Util qw(weaken);
 
 sub dump {
     my ( $self, $reference ) = @_;
@@ -42,6 +43,7 @@ sub process {
 
         # Repair context
         $reference->{_context} = $context;
+        weaken( $reference->{_context} );
 
         # Repair body
         $reference->{_body} = $body;
