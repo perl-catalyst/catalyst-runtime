@@ -1,5 +1,10 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
+5.50
+        - Restarter process in HTTP engine now properly exits when the
+          parent app is shut down.
+        - Fixed memory leak in TestApp.
+
 5.49_02 2005-10-26 12:39:00 
         - Whole new dispatcher!
         - Added index action
