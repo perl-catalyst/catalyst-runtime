@@ -15,6 +15,9 @@ plan skip_all => 'set TEST_MEMLEAK to enable this test'
     unless $ENV{TEST_MEMLEAK};
 plan skip_all => 'GTop required for this test' if $@;
 
+eval "use HTTP::Body 0.03";
+plan skip_all => 'HTTP::Body >= 0.03 required for this test' if $@;
+
 our $gtop = GTop->new;
 our ( $initial, $final ) = ( 0, 0 ); 
 our $tests = YAML::LoadFile("$FindBin::Bin/stress.yml");
