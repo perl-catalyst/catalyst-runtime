@@ -54,7 +54,7 @@ sub match {
             $c->req->match($path);
             $c->req->snippets( \@snippets );
             $c->action( $compiled->{action} );
-            $c->namespace( $compiled->{action}->prefix );
+            $c->namespace( $compiled->{action}->namespace );
             return 1;
         }
     }

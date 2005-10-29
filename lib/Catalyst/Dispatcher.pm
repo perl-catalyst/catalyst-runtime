@@ -184,8 +184,8 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
                     name      => $method,
                     code      => $code,
                     reverse   => "$class->$method",
+                    class     => $class,
                     namespace => $class,
-                    prefix    => $class,
                 }
             );
             $results = [ [$action] ];
@@ -271,7 +271,7 @@ sub get_action {
         my $node = $match[-1]->actions;    # Only bother looking at the last one
 
         if ( defined $node->{$action}
-            && ( $node->{$action}->prefix eq $namespace ) )
+            && ( $node->{$action}->namespace eq $namespace ) )
         {
             return [ [ $node->{$action} ] ];
         }
@@ -323,15 +323,15 @@ sub get_containers {
     return map { $_->getNodeValue } @match;
 }
 
-=item $self->set_action( $c, $action, $code, $namespace, $attrs )
+=item $self->set_action( $c, $action, $code, $class, $attrs )
 
 =cut
 
 sub set_action {
-    my ( $self, $c, $method, $code, $namespace, $attrs ) = @_;
+    my ( $self, $c, $method, $code, $class, $attrs ) = @_;
 
-    my $prefix =
-      Catalyst::Utils::class2prefix( $namespace, $c->config->{case_sensitive} )
+    my $namespace =
+      Catalyst::Utils::class2prefix( $class, $c->config->{case_sensitive} )
       || '';
     my %attributes;
 
@@ -362,7 +362,7 @@ sub set_action {
     if ( $attributes{Private} && ( keys %attributes > 1 ) ) {
         $c->log->debug( 'Bad action definition "'
               . join( ' ', @{$attrs} )
-              . qq/" for "$namespace->$method"/ )
+              . qq/" for "$class->$method"/ )
           if $c->debug;
         return;
     }
@@ -371,8 +371,8 @@ sub set_action {
     my $parent  = $self->tree;
     my $visitor = Tree::Simple::Visitor::FindByPath->new;
 
-    if ($prefix) {
-        for my $part ( split '/', $prefix ) {
+    if ($namespace) {
+        for my $part ( split '/', $namespace ) {
             $visitor->setSearchPath($part);
             $parent->accept($visitor);
             my $child = $visitor->getResult;
@@ -395,7 +395,7 @@ sub set_action {
         }
     }
 
-    my $reverse = $prefix ? "$prefix/$method" : $method;
+    my $reverse = $namespace ? "$namespace/$method" : $method;
 
     my $action = Catalyst::Action->new(
         {
@@ -403,7 +403,7 @@ sub set_action {
             code       => $code,
             reverse    => $reverse,
             namespace  => $namespace,
-            prefix     => $prefix,
+            class      => $class,
             attributes => \%attributes,
         }
     );
@@ -422,7 +422,7 @@ sub set_action {
 =cut
 
 sub setup_actions {
-    my ( $self, $class ) = @_;
+    my ( $self, $c ) = @_;
 
     $self->dispatch_types( [] );
 
@@ -440,7 +440,7 @@ sub setup_actions {
       Catalyst::ActionContainer->new( { part => '/', actions => {} } );
     $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 
-    for my $comp ( keys %{ $class->components } ) {
+    for my $comp ( keys %{ $c->components } ) {
 
         # We only setup components that inherit from Catalyst::Base
         next unless $comp->isa('Catalyst::Base');
@@ -450,22 +450,22 @@ sub setup_actions {
             my $name = '';
             no strict 'refs';
             my @cache = ( $comp, @{"$comp\::ISA"} );
-            my %namespaces;
+            my %classes;
 
-            while ( my $namespace = shift @cache ) {
-                $namespaces{$namespace}++;
+            while ( my $class = shift @cache ) {
+                $classes{$class}++;
                 for my $isa ( @{"$comp\::ISA"} ) {
-                    next if $namespaces{$isa};
+                    next if $classes{$isa};
                     push @cache, $isa;
-                    $namespaces{$isa}++;
+                    $classes{$isa}++;
                 }
             }
 
-            for my $namespace ( keys %namespaces ) {
-                for my $sym ( values %{ $namespace . '::' } ) {
+            for my $class ( keys %classes ) {
+                for my $sym ( values %{ $class . '::' } ) {
                     if ( *{$sym}{CODE} && *{$sym}{CODE} == $code ) {
                         $name = *{$sym}{NAME};
-                        $class->set_action( $name, $code, $comp, $attrs );
+                        $self->set_action( $c, $name, $code, $comp, $attrs );
                         last;
                     }
                 }
@@ -482,7 +482,7 @@ sub setup_actions {
         push @{ $self->dispatch_types }, $class->new;
     }
 
-    return unless $class->debug;
+    return unless $c->debug;
 
     my $privates = Text::ASCIITable->new;
     $privates->setCols( 'Private', 'Class' );
@@ -497,18 +497,18 @@ sub setup_actions {
 
         for my $action ( keys %{$node} ) {
             my $action_obj = $node->{$action};
-            $privates->addRow( "$prefix$action", $action_obj->namespace );
+            $privates->addRow( "$prefix$action", $action_obj->class );
         }
 
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
 
     $walker->( $walker, $self->tree, '' );
-    $class->log->debug( "Loaded Private actions:\n" . $privates->draw )
+    $c->log->debug( "Loaded Private actions:\n" . $privates->draw )
       if ( @{ $privates->{tbl_rows} } );
 
     # List all public actions
-    $_->list($class) for @{ $self->dispatch_types };
+    $_->list($c) for @{ $self->dispatch_types };
 }
 
 =back
