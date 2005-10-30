@@ -13,7 +13,10 @@ L<Catalyst::Manual::Tutorial>
     A simple step by step tutorial.
 
 L<Catalyst::Manual::Cookbook>
-    Cooking with Catalyst.
+    Cooking with Catalyst
+
+L<Catalyst::Manual::WritingPlugins>
+    Writing plugins for Catalyst; the use of L<NEXT>.
 
 L<Catalyst::Manual::Internals>
     Here be dragons!
