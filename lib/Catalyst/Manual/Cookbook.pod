@@ -616,6 +616,110 @@ You can manually set errors in your code to trigger this page by calling
 
     $c->error( 'You broke me!' );
 
+=head2 Require user logins
+
+It's often useful to restrict access to your application to a set of
+registered users, forcing everyone else to the login page until they're
+signed in.
+
+To implement this in your application make sure you have a customer
+table with username and password fields and a corresponding Model class
+in your Catalyst application, then make the following changes:
+
+=head3 lib/MyApp.pm
+
+  use Catalyst qw/Session::FastMmap Authentication::CDBI/;
+
+  __PACKAGE__->config->{authentication} = {
+    'user_class'        => 'ScratchPad::M::MyDB::Customer',
+    'user_field'        => 'username',
+    'password_field'    => 'password',
+    'password_hash'     => '',
+  };
+
+  sub auto : Private {
+    my ($self, $c) = @_;
+    my $login_path = 'user/login';
+
+    # allow people to actually reach the login page!
+    if ($c->req->path eq $login_path) {
+      return 1;
+    }
+
+    # if we have a user ... we're OK
+    if ( $c->req->user ) {
+      $c->session->{'authed_user'} =
+        MyApp::M::MyDB::Customer->retrieve(
+          'username' => $c->req->user
+        );
+    }
+
+    # otherwise they're not logged in
+    else {
+      # force the login screen to be shown
+      $c->res->redirect($c->req->base . $login_path);
+    }
+
+    # continue with the processing chain
+    return 1;
+  }
+
+=head3 lib/MyApp/C/User.pm
+
+  sub login : Path('/user/login') {
+    my ($self, $c) = @_;
+
+    # default template
+    $c->stash->{'template'} = "user/login.tt";
+    # default form message
+    $c->stash->{'message'} = 'Please enter your username and password';
+
+    if ( $c->req->param('username') ) {
+      # try to log the user in
+      $c->session_login(
+        $c->req->param('username'),
+        $c->req->param('password'),
+      );
+
+      # if we have a user we're logged in
+      if ( $c->req->user ) {
+        $c->res->redirect('/some/page');
+      }
+
+      # otherwise we failed to login, try again!
+      else {
+        $c->stash->{'message'} = 
+           'Unable to authenticate the login details supplied';
+      }
+    }
+  }
+
+  sub logout : Path('/user/logout') {
+    my ($self, $c) = @_;
+    # logout the session, and remove information we've stashed
+    $c->session_logout;
+    delete $c->session->{'authed_user'};
+
+    # do the 'default' action
+    $c->res->redirect($c->req->base);
+}
+
+
+=head3 root/base/user/login.tt
+
+ [% INCLUDE header.tt %]
+ <form action="/user/login" method="POST" name="login_form">
+    [% message %]<br />
+    <label for="username">username:</label><br />
+    <input type="text" id="username" name="username" /><br />
+
+    <label for="password">password:</label><br />
+    <input type="password" id="password" name="password" /><br />
+
+    <input type="submit" value="log in" name="form_submit" />
+  </form>
+  [% INCLUDE footer.tt %]
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
