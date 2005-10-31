@@ -29,7 +29,8 @@ my $build = Module::Build->new(
         'Tree::Simple::Visitor::FindByPath' => 0,
         'URI'                               => 1.35,
     },
-    recommends         => { 'Catalyst::Engine::Apache' => 0 },
+    recommends =>
+      { 'Catalyst::Engine::Apache' => 0, FCGI => 0, 'FCGI::ProcManager' => 0 },
     create_makefile_pl => 'passthrough',
     create_readme      => 1,
     script_files       => [ glob('script/*') ],
@@ -52,7 +53,15 @@ print(
 print( '*' x 80, "\n" );
 
 eval "use FCGI";
-print qq/Install "FCGI" for FastCGI support.\n/ if $@;
+if ($@) {
+    print qq/Install "FCGI" for FastCGI support.\n/;
+}
+else {
+    eval "use FCGI::ProcManager";
+    print
+qq/Install "FCGI::ProcManager" for multiprocess FastCGI external support.\n/
+      if ($@);
+}
 
 print qq/
 *** IMPORTANT NOTE: ***

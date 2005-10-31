@@ -18,17 +18,68 @@ This class overloads some methods from C<Catalyst::Engine::CGI>.
 
 =over 4
 
-=item $self->run($c)
+=item $self->run($c, $listen, { option => value, ... })
+ 
+Starts the FastCGI server.  If C<$listen> is set, then it specifies a
+location to listen for FastCGI requests;
+
+  Form            Meaning
+  /path           listen via Unix sockets on /path
+  :port           listen via TCP on port on all interfaces
+  hostname:port   listen via TCP on port bound to hostname
+
+Options may also be specified;
+
+  Option          Meaning
+  leave_umask     Set to 1 to disable setting umask to 0
+                  for socket open
+  nointr          Do not allow the listener to be
+                  interrupted by Ctrl+C
+  nproc           Specify a number of processes for
+                  FCGI::ProcManager
 
 =cut
 
 sub run {
-    my ( $self, $class ) = @_;
+    my ( $self, $class, $listen, $options ) = @_;
 
-    my $request = FCGI::Request();
+    my $sock;
+    if ($listen) {
+        my $old_umask = umask;
+        unless ( $options->{leave_umask} ) {
+            umask(0);
+        }
+        $sock = FCGI::OpenSocket( $listen, 100 )
+          or die "failed to open FastCGI socket; $!";
+        unless ( $options->{leave_umask} ) {
+            umask($old_umask);
+        }
+    }
+    else {
+        -S STDIN
+          or die "STDIN is not a socket; specify a listen location";
+    }
+
+    $options ||= {};
+
+    my $request =
+      FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, $sock,
+        ( $options->{nointr} ? 0 : &FCGI::FAIL_ACCEPT_ON_INTR ),
+      );
+
+    my $proc_manager;
+
+    if ( $listen and ( $options->{nproc} || 1 ) > 1 ) {
+        require FCGI::ProcManager;
+        $proc_manager =
+          FCGI::ProcManager->new( { n_processes => $options->{nproc} } );
+        $proc_manager->pm_manage();
+    }
 
     while ( $request->Accept >= 0 ) {
+        $proc_manager && $proc_manager->pm_pre_dispatch();
         $class->handle_request;
+        $proc_manager && $proc_manager->pm_pre_dispatch();
     }
 }
 

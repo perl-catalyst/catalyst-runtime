@@ -644,11 +644,24 @@ __fastcgi__
 BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
 
 use strict;
+use Getopt::Long;
+use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use [% name %];
 
-[% name %]->run;
+my $help = 0;
+my ( $listen, $nproc );
+ 
+GetOptions(
+    'help|?'     => \$help,
+    'listen|l=s' => \$listen,
+    'nproc|n=i'  => \$nproc,
+);
+
+pod2usage(1) if $help;
+
+[% name %]->run( $listen, { nproc => $nproc } );
 
 1;
 
@@ -658,7 +671,16 @@ use [% name %];
 
 =head1 SYNOPSIS
 
-See L<Catalyst::Manual>
+[% appprefix %]_server.pl [options]
+ 
+ Options:
+   -? -help      display this help and exits
+   -l -listen    Socket path to listen on
+                 (defaults to standard input)
+                 can be HOST:PORT, :PORT or a
+                 filesystem path
+   -n -nproc     specify number of processes to keep
+                 to serve requests (defaults to 1)
 
 =head1 DESCRIPTION
 
