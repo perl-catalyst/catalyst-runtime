@@ -708,7 +708,8 @@ my $home = Catalyst::Utils::home('[% name %]');
 $ENV{JSAN_PREFIX} ||= File::Spec->catdir( $home, 'root', 'static', 'js' );
 
 # JSAN shell
-require JSAN;
+eval 'require JSAN';
+die "Please install JSAN\n" if $@;
 JSAN->control;
 
 1;
@@ -736,7 +737,7 @@ Install JavaScript libraries from the JSAN shell.
 
 =head1 SEE ALSO
 
-http://openjsan.org
+L<JSAN>, L<http://openjsan.org>
 
 =head1 AUTHOR
 
