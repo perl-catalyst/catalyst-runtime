@@ -24,7 +24,9 @@ See L<Catalyst>.
 
 =item appprefix($class)
 
-Returns the application prefix for the class
+Returns the application prefix for the class.
+
+	MyApp::Foo becomes myapp_foo
 
 =cut
 
