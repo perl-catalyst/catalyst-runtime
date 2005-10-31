@@ -79,6 +79,7 @@ sub import {
 
     else {
         $class->require;
+		die if $@ && $@ !~ /^Can't locate /;
         $class->import;
 
         $request = sub { $class->run(@_) };
