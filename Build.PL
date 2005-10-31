@@ -29,7 +29,7 @@ my $build = Module::Build->new(
         'Tree::Simple::Visitor::FindByPath' => 0,
         'URI'                               => 1.35,
     },
-    recommends         => { 'Catalyst::Engine::Apache' => 0, JSAN => 0 },
+    recommends         => { 'Catalyst::Engine::Apache' => 0 },
     create_makefile_pl => 'passthrough',
     create_readme      => 1,
     script_files       => [ glob('script/*') ],

@@ -10,6 +10,7 @@ use Catalyst::Request;
 use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
+use JSAN::Parse::FileDeps;
 use NEXT;
 use Text::ASCIITable;
 use Path::Class;

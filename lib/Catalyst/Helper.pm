@@ -77,7 +77,6 @@ sub mk_app {
     $self->_mk_apptest;
     $self->_mk_cgi;
     $self->_mk_fastcgi;
-    $self->_mk_jsan;
     $self->_mk_server;
     $self->_mk_test;
     $self->_mk_create;
@@ -283,8 +282,6 @@ sub _mk_dirs {
     $self->mk_dir( $self->{static} );
     $self->{images} = File::Spec->catdir( $self->{static}, 'images' );
     $self->mk_dir( $self->{images} );
-    $self->{static} = File::Spec->catdir( $self->{static}, 'js' );
-    $self->mk_dir( $self->{static} );
     $self->{t} = File::Spec->catdir( $self->{dir}, 't' );
     $self->mk_dir( $self->{t} );
     $self->mk_dir( File::Spec->catdir( $self->{t}, 'M' ) );
@@ -355,14 +352,6 @@ sub _mk_fastcgi {
     my $appprefix = $self->{appprefix};
     $self->render_file( 'fastcgi', "$script\/$appprefix\_fastcgi.pl" );
     chmod 0700, "$script/$appprefix\_fastcgi.pl";
-}
-
-sub _mk_jsan {
-    my $self      = shift;
-    my $script    = $self->{script};
-    my $appprefix = $self->{appprefix};
-    $self->render_file( 'jsan', "$script\/$appprefix\_jsan.pl" );
-    chmod 0700, "$script/$appprefix\_jsan.pl";
 }
 
 sub _mk_server {
@@ -674,70 +663,6 @@ See L<Catalyst::Manual>
 =head1 DESCRIPTION
 
 Run a Catalyst application as fastcgi.
-
-=head1 AUTHOR
-
-Sebastian Riedel, C<sri@oook.de>
-
-=head1 COPYRIGHT
-
-Copyright 2004 Sebastian Riedel. All rights reserved.
-
-This library is free software, you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-__jsan__
-[% startperl %] -w
-
-use strict;
-use Catalyst;
-use Catalyst::Utils;
-use File::Spec;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-
-# Needed for home detection
-{
-    no warnings 'all';
-    sub Catalyst::setup {}
-    require [% name %];
-}
-
-my $home = Catalyst::Utils::home('[% name %]');
-$ENV{JSAN_PREFIX} ||= File::Spec->catdir( $home, 'root', 'static', 'js' );
-
-# JSAN shell
-eval 'require JSAN';
-die "Please install JSAN\n" if $@;
-JSAN->control;
-
-1;
-
-=head1 NAME
-
-[% appprefix %]_jsan.pl - JSAN shell
-
-=head1 SYNOPSIS
-
-[% appprefix %]_jsan.pl [options]
-
- Examples:
-   jsan> index
-   jsan> install Test.Simple
-
- See also:
-   perldoc Catalyst::Manual
-   perldoc Catalyst::Manual::Intro
-
-
-=head1 DESCRIPTION
-
-Install JavaScript libraries from the JSAN shell.
-
-=head1 SEE ALSO
-
-L<JSAN>, L<http://openjsan.org>
 
 =head1 AUTHOR
 
