@@ -16,6 +16,7 @@ my $build = Module::Build->new(
         'HTTP::Headers'                     => 1.59,
         'HTTP::Request'                     => 0,
         'HTTP::Response'                    => 0,
+        'JSAN'                              => 0,
         'LWP::UserAgent'                    => 0,
         'MIME::Types'                       => 0,
         'Module::Pluggable::Fast'           => 0.16,
