@@ -1705,6 +1705,8 @@ Matt S Trout
 
 Robert Sedlacek
 
+Sam Vilain
+
 Tatsuhiko Miyagawa
 
 Ulf Edvinsson
