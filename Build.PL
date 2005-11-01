@@ -10,6 +10,7 @@ my $build = Module::Build->new(
         'UNIVERSAL::require'                => "0.10",
         'Class::Accessor::Fast'             => 0,
         'Class::Data::Inheritable'          => 0,
+        'Class::Inspector'                  => 0,
         'CGI::Cookie'                       => 0,
         'HTML::Entities'                    => 0,
         'HTTP::Body'                        => 0.03,

@@ -4,6 +4,8 @@ use strict;
 use base qw/Catalyst::AttrContainer Class::Accessor::Fast/;
 
 use Catalyst::Exception;
+use Catalyst::Utils;
+use Class::Inspector;
 use NEXT;
 
 __PACKAGE__->mk_classdata($_) for qw/_config _dispatch_steps/;
@@ -51,6 +53,65 @@ sub _END : Private {
     $end->execute($c);
     return !@{ $c->error };
 }
+
+sub action_namespace {
+    my ( $self, $c ) = @_;
+    return
+        Catalyst::Utils::class2prefix(
+            ref $self, $c->config->{case_sensitive} ) || '';
+}
+
+sub register_actions {
+    my ( $self, $c ) = @_;
+    my $class = ref $self || $self;
+    my $namespace = $self->action_namespace( $c );
+    my %methods;
+    $methods{$self->can($_)} = $_ for @{Class::Inspector->methods($class)||[]};
+    foreach my $cache (@{$self->_action_cache}) {
+        my $code = $cache->[0];
+        my $method = $methods{$code};
+        next unless $method;
+        my $attrs = $self->_parse_attrs(@{$cache->[1]});
+        if ($attrs->{Private} && ( keys %$attrs > 1 ) ) {
+            $c->log->debug( 'Bad action definition "'
+                  . join( ' ', @{$cache->[1]} )
+                  . qq/" for "$class->$method"/ )
+              if $c->debug;
+            next;
+        }
+        my $reverse = $namespace ? "$namespace/$method" : $method;
+        my $action = Catalyst::Action->new(
+            {
+                name       => $method,
+                code       => $code,
+                reverse    => $reverse,
+                namespace  => $namespace,
+                class      => $class,
+                attributes => $attrs,
+            }
+        );
+        $c->dispatcher->register($c, $action);
+    }
+}
+
+sub _parse_attrs {
+    my ( $self, @attrs ) = @_;
+    my %attributes;
+    foreach my $attr (@attrs) {
+
+        # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
+
+        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+)\s*\))?$/ ) ) {
+
+            if ( defined $value ) {
+                ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
+            }
+            push( @{ $attributes{$key} }, $value );
+        }
+    }
+    return \%attributes;
+}
+
 
 =head1 NAME
 
