@@ -671,7 +671,7 @@ pod2usage(1) if $help;
 
 =head1 SYNOPSIS
 
-[% appprefix %]_server.pl [options]
+[% appprefix %]_fastcgi.pl [options]
  
  Options:
    -? -help      display this help and exits

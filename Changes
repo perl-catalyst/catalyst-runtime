@@ -1,7 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
-        - Added multi process external FCGI support
+        - Added multi process external FastCGI support
+          (see myapp_fastcgi.pl -help) (Sam Vilain)
         - Restarter process in HTTP engine now properly exits when the
           parent app is shut down.  
         - Improved performance of restarter loop while watching for
