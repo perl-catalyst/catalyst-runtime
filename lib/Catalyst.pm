@@ -749,7 +749,6 @@ Dispatch request to actions.
 
 sub dispatch { my $c = shift; $c->dispatcher->dispatch( $c, @_ ) }
 
-
 =item dump_these
 
 Returns a list of 2-element array references (name, structure) pairs that will
@@ -797,7 +796,11 @@ sub execute {
         {
             my ( $elapsed, @state ) =
               $c->benchmark( $code, $class, $c, @{ $c->req->args } );
-            push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
+            unless ( ( $code->name =~ /^_.*/ )
+                && ( !$c->config->{show_internal_actions} ) )
+            {
+                push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
+            }
             $c->state(@state);
         }
         else {
@@ -1481,39 +1484,39 @@ sub setup_engine {
 qq/Couldn't load engine "$engine" (maybe you forgot to install it?), "$@"/
         );
     }
-    
+
     # check for old engines that are no longer compatible
     my $old_engine;
-    if (   $engine->isa('Catalyst::Engine::Apache')
-        && ! Catalyst::Engine::Apache->VERSION )
+    if ( $engine->isa('Catalyst::Engine::Apache')
+        && !Catalyst::Engine::Apache->VERSION )
     {
         $old_engine = 1;
     }
-    
+
     elsif ( $engine->isa('Catalyst::Engine::Server::Base')
-         && Catalyst::Engine::Server->VERSION le '0.02' )
+        && Catalyst::Engine::Server->VERSION le '0.02' )
     {
         $old_engine = 1;
     }
-    
-    elsif ( $engine->isa('Catalyst::Engine::HTTP::POE')
-         && $engine->VERSION eq '0.01' )
+
+    elsif ($engine->isa('Catalyst::Engine::HTTP::POE')
+        && $engine->VERSION eq '0.01' )
     {
         $old_engine = 1;
     }
-    
-    elsif ( $engine->isa('Catalyst::Engine::Zeus')
-         && $engine->VERSION eq '0.01' )
+
+    elsif ($engine->isa('Catalyst::Engine::Zeus')
+        && $engine->VERSION eq '0.01' )
     {
         $old_engine = 1;
     }
 
     if ($old_engine) {
         Catalyst::Exception->throw( message =>
-            qq/Engine "$engine" is not supported by this version of Catalyst/
+              qq/Engine "$engine" is not supported by this version of Catalyst/
         );
     }
-            
+
     # engine instance
     $class->engine( $engine->new );
 }
