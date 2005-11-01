@@ -6,59 +6,50 @@ use base qw/Catalyst::AttrContainer Class::Accessor::Fast/;
 use Catalyst::Exception;
 use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_config/;
+__PACKAGE__->mk_classdata($_) for qw/_config _dispatch_steps/;
+
+__PACKAGE__->_dispatch_steps([ qw/_BEGIN _AUTO _ACTION/ ]);
 
 sub _DISPATCH :Private {
     my ( $self, $c ) = @_;
-    my @containers = $c->dispatcher->get_containers( $c->namespace );
-    my %actions;
-    foreach my $name (qw/begin auto end/) {
 
-        # Go down the container list representing each part of the
-        # current namespace inheritance tree, grabbing the actions hash
-        # of the ActionContainer object and looking for actions of the
-        # appropriate name registered to the namespace
-
-        $actions{$name} = [
-            map    { $_->{$name} }
-              grep { exists $_->{$name} }
-              map  { $_->actions } @containers
-        ];
+    foreach my $disp (@{$self->_dispatch_steps}) {
+        last unless $c->forward($disp);
     }
 
-    # Errors break the normal flow and the end action is instantly run
-    my $error = 0;
+    $c->forward('_END');
+}
 
-    # Execute last begin
-    $c->state(1);
-    if ( my $begin = @{ $actions{begin} }[-1] ) {
-        $begin->execute($c);
-        $error++ if scalar @{ $c->error };
-    }
+sub _BEGIN :Private {
+    my ( $self, $c ) = @_;
+    my $begin = @{ $c->get_action('begin', $c->namespace, 1) }[-1];
+    return 1 unless $begin;
+    $begin->[0]->execute($c);
+    return !@{$c->error};
+}
 
-    # Execute the auto chain
-    my $autorun = 0;
-    for my $auto ( @{ $actions{auto} } ) {
-        last if $error;
-        $autorun++;
-        $auto->execute($c);
-        $error++ if scalar @{ $c->error };
-        last unless $c->state;
+sub _AUTO :Private {
+    my ( $self, $c ) = @_;
+    my @auto = @{ $c->get_action('auto', $c->namespace, 1) };
+    foreach my $auto (@auto) {
+        $auto->[0]->execute($c);
+        return 0 unless $c->state;
     }
+    return 1;
+}
 
-    # Execute the action or last default
-    my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
-    if ($mkay) {
-        unless ($error) {
-            $c->action->execute($c);
-            $error++ if scalar @{ $c->error };
-        }
-    }
+sub _ACTION :Private {
+    my ( $self, $c ) = @_;
+    $c->action->execute($c);
+    return !@{$c->error};
+}
 
-    # Execute last end
-    if ( my $end = @{ $actions{end} }[-1] ) {
-        $end->execute($c);
-    }
+sub _END :Private {
+    my ( $self, $c ) = @_;
+    my $end = @{ $c->get_action('end', $c->namespace, 1) }[-1];
+    return 1 unless $end;
+    $end->[0]->execute($c);
+    return !@{$c->error};
 }
 
 =head1 NAME
