@@ -13,4 +13,9 @@ sub two : Action Path("åäö") {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub three :Path {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;

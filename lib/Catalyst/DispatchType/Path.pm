@@ -65,7 +65,10 @@ sub register {
     my @register;
 
     foreach my $r ( @{ $attrs->{Path} || [] } ) {
-        unless ( $r =~ m!^/! ) {    # It's a relative path
+        unless ( $r ) {
+            $r = $action->namespace;
+        }
+        elsif ( $r !~ m!^/! ) {    # It's a relative path
             $r = $action->namespace . "/$r";
         }
         push( @register, $r );
