@@ -749,6 +749,19 @@ Dispatch request to actions.
 
 sub dispatch { my $c = shift; $c->dispatcher->dispatch( $c, @_ ) }
 
+
+=item dump_these
+
+Returns a list of 2-element array references (name, structure) pairs that will
+be dumped on the error page in debug mode.
+
+=cut
+
+sub dump_these {
+    my $c = shift;
+    [ Request => $c->req ], [ Response => $c->res ], [ Stash => $c->stash ],;
+}
+
 =item $c->execute($class, $coderef)
 
 Execute a coderef in given class and catch exceptions.

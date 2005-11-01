@@ -117,15 +117,14 @@ sub finalize_error {
         my $req   = encode_entities Dumper $c->req;
         my $res   = encode_entities Dumper $c->res;
         my $stash = encode_entities Dumper $c->stash;
-        $infos = <<"";
-<br/>
-<b><u>Request</u></b><br/>
-<pre>$req</pre>
-<b><u>Response</u></b><br/>
-<pre>$res</pre>
-<b><u>Stash</u></b><br/>
-<pre>$stash</pre>
 
+        $infos = join(
+            "\n", "<br/>",
+            map {
+                sprintf "<b><u>%s</u></b><br/>\n<pre>%s</pre>", $_->[0],
+                  encode_entities( Dumper $_->[1] )
+              } $c->dump_these
+        );
     }
     else {
         $title = $name;
