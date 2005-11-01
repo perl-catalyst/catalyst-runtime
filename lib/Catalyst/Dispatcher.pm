@@ -55,56 +55,7 @@ sub dispatch {
     my ( $self, $c ) = @_;
 
     if ( $c->action ) {
-
-        my @containers = $self->get_containers( $c->namespace );
-        my %actions;
-        foreach my $name (qw/begin auto end/) {
-
-            # Go down the container list representing each part of the
-            # current namespace inheritance tree, grabbing the actions hash
-            # of the ActionContainer object and looking for actions of the
-            # appropriate name registered to the namespace
-
-            $actions{$name} = [
-                map    { $_->{$name} }
-                  grep { exists $_->{$name} }
-                  map  { $_->actions } @containers
-            ];
-        }
-
-        # Errors break the normal flow and the end action is instantly run
-        my $error = 0;
-
-        # Execute last begin
-        $c->state(1);
-        if ( my $begin = @{ $actions{begin} }[-1] ) {
-            $begin->execute($c);
-            $error++ if scalar @{ $c->error };
-        }
-
-        # Execute the auto chain
-        my $autorun = 0;
-        for my $auto ( @{ $actions{auto} } ) {
-            last if $error;
-            $autorun++;
-            $auto->execute($c);
-            $error++ if scalar @{ $c->error };
-            last unless $c->state;
-        }
-
-        # Execute the action or last default
-        my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
-        if ($mkay) {
-            unless ($error) {
-                $c->action->execute($c);
-                $error++ if scalar @{ $c->error };
-            }
-        }
-
-        # Execute last end
-        if ( my $end = @{ $actions{end} }[-1] ) {
-            $end->execute($c);
-        }
+        $c->forward( join('/', '', $c->namespace, '_DISPATCH') );
     }
 
     else {
@@ -454,7 +405,7 @@ sub setup_actions {
 
             while ( my $class = shift @cache ) {
                 $classes{$class}++;
-                for my $isa ( @{"$comp\::ISA"} ) {
+                for my $isa ( @{"$class\::ISA"} ) {
                     next if $classes{$isa};
                     push @cache, $isa;
                     $classes{$isa}++;

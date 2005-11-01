@@ -29,7 +29,7 @@ sub match {
     # Find default on namespace or super
     if ($result) {
         $c->action( $result->[0] );
-        $c->namespace( $c->req->path );
+        $c->namespace( $result->[0]->namespace );
         $c->req->action('default');
         # default methods receive the controller name as the first argument
         unshift @{ $c->req->args }, $path;

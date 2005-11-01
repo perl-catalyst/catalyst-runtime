@@ -1,24 +1,65 @@
 package Catalyst::Base;
 
 use strict;
-use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
+use base qw/Catalyst::AttrContainer Class::Accessor::Fast/;
 
 use Catalyst::Exception;
 use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache _config/;
-__PACKAGE__->_attr_cache( {} );
-__PACKAGE__->_action_cache( [] );
+__PACKAGE__->mk_classdata($_) for qw/_config/;
 
-# note - see attributes(3pm)
-sub MODIFY_CODE_ATTRIBUTES {
-    my ( $class, $code, @attrs ) = @_;
-    $class->_attr_cache->{$code} = [@attrs];
-    push @{ $class->_action_cache }, [ $code, [@attrs] ];
-    return ();
+sub _DISPATCH :Private {
+    my ( $self, $c ) = @_;
+    my @containers = $c->dispatcher->get_containers( $c->namespace );
+    my %actions;
+    foreach my $name (qw/begin auto end/) {
+
+        # Go down the container list representing each part of the
+        # current namespace inheritance tree, grabbing the actions hash
+        # of the ActionContainer object and looking for actions of the
+        # appropriate name registered to the namespace
+
+        $actions{$name} = [
+            map    { $_->{$name} }
+              grep { exists $_->{$name} }
+              map  { $_->actions } @containers
+        ];
+    }
+
+    # Errors break the normal flow and the end action is instantly run
+    my $error = 0;
+
+    # Execute last begin
+    $c->state(1);
+    if ( my $begin = @{ $actions{begin} }[-1] ) {
+        $begin->execute($c);
+        $error++ if scalar @{ $c->error };
+    }
+
+    # Execute the auto chain
+    my $autorun = 0;
+    for my $auto ( @{ $actions{auto} } ) {
+        last if $error;
+        $autorun++;
+        $auto->execute($c);
+        $error++ if scalar @{ $c->error };
+        last unless $c->state;
+    }
+
+    # Execute the action or last default
+    my $mkay = $autorun ? $c->state ? 1 : 0 : 1;
+    if ($mkay) {
+        unless ($error) {
+            $c->action->execute($c);
+            $error++ if scalar @{ $c->error };
+        }
+    }
+
+    # Execute last end
+    if ( my $end = @{ $actions{end} }[-1] ) {
+        $end->execute($c);
+    }
 }
-
-sub FETCH_CODE_ATTRIBUTES { $_[0]->_attr_cache->{ $_[1] } || () }
 
 =head1 NAME
 
@@ -126,6 +167,7 @@ L<Catalyst>.
 
 Sebastian Riedel, C<sri@cpan.org>
 Marcus Ramberg, C<mramberg@cpan.org>
+Matt S Trout, C<mst@shadowcatsystems.co.uk>
 
 =head1 COPYRIGHT
 

@@ -29,7 +29,7 @@ sub match {
     # Find default on namespace or super
     if ($result) {
         $c->action( $result->[0] );
-        $c->namespace( $c->req->path );
+        $c->namespace( $result->[0]->namespace );
         $c->req->action('index');
         $c->req->match( $c->req->path );
         return 1;

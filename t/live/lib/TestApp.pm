@@ -34,7 +34,7 @@ sub execute {
         $method = $1;
     }
 
-    if ( $class && $method ) {
+    if ( $class && $method && $method !~ /^_/ ) {
         my $executed = sprintf( "%s->%s", $class, $method );
         my @executed = $c->response->headers->header('X-Catalyst-Executed');
         push @executed, $executed;
