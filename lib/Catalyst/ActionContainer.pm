@@ -26,9 +26,19 @@ See L<Catalyst>.
 
 =over 4
 
-=item part
+=item get_action
+
+=cut
+
+sub get_action {
+    my ( $self, $c, $name ) = @_;
+    return $self->actions->{$name} if defined $self->actions->{$name};
+    return;
+}
 
 =item actions
+
+=item part
 
 =back
 

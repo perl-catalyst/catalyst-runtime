@@ -198,19 +198,18 @@ sub prepare_action {
 =cut
 
 sub get_action {
-    my ( $self, $c, $action, $namespace ) = @_;
-    return [] unless $action;
+    my ( $self, $c, $name, $namespace ) = @_;
+    return unless $name;
     $namespace ||= '';
     $namespace = '' if $namespace eq '/';
 
     my @match = $self->get_containers($namespace);
 
-    my $node = $match[-1]->actions;    # Only bother looking at the last one
+    return unless @match;
 
-    if ( defined $node->{$action}
-        && ( $node->{$action}->namespace eq $namespace ) )
+    if ( my $action = $match[-1]->get_action( $c, $name ) )
     {
-        return $node->{$action};
+        return $action if $action->namespace eq $namespace;
     }
 }
 
@@ -226,11 +225,7 @@ sub get_actions {
 
     my @match = $self->get_containers($namespace);
 
-    return
-        map    { $_->{$action} }
-          grep { defined $_->{$action} }    # If it exists in the container
-          map  { $_->actions }              # Get action hash for container
-          @match
+    return map { $_->get_action($c, $action) } @match;
 }
 
 =item $self->get_containers( $namespace )
@@ -320,8 +315,28 @@ sub set_action {
     }
     return unless keys %attributes;
 
-    my $parent  = $self->tree;
-    my $visitor = Tree::Simple::Visitor::FindByPath->new;
+    my $reverse = $namespace ? "$namespace/$method" : $method;
+
+    my $action = Catalyst::Action->new(
+        {
+            name       => $method,
+            code       => $code,
+            reverse    => $reverse,
+            namespace  => $namespace,
+            class      => $class,
+            attributes => \%attributes,
+        }
+    );
+
+    $self->register($c, $action);
+}
+
+sub register {
+    my ( $self, $c, $action ) = @_;
+
+    my $namespace = $action->namespace;
+    my $parent    = $self->tree;
+    my $visitor   = Tree::Simple::Visitor::FindByPath->new;
 
     if ($namespace) {
         for my $part ( split '/', $namespace ) {
@@ -347,21 +362,8 @@ sub set_action {
         }
     }
 
-    my $reverse = $namespace ? "$namespace/$method" : $method;
-
-    my $action = Catalyst::Action->new(
-        {
-            name       => $method,
-            code       => $code,
-            reverse    => $reverse,
-            namespace  => $namespace,
-            class      => $class,
-            attributes => \%attributes,
-        }
-    );
-
     # Set the method value
-    $parent->getNodeValue->actions->{$method} = $action;
+    $parent->getNodeValue->actions->{$action->name} = $action;
 
     # Pass the action to our dispatch types so they can register it if reqd.
     foreach my $type ( @{ $self->dispatch_types } ) {
