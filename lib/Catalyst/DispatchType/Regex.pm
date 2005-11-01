@@ -71,6 +71,9 @@ sub register {
     my $attrs = $action->attributes;
     my @register = map { @{ $_ || [] } } @{$attrs}{ 'Regex', 'Regexp' };
     foreach my $r (@register) {
+        unless ($r =~ /^\^/) {     # Relative regex
+            $r = '^'.$action->namespace.'/'.$r;
+        }
         $self->{paths}{$r} = $action;    # Register path for superclass
         push(
             @{ $self->{compiled} },      # and compiled regex for us
