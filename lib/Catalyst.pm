@@ -1562,6 +1562,16 @@ sub version { return $Catalyst::VERSION }
 
 =back
 
+=head1 INTERNAL ACTIONS
+
+Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>
+C<_ACTION> and C<_END>, these are by default not shown in the private
+action table.
+
+But you can deactivate this with a config parameter.
+
+    MyApp->config->{show_internal_actions} = 1;
+
 =head1 CASE SENSITIVITY
 
 By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> becomes

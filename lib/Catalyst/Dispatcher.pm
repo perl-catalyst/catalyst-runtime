@@ -55,7 +55,7 @@ sub dispatch {
     my ( $self, $c ) = @_;
 
     if ( $c->action ) {
-        $c->forward( join('/', '', $c->namespace, '_DISPATCH') );
+        $c->forward( join( '/', '', $c->namespace, '_DISPATCH' ) );
     }
 
     else {
@@ -448,6 +448,9 @@ sub setup_actions {
 
         for my $action ( keys %{$node} ) {
             my $action_obj = $node->{$action};
+            next
+              if ( ( $action =~ /^_.*/ )
+                && ( !$c->config->{show_internal_actions} ) );
             $privates->addRow( "$prefix$action", $action_obj->class );
         }
 
