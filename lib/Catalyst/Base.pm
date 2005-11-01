@@ -22,17 +22,17 @@ sub _DISPATCH : Private {
 
 sub _BEGIN : Private {
     my ( $self, $c ) = @_;
-    my $begin = @{ $c->get_action( 'begin', $c->namespace, 1 ) }[-1];
+    my $begin = ($c->get_actions( 'begin', $c->namespace))[-1];
     return 1 unless $begin;
-    $begin->[0]->execute($c);
+    $begin->execute($c);
     return !@{ $c->error };
 }
 
 sub _AUTO : Private {
     my ( $self, $c ) = @_;
-    my @auto = @{ $c->get_action( 'auto', $c->namespace, 1 ) };
+    my @auto = $c->get_actions('auto', $c->namespace);
     foreach my $auto (@auto) {
-        $auto->[0]->execute($c);
+        $auto->execute($c);
         return 0 unless $c->state;
     }
     return 1;
@@ -46,9 +46,9 @@ sub _ACTION : Private {
 
 sub _END : Private {
     my ( $self, $c ) = @_;
-    my $end = @{ $c->get_action( 'end', $c->namespace, 1 ) }[-1];
+    my $end = ($c->get_actions( 'end', $c->namespace))[-1];
     return 1 unless $end;
-    $end->[0]->execute($c);
+    $end->execute($c);
     return !@{ $c->error };
 }
 

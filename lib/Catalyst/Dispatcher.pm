@@ -88,7 +88,7 @@ sub forward {
 
     my $arguments = ( ref( $_[-1] ) eq 'ARRAY' ) ? pop(@_) : $c->req->args;
 
-    my $results = [];
+    my $result;
 
     my $command_copy = $command;
 
@@ -100,14 +100,14 @@ sub forward {
     }
 
     unless ( $command_copy =~ /\// ) {
-        $results = $c->get_action( $command_copy, '/' );
+        $result = $c->get_action( $command_copy, '/' );
     }
     else {
         my @extra_args;
       DESCEND: while ( $command_copy =~ s/^(.*)\/(\w+)$/$1/ ) {
             my $tail = $2;
-            $results = $c->get_action( $tail, $1 );
-            if ( @{$results} ) {
+            $result = $c->get_action( $tail, $1 );
+            if ( $result ) {
                 $command = $tail;
                 push( @{$arguments}, @extra_args );
                 last DESCEND;
@@ -116,7 +116,7 @@ sub forward {
         }
     }
 
-    unless ( @{$results} ) {
+    unless ( $result ) {
 
         unless ( $c->components->{$command} ) {
             my $error =
@@ -139,7 +139,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
                     namespace => $class,
                 }
             );
-            $results = [ [$action] ];
+            $result = $action;
         }
 
         else {
@@ -155,11 +155,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
 
     local $c->request->{arguments} = [ @{$arguments} ];
 
-    for my $result ( @{$results} ) {
-        $result->[0]->execute($c);
-        return if scalar @{ $c->error };
-        last unless $c->state;
-    }
+    $result->execute($c);
 
     return $c->state;
 }
@@ -197,39 +193,44 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-=item $self->get_action( $c, $action, $namespace, $inherit )
+=item $self->get_action( $c, $action, $namespace )
 
 =cut
 
 sub get_action {
-    my ( $self, $c, $action, $namespace, $inherit ) = @_;
+    my ( $self, $c, $action, $namespace ) = @_;
     return [] unless $action;
     $namespace ||= '';
     $namespace = '' if $namespace eq '/';
-    $inherit ||= 0;
 
     my @match = $self->get_containers($namespace);
 
-    if ($inherit) {    # Return [ [ $act_obj ], ... ] for valid containers
-        return [
-            map    { [ $_->{$action} ] }        # Make [ $action_obj ]
-              grep { defined $_->{$action} }    # If it exists in the container
-              map  { $_->actions }              # Get action hash for container
-              @match
-        ];
-    }
-    else {
-        my $node = $match[-1]->actions;    # Only bother looking at the last one
+    my $node = $match[-1]->actions;    # Only bother looking at the last one
 
-        if ( defined $node->{$action}
-            && ( $node->{$action}->namespace eq $namespace ) )
-        {
-            return [ [ $node->{$action} ] ];
-        }
-        else {
-            return [];
-        }
+    if ( defined $node->{$action}
+        && ( $node->{$action}->namespace eq $namespace ) )
+    {
+        return $node->{$action};
     }
+}
+
+=item $self->get_actions( $c, $action, $namespace )
+
+=cut
+
+sub get_actions {
+    my ( $self, $c, $action, $namespace ) = @_;
+    return [] unless $action;
+    $namespace ||= '';
+    $namespace = '' if $namespace eq '/';
+
+    my @match = $self->get_containers($namespace);
+
+    return
+        map    { $_->{$action} }
+          grep { defined $_->{$action} }    # If it exists in the container
+          map  { $_->actions }              # Get action hash for container
+          @match
 }
 
 =item $self->get_containers( $namespace )

@@ -919,13 +919,21 @@ Finalize uploads.  Cleans up any temporary files.
 
 sub finalize_uploads { my $c = shift; $c->engine->finalize_uploads( $c, @_ ) }
 
-=item $c->get_action( $action, $namespace, $inherit )
+=item $c->get_action( $action, $namespace )
 
 Get an action in a given namespace.
 
 =cut
 
 sub get_action { my $c = shift; $c->dispatcher->get_action( $c, @_ ) }
+
+=item $c->get_actions( $action, $namespace )
+
+Get all actions of a given name in a namespace and all base namespaces.
+
+=cut
+
+sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
 =item handle_request( $class, @arguments )
 

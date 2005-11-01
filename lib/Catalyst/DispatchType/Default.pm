@@ -24,12 +24,12 @@ See L<Catalyst>.
 sub match {
     my ( $self, $c, $path ) = @_;
     return if $path =~ m!/!;    # Not at root yet, wait for it ...
-    my $result = @{ $c->get_action( 'default', $c->req->path, 1 ) || [] }[-1];
+    my $result = ($c->get_actions('default', $c->req->path))[-1];
 
     # Find default on namespace or super
     if ($result) {
-        $c->action( $result->[0] );
-        $c->namespace( $result->[0]->namespace );
+        $c->action( $result );
+        $c->namespace( $result->namespace );
         $c->req->action('default');
         # default methods receive the controller name as the first argument
         unshift @{ $c->req->args }, $path;

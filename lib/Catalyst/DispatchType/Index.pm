@@ -24,12 +24,11 @@ See L<Catalyst>.
 sub match {
     my ( $self, $c, $path ) = @_;
     return if @{ $c->req->args };
-    my $result = @{ $c->get_action( 'index', $path ) || [] }[-1];
+    my $result = $c->get_action( 'index', $path );
 
-    # Find default on namespace or super
     if ($result) {
-        $c->action( $result->[0] );
-        $c->namespace( $result->[0]->namespace );
+        $c->action( $result );
+        $c->namespace( $result->namespace );
         $c->req->action('index');
         $c->req->match( $c->req->path );
         return 1;
