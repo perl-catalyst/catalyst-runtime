@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added _DISPATCH, _BEGIN, _AUTO, _ACTION and _END actions
         - Added multi process external FastCGI support
           (see myapp_fastcgi.pl -help) (Sam Vilain)
         - Restarter process in HTTP engine now properly exits when the

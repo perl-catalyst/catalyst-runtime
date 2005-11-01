@@ -8,29 +8,29 @@ use NEXT;
 
 __PACKAGE__->mk_classdata($_) for qw/_config _dispatch_steps/;
 
-__PACKAGE__->_dispatch_steps([ qw/_BEGIN _AUTO _ACTION/ ]);
+__PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
 
-sub _DISPATCH :Private {
+sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
 
-    foreach my $disp (@{$self->_dispatch_steps}) {
+    foreach my $disp ( @{ $self->_dispatch_steps } ) {
         last unless $c->forward($disp);
     }
 
     $c->forward('_END');
 }
 
-sub _BEGIN :Private {
+sub _BEGIN : Private {
     my ( $self, $c ) = @_;
-    my $begin = @{ $c->get_action('begin', $c->namespace, 1) }[-1];
+    my $begin = @{ $c->get_action( 'begin', $c->namespace, 1 ) }[-1];
     return 1 unless $begin;
     $begin->[0]->execute($c);
-    return !@{$c->error};
+    return !@{ $c->error };
 }
 
-sub _AUTO :Private {
+sub _AUTO : Private {
     my ( $self, $c ) = @_;
-    my @auto = @{ $c->get_action('auto', $c->namespace, 1) };
+    my @auto = @{ $c->get_action( 'auto', $c->namespace, 1 ) };
     foreach my $auto (@auto) {
         $auto->[0]->execute($c);
         return 0 unless $c->state;
@@ -38,18 +38,18 @@ sub _AUTO :Private {
     return 1;
 }
 
-sub _ACTION :Private {
+sub _ACTION : Private {
     my ( $self, $c ) = @_;
     $c->action->execute($c);
-    return !@{$c->error};
+    return !@{ $c->error };
 }
 
-sub _END :Private {
+sub _END : Private {
     my ( $self, $c ) = @_;
-    my $end = @{ $c->get_action('end', $c->namespace, 1) }[-1];
+    my $end = @{ $c->get_action( 'end', $c->namespace, 1 ) }[-1];
     return 1 unless $end;
     $end->[0]->execute($c);
-    return !@{$c->error};
+    return !@{ $c->error };
 }
 
 =head1 NAME
@@ -103,11 +103,11 @@ component loader with config() support and a process() method placeholder.
 
 sub new {
     my ( $self, $c ) = @_;
- 
+
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( { %{ $self->config }, %{ $arguments } } );
+    return $self->NEXT::new( { %{ $self->config }, %{$arguments} } );
 }
 
 # remember to leave blank lines between the consecutive =item's
@@ -139,14 +139,9 @@ sub config {
 
 sub process {
 
-    Catalyst::Exception->throw( 
-        message => ( ref $_[0] || $_[0] ) . " did not override Catalyst::Base::process"
-    );
+    Catalyst::Exception->throw( message => ( ref $_[0] || $_[0] )
+          . " did not override Catalyst::Base::process" );
 }
-
-=item FETCH_CODE_ATTRIBUTES
-
-=item MODIFY_CODE_ATTRIBUTES
 
 =back
 
