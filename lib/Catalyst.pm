@@ -426,6 +426,7 @@ sub uri_for {
     # massage match, empty if absolute path
     $match =~ s/^\///;
     $match .= '/' if $match;
+    $path ||= '';
     $match = '' if $path =~ /^\//;
     $path =~ s/^\///;
 
