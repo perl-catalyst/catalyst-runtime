@@ -110,6 +110,8 @@ L<Catalyst::Plugin::Session::FastMmap> is a session plugin for Catalyst
 based on C<Cache::FastMMap>, which uses an mmap'ed file to act as a
 shared memory interprocess cache.
 
+=head2 Catalyst::Plugin::Session
+
 
 =head2 Catalyst::Plugin::Static
 
