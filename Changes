@@ -1,6 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Added Catalyst::Controller, Catalyst::Model and Catalyst::View
+          base classes
         - Added JavaScript to debug screen to show and hide specific dumps
         - Added _DISPATCH, _BEGIN, _AUTO, _ACTION and _END actions
         - Added multi process external FastCGI support
