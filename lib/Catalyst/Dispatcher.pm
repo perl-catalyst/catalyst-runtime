@@ -112,7 +112,9 @@ sub forward {
 
     unless ( $result ) {
 
-        unless ( $c->components->{$command} ) {
+        my $comp;
+
+        unless ( $comp = $c->component($command) ) {
             my $error =
 qq/Couldn't forward to command "$command". Invalid action or component./;
             $c->error($error);
@@ -120,10 +122,10 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
             return 0;
         }
 
-        my $class  = $command;
+        my $class  = ref $comp;
         my $method = shift || 'process';
 
-        if ( my $code = $c->components->{$class}->can($method) ) {
+        if ( my $code = $class->can($method) ) {
             my $action = Catalyst::Action->new(
                 {
                     name      => $method,

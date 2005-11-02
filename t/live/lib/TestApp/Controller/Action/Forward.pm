@@ -25,7 +25,7 @@ sub four : Private {
 
 sub five : Local {
     my ( $self, $c ) = @_;
-    $c->forward('TestApp::View::Dump::Request');
+    $c->forward('View::Dump::Request');
 }
 
 sub jojo : Local {
