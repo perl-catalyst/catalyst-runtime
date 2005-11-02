@@ -99,10 +99,11 @@ sub finalize_error {
         # For pretty dumps
         local $Data::Dumper::Terse = 1;
         $error = join '',
-          map { '<code class="error">' . encode_entities($_) . '</code>' }
+          map { '<p><code class="error">' . encode_entities($_) . '</code></p>' }
           @{ $c->error };
         $error ||= 'No output';
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
+        $name = "<h1>$name</h1>";
 
         # Don't show context in the dump
         delete $c->req->{_context};
@@ -124,12 +125,7 @@ sub finalize_error {
             my $name  = $dump->[0];
             my $value = encode_entities( Dumper $dump->[1] );
             push @infos, sprintf <<"EOF", $name, $value;
-<div>
-    <b><u>
-        <a href="#" onclick="toggleDump('dump_$i'); return false">%s</a>
-    </u></b>
-</div>
-<br/>
+<h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
 <div id="dump_$i">
     <pre>%s</pre>
 </div>
@@ -189,6 +185,7 @@ EOF
             color: #ddd;
         }
         div.box {
+            position: relative;
             background-color: #ccc;
             border: 1px solid #aaa;
             padding: 4px;
@@ -223,6 +220,20 @@ EOF
             margin: 1em 0;
             overflow: auto;
             white-space: pre;
+        }
+        div.name h1, div.error p {
+            margin: 0;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: medium;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        h1 {
+            font-size: medium;
+            font-weight: normal;
         }
     </style>
 </head>

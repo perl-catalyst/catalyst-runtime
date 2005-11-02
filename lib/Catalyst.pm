@@ -646,7 +646,8 @@ sub welcome_message {
                 float: right;
                 margin-left: 10px;
             }
-            b#appname {
+            span#appname {
+                font-weight: bold;
                 font-size: 1.6em;
             }
         </style>
@@ -654,7 +655,7 @@ sub welcome_message {
     <body>
         <div id="content">
             <div id="topbar">
-                <h1><b id="appname">$name</b> on <a href="http://catalyst.perl.org">Catalyst</a>
+                <h1><span id="appname">$name</span> on <a href="http://catalyst.perl.org">Catalyst</a>
                     $VERSION</h1>
              </div>
              <div id="answers">
