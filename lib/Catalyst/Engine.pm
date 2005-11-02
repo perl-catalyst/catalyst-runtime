@@ -90,7 +90,7 @@ sub finalize_cookies {
 sub finalize_error {
     my ( $self, $c ) = @_;
 
-    $c->res->headers->content_type('text/html');
+    $c->res->content_type('text/html; charset=utf-8');
     my $name = $c->config->{name} || 'Catalyst Application';
 
     my ( $title, $error, $infos );
@@ -126,7 +126,7 @@ sub finalize_error {
             push @infos, sprintf <<"EOF", $name, $value;
 <div>
     <b><u>
-        <a href="#" onclick="toggleDump(dump_$i); return false">%s</a>
+        <a href="#" onclick="toggleDump('dump_$i'); return false">%s</a>
     </u></b>
 </div>
 <br/>
@@ -156,17 +156,22 @@ EOF
         $name = '';
     }
     $c->res->body( <<"" );
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>$title</title>
-    <script language="JavaScript">
+    <script type="text/javascript">
         <!--
         function toggleDump (dumpElement) {
-            if (dumpElement.style.display == "none") {
-                dumpElement.style.display = "";
+            var e = document.getElementById( dumpElement );
+            if (e.style.display == "none") {
+                e.style.display = "";
             }
             else {
-                dumpElement.style.display = "none";
+                e.style.display = "none";
             }
         }
         -->
