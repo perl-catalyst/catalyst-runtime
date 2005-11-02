@@ -393,6 +393,7 @@ sub setup_actions {
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Matt S Trout, C<mst@shadowcatsystems.co.uk>
 
 =head1 COPYRIGHT
 
