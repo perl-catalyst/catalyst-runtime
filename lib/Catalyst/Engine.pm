@@ -118,13 +118,27 @@ sub finalize_error {
         my $res   = encode_entities Dumper $c->res;
         my $stash = encode_entities Dumper $c->stash;
 
-        $infos = join(
-            "\n", "<br/>",
-            map {
-                sprintf "<b><u>%s</u></b><br/>\n<pre>%s</pre>", $_->[0],
-                  encode_entities( Dumper $_->[1] )
-              } $c->dump_these
-        );
+        my @infos;
+        my $i = 0;
+        warn "BAAR";
+        for my $dump ( $c->dump_these ) {
+            warn "FOOO";
+            my $name  = $dump->[0];
+            my $value = encode_entities( Dumper $dump->[1] );
+            push @infos, sprintf <<"EOF", $name, $value;
+<div>
+    <b><u>
+        <a href="#" onclick="toggleDump(dump_$i); return false">%s</a>
+    </u></b>
+</div>
+<br/>
+<div id="dump_$i">
+    <pre>%s</pre>
+</div>
+EOF
+            $i++;
+        }
+        $infos = join "\n", @infos;
     }
     else {
         $title = $name;
@@ -147,6 +161,18 @@ sub finalize_error {
 <html>
 <head>
     <title>$title</title>
+    <script language="JavaScript">
+        <!--
+        function toggleDump (dumpElement) {
+            if (dumpElement.style.display == "none") {
+                dumpElement.style.display = "";
+            }
+            else {
+                dumpElement.style.display = "none";
+            }
+        }
+        -->
+    </script>
     <style type="text/css">
         body {
             font-family: "Bitstream Vera Sans", "Trebuchet MS", Verdana,
@@ -155,6 +181,9 @@ sub finalize_error {
             background-color: #eee;
             margin: 0px;
             padding: 0px;
+        }
+        :link, :link:hover, :visited, :visited:hover {
+            color: #ddd;
         }
         div.box {
             background-color: #ccc;
