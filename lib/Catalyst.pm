@@ -38,7 +38,7 @@ our $DETACH    = "catalyst_detach\n";
 require Module::Pluggable::Fast;
 
 # Helper script generation
-our $CATALYST_SCRIPT_GEN = 9;
+our $CATALYST_SCRIPT_GEN = 10;
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log/;
