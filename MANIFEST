@@ -6,6 +6,8 @@ lib/Catalyst/ActionContainer.pm
 lib/Catalyst/AttrContainer.pm
 lib/Catalyst/Base.pm
 lib/Catalyst/Build.pm
+lib/Catalyst/Component.pm
+lib/Catalyst/Controller.pm
 lib/Catalyst/Dispatcher.pm
 lib/Catalyst/DispatchType.pm
 lib/Catalyst/DispatchType/Default.pm
@@ -16,6 +18,8 @@ lib/Catalyst/Engine.pm
 lib/Catalyst/Engine/CGI.pm
 lib/Catalyst/Engine/FastCGI.pm
 lib/Catalyst/Engine/HTTP.pm
+lib/Catalyst/Engine/HTTP/Restarter.pm
+lib/Catalyst/Engine/HTTP/Restarter/Watcher.pm
 lib/Catalyst/Engine/Test.pm
 lib/Catalyst/Exception.pm
 lib/Catalyst/Helper.pm
@@ -30,12 +34,14 @@ lib/Catalyst/Manual/SuccessStories.pod
 lib/Catalyst/Manual/Troubleshooting.pod
 lib/Catalyst/Manual/Tutorial.pod
 lib/Catalyst/Manual/WritingPlugins.pod
+lib/Catalyst/Model.pm
 lib/Catalyst/Plugin/Static/Simple.pm
 lib/Catalyst/Request.pm
 lib/Catalyst/Request/Upload.pm
 lib/Catalyst/Response.pm
 lib/Catalyst/Test.pm
 lib/Catalyst/Utils.pm
+lib/Catalyst/View.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
