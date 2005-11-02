@@ -151,9 +151,7 @@ sub mk_component {
 
         # Helper
         if ($helper) {
-            my $comp = 'Model';
-            $comp = 'View'       if $type eq 'V';
-            $comp = 'Controller' if $type eq 'C';
+            my $comp  = $self->{long_type};
             my $class = "Catalyst::Helper::$comp\::$helper";
             eval "require $class";
 
