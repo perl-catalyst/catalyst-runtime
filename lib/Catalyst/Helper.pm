@@ -100,7 +100,7 @@ sub mk_component {
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'A clever guy';
     $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
-    unless ( $_[0] =~ /^(?:model|m|view|v|controller|c)$/i ) {
+    unless ( $_[0] =~ /^(?:model|view|controller)$/i ) {
         my $helper = shift;
         my @args   = @_;
         my $class  = "Catalyst::Helper::$helper";
@@ -121,12 +121,15 @@ sub mk_component {
         my $helper = shift;
         my @args   = @_;
         return 0 if $name =~ /[^\w\:]/;
-        $type = 'M' if $type =~ /model|m/i;
-        $type = 'V' if $type =~ /view|v/i;
-        $type = 'C' if $type =~ /controller|c/i;
-        $self->{type}  = $type;
-        $self->{name}  = $name;
-        $self->{class} = "$app\::$type\::$name";
+        $type              = lc $type;
+        $self->{long_type} = ucfirst $type;
+        $type              = 'M' if $type =~ /model/i;
+        $type              = 'V' if $type =~ /view/i;
+        $type              = 'C' if $type =~ /controller/i;
+        $type              = $self->{long_type} unless $self->{short};
+        $self->{type}      = $type;
+        $self->{name}      = $name;
+        $self->{class}     = "$app\::$type\::$name";
 
         # Class
         my $appdir = File::Spec->catdir( split /\:\:/, $app );
@@ -137,8 +140,8 @@ sub mk_component {
             my @path = split /\:\:/, $name;
             $file = pop @path;
             $path = File::Spec->catdir( $path, @path );
-            mkpath [$path];
         }
+        $self->mk_dir($path);
         $file = File::Spec->catfile( $path, "$file.pm" );
         $self->{file} = $file;
 
@@ -246,7 +249,9 @@ sub next_test {
     }
     my $dir  = $self->{test_dir};
     my $type = $self->{type};
-    return File::Spec->catfile( $dir, $type, $tname );
+    $dir = File::Spec->catdir( $dir, $type );
+    $self->mk_dir($dir);
+    return File::Spec->catfile( $dir, $tname );
 }
 
 =head3 render_file
@@ -284,18 +289,38 @@ sub _mk_dirs {
     $self->mk_dir( $self->{images} );
     $self->{t} = File::Spec->catdir( $self->{dir}, 't' );
     $self->mk_dir( $self->{t} );
-    $self->mk_dir( File::Spec->catdir( $self->{t}, 'M' ) );
-    $self->mk_dir( File::Spec->catdir( $self->{t}, 'V' ) );
-    $self->mk_dir( File::Spec->catdir( $self->{t}, 'C' ) );
+
+    if ( $self->{short} ) {
+        $self->mk_dir( File::Spec->catdir( $self->{t}, 'M' ) );
+        $self->mk_dir( File::Spec->catdir( $self->{t}, 'V' ) );
+        $self->mk_dir( File::Spec->catdir( $self->{t}, 'C' ) );
+    }
+    else {
+        $self->mk_dir( File::Spec->catdir( $self->{t}, 'Model' ) );
+        $self->mk_dir( File::Spec->catdir( $self->{t}, 'View' ) );
+        $self->mk_dir( File::Spec->catdir( $self->{t}, 'Controller' ) );
+    }
+
     $self->{class} = File::Spec->catdir( split( /\:\:/, $self->{name} ) );
     $self->{mod} = File::Spec->catdir( $self->{lib}, $self->{class} );
     $self->mk_dir( $self->{mod} );
-    $self->{m} = File::Spec->catdir( $self->{mod}, 'M' );
-    $self->mk_dir( $self->{m} );
-    $self->{v} = File::Spec->catdir( $self->{mod}, 'V' );
-    $self->mk_dir( $self->{v} );
-    $self->{c} = File::Spec->catdir( $self->{mod}, 'C' );
-    $self->mk_dir( $self->{c} );
+
+    if ( $self->{short} ) {
+        $self->{m} = File::Spec->catdir( $self->{mod}, 'M' );
+        $self->mk_dir( $self->{m} );
+        $self->{v} = File::Spec->catdir( $self->{mod}, 'V' );
+        $self->mk_dir( $self->{v} );
+        $self->{c} = File::Spec->catdir( $self->{mod}, 'C' );
+        $self->mk_dir( $self->{c} );
+    }
+    else {
+        $self->{m} = File::Spec->catdir( $self->{mod}, 'Model' );
+        $self->mk_dir( $self->{m} );
+        $self->{v} = File::Spec->catdir( $self->{mod}, 'View' );
+        $self->mk_dir( $self->{v} );
+        $self->{c} = File::Spec->catdir( $self->{mod}, 'Controller' );
+        $self->mk_dir( $self->{c} );
+    }
     $self->{base} = File::Spec->rel2abs( $self->{dir} );
 }
 
@@ -853,13 +878,19 @@ use Catalyst::Helper;
 
 my $help = 0;
 my $nonew = 0;
+my $short = 0;
 
-GetOptions( 'help|?' => \$help,
-	    'nonew'  => \$nonew );
+GetOptions(
+    'help|?' => \$help,
+    'nonew'  => \$nonew,
+    'short'  => \$short
+ );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new({'.newfiles' => !$nonew});
+my $helper =
+    Catalyst::Helper->new( { '.newfiles' => !$nonew, short => $short } );
+
 pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
 1;
@@ -873,8 +904,9 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 [% appprefix %]_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
-   -help    display this help and exits
-   -nonew   don't create a .new file where a file to be created exists
+   -help     display this help and exits
+   -nonew    don't create a .new file where a file to be created exists
+   -short    use short types, like C instead of Controller...
 
  Examples:
    [% appprefix %]_create.pl controller My::Controller
@@ -914,11 +946,11 @@ package [% class %];
 
 use strict;
 use warnings;
-use base 'Catalyst::Base';
+use base 'Catalyst::[% long_type %]';
 
 =head1 NAME
 
-[% class %] - Catalyst component
+[% class %] - Catalyst [% long_type %]
 
 =head1 SYNOPSIS
 
@@ -926,8 +958,8 @@ See L<[% app %]>
 
 =head1 DESCRIPTION
 
-Catalyst component.
-[% IF type == 'C' %]
+Catalyst [% long_type %].
+[% IF long_type == 'Controller' %]
 =head1 METHODS
 
 =over 4
@@ -960,7 +992,7 @@ it under the same terms as Perl itself.
 
 1;
 __comptest__
-[% IF type == 'C' %]
+[% IF long_type == 'Controller' %]
 use Test::More tests => 3;
 use_ok( Catalyst::Test, '[% app %]' );
 use_ok('[% class %]');

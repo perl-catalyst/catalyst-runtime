@@ -7,15 +7,18 @@ use Catalyst::Helper;
 
 my $help  = 0;
 my $nonew = 0;
+my $short = 0;
 
 GetOptions(
     'help|?' => \$help,
-    'nonew'  => \$nonew
+    'nonew'  => \$nonew,
+    'short'  => \$short
 );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new( { '.newfiles' => !$nonew } );
+my $helper =
+  Catalyst::Helper->new( { '.newfiles' => !$nonew, 'short' => $short } );
 pod2usage(1) unless $helper->mk_app( $ARGV[0] );
 
 1;
@@ -30,8 +33,9 @@ catalyst - Bootstrap a Catalyst application
 catalyst.pl [options] application-name
 
  Options:
-   -help        display this help and exits
-   -nonew       don't create a .new file where a file to be created exists
+   -help     display this help and exits
+   -nonew    don't create a .new file where a file to be created exists
+   -short    use short types, like C instead of Controller...
 
  application-name must be a valid Perl module name and can include "::"
 

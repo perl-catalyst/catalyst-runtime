@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Changed helpers to default to long types, Controller instead of C
         - Added Catalyst::Controller, Catalyst::Model and Catalyst::View
           base classes
         - Added JavaScript to debug screen to show and hide specific dumps
