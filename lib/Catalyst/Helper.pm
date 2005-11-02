@@ -734,7 +734,6 @@ use Getopt::Long;
 use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use [% name %];
 
 my $fork          = 0;
 my $help          = 0;
@@ -757,6 +756,12 @@ GetOptions(
 );
 
 pod2usage(1) if $help;
+
+if ( $restart ) {
+    $ENV{CATALYST_ENGINE} = 'HTTP::Restarter';
+}
+
+require [% name %];
 
 [% name %]->run( $port, $host, {
     argv   => \@argv,
