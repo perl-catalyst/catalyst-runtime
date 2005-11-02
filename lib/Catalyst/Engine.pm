@@ -120,9 +120,7 @@ sub finalize_error {
 
         my @infos;
         my $i = 0;
-        warn "BAAR";
         for my $dump ( $c->dump_these ) {
-            warn "FOOO";
             my $name  = $dump->[0];
             my $value = encode_entities( Dumper $dump->[1] );
             push @infos, sprintf <<"EOF", $name, $value;
