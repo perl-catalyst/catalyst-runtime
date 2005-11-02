@@ -62,26 +62,30 @@ sub mk_app {
     $self->{name} = $name;
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
+    $self->{script}    = File::Spec->catdir( $self->{dir}, 'script' );
     $self->{appprefix} = Catalyst::Utils::appprefix($name);
     $self->{startperl} = $Config{startperl};
     $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN || 4;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'Catalyst developer';
-    $self->_mk_dirs;
-    $self->_mk_appclass;
-    $self->_mk_build;
-    $self->_mk_makefile;
-    $self->_mk_readme;
-    $self->_mk_changes;
-    $self->_mk_apptest;
+
+    unless ( $self->{scripts} ) {
+        $self->_mk_dirs;
+        $self->_mk_appclass;
+        $self->_mk_build;
+        $self->_mk_makefile;
+        $self->_mk_readme;
+        $self->_mk_changes;
+        $self->_mk_apptest;
+        $self->_mk_images;
+        $self->_mk_favicon;
+    }
     $self->_mk_cgi;
     $self->_mk_fastcgi;
     $self->_mk_server;
     $self->_mk_test;
     $self->_mk_create;
-    $self->_mk_images;
-    $self->_mk_favicon;
     return 1;
 }
 
@@ -210,12 +214,14 @@ sub mk_file {
     my ( $self, $file, $content ) = @_;
     if ( -e $file ) {
         print qq/ exists "$file"\n/;
-        return 0 unless $self->{'.newfiles'};
-        if ( my $f = IO::File->new("< $file") ) {
-            my $oldcontent = join( '', (<$f>) );
-            return 0 if $content eq $oldcontent;
+        return 0 unless ( $self->{'.newfiles'} || $self->{scripts} );
+        if ( $self->{'.newfiles'} ) {
+            if ( my $f = IO::File->new("< $file") ) {
+                my $oldcontent = join( '', (<$f>) );
+                return 0 if $content eq $oldcontent;
+            }
+            $file .= '.new';
         }
-        $file .= '.new';
     }
     if ( my $f = IO::File->new("> $file") ) {
         binmode $f;
@@ -275,7 +281,6 @@ sub render_file {
 sub _mk_dirs {
     my $self = shift;
     $self->mk_dir( $self->{dir} );
-    $self->{script} = File::Spec->catdir( $self->{dir}, 'script' );
     $self->mk_dir( $self->{script} );
     $self->{lib} = File::Spec->catdir( $self->{dir}, 'lib' );
     $self->mk_dir( $self->{lib} );
