@@ -576,20 +576,24 @@ sub welcome_message {
     my $name   = $c->config->{name};
     my $logo   = $c->uri_for('/static/images/catalyst_logo.png');
     my $prefix = Catalyst::Utils::appprefix( ref $c );
+    $c->response->content_type('text/html; charset=utf-8');
     return <<"EOF";
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
+	<meta http-equiv="Content-Language" content="en" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>$name on Catalyst $VERSION</title>
         <style type="text/css">
             body {
-                text-align: center;
-                padding-left: 50%;
                 color: #000;
                 background-color: #eee;
             }
             div#content {
                 width: 640px;
-                margin-left: -320px;
+                margin-left: auto;
+                margin-right: auto;
                 margin-top: 10px;
                 margin-bottom: 10px;
                 text-align: left;
@@ -655,7 +659,7 @@ sub welcome_message {
              </div>
              <div id="answers">
                  <p>
-                 <img src="$logo"/>
+                 <img src="$logo" alt="Catalyst Logo" />
                  </p>
                  <p>Welcome to the wonderful world of Catalyst.
                     This <a href="http://en.wikipedia.org/wiki/MVC">MVC</a>
@@ -670,13 +674,13 @@ sub welcome_message {
 perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a></code></pre>
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
-                    helper scripts to generate <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AController%3A%3A&mode=all">controllers</a>,
-                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&mode=all">models</a> and
-                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&mode=all">views</a>,
+                    helper scripts to generate <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AController%3A%3A&amp;mode=all">controllers</a>,
+                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&amp;mode=all">models</a> and
+                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&amp;mode=all">views</a>,
                     they can save you a lot of work.</p>
                     <pre><code>script/${prefix}_create.pl -help</code></pre>
                     <p>Also, be sure to check out the vast and growing
-                    collection of <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3APlugin%3A%3A&mode=all">plugins for Catalyst on CPAN</a>,
+                    collection of <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3APlugin%3A%3A&amp;mode=all">plugins for Catalyst on CPAN</a>,
                     you are likely to find what you need there.
                     </p>
 
