@@ -7,9 +7,10 @@ Catalyst::Manual::Plugins - Catalyst Plugins (and Components)
 This section lists the some of the plugins and components that are
 available to extend the runtime functionality of Catalyst. The plugins
 are not distributed with Catalyst but should be available from CPAN.
-They typically require additional modules from CPAN. We will try to
-keep this document up to date, but please check CPAN directly for
-the latest and greatest.
+They typically require additional modules from CPAN.  
+
+This list is almost certainly outdated by the time you read this, so be sure
+to check the Catalyst::Plugin namespace for additional plugins.
 
 =head1 PLUGINS
 
@@ -23,17 +24,18 @@ authentication plugin.  Note that it requires a session plugin.
 L<Catalyst::Plugin::Authentication::LDAP> is a plugin allowing you 
 to authenticate your web users using an LDAP server. 
 
-=head2 Catalyst::Plugin::Email
-
-L<Catalyst::Plugin::Email> sends email with Catalyst and L<Email::Send>
-and L<Email::MIME::Creator>.
-
 =head2 Catalyst::Plugin::Browser
 
 L<Catalyst::Plugin::Browser> extends L<Catalyst::Request> by adding the
 capability of browser detection. It returns an instance of
 L<HTTP::BrowserDetect>, which lets you get information from the client's
 user agent.
+
+=head2 Catalyst::Plugin::Cache::FastMmap, FileCache, and Memcached
+
+L<Catalyst::Plugin::Cache::FastMmap>, L<Catalyst::Plugin::Cache::FileCache>,
+and L<Catalyst::Plugin::Cache::Memcached> all provide a cache method enabling
+easy access to a shared cache.
 
 =head2 Catalyst::Plugin::Compress::Zlib
 
@@ -44,6 +46,16 @@ Catalyst.
 
 L<Catalyst::Plugin::Compress::Bzip2> compresses a response using
 bzip compression.
+
+=head2 Catalyst::Plugin::DefaultEnd
+
+L<Catalyst::Plugin::DefaultEnd> creates a sane, standard end method for your
+application.
+
+=head2 Catalyst::Plugin::Email
+
+L<Catalyst::Plugin::Email> sends email with Catalyst and L<Email::Send>
+and L<Email::MIME::Creator>.
 
 =head2 Catalyst::Plugin::FillInForm
 
@@ -78,13 +90,18 @@ application's I18N namespace.
 L<Catalyst::Plugin::Observe> provides the ability to register AOP-like
 callbacks to specific Engine events. Subclasses L<Class::Publisher>.
 
+=head2 Catalyst::Plugin::OrderedParams
+
+L<Catalyst::Plugin::OrderedParams> adjusts the way that parameters operate,
+causing them to appear in the same order they were submitted by the browser.
+This can be useful for creating things such as email forms.
+
 =head2 Catalyst::Plugin::PageCache
 
 L<Catalyst::Plugin::PageCache> helps improve the performance of slow or
 frequently accessed pages by caching the entire output of your page.
 Subsequent requests to the page will receive the page very quickly from
-cache. Note: At the moment it should be regarded as I<highly
-experimental>.
+cache.
 
 =head2 Catalyst::Plugin::Pluggable
 
@@ -104,14 +121,30 @@ to access certain pages using only SSL mode. An attempt to access the
 page in non-SSL mode will receive a redirect into SSL mode. Useful for
 shopping carts, user registration forms, and other sensitive data.
 
+=head2 Catalyst::Plugin::Session
+
+The L<Catalyst::Plugin::Session> series of modules provide an easy way to
+include session handling in an application.  You can choose from several
+different backend storage methods and combine that with your choice of
+client-side storage methods.
+
 =head2 Catalyst::Plugin::Session::FastMmap
 
 L<Catalyst::Plugin::Session::FastMmap> is a session plugin for Catalyst
 based on C<Cache::FastMMap>, which uses an mmap'ed file to act as a
-shared memory interprocess cache.
+shared memory interprocess cache.  This is an older session plugin; you may
+wish to look at L<Catalyst::Plugin::Session> instead.
 
-=head2 Catalyst::Plugin::Session
+=head2 Catalyst::Plugin::SRU
 
+L<Catalyst::Plugin::SRU> allows your controller class to dispatch SRU
+actions (C<explain>, C<scan>, and C<searchRetrieve>) from its own class.
+
+=head2 Catalyst::Plugin::Static::Simple
+
+L<Catalyst::Plugin::Static::Simple> serves static files in your application
+without requiring a single line of code.  This plugin is now included in the
+core Catalyst distribution.
 
 =head2 Catalyst::Plugin::Static
 
@@ -119,11 +152,15 @@ L<Catalyst::Plugin::Static> is a plugin to serve static files from
 C<$c-E<gt>config-E<gt>{root}>. Intended chiefly for development
 purposes.
 
-
 =head2 Catalyst::Plugin::SubRequest
 
 L<Catalyst::Plugin::SubRequest> is a plugin to allow subrequests to
 actions to be made within Catalyst.  Nice for portal software and such.
+
+=head2 Catalyst::Plugin::SuperForm
+
+L<Catalyst::Plugin::SuperForm> is an interface to the L<HTML::SuperForm>
+module, enabling easy HTML form creation.
 
 =head2 Catalyst::Plugin::Textile
 
@@ -143,7 +180,6 @@ logical characters. On response, it encodes the body into UTF-8 octets.
 L<Catalyst::Plugin::XMLRPC> plugin allows your Controller class to
 dispatch XMLRPC methods from its own class.
 
-
 =head1 COMPONENT MODULES
 
 =head2 Catalyst::Model::CDBI
@@ -162,20 +198,28 @@ classes, either by doing so within the Catalyst model classes
 themselves, or by inheriting from existing C<Class::DBI>
 classes.
 
-=head2 Catalyst::Model::CDBI::CRUD
+=head2 Catalyst::Model::DBIC
 
-L<Catalyst::Model::CDBI::CRUD> is a subclass of 
-C<Catalyst::Model::CDBI> with additional CRUD (create, retrieve, 
-update, delete) methods.
+L<Catalyst::Model::DBIC> is a L<DBIx::Class> model class built on top of
+L<DBIx::Class::Loader>.
 
 =head2 Catalyst::Model::Plucene
-L<Catalyst::Model::Plucene> is the model class for the Plucene
-search engine.
+
+L<Catalyst::Model::Plucene> is a model class for the Plucene search engine.
+
+=head2 Catalyst::Model::Xapian
+
+L<Catalyst::Model::Xapian> is a model class for the Xapian search engine.
 
 =head2 Catalyst::View::HTML::Template
 
 L<Catalyst::View::HTML::Template> is a View component for
 displaying your stash with L<HTML::Template>.
+
+=head2 Catalyst::View::Mason
+
+L<Catalyst::View::Mason> is a View component for displaying your stash
+with L<HTML::Mason>.
 
 =head2 Catalyst::View::PSP
 
@@ -184,24 +228,21 @@ stash using PSP, a Perl extension implementing a JSP-like
 templating system; see L<Text::PSP>.
 
 =head2 Catalyst::View::Petal
+
 L<Catalyst::View::Petal> is a View component for displaying 
 your stash using Petal, the Perl Template Attribute Language,
 an XML-based templating system; see L<Petal>.
 
-=head2 Catalyst::View::Mason
-
-L<Catalyst::View::Mason> is a View component for displaying your stash
-with L<HTML::Mason>.
-
 =head2 Catalyst::View::TT
 
-L<Catalyst::View::TT> is a Template Toolkit view. See
-L<Template::Manual>.
+L<Catalyst::View::TT> is a Template Toolkit view. See L<Template::Manual>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
+
 Marcus Ramberg E<lt>mramberg@cpan.orgE<gt>
+
 Jesse Sheidlower E<lt>jester@panix.comE<gt>
 
 =head1 COPYRIGHT
