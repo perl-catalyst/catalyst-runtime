@@ -535,7 +535,7 @@ sub default : Private {
 #    my ( $self, $c ) = @_;
 #
 #    # Forward to View unless response body is already defined
-#    $c->forward('MyApp::V::') unless $c->response->body;
+#    $c->forward('View::') unless $c->response->body;
 #}
 
 =back
@@ -590,7 +590,7 @@ my $build = Catalyst::Build->new(
     create_makefile_pl => 'passthrough',
     license            => 'perl',
     module_name        => '[% name %]',
-    requires           => { Catalyst => '5.10' },
+    requires           => { Catalyst => '5.49' },
     create_makefile_pl => 'passthrough',
     script_files       => [ glob('script/*') ],
     test_files         => [ glob('t/*.t'), glob('t/*/*.t') ]
