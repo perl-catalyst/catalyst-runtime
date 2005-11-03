@@ -226,7 +226,7 @@ sub run {
     if ($GOT_HUP) {
         $SIG{CHLD} = 'DEFAULT';
         wait;
-        exec {$0}( ( ( -x $0 ) ? () : ($^X) ), $0, @{ $options->{argv} } );
+        exec $^X . ' "' . $0 . '" ' . join(' ', @{$options->{argv}});
     }
 }
 
