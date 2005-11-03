@@ -282,7 +282,7 @@ is a method for accessing parameters in $c->req->parameters.
     @values = $c->request->param( 'foo' );
     @params = $c->request->param;
 
-Like C<CGI>, and B<unlike> previous versions of Catalyst, passing multiple
+Like L<CGI>, and B<unlike> previous versions of Catalyst, passing multiple
 arguments to this method, like this:
 
 	$c->request( 'foo', 'bar', 'gorch', 'quxx' );
