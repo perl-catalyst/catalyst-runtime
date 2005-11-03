@@ -491,16 +491,24 @@ package [% name %];
 use strict;
 use warnings;
 
-# -Debug activates the debug mode for very useful log messages
-# Static::Simple will serve static files from the root directory
+#
+# Set flags and add plugins for the application
+#
+#        -Debug : activates the debug mode for very useful log messages
+# Static::Simple: will serve static files from the applications root directory
+#
 use Catalyst qw/-Debug Static::Simple/;
 
 our $VERSION = '0.01';
 
+#
 # Configure the application
+#
 __PACKAGE__->config( name => '[% name %]' );
 
+#
 # Start the application
+#
 __PACKAGE__->setup;
 
 =head1 NAME
@@ -523,7 +531,9 @@ Catalyst based application.
 
 =cut
 
+#
 # Output a friendly welcome message
+#
 sub default : Private {
     my ( $self, $c ) = @_;
 
@@ -531,7 +541,9 @@ sub default : Private {
     $c->response->body( $c->welcome_message );
 }
 
-# Uncomment and modify this end action after adding a View class
+#
+# Uncomment and modify this end action after adding a View component
+#
 #=item end
 #
 #=cut
