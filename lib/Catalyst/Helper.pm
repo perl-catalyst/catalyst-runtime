@@ -984,7 +984,9 @@ Catalyst [% long_type %].
 
 =over 4
 
-# Uncomment, modify and add new actions to fit your needs
+#
+# Uncomment and modify this or add new actions to fit your needs
+#
 #=item default
 #
 #=cut
