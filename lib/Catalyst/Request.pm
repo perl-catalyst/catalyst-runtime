@@ -159,7 +159,7 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->body_parameters->{field};
     print $c->request->body_parameters->{field}->[0];
 
-These are the paramaters from the POST part of the request, if any.
+These are the parameters from the POST part of the request, if any.
     
 =item $req->body_params
 
