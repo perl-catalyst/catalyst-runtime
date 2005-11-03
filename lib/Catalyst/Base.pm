@@ -12,9 +12,6 @@ __PACKAGE__->mk_classdata($_) for qw/_dispatch_steps/;
 
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
 
-# Fix for stupid components
-*new = \&Catalyst::Component::new;
-
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
 
