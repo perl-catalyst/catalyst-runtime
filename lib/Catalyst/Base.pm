@@ -24,7 +24,7 @@ sub _DISPATCH : Private {
 
 sub _BEGIN : Private {
     my ( $self, $c ) = @_;
-    my $begin = ($c->get_actions( 'begin', $c->namespace))[-1];
+    my $begin = ( $c->get_actions( 'begin', $c->namespace ) )[-1];
     return 1 unless $begin;
     $begin->execute($c);
     return !@{ $c->error };
@@ -32,7 +32,7 @@ sub _BEGIN : Private {
 
 sub _AUTO : Private {
     my ( $self, $c ) = @_;
-    my @auto = $c->get_actions('auto', $c->namespace);
+    my @auto = $c->get_actions( 'auto', $c->namespace );
     foreach my $auto (@auto) {
         $auto->execute($c);
         return 0 unless $c->state;
@@ -48,7 +48,7 @@ sub _ACTION : Private {
 
 sub _END : Private {
     my ( $self, $c ) = @_;
-    my $end = ($c->get_actions( 'end', $c->namespace))[-1];
+    my $end = ( $c->get_actions( 'end', $c->namespace ) )[-1];
     return 1 unless $end;
     $end->execute($c);
     return !@{ $c->error };
@@ -56,25 +56,37 @@ sub _END : Private {
 
 sub action_namespace {
     my ( $self, $c ) = @_;
-    return
-        Catalyst::Utils::class2prefix(
-            ref $self, $c->config->{case_sensitive} ) || '';
+    return Catalyst::Utils::class2prefix( ref $self,
+        $c->config->{case_sensitive} )
+      || '';
 }
 
 sub register_actions {
     my ( $self, $c ) = @_;
     my $class = ref $self || $self;
-    my $namespace = $self->action_namespace( $c );
+    my $namespace = $self->action_namespace($c);
     my %methods;
-    $methods{$self->can($_)} = $_ for @{Class::Inspector->methods($class)||[]};
-    foreach my $cache (@{$self->_action_cache}) {
-        my $code = $cache->[0];
+    $methods{ $self->can($_) } = $_
+      for @{ Class::Inspector->methods($class) || [] };
+
+    # Advanced inheritance support for plugins and the like
+    my @action_cache;
+    {
+        no strict 'refs';
+        for my $isa ( @{"$class\::ISA"}, $class ) {
+            push @action_cache, @{ $isa->_action_cache }
+              if $isa->can('_action_cache');
+        }
+    }
+
+    foreach my $cache (@action_cache) {
+        my $code   = $cache->[0];
         my $method = $methods{$code};
         next unless $method;
-        my $attrs = $self->_parse_attrs(@{$cache->[1]});
-        if ($attrs->{Private} && ( keys %$attrs > 1 ) ) {
+        my $attrs = $self->_parse_attrs( @{ $cache->[1] } );
+        if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
             $c->log->debug( 'Bad action definition "'
-                  . join( ' ', @{$cache->[1]} )
+                  . join( ' ', @{ $cache->[1] } )
                   . qq/" for "$class->$method"/ )
               if $c->debug;
             next;
@@ -90,7 +102,7 @@ sub register_actions {
                 attributes => $attrs,
             }
         );
-        $c->dispatcher->register($c, $action);
+        $c->dispatcher->register( $c, $action );
     }
 }
 
@@ -111,7 +123,6 @@ sub _parse_attrs {
     }
     return \%attributes;
 }
-
 
 =head1 NAME
 
