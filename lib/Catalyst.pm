@@ -1563,12 +1563,7 @@ sub setup_log {
         $class->log( Catalyst::Log->new );
     }
 
-    
-    if ( $ENV{CATALYST_DEBUG} || 
-         $ENV{ Catalyst::Utils->class2env($class) . '_DEBUG' } || 
-         $debug  &&
-         $ENV{CATALYST_DEBUG} != 0 && 
-         $ENV{ Catalyst::Utils->class2env($class).'_DEBUG' } != 0 ) {
+    if ( $ENV{CATALYST_DEBUG} || $ENV{ uc($class) . '_DEBUG' } || $debug ) {
         no strict 'refs';
         *{"$class\::debug"} = sub { 1 };
         $class->log->debug('Debug messages enabled');
