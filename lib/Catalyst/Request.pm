@@ -101,9 +101,23 @@ Returns a reference to an array containing the arguments.
 
     print $c->request->arguments->[0];
 
+For example, if your action was
+
+	package MyApp::C::Foo;
+	
+	sub moose : Local {
+		...
+	}
+
+And the URI for the request was C<http://.../foo/moose/bah> the string C<bah>
+would be the first and only argument.
+
 =item $req->base
 
-Contains the url base. This will always have a trailing slash.
+Contains the URI base. This will always have a trailing slash.
+
+If your application was queried with the URI C<http://localhost:3000/some/path>
+then C<base> is C<http://localhost:3000/>.
 
 =cut
 
@@ -144,6 +158,8 @@ be either a scalar or an arrayref containing scalars.
 
     print $c->request->body_parameters->{field};
     print $c->request->body_parameters->{field}->[0];
+
+These are the paramaters from the POST part of the request, if any.
     
 =item $req->body_params
 
@@ -203,6 +219,9 @@ sub cookie {
 Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
+
+The cookies in the hash are indexed by name, and the values are C<CGI::Cookie>
+objects.
 
 =item $req->header
 
@@ -323,6 +342,8 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->parameters->{field};
     print $c->request->parameters->{field}->[0];
 
+This is the combination of C<query_parameters> and C<body_parameters>.
+
 =cut
 
 sub parameters {
@@ -375,6 +396,9 @@ be either a scalar or an arrayref containing scalars.
 
     print $c->request->query_parameters->{field};
     print $c->request->query_parameters->{field}->[0];
+
+These are the parameters from the query string portion of the request's URI, if
+any.
     
 =item $req->read( [$maxlength] )
 
