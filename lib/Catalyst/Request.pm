@@ -6,7 +6,7 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments base cookies headers match method
+    qw/action address arguments cookies headers match method
       protocol query_parameters secure snippets uri user/
 );
 
@@ -104,6 +104,23 @@ Returns a reference to an array containing the arguments.
 =item $req->base
 
 Contains the url base. This will always have a trailing slash.
+
+=cut
+
+sub base {
+    my ( $self, $base ) = @_;
+    
+    return $self->{base} unless $base;
+    
+    $self->{base} = $base;
+    
+    # set the value in path for backwards-compat
+    if ( $self->uri ) {
+        $self->path;
+    }
+    
+    return $self->{base};
+}
 
 =item $req->body
 
@@ -333,12 +350,16 @@ sub path {
     if ($params) {
         $self->uri->path($params);
     }
+    else {
+        return $self->{path} if $self->{path};
+    }
 
     my $path     = $self->uri->path;
     my $location = $self->base->path;
     $path =~ s/^(\Q$location\E)?//;
     $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~ s/^\///;
+    $self->{path} = $path;
 
     return $path;
 }
