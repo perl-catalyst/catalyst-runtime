@@ -1,6 +1,6 @@
 ---
 name: Catalyst
-version: 5.49_01
+version: 5.49_02
 author:
   - 'Sebastian Riedel, C<sri@oook.de>'
 abstract: The Elegant MVC Web Application Framework
@@ -15,6 +15,7 @@ requires:
   HTTP::Request: 0
   HTTP::Response: 0
   LWP::UserAgent: 0
+  MIME::Types: 0
   Module::Pluggable::Fast: 0.16
   NEXT: 0
   Path::Class: 0.09
@@ -26,20 +27,31 @@ requires:
   Tree::Simple::Visitor::FindByPath: 0
   UNIVERSAL::require: 0
   URI: 1.35
-  URI::Query: 0
   perl: 5.8.1
 recommends:
   Catalyst::Engine::Apache: 0
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.49_01
+    version: 5.49_02
   Catalyst::Action:
     file: lib/Catalyst/Action.pm
+  Catalyst::ActionContainer:
+    file: lib/Catalyst/ActionContainer.pm
   Catalyst::Base:
     file: lib/Catalyst/Base.pm
   Catalyst::Build:
     file: lib/Catalyst/Build.pm
+  Catalyst::DispatchType:
+    file: lib/Catalyst/DispatchType.pm
+  Catalyst::DispatchType::Default:
+    file: lib/Catalyst/DispatchType/Default.pm
+  Catalyst::DispatchType::Index:
+    file: lib/Catalyst/DispatchType/Index.pm
+  Catalyst::DispatchType::Path:
+    file: lib/Catalyst/DispatchType/Path.pm
+  Catalyst::DispatchType::Regex:
+    file: lib/Catalyst/DispatchType/Regex.pm
   Catalyst::Dispatcher:
     file: lib/Catalyst/Dispatcher.pm
   Catalyst::Engine:
@@ -61,6 +73,9 @@ provides:
     version: 0.01
   Catalyst::Log:
     file: lib/Catalyst/Log.pm
+  Catalyst::Plugin::Static::Simple:
+    file: lib/Catalyst/Plugin/Static/Simple.pm
+    version: 0.11
   Catalyst::Request:
     file: lib/Catalyst/Request.pm
   Catalyst::Request::Upload:
@@ -71,4 +86,4 @@ provides:
     file: lib/Catalyst/Test.pm
   Catalyst::Utils:
     file: lib/Catalyst/Utils.pm
-generated_by: Module::Build version 0.2611
+generated_by: Module::Build version 0.2607

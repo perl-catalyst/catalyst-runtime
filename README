@@ -52,7 +52,7 @@ DESCRIPTION
 
         use Catalyst 'My::Module';
 
-    Special flags like -Debug and -Engine can also be specifed as arguments
+    Special flags like -Debug and -Engine can also be specified as arguments
     when Catalyst is loaded:
 
         use Catalyst qw/-Debug My::Module/;
@@ -88,6 +88,9 @@ DESCRIPTION
         Specify log level.
 
 METHODS
+    $c->action
+        Accessor for the current action
+
     $c->comp($name)
     $c->component($name)
         Get a component object by name.
@@ -118,15 +121,27 @@ METHODS
             $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
             $c->forward('MyApp::View::TT');
 
+    $c->namespace
+        Accessor to the namespace of the current action
+
+    $c->path_to(@path)
+        Merges @path with $c->config->{home} and returns a Path::Class
+        object.
+
+        For example:
+
+            $c->path_to( 'db', 'sqlite.db' );
+
     $c->setup
         Setup.
 
             $c->setup;
 
-    $c->uri_for($path)
+    $c->uri_for($path,[@args])
         Merges path with $c->request->base for absolute uri's and with
         $c->request->match for relative uri's, then returns a normalized URI
-        object.
+        object. If any args are passed, they are added at the end of the
+        path.
 
     $c->error
     $c->error($error, ...)
@@ -138,6 +153,10 @@ METHODS
         Add a new error.
 
             $c->error('Something bad happened');
+
+        Clean errors.
+
+            $c->error(0);
 
     $c->engine
         Contains the engine instance. Stringifies to the class.
@@ -178,8 +197,20 @@ METHODS
     $c->stash
         Returns a hashref containing all your data.
 
-            $c->stash->{foo} ||= 'yada';
             print $c->stash->{foo};
+
+        Keys may be set in the stash by assigning to the hash reference, or
+        by passing either a single hash reference or a list of key/value
+        pairs as arguments.
+
+        For example:
+
+            $c->stash->{foo} ||= 'yada';
+            $c->stash( { moose => 'majestic', qux => 0 } );
+            $c->stash( bar => 1, gorch => 2 );
+
+    $c->welcome_message
+        Returns the Catalyst welcome HTML page.
 
 INTERNAL METHODS
     $c->benchmark($coderef)
@@ -245,6 +276,9 @@ INTERNAL METHODS
     $c->prepare_body
         Prepare message body.
 
+    $c->prepare_body_chunk( $chunk )
+        Prepare a chunk of data before sending it to HTTP::Body.
+
     $c->prepare_body_parameters
         Prepare body parameters.
 
@@ -307,6 +341,10 @@ INTERNAL METHODS
         Writes $data to the output stream. When using this method directly,
         you will need to manually set the Content-Length header to the
         length of your output data, if known.
+
+    version
+        Returns the Catalyst version number. mostly useful for powered by
+        messages in template systems.
 
 CASE SENSITIVITY
     By default Catalyst is not case sensitive, so "MyApp::C::FOO::Bar"
@@ -393,6 +431,10 @@ CREDITS
 
     Andy Wardley
 
+    Andreas Marienborg
+
+    Andrew Bramble
+
     Andrew Ford
 
     Andrew Ruthven
@@ -437,10 +479,12 @@ CREDITS
 
     Ulf Edvinsson
 
+    Yuval Kogman
+
 AUTHOR
     Sebastian Riedel, "sri@oook.de"
 
 LICENSE
-    This library is free software . You can redistribute it and/or modify it
-    under the same terms as perl itself.
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

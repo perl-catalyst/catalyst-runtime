@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 19*$iters;
+use Test::More tests => 20*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -26,7 +26,15 @@ else {
 sub run_tests {
     # test root index
     {
+        my @expected = qw[
+          TestApp->index
+          TestApp->end
+        ];
+    
+        my $expected = join( ", ", @expected );
         ok( my $response = request('http://localhost/'), 'root index' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
         is( $response->content, 'root index', 'root index ok' );
         
         ok( $response = request('http://localhost'), 'root index no slash' );
@@ -37,6 +45,7 @@ sub run_tests {
     {
         my @expected = qw[
           TestApp::Controller::Index->index
+          TestApp->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -57,6 +66,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Index->begin
           TestApp::Controller::Action::Index->index
+          TestApp->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -77,6 +87,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Index->begin
           TestApp::Controller::Action::Index->default
+	  TestApp->end
         ];
     
         my $expected = join( ", ", @expected );

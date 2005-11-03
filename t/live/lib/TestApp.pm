@@ -20,6 +20,7 @@ sub global_action : Private {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+
 sub execute {
     my $c      = shift;
     my $class  = ref( $c->component( $_[0] ) ) || $_[0];
@@ -33,6 +34,10 @@ sub execute {
     elsif ( $action =~ /\/(\w+)$/ ) {
         $method = $1;
     }
+    elsif ( $action =~ /^(\w+)$/ ) {
+        $method = $action;
+    }
+
 
     if ( $class && $method && $method !~ /^_/ ) {
         my $executed = sprintf( "%s->%s", $class, $method );

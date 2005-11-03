@@ -2,7 +2,7 @@ package Catalyst::Plugin::Test::Plugin;
 
 use strict;
 
-use base 'Class::Data::Inheritable';
+use base qw/Catalyst::Base Class::Data::Inheritable/;
 
  __PACKAGE__->mk_classdata('ran_setup');
 
@@ -20,6 +20,10 @@ sub  prepare {
 
     return $c;
 
+}
+
+sub end : Private {
+    my ($self,$c) = @_;
 }
 
 1;
