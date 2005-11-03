@@ -62,9 +62,32 @@ Shortcut to $res->headers->content_type
 
 =item $res->cookies
 
-Returns a reference to a hash containing the cookies to be set.
+Returns a reference to a hash containing the cookies to be set. The keys of the
+hash are the cookies' names, and their corresponding values are hash references
+used to construct L<CGI::Cookie> object.
 
     $c->response->cookies->{foo} = { value => '123' };
+
+The values correspond to the L<CGI::Cookie> parameters of the same name, except
+they are used without a leading dash.
+
+The proxied parameters are
+
+=over 4
+
+=item value
+
+=item expires
+
+=item domain
+
+=item path
+
+=item secure
+
+=item 
+
+=back
 
 =item $res->header
 
