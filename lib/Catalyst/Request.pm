@@ -278,9 +278,18 @@ Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 Get request parameters with a CGI.pm-compatible param method. This 
 is a method for accessing parameters in $c->req->parameters.
 
-    $value  = $c->request->param('foo');
-    @values = $c->request->param('foo');
+    $value  = $c->request->param( 'foo' );
+    @values = $c->request->param( 'foo' );
     @params = $c->request->param;
+
+Like C<CGI>, and B<unlike> previous versions of Catalyst, passing multiple
+arguments to this method, like this:
+
+	$c->request( 'foo', 'bar', 'gorch', 'quxx' );
+
+will set the parameter C<foo> to the multiple values C<bar>, C<gorch> and
+C<quxx>. Previously this would have added C<bar> as another value to C<foo>
+(creating it if it didn't exist before), and C<quxx> as another value for C<gorch>.
 
 =cut
 
@@ -310,23 +319,9 @@ sub param {
               : $self->parameters->{$param};
         }
     }
-
-    if ( @_ > 1 ) {
-
-        while ( my ( $field, $value ) = splice( @_, 0, 2 ) ) {
-
-            next unless defined $field;
-
-            if ( exists $self->parameters->{$field} ) {
-                for ( $self->parameters->{$field} ) {
-                    $_ = [$_] unless ref($_) eq "ARRAY";
-                    push( @$_, $value );
-                }
-            }
-            else {
-                $self->parameters->{$field} = $value;
-            }
-        }
+    elsif ( @_ > 1 ) {
+        my $field = shift;
+        $self->parameters->{$field} = [@_];
     }
 }
 
