@@ -150,7 +150,6 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
     }
 
     local $c->request->{arguments} = [ @{$arguments} ];
-    local $c->{namespace} = $result->namespace;
 
     $result->execute($c);
 
