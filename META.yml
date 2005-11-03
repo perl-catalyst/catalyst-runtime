@@ -1,6 +1,6 @@
 ---
 name: Catalyst
-version: 5.49_02
+version: 5.49_03
 author:
   - 'Sebastian Riedel, C<sri@oook.de>'
 abstract: The Elegant MVC Web Application Framework
@@ -9,8 +9,10 @@ requires:
   CGI::Cookie: 0
   Class::Accessor::Fast: 0
   Class::Data::Inheritable: 0
+  Class::Inspector: 0
+  File::Modified: 0
   HTML::Entities: 0
-  HTTP::Body: 0
+  HTTP::Body: 0.03
   HTTP::Headers: 1.59
   HTTP::Request: 0
   HTTP::Response: 0
@@ -23,25 +25,34 @@ requires:
   Template: 0
   Test::MockObject: 0
   Text::ASCIITable: 0.17
+  Time::HiRes: 0
   Tree::Simple: 0
   Tree::Simple::Visitor::FindByPath: 0
-  UNIVERSAL::require: 0
+  UNIVERSAL::require: 0.10
   URI: 1.35
   perl: 5.8.1
 recommends:
   Catalyst::Engine::Apache: 0
+  FCGI: 0
+  FCGI::ProcManager: 0
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.49_02
+    version: 5.49_03
   Catalyst::Action:
     file: lib/Catalyst/Action.pm
   Catalyst::ActionContainer:
     file: lib/Catalyst/ActionContainer.pm
+  Catalyst::AttrContainer:
+    file: lib/Catalyst/AttrContainer.pm
   Catalyst::Base:
     file: lib/Catalyst/Base.pm
   Catalyst::Build:
     file: lib/Catalyst/Build.pm
+  Catalyst::Component:
+    file: lib/Catalyst/Component.pm
+  Catalyst::Controller:
+    file: lib/Catalyst/Controller.pm
   Catalyst::DispatchType:
     file: lib/Catalyst/DispatchType.pm
   Catalyst::DispatchType::Default:
@@ -62,6 +73,10 @@ provides:
     file: lib/Catalyst/Engine/FastCGI.pm
   Catalyst::Engine::HTTP:
     file: lib/Catalyst/Engine/HTTP.pm
+  Catalyst::Engine::HTTP::Restarter:
+    file: lib/Catalyst/Engine/HTTP/Restarter.pm
+  Catalyst::Engine::HTTP::Restarter::Watcher:
+    file: lib/Catalyst/Engine/HTTP/Restarter/Watcher.pm
   Catalyst::Engine::Test:
     file: lib/Catalyst/Engine/Test.pm
   Catalyst::Exception:
@@ -73,6 +88,8 @@ provides:
     version: 0.01
   Catalyst::Log:
     file: lib/Catalyst/Log.pm
+  Catalyst::Model:
+    file: lib/Catalyst/Model.pm
   Catalyst::Plugin::Static::Simple:
     file: lib/Catalyst/Plugin/Static/Simple.pm
     version: 0.11
@@ -86,4 +103,6 @@ provides:
     file: lib/Catalyst/Test.pm
   Catalyst::Utils:
     file: lib/Catalyst/Utils.pm
-generated_by: Module::Build version 0.2607
+  Catalyst::View:
+    file: lib/Catalyst/View.pm
+generated_by: Module::Build version 0.2611

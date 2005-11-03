@@ -1,6 +1,6 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
-5.50
+5.49_03 2005-11-03 12:00:00
         - Fixed $c->req->{path} for backwards-compatibility.
         - Allow debug to be disabled via ENV as well as enabled.
         - Added -scripts option to catalyst.pl for script updating

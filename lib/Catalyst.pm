@@ -43,7 +43,7 @@ our $CATALYST_SCRIPT_GEN = 10;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log/;
 
-our $VERSION = '5.49_02';
+our $VERSION = '5.49_03';
 
 sub import {
     my ( $class, @arguments ) = @_;

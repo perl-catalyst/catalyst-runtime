@@ -232,6 +232,10 @@ INTERNAL METHODS
     $c->dispatch
         Dispatch request to actions.
 
+    dump_these
+        Returns a list of 2-element array references (name, structure) pairs
+        that will be dumped on the error page in debug mode.
+
     $c->execute($class, $coderef)
         Execute a coderef in given class and catch exceptions. Errors are
         available via $c->error.
@@ -260,8 +264,12 @@ INTERNAL METHODS
     $c->finalize_uploads
         Finalize uploads. Cleans up any temporary files.
 
-    $c->get_action( $action, $namespace, $inherit )
+    $c->get_action( $action, $namespace )
         Get an action in a given namespace.
+
+    $c->get_actions( $action, $namespace )
+        Get all actions of a given name in a namespace and all base
+        namespaces.
 
     handle_request( $class, @arguments )
         Handles the request.
@@ -345,6 +353,15 @@ INTERNAL METHODS
     version
         Returns the Catalyst version number. mostly useful for powered by
         messages in template systems.
+
+INTERNAL ACTIONS
+    Catalyst uses internal actions like "_DISPATCH", "_BEGIN", "_AUTO"
+    "_ACTION" and "_END", these are by default not shown in the private
+    action table.
+
+    But you can deactivate this with a config parameter.
+
+        MyApp->config->{show_internal_actions} = 1;
 
 CASE SENSITIVITY
     By default Catalyst is not case sensitive, so "MyApp::C::FOO::Bar"
@@ -474,6 +491,8 @@ CREDITS
     Matt S Trout
 
     Robert Sedlacek
+
+    Sam Vilain
 
     Tatsuhiko Miyagawa
 
