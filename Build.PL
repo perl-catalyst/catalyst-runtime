@@ -46,16 +46,13 @@ my $build = Module::Build->new(
 $build->create_build_script;
 
 print( '*' x 80, "\n" );
-
 my $banner =
   (qw/andyg chansen draven fordmason mst naughton sri jester/)[ int( rand(8) ) ]
   . " is the greatest and gabb is "
   . ( (localtime)[2] > 12 ? "drunk" : "hung over" )
-  . " again! :)";
-$banner = sprintf '%-76s', $banner;
-print "* $banner *\n";
-
-print( '*' x 80, "\n\n" );
+  . " again!";
+print " $banner \n";
+print( '*' x 80, "\n" );
 
 print <<'EOF';
 
@@ -70,18 +67,18 @@ EOF
 
 eval "use FCGI";
 if ($@) {
-    print qq/Install "FCGI" for FastCGI support.\n/;
+    print qq/ Install "FCGI" for FastCGI support.\n/;
 }
 else {
     eval "use FCGI::ProcManager";
     print
-qq/Install "FCGI::ProcManager" for multiprocess FastCGI external support.\n/
+qq/ Install "FCGI::ProcManager" for multiprocess FastCGI external support.\n/
       if ($@);
 }
 
 print <<"EOF";
 
-Important:
-    The Apache engines have been moved to a separate package in Catalyst 5.5.
-    Please install Catalyst::Engine::Apache if you need Apache support.
+ Important:
+     The Apache engines have been moved to a separate package in Catalyst 5.5.
+     Please install Catalyst::Engine::Apache if you need Apache support.
 EOF
