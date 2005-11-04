@@ -8,7 +8,7 @@ use Catalyst::Action;
 use Catalyst::ActionContainer;
 use Catalyst::DispatchType::Default;
 use Catalyst::DispatchType::Index;
-use Text::ASCIITable;
+use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 
@@ -359,11 +359,9 @@ sub setup_actions {
 
     return unless $c->debug;
 
-    my $privates = Text::ASCIITable->new;
-    $privates->setCols( 'Private', 'Class' );
-    $privates->setColWidth( 'Private', 36, 1 );
-    $privates->setColWidth( 'Class',   37, 1 );
+    my $privates = Text::SimpleTable->new( [ 36, 'Private' ], [ 37, 'Class' ] );
 
+    my $has_private = 0;
     my $walker = sub {
         my ( $walker, $parent, $prefix ) = @_;
         $prefix .= $parent->getNodeValue || '';
@@ -375,7 +373,8 @@ sub setup_actions {
             next
               if ( ( $action =~ /^_.*/ )
                 && ( !$c->config->{show_internal_actions} ) );
-            $privates->addRow( "$prefix$action", $action_obj->class );
+            $privates->row( "$prefix$action", $action_obj->class );
+            $has_private = 1;
         }
 
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
@@ -383,7 +382,7 @@ sub setup_actions {
 
     $walker->( $walker, $self->tree, '' );
     $c->log->debug( "Loaded Private actions:\n" . $privates->draw )
-      if ( @{ $privates->{tbl_rows} } );
+      if ( $has_private );
 
     # List all public actions
     $_->list($c) for @{ $self->dispatch_types };
