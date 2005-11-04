@@ -172,15 +172,6 @@ sub _serve_static {
     my $full_path = $c->_static_file;
     my $stat = stat $full_path;
 
-    # the below code all from C::P::Static
-    if ( $c->req->headers->if_modified_since ) {
-        if ( $c->req->headers->if_modified_since == $stat->mtime ) {
-            $c->res->status( 304 ); # Not Modified
-            $c->res->headers->remove_content_headers;
-            return 1;
-        }
-    }
-    
     $c->res->headers->content_type( $type );
     $c->res->headers->content_length( $stat->size );
     $c->res->headers->last_modified( $stat->mtime );
