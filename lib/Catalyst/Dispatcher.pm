@@ -359,7 +359,8 @@ sub setup_actions {
 
     return unless $c->debug;
 
-    my $privates = Text::SimpleTable->new( [ 36, 'Private' ], [ 37, 'Class' ] );
+    my $privates 
+        = Text::SimpleTable->new( [ 36, 'Private' ], [ 37, 'Class' ] );
 
     my $has_private = 0;
     my $walker = sub {
