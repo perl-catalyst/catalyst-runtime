@@ -752,6 +752,7 @@ use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+my $debug         = 0;
 my $fork          = 0;
 my $help          = 0;
 my $host          = undef;
@@ -763,6 +764,7 @@ my $restart_regex = '\.yml$|\.yaml$|\.pm$';
 my @argv = @ARGV;
 
 GetOptions(
+    'debug|d'           => \$debug,
     'fork'              => \$fork,
     'help|?'            => \$help,
     'host=s'            => \$host,
@@ -776,6 +778,9 @@ pod2usage(1) if $help;
 
 if ( $restart ) {
     $ENV{CATALYST_ENGINE} = 'HTTP::Restarter';
+}
+if ( $debug ) {
+    $ENV{CATALYST_DEBUG} = 1;
 }
 
 require [% name %];
@@ -799,6 +804,7 @@ require [% name %];
 [% appprefix %]_server.pl [options]
 
  Options:
+   -d -debug          force debug mode
    -f -fork           handle each request in a new process
                       (defaults to false)
    -? -help           display this help and exits
