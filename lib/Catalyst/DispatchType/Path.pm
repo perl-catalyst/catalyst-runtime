@@ -2,7 +2,7 @@ package Catalyst::DispatchType::Path;
 
 use strict;
 use base qw/Catalyst::DispatchType/;
-use Text::ASCIITable;
+use Text::SimpleTable;
 
 =head1 NAME
 
@@ -24,16 +24,13 @@ See L<Catalyst>.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $paths = Text::ASCIITable->new;
-    $paths->setCols( 'Path', 'Private' );
-    $paths->setColWidth( 'Path',  36, 1 );
-    $paths->setColWidth( 'Private', 37, 1 );
+    my $paths = Text::SimpleTable->new( [ 36, 'Path' ], [ 37, 'Private' ] );
     for my $path ( sort keys %{ $self->{paths} } ) {
         my $action = $self->{paths}->{$path};
-        $paths->addRow( "/$path", "/$action" );
+        $paths->row( "/$path", "/$action" );
     }
     $c->log->debug( "Loaded Path actions:\n" . $paths->draw )
-      if ( @{ $paths->{tbl_rows} } );
+      if ( keys %{ $self->{paths} } );
 }
 
 =item $self->match( $c, $path )
@@ -65,10 +62,7 @@ sub register {
     my @register;
 
     foreach my $r ( @{ $attrs->{Path} || [] } ) {
-        unless ( $r ) {
-            $r = $action->namespace;
-        }
-        elsif ( $r !~ m!^/! ) {    # It's a relative path
+        unless ( $r =~ m!^/! ) {    # It's a relative path
             $r = $action->namespace . "/$r";
         }
         push( @register, $r );

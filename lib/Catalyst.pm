@@ -11,7 +11,7 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 use NEXT;
-use Text::ASCIITable;
+use Text::SimpleTable;
 use Path::Class;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
@@ -348,12 +348,8 @@ sub setup {
         }
 
         if (@plugins) {
-            my $t = Text::ASCIITable->new;
-            $t->setOptions( 'hide_HeadRow',  1 );
-            $t->setOptions( 'hide_HeadLine', 1 );
-            $t->setCols('Class');
-            $t->setColWidth( 'Class', 75, 1 );
-            $t->addRow($_) for @plugins;
+            my $t = Text::SimpleTable->new(76);
+            $t->row($_) for @plugins;
             $class->log->debug( "Loaded plugins:\n" . $t->draw );
         }
 
@@ -384,14 +380,10 @@ sub setup {
     $class->setup_components;
 
     if ( $class->debug ) {
-        my $t = Text::ASCIITable->new;
-        $t->setOptions( 'hide_HeadRow',  1 );
-        $t->setOptions( 'hide_HeadLine', 1 );
-        $t->setCols('Class');
-        $t->setColWidth( 'Class', 75, 1 );
-        $t->addRow($_) for sort keys %{ $class->components };
+        my $t = Text::SimpleTable->new(76);
+        $t->row($_) for sort keys %{ $class->components };
         $class->log->debug( "Loaded components:\n" . $t->draw )
-          if ( @{ $t->{tbl_rows} } );
+          if ( keys %{ $class->components } );
     }
 
     # Add our self to components, since we are also a component
@@ -984,12 +976,9 @@ sub handle_request {
             $elapsed = sprintf '%f', $elapsed;
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
-            my $t = Text::ASCIITable->new;
-            $t->setCols( 'Action', 'Time' );
-            $t->setColWidth( 'Action', 64, 1 );
-            $t->setColWidth( 'Time',   9,  1 );
+            my $t = Text::SimpleTable->new( [ 64, 'Action' ], [ 9, 'Time' ] );
 
-            for my $stat (@stats) { $t->addRow( $stat->[0], $stat->[1] ) }
+            for my $stat (@stats) { $t->row( $stat->[0], $stat->[1] ) }
             $class->log->info(
                 "Request took ${elapsed}s ($av/s)\n" . $t->draw );
         }
@@ -1107,15 +1096,11 @@ sub prepare_body {
     $c->prepare_uploads;
 
     if ( $c->debug && keys %{ $c->req->body_parameters } ) {
-        my $t = Text::ASCIITable->new;
-        $t->setCols( 'Key', 'Value' );
-        $t->setColWidth( 'Key',   37, 1 );
-        $t->setColWidth( 'Value', 36, 1 );
-        $t->alignCol( 'Value', 'right' );
+        my $t = Text::SimpleTable->new( [ 37, 'Key' ], [ 36, 'Value' ] );
         for my $key ( sort keys %{ $c->req->body_parameters } ) {
             my $param = $c->req->body_parameters->{$key};
             my $value = defined($param) ? $param : '';
-            $t->addRow( $key,
+            $t->row( $key,
                 ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
         }
         $c->log->debug( "Body Parameters are:\n" . $t->draw );
@@ -1203,15 +1188,11 @@ sub prepare_query_parameters {
     $c->engine->prepare_query_parameters( $c, @_ );
 
     if ( $c->debug && keys %{ $c->request->query_parameters } ) {
-        my $t = Text::ASCIITable->new;
-        $t->setCols( 'Key', 'Value' );
-        $t->setColWidth( 'Key',   37, 1 );
-        $t->setColWidth( 'Value', 36, 1 );
-        $t->alignCol( 'Value', 'right' );
+        my $t = Text::SimpleTable->new( [ 37, 'Key' ], [ 36, 'Value' ] );
         for my $key ( sort keys %{ $c->req->query_parameters } ) {
             my $param = $c->req->query_parameters->{$key};
             my $value = defined($param) ? $param : '';
-            $t->addRow( $key,
+            $t->row( $key,
                 ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
         }
         $c->log->debug( "Query Parameters are:\n" . $t->draw );
@@ -1246,17 +1227,16 @@ sub prepare_uploads {
     $c->engine->prepare_uploads( $c, @_ );
 
     if ( $c->debug && keys %{ $c->request->uploads } ) {
-        my $t = Text::ASCIITable->new;
-        $t->setCols( 'Key', 'Filename', 'Type', 'Size' );
-        $t->setColWidth( 'Key',      12, 1 );
-        $t->setColWidth( 'Filename', 28, 1 );
-        $t->setColWidth( 'Type',     18, 1 );
-        $t->setColWidth( 'Size',     9,  1 );
-        $t->alignCol( 'Size', 'left' );
+        my $t = Text::SimpleTable->new(
+            [ 12, 'Key' ],
+            [ 28, 'Filename' ],
+            [ 18, 'Type' ],
+            [ 9,  'Size' ]
+        );
         for my $key ( sort keys %{ $c->request->uploads } ) {
             my $upload = $c->request->uploads->{$key};
             for my $u ( ref $upload eq 'ARRAY' ? @{$upload} : ($upload) ) {
-                $t->addRow( $key, $u->filename, $u->type, $u->size );
+                $t->row( $key, $u->filename, $u->type, $u->size );
             }
         }
         $c->log->debug( "File Uploads are:\n" . $t->draw );

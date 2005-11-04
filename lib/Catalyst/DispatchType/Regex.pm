@@ -2,7 +2,7 @@ package Catalyst::DispatchType::Regex;
 
 use strict;
 use base qw/Catalyst::DispatchType::Path/;
-use Text::ASCIITable;
+use Text::SimpleTable;
 
 =head1 NAME
 
@@ -24,17 +24,14 @@ See L<Catalyst>.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $re = Text::ASCIITable->new;
-    $re->setCols( 'Regex', 'Private' );
-    $re->setColWidth( 'Regex',   36, 1 );
-    $re->setColWidth( 'Private', 37, 1 );
+    my $re = Text::SimpleTable->new( [ 36, 'Regex' ], [ 37, 'Private' ] );
     for my $regex ( @{ $self->{compiled} } ) {
         my $compiled = $regex->{re};
         my $action   = $regex->{action};
-        $re->addRow( $compiled, "/$action" );
+        $re->row( $compiled, "/$action" );
     }
     $c->log->debug( "Loaded Regex actions:\n" . $re->draw )
-      if ( @{ $re->{tbl_rows} } );
+      if ( @{ $self->{compiled} } );
 }
 
 =item $self->match( $c, $path )
@@ -71,8 +68,8 @@ sub register {
     my $attrs = $action->attributes;
     my @register = map { @{ $_ || [] } } @{$attrs}{ 'Regex', 'Regexp' };
     foreach my $r (@register) {
-        unless ($r =~ /^\^/) {     # Relative regex
-            $r = '^'.$action->namespace.'/'.$r;
+        unless ( $r =~ /^\^/ ) {    # Relative regex
+            $r = '^' . $action->namespace . '/' . $r;
         }
         $self->{paths}{$r} = $action;    # Register path for superclass
         push(
