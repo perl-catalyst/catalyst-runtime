@@ -15,7 +15,8 @@ use Tree::Simple::Visitor::FindByPath;
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
 
-__PACKAGE__->mk_accessors(qw/tree dispatch_types registered_dispatch_types/);
+__PACKAGE__->mk_accessors(qw/tree dispatch_types registered_dispatch_types
+  method_action_class action_container_class/);
 
 # Preload these action types
 our @PRELOAD = qw/Path Regex/;
@@ -126,7 +127,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
         my $method = shift || 'process';
 
         if ( my $code = $class->can($method) ) {
-            my $action = Catalyst::Action->new(
+            my $action = $self->method_action_class->new(
                 {
                     name      => $method,
                     code      => $code,
@@ -326,6 +327,8 @@ sub setup_actions {
 
     $self->dispatch_types( [] );
     $self->registered_dispatch_types( {} );
+    $self->method_action_class( 'Catalyst::Action' );
+    $self->action_container_class( 'Catalyst::ActionContainer' );
 
     # Preload action types
     for my $type (@PRELOAD) {

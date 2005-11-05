@@ -8,9 +8,10 @@ use Catalyst::Utils;
 use Class::Inspector;
 use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps/;
+__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class/;
 
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
+__PACKAGE__->_action_class('Catalyst::Action');
 
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
@@ -92,7 +93,7 @@ sub register_actions {
             next;
         }
         my $reverse = $namespace ? "$namespace/$method" : $method;
-        my $action = Catalyst::Action->new(
+        my $action = $self->_action_class->new(
             {
                 name       => $method,
                 code       => $code,
