@@ -8,7 +8,7 @@ sub one : Action Regex('^action/regexp/(\w+)/(\d+)$') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
-sub two : Action Regexp('(\d+)/(\w+)$') {
+sub two : Action LocalRegexp('^(\d+)/(\w+)$') {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }

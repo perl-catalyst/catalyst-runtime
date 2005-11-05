@@ -81,10 +81,17 @@ sub register {
         # Register sub name as a relative path
     }
 
-    foreach my $r (@register) {
-        $r =~ s!^/!!;
-        $self->{paths}{$r} = $action;
-    }
+    $self->register_path($c, $_, $action) for @register;
+}
+
+=item $self->register_path($c, $path, $action)
+
+=cut
+
+sub register_path {
+    my ($self, $c, $path, $action) = @_;
+    $path =~ s!^/!!;
+    $self->{paths}{$path} = $action;
 }
 
 =back

@@ -67,20 +67,33 @@ sub register {
     my ( $self, $c, $action ) = @_;
     my $attrs = $action->attributes;
     my @register = map { @{ $_ || [] } } @{$attrs}{ 'Regex', 'Regexp' };
-    foreach my $r (@register) {
-        unless ( $r =~ /^\^/ ) {    # Relative regex
-            $r = '^' . $action->namespace . '/' . $r;
-        }
-        $self->{paths}{$r} = $action;    # Register path for superclass
-        push(
-            @{ $self->{compiled} },      # and compiled regex for us
-            {
-                re     => qr#$r#,
-                action => $action,
-                path   => $r,
-            }
-        );
+    foreach
+      my $r ( map { @{ $_ || [] } } @{$attrs}{ 'LocalRegex', 'LocalRegexp' } )
+    {
+        unless ( $r =~ s/^\^// ) { $r = "(?:.*?)$r"; }
+        push( @register, '^' . $action->namespace . '/' . $r );
     }
+
+    foreach my $r (@register) {
+        $self->register_path( $c, $r, $action );
+        $self->register_regex( $c, $r, $action );
+    }
+}
+
+=item $self->register_regex($c, $re, $action)
+
+=cut
+
+sub register_regex {
+    my ( $self, $c, $re, $action ) = @_;
+    push(
+        @{ $self->{compiled} },    # and compiled regex for us
+        {
+            re     => qr#$re#,
+            action => $action,
+            path   => $re,
+        }
+    );
 }
 
 =back
