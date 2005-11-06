@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.5
+        - Added $c->controller, $c->model and $c->view shortcuts
         - Switched to Text::SimpleTable
 
 5.49_03 2005-11-03 12:00:00

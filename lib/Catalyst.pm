@@ -219,6 +219,23 @@ sub component {
 
 Returns a hashref containing your applications settings.
 
+=cut
+
+=item $c->controller($name)
+
+Get a L<Catalyst::Controller> instance by name.
+
+    $c->controller('Foo')->do_stuff;
+
+=cut
+
+sub controller {
+    my ( $c, $name ) = @_;
+    my $controller = $c->comp("Controller::$name");
+    return $controller if $controller;
+    return $c->comp("C::$name");
+}
+
 =item debug
 
 Overload to enable debug messages.
@@ -256,6 +273,21 @@ from the function.
 =cut
 
 sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
+
+=item $c->model($name)
+
+Get a L<Catalyst::Model> instance by name.
+
+    $c->model('Foo')->do_stuff;
+
+=cut
+
+sub model {
+    my ( $c, $name ) = @_;
+    my $model = $c->comp("Model::$name");
+    return $model if $model;
+    return $c->comp("M::$name");
+}
 
 =item $c->namespace
 
@@ -555,6 +587,21 @@ sub stash {
         }
     }
     return $c->{stash};
+}
+
+=item $c->view($name)
+
+Get a L<Catalyst::View> instance by name.
+
+    $c->view('Foo')->do_stuff;
+
+=cut
+
+sub view {
+    my ( $c, $name ) = @_;
+    my $view = $c->comp("View::$name");
+    return $view if $view;
+    return $c->comp("V::$name");
 }
 
 =item $c->welcome_message
@@ -1542,13 +1589,15 @@ sub setup_log {
     unless ( $class->log ) {
         $class->log( Catalyst::Log->new );
     }
-    
+
     my $app_flag = Catalyst::Utils::class2env($class) . '_DEBUG';
 
-     if ( ( defined( $ENV{CATALYST_DEBUG} ) || 
-            defined( $ENV{ $app_flag } ) )  ? 
-	  (  $ENV{CATALYST_DEBUG} || $ENV{ $app_flag } ) :
-	  $debug ) {
+    if (
+          ( defined( $ENV{CATALYST_DEBUG} ) || defined( $ENV{$app_flag} ) )
+        ? ( $ENV{CATALYST_DEBUG} || $ENV{$app_flag} )
+        : $debug
+      )
+    {
         no strict 'refs';
         *{"$class\::debug"} = sub { 1 };
         $class->log->debug('Debug messages enabled');
