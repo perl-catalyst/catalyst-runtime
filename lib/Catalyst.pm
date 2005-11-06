@@ -1346,7 +1346,7 @@ sub setup_components {
     my $callback = sub {
         my ( $component, $context ) = @_;
 
-        unless ( $component->isa('Catalyst::Base') ) {
+        unless ( $component->isa('Catalyst::Component') ) {
             return $component;
         }
 
