@@ -114,15 +114,12 @@ sub forward {
             }
         }
     }
-    else {
-        $result = $command;
-    }
 
     unless ($result) {
 
         my $comp;
 
-        unless ( $comp = $c->component($command) ) {
+        unless ( $comp = (ref $command ? $command : $c->component($command)) ) {
             my $error =
 qq/Couldn't forward to command "$command". Invalid action or component./;
             $c->error($error);
