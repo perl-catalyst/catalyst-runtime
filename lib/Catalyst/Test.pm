@@ -62,7 +62,7 @@ Returns the content.
 
 Returns a C<HTTP::Response> object.
 
-    my $res =request('foo/bar?test=1');
+    my $res = request('foo/bar?test=1');
 
 =cut
 
@@ -79,7 +79,7 @@ sub import {
 
     else {
         $class->require;
-		die if $@ && $@ !~ /^Can't locate /;
+        die if $@ && $@ !~ /^Can't locate /;
         $class->import;
 
         $request = sub { $class->run(@_) };

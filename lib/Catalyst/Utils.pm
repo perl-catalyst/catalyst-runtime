@@ -1,7 +1,6 @@
 package Catalyst::Utils;
 
 use strict;
-use attributes ();
 use Catalyst::Exception;
 use File::Spec;
 use HTTP::Request;
@@ -36,14 +35,6 @@ sub appprefix {
     $class = lc($class);
     return $class;
 }
-
-=item attrs($coderef)
-
-Returns attributes for coderef in a arrayref
-
-=cut
-
-sub attrs { attributes::get( $_[0] ) || [] }
 
 =item class2appclass($class);
 
@@ -205,25 +196,6 @@ sub prefix {
     my $prefix = &class2prefix($class);
     $name = "$prefix/$name" if $prefix;
     return $name;
-}
-
-=item reflect_actions($class);
-
-Returns an arrayref containing all actions of a component class.
-
-=cut
-
-sub reflect_actions {
-    my $class   = shift;
-    my $actions = [];
-    eval '$actions = $class->_action_cache';
-
-    if ($@) {
-        Catalyst::Exception->throw( message =>
-              qq/Couldn't reflect actions of component "$class", "$@"/ );
-    }
-
-    return $actions;
 }
 
 =item request($request)
