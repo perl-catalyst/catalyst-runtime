@@ -1544,7 +1544,6 @@ sub setup_log {
     }
     
     my $app_flag = Catalyst::Utils::class2env($class) . '_DEBUG';
-    warn "app: ".$app_flag;
 
      if ( ( defined( $ENV{CATALYST_DEBUG} ) || 
             defined( $ENV{ $app_flag } ) )  ? 
