@@ -80,8 +80,6 @@ sub forward {
     my $c       = shift;
     my $command = shift;
 
-    $command = ref $command if ref $command;
-
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
@@ -91,28 +89,33 @@ sub forward {
 
     my $result;
 
-    my $command_copy = $command;
+    unless ( ref $command ) {
+        my $command_copy = $command;
 
-    unless ( $command_copy =~ s/^\/// ) {
-        my $namespace = $c->namespace;
-        $command_copy = "${namespace}/${command}";
-    }
+        unless ( $command_copy =~ s/^\/// ) {
+            my $namespace = $c->namespace;
+            $command_copy = "${namespace}/${command}";
+        }
 
-    unless ( $command_copy =~ /\// ) {
-        $result = $c->get_action( $command_copy, '/' );
+        unless ( $command_copy =~ /\// ) {
+            $result = $c->get_action( $command_copy, '/' );
+        }
+        else {
+            my @extra_args;
+          DESCEND: while ( $command_copy =~ s/^(.*)\/(\w+)$/$1/ ) {
+                my $tail = $2;
+                $result = $c->get_action( $tail, $1 );
+                if ($result) {
+                    $command = $tail;
+                    push( @{$arguments}, @extra_args );
+                    last DESCEND;
+                }
+                unshift( @extra_args, $tail );
+            }
+        }
     }
     else {
-        my @extra_args;
-      DESCEND: while ( $command_copy =~ s/^(.*)\/(\w+)$/$1/ ) {
-            my $tail = $2;
-            $result = $c->get_action( $tail, $1 );
-            if ($result) {
-                $command = $tail;
-                push( @{$arguments}, @extra_args );
-                last DESCEND;
-            }
-            unshift( @extra_args, $tail );
-        }
+        $result = $command;
     }
 
     unless ($result) {
