@@ -15,8 +15,10 @@ use Tree::Simple::Visitor::FindByPath;
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
 
-__PACKAGE__->mk_accessors(qw/tree dispatch_types registered_dispatch_types
-  method_action_class action_container_class/);
+__PACKAGE__->mk_accessors(
+    qw/tree dispatch_types registered_dispatch_types
+      method_action_class action_container_class/
+);
 
 # Preload these action types
 our @PRELOAD = qw/Path Regex/;
@@ -78,6 +80,8 @@ sub forward {
     my $c       = shift;
     my $command = shift;
 
+    $command = ref $command if ref $command;
+
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
@@ -102,7 +106,7 @@ sub forward {
       DESCEND: while ( $command_copy =~ s/^(.*)\/(\w+)$/$1/ ) {
             my $tail = $2;
             $result = $c->get_action( $tail, $1 );
-            if ( $result ) {
+            if ($result) {
                 $command = $tail;
                 push( @{$arguments}, @extra_args );
                 last DESCEND;
@@ -111,7 +115,7 @@ sub forward {
         }
     }
 
-    unless ( $result ) {
+    unless ($result) {
 
         my $comp;
 
@@ -204,8 +208,7 @@ sub get_action {
 
     return unless @match;
 
-    if ( my $action = $match[-1]->get_action( $c, $name ) )
-    {
+    if ( my $action = $match[-1]->get_action( $c, $name ) ) {
         return $action if $action->namespace eq $namespace;
     }
 }
@@ -222,7 +225,7 @@ sub get_actions {
 
     my @match = $self->get_containers($namespace);
 
-    return map { $_->get_action($c, $action) } @match;
+    return map { $_->get_action( $c, $action ) } @match;
 }
 
 =item $self->get_containers( $namespace )
@@ -299,17 +302,17 @@ sub register {
     }
 
     # Set the method value
-    $parent->getNodeValue->actions->{$action->name} = $action;
+    $parent->getNodeValue->actions->{ $action->name } = $action;
 
     my $registered = $self->registered_dispatch_types;
 
-    foreach my $key (keys %{$action->attributes}) {
-            my $class = "Catalyst::DispatchType::$key";
-            unless ( $registered->{$class} ) {
-                eval "require $class";
-                push( @{ $self->dispatch_types }, $class->new ) unless $@;
-                $registered->{$class} = 1;
-            }
+    foreach my $key ( keys %{ $action->attributes } ) {
+        my $class = "Catalyst::DispatchType::$key";
+        unless ( $registered->{$class} ) {
+            eval "require $class";
+            push( @{ $self->dispatch_types }, $class->new ) unless $@;
+            $registered->{$class} = 1;
+        }
     }
 
     # Pass the action to our dispatch types so they can register it if reqd.
@@ -327,8 +330,8 @@ sub setup_actions {
 
     $self->dispatch_types( [] );
     $self->registered_dispatch_types( {} );
-    $self->method_action_class( 'Catalyst::Action' );
-    $self->action_container_class( 'Catalyst::ActionContainer' );
+    $self->method_action_class('Catalyst::Action');
+    $self->action_container_class('Catalyst::ActionContainer');
 
     # Preload action types
     for my $type (@PRELOAD) {
@@ -345,10 +348,10 @@ sub setup_actions {
       Catalyst::ActionContainer->new( { part => '/', actions => {} } );
     $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 
-    $c->register_actions( $c );
+    $c->register_actions($c);
 
-    foreach my $comp ( values %{$c->components} ) {
-        $comp->register_actions( $c ) if $comp->can('register_actions');
+    foreach my $comp ( values %{ $c->components } ) {
+        $comp->register_actions($c) if $comp->can('register_actions');
     }
 
     # Postload action types
@@ -362,8 +365,7 @@ sub setup_actions {
 
     return unless $c->debug;
 
-    my $privates 
-        = Text::SimpleTable->new( [ 36, 'Private' ], [ 37, 'Class' ] );
+    my $privates = Text::SimpleTable->new( [ 36, 'Private' ], [ 37, 'Class' ] );
 
     my $has_private = 0;
     my $walker = sub {
@@ -386,7 +388,7 @@ sub setup_actions {
 
     $walker->( $walker, $self->tree, '' );
     $c->log->debug( "Loaded Private actions:\n" . $privates->draw )
-      if ( $has_private );
+      if ($has_private);
 
     # List all public actions
     $_->list($c) for @{ $self->dispatch_types };
