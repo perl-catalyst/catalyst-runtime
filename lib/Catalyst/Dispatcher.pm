@@ -117,18 +117,16 @@ sub forward {
 
     unless ($result) {
 
-        my $comp;
+        my $class  = ref($command) || ref($c->component($command));
+        my $method = shift || 'process';
 
-        unless ( $comp = (ref $command ? $command : $c->component($command)) ) {
+        unless ( $class ) {
             my $error =
 qq/Couldn't forward to command "$command". Invalid action or component./;
             $c->error($error);
             $c->log->debug($error) if $c->debug;
             return 0;
         }
-
-        my $class  = ref $comp;
-        my $method = shift || 'process';
 
         if ( my $code = $class->can($method) ) {
             my $action = $self->method_action_class->new(

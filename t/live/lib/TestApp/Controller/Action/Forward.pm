@@ -15,7 +15,7 @@ sub two : Private {
 
 sub three : Local {
     my ( $self, $c ) = @_;
-    $c->forward('four');
+    $c->forward($self, 'four');
 }
 
 sub four : Private {
@@ -31,7 +31,7 @@ sub five : Local {
 sub jojo : Local {
     my ( $self, $c ) = @_;
     $c->forward('one');
-    $c->forward('three');
+    $c->forward($c->controller('Action::Forward'), 'three');
 }
 
 sub inheritance : Local {
