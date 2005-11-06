@@ -1303,7 +1303,7 @@ sub setup_components {
             return $component;
         }
 
-        my $suffix = Catalyst::Utils::class2classsuffix($component);
+        my $suffix = Catalyst::Utils::class2classsuffix($class);
         my $config = $class->config->{$suffix} || {};
 
         my $instance;
@@ -1542,8 +1542,14 @@ sub setup_log {
     unless ( $class->log ) {
         $class->log( Catalyst::Log->new );
     }
+    
+    my $app_flag = Catalyst::Utils::class2env($class) . '_DEBUG';
+    warn "app: ".$app_flag;
 
-    if ( $ENV{CATALYST_DEBUG} || $ENV{ uc($class) . '_DEBUG' } || $debug ) {
+     if ( ( defined( $ENV{CATALYST_DEBUG} ) || 
+            defined( $ENV{ $app_flag } ) )  ? 
+	  (  $ENV{CATALYST_DEBUG} || $ENV{ $app_flag } ) :
+	  $debug ) {
         no strict 'refs';
         *{"$class\::debug"} = sub { 1 };
         $class->log->debug('Debug messages enabled');
