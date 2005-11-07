@@ -12,14 +12,13 @@ TestApp->setup;
 
 sub index : Private {
     my ( $self, $c ) = @_;
-    $c->res->body( 'root index' );
+    $c->res->body('root index');
 }
 
 sub global_action : Private {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
-
 
 sub execute {
     my $c      = shift;
@@ -38,7 +37,6 @@ sub execute {
         $method = $action;
     }
 
-
     if ( $class && $method && $method !~ /^_/ ) {
         my $executed = sprintf( "%s->%s", $class, $method );
         my @executed = $c->response->headers->header('X-Catalyst-Executed');
@@ -52,4 +50,8 @@ sub execute {
     return $c->SUPER::execute(@_);
 }
 
+{
+    no warnings 'redefine';
+    sub Catalyst::Log::error { }
+}
 1;

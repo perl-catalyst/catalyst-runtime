@@ -862,8 +862,6 @@ sub execute {
                 chomp $error;
                 $error = qq/Caught exception "$error"/;
             }
-
-            $c->log->error($error);
             $c->error($error);
             $c->state(0);
         }
@@ -879,6 +877,10 @@ Finalize request.
 
 sub finalize {
     my $c = shift;
+
+    for my $error ( @{ $c->error } ) {
+        $c->log->error($error);
+    }
 
     $c->finalize_uploads;
 
