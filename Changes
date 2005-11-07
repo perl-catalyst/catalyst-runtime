@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.5
+        - Removed $c->req->user accessor
         - Added $c->controller, $c->model and $c->view shortcuts
         - Switched to Text::SimpleTable
 

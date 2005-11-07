@@ -7,7 +7,7 @@ use IO::Socket qw[AF_INET inet_aton];
 
 __PACKAGE__->mk_accessors(
     qw/action address arguments cookies headers match method
-      protocol query_parameters secure snippets uri user/
+      protocol query_parameters secure snippets uri/
 );
 
 *args         = \&arguments;
@@ -63,7 +63,6 @@ Catalyst::Request - Catalyst Request Class
     $req->upload;
     $req->uploads;
     $req->uri;
-    $req->user;
     $req->user_agent;
 
 See also L<Catalyst>.
@@ -123,16 +122,16 @@ then C<base> is C<http://localhost:3000/>.
 
 sub base {
     my ( $self, $base ) = @_;
-    
+
     return $self->{base} unless $base;
-    
+
     $self->{base} = $base;
-    
+
     # set the value in path for backwards-compat
     if ( $self->uri ) {
         $self->path;
     }
-    
+
     return $self->{base};
 }
 
@@ -499,10 +498,6 @@ sub uploads {
 =item $req->uri
 
 Returns a URI object for the request.
-
-=item $req->user
-
-Contains the user name of user if authentication check was successful.
 
 =item $req->user_agent
 
