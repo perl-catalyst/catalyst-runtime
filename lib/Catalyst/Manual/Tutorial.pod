@@ -25,58 +25,74 @@ install them for you.
 Catalyst includes a helper script, C<catalyst.pl>, that will set up a 
 skeleton application for you:
 
-    created "My-App"
-    created "My-App/script"
-    created "My-App/lib"
-    created "My-App/root"
-    created "My-App/t"
-    created "My-App/t/m"
-    created "My-App/t/v"
-    created "My-App/t/c"
-    created "My-App/lib/My/App"
-    created "My-App/lib/My/App/M"
-    created "My-App/lib/My/App/V"
-    created "My-App/lib/My/App/C"
-    created "My-App/lib/My/App.pm"
-    created "My-App/Build.PL"
-    created "My-App/Makefile.PL"
-    created "My-App/README"
-    created "My-App/Changes"
-    created "My-App/t/01app.t"
-    created "My-App/t/02pod.t"
-    created "My-App/t/03podcoverage.t"
-    created "My-App/script/my_app_cgi.pl"
-    created "My-App/script/my_app_fastcgi.pl"
-    created "My-App/script/my_app_server.pl"
-    created "My-App/script/my_app_test.pl"
-    created "My-App/script/my_app_create.pl"
+    $ catalyst MyApp
+    
+    created "MyApp"
+    created "MyApp/script"
+    created "MyApp/lib"
+    created "MyApp/root"
+    created "MyApp/root/static"
+    created "MyApp/root/static/images"
+    created "MyApp/t"
+    created "MyApp/t/Model"
+    created "MyApp/t/View"
+    created "MyApp/t/Controller"
+    created "MyApp/lib/MyApp"
+    created "MyApp/lib/MyApp/Model"
+    created "MyApp/lib/MyApp/View"
+    created "MyApp/lib/MyApp/Controller"
+    created "MyApp/lib/MyApp.pm"
+    created "MyApp/Build.PL"
+    created "MyApp/Makefile.PL"
+    created "MyApp/README"
+    created "MyApp/Changes"
+    created "MyApp/t/01app.t"
+    created "MyApp/t/02pod.t"
+    created "MyApp/t/03podcoverage.t"
+    created "MyApp/root/static/images/catalyst_logo.png"
+    created "MyApp/root/static/images/btn_120x50_built.png"
+    created "MyApp/root/static/images/btn_120x50_built_shadow.png"
+    created "MyApp/root/static/images/btn_120x50_powered.png"
+    created "MyApp/root/static/images/btn_120x50_powered_shadow.png"
+    created "MyApp/root/static/images/btn_88x31_built.png"
+    created "MyApp/root/static/images/btn_88x31_built_shadow.png"
+    created "MyApp/root/static/images/btn_88x31_powered.png"
+    created "MyApp/root/static/images/btn_88x31_powered_shadow.png"
+    created "MyApp/root/favicon.ico"
+    created "MyApp/script/myapp_cgi.pl"
+    created "MyApp/script/myapp_fastcgi.pl"
+    created "MyApp/script/myapp_server.pl"
+    created "MyApp/script/myapp_test.pl"
+    created "MyApp/script/myapp_create.pl"
 
 This creates the directory structure shown, populated with skeleton 
 files.
-
-
 
 =head2 Testing out the sample application
 
 You can test out your new application by running the server script that
 Catalyst provides:
 
-    $ cd My-App
-    $ script/my_app_server.pl 
+    $ cd MyApp
+    $ script/myapp_server.pl 
 
     [...] [catalyst] [debug] Debug messages enabled
+    [...] [catalyst] [debug] Loaded plugins:
+    .------------------------------------------------------------------------------.
+    | Catalyst::Plugin::Static::Simple                                             |
+    '------------------------------------------------------------------------------'
     [...] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
     [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [...] [catalyst] [debug] Found home "/usr/home/jester/foo/My-App/script/.."
-    [...] [catalyst] [debug] Loaded private actions
-    .=--------------------------------+------------------------------------=.
-    | Private                         | Class                               |
-    |=--------------------------------+------------------------------------=|
-    | /default                        | My::App                             |
-    '=--------------------------------+------------------------------------='
-
-    [....] [catalyst] [info] My::App powered by Catalyst 5.20
-    You can connect to your server at http://localhost:3000/
+    [...] [catalyst] [debug] Found home "/home/users/me/MyApp"
+    [...] [catalyst] [debug] Loaded Private actions:
+    .--------------------------------------+---------------------------------------.
+    | Private                              | Class                                 |
+    +--------------------------------------+---------------------------------------+
+    | /default                             | MyApp                                 |
+    '--------------------------------------+---------------------------------------'
+    
+    [...] [catalyst] [info] MyApp powered by Catalyst 5.5
+    You can connect to your server at http://localhost:3000
 
 (Note that each line logged by Catalyst begins with a timestamp, which has
 been replaced here with "C<...>" so that the text fits onto the lines.)
@@ -92,36 +108,38 @@ and hit return twice):
     Escape character is '^]'.
     GET / HTTP/1.0
     
-    HTTP/1.0 200
-    Server: Catalyst/5.20
+    HTTP/1.0 200 OK
+    Date: Mon, 07 Nov 2005 14:57:39 GMT
+    Content-Length: 5525
+    Content-Type: text/html; charset=utf-8
     Status: 200
-    Date: Fri May 13 14:15:46 EDT 2005
-    X-catalyst: 5.20
-    Content-length: 40
-    Content-Type: text/html; charset=ISO-8859-1
+    X-Catalyst: 5.5
 
-    Congratulations, My::App is on Catalyst!
+    [...]
     Connection closed by foreign host.
     $
 
+You can see the full welcome message by visting
+http://localhost:3000/ with your browser.
+
 More trace messages will appear in the original terminal window:
 
-    [...] [catalyst] [debug] ********************************
-    [...] [catalyst] [debug] * Request 1 (0.027/s) [9818]
-    [...] [catalyst] [debug] ********************************
+    [...] [catalyst] [debug] **********************************
+    [...] [catalyst] [debug] * Request 1 (0.063/s) [2148]
+    [...] [catalyst] [debug] **********************************
+    [...] [catalyst] [debug] Arguments are ""
     [...] [catalyst] [debug] "GET" request for "" from localhost
-    [...] [catalyst] [info] Request took 0.051399s (19.456/s)
-    .=--------------------------------------------------+----------=.
-    | Action                                            | Time      |
-    |=--------------------------------------------------+----------=|
-    | /default                                          | 0.000026s |
-    '=--------------------------------------------------+----------='
+    [...] [catalyst] [info] Request took 0.046883s (21.330/s)
+    .------------------------------------------------------------------+-----------.
+    | Action                                                           | Time      |
+    +------------------------------------------------------------------+-----------+
+    | /default                                                         | 0.000000s |
+    '------------------------------------------------------------------+-----------'
 
 The server will continue running until you interrupt it.
 
 The application can also be tested from the command line using the generated
-helper script, C<script/my_app_test.pl>.
-
+helper script, C<script/myapp_test.pl>.
 
 =head2 Getting your application invoked
 
@@ -134,49 +152,45 @@ code take effect under CGI without having to restart the web server.
 To run from mod_perl you need to add something like this to your Apache
 configuration file:
 
-    <Location /my-app>
+    <Location /MyApp>
         SetHandler  perl-script
-        PerlHandler My::App
+        PerlHandler MyApp
     </Location>
 
 To run as a CGI script you need a wrapper script like:
 
     #!/usr/bin/perl -w
-
+    
     use strict;
-    use lib '/path/to/My/App/lib';
-    use My::App;
-
-    My::App->run;
-
-
+    use lib '/path/to/MyApp/lib';
+    use MyApp;
+    
+    MyApp->run;
 
 =head2 Examining the generated code
 
 The generated application code is quite simple and looks something 
-like this:
+like this (comments removed):
 
-    package My::App;
-
+    package MyApp;
+    
     use strict;
-    use Catalyst qw/-Debug/;
-
+    use warnings;
+    
+    use Catalyst qw/-Debug Static::Simple/;
+    
     our $VERSION = '0.01';
-
-    My::App->config(
-    name => 'My::App',
-    root => '/home/andrew/My-App/root',
-    );
-
-    __PACKAGE__->setup();
-
+    
+    __PACKAGE__->config( name => 'MyApp' );
+    __PACKAGE__->setup;
+    
     sub default : Private {
-      my ( $self, $c ) = @_;
-      $c->res->output('Congratulations, My::App is on Catalyst!');
+        my ( $self, $c ) = @_;
+    
+        $c->response->body( $c->welcome_message );
     }
-
+    
     1;
-
 
 When the C<Catalyst> module is imported by the application code, 
 Catalyst performs the first stage of its initialization.  This includes
@@ -187,19 +201,19 @@ calling module (the application module) inherits from C<Catalyst>
 the application module).
 
 The call to C<config> sets up configuration data for the application.  
-The C<name> and C<root> items are the minimum required, and specify 
-the name of the application and the path to the root directory where 
-documents, images, and templates can be found.
+The C<name> parameter is the only required configuration parameter.
+You may also specificy a C<root> parameter, which is the path to the
+directory where documents, images, and templates can be found.
 
 Catalyst associates I<actions> with URLs and on receiving a request 
 dispatches to the action that matches to request URL.  The call to 
 C<setup> in the code above registers a default action.  With just 
 this action registered the application will respond to all requests 
-with the same message "Congratulations, My::App is on Catalyst!".
+with the same welcome page.
 
 As you see, the default action is defined as a Private action. 
 Most private actions are not directly available from a web url. This
-also includes the built-in actions, 'default','begin','end', and
+also includes the built-in actions, 'default', 'begin', 'end', and
 'auto', although they will be called as part of some chains.  
 The rest can only be reached by using C<forward>.
 
@@ -209,38 +223,37 @@ for any component modules, locating and registering any actions it
 finds in those modules.
 
 Component modules have names prefixed with the application module name,
-followed by C<M>, C<V> or C<C> (or the optional long
-forms: C<Model>, C<View> or C<Controller>) followed by the component
+followed by C<Model>, C<View> or C<Controller> (or the optional short
+forms: C<M>, C<V> or C<C>) followed by the component
 name, for example:
 
-    My::App::C::ShoppingCart           # short (default) version 
-    My::App::Controller::ShoppingCart  # long version
+    MyApp::Controller::ShoppingCart  # long (default) version
+    MyApp::C::ShoppingCart           # short version 
 
-    My::App::M::User                   # short (default) version
-    My::App::Model::User               # long version
+    MyApp::Model::User               # long (default) version
+    MyApp::M::User                   # short version
 
 =head2 Extending the generated code
-
 
 You can start extending the application by adding new actions:
 
     sub test1 : Global {
-      my ( $self, $c ) = @_;
-      $c->res->output('In a new test action #1');
+        my ( $self, $c ) = @_;
+        $c->res->body('In a new test action #1');
     }
     sub default : Private {
-      my ( $self, $c ) = @_;
-      $c->res->output('Congratulations, My::App is on Catalyst!');
+        my ( $self, $c ) = @_;
+        $c->res->body('Congratulations, MyApp is on Catalyst!');
     }
 
     # called like '/article/2005/06'
     sub archive_month : Regex('^article/(\d{4})/(\d{2})$') {
-      my ( $self, $c ) = @_;
+        my ( $self, $c ) = @_;
 
-      my $datetime = DateTime->new(
-          year  => $c->request->snippets->[0],
-          month => $c->request->snippets->[1]
-      );
+        my $datetime = DateTime->new(
+            year  => $c->request->snippets->[0],
+            month => $c->request->snippets->[1]
+        );
     }
 
 TODO: explain briefly about plugins, actions, and components
@@ -249,7 +262,6 @@ If the action is a Regex type, you can use capturing parentheses to
 extract values within the matching URL (2005, 06 in the above
 example). Those values are available in the $c->req->snippets
 anonymous array. See L<Catalyst::Manual::Intro#Actions> for details.
-
 
 =head2 Hooking in to Template Toolkit
 
@@ -261,19 +273,25 @@ C<Template>, read the documentation and play around with it, and have
 a look at the I<Badger Book> (I<Template Toolkit> by Darren 
 Chamberlain, Dave Cross, and Andy Wardley, O'Reilly & Associates, 2004).
 
-You can create a stub Template Toolkit view component using the create 
-script that Catalyst set up as part of the skeleton application:
+You can create a stub Template Toolkit view component by installing
+L<Catalyst::View::TT> and using the create script that Catalyst set
+up as part of the skeleton application:
 
-    $ script/create.pl view TT TT
+    $ script/myapp_create.pl view TT TT
+    
+     exists "MyApp/lib/MyApp/View"
+     exists "MyApp/t/View"
+    created "MyApp/lib/MyApp/View/TT.pm"
+    created "MyApp/t/View/TT.t"
 
-this generates a view component named C<My::App::V::TT>, which you 
+this generates a view component named C<MyApp::View::TT>, which you 
 might use by forwarding from your C<end> action:
 
-    # In My::App or My::App::Controller::SomeController
+    # In MyApp or MyApp::Controller::SomeController
 
     sub end : Private {
         my($self, $c) = @_;
-        $c->forward('My::App::V::TT');
+        $c->forward('MyApp::V::TT');
     }
 
 The generated TT view component simply subclasses the 
@@ -294,13 +312,11 @@ configure TT more to your needs by adding a C<new> method to the
 generated TT component:
 
     sub new {
-      my $self = shift;
-      $self->config->{PRE_PROCESS} = 'config/main';
-      $self->config->{WRAPPER}     = 'site/wrapper';
-      return $self->SUPER::new(@_);
+        my $self = shift;
+        $self->config->{PRE_PROCESS} = 'config/main';
+        $self->config->{WRAPPER}     = 'site/wrapper';
+        return $self->SUPER::new(@_);
     }
-
-
 
 =head1 AUTHOR
 
@@ -331,7 +347,6 @@ Placeholders are indicated by the words: TODO or CHECK
 
 Please send comments, corrections and suggestions for improvements to
 A.Ford@ford-mason.co.uk
-
 
 =head1 COPYRIGHT
 
