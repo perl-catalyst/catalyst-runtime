@@ -47,7 +47,7 @@ sub finalize_body {
     if ( ref $c->response->body && $c->response->body->can('read') ) {
         while ( !$c->response->body->eof() ) {
             $c->response->body->read( my $buffer, $CHUNKSIZE );
-            $self->write( $c, $buffer );
+            last unless $self->write( $c, $buffer );
         }
         $c->response->body->close();
     }

@@ -1,6 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.5
+        - Fixed streaming write from a filehandle to stop writing
+          if the browser is closed.
         - Added $c->controller, $c->model and $c->view shortcuts
         - Switched to Text::SimpleTable
 
