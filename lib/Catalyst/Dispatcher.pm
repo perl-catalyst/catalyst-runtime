@@ -258,11 +258,11 @@ sub get_containers {
         # should catch any failures - or short-circuit this if this *is* a
         # bug in the visitor and gets fixed.
 
-        my $extra = $path[ ( scalar @match ) - 1 ];
-        last unless $extra;
-        $visitor->setSearchPath($extra);
-        $match[-1]->accept($visitor);
-        push( @match, $visitor->getResult ) if defined $visitor->getResult;
+        if (my $extra = $path[ ( scalar @match ) - 1 ]) {
+            $visitor->setSearchPath($extra);
+            $match[-1]->accept($visitor);
+            push( @match, $visitor->getResult ) if defined $visitor->getResult;
+        }
     }
 
     return map { $_->getNodeValue } @match;
