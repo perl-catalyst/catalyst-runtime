@@ -26,8 +26,9 @@ sub list {
     my ( $self, $c ) = @_;
     my $re = Text::SimpleTable->new( [ 36, 'Regex' ], [ 37, 'Private' ] );
     for my $regex ( @{ $self->{compiled} } ) {
+        my $compiled = $regex->{re};
         my $action   = $regex->{action};
-        $re->row( $regex->{path}, "/$action" );
+        $re->row( $compiled, "/$action" );
     }
     $c->log->debug( "Loaded Regex actions:\n" . $re->draw )
       if ( @{ $self->{compiled} } );
@@ -66,16 +67,12 @@ sub register {
     my ( $self, $c, $action ) = @_;
     my $attrs = $action->attributes;
     my @register = map { @{ $_ || [] } } @{$attrs}{ 'Regex', 'Regexp' };
-    foreach
-      my $r ( map { @{ $_ || [] } } @{$attrs}{ 'LocalRegex', 'LocalRegexp' } )
-    {
-        unless ( $r =~ s/^\^// ) { $r = "(?:.*?)$r"; }
-        push( @register, '^' . $action->namespace . '/' . $r );
-    }
-
     foreach my $r (@register) {
-        $self->register_path( $c, $r, $action );
-        $self->register_regex( $c, $r, $action );
+        unless ( $r =~ /^\^/ ) {    # Relative regex
+            $r = '^' . $action->namespace . '/' . $r;
+        }
+        $self->register_path($c, $r, $action);
+        $self->register_regex($c, $r, $action);
     }
 }
 
@@ -84,9 +81,9 @@ sub register {
 =cut
 
 sub register_regex {
-    my ( $self, $c, $re, $action ) = @_;
+    my ( $self, $c, $re, $action) = @_;
     push(
-        @{ $self->{compiled} },    # and compiled regex for us
+        @{ $self->{compiled} },      # and compiled regex for us
         {
             re     => qr#$re#,
             action => $action,
