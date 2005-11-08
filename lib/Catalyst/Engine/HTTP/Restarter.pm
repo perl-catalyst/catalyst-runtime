@@ -49,7 +49,7 @@ sub run {
                     PeerAddr => $host,
                     PeerPort => $port
                   )
-                  or die "can't create client socket (is server running?): ",
+                  or die "Can't create client socket (is server running?): ",
                   $!;
 
                 # build the Kill request
@@ -59,7 +59,7 @@ sub run {
                 $req->protocol('HTTP/1.0');
 
                 $client->send( $req->as_string )
-                  or die "can't send restart instruction: ", $!;
+                  or die "Can't send restart instruction: ", $!;
                 $client->close();
                 exit;
             }
