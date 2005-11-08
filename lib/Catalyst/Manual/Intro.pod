@@ -84,7 +84,7 @@ With Catalyst you register your actions and address them directly. For example:
 
     sub hello : Global {
         my ( $self, $context ) = @_;
-        $context->response->output('Hello World!');
+        $context->response->body('Hello World!');
     }
 
 Now http://localhost:3000/hello prints "Hello World!".
@@ -184,7 +184,6 @@ application, load plugins, define application-wide actions, and extend Catalyst.
 
     MyApp->config(
         name => 'My Application',
-        root => '/home/joeuser/myapp/root',
 
         # You can put anything else you want in here:
         my_configuration_variable => 'something',
@@ -192,13 +191,13 @@ application, load plugins, define application-wide actions, and extend Catalyst.
 
     sub default : Private {
         my ( $self, $context ) = @_;
-        $context->response->output('Catalyst rockz!');
+        $context->response->body('Catalyst rockz!');
     }
 
     1;
 
-For most applications, Catalyst requires you to define only two config
-parameters:
+For most applications, Catalyst requires you to define only one config
+parameter:
 
 =over 4
 
@@ -206,15 +205,13 @@ parameters:
 
 Name of your application.
 
-=item * B<root>
-
-Path to additional files such as templates, images, or other static data.
-
 =back
 
-However, you can define as many parameters as you want for plugins or whatever
-you need. You can access them anywhere in your application via
-C<$context-E<gt>config-E<gt>{$param_name}>.
+Optionally, you can specify a B<root> parameter for templates and static data.
+If omitted, Catalyst will try to auto-detect the directory's location. You
+can define as many parameters as you want for plugins or whatever you
+need. You can access them anywhere in your application
+via C<$context-E<gt>config-E<gt>{$param_name}>.
 
 =head3 Context
 
@@ -233,7 +230,7 @@ Catalyst developers just call it C<$c>:
 
     sub hello : Global {
         my ( $self, $c ) = @_;
-        $c->res->output('Hello World!');
+        $c->res->body('Hello World!');
     }
 
 The Context contains several important objects:
@@ -261,7 +258,7 @@ query parameters, cookies, uploads, headers, and more.
 The response is like the request, but contains just response-specific
 information.
 
-    $c->res->output('Hello World');
+    $c->res->body('Hello World');
     $c->res->status(404);
     $c->res->redirect('http://oook.de');
 
@@ -298,7 +295,7 @@ application components. For an example, we return to our 'hello' action:
 
     sub show_message : Private {
         my ( $self, $c ) = @_;
-        $c->res->output( $c->stash->{message} );
+        $c->res->body( $c->stash->{message} );
     }
 
 Note that the stash should be used only for passing data in an individual
@@ -336,10 +333,19 @@ Regex matches act globally, i.e. without reference to the namespace from which
 it is called, so that a C<bar> method in the
 C<MyApp::Controller::Catalog::Order::Process> namespace won't match any form of
 C<bar>, C<Catalog>, C<Order>, or C<Process> unless you explicitly put this in
-the regex.
+the regex. To achieve the above, you should consider using a C<LocalRegex> action.
 
-If you use capturing parentheses to extract values within the matching URL (23,
-42 in the above example), those values are available in the $c->req->snippets
+=item * B<LocalRegex>
+
+    sub bar : LocalRegex('^widget(\d+)$') { }
+
+LocalRegex actions act locally. If you were to use C<bar> in
+C<MyApp::Controller::Catalogue>, the above example would match urls like
+http://localhost:3000/catalogue/widget23.
+
+For both LocalRegex and Regex actions, if you use capturing parentheses to
+extract values within the matching URL ("widget23" would capture "23" in the
+above example), those values are available in the $c->req->snippets
 array. If you want to pass arguments at the end of your URL, you must use regex
 action keys. See L</URL Argument Handling> below.
 
@@ -401,6 +407,11 @@ call these built-in private actions in your application class:
 Called when no other action matches. Could be used, for example, for
 displaying a generic frontpage for the main app, or an error page for
 individual controllers.
+
+=item * B<index : Private>
+
+C<index> is much like C<default> except that it takes no arguments
+and it is weighted slightly higher in the matching process.
 
 =item * B<begin : Private>
 
@@ -556,7 +567,7 @@ debugging enabled).
 
     sub show_message : Private {
         my ( $self, $c ) = @_;
-        $c->res->output( $c->stash->{message} );
+        $c->res->body( $c->stash->{message} );
     }
 
 A C<forward> does not create a new request, so your request
@@ -607,12 +618,12 @@ Here are some examples of how to forward to classes and methods.
 
     sub say_hello {
         my ( $self, $c ) = @_;
-        $c->res->output('Hello World!');
+        $c->res->body('Hello World!');
     }
 
     sub process {
         my ( $self, $c ) = @_;
-        $c->res->output('Goodbye World!');
+        $c->res->body('Goodbye World!');
     }
 
 Note that C<forward> returns to the calling action and continues
