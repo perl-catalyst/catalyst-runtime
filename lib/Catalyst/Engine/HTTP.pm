@@ -109,25 +109,27 @@ sub run {
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
-    
+
     our $GOT_HUP;
     local $GOT_HUP = 0;
-    
+
     local $SIG{HUP} = sub { $GOT_HUP = 1; };
     local $SIG{CHLD} = 'IGNORE';
+
+    my $allowed = $options->{allowed} || { '127.0.0.1' => '255.255.255.255' };
 
     # Handle requests
 
     # Setup socket
     $host = $host ? inet_aton($host) : INADDR_ANY;
     socket( HTTPDaemon, PF_INET, SOCK_STREAM, getprotobyname('tcp') )
-        || die "Couldn't assign TCP socket: $!";
+      || die "Couldn't assign TCP socket: $!";
     setsockopt( HTTPDaemon, SOL_SOCKET, SO_REUSEADDR, pack( "l", 1 ) )
-        || die "Couldn't set TCP socket options: $!";
+      || die "Couldn't set TCP socket options: $!";
     bind( HTTPDaemon, sockaddr_in( $port, $host ) )
-        || die "Couldn't bind socket to $port on $host: $!";
+      || die "Couldn't bind socket to $port on $host: $!";
     listen( HTTPDaemon, SOMAXCONN )
-	|| die "Couldn't listen to socket on $port on $host: $!";
+      || die "Couldn't listen to socket on $port on $host: $!";
     my $url = 'http://';
     if ( $host eq INADDR_ANY ) {
         require Sys::Hostname;
@@ -213,9 +215,22 @@ sub run {
                 }
             }
         }
+        unless ( uc($method) eq 'KILL' ) {
 
-        # Pass flow control to Catalyst
-        $class->handle_request;
+            # Pass flow control to Catalyst
+            $class->handle_request;
+        }
+        else {
+            my $ipaddr = _inet_addr($peeraddr);
+            my $ready  = 0;
+            while ( my ( $ip, $mask ) = each %$allowed and not $ready ) {
+                $ready = ( $ipaddr & _inet_addr($mask) ) == _inet_addr($ip);
+            }
+            if ($ready) {
+                $GOT_HUP = 1;
+                last;
+            }
+        }
         exit if defined $pid;
     }
     continue {
@@ -226,7 +241,7 @@ sub run {
     if ($GOT_HUP) {
         $SIG{CHLD} = 'DEFAULT';
         wait;
-        exec $^X . ' "' . $0 . '" ' . join(' ', @{$options->{argv}});
+        exec $^X . ' "' . $0 . '" ' . join( ' ', @{ $options->{argv} } );
     }
 }
 
@@ -244,6 +259,8 @@ sub _get_line {
 
     return $line;
 }
+
+sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
 
 =back
 

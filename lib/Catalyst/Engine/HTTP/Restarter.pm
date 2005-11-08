@@ -14,31 +14,53 @@ sub run {
     # Setup restarter
     my $restarter;
     my $parent = $$;
-    
+
     unless ( $restarter = fork ) {
 
         # Prepare
         close STDIN;
         close STDOUT;
-        
+
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
             directory => File::Spec->catdir( $FindBin::Bin, '..' ),
             regex     => $options->{restart_regex},
             delay     => $options->{restart_delay},
         );
 
+        $host ||= '127.0.0.1';
         while (1) {
+
             # poll for changed files
             my @changed_files = $watcher->watch();
-            
+
             # check if our parent process has died
-            exit if ( getppid == 1 );            
-            
+            exit if $^O ne 'MSWin32' and getppid == 1;
+
             # Restart if any files have changed
-            if ( @changed_files ) {
+            if (@changed_files) {
                 my $files = join ', ', @changed_files;
                 print STDERR qq/File(s) "$files" modified, restarting\n\n/;
-                kill( 1, $parent );
+
+                require IO::Socket::INET;
+                require HTTP::Headers;
+                require HTTP::Request;
+
+                my $client = IO::Socket::INET->new(
+                    PeerAddr => $host,
+                    PeerPort => $port
+                  )
+                  or die "can't create client socket (is server running?): ",
+                  $!;
+
+                # build the Kill request
+                my $req =
+                  HTTP::Request->new( 'KILL', '/',
+                    HTTP::Headers->new( 'Connection' => 'close' ) );
+                $req->protocol('HTTP/1.0');
+
+                $client->send( $req->as_string )
+                  or die "can't send restart instruction: ", $!;
+                $client->close();
                 exit;
             }
         }
