@@ -988,7 +988,7 @@ Get an action in a given namespace.
 
 =cut
 
-sub get_action { my $c = shift; $c->dispatcher->get_action( $c, @_ ) }
+sub get_action { my $c = shift; $c->dispatcher->get_action( @_ ) }
 
 =item $c->get_actions( $action, $namespace )
 

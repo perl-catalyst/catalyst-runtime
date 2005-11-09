@@ -192,12 +192,12 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-=item $self->get_action( $c, $action, $namespace )
+=item $self->get_action( $action, $namespace )
 
 =cut
 
 sub get_action {
-    my ( $self, $c, $name, $namespace ) = @_;
+    my ( $self, $name, $namespace ) = @_;
     return unless $name;
     $namespace ||= '';
     $namespace = '' if $namespace eq '/';
@@ -206,7 +206,7 @@ sub get_action {
 
     return unless @match;
 
-    if ( my $action = $match[-1]->get_action( $c, $name ) ) {
+    if ( my $action = $match[-1]->get_action( $name ) ) {
         return $action if $action->namespace eq $namespace;
     }
 }
@@ -223,7 +223,7 @@ sub get_actions {
 
     my @match = $self->get_containers($namespace);
 
-    return map { $_->get_action( $c, $action ) } @match;
+    return map { $_->get_action( $action ) } @match;
 }
 
 =item $self->get_containers( $namespace )

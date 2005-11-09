@@ -31,7 +31,7 @@ See L<Catalyst>.
 =cut
 
 sub get_action {
-    my ( $self, $c, $name ) = @_;
+    my ( $self, $name ) = @_;
     return $self->actions->{$name} if defined $self->actions->{$name};
     return;
 }
