@@ -317,9 +317,23 @@ Catalyst supports several types of actions:
 
 =item * B<Literal>
 
+    package MyApp::C::My::Controller;
     sub bar : Path('foo/bar') { }
 
+Literal C<Path> actions will act relative to their current namespace. The above
+example matches only http://localhost:3000/my/controller/foo/bar. If you start
+your path with a forward slash, it will match from the root. Example:
+
+    package MyApp::C::My::Controller;
+    sub bar : Path('/foo/bar') { }
+
 Matches only http://localhost:3000/foo/bar.
+
+    package MyApp::C::My::Controller;
+    sub bar : Path { }
+
+By leaving the C<Path> definition empty, it will match on the namespace root.
+The above code matches http://localhost:3000/my/controller.
 
 =item * B<Regex>
 
@@ -340,8 +354,16 @@ the regex. To achieve the above, you should consider using a C<LocalRegex> actio
     sub bar : LocalRegex('^widget(\d+)$') { }
 
 LocalRegex actions act locally. If you were to use C<bar> in
-C<MyApp::Controller::Catalogue>, the above example would match urls like
-http://localhost:3000/catalogue/widget23.
+C<MyApp::Controller::Catalog>, the above example would match urls like
+http://localhost:3000/catalog/widget23.
+
+If you omit the "C<^>" from your regex, then it will match any depth from the
+controller and not immediately off of the controller name. The following example
+differes from the above code in that it will match
+http://localhost:3000/catalog/foo/widget23 as well.
+
+    package MyApp::Controller::Catalog;
+    sub bar : LocalRegex('widget(\d+)$') { }
 
 For both LocalRegex and Regex actions, if you use capturing parentheses to
 extract values within the matching URL ("widget23" would capture "23" in the
@@ -407,6 +429,11 @@ call these built-in private actions in your application class:
 Called when no other action matches. Could be used, for example, for
 displaying a generic frontpage for the main app, or an error page for
 individual controllers.
+
+If C<default> isn't acting how you would expect, look at using a
+L<Literal> C<Path> action (with an empty path string). The difference
+being that C<Path> takes arguments relative from the namespace and
+C<default> takes arguments relative from the root.
 
 =item * B<index : Private>
 
