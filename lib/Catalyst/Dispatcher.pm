@@ -206,7 +206,7 @@ sub get_action {
 
     return unless @match;
 
-    if ( my $action = $match[-1]->get_action( $name ) ) {
+    if ( my $action = $match[-1]->get_action($name) ) {
         return $action if $action->namespace eq $namespace;
     }
 }
@@ -223,7 +223,7 @@ sub get_actions {
 
     my @match = $self->get_containers($namespace);
 
-    return map { $_->get_action( $action ) } @match;
+    return map { $_->get_action($action) } @match;
 }
 
 =item $self->get_containers( $namespace )
@@ -361,7 +361,11 @@ sub setup_actions {
 
     return unless $c->debug;
 
-    my $privates = Text::SimpleTable->new( [ 36, 'Private' ], [ 37, 'Class' ] );
+    my $privates = Text::SimpleTable->new(
+        [ 24, 'Private' ],
+        [ 23, 'Class' ],
+        [ 23, 'Method' ]
+    );
 
     my $has_private = 0;
     my $walker = sub {
@@ -375,7 +379,7 @@ sub setup_actions {
             next
               if ( ( $action =~ /^_.*/ )
                 && ( !$c->config->{show_internal_actions} ) );
-            $privates->row( "$prefix$action", $action_obj->class );
+            $privates->row( "$prefix$action", $action_obj->class, $action );
             $has_private = 1;
         }
 

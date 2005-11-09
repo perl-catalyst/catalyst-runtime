@@ -1,7 +1,7 @@
 package Catalyst::Component;
 
 use strict;
-use base qw/Class::Data::Inheritable/;
+use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use NEXT;
 
 __PACKAGE__->mk_classdata($_) for qw/_config/;

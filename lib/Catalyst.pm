@@ -22,7 +22,7 @@ __PACKAGE__->mk_accessors(
     qw/counter depth request response state action namespace/
 );
 
-attributes->import(__PACKAGE__, \&namespace, 'lvalue');
+attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
 
 # Laziness++
 *comp = \&component;
@@ -415,8 +415,11 @@ sub setup {
     $class->setup_components;
 
     if ( $class->debug ) {
-        my $t = Text::SimpleTable->new(76);
-        $t->row($_) for sort keys %{ $class->components };
+        my $t = Text::SimpleTable->new( [ 37, 'Class' ], [ 36, 'Type' ] );
+        for my $comp ( sort keys %{ $class->components } ) {
+            my $type = ref $class->components->{$comp} ? 'instance' : 'class';
+            $t->row( $comp, $type );
+        }
         $class->log->debug( "Loaded components:\n" . $t->draw )
           if ( keys %{ $class->components } );
     }
@@ -991,7 +994,7 @@ Get an action in a given namespace.
 
 =cut
 
-sub get_action { my $c = shift; $c->dispatcher->get_action( @_ ) }
+sub get_action { my $c = shift; $c->dispatcher->get_action(@_) }
 
 =item $c->get_actions( $action, $namespace )
 
