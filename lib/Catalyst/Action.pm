@@ -41,7 +41,7 @@ See L<Catalyst>.
 
 sub execute {    # Execute ourselves against a context
     my ( $self, $c ) = @_;
-    local $c->{namespace} = $self->namespace;
+    local $c->namespace = $self->namespace;
     return $c->execute( $self->class, $self );
 }
 

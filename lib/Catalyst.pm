@@ -16,10 +16,13 @@ use Path::Class;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
 use Scalar::Util qw/weaken/;
+use attributes;
 
 __PACKAGE__->mk_accessors(
     qw/counter depth request response state action namespace/
 );
+
+attributes->import(__PACKAGE__, \&namespace, 'lvalue');
 
 # Laziness++
 *comp = \&component;
