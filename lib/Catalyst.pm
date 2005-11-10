@@ -789,6 +789,10 @@ sub benchmark {
 
 Contains the components.
 
+=item $c->context_class($class)
+
+Contains the context class.
+
 =item $c->counter
 
 Returns a hashref containing coderefs and execution counts.
@@ -806,6 +810,10 @@ Dispatch request to actions.
 
 sub dispatch { my $c = shift; $c->dispatcher->dispatch( $c, @_ ) }
 
+=item $c->dispatcher_class($class)
+
+Contains the dispatcher class.
+
 =item dump_these
 
 Returns a list of 2-element array references (name, structure) pairs that will
@@ -817,6 +825,10 @@ sub dump_these {
     my $c = shift;
     [ Request => $c->req ], [ Response => $c->res ], [ Stash => $c->stash ],;
 }
+
+=item $c->engine_class($class)
+
+Contains the engine class.
 
 =item $c->execute($class, $coderef)
 
@@ -1314,6 +1326,14 @@ Prepare the output for writing.
 =cut
 
 sub prepare_write { my $c = shift; $c->engine->prepare_write( $c, @_ ) }
+
+=item $c->request_class($class)
+
+Contains the request class.
+
+=item $c->response_class($class)
+
+Contains the response class.
 
 =item $c->read( [$maxlength] )
 
