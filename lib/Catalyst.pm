@@ -375,11 +375,13 @@ sub setup {
         }
     }
 
-    $class->log->warn( "You are running an old helper script! "
-          . "Please update your scripts by regenerating the "
-          . "application and copying over the new scripts." )
-      if ( $ENV{CATALYST_SCRIPT_GEN}
-        && ( $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::CATALYST_SCRIPT_GEN ) );
+    $class->log->warn(
+        <<"EOF") if ( $ENV{CATALYST_SCRIPT_GEN} && ( $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::CATALYST_SCRIPT_GEN ) );
+You are running an old script!
+
+  Please update by running:
+    catalyst.pl -nonew -scripts $class
+EOF
 
     if ( $class->debug ) {
 
