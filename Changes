@@ -1,6 +1,7 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
 5.50
+        - Fixed catalyst.pl-generated Build.PL Makefile section.
         - Fixed relative forwarding
         - Fixed forward arrows in debug output
 

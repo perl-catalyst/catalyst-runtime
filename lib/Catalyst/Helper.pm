@@ -604,7 +604,6 @@ use strict;
 use Catalyst::Build;
 
 my $build = Catalyst::Build->new(
-    create_makefile_pl => 'passthrough',
     license            => 'perl',
     module_name        => '[% name %]',
     requires           => { Catalyst => '5.49' },
