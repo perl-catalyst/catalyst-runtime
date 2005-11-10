@@ -1,10 +1,11 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
-5.50
+5.49_04 2005-11-09 23:00:00
         - Made context, dispatcher, engine, request and response classes
-          configurable
-        - Added $c->stack
-        - Fixed dispatcher to ignore unknown attributes
+          configurable.
+        - Added $c->stack.
+        - Fixed dispatcher to ignore unknown attributes.
+        - Improved format of startup debug log.
         - Updated built in server to restart on win32. (Will Hawes)
         - Fixed streaming write from a filehandle to stop writing
           if the browser is closed.
