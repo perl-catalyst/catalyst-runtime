@@ -58,7 +58,7 @@ sub dispatch {
     my ( $self, $c ) = @_;
 
     if ( $c->action ) {
-        $c->forward( join( '/', '', $c->namespace, '_DISPATCH' ) );
+        $c->forward( join( '/', '', $c->action->namespace, '_DISPATCH' ) );
     }
 
     else {

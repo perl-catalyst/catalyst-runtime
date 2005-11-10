@@ -19,10 +19,13 @@ use Scalar::Util qw/weaken/;
 use attributes;
 
 __PACKAGE__->mk_accessors(
-    qw/counter depth request response state action namespace/
+    qw/counter request response state action stack namespace/
 );
 
 attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
+
+sub depth { scalar @{shift->stack||[]}; }
+#sub namespace { my $a = shift->stack->[-1]; ($a ? $a->namespace : ''); }
 
 # Laziness++
 *comp = \&component;
@@ -859,7 +862,7 @@ sub execute {
 
         $action = "-> $action" if $callsub =~ /forward$/;
     }
-    $c->{depth}++;
+    push(@{$c->stack}, $code);
     eval {
         if ( $c->debug )
         {
@@ -876,11 +879,11 @@ sub execute {
             $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 );
         }
     };
-    $c->{depth}--;
+    pop(@{$c->stack});
 
     if ( my $error = $@ ) {
 
-        if ( $error eq $DETACH ) { die $DETACH if $c->{depth} > 1 }
+        if ( $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
         else {
             unless ( ref $error ) {
                 chomp $error;
@@ -1083,7 +1086,7 @@ sub prepare {
     my $c = $class->context_class->new(
         {
             counter => {},
-            depth   => 0,
+            stack   => [],
             request => $class->request_class->new(
                 {
                     arguments        => [],
