@@ -44,7 +44,28 @@ require Module::Pluggable::Fast;
 our $CATALYST_SCRIPT_GEN = 10;
 
 __PACKAGE__->mk_classdata($_)
-  for qw/components arguments dispatcher engine log/;
+  for qw/components arguments dispatcher engine log _dispatcher_class
+    _engine_class _context_class _request_class _response_class/;
+
+sub dispatcher_class {
+    return $_[0]->_dispatcher_class(@_[1..$#_]) || 'Catalyst::Dispatcher';
+}
+
+sub engine_class {
+    return $_[0]->_engine_class(@_[1..$#_]) || 'Catalyst::Engine::CGI';
+}
+
+sub context_class {
+    return $_[0]->_context_class(@_[1..$#_]) || ref $_[0] || $_[0];
+}
+
+sub request_class {
+    return $_[0]->_request_class(@_[1..$#_]) || 'Catalyst::Request';
+}
+
+sub response_class {
+    return $_[0]->_response_class(@_[1..$#_]) || 'Catalyst::Response';
+}
 
 our $VERSION = '5.49_03';
 
@@ -1061,10 +1082,10 @@ into a Catalyst context .
 sub prepare {
     my ( $class, @arguments ) = @_;
 
-    my $c = bless {
+    my $c = $class->context_class->new({
         counter => {},
         depth   => 0,
-        request => Catalyst::Request->new(
+        request => $class->request_class->new(
             {
                 arguments        => [],
                 body_parameters  => {},
@@ -1077,7 +1098,7 @@ sub prepare {
                 uploads          => {}
             }
         ),
-        response => Catalyst::Response->new(
+        response => $class->response_class->new(
             {
                 body    => '',
                 cookies => {},
@@ -1087,7 +1108,7 @@ sub prepare {
         ),
         stash => {},
         state => 0
-    }, $class;
+    });
 
     # For on-demand data
     $c->request->{_context}  = $c;
@@ -1426,7 +1447,7 @@ sub setup_dispatcher {
     }
 
     unless ($dispatcher) {
-        $dispatcher = 'Catalyst::Dispatcher';
+        $dispatcher = $class->dispatcher_class;
     }
 
     $dispatcher->require;
@@ -1515,7 +1536,7 @@ sub setup_engine {
     }
 
     unless ($engine) {
-        $engine = 'Catalyst::Engine::CGI';
+        $engine = $class->engine_class;
     }
 
     $engine->require;
