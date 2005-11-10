@@ -100,6 +100,11 @@ METHODS
     config
         Returns a hashref containing your applications settings.
 
+    $c->controller($name)
+        Get a Catalyst::Controller instance by name.
+
+            $c->controller('Foo')->do_stuff;
+
     debug
         Overload to enable debug messages.
 
@@ -120,6 +125,11 @@ METHODS
             $c->forward('index');
             $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
             $c->forward('MyApp::View::TT');
+
+    $c->model($name)
+        Get a Catalyst::Model instance by name.
+
+            $c->model('Foo')->do_stuff;
 
     $c->namespace
         Accessor to the namespace of the current action
@@ -209,6 +219,11 @@ METHODS
             $c->stash( { moose => 'majestic', qux => 0 } );
             $c->stash( bar => 1, gorch => 2 );
 
+    $c->view($name)
+        Get a Catalyst::View instance by name.
+
+            $c->view('Foo')->do_stuff;
+
     $c->welcome_message
         Returns the Catalyst welcome HTML page.
 
@@ -222,6 +237,9 @@ INTERNAL METHODS
     $c->components
         Contains the components.
 
+    $c->context_class($class)
+        Contains the context class.
+
     $c->counter
         Returns a hashref containing coderefs and execution counts. (Needed
         for deep recursion detection)
@@ -232,9 +250,15 @@ INTERNAL METHODS
     $c->dispatch
         Dispatch request to actions.
 
+    $c->dispatcher_class($class)
+        Contains the dispatcher class.
+
     dump_these
         Returns a list of 2-element array references (name, structure) pairs
         that will be dumped on the error page in debug mode.
+
+    $c->engine_class($class)
+        Contains the engine class.
 
     $c->execute($class, $coderef)
         Execute a coderef in given class and catch exceptions. Errors are
@@ -320,6 +344,12 @@ INTERNAL METHODS
     $c->prepare_write
         Prepare the output for writing.
 
+    $c->request_class($class)
+        Contains the request class.
+
+    $c->response_class($class)
+        Contains the response class.
+
     $c->read( [$maxlength] )
         Read a chunk of data from the request body. This method is designed
         to be used in a while loop, reading $maxlength bytes on every call.
@@ -345,6 +375,9 @@ INTERNAL METHODS
     $c->setup_home
     $c->setup_log
     $c->setup_plugins
+    $c->stack
+        Contains the stack.
+
     $c->write( $data )
         Writes $data to the output stream. When using this method directly,
         you will need to manually set the Content-Length header to the
@@ -460,6 +493,8 @@ CREDITS
 
     Autrijus Tang
 
+    Brian Cassidy
+
     Christian Hansen
 
     Christopher Hicks
@@ -493,6 +528,8 @@ CREDITS
     Robert Sedlacek
 
     Sam Vilain
+
+    Sascha Kiefer
 
     Tatsuhiko Miyagawa
 
