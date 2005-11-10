@@ -843,7 +843,11 @@ sub execute {
     my ( $c, $class, $code ) = @_;
     $class = $c->components->{$class} || $class;
     $c->state(0);
-    my $callsub = ( caller(1) )[3];
+
+    my $callsub =
+        ( caller(0) )[0]->isa('Catalyst::Action')
+      ? ( caller(2) )[3]
+      : ( caller(1) )[3];
 
     my $action = '';
     if ( $c->debug ) {

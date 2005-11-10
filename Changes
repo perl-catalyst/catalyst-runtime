@@ -1,5 +1,9 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
+5.50
+        - Fixed relative forwarding
+        - Fixed forward arrows in debug output
+
 5.49_04 2005-11-09 23:00:00
         - Made context, dispatcher, engine, request and response classes
           configurable.
