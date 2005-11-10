@@ -373,9 +373,9 @@ sub setup_actions {
     return unless $c->debug;
 
     my $privates = Text::SimpleTable->new(
-        [ 24, 'Private' ],
-        [ 23, 'Class' ],
-        [ 23, 'Method' ]
+        [ 20, 'Private' ],
+        [ 38, 'Class' ],
+        [ 12, 'Method' ]
     );
 
     my $has_private = 0;
