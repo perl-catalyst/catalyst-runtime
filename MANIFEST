@@ -124,7 +124,8 @@ t/optional/http-server.t
 t/optional/memleak.t
 t/optional/stress.t
 t/optional/stress.yml
+t/optional/threads.t
 t/unit/core/component.t
+t/unit/core/mvc.t
 t/unit/core/path_to.t
-t/unit/core/threads.t
 t/unit/core/uri_for.t
