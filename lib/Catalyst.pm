@@ -1395,7 +1395,7 @@ sub setup_components {
             return $component;
         }
 
-        my $suffix = Catalyst::Utils::class2classsuffix($class);
+        my $suffix = Catalyst::Utils::class2classsuffix($component);
         my $config = $class->config->{$suffix} || {};
 
         my $instance;
