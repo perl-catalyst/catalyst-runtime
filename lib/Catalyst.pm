@@ -415,7 +415,7 @@ sub setup {
     $class->setup_components;
 
     if ( $class->debug ) {
-        my $t = Text::SimpleTable->new( [ 37, 'Class' ], [ 36, 'Type' ] );
+        my $t = Text::SimpleTable->new( [ 65, 'Class' ], [ 8, 'Type' ] );
         for my $comp ( sort keys %{ $class->components } ) {
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
             $t->row( $comp, $type );
