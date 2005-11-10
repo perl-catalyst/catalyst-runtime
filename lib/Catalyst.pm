@@ -24,8 +24,7 @@ __PACKAGE__->mk_accessors(
 
 attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
 
-sub depth { scalar @{shift->stack||[]}; }
-#sub namespace { my $a = shift->stack->[-1]; ($a ? $a->namespace : ''); }
+sub depth { scalar @{ shift->stack || [] }; }
 
 # Laziness++
 *comp = \&component;
@@ -862,7 +861,7 @@ sub execute {
 
         $action = "-> $action" if $callsub =~ /forward$/;
     }
-    push(@{$c->stack}, $code);
+    push( @{ $c->stack }, $code );
     eval {
         if ( $c->debug )
         {
@@ -879,7 +878,7 @@ sub execute {
             $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 );
         }
     };
-    pop(@{$c->stack});
+    pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
 
@@ -1669,6 +1668,10 @@ sub setup_plugins {
         }
     }
 }
+
+=item $c->stack
+
+Contains the stack.
 
 =item $c->write( $data )
 
