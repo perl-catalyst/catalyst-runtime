@@ -44,28 +44,13 @@ require Module::Pluggable::Fast;
 our $CATALYST_SCRIPT_GEN = 10;
 
 __PACKAGE__->mk_classdata($_)
-  for qw/components arguments dispatcher engine log _dispatcher_class
-    _engine_class _context_class _request_class _response_class/;
+  for qw/components arguments dispatcher engine log dispatcher_class
+  engine_class context_class request_class response_class/;
 
-sub dispatcher_class {
-    return $_[0]->_dispatcher_class(@_[1..$#_]) || 'Catalyst::Dispatcher';
-}
-
-sub engine_class {
-    return $_[0]->_engine_class(@_[1..$#_]) || 'Catalyst::Engine::CGI';
-}
-
-sub context_class {
-    return $_[0]->_context_class(@_[1..$#_]) || ref $_[0] || $_[0];
-}
-
-sub request_class {
-    return $_[0]->_request_class(@_[1..$#_]) || 'Catalyst::Request';
-}
-
-sub response_class {
-    return $_[0]->_response_class(@_[1..$#_]) || 'Catalyst::Response';
-}
+__PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
+__PACKAGE__->engine_class('Catalyst::Engine::CGI');
+__PACKAGE__->request_class('Catalyst::Request');
+__PACKAGE__->response_class('Catalyst::Response');
 
 our $VERSION = '5.49_03';
 
@@ -1082,33 +1067,36 @@ into a Catalyst context .
 sub prepare {
     my ( $class, @arguments ) = @_;
 
-    my $c = $class->context_class->new({
-        counter => {},
-        depth   => 0,
-        request => $class->request_class->new(
-            {
-                arguments        => [],
-                body_parameters  => {},
-                cookies          => {},
-                headers          => HTTP::Headers->new,
-                parameters       => {},
-                query_parameters => {},
-                secure           => 0,
-                snippets         => [],
-                uploads          => {}
-            }
-        ),
-        response => $class->response_class->new(
-            {
-                body    => '',
-                cookies => {},
-                headers => HTTP::Headers->new(),
-                status  => 200
-            }
-        ),
-        stash => {},
-        state => 0
-    });
+    $class->context_class( ref $class || $class ) unless $class->context_class;
+    my $c = $class->context_class->new(
+        {
+            counter => {},
+            depth   => 0,
+            request => $class->request_class->new(
+                {
+                    arguments        => [],
+                    body_parameters  => {},
+                    cookies          => {},
+                    headers          => HTTP::Headers->new,
+                    parameters       => {},
+                    query_parameters => {},
+                    secure           => 0,
+                    snippets         => [],
+                    uploads          => {}
+                }
+            ),
+            response => $class->response_class->new(
+                {
+                    body    => '',
+                    cookies => {},
+                    headers => HTTP::Headers->new(),
+                    status  => 200
+                }
+            ),
+            stash => {},
+            state => 0
+        }
+    );
 
     # For on-demand data
     $c->request->{_context}  = $c;
