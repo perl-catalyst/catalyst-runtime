@@ -369,7 +369,7 @@ For both LocalRegex and Regex actions, if you use capturing parentheses to
 extract values within the matching URL ("widget23" would capture "23" in the
 above example), those values are available in the $c->req->snippets
 array. If you want to pass arguments at the end of your URL, you must use regex
-action keys. See L</URL Argument Handling> below.
+action keys. See L</URL Path Handling> below.
 
 =item * B<Top-level>
 
