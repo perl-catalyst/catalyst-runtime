@@ -93,7 +93,7 @@ sub forward {
         my $command_copy = $command;
 
         unless ( $command_copy =~ s/^\/// ) {
-            my $namespace = $c->namespace;
+            my $namespace = $c->stack->[-1]->namespace;
             $command_copy = "${namespace}/${command}";
         }
 
