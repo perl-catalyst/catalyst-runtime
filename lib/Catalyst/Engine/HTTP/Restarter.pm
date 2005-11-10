@@ -11,6 +11,9 @@ sub run {
 
     $options ||= {};
 
+    die "Sorry, but 'restart' doesn't work together with 'fork'.\n"
+      if $options->{fork};
+
     # Setup restarter
     my $restarter;
     my $parent = $$;
