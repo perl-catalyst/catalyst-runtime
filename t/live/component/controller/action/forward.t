@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 30*$iters;
+use Test::More tests => 44 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -33,7 +33,7 @@ sub run_tests {
           TestApp::Controller::Action::Forward->four
           TestApp::Controller::Action::Forward->five
           TestApp::View::Dump::Request->process
-	  TestApp->end
+          TestApp->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -81,7 +81,7 @@ sub run_tests {
           TestApp::Controller::Action::Forward->four
           TestApp::Controller::Action::Forward->five
           TestApp::View::Dump::Request->process
-	  TestApp->end
+          TestApp->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -145,5 +145,81 @@ sub run_tests {
         );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content, 'ok' );
+    }
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Relative->begin
+          TestApp::Controller::Action::Relative->relative
+          TestApp::Controller::Action::Forward->one
+          TestApp::Controller::Action::Forward->two
+          TestApp::Controller::Action::Forward->three
+          TestApp::Controller::Action::Forward->four
+          TestApp::Controller::Action::Forward->five
+          TestApp::View::Dump::Request->process
+          TestApp->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        # Test forward to chain of actions.
+        ok( my $response = request('http://localhost/action/relative/relative'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            'action/relative/relative', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Relative',
+            'Test Class'
+        );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        like(
+            $response->content,
+            qr/^bless\( .* 'Catalyst::Request' \)$/s,
+            'Content is a serialized Catalyst::Request'
+        );
+    }
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Relative->begin
+          TestApp::Controller::Action::Relative->relative_two
+          TestApp::Controller::Action::Forward->one
+          TestApp::Controller::Action::Forward->two
+          TestApp::Controller::Action::Forward->three
+          TestApp::Controller::Action::Forward->four
+          TestApp::Controller::Action::Forward->five
+          TestApp::View::Dump::Request->process
+          TestApp->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        # Test forward to chain of actions.
+        ok(
+            my $response =
+              request('http://localhost/action/relative/relative_two'),
+            'Request'
+        );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is(
+            $response->header('X-Catalyst-Action'),
+            'action/relative/relative_two',
+            'Test Action'
+        );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Relative',
+            'Test Class'
+        );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        like(
+            $response->content,
+            qr/^bless\( .* 'Catalyst::Request' \)$/s,
+            'Content is a serialized Catalyst::Request'
+        );
     }
 }

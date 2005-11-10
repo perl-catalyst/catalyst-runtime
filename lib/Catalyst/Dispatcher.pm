@@ -80,13 +80,6 @@ sub forward {
     my $c       = shift;
     my $command = shift;
 
-    # Get the calling class
-    my $caller = ( caller(0) )[0];
-    if ( $caller->isa('Catalyst') ) {
-        if    ( ( caller(2) )[3] =~ /detach$/ )  { $caller = caller(3) }
-        elsif ( ( caller(0) )[3] =~ /forward$/ ) { $caller = caller(1) }
-    }
-
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
@@ -100,11 +93,8 @@ sub forward {
         my $command_copy = $command;
 
         unless ( $command_copy =~ s/^\/// ) {
-            my $prefix =
-              Catalyst::Utils::class2prefix( $caller,
-                $c->config->{case_sensitive} )
-              || '';
-            $command_copy = "${prefix}/${command}";
+            my $namespace = $c->stack->[-1]->namespace;
+            $command_copy = "${namespace}/${command}";
         }
 
         unless ( $command_copy =~ /\// ) {
@@ -145,7 +135,9 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
                     code      => $code,
                     reverse   => "$class->$method",
                     class     => $class,
-                    namespace => $class,
+                    namespace => Catalyst::Utils::class2prefix(
+                        $class, $c->config->{case_sensitive}
+                    ),
                 }
             );
             $result = $action;
