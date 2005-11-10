@@ -55,12 +55,36 @@ sub _END : Private {
     return !@{ $c->error };
 }
 
+=head1 NAME
+
+Catalyst::Base - Catalyst Base Class
+
+=head1 SYNOPSIS
+
+See L<Catalyst>
+
+=head1 DESCRIPTION
+
+Catalyst Base Class
+
+=head1 METHODS
+
+=over 4
+
+=item $self->action_namespace($c)
+
+=cut
+
 sub action_namespace {
     my ( $self, $c ) = @_;
     return Catalyst::Utils::class2prefix( ref $self,
         $c->config->{case_sensitive} )
       || '';
 }
+
+=item $self->register_actions($c)
+
+=cut
 
 sub register_actions {
     my ( $self, $c ) = @_;
@@ -114,7 +138,8 @@ sub _parse_attrs {
 
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
 
-        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+?)\s*\))?$/ ) ) {
+        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+?)\s*\))?$/ ) )
+        {
 
             if ( defined $value ) {
                 ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
@@ -124,20 +149,6 @@ sub _parse_attrs {
     }
     return \%attributes;
 }
-
-=head1 NAME
-
-Catalyst::Base - Catalyst Controller Base Class
-
-=head1 SYNOPSIS
-
-
-=head1 DESCRIPTION
-
-
-=head1 METHODS
-
-=over 4
 
 =back
 

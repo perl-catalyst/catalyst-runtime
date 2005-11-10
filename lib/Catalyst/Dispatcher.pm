@@ -268,6 +268,10 @@ sub get_containers {
     return map { $_->getNodeValue } @match;
 }
 
+=item $self->register( $c, $action )
+
+=cut
+
 sub register {
     my ( $self, $c, $action ) = @_;
 
