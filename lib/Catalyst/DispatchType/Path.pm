@@ -62,7 +62,7 @@ sub register {
     my @register;
 
     foreach my $r ( @{ $attrs->{Path} || [] } ) {
-        unless ( $r ) {
+        unless ($r) {
             $r = $action->namespace;
         }
         elsif ( $r !~ m!^/! ) {    # It's a relative path
@@ -81,7 +81,9 @@ sub register {
         # Register sub name as a relative path
     }
 
-    $self->register_path($c, $_, $action) for @register;
+    $self->register_path( $c, $_, $action ) for @register;
+    return 1 if @register;
+    return 0;
 }
 
 =item $self->register_path($c, $path, $action)
@@ -89,7 +91,7 @@ sub register {
 =cut
 
 sub register_path {
-    my ($self, $c, $path, $action) = @_;
+    my ( $self, $c, $path, $action ) = @_;
     $path =~ s!^/!!;
     $self->{paths}{$path} = $action;
 }

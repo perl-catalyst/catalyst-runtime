@@ -26,7 +26,7 @@ sub list {
     my ( $self, $c ) = @_;
     my $re = Text::SimpleTable->new( [ 36, 'Regex' ], [ 37, 'Private' ] );
     for my $regex ( @{ $self->{compiled} } ) {
-        my $action   = $regex->{action};
+        my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
     }
     $c->log->debug( "Loaded Regex actions:\n" . $re->draw )
@@ -77,6 +77,8 @@ sub register {
         $self->register_path( $c, $r, $action );
         $self->register_regex( $c, $r, $action );
     }
+    return 1 if @register;
+    return 0;
 }
 
 =item $self->register_regex($c, $re, $action)

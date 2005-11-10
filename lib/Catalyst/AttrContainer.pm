@@ -13,7 +13,6 @@ __PACKAGE__->_action_cache( [] );
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {
     my ( $class, $code, @attrs ) = @_;
-    return if ( ( $attrs[0] eq 'lvalue' ) && ( @attrs == 1 ) );
     $class->_attr_cache( { %{ $class->_attr_cache }, $code => [@attrs] } );
     $class->_action_cache(
         [ @{ $class->_action_cache }, [ $code, [@attrs] ] ] );

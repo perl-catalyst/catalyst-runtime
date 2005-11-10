@@ -271,6 +271,27 @@ sub get_containers {
 sub register {
     my ( $self, $c, $action ) = @_;
 
+    my $registered = $self->registered_dispatch_types;
+
+    my $priv = 0;
+    foreach my $key ( keys %{ $action->attributes } ) {
+        $priv++ if $key eq 'Private';
+        my $class = "Catalyst::DispatchType::$key";
+        unless ( $registered->{$class} ) {
+            eval "require $class";
+            push( @{ $self->dispatch_types }, $class->new ) unless $@;
+            $registered->{$class} = 1;
+        }
+    }
+
+    # Pass the action to our dispatch types so they can register it if reqd.
+    my $reg = 0;
+    foreach my $type ( @{ $self->dispatch_types } ) {
+        $reg++ if $type->register( $c, $action );
+    }
+
+    return unless $reg + $priv;
+
     my $namespace = $action->namespace;
     my $parent    = $self->tree;
     my $visitor   = Tree::Simple::Visitor::FindByPath->new;
@@ -301,22 +322,6 @@ sub register {
 
     # Set the method value
     $parent->getNodeValue->actions->{ $action->name } = $action;
-
-    my $registered = $self->registered_dispatch_types;
-
-    foreach my $key ( keys %{ $action->attributes } ) {
-        my $class = "Catalyst::DispatchType::$key";
-        unless ( $registered->{$class} ) {
-            eval "require $class";
-            push( @{ $self->dispatch_types }, $class->new ) unless $@;
-            $registered->{$class} = 1;
-        }
-    }
-
-    # Pass the action to our dispatch types so they can register it if reqd.
-    foreach my $type ( @{ $self->dispatch_types } ) {
-        $type->register( $c, $action );
-    }
 }
 
 =item $self->setup_actions( $class, $component )
