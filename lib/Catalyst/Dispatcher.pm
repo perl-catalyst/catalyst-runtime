@@ -113,7 +113,7 @@ sub forward {
                 if ($result) {
                     $local_args = 1;
                     $command    = $tail;
-                    push( @{$arguments}, @extra_args );
+                    unshift( @{$arguments}, @extra_args );
                     last DESCEND;
                 }
                 unshift( @extra_args, $tail );
