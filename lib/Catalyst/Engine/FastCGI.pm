@@ -155,7 +155,17 @@ This configuration was tested with Lighttpd 1.4.7.
         )
     )
     
-Or use an external server:
+You can also run your application at any non-root location.
+
+    fastcgi.server = (
+        "/myapp" => (
+            "MyApp" => (
+                # same as above
+            )
+        )
+    )
+    
+You can also use an external server:
 
     # Start the external server (requires FCGI::ProcManager)
     $ script/myapp_fastcgi.pl -l /tmp/myapp.socket -n 5
