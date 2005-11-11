@@ -85,7 +85,12 @@ sub forward {
         return 0;
     }
 
-    my $arguments = ( ref( $_[-1] ) eq 'ARRAY' ) ? pop(@_) : $c->req->args;
+    my $local_args = 0;
+    my $arguments  = [];
+    if ( ref( $_[-1] ) eq 'ARRAY' ) {
+        $arguments = pop(@_);
+        $local_args++;
+    }
 
     my $result;
 
@@ -107,7 +112,11 @@ sub forward {
                 $result = $c->get_action( $tail, $1 );
                 if ($result) {
                     $command = $tail;
-                    push( @{$arguments}, @extra_args );
+                    if ($local_args) { unshift( @{$arguments}, @extra_args ) }
+                    else {
+                        $local_args++;
+                        $arguments = \@extra_args;
+                    }
                     last DESCEND;
                 }
                 unshift( @extra_args, $tail );
@@ -154,7 +163,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
 
     }
 
-    local $c->request->{arguments} = [ @{$arguments} ];
+    if ($local_args) { local $c->request->{arguments} = [ @{$arguments} ] }
 
     $result->execute($c);
 
