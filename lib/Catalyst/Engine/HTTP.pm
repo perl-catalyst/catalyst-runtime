@@ -110,10 +110,7 @@ sub run {
 
     $options ||= {};
 
-    our $GOT_HUP;
-    local $GOT_HUP = 0;
-
-    local $SIG{HUP} = sub { $GOT_HUP = 1; };
+    my $restart = 0;
     local $SIG{CHLD} = 'IGNORE';
 
     my $allowed = $options->{allowed} || { '127.0.0.1' => '255.255.255.255' };
@@ -140,21 +137,12 @@ sub run {
     }
     $url .= ":$port";
     print "You can connect to your server at $url\n";
-    my $pid = undef;
+
+    my $parent = $$;
+    my $pid    = undef;
     while ( accept( Remote, HTTPDaemon ) ) {
 
-        # Fork
-        if ( $options->{fork} ) { next if $pid = fork }
-
-        close HTTPDaemon if defined $pid;
-
-        # Ignore broken pipes as an HTTP server should
-        local $SIG{PIPE} = sub { close Remote };
-        local $SIG{HUP} = ( defined $pid ? 'IGNORE' : $SIG{HUP} );
-
-        local *STDIN  = \*Remote;
-        local *STDOUT = \*Remote;
-        select STDOUT;
+        select Remote;
 
         # Request data
         my $remote_sockaddr = getpeername( \*Remote );
@@ -167,55 +155,67 @@ sub run {
           || "localhost";
         my $localaddr = inet_ntoa($localiaddr) || "127.0.0.1";
 
-        STDIN->blocking(1);
+        Remote->blocking(1);
 
         # Parse request line
-        my $line = $self->_get_line( \*STDIN );
+        my $line = $self->_get_line( \*Remote );
         next
           unless my ( $method, $uri, $protocol ) =
           $line =~ m/\A(\w+)\s+(\S+)(?:\s+HTTP\/(\d+(?:\.\d+)?))?\z/;
 
-        # We better be careful and just use 1.0
-        $protocol = '1.0';
+        unless ( uc($method) eq 'RESTART' ) {
 
-        my ( $path, $query_string ) = split /\?/, $uri, 2;
+            # Fork
+            if ( $options->{fork} ) { next if $pid = fork }
 
-        # Initialize CGI environment
-        local %ENV = (
-            PATH_INFO      => $path         || '',
-            QUERY_STRING   => $query_string || '',
-            REMOTE_ADDR    => $peeraddr,
-            REMOTE_HOST    => $peername,
-            REQUEST_METHOD => $method       || '',
-            SERVER_NAME    => $localname,
-            SERVER_PORT    => $port,
-            SERVER_PROTOCOL => "HTTP/$protocol",
-            %ENV,
-        );
+            close HTTPDaemon if defined $pid;
 
-        # Parse headers
-        if ( $protocol >= 1 ) {
-            while (1) {
-                my $line = $self->_get_line( \*STDIN );
-                last if $line eq '';
-                next
-                  unless my ( $name, $value ) =
-                  $line =~ m/\A(\w(?:-?\w+)*):\s(.+)\z/;
+            # Ignore broken pipes as an HTTP server should
+            local $SIG{PIPE} = sub { close Remote };
 
-                $name = uc $name;
-                $name = 'COOKIE' if $name eq 'COOKIES';
-                $name =~ tr/-/_/;
-                $name = 'HTTP_' . $name
-                  unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
-                if ( exists $ENV{$name} ) {
-                    $ENV{$name} .= "; $value";
-                }
-                else {
-                    $ENV{$name} = $value;
+            local *STDIN  = \*Remote;
+            local *STDOUT = \*Remote;
+
+            # We better be careful and just use 1.0
+            $protocol = '1.0';
+
+            my ( $path, $query_string ) = split /\?/, $uri, 2;
+
+            # Initialize CGI environment
+            local %ENV = (
+                PATH_INFO      => $path         || '',
+                QUERY_STRING   => $query_string || '',
+                REMOTE_ADDR    => $peeraddr,
+                REMOTE_HOST    => $peername,
+                REQUEST_METHOD => $method       || '',
+                SERVER_NAME    => $localname,
+                SERVER_PORT    => $port,
+                SERVER_PROTOCOL => "HTTP/$protocol",
+                %ENV,
+            );
+
+            # Parse headers
+            if ( $protocol >= 1 ) {
+                while (1) {
+                    my $line = $self->_get_line( \*STDIN );
+                    last if $line eq '';
+                    next
+                      unless my ( $name, $value ) =
+                      $line =~ m/\A(\w(?:-?\w+)*):\s(.+)\z/;
+
+                    $name = uc $name;
+                    $name = 'COOKIE' if $name eq 'COOKIES';
+                    $name =~ tr/-/_/;
+                    $name = 'HTTP_' . $name
+                      unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
+                    if ( exists $ENV{$name} ) {
+                        $ENV{$name} .= "; $value";
+                    }
+                    else {
+                        $ENV{$name} = $value;
+                    }
                 }
             }
-        }
-        unless ( uc($method) eq 'KILL' ) {
 
             # Pass flow control to Catalyst
             $class->handle_request;
@@ -227,10 +227,11 @@ sub run {
                 $ready = ( $ipaddr & _inet_addr($mask) ) == _inet_addr($ip);
             }
             if ($ready) {
-                $GOT_HUP = 1;
+                $restart = 1;
                 last;
             }
         }
+
         exit if defined $pid;
     }
     continue {
@@ -238,11 +239,13 @@ sub run {
     }
     close HTTPDaemon;
 
-    if ($GOT_HUP) {
+    if ($restart) {
         $SIG{CHLD} = 'DEFAULT';
         wait;
         exec $^X . ' "' . $0 . '" ' . join( ' ', @{ $options->{argv} } );
     }
+
+    exit;
 }
 
 sub _get_line {
