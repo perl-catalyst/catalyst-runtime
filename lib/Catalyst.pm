@@ -342,9 +342,8 @@ Contains the return value of the last executed action.
 
 =item $c->component($name)
 
-Gets a component object by name.
-
-    $c->comp('MyApp::Model::MyModel')->do_stuff;
+Gets a component object by name.  This method is no longer recommended.
+$c->controller, $c->model, and $c->view should be used instead.
 
 =cut
 
