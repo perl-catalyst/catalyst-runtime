@@ -14,7 +14,7 @@ sub header           { shift->headers->header(@_) }
 
 =head1 NAME
 
-Catalyst::Response - Catalyst Response Class
+Catalyst::Response - stores output responding to the current client request
 
 =head1 SYNOPSIS
 
@@ -31,12 +31,10 @@ Catalyst::Response - Catalyst Response Class
     $res->status;
     $res->write;
 
-See also L<Catalyst::Application>.
-
 =head1 DESCRIPTION
 
-This is the Catalyst Response class, which provides a set of accessors
-to response data.
+This is the Catalyst Response class, which provides methods for responding to
+the current client request.
 
 =head1 METHODS
 
@@ -46,32 +44,31 @@ to response data.
 
     $c->response->body('Catalyst rocks!');
 
-Contains the final output.
+Sets or returns the output (text or binary data).
 
 =item $res->content_encoding
 
-Shortcut to $res->headers->content_encoding
+Shortcut for $res->headers->content_encoding.
 
 =item $res->content_length
 
-Shortcut to $res->headers->content_length
+Shortcut for $res->headers->content_length.
 
 =item $res->content_type
 
-Shortcut to $res->headers->content_type
+Shortcut for $res->headers->content_type.
 
 =item $res->cookies
 
-Returns a reference to a hash containing the cookies to be set. The keys of the
-hash are the cookies' names, and their corresponding values are hash references
-used to construct L<CGI::Cookie> object.
+Returns a reference to a hash containing cookies to be set. The keys of the
+hash are the cookies' names, and their corresponding values are hash
+references used to construct a L<CGI::Cookie> object.
 
     $c->response->cookies->{foo} = { value => '123' };
 
-The values correspond to the L<CGI::Cookie> parameters of the same name, except
-they are used without a leading dash.
-
-The proxied parameters are
+The keys of the hash reference on the right correspond to the L<CGI::Cookie>
+parameters of the same name, except they are used without a leading dash.
+Possible parameters are:
 
 =over 4
 
@@ -85,27 +82,25 @@ The proxied parameters are
 
 =item secure
 
-=item 
-
 =back
 
 =item $res->header
 
-Shortcut to $res->headers->header
+Shortcut for $res->headers->header.
 
 =item $res->headers
 
-Returns a L<HTTP::Headers> object containing the headers.
+Returns an L<HTTP::Headers> object, which can be used to set headers.
 
     $c->response->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
 
 =item $res->output
 
-Shortcut to $res->body
+Alias for $res->body.
 
 =item $res->redirect( $url, $status )
 
-Contains a location to redirect to.
+Causes the response to redirect to the specified URL.
 
     $c->response->redirect( 'http://slashdot.org' );
     $c->response->redirect( 'http://slashdot.org', 307 );
@@ -128,7 +123,7 @@ sub redirect {
 
 =item $res->status
 
-Contains the HTTP status.
+Sets or returns the HTTP status.
 
     $c->response->status(404);
     
@@ -142,9 +137,10 @@ sub write { shift->{_context}->write(@_); }
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Sebastian Riedel, C<sri@cpan.org>
+
 Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
