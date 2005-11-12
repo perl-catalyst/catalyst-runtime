@@ -54,7 +54,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.49_04';
+our $VERSION = '5.49_05';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -357,7 +357,8 @@ sub component {
 
         my @names = (
             $name, "${appclass}::${name}",
-            map { "${appclass}::${_}::${name}" } qw/M V C/
+            map { "${appclass}::${_}::${name}" } 
+	    qw/Model M Controller C View V/
         );
 
         foreach my $try (@names) {
