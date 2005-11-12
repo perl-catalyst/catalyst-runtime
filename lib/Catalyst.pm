@@ -523,7 +523,7 @@ sub plugin {
 
 Initializes the dispatcher and engine, loads any plugins, and loads the
 model, view, and controller components.  You may also specify an array of
-plugins to load here, if you choose to not load them in the 'use Catalyst'
+plugins to load here, if you choose to not load them in the C<use Catalyst>
 line.
 
     MyApp->setup;
@@ -876,7 +876,7 @@ sub dispatch { my $c = shift; $c->dispatcher->dispatch( $c, @_ ) }
 
 Returns or sets the dispatcher class.
 
-=item dump_these
+=item $c->dump_these
 
 Returns a list of 2-element array references (name, structure) pairs that will
 be dumped on the error page in debug mode.
@@ -1768,28 +1768,25 @@ sub version { return $Catalyst::VERSION }
 =head1 INTERNAL ACTIONS
 
 Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>
-C<_ACTION> and C<_END>, these are by default not shown in the private
-action table.
-
-But you can deactivate this with a config parameter.
+C<_ACTION> and C<_END>. These are by default not shown in the private
+action table, but you can make them visible with a config parameter.
 
     MyApp->config->{show_internal_actions} = 1;
 
 =head1 CASE SENSITIVITY
 
-By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> becomes
-C</foo/bar>.
-
-But you can activate case sensitivity with a config parameter.
+By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
+mapped to C</foo/bar>. You can activate case sensitivity with a config 
+parameter.
 
     MyApp->config->{case_sensitive} = 1;
 
-So C<MyApp::C::Foo::Bar> becomes C</Foo/Bar>.
+This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
 
 =head1 ON-DEMAND PARSER
 
 The request body is usually parsed at the beginning of a request,
-but if you want to handle input yourself or speed things up a bit
+but if you want to handle input yourself or speed things up a bit,
 you can enable on-demand parsing with a config parameter.
 
     MyApp->config->{parse_on_demand} = 1;
@@ -1799,21 +1796,21 @@ you can enable on-demand parsing with a config parameter.
 Many production servers operate using the common double-server approach, with
 a lightweight frontend web server passing requests to a larger backend
 server.  An application running on the backend server must deal with two
-problems: the remote user always appears to be '127.0.0.1' and the server's
-hostname will appear to be 'localhost' regardless of the virtual host the
-user connected through.
+problems: the remote user always appears to be C<127.0.0.1> and the server's
+hostname will appear to be C<localhost> regardless of the virtual host that
+the user connected through.
 
-Catalyst will automatically detect this situation when you are running both
-the frontend and backend servers on the same machine.  The following changes
+Catalyst will automatically detect this situation when you are running the
+frontend and backend servers on the same machine. The following changes
 are made to the request.
 
     $c->req->address is set to the user's real IP address, as read from the
-    HTTP_X_FORWARDED_FOR header.
+    HTTP X-Forwarded-For header.
     
     The host value for $c->req->base and $c->req->uri is set to the real host,
-    as read from the HTTP_X_FORWARDED_HOST header.
+    as read from the HTTP X-Forwarded-Host header.
 
-Obviously, your web server must support these 2 headers for this to work.
+Obviously, your web server must support these headers for this to work.
 
 In a more complex server farm environment where you may have your frontend
 proxy server(s) on different machines, you will need to set a configuration
@@ -1828,12 +1825,12 @@ If you do not wish to use the proxy support at all, you may set:
 =head1 THREAD SAFETY
 
 Catalyst has been tested under Apache 2's threading mpm_worker, mpm_winnt,
-and the standalone forking HTTP server on Windows.  We believe the Catalyst
+and the standalone forking HTTP server on Windows. We believe the Catalyst
 core to be thread-safe.
 
 If you plan to operate in a threaded environment, remember that all other
-modules you are using must also be thread-safe.  Some modules, most notably
-DBD::SQLite, are not thread-safe.
+modules you are using must also be thread-safe. Some modules, most notably
+L<DBD::SQLite>, are not thread-safe.
 
 =head1 SUPPORT
 
@@ -1841,7 +1838,7 @@ IRC:
 
     Join #catalyst on irc.perl.org.
 
-Mailing-Lists:
+Mailing Lists:
 
     http://lists.rawmode.org/mailman/listinfo/catalyst
     http://lists.rawmode.org/mailman/listinfo/catalyst-dev

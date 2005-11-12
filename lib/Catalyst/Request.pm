@@ -268,10 +268,10 @@ is an alternative method for accessing parameters in $c->req->parameters.
     @values = $c->request->param( 'foo' );
     @params = $c->request->param;
 
-Like L<CGI>, and B<unlike> previous versions of Catalyst, passing multiple
+Like L<CGI>, and B<unlike> earlier versions of Catalyst, passing multiple
 arguments to this method, like this:
 
-	$c->request( 'foo', 'bar', 'gorch', 'quxx' );
+	$c->request->param( 'foo', 'bar', 'gorch', 'quxx' );
 
 will set the parameter C<foo> to the multiple values C<bar>, C<gorch> and
 C<quxx>. Previously this would have added C<bar> as another value to C<foo>
