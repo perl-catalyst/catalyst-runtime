@@ -13,12 +13,12 @@ sub new { shift->SUPER::new( ref( $_[0] ) ? $_[0] : {@_} ) }
 
 =head1 NAME
 
-Catalyst::Request::Upload - Catalyst Request Upload Class
+Catalyst::Request::Upload - handles file upload requests
 
 =head1 SYNOPSIS
 
-    $upload->copy_to
-    $upload->fh
+    $upload->copy_to;
+    $upload->fh;
     $upload->filename;
     $upload->headers;
     $upload->link_to;
@@ -31,8 +31,7 @@ See also L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is the Catalyst Request Upload class, which provides a set of accessors 
-to the upload data.
+This class provides accessors and methods to handle client upload requests.
 
 =head1 METHODS
 
@@ -40,11 +39,12 @@ to the upload data.
 
 =item $upload->new
 
-simple constructor.
+Simple constructor.
 
 =item $upload->copy_to
 
-Copies tempname using C<File::Copy>. Returns true for success, false otherwise.
+Copies the temporary file using L<File::Copy>. Returns true for success,
+false for failure.
 
      $upload->copy_to('/path/to/target');
 
@@ -57,7 +57,7 @@ sub copy_to {
 
 =item $upload->fh
 
-Opens tempname and returns a C<IO::File> handle.
+Opens a temporary file (see tempname below) and returns an L<IO::File> handle.
 
 =cut
 
@@ -79,16 +79,16 @@ sub fh {
 
 =item $upload->filename
 
-Contains client supplied filename.
+Returns the client-supplied filename.
 
 =item $upload->headers
 
-Returns a C<HTTP::Headers> object.
+Returns an L<HTTP::Headers> object for the request.
 
 =item $upload->link_to
 
-Creates a hard link to the tempname.  Returns true for success, 
-false otherwise.
+Creates a hard link to the temporary file. Returns true for success, 
+false for failure.
 
     $upload->link_to('/path/to/target');
 
@@ -101,11 +101,11 @@ sub link_to {
 
 =item $upload->size
 
-Contains size of the file in bytes.
+Returns the size of the uploaded file in bytes.
 
 =item $upload->slurp
 
-Returns a scalar containing contents of tempname.
+Returns a scalar containing the contents of the temporary file.
 
 =cut
 
@@ -130,17 +130,18 @@ sub slurp {
 
 =item $upload->tempname
 
-Contains path to the temporary spool file.
+Returns the path to the temporary file.
 
 =item $upload->type
 
-Contains client supplied Content-Type.
+Returns the client-supplied Content-Type.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Sebastian Riedel, C<sri@cpan.org>
+
 Christian Hansen, C<ch@ngmedia.com>
 
 =head1 COPYRIGHT
