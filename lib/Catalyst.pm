@@ -82,43 +82,84 @@ Catalyst - The Elegant MVC Web Application Framework
 
     # use the helper to start a new application
     catalyst.pl MyApp
-    cd MyApp
 
     # add models, views, controllers
-    script/myapp_create.pl model Something
-    script/myapp_create.pl view Stuff
-    script/myapp_create.pl controller Yada
+    script/myapp_create.pl model Database DBIC dbi:SQLite:/path/to/db
+    script/myapp_create.pl view TT TT
+    script/myapp_create.pl controller Search
 
     # built in testserver -- use -r to restart automatically on changes
     script/myapp_server.pl
 
-    # command line interface
+    # command line testing interface
     script/myapp_test.pl /yada
 
+    ### in MyApp.pm
+    use Catalyst qw/-Debug/; # include plugins here as well
+    
+    sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
+        my ( $self, $c, @args ) = @_; # args are qw/on you/ for /foo/on/you
+        $c->stash->{template} = 'foo.tt';
+        # lookup something from db -- stash vars are passed to TT
+        $c->stash->{data} = MyApp::Model::Database::Foo->search;
+        if ( $c->req->params->{bar} ) { # access GET or POST parameters
+            $c->forward( 'bar' ); # process another action
+            # do something else after forward returns            
+        }
+    }
+    
+    # The foo.tt TT template can easily use the stash data from the database
+    [% WHILE (item = data.next) %]
+        [% item.foo %]
+    [% END %]
+    
+    # called for /bar/of/soap, /bar/of/soap/10, etc.
+    sub bar : Path('/bar/of/soap') { ... }
 
-    use Catalyst;
+    # called for / and only /, no other args
+    sub baz : Path  { ... } 
+    sub baz : Index { ... }
 
-    use Catalyst qw/My::Module My::OtherModule/;
-
-    use Catalyst '-Debug';
-
-    use Catalyst qw/-Debug -Engine=CGI/;
-
-    sub default : Private { $_[1]->res->output('Hello') } );
-
-    sub index : Path('/index.html') {
+    # called for all actions, from the top-most controller inwards
+    sub auto : Private { 
         my ( $self, $c ) = @_;
-        $c->res->output('Hello');
-        $c->forward('foo');
+        if ( !$c->user ) {
+            $c->res->redirect( '/login' ); # require login
+            return 0; # abort request and go immediately to end()
+        }
+        return 1;
+    }
+    
+    # called after the main action is finished
+    sub end : Private { 
+        my ( $self, $c ) = @_;
+        if ( scalar @{ $c->error } ) { ... } # handle errors
+        return if $c->res->body; # already have a response
+        $c->forward( 'MyApp::View::TT' ); # render template
     }
 
-    sub product : Regex('^product[_]*(\d*).html$') {
+    ### in MyApp/Controller/Foo.pm
+    # called for /foo/bar
+    sub bar : Local { ... }
+    
+    # overrides /foo, but not /foo/1, etc.
+    sub index : Path { ... }
+    
+    ### in MyApp/Controller/Foo/Bar.pm
+    # called for /foo/bar/baz
+    sub baz : Local { ... }
+    
+    # first MyApp auto is called, then Foo auto, then this
+    sub auto : Private { ... }
+    
+    # powerful regular expression paths are also possible
+    sub details : Regex('^product/(\w+)/details$') {
         my ( $self, $c ) = @_;
-        $c->stash->{template} = 'product.tt';
-        $c->stash->{product} = $c->req->snippets->[0];
+        # extract the (\w+) from the URI
+        my $product = $c->req->snippets->[0];
     }
 
-See also L<Catalyst::Manual::Intro>
+See L<Catalyst::Manual::Intro> for additional information.
 
 =head1 DESCRIPTION
 
@@ -127,10 +168,10 @@ The key concept of Catalyst is DRY (Don't Repeat Yourself).
 See L<Catalyst::Manual> for more documentation.
 
 Catalyst plugins can be loaded by naming them as arguments to the "use Catalyst" statement.
-Omit the C<Catalyst::Plugin::> prefix from the plugin name,
-so C<Catalyst::Plugin::My::Module> becomes C<My::Module>.
+Omit the C<Catalyst::Plugin::> prefix from the plugin name, i.e.,
+C<Catalyst::Plugin::My::Module> becomes C<My::Module>.
 
-    use Catalyst 'My::Module';
+    use Catalyst qw/My::Module/;
 
 Special flags like -Debug and -Engine can also be specified as arguments when
 Catalyst is loaded:
@@ -146,46 +187,162 @@ The following flags are supported:
 
 =item -Debug
 
-enables debug output, i.e.:
-
-    use Catalyst '-Debug';
-
-this is equivalent to:
-
-    use Catalyst;
-    sub debug { 1 }
+Enables debug output.
 
 =item -Engine
 
-Force Catalyst to use a specific engine.
+Forces Catalyst to use a specific engine.
 Omit the C<Catalyst::Engine::> prefix of the engine name, i.e.:
 
-    use Catalyst '-Engine=CGI';
+    use Catalyst qw/-Engine=CGI/;
 
 =item -Home
 
-Force Catalyst to use a specific home directory.
+Forces Catalyst to use a specific home directory.
 
 =item -Log
 
-Specify log level.
+Specifies log level.
 
 =back
 
 =head1 METHODS
 
+=head2 Information about the current request
+
 =over 4
 
 =item $c->action
 
-Accessor for the current action. Returns a L<Catalyst::Action> object,
-which stringifies to the action name.
+Returns a L<Catalyst::Action> object for the current action, which stringifies to the action name.
+
+=item $c->namespace
+
+Returns the namespace of the current action, i.e., the uri prefix corresponding to the 
+controller of the current action.
+
+=item $c->request
+
+=item $c->req
+
+Returns the current L<Catalyst::Request> object.
+
+    my $req = $c->req;
+
+=back
+
+=head2 Processing and response to the current request
+
+=over 4
+
+=item $c->forward( $action [, \@arguments ] )
+
+=item $c->forward( $class, $method, [, \@arguments ] )
+
+Forwards processing to a private action. If you give a class name but 
+no method, process() is called. You may also optionally pass arguments 
+in an arrayref. The action will receive the arguments in @_ and $c->req->args. 
+Upon returning from the function, $c->req->args will be restored to the previous
+values.
+
+    $c->forward('/foo');
+    $c->forward('index');
+    $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
+    $c->forward('MyApp::View::TT');
+
+=cut
+
+sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
+
+=item $c->detach( $action [, \@arguments ] )
+
+=item $c->detach( $class, $method, [, \@arguments ] )
+
+The same as C<forward>, but doesn't return.
+
+=cut
+
+sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
+
+=item $c->error
+
+=item $c->error($error, ...)
+
+=item $c->error($arrayref)
+
+Returns an arrayref containing error messages.
+
+    my @error = @{ $c->error };
+
+Add a new error.
+
+    $c->error('Something bad happened');
+
+Clear errors.
+
+    $c->error(0);
+
+=cut
+
+sub error {
+    my $c = shift;
+    if ( $_[0] ) {
+        my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+        push @{ $c->{error} }, @$error;
+    }
+    elsif ( defined $_[0] ) { $c->{error} = undef }
+    return $c->{error} || [];
+}
+
+=item $c->response
+
+=item $c->res
+
+Returns the current L<Catalyst::Response> object.
+
+    my $res = $c->res;
+
+=item $c->stash
+
+Returns a hashref to the stash, which may be used to store data and pass it
+between components. You can also set hash keys by passing arguments.  The
+stash is automatically sent to the view.
+
+    $c->stash->{foo} = $bar;
+    $c->stash( { moose => 'majestic', qux => 0 } );
+    $c->stash( bar => 1, gorch => 2 ); # equivalent to passing a hashref
+    
+    # stash is automatically passed to the view for use in a template
+    $c->forward( 'MyApp::V::TT' );
+
+=cut
+
+sub stash {
+    my $c = shift;
+    if (@_) {
+        my $stash = @_ > 1 ? {@_} : $_[0];
+        while ( my ( $key, $val ) = each %$stash ) {
+            $c->{stash}->{$key} = $val;
+        }
+    }
+    return $c->{stash};
+}
+
+=item $c->state
+
+Contains the return value of the last executed action.
+
+=back
+
+=head2 Component Accessors
+
+=over 4
 
 =item $c->comp($name)
 
 =item $c->component($name)
 
-Get a component object by name.
+Gets a component object by name.
 
     $c->comp('MyApp::Model::MyModel')->do_stuff;
 
@@ -223,15 +380,9 @@ sub component {
     return sort keys %{ $c->components };
 }
 
-=item config
-
-Returns a hashref containing your applications settings.
-
-=cut
-
 =item $c->controller($name)
 
-Get a L<Catalyst::Controller> instance by name.
+Gets a L<Catalyst::Controller> instance by name.
 
     $c->controller('Foo')->do_stuff;
 
@@ -244,46 +395,9 @@ sub controller {
     return $c->comp("C::$name");
 }
 
-=item debug
-
-Overload to enable debug messages.
-
-=cut
-
-sub debug { 0 }
-
-=item $c->detach( $command [, \@arguments ] )
-
-Like C<forward> but doesn't return.
-
-=cut
-
-sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
-
-=item $c->dispatcher
-
-Contains the dispatcher instance. Stringifies to class name.
-
-=item $c->forward( $command [, \@arguments ] )
-
-Forward processing to a private action or a method from a class.
-If you define a class without method it will default to process().
-also takes an optional arrayref containing arguments to be passed
-to the new function. $c->req->args will be restored upon returning 
-from the function.
-
-    $c->forward('/foo');
-    $c->forward('index');
-    $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
-    $c->forward('MyApp::View::TT');
-
-=cut
-
-sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
-
 =item $c->model($name)
 
-Get a L<Catalyst::Model> instance by name.
+Gets a L<Catalyst::Model> instance by name.
 
     $c->model('Foo')->do_stuff;
 
@@ -296,10 +410,67 @@ sub model {
     return $c->comp("M::$name");
 }
 
-=item $c->namespace
+=item $c->view($name)
 
-Returns the namespace of the current action, i.e., the uri prefix corresponding to the 
-controller of the current action.
+Gets a L<Catalyst::View> instance by name.
+
+    $c->view('Foo')->do_stuff;
+
+=cut
+
+sub view {
+    my ( $c, $name ) = @_;
+    my $view = $c->comp("View::$name");
+    return $view if $view;
+    return $c->comp("V::$name");
+}
+
+=back
+
+=head2 Class data and helper classes
+
+=over 4
+
+=item $c->config
+
+Returns or takes a hashref containing the application's configuration.
+
+    __PACKAGE__->config({ db => 'dsn:SQLite:foo.db' });
+
+=item $c->debug
+
+Overload to enable debug messages (same as -Debug option).
+
+=cut
+
+sub debug { 0 }
+
+=item $c->dispatcher
+
+Returns the dispatcher instance. Stringifies to class name.
+
+=item $c->engine
+
+Returns the engine instance. Stringifies to the class name.
+
+=item $c->log
+
+Returns the logging object instance. Unless it is already set, Catalyst sets this up with a
+L<Catalyst::Log> object. To use your own log class:
+
+    $c->log( MyLogger->new );
+    $c->log->info( 'now logging with my own logger!' );
+
+Your log class should implement the methods described in the L<Catalyst::Log>
+man page.
+
+=cut
+
+=back
+
+=head2 Utility methods
+
+=over 4
 
 =item $c->path_to(@path)
 
@@ -318,12 +489,50 @@ sub path_to {
     else { return file( $c->config->{home}, @path ) }
 }
 
-=item $c->setup
+=item $c->plugin( $name, $class, @args )
+
+Helper method for plugins. It creates a classdata accessor/mutator and loads
+and instantiates the given class.
+
+    MyApp->plugin( 'prototype', 'HTML::Prototype' );
+
+    $c->prototype->define_javascript_functions;
+
+=cut
+
+sub plugin {
+    my ( $class, $name, $plugin, @args ) = @_;
+    $plugin->require;
+
+    if ( my $error = $UNIVERSAL::require::ERROR ) {
+        Catalyst::Exception->throw(
+            message => qq/Couldn't load instant plugin "$plugin", "$error"/ );
+    }
+
+    eval { $plugin->import };
+    $class->mk_classdata($name);
+    my $obj;
+    eval { $obj = $plugin->new(@args) };
+
+    if ($@) {
+        Catalyst::Exception->throw( message =>
+              qq/Couldn't instantiate instant plugin "$plugin", "$@"/ );
+    }
+
+    $class->$name($obj);
+    $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
+      if $class->debug;
+}
+
+=item MyApp->setup
 
 Initializes the dispatcher and engine, loads any plugins, and loads the
-model, view, and controller components.
+model, view, and controller components.  You may also specify an array of
+plugins to load here, if you choose to not load them in the 'use Catalyst'
+line.
 
-    $c->setup;
+    MyApp->setup;
+    MyApp->setup( qw/-Debug/ );
 
 =cut
 
@@ -444,7 +653,7 @@ EOF
     $class->log->_flush() if $class->log->can('_flush');
 }
 
-=item $c->uri_for($path,[@args])
+=item $c->uri_for( $path, [ @args ] )
 
 Merges path with $c->request->base for absolute uri's and with
 $c->request->match for relative uri's, then returns a normalized
@@ -472,149 +681,6 @@ sub uri_for {
     my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
     return URI->new_abs( URI->new_abs( "$path$args", "$basepath$match" ),
         $base )->canonical;
-}
-
-=item $c->error
-
-=item $c->error($error, ...)
-
-=item $c->error($arrayref)
-
-Returns an arrayref containing error messages.
-
-    my @error = @{ $c->error };
-
-Add a new error.
-
-    $c->error('Something bad happened');
-
-Clear errors.
-
-    $c->error(0);
-
-=cut
-
-sub error {
-    my $c = shift;
-    if ( $_[0] ) {
-        my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-        push @{ $c->{error} }, @$error;
-    }
-    elsif ( defined $_[0] ) { $c->{error} = undef }
-    return $c->{error} || [];
-}
-
-=item $c->engine
-
-Contains the engine instance. Stringifies to the class name.
-
-=item $c->log
-
-Contains the logging object.  Unless it is already set Catalyst sets this up with a
-L<Catalyst::Log> object.  To use your own log class:
-
-    $c->log( MyLogger->new );
-    $c->log->info("now logging with my own logger!");
-
-Your log class should implement the methods described in the L<Catalyst::Log>
-man page.
-
-=item $c->plugin( $name, $class, @args )
-
-Instant plugins for Catalyst.
-Classdata accessor/mutator will be created, class loaded and instantiated.
-
-    MyApp->plugin( 'prototype', 'HTML::Prototype' );
-
-    $c->prototype->define_javascript_functions;
-
-=cut
-
-sub plugin {
-    my ( $class, $name, $plugin, @args ) = @_;
-    $plugin->require;
-
-    if ( my $error = $UNIVERSAL::require::ERROR ) {
-        Catalyst::Exception->throw(
-            message => qq/Couldn't load instant plugin "$plugin", "$error"/ );
-    }
-
-    eval { $plugin->import };
-    $class->mk_classdata($name);
-    my $obj;
-    eval { $obj = $plugin->new(@args) };
-
-    if ($@) {
-        Catalyst::Exception->throw( message =>
-              qq/Couldn't instantiate instant plugin "$plugin", "$@"/ );
-    }
-
-    $class->$name($obj);
-    $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
-      if $class->debug;
-}
-
-=item $c->request
-
-=item $c->req
-
-Returns a C<Catalyst::Request> object.
-
-    my $req = $c->req;
-
-=item $c->response
-
-=item $c->res
-
-Returns a C<Catalyst::Response> object.
-
-    my $res = $c->res;
-
-=item $c->state
-
-Contains the return value of the last executed action.
-
-=item $c->stash
-
-Returns a hashref containing all your data.
-
-    print $c->stash->{foo};
-
-Keys may be set in the stash by assigning to the hash reference, or by passing
-either a single hash reference or a list of key/value pairs as arguments.
-
-For example:
-
-    $c->stash->{foo} ||= 'yada';
-    $c->stash( { moose => 'majestic', qux => 0 } );
-    $c->stash( bar => 1, gorch => 2 );
-
-=cut
-
-sub stash {
-    my $c = shift;
-    if (@_) {
-        my $stash = @_ > 1 ? {@_} : $_[0];
-        while ( my ( $key, $val ) = each %$stash ) {
-            $c->{stash}->{$key} = $val;
-        }
-    }
-    return $c->{stash};
-}
-
-=item $c->view($name)
-
-Get a L<Catalyst::View> instance by name.
-
-    $c->view('Foo')->do_stuff;
-
-=cut
-
-sub view {
-    my ( $c, $name ) = @_;
-    my $view = $c->comp("View::$name");
-    return $view if $view;
-    return $c->comp("V::$name");
 }
 
 =item $c->welcome_message
@@ -768,7 +834,7 @@ EOF
 
 =over 4
 
-=item $c->benchmark($coderef)
+=item $c->benchmark( $coderef )
 
 Takes a coderef with arguments and returns elapsed time as float.
 
@@ -796,7 +862,8 @@ Returns or sets the context class.
 
 =item $c->counter
 
-Returns a hashref containing coderefs and execution counts (needed for deep recursion detection).
+Returns a hashref containing coderefs and execution counts (needed for deep
+recursion detection).
 
 =item $c->depth
 
@@ -830,10 +897,10 @@ sub dump_these {
 
 Returns or sets the engine class.
 
-=item $c->execute($class, $coderef)
+=item $c->execute( $class, $coderef )
 
-Execute a coderef in given class and catch exceptions.
-Errors are available via $c->error.
+Execute a coderef in given class and catch exceptions. Errors are available
+via $c->error.
 
 =cut
 
@@ -1073,9 +1140,10 @@ sub handle_request {
     return $status;
 }
 
-=item $c->prepare(@arguments)
+=item $c->prepare( @arguments )
 
-Creates a Catalyst context from an engine-specific request (Apache, CGI, etc.).
+Creates a Catalyst context from an engine-specific request
+(Apache, CGI, etc.).
 
 =cut
 
@@ -1672,7 +1740,7 @@ sub setup_plugins {
 
 =item $c->stack
 
-Contains the stack.
+Returns the stack.
 
 =item $c->write( $data )
 
@@ -1787,6 +1855,10 @@ Web:
 
     http://catalyst.perl.org
 
+Wiki:
+
+    http://dev.catalyst.perl.org
+
 =head1 SEE ALSO
 
 =over 4
@@ -1834,6 +1906,8 @@ Christopher Hicks
 Dan Sully
 
 Danijel Milicevic
+
+David Kamholz
 
 David Naughton
 
