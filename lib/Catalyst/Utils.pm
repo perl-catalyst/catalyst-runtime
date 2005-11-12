@@ -23,8 +23,6 @@ See L<Catalyst>.
 
 =item appprefix($class)
 
-Returns the application prefix for the class.
-
 	MyApp::Foo becomes myapp_foo
 
 =cut
@@ -37,8 +35,6 @@ sub appprefix {
 }
 
 =item class2appclass($class);
-
-Returns the appclass for class.
 
     MyApp::C::Foo::Bar becomes MyApp
     My::App::C::Foo::Bar becomes My::App
@@ -56,8 +52,6 @@ sub class2appclass {
 
 =item class2classprefix($class);
 
-Returns the classprefix for class.
-
     MyApp::C::Foo::Bar becomes MyApp::C
     My::App::C::Foo::Bar becomes My::App::C
 
@@ -73,8 +67,6 @@ sub class2classprefix {
 }
 
 =item class2classsuffix($class);
-
-Returns the classsuffix for class.
 
     MyApp::C::Foo::Bar becomes C::Foo::Bar
 
@@ -104,9 +96,9 @@ sub class2env {
 
 =item class2prefix( $class, $case );
 
-Returns the prefix for class.
+Returns the uri prefix for a class. If case is false the prefix is converted to lowercase.
 
-    My::App::C::Foo::Bar becomes /foo/bar
+    My::App::C::Foo::Bar becomes foo/bar
 
 =cut
 
@@ -123,7 +115,7 @@ sub class2prefix {
 
 =item class2tempdir( $class [, $create ] );
 
-Returns a tempdir for class. If create is true it will try to create the path.
+Returns a tempdir for a class. If create is true it will try to create the path.
 
     My::App becomes /tmp/my/app
     My::App::C::Foo::Bar becomes /tmp/my/app/c/foo/bar
@@ -187,7 +179,7 @@ sub home {
 
 Returns a prefixed action.
 
-    MyApp::C::Foo::Bar, yada becomes /foo/bar/yada
+    MyApp::C::Foo::Bar, yada becomes foo/bar/yada
 
 =cut
 
@@ -198,9 +190,9 @@ sub prefix {
     return $name;
 }
 
-=item request($request)
+=item request($uri)
 
-Returns a HTTP::Request object.
+Returns an L<HTTP::Request> object for a uri.
 
 =cut
 
