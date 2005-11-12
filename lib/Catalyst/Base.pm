@@ -154,7 +154,7 @@ sub _parse_attrs {
 
 =head1 SEE ALSO
 
-L<Catalyst>.
+L<Catalyst>, L<Catalyst::Controller>.
 
 =head1 AUTHOR
 

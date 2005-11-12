@@ -15,7 +15,7 @@ Catalyst::Component - Catalyst Component Base Class
     # lib/MyApp/Model/Something.pm
     package MyApp::Model::Something;
 
-    use base 'Catalyst::Base';
+    use base 'Catalyst::Component';
 
     __PACKAGE__->config( foo => 'bar' );
 
@@ -101,7 +101,7 @@ sub process {
 
 =head1 SEE ALSO
 
-L<Catalyst>.
+L<Catalyst>, L<Catalyst::Model>, L<Catalyst::View>, L<Catalyst::Controller>.
 
 =head1 AUTHOR
 

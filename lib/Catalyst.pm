@@ -89,7 +89,7 @@ Catalyst - The Elegant MVC Web Application Framework
     script/myapp_create.pl view Stuff
     script/myapp_create.pl controller Yada
 
-    # built in testserver
+    # built in testserver -- use -r to restart automatically on changes
     script/myapp_server.pl
 
     # command line interface
@@ -155,10 +155,6 @@ this is equivalent to:
     use Catalyst;
     sub debug { 1 }
 
-=item -Dispatcher
-
-Force Catalyst to use a specific dispatcher.
-
 =item -Engine
 
 Force Catalyst to use a specific engine.
@@ -182,7 +178,8 @@ Specify log level.
 
 =item $c->action
 
-Accessor for the current action
+Accessor for the current action. Returns a L<Catalyst::Action> object,
+which stringifies to the action name.
 
 =item $c->comp($name)
 
@@ -265,15 +262,14 @@ sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
 =item $c->dispatcher
 
-Contains the dispatcher instance.
-Stringifies to class.
+Contains the dispatcher instance. Stringifies to class name.
 
 =item $c->forward( $command [, \@arguments ] )
 
 Forward processing to a private action or a method from a class.
 If you define a class without method it will default to process().
 also takes an optional arrayref containing arguments to be passed
-to the new function. $c->req->args will be reset upon returning 
+to the new function. $c->req->args will be restored upon returning 
 from the function.
 
     $c->forward('/foo');
@@ -302,7 +298,8 @@ sub model {
 
 =item $c->namespace
 
-Accessor to the namespace of the current action
+Returns the namespace of the current action, i.e., the uri prefix corresponding to the 
+controller of the current action.
 
 =item $c->path_to(@path)
 
@@ -323,7 +320,8 @@ sub path_to {
 
 =item $c->setup
 
-Setup.
+Initializes the dispatcher and engine, loads any plugins, and loads the
+model, view, and controller components.
 
     $c->setup;
 
@@ -490,7 +488,7 @@ Add a new error.
 
     $c->error('Something bad happened');
 
-Clean errors.
+Clear errors.
 
     $c->error(0);
 
@@ -508,18 +506,17 @@ sub error {
 
 =item $c->engine
 
-Contains the engine instance.
-Stringifies to the class.
+Contains the engine instance. Stringifies to the class name.
 
 =item $c->log
 
 Contains the logging object.  Unless it is already set Catalyst sets this up with a
-C<Catalyst::Log> object.  To use your own log class:
+L<Catalyst::Log> object.  To use your own log class:
 
     $c->log( MyLogger->new );
     $c->log->info("now logging with my own logger!");
 
-Your log class should implement the methods described in the C<Catalyst::Log>
+Your log class should implement the methods described in the L<Catalyst::Log>
 man page.
 
 =item $c->plugin( $name, $class, @args )
@@ -791,32 +788,31 @@ sub benchmark {
 
 =item $c->components
 
-Contains the components.
+Returns a hash of components.
 
-=item $c->context_class($class)
+=item $c->context_class
 
-Contains the context class.
+Returns or sets the context class.
 
 =item $c->counter
 
-Returns a hashref containing coderefs and execution counts.
-(Needed for deep recursion detection) 
+Returns a hashref containing coderefs and execution counts (needed for deep recursion detection).
 
 =item $c->depth
 
-Returns the actual forward depth.
+Returns the number of actions on the current internal execution stack.
 
 =item $c->dispatch
 
-Dispatch request to actions.
+Dispatches a request to actions.
 
 =cut
 
 sub dispatch { my $c = shift; $c->dispatcher->dispatch( $c, @_ ) }
 
-=item $c->dispatcher_class($class)
+=item $c->dispatcher_class
 
-Contains the dispatcher class.
+Returns or sets the dispatcher class.
 
 =item dump_these
 
@@ -830,9 +826,9 @@ sub dump_these {
     [ Request => $c->req ], [ Response => $c->res ], [ Stash => $c->stash ],;
 }
 
-=item $c->engine_class($class)
+=item $c->engine_class
 
-Contains the engine class.
+Returns or sets the engine class.
 
 =item $c->execute($class, $coderef)
 
@@ -903,7 +899,7 @@ sub execute {
 
 =item $c->finalize
 
-Finalize request.
+Finalizes the request.
 
 =cut
 
@@ -935,7 +931,7 @@ sub finalize {
 
 =item $c->finalize_body
 
-Finalize body.
+Finalizes body.
 
 =cut
 
@@ -943,7 +939,7 @@ sub finalize_body { my $c = shift; $c->engine->finalize_body( $c, @_ ) }
 
 =item $c->finalize_cookies
 
-Finalize cookies.
+Finalizes cookies.
 
 =cut
 
@@ -951,7 +947,7 @@ sub finalize_cookies { my $c = shift; $c->engine->finalize_cookies( $c, @_ ) }
 
 =item $c->finalize_error
 
-Finalize error.
+Finalizes error.
 
 =cut
 
@@ -959,7 +955,7 @@ sub finalize_error { my $c = shift; $c->engine->finalize_error( $c, @_ ) }
 
 =item $c->finalize_headers
 
-Finalize headers.
+Finalizes headers.
 
 =cut
 
@@ -1000,7 +996,7 @@ An alias for finalize_body.
 
 =item $c->finalize_read
 
-Finalize the input after reading is complete.
+Finalizes the input after reading is complete.
 
 =cut
 
@@ -1008,7 +1004,7 @@ sub finalize_read { my $c = shift; $c->engine->finalize_read( $c, @_ ) }
 
 =item $c->finalize_uploads
 
-Finalize uploads.  Cleans up any temporary files.
+Finalizes uploads.  Cleans up any temporary files.
 
 =cut
 
@@ -1016,7 +1012,7 @@ sub finalize_uploads { my $c = shift; $c->engine->finalize_uploads( $c, @_ ) }
 
 =item $c->get_action( $action, $namespace )
 
-Get an action in a given namespace.
+Gets an action in a given namespace.
 
 =cut
 
@@ -1024,7 +1020,7 @@ sub get_action { my $c = shift; $c->dispatcher->get_action(@_) }
 
 =item $c->get_actions( $action, $namespace )
 
-Get all actions of a given name in a namespace and all base namespaces.
+Gets all actions of a given name in a namespace and all parent namespaces.
 
 =cut
 
@@ -1032,7 +1028,7 @@ sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
 =item handle_request( $class, @arguments )
 
-Handles the request.
+Called to handle each HTTP request.
 
 =cut
 
@@ -1079,8 +1075,7 @@ sub handle_request {
 
 =item $c->prepare(@arguments)
 
-Turns the engine-specific request( Apache, CGI ... )
-into a Catalyst context .
+Creates a Catalyst context from an engine-specific request (Apache, CGI, etc.).
 
 =cut
 
@@ -1156,7 +1151,7 @@ sub prepare {
 
 =item $c->prepare_action
 
-Prepare action.
+Prepares action.
 
 =cut
 
@@ -1164,7 +1159,7 @@ sub prepare_action { my $c = shift; $c->dispatcher->prepare_action( $c, @_ ) }
 
 =item $c->prepare_body
 
-Prepare message body.
+Prepares message body.
 
 =cut
 
@@ -1193,7 +1188,7 @@ sub prepare_body {
 
 =item $c->prepare_body_chunk( $chunk )
 
-Prepare a chunk of data before sending it to HTTP::Body.
+Prepares a chunk of data before sending it to L<HTTP::Body>.
 
 =cut
 
@@ -1204,7 +1199,7 @@ sub prepare_body_chunk {
 
 =item $c->prepare_body_parameters
 
-Prepare body parameters.
+Prepares body parameters.
 
 =cut
 
@@ -1215,7 +1210,7 @@ sub prepare_body_parameters {
 
 =item $c->prepare_connection
 
-Prepare connection.
+Prepares connection.
 
 =cut
 
@@ -1226,7 +1221,7 @@ sub prepare_connection {
 
 =item $c->prepare_cookies
 
-Prepare cookies.
+Prepares cookies.
 
 =cut
 
@@ -1234,7 +1229,7 @@ sub prepare_cookies { my $c = shift; $c->engine->prepare_cookies( $c, @_ ) }
 
 =item $c->prepare_headers
 
-Prepare headers.
+Prepares headers.
 
 =cut
 
@@ -1242,7 +1237,7 @@ sub prepare_headers { my $c = shift; $c->engine->prepare_headers( $c, @_ ) }
 
 =item $c->prepare_parameters
 
-Prepare parameters.
+Prepares parameters.
 
 =cut
 
@@ -1254,7 +1249,7 @@ sub prepare_parameters {
 
 =item $c->prepare_path
 
-Prepare path and base.
+Prepares path and base.
 
 =cut
 
@@ -1262,7 +1257,7 @@ sub prepare_path { my $c = shift; $c->engine->prepare_path( $c, @_ ) }
 
 =item $c->prepare_query_parameters
 
-Prepare query parameters.
+Prepares query parameters.
 
 =cut
 
@@ -1285,7 +1280,7 @@ sub prepare_query_parameters {
 
 =item $c->prepare_read
 
-Prepare the input for reading.
+Prepares the input for reading.
 
 =cut
 
@@ -1293,7 +1288,7 @@ sub prepare_read { my $c = shift; $c->engine->prepare_read( $c, @_ ) }
 
 =item $c->prepare_request
 
-Prepare the engine request.
+Prepares the engine request.
 
 =cut
 
@@ -1301,7 +1296,7 @@ sub prepare_request { my $c = shift; $c->engine->prepare_request( $c, @_ ) }
 
 =item $c->prepare_uploads
 
-Prepare uploads.
+Prepares uploads.
 
 =cut
 
@@ -1329,23 +1324,23 @@ sub prepare_uploads {
 
 =item $c->prepare_write
 
-Prepare the output for writing.
+Prepares the output for writing.
 
 =cut
 
 sub prepare_write { my $c = shift; $c->engine->prepare_write( $c, @_ ) }
 
-=item $c->request_class($class)
+=item $c->request_class
 
-Contains the request class.
+Returns or sets the request class.
 
-=item $c->response_class($class)
+=item $c->response_class
 
-Contains the response class.
+Returns or sets the response class.
 
 =item $c->read( [$maxlength] )
 
-Read a chunk of data from the request body.  This method is designed to be
+Reads a chunk of data from the request body.  This method is designed to be
 used in a while loop, reading $maxlength bytes on every call.  $maxlength
 defaults to the size of the request if not specified.
 
@@ -1365,7 +1360,7 @@ sub run { my $c = shift; return $c->engine->run( $c, @_ ) }
 
 =item $c->set_action( $action, $code, $namespace, $attrs )
 
-Set an action in a given namespace.
+Sets an action in a given namespace.
 
 =cut
 
@@ -1373,7 +1368,7 @@ sub set_action { my $c = shift; $c->dispatcher->set_action( $c, @_ ) }
 
 =item $c->setup_actions($component)
 
-Setup actions for a component.
+Sets up actions for a component.
 
 =cut
 
@@ -1381,7 +1376,7 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 
 =item $c->setup_components
 
-Setup components.
+Sets up components.
 
 =cut
 
@@ -1698,7 +1693,7 @@ sub write {
 
 =item version
 
-Returns the Catalyst version number. mostly useful for powered by messages
+Returns the Catalyst version number. Mostly useful for "powered by" messages
 in template systems.
 
 =cut
@@ -1797,6 +1792,8 @@ Web:
 =over 4
 
 =item L<Catalyst::Manual> - The Catalyst Manual
+
+=item L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
 
 =item L<Catalyst::Engine> - Core Engine
 
