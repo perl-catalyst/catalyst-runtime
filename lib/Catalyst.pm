@@ -116,9 +116,6 @@ Catalyst - The Elegant MVC Web Application Framework
     # called for /bar/of/soap, /bar/of/soap/10, etc.
     sub bar : Path('/bar/of/soap') { ... }
 
-    # called for / and only /, no other args
-    sub baz : Path  { ... } 
-
     # called for all actions, from the top-most controller inwards
     sub auto : Private { 
         my ( $self, $c ) = @_;
@@ -141,8 +138,11 @@ Catalyst - The Elegant MVC Web Application Framework
     # called for /foo/bar
     sub bar : Local { ... }
     
-    # overrides /foo, but not /foo/1, etc.
-    sub index : Path { ... }
+    # called for /blargle
+    sub blargle : Global { ... }
+    
+    # an index action matches /foo, but not /foo/1, etc.
+    sub index : Private { ... }
     
     ### in MyApp/Controller/Foo/Bar.pm
     # called for /foo/bar/baz
@@ -226,8 +226,6 @@ controller of the current action.
 
 Returns the current L<Catalyst::Request> object.
 
-    my $req = $c->req;
-
 =back
 
 =head2 Processing and response to the current request
@@ -298,8 +296,6 @@ sub error {
 =item $c->res
 
 Returns the current L<Catalyst::Response> object.
-
-    my $res = $c->res;
 
 =item $c->stash
 
