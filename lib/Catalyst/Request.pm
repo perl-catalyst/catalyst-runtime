@@ -26,16 +26,15 @@ sub user_agent       { shift->headers->user_agent(@_) }
 
 =head1 NAME
 
-Catalyst::Request - Catalyst Request Class
+Catalyst::Request - provides information about the current client request
 
 =head1 SYNOPSIS
-
 
     $req = $c->request;
     $req->action;
     $req->address;
-    $req->args;
     $req->arguments;
+    $req->args;
     $req->base;
     $req->body;
     $req->body_parameters;
@@ -51,8 +50,8 @@ Catalyst::Request - Catalyst Request Class
     $req->match;
     $req->method;
     $req->param;
-    $req->params;
     $req->parameters;
+    $req->params;
     $req->path;
     $req->protocol;
     $req->query_parameters;
@@ -70,10 +69,9 @@ See also L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is the Catalyst Request class, which provides a set of accessors to the
-request data.  The request object is prepared by the specialized Catalyst
-Engine module thus hiding the details of the particular engine implementation.
-
+This is the Catalyst Request class, which provides an interface to data for the
+current client request. The request object is prepared by L<Catalyst::Engine>,
+thus hiding the details of the particular engine implementation.
 
 =head1 METHODS
 
@@ -81,19 +79,11 @@ Engine module thus hiding the details of the particular engine implementation.
 
 =item $req->action
 
-Contains the requested action.
-
-    print $c->request->action;
+Returns the requested action as a L<Catalyst::Action> object.
 
 =item $req->address
 
-Contains the remote address.
-
-    print $c->request->address
-
-=item $req->args
-
-Shortcut for arguments
+Returns the IP address of the client.
 
 =item $req->arguments
 
@@ -109,15 +99,19 @@ For example, if your action was
 		...
 	}
 
-And the URI for the request was C<http://.../foo/moose/bah> the string C<bah>
+and the URI for the request was C<http://.../foo/moose/bah>, the string C<bah>
 would be the first and only argument.
+
+=item $req->args
+
+Shortcut for arguments.
 
 =item $req->base
 
 Contains the URI base. This will always have a trailing slash.
 
-If your application was queried with the URI C<http://localhost:3000/some/path>
-then C<base> is C<http://localhost:3000/>.
+If your application was queried with the URI
+C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
 =cut
 
@@ -138,10 +132,8 @@ sub base {
 
 =item $req->body
 
-Contains the message body of the request unless Content-Type is
+Returns the message body of the request, unless Content-Type is
 C<application/x-www-form-urlencoded> or C<multipart/form-data>.
-
-    print $c->request->body
 
 =cut
 
@@ -153,7 +145,7 @@ sub body {
 
 =item $req->body_parameters
 
-Returns a reference to a hash containing body parameters. Values can
+Returns a reference to a hash containing body (POST) parameters. Values can
 be either a scalar or an arrayref containing scalars.
 
     print $c->request->body_parameters->{field};
@@ -163,7 +155,7 @@ These are the parameters from the POST part of the request, if any.
     
 =item $req->body_params
 
-An alias for body_parameters.
+Shortcut for body_parameters.
 
 =cut
 
@@ -176,19 +168,19 @@ sub body_parameters {
 
 =item $req->content_encoding
 
-Shortcut to $req->headers->content_encoding
+Shortcut for $req->headers->content_encoding.
 
 =item $req->content_length
 
-Shortcut to $req->headers->content_length
+Shortcut for $req->headers->content_length.
 
 =item $req->content_type
 
-Shortcut to $req->headers->content_type
+Shortcut for $req->headers->content_type.
 
 =item $req->cookie
 
-A convenient method to $req->cookies.
+A convenient method to access $req->cookies.
 
     $cookie  = $c->request->cookie('name');
     @cookies = $c->request->cookie;
@@ -220,24 +212,22 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-The cookies in the hash are indexed by name, and the values are C<CGI::Cookie>
+The cookies in the hash are indexed by name, and the values are L<CGI::Cookie>
 objects.
 
 =item $req->header
 
-Shortcut to $req->headers->header
+Shortcut for $req->headers->header.
 
 =item $req->headers
 
-Returns an L<HTTP::Headers> object containing the headers.
+Returns an L<HTTP::Headers> object containing the headers for the current request.
 
     print $c->request->headers->header('X-Catalyst');
 
 =item $req->hostname
 
-Lookup the current users DNS hostname.
-
-    print $c->request->hostname
+Returns the hostname of the client.
     
 =cut
 
@@ -258,25 +248,21 @@ sub hostname {
 
 =item $req->input
 
-Shortcut for $req->body.
+Alias for $req->body.
 
 =item $req->match
 
-This contains the matching part of a regexp action. Otherwise
+This contains the matching part of a Regex action. Otherwise
 it returns the same as 'action'.
-
-    print $c->request->match;
 
 =item $req->method
 
 Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
-    print $c->request->method;
-
 =item $req->param
 
-Get request parameters with a CGI.pm-compatible param method. This 
-is a method for accessing parameters in $c->req->parameters.
+Returns GET and POST parameters with a CGI.pm-compatible param method. This 
+is an alternative method for accessing parameters in $c->req->parameters.
 
     $value  = $c->request->param( 'foo' );
     @values = $c->request->param( 'foo' );
@@ -289,7 +275,8 @@ arguments to this method, like this:
 
 will set the parameter C<foo> to the multiple values C<bar>, C<gorch> and
 C<quxx>. Previously this would have added C<bar> as another value to C<foo>
-(creating it if it didn't exist before), and C<quxx> as another value for C<gorch>.
+(creating it if it didn't exist before), and C<quxx> as another value for
+C<gorch>.
 
 =cut
 
@@ -325,19 +312,19 @@ sub param {
     }
 }
 
-=item $req->params
-
-Shortcut for $req->parameters.
-
 =item $req->parameters
 
-Returns a reference to a hash containing parameters. Values can
+Returns a reference to a hash containing GET and POST parameters. Values can
 be either a scalar or an arrayref containing scalars.
 
     print $c->request->parameters->{field};
     print $c->request->parameters->{field}->[0];
 
 This is the combination of C<query_parameters> and C<body_parameters>.
+
+=item $req->params
+
+Shortcut for $req->parameters.
 
 =cut
 
@@ -350,13 +337,11 @@ sub parameters {
 
 =item $req->path
 
-Contains the path.
-
-    print $c->request->path;
+Returns the path, i.e. the part of the URI after $req->base, for the current request.
 
 =item $req->path_info
 
-alias for path, added for compability with L<CGI>
+Alias for path, added for compability with L<CGI>.
 
 =cut
 
@@ -382,23 +367,20 @@ sub path {
 
 =item $req->protocol
 
-Contains the protocol.
+Returns the protocol (HTTP/1.0 or HTTP/1.1) used for the current request.
 
 =item $req->query_parameters
 
-Returns a reference to a hash containing query parameters. Values can
+Returns a reference to a hash containing query string (GET) parameters. Values can
 be either a scalar or an arrayref containing scalars.
 
     print $c->request->query_parameters->{field};
     print $c->request->query_parameters->{field}->[0];
-
-These are the parameters from the query string portion of the request's URI, if
-any.
     
 =item $req->read( [$maxlength] )
 
-Read a chunk of data from the request body.  This method is designed to be
-used in a while loop, reading $maxlength bytes on every call.  $maxlength
+Reads a chunk of data from the request body. This method is intended to be
+used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
 You have to set MyApp->config->{parse_on_demand} to use this directly.
@@ -409,11 +391,11 @@ sub read { shift->{_context}->read(@_); }
 
 =item $req->referer
 
-Shortcut to $req->headers->referer. Referring page.
+Shortcut for $req->headers->referer. Returns the referring page.
 
 =item $req->secure
 
-Contains a boolean denoting whether the communication is secure.
+Returns true or false, indicating whether the connection is secure (https).
 
 =item $req->snippets
 
@@ -423,7 +405,7 @@ Returns a reference to an array containing regex snippets.
 
 =item $req->upload
 
-A convenient method to $req->uploads.
+A convenient method to access $req->uploads.
 
     $upload  = $c->request->upload('field');
     @uploads = $c->request->upload('field');
@@ -482,7 +464,7 @@ sub upload {
 =item $req->uploads
 
 Returns a reference to a hash containing uploads. Values can be either a
-hashref or a arrayref containing C<Catalyst::Request::Upload> objects.
+hashref or a arrayref containing L<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
@@ -498,21 +480,24 @@ sub uploads {
 
 =item $req->uri
 
-Returns a URI object for the request.
+Returns a URI object for the current request. Stringifies to the URI text.
 
 =item $req->user
 
-Returns the user.
+Returns the currently logged in user. Deprecated. The method recommended for
+newer plugins is $c->user.
 
 =item $req->user_agent
 
-Shortcut to $req->headers->user_agent. User Agent version string.
+Shortcut to $req->headers->user_agent. Returns the user agent (browser)
+version string.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Sebastian Riedel, C<sri@cpan.org>
+
 Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
