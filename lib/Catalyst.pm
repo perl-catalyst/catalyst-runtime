@@ -118,7 +118,6 @@ Catalyst - The Elegant MVC Web Application Framework
 
     # called for / and only /, no other args
     sub baz : Path  { ... } 
-    sub baz : Index { ... }
 
     # called for all actions, from the top-most controller inwards
     sub auto : Private { 
