@@ -5,12 +5,12 @@ Catalyst::Manual::Plugins - Catalyst Plugins (and Components)
 =head1 DESCRIPTION
 
 This section lists the some of the plugins and components that are
-available to extend the runtime functionality of Catalyst. The plugins
+available to extend the runtime functionality of Catalyst. Most plugins
 are not distributed with Catalyst but should be available from CPAN.
-They typically require additional modules from CPAN.  
+They typically require additional modules from CPAN.
 
-This list is almost certainly outdated by the time you read this, so be sure
-to check the Catalyst::Plugin namespace for additional plugins.
+This list is almost certainly outdated by the time you read this, so be
+sure to check the Catalyst::Plugin namespace for additional plugins.
 
 =head1 PLUGINS
 
@@ -33,9 +33,10 @@ user agent.
 
 =head2 Catalyst::Plugin::Cache::FastMmap, FileCache, and Memcached
 
-L<Catalyst::Plugin::Cache::FastMmap>, L<Catalyst::Plugin::Cache::FileCache>,
-and L<Catalyst::Plugin::Cache::Memcached> all provide a cache method enabling
-easy access to a shared cache.
+L<Catalyst::Plugin::Cache::FastMmap>,
+L<Catalyst::Plugin::Cache::FileCache>, and
+L<Catalyst::Plugin::Cache::Memcached> all provide a cache method
+enabling easy access to a shared cache.
 
 =head2 Catalyst::Plugin::Compress::Zlib
 
@@ -49,8 +50,8 @@ bzip compression.
 
 =head2 Catalyst::Plugin::DefaultEnd
 
-L<Catalyst::Plugin::DefaultEnd> creates a sane, standard end method for your
-application.
+L<Catalyst::Plugin::DefaultEnd> creates a sane, standard end method for
+your application.
 
 =head2 Catalyst::Plugin::Email
 
@@ -70,7 +71,7 @@ values into the form tags.
 
 L<Catalyst::Plugin::FormValidator> is a form validator plugin that uses
 L<Data::FormValidator> to validate and set up form data from your
-request parameters.  It's a quite thin wrapper around that module, so
+request parameters. It's a quite thin wrapper around that module, so
 most of the relevant information can be found there.
 
 =head2 Catalyst::Plugin::Geography
@@ -119,12 +120,13 @@ without actually knowing Javascript.
 Use L<Catalyst::Plugin::RequireSSL> if you would like to force visitors
 to access certain pages using only SSL mode. An attempt to access the
 page in non-SSL mode will receive a redirect into SSL mode. Useful for
-shopping carts, user registration forms, and other sensitive data.
+login pages, shopping carts, user registration forms, and other
+sensitive data.
 
 =head2 Catalyst::Plugin::Session
 
 The L<Catalyst::Plugin::Session> series of modules provide an easy way to
-include session handling in an application.  You can choose from several
+include session handling in an application. You can choose from several
 different backend storage methods and combine that with your choice of
 client-side storage methods.
 
@@ -132,7 +134,7 @@ client-side storage methods.
 
 L<Catalyst::Plugin::Session::FastMmap> is a session plugin for Catalyst
 based on C<Cache::FastMMap>, which uses an mmap'ed file to act as a
-shared memory interprocess cache.  This is an older session plugin; you may
+shared memory interprocess cache. This is an older session plugin; you may
 wish to look at L<Catalyst::Plugin::Session> instead.
 
 =head2 Catalyst::Plugin::SRU
@@ -142,9 +144,9 @@ actions (C<explain>, C<scan>, and C<searchRetrieve>) from its own class.
 
 =head2 Catalyst::Plugin::Static::Simple
 
-L<Catalyst::Plugin::Static::Simple> serves static files in your application
-without requiring a single line of code.  This plugin is now included in the
-core Catalyst distribution.
+L<Catalyst::Plugin::Static::Simple> serves static files in your
+application without requiring a single line of code. This plugin is now
+included in the core Catalyst distribution.
 
 =head2 Catalyst::Plugin::Static
 
@@ -155,7 +157,7 @@ purposes.
 =head2 Catalyst::Plugin::SubRequest
 
 L<Catalyst::Plugin::SubRequest> is a plugin to allow subrequests to
-actions to be made within Catalyst.  Nice for portal software and such.
+actions to be made within Catalyst. Nice for portal software and such.
 
 =head2 Catalyst::Plugin::SuperForm
 
@@ -205,11 +207,13 @@ L<DBIx::Class::Loader>.
 
 =head2 Catalyst::Model::Plucene
 
-L<Catalyst::Model::Plucene> is a model class for the Plucene search engine.
+L<Catalyst::Model::Plucene> is a model class for the Plucene search
+engine.
 
 =head2 Catalyst::Model::Xapian
 
-L<Catalyst::Model::Xapian> is a model class for the Xapian search engine.
+L<Catalyst::Model::Xapian> is a model class for the Xapian search
+engine.
 
 =head2 Catalyst::View::HTML::Template
 
@@ -223,9 +227,9 @@ with L<HTML::Mason>.
 
 =head2 Catalyst::View::PSP
 
-L<Catalyst::View::PSP> is a View component for displaying your
-stash using PSP, a Perl extension implementing a JSP-like 
-templating system; see L<Text::PSP>.
+L<Catalyst::View::PSP> is a View component for displaying your stash
+using PSP, a Perl extension implementing a JSP-like templating system;
+see L<Text::PSP>.
 
 =head2 Catalyst::View::Petal
 
