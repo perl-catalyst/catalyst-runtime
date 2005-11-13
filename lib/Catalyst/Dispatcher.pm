@@ -17,7 +17,7 @@ use overload '""' => sub { return ref shift }, fallback => 1;
 
 __PACKAGE__->mk_accessors(
     qw/tree dispatch_types registered_dispatch_types
-      method_action_class action_container_class/
+      method_action_class action_container_class reserved_actions/
 );
 
 # Preload these action types
@@ -25,6 +25,9 @@ our @PRELOAD = qw/Path Regex/;
 
 # Postload these action types
 our @POSTLOAD = qw/Index Default/;
+
+# Reserved action names
+our @RESERVED = qw/begin auto default index end/;
 
 =head1 NAME
 
@@ -300,10 +303,18 @@ sub register {
         }
     }
 
+    # Check if action name is reserved
+    my $reserved = 0;
+    for my $name ( @{ $self->reserved_actions } ) {
+        $reserved++ if $action->name eq $name;
+    }
+
     # Pass the action to our dispatch types so they can register it if reqd.
-    my $reg = 0;
-    foreach my $type ( @{ $self->dispatch_types } ) {
-        $reg++ if $type->register( $c, $action );
+    my $reg = $reserved;
+    unless ($reserved) {
+        foreach my $type ( @{ $self->dispatch_types } ) {
+            $reg++ if $type->register( $c, $action );
+        }
     }
 
     return unless $reg + $priv;
@@ -349,6 +360,7 @@ sub setup_actions {
 
     $self->dispatch_types( [] );
     $self->registered_dispatch_types( {} );
+    $self->reserved_actions( \@RESERVED );
     $self->method_action_class('Catalyst::Action');
     $self->action_container_class('Catalyst::ActionContainer');
 
