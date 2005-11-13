@@ -23,6 +23,7 @@
 \.bak$
 \#$
 \b\.#
+\.DS_Store$
 
 # Avoid Apache::Test files
 t/conf/apache_test_config.pm
