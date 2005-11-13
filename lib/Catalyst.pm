@@ -353,8 +353,8 @@ sub component {
 
         my @names = (
             $name, "${appclass}::${name}",
-            map { "${appclass}::${_}::${name}" } 
-	    qw/Model M Controller C View V/
+            map { "${appclass}::${_}::${name}" }
+              qw/Model M Controller C View V/
         );
 
         foreach my $try (@names) {
@@ -1201,13 +1201,14 @@ sub prepare {
     # On-demand parsing
     $c->prepare_body unless $c->config->{parse_on_demand};
 
-    $c->prepare_action;
     my $method  = $c->req->method  || '';
     my $path    = $c->req->path    || '';
     my $address = $c->req->address || '';
 
-    $c->log->debug(qq/"$method" request for "$path" from $address/)
+    $c->log->debug(qq/"$method" request for "$path" from "$address"/)
       if $c->debug;
+
+    $c->prepare_action;
 
     return $c;
 }

@@ -198,6 +198,9 @@ sub prepare_action {
         unshift @args, pop @path;
     }
 
+    $c->log->debug( 'Path is "' . $c->req->match . '"' )
+      if ( $c->debug && $c->req->match );
+
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
 }
