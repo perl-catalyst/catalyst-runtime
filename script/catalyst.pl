@@ -47,6 +47,9 @@ catalyst.pl [options] application-name
     catalyst.pl My::App
     catalyst.pl MyApp
 
+ To upgrade your app to a new version of Catalyst:
+    catalyst.pl -nonew -scripts MyApp
+
 
 =head1 DESCRIPTION
 

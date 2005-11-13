@@ -98,17 +98,18 @@ Catalyst - The Elegant MVC Web Application Framework
     use Catalyst qw/-Debug/; # include plugins here as well
     
     sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
-        my ( $self, $c, @args ) = @_; # args are qw/on you/ for /foo/on/you
-        $c->stash->{template} = 'foo.tt';
+        my ( $self, $c, @args ) = @_; # args are qw/1 2/ for /foo/1/2
+        $c->stash->{template} = 'foo.tt'; # set the template
         # lookup something from db -- stash vars are passed to TT
-        $c->stash->{data} = MyApp::Model::Database::Foo->search;
+        $c->stash->{data} = 
+          MyApp::Model::Database::Foo->search( { country => $args[0] } );
         if ( $c->req->params->{bar} ) { # access GET or POST parameters
             $c->forward( 'bar' ); # process another action
             # do something else after forward returns            
         }
     }
     
-    # The foo.tt TT template can easily use the stash data from the database
+    # The foo.tt TT template can use the stash data from the database
     [% WHILE (item = data.next) %]
         [% item.foo %]
     [% END %]
@@ -116,17 +117,17 @@ Catalyst - The Elegant MVC Web Application Framework
     # called for /bar/of/soap, /bar/of/soap/10, etc.
     sub bar : Path('/bar/of/soap') { ... }
 
-    # called for all actions, from the top-most controller inwards
+    # called for all actions, from the top-most controller downwards
     sub auto : Private { 
         my ( $self, $c ) = @_;
         if ( !$c->user ) {
             $c->res->redirect( '/login' ); # require login
             return 0; # abort request and go immediately to end()
         }
-        return 1;
+        return 1; # success; carry on to next action
     }
     
-    # called after the main action is finished
+    # called after all actions are finished
     sub end : Private { 
         my ( $self, $c ) = @_;
         if ( scalar @{ $c->error } ) { ... } # handle errors
@@ -166,19 +167,20 @@ The key concept of Catalyst is DRY (Don't Repeat Yourself).
 
 See L<Catalyst::Manual> for more documentation.
 
-Catalyst plugins can be loaded by naming them as arguments to the "use Catalyst" statement.
-Omit the C<Catalyst::Plugin::> prefix from the plugin name, i.e.,
-C<Catalyst::Plugin::My::Module> becomes C<My::Module>.
+Catalyst plugins can be loaded by naming them as arguments to the "use
+Catalyst" statement. Omit the C<Catalyst::Plugin::> prefix from the
+plugin name, i.e., C<Catalyst::Plugin::My::Module> becomes
+C<My::Module>.
 
     use Catalyst qw/My::Module/;
 
-Special flags like -Debug and -Engine can also be specified as arguments when
-Catalyst is loaded:
+Special flags like C<-Debug> and C<-Engine> can also be specified as
+arguments when Catalyst is loaded:
 
     use Catalyst qw/-Debug My::Module/;
 
-The position of plugins and flags in the chain is important, because they are
-loaded in exactly the order that they appear.
+The position of plugins and flags in the chain is important, because
+they are loaded in exactly the order in which they appear.
 
 The following flags are supported:
 
@@ -190,14 +192,16 @@ Enables debug output.
 
 =item -Engine
 
-Forces Catalyst to use a specific engine.
-Omit the C<Catalyst::Engine::> prefix of the engine name, i.e.:
+Forces Catalyst to use a specific engine. Omit the
+C<Catalyst::Engine::> prefix of the engine name, i.e.:
 
     use Catalyst qw/-Engine=CGI/;
 
 =item -Home
 
-Forces Catalyst to use a specific home directory.
+Forces Catalyst to use a specific home directory, e.g.:
+
+    use Catalyst qw[-Home=/usr/sri];
 
 =item -Log
 
@@ -213,18 +217,23 @@ Specifies log level.
 
 =item $c->action
 
-Returns a L<Catalyst::Action> object for the current action, which stringifies to the action name.
+Returns a L<Catalyst::Action> object for the current action, which
+stringifies to the action name. See L<Catalyst::Action>.
 
 =item $c->namespace
 
-Returns the namespace of the current action, i.e., the uri prefix corresponding to the 
-controller of the current action.
+Returns the namespace of the current action, i.e., the uri prefix
+corresponding to the controller of the current action. For example:
+
+    # in Controller::Foo::Bar
+    $c->namespace; # returns 'foo/bar';
 
 =item $c->request
 
 =item $c->req
 
-Returns the current L<Catalyst::Request> object.
+Returns the current L<Catalyst::Request> object. See
+L<Catalyst::Request>.
 
 =back
 
@@ -236,11 +245,11 @@ Returns the current L<Catalyst::Request> object.
 
 =item $c->forward( $class, $method, [, \@arguments ] )
 
-Forwards processing to a private action. If you give a class name but 
-no method, process() is called. You may also optionally pass arguments 
-in an arrayref. The action will receive the arguments in @_ and $c->req->args. 
-Upon returning from the function, $c->req->args will be restored to the previous
-values.
+Forwards processing to a private action. If you give a class name but no
+method, C<process()> is called. You may also optionally pass arguments
+in an arrayref. The action will receive the arguments in C<@_> and
+C<$c-E<gt>req-E<gt>args>. Upon returning from the function,
+C<$c-E<gt>req-E<gt>args> will be restored to the previous values.
 
     $c->forward('/foo');
     $c->forward('index');
@@ -299,9 +308,11 @@ Returns the current L<Catalyst::Response> object.
 
 =item $c->stash
 
-Returns a hashref to the stash, which may be used to store data and pass it
-between components. You can also set hash keys by passing arguments.  The
-stash is automatically sent to the view.
+Returns a hashref to the stash, which may be used to store data and pass
+it between components during a request. You can also set hash keys by
+passing arguments. The stash is automatically sent to the view. The
+stash is cleared at the end of a request; it cannot be used for
+persistent storage.
 
     $c->stash->{foo} = $bar;
     $c->stash( { moose => 'majestic', qux => 0 } );
@@ -337,8 +348,10 @@ Contains the return value of the last executed action.
 
 =item $c->component($name)
 
-Gets a component object by name.  This method is no longer recommended.
-$c->controller, $c->model, and $c->view should be used instead.
+Gets a component object by name. This method is no longer recommended,
+unless you want to get a specific component by full
+class. C<$c-E<gt>controller>, C<$c-E<gt>model>, and C<$c-E<gt>view>
+should be used instead.
 
 =cut
 
@@ -442,22 +455,24 @@ sub debug { 0 }
 
 =item $c->dispatcher
 
-Returns the dispatcher instance. Stringifies to class name.
+Returns the dispatcher instance. Stringifies to class name. See
+L<Catalyst::Dispatcher>.
 
 =item $c->engine
 
-Returns the engine instance. Stringifies to the class name.
+Returns the engine instance. Stringifies to the class name. See
+L<Catalyst::Engine>.
 
 =item $c->log
 
-Returns the logging object instance. Unless it is already set, Catalyst sets this up with a
-L<Catalyst::Log> object. To use your own log class:
+Returns the logging object instance. Unless it is already set, Catalyst
+sets this up with a L<Catalyst::Log> object. To use your own log class:
 
     $c->log( MyLogger->new );
-    $c->log->info( 'now logging with my own logger!' );
+    $c->log->info( 'Now logging with my own logger!' );
 
-Your log class should implement the methods described in the L<Catalyst::Log>
-man page.
+Your log class should implement the methods described in the
+L<Catalyst::Log> man page.
 
 =cut
 
@@ -469,7 +484,8 @@ man page.
 
 =item $c->path_to(@path)
 
-Merges C<@path> with $c->config->{home} and returns a L<Path::Class> object.
+Merges C<@path> with C<$c-E<gt>config-E<gt>{home}> and returns a
+L<Path::Class> object.
 
 For example:
 
@@ -486,8 +502,8 @@ sub path_to {
 
 =item $c->plugin( $name, $class, @args )
 
-Helper method for plugins. It creates a classdata accessor/mutator and loads
-and instantiates the given class.
+Helper method for plugins. It creates a classdata accessor/mutator and
+loads and instantiates the given class.
 
     MyApp->plugin( 'prototype', 'HTML::Prototype' );
 
@@ -522,9 +538,9 @@ sub plugin {
 =item MyApp->setup
 
 Initializes the dispatcher and engine, loads any plugins, and loads the
-model, view, and controller components.  You may also specify an array of
-plugins to load here, if you choose to not load them in the C<use Catalyst>
-line.
+model, view, and controller components. You may also specify an array
+of plugins to load here, if you choose to not load them in the C<use
+Catalyst> line.
 
     MyApp->setup;
     MyApp->setup( qw/-Debug/ );
@@ -650,10 +666,10 @@ EOF
 
 =item $c->uri_for( $path, [ @args ] )
 
-Merges path with $c->request->base for absolute uri's and with
-$c->request->match for relative uri's, then returns a normalized
-L<URI> object. If any args are passed, they are added at the end
-of the path.
+Merges path with C<$c-E<gt>request-E<gt>base> for absolute uri's and
+with C<$c-E<gt>request-E<gt>match> for relative uri's, then returns a
+normalized L<URI> object. If any args are passed, they are added at the
+end of the path.
 
 =cut
 
@@ -827,6 +843,8 @@ EOF
 
 =head1 INTERNAL METHODS
 
+These methods are not meant to be used by end users.
+
 =over 4
 
 =item $c->benchmark( $coderef )
@@ -857,8 +875,8 @@ Returns or sets the context class.
 
 =item $c->counter
 
-Returns a hashref containing coderefs and execution counts (needed for deep
-recursion detection).
+Returns a hashref containing coderefs and execution counts (needed for
+deep recursion detection).
 
 =item $c->depth
 
@@ -878,8 +896,8 @@ Returns or sets the dispatcher class.
 
 =item $c->dump_these
 
-Returns a list of 2-element array references (name, structure) pairs that will
-be dumped on the error page in debug mode.
+Returns a list of 2-element array references (name, structure) pairs
+that will be dumped on the error page in debug mode.
 
 =cut
 
@@ -1066,7 +1084,7 @@ sub finalize_read { my $c = shift; $c->engine->finalize_read( $c, @_ ) }
 
 =item $c->finalize_uploads
 
-Finalizes uploads.  Cleans up any temporary files.
+Finalizes uploads. Cleans up any temporary files.
 
 =cut
 
@@ -1082,7 +1100,8 @@ sub get_action { my $c = shift; $c->dispatcher->get_action(@_) }
 
 =item $c->get_actions( $action, $namespace )
 
-Gets all actions of a given name in a namespace and all parent namespaces.
+Gets all actions of a given name in a namespace and all parent
+namespaces.
 
 =cut
 
@@ -1137,8 +1156,8 @@ sub handle_request {
 
 =item $c->prepare( @arguments )
 
-Creates a Catalyst context from an engine-specific request
-(Apache, CGI, etc.).
+Creates a Catalyst context from an engine-specific request (Apache, CGI,
+etc.).
 
 =cut
 
@@ -1404,11 +1423,12 @@ Returns or sets the response class.
 
 =item $c->read( [$maxlength] )
 
-Reads a chunk of data from the request body.  This method is designed to be
-used in a while loop, reading $maxlength bytes on every call.  $maxlength
-defaults to the size of the request if not specified.
+Reads a chunk of data from the request body. This method is designed to
+be used in a while loop, reading C<$maxlength> bytes on every call.
+C<$maxlength> defaults to the size of the request if not specified.
 
-You have to set MyApp->config->{parse_on_demand} to use this directly.
+You have to set C<MyApp-E<gt>config-E<gt>{parse_on_demand}> to use this
+directly.
 
 =cut
 
@@ -1503,6 +1523,8 @@ qq/Couldn't instantiate component "$component", "new() didn't return a object"/
 
 =item $c->setup_dispatcher
 
+Sets up dispatcher.
+
 =cut
 
 sub setup_dispatcher {
@@ -1537,6 +1559,8 @@ sub setup_dispatcher {
 }
 
 =item $c->setup_engine
+
+Sets up engine.
 
 =cut
 
@@ -1660,6 +1684,8 @@ qq/Couldn't load engine "$engine" (maybe you forgot to install it?), "$@"/
 
 =item $c->setup_home
 
+Sets up the home directory.
+
 =cut
 
 sub setup_home {
@@ -1685,6 +1711,8 @@ sub setup_home {
 
 =item $c->setup_log
 
+Sets up log.
+
 =cut
 
 sub setup_log {
@@ -1709,6 +1737,8 @@ sub setup_log {
 }
 
 =item $c->setup_plugins
+
+Sets up plugins.
 
 =cut
 
@@ -1740,9 +1770,9 @@ Returns the stack.
 
 =item $c->write( $data )
 
-Writes $data to the output stream.  When using this method directly, you will
-need to manually set the Content-Length header to the length of your output
-data, if known.
+Writes $data to the output stream. When using this method directly, you
+will need to manually set the C<Content-Length> header to the length of
+your output data, if known.
 
 =cut
 
@@ -1757,8 +1787,8 @@ sub write {
 
 =item version
 
-Returns the Catalyst version number. Mostly useful for "powered by" messages
-in template systems.
+Returns the Catalyst version number. Mostly useful for "powered by"
+messages in template systems.
 
 =cut
 
@@ -1768,8 +1798,8 @@ sub version { return $Catalyst::VERSION }
 
 =head1 INTERNAL ACTIONS
 
-Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>
-C<_ACTION> and C<_END>. These are by default not shown in the private
+Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,
+C<_ACTION>, and C<_END>. These are by default not shown in the private
 action table, but you can make them visible with a config parameter.
 
     MyApp->config->{show_internal_actions} = 1;
@@ -1777,7 +1807,7 @@ action table, but you can make them visible with a config parameter.
 =head1 CASE SENSITIVITY
 
 By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
-mapped to C</foo/bar>. You can activate case sensitivity with a config 
+mapped to C</foo/bar>. You can activate case sensitivity with a config
 parameter.
 
     MyApp->config->{case_sensitive} = 1;
@@ -1794,28 +1824,29 @@ you can enable on-demand parsing with a config parameter.
     
 =head1 PROXY SUPPORT
 
-Many production servers operate using the common double-server approach, with
-a lightweight frontend web server passing requests to a larger backend
-server.  An application running on the backend server must deal with two
-problems: the remote user always appears to be C<127.0.0.1> and the server's
-hostname will appear to be C<localhost> regardless of the virtual host that
-the user connected through.
+Many production servers operate using the common double-server approach,
+with a lightweight frontend web server passing requests to a larger
+backend server. An application running on the backend server must deal
+with two problems: the remote user always appears to be C<127.0.0.1> and
+the server's hostname will appear to be C<localhost> regardless of the
+virtual host that the user connected through.
 
-Catalyst will automatically detect this situation when you are running the
-frontend and backend servers on the same machine. The following changes
-are made to the request.
+Catalyst will automatically detect this situation when you are running
+the frontend and backend servers on the same machine. The following
+changes are made to the request.
 
-    $c->req->address is set to the user's real IP address, as read from the
-    HTTP X-Forwarded-For header.
+    $c->req->address is set to the user's real IP address, as read from 
+    the HTTP X-Forwarded-For header.
     
-    The host value for $c->req->base and $c->req->uri is set to the real host,
-    as read from the HTTP X-Forwarded-Host header.
+    The host value for $c->req->base and $c->req->uri is set to the real
+    host, as read from the HTTP X-Forwarded-Host header.
 
 Obviously, your web server must support these headers for this to work.
 
-In a more complex server farm environment where you may have your frontend
-proxy server(s) on different machines, you will need to set a configuration
-option to tell Catalyst to read the proxied data from the headers.
+In a more complex server farm environment where you may have your
+frontend proxy server(s) on different machines, you will need to set a
+configuration option to tell Catalyst to read the proxied data from the
+headers.
 
     MyApp->config->{using_frontend_proxy} = 1;
     
@@ -1860,13 +1891,13 @@ Wiki:
 
 =item L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
 
-=item L<Catalyst::Engine> - Core Engine
+=item L<Catalyst::Engine> - Core engine
 
-=item L<Catalyst::Log> - The Log Class.
+=item L<Catalyst::Log> - Log class.
 
-=item L<Catalyst::Request> - The Request Object
+=item L<Catalyst::Request> - Request object
 
-=item L<Catalyst::Response> - The Response Object
+=item L<Catalyst::Response> - Response object
 
 =item L<Catalyst::Test> - The test suite.
 
