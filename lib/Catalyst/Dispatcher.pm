@@ -194,7 +194,6 @@ sub prepare_action {
         }
 
         # If not, move the last part path to args
-
         unshift @args, pop @path;
     }
 
