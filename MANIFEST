@@ -101,6 +101,7 @@ t/live/lib/TestApp/Controller/Action/Multipath.pm
 t/live/lib/TestApp/Controller/Action/Path.pm
 t/live/lib/TestApp/Controller/Action/Private.pm
 t/live/lib/TestApp/Controller/Action/Regexp.pm
+t/live/lib/TestApp/Controller/Action/Relative.pm
 t/live/lib/TestApp/Controller/Action/Streaming.pm
 t/live/lib/TestApp/Controller/Dump.pm
 t/live/lib/TestApp/Controller/Engine/Request/Uploads.pm

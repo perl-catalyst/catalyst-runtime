@@ -1,6 +1,6 @@
 ---
 name: Catalyst
-version: 5.49_04
+version: 5.49_05
 author:
   - 'Sebastian Riedel, C<sri@oook.de>'
 abstract: The Elegant MVC Web Application Framework
@@ -38,7 +38,7 @@ recommends:
 provides:
   Catalyst:
     file: lib/Catalyst.pm
-    version: 5.49_04
+    version: 5.49_05
   Catalyst::Action:
     file: lib/Catalyst/Action.pm
   Catalyst::ActionContainer:
