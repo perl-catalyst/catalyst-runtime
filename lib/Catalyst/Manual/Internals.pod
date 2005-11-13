@@ -50,21 +50,25 @@ context, processing of the request, and finalization of the response.  These
 are the steps of a Catalyst request in detail; every step can be overloaded to
 extend Catalyst.
 
-    handler
+    handle_request
       prepare
         prepare_request
         prepare_connection
+        prepare_query_parameters
         prepare_headers
         prepare_cookies
         prepare_path
+        prepare_body (unless parse_on_demand)
+          prepare_body_parameters
+          prepare_parameters
+          prepare_uploads
         prepare_action
-        prepare_body
-        prepare_parameters
-        prepare_uploads
       dispatch
       finalize
-        finalize_cookies
+        finalize_uploads
+        finalize_error (if one happened)
         finalize_headers
+          finalize_cookies
         finalize_body
 
 These steps are normally overloaded from engine classes, and may also be
