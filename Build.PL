@@ -33,7 +33,7 @@ my $build = Module::Build->new(
         'URI'                               => 1.35,
     },
     recommends =>
-      { 'Catalyst::Engine::Apache' => 0, FCGI => 0, 'FCGI::ProcManager' => 0 },
+      { 'Catalyst::Engine::Apache' => '1.00', FCGI => 0, 'FCGI::ProcManager' => 0 },
     create_makefile_pl => 'passthrough',
     create_readme      => 1,
     script_files       => [ glob('script/*') ],

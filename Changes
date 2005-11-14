@@ -1,7 +1,12 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
+5.53    2005-11-14 15:55:00
+        - Removed t/04prereq.t that was testing for non-required
+          modules.
+
 5.52    2005-11-14 10:57:00
         - Strip '..'s in static urls to fix security issue.
+
 5.51    2005-11-14 00:45:00
         - Changed uri_for to use namespace instead of match.
 
