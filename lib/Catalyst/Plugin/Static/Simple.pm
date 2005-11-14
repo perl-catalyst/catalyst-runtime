@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use File::stat;
+use File::Spec::Functions qw/catdir no_upwards splitdir/;
 use IO::File;
 use MIME::Types;
 use NEXT;
@@ -111,7 +112,7 @@ sub setup {
 sub _locate_static_file {
     my $c = shift;
     
-    my $path = $c->req->path;
+    my $path = catdir(no_upwards(splitdir( $c->req->path )));
     
     my @ipaths = @{ $c->config->{static}->{include_path} };
     my $dpaths;
