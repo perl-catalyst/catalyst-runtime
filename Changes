@@ -1,5 +1,12 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
+5.51 2005-11-14 00:45:00
+        - Changed uri_for to use namespace instead of match
+
+5.5 2005-11-13 20:45:00
+        - Fixed minor bugs
+        - Updated docs
+
 5.49_05 2005-11-12 20:45:00
         - Large update to the documentation. (David Kamholz)
         - Fixed args handling in forward()

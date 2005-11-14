@@ -6,11 +6,11 @@ use Test::MockObject;
 use URI;
 
 my $request = Test::MockObject->new;
-$request->mock( 'base',  sub { URI->new('http://127.0.0.1/foo') } );
-$request->mock( 'match', sub { '/yada' } );
+$request->mock( 'base', sub { URI->new('http://127.0.0.1/foo') } );
 
 my $context = Test::MockObject->new;
-$context->mock( 'request', sub { $request } );
+$context->mock( 'request',   sub { $request } );
+$context->mock( 'namespace', sub { 'yada' } );
 
 use_ok('Catalyst');
 
@@ -38,11 +38,11 @@ is(
 );
 
 {
-    $request->mock( 'base',  sub { URI->new('http://127.0.0.1/') } );
-    $request->mock( 'match', sub { '' } );
+    $request->mock( 'base', sub { URI->new('http://127.0.0.1/') } );
 
     my $context = Test::MockObject->new;
-    $context->mock( 'request', sub { $request } );
+    $context->mock( 'request',   sub { $request } );
+    $context->mock( 'namespace', sub { '' } );
 
     is( Catalyst::uri_for( $context, '/bar/baz' )->as_string,
         'http://127.0.0.1/bar/baz', 'URI with no base or match' );

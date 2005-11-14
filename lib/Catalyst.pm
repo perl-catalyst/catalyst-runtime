@@ -54,7 +54,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.5';
+our $VERSION = '5.51';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -667,7 +667,7 @@ EOF
 =item $c->uri_for( $path, [ @args ] )
 
 Merges path with C<$c-E<gt>request-E<gt>base> for absolute uri's and
-with C<$c-E<gt>request-E<gt>match> for relative uri's, then returns a
+with C<$c-E<gt>namespace> for relative uri's, then returns a
 normalized L<URI> object. If any args are passed, they are added at the
 end of the path.
 
@@ -679,18 +679,18 @@ sub uri_for {
     my $basepath = $base->path;
     $basepath =~ s/\/$//;
     $basepath .= '/';
-    my $match = $c->request->match;
+    my $namespace = $c->namespace;
 
-    # massage match, empty if absolute path
-    $match =~ s/^\///;
-    $match .= '/' if $match;
+    # massage namespace, empty if absolute path
+    $namespace =~ s/^\///;
+    $namespace .= '/' if $namespace;
     $path ||= '';
-    $match = '' if $path =~ /^\//;
+    $namespace = '' if $path =~ /^\//;
     $path =~ s/^\///;
 
     # join args with '/', or a blank string
     my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
-    return URI->new_abs( URI->new_abs( "$path$args", "$basepath$match" ),
+    return URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ),
         $base )->canonical;
 }
 
