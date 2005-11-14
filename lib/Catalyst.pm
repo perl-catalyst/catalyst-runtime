@@ -54,7 +54,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.53';
+our $VERSION = '5.54';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1496,8 +1496,7 @@ qq/Couldn't instantiate component "$component", "new() didn't return a object"/
         return $instance;
     };
 
-    eval "package $class;\n".
-        q!Module::Pluggable::Fast->import(
+    eval "package $class;\n" . q!Module::Pluggable::Fast->import(
             name   => '_catalyst_components',
             search => [
                 "$class\::Controller", "$class\::C",

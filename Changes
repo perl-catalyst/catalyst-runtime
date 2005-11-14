@@ -1,5 +1,8 @@
 Tis file documents the revision history for Perl extension Catalyst.
 
+5.54    2005-11-14 22:55:00
+        - Fixed a Module::Pluggable::Fast related bug
+
 5.53    2005-11-14 15:55:00
         - Removed t/04prereq.t that was testing for non-required
           modules.
