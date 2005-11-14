@@ -1496,8 +1496,8 @@ qq/Couldn't instantiate component "$component", "new() didn't return a object"/
         return $instance;
     };
 
-    eval {
-        Module::Pluggable::Fast->import(
+    eval "package $class;\n".
+        q!Module::Pluggable::Fast->import(
             name   => '_catalyst_components',
             search => [
                 "$class\::Controller", "$class\::C",
@@ -1506,7 +1506,7 @@ qq/Couldn't instantiate component "$component", "new() didn't return a object"/
             ],
             callback => $callback
         );
-    };
+    !;
 
     if ( my $error = $@ ) {
 
