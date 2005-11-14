@@ -16,8 +16,6 @@ use Path::Class;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
 use Scalar::Util qw/weaken/;
-use Hash::Util qw/lock_hash/;
-use HTTP::Headers::ReadOnly;
 use attributes;
 
 __PACKAGE__->mk_accessors(
@@ -1025,11 +1023,7 @@ Finalizes cookies.
 
 =cut
 
-sub finalize_cookies {
-	my $c = shift;
-	$c->engine->finalize_cookies( $c, @_ );
-	lock_hash( %$_ ) for $c->res->cookies, values %{ $c->res->cookies };
-}
+sub finalize_cookies { my $c = shift; $c->engine->finalize_cookies( $c, @_ ) }
 
 =item $c->finalize_error
 
@@ -1071,8 +1065,6 @@ sub finalize_headers {
     $c->finalize_cookies;
 
     $c->engine->finalize_headers( $c, @_ );
-
-	bless $c->response->headers, "HTTP::Headers::ReadOnly";
 
     # Done
     $c->response->{_finalized_headers} = 1;
@@ -1781,9 +1773,6 @@ Returns the stack.
 Writes $data to the output stream. When using this method directly, you
 will need to manually set the C<Content-Length> header to the length of
 your output data, if known.
-
-Also note that any headers created after the write can  no longer be added, and
-this includes cookies.
 
 =cut
 
