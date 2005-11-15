@@ -116,7 +116,7 @@ control the running of your FastCGI processes.
 
     # Launch the FastCGI processes
     FastCgiIpcDir /tmp
-    FastCgiServer /var/www/MyApp/script/myapp_fastcgi.pl -idle_timeout 300 -processes 5
+    FastCgiServer /var/www/MyApp/script/myapp_fastcgi.pl -idle-timeout 300 -processes 5
     
     <VirtualHost *>
         ScriptAlias / /var/www/MyApp/script/myapp_fastcgi.pl/
