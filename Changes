@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Updated benchmarking to work with detach
         - Fixed dispatcher, so $c->req->action(undef) works again
         - Updated Catalyst::Test to use HTTP::Request::AsCGI
+        - Added -pidfile to external FastCGI server.
 
 5.55    2005-11-15 12:55:00
         - Fixed multiple cookie handling

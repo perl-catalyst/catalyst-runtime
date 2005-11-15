@@ -690,17 +690,23 @@ use lib "$FindBin::Bin/../lib";
 use [% name %];
 
 my $help = 0;
-my ( $listen, $nproc );
+my ( $listen, $nproc, $pidfile );
  
 GetOptions(
-    'help|?'     => \$help,
-    'listen|l=s' => \$listen,
-    'nproc|n=i'  => \$nproc,
+    'help|?'      => \$help,
+    'listen|l=s'  => \$listen,
+    'nproc|n=i'   => \$nproc,
+    'pidfile|p=s' => \$pidfile,
 );
 
 pod2usage(1) if $help;
 
-[% name %]->run( $listen, { nproc => $nproc } );
+[% name %]->run( 
+    $listen, 
+    {   nproc   => $nproc,
+        pidfile => $pidfile, 
+    }
+);
 
 1;
 

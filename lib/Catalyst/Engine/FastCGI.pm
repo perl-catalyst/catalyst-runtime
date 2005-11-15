@@ -37,6 +37,7 @@ Options may also be specified;
                   interrupted by Ctrl+C
   nproc           Specify a number of processes for
                   FCGI::ProcManager
+  pidfile         Specify a filename for the pid file
 
 =cut
 
@@ -70,11 +71,18 @@ sub run {
       );
 
     my $proc_manager;
-
-    if ( $listen and ( $options->{nproc} || 1 ) > 1 ) {
+    
+    if ( $listen ) {
         require FCGI::ProcManager;
-        $proc_manager =
-          FCGI::ProcManager->new( { n_processes => $options->{nproc} } );
+        $options->{nproc} ||= 1;
+        
+        $proc_manager
+            = FCGI::ProcManager->new( { n_processes => $options->{nproc} } );
+          
+        if ( $options->{pidfile} ) {
+            $proc_manager->pm_write_pid_file( $options->{pidfile} );
+        }
+        
         $proc_manager->pm_manage();
     }
 
