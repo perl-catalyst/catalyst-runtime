@@ -725,7 +725,10 @@ pod2usage(1) if $help;
                  can be HOST:PORT, :PORT or a
                  filesystem path
    -n -nproc     specify number of processes to keep
-                 to serve requests (defaults to 1)
+                 to serve requests (defaults to 1,
+                 requires -listen)
+   -p -pidfile   specify filename for pid file
+                 (requires -listen)
 
 =head1 DESCRIPTION
 
