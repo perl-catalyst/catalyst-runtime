@@ -61,9 +61,11 @@ sub run {
     }
 
     $options ||= {};
+    
+    my %env;
 
     my $request =
-      FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, $sock,
+      FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%env, $sock,
         ( $options->{nointr} ? 0 : &FCGI::FAIL_ACCEPT_ON_INTR ),
       );
 
@@ -78,7 +80,7 @@ sub run {
 
     while ( $request->Accept >= 0 ) {
         $proc_manager && $proc_manager->pm_pre_dispatch();
-        $class->handle_request;
+        $class->handle_request( env => \%env );
         $proc_manager && $proc_manager->pm_pre_dispatch();
     }
 }

@@ -5,6 +5,8 @@ use base 'Catalyst::Engine';
 use NEXT;
 use URI;
 
+__PACKAGE__->mk_accessors( 'env' );
+
 =head1 NAME
 
 Catalyst::Engine::CGI - The CGI Engine
@@ -53,6 +55,7 @@ sub finalize_headers {
 
 sub prepare_connection {
     my ( $self, $c ) = @_;
+    local(*ENV) = $self->env || \%ENV;
 
     $c->request->address( $ENV{REMOTE_ADDR} );
 
@@ -90,6 +93,7 @@ sub prepare_connection {
 
 sub prepare_headers {
     my ( $self, $c ) = @_;
+    local(*ENV) = $self->env || \%ENV;
 
     # Read headers from %ENV
     while ( my ( $header, $value ) = each %ENV ) {
@@ -105,6 +109,7 @@ sub prepare_headers {
 
 sub prepare_path {
     my ( $self, $c ) = @_;
+    local(*ENV) = $self->env || \%ENV;
 
     my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
@@ -155,9 +160,22 @@ sub prepare_path {
 
 sub prepare_query_parameters {
     my ( $self, $c ) = @_;
+    local(*ENV) = $self->env || \%ENV;
     
     if ( $ENV{QUERY_STRING} ) {
         $self->SUPER::prepare_query_parameters( $c, $ENV{QUERY_STRING} );
+    }
+}
+
+=item $self->prepare_request($c, (env => \%env))
+
+=cut
+
+sub prepare_request {
+    my ( $self, $c, %args ) = @_;
+
+    if ( $args{env} ) {
+       $self->env( $args{env} );
     }
 }
 
