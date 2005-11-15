@@ -6,25 +6,8 @@ use warnings;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use UNIVERSAL::require;
-use HTTP::Headers;
 
-$ENV{CATALYST_ENGINE} = 'Test';
-
-# Bypass a HTTP::Headers bug
-{
-    no warnings 'redefine';
-
-    sub HTTP::Headers::new {
-        my $class = shift;
-        my $self = bless {}, $class;
-        if (@_) {
-            while ( my ( $field, $val ) = splice( @_, 0, 2 ) ) {
-                $self->push_header( $field, $val );
-            }
-        }
-        return $self;
-    }
-}
+$ENV{CATALYST_ENGINE} = 'CGI';
 
 =head1 NAME
 
@@ -100,14 +83,31 @@ sub import {
         die if $@ && $@ !~ /^Can't locate /;
         $class->import;
 
-        $request = sub { $class->run(@_) };
-        $get     = sub { $class->run(@_)->content };
+        $request = sub { local_request( $class, @_ ) };
+        $get     = sub { local_request( $class, @_ )->content };
     }
 
     no strict 'refs';
     my $caller = caller(0);
     *{"$caller\::request"} = $request;
     *{"$caller\::get"}     = $get;
+}
+
+=item local_request
+
+=cut
+
+sub local_request {
+    my $class = shift;
+
+    require HTTP::Request::AsCGI;
+
+    my $request = Catalyst::Utils::request( shift(@_) );
+    my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
+
+    $class->handle_request;
+
+    return $cgi->restore->response;
 }
 
 my $agent;
@@ -123,8 +123,7 @@ sub remote_request {
     require LWP::UserAgent;
 
     my $request = Catalyst::Utils::request( shift(@_) );
-
-    my $server = URI->new( $ENV{CATALYST_SERVER} );
+    my $server  = URI->new( $ENV{CATALYST_SERVER} );
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         $server->path("$1");    # need to be quoted
