@@ -6,7 +6,7 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments cookies headers match method
+    qw/address arguments cookies headers match method
       protocol query_parameters secure snippets uri user/
 );
 
@@ -80,6 +80,10 @@ thus hiding the details of the particular engine implementation.
 =item $req->action
 
 Returns the requested action as a L<Catalyst::Action> object.
+
+=cut
+
+sub action { shift->{_context}->action(@_) }
 
 =item $req->address
 

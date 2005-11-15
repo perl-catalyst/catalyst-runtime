@@ -56,7 +56,6 @@ sub detach {
 
 sub dispatch {
     my ( $self, $c ) = @_;
-
     if ( $c->action ) {
         $c->forward( join( '/', '', $c->action->namespace, '_DISPATCH' ) );
     }

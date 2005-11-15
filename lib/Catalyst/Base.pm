@@ -43,7 +43,9 @@ sub _AUTO : Private {
 
 sub _ACTION : Private {
     my ( $self, $c ) = @_;
-    $c->action->execute($c);
+    if ( ref $c->action && $c->action->isa('Catalyst::Action') ) {
+        $c->action->execute($c);
+    }
     return !@{ $c->error };
 }
 

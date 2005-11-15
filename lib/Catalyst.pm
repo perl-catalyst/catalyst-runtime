@@ -54,7 +54,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.55';
+our $VERSION = '5.56';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -847,24 +847,6 @@ These methods are not meant to be used by end users.
 
 =over 4
 
-=item $c->benchmark( $coderef )
-
-Takes a coderef with arguments and returns elapsed time as float.
-
-    my ( $elapsed, $status ) = $c->benchmark( sub { return 1 } );
-    $c->log->info( sprintf "Processing took %f seconds", $elapsed );
-
-=cut
-
-sub benchmark {
-    my $c       = shift;
-    my $code    = shift;
-    my $time    = [gettimeofday];
-    my @return  = &$code(@_);
-    my $elapsed = tv_interval $time;
-    return wantarray ? ( $elapsed, @return ) : $elapsed;
-}
-
 =item $c->components
 
 Returns a hash of components.
@@ -944,22 +926,19 @@ sub execute {
         $action = "-> $action" if $callsub =~ /forward$/;
     }
     push( @{ $c->stack }, $code );
-    eval {
-        if ( $c->debug )
+    my $elapsed = 0;
+    my $start   = 0;
+    $start = [gettimeofday] if $c->debug;
+    eval { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) };
+    $elapsed = tv_interval($start) if $c->debug;
+
+    if ( $c->debug ) {
+        unless ( ( $code->name =~ /^_.*/ )
+            && ( !$c->config->{show_internal_actions} ) )
         {
-            my ( $elapsed, @state ) =
-              $c->benchmark( $code, $class, $c, @{ $c->req->args } );
-            unless ( ( $code->name =~ /^_.*/ )
-                && ( !$c->config->{show_internal_actions} ) )
-            {
-                push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
-            }
-            $c->state(@state);
+            push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
         }
-        else {
-            $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 );
-        }
-    };
+    }
     pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
@@ -1129,8 +1108,9 @@ sub handle_request {
         };
 
         if ( $class->debug ) {
-            my $elapsed;
-            ( $elapsed, $status ) = $class->benchmark($handler);
+            my $start = [gettimeofday];
+            $status = &$handler;
+            my $elapsed = tv_interval $start;
             $elapsed = sprintf '%f', $elapsed;
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
