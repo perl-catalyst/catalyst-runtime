@@ -3,6 +3,7 @@ package Catalyst::Engine::Test;
 use strict;
 use base 'Catalyst::Engine::CGI';
 use Catalyst::Utils;
+use HTTP::Headers;
 use HTTP::Response;
 use HTTP::Status;
 use NEXT;
@@ -66,10 +67,10 @@ sub run {
 
     # We emulate CGI
     local %ENV = (
-        PATH_INFO       => $request->uri->path  || '',
-        QUERY_STRING    => $request->uri->query || '',
-        REMOTE_ADDR     => '127.0.0.1',
-        REMOTE_HOST     => 'localhost',
+        PATH_INFO    => $request->uri->path  || '',
+        QUERY_STRING => $request->uri->query || '',
+        REMOTE_ADDR  => '127.0.0.1',
+        REMOTE_HOST  => 'localhost',
         REQUEST_METHOD  => $request->method,
         SERVER_NAME     => 'localhost',
         SERVER_PORT     => $request->uri->port,

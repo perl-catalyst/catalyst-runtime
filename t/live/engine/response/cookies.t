@@ -8,12 +8,11 @@ use lib "$FindBin::Bin/../../lib";
 
 use Test::More tests => 10;
 use Catalyst::Test 'TestApp';
-
 use HTTP::Headers::Util 'split_header_words';
 
 my $expected = {
-    Catalyst => [qw( Catalyst Cool path / )],
-    Cool     => [qw( Cool Catalyst path / )]
+    Catalyst => [qw|Catalyst Cool path /|],
+    Cool     => [qw|Cool Catalyst path /|]
 };
 
 {
@@ -26,8 +25,9 @@ my $expected = {
 
     my $cookies = {};
 
-    for my $cookie ( split_header_words( $response->header('Set-Cookie') ) ) {
-        $cookies->{ $cookie->[0] } = $cookie;
+    for my $string ( $response->header('Set-Cookie') ) {
+        my $cookie = [ split_header_words $string];
+        $cookies->{ $cookie->[0]->[0] } = $cookie->[0];
     }
 
     is_deeply( $cookies, $expected, 'Response Cookies' );
@@ -43,8 +43,9 @@ my $expected = {
 
     my $cookies = {};
 
-    for my $cookie ( split_header_words( $response->header('Set-Cookie') ) ) {
-        $cookies->{ $cookie->[0] } = $cookie;
+    for my $string ( $response->header('Set-Cookie') ) {
+        my $cookie = [ split_header_words $string];
+        $cookies->{ $cookie->[0]->[0] } = $cookie->[0];
     }
 
     is_deeply( $cookies, $expected, 'Response Cookies' );

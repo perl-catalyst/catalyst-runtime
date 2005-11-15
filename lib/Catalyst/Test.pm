@@ -1,12 +1,30 @@
 package Catalyst::Test;
 
 use strict;
+use warnings;
 
 use Catalyst::Exception;
 use Catalyst::Utils;
 use UNIVERSAL::require;
+use HTTP::Headers;
 
 $ENV{CATALYST_ENGINE} = 'Test';
+
+# Bypass a HTTP::Headers bug
+{
+    no warnings 'redefine';
+
+    sub HTTP::Headers::new {
+        my $class = shift;
+        my $self = bless {}, $class;
+        if (@_) {
+            while ( my ( $field, $val ) = splice( @_, 0, 2 ) ) {
+                $self->push_header( $field, $val );
+            }
+        }
+        return $self;
+    }
+}
 
 =head1 NAME
 

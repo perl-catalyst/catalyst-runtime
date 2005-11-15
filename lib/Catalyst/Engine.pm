@@ -78,8 +78,8 @@ sub finalize_cookies {
         push @cookies, $cookie->as_string;
     }
 
-    if (@cookies) {
-        $c->res->headers->push_header( 'Set-Cookie' => join ',', @cookies );
+    for my $cookie (@cookies) {
+        $c->res->headers->push_header( 'Set-Cookie' => $cookie );
     }
 }
 
