@@ -12,6 +12,9 @@ L<Catalyst::Manual::Intro>
 L<Catalyst::Manual::Tutorial>
     A simple step by step tutorial.
 
+L<Catalyst::Manual::Plugins>
+    Catalyst Plugins and Components.
+
 L<Catalyst::Manual::Cookbook>
     Cooking with Catalyst
 
@@ -20,12 +23,6 @@ L<Catalyst::Manual::WritingPlugins>
 
 L<Catalyst::Manual::Internals>
     Here be dragons!
-
-L<Catalyst::Manual::SuccessStories>
-    Catalyst rocks!
-
-L<Catalyst::Manual::Troubleshooting>
-    Got trouble? Read this first!
 
 L<Catalyst::Manual::FAQ>
     Frequently Asked Questions.
