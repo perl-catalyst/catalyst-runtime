@@ -1027,7 +1027,7 @@ Catalyst::PAR->new->package( {
 
 =head1 NAME
 
-[% appprefix %]_package.pl - Package a Catalyst application
+[% appprefix %]_package.pl - Package Catalyst Applications
 
 =head1 SYNOPSIS
 
@@ -1054,7 +1054,7 @@ Catalyst::PAR->new->package( {
 
 =head1 DESCRIPTION
 
-Package a Catalyst application with L<PAR>.
+Package Catalyst Applications with L<PAR>.
 
 =head1 AUTHOR
 

@@ -24,7 +24,7 @@ Package Catalyst Applications.
 
 =over 4
 
-=item $self->package( $par, $engine )
+=item $self->package(\%options)
 
 =cut
 
