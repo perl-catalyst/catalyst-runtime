@@ -776,6 +776,7 @@ my $fork          = 0;
 my $help          = 0;
 my $host          = undef;
 my $port          = 3000;
+my $keepalive     = 0;
 my $restart       = 0;
 my $restart_delay = 1;
 my $restart_regex = '\.yml$|\.yaml$|\.pm$';
@@ -788,6 +789,7 @@ GetOptions(
     'help|?'            => \$help,
     'host=s'            => \$host,
     'port=s'            => \$port,
+    'keepalive|k'       => \$keepalive,
     'restart|r'         => \$restart,
     'restartdelay|rd=s' => \$restart_delay,
     'restartregex|rr=s' => \$restart_regex
@@ -805,9 +807,10 @@ if ( $debug ) {
 require [% name %];
 
 [% name %]->run( $port, $host, {
-    argv   => \@argv,
-    'fork' => $fork,
-    restart => $restart,
+    argv          => \@argv,
+    'fork'        => $fork,
+    keepalive     => $keepalive,
+    restart       => $restart,
     restart_delay => $restart_delay,
     restart_regex => qr/$restart_regex/
 } );
@@ -829,6 +832,7 @@ require [% name %];
    -? -help           display this help and exits
       -host           host (defaults to all)
    -p -port           port (defaults to 3000)
+   -k -keepalive      enable keep-alive connections
    -r -restart        restart when files got modified
                       (defaults to false)
    -rd -restartdelay  delay between file checks

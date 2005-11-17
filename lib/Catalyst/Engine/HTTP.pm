@@ -6,6 +6,8 @@ use Errno 'EWOULDBLOCK';
 use HTTP::Status;
 use NEXT;
 use Socket;
+use IO::Socket::INET ();
+use IO::Select ();
 
 # For PAR
 require Catalyst::Engine::HTTP::Restarter;
@@ -48,6 +50,8 @@ sub finalize_headers {
     my $message  = status_message($status);
     print "$protocol $status $message\015\012";
     $c->response->headers->date(time);
+    $c->response->headers->header(
+        Connection => $self->_keep_alive ? 'keep-alive' : 'close' );
     $self->NEXT::finalize_headers($c);
 }
 
@@ -118,115 +122,64 @@ sub run {
     local $SIG{CHLD} = 'IGNORE';
 
     my $allowed = $options->{allowed} || { '127.0.0.1' => '255.255.255.255' };
+    my $addr = $host ? inet_aton($host) : INADDR_ANY;
+    if ( $addr eq INADDR_ANY ) {
+        require Sys::Hostname;
+        $host = lc Sys::Hostname::hostname();
+    }
+    else {
+        $host = gethostbyaddr( $addr, AF_INET ) || inet_ntoa($addr);
+    }
 
     # Handle requests
 
     # Setup socket
-    $host = $host ? inet_aton($host) : INADDR_ANY;
-    socket( HTTPDaemon, PF_INET, SOCK_STREAM, getprotobyname('tcp') )
-      || die "Couldn't assign TCP socket: $!";
-    setsockopt( HTTPDaemon, SOL_SOCKET, SO_REUSEADDR, pack( "l", 1 ) )
-      || die "Couldn't set TCP socket options: $!";
-    bind( HTTPDaemon, sockaddr_in( $port, $host ) )
-      || die "Couldn't bind socket to $port on $host: $!";
-    listen( HTTPDaemon, SOMAXCONN )
-      || die "Couldn't listen to socket on $port on $host: $!";
-    my $url = 'http://';
-    if ( $host eq INADDR_ANY ) {
-        require Sys::Hostname;
-        $url .= lc Sys::Hostname::hostname();
-    }
-    else {
-        $url .= gethostbyaddr( $host, AF_INET ) || inet_ntoa($host);
-    }
-    $url .= ":$port";
+    my $daemon = IO::Socket::INET->new(
+        Listen    => SOMAXCONN,
+        LocalAddr => inet_ntoa($addr),
+        LocalPort => $port,
+        Proto     => 'tcp',
+        ReuseAddr => 1,
+        Type      => SOCK_STREAM,
+      )
+      or die "Couldn't create daemon: $!";
+
+    my $url = "http://$host";
+    $url .= ":$port" unless $port == 80;
+
     print "You can connect to your server at $url\n";
+
+    $self->_keep_alive( $options->{keepalive} || 0 );
 
     my $parent = $$;
     my $pid    = undef;
-    while ( accept( Remote, HTTPDaemon ) ) {
+    while ( accept( Remote, $daemon ) )
+    {    # TODO: get while ( my $remote = $daemon->accept ) to work
 
         select Remote;
 
         # Request data
-        my $remote_sockaddr = getpeername( \*Remote );
-        my ( undef, $iaddr ) = sockaddr_in($remote_sockaddr);
-        my $peername = gethostbyaddr( $iaddr, AF_INET ) || "localhost";
-        my $peeraddr = inet_ntoa($iaddr) || "127.0.0.1";
-        my $local_sockaddr = getsockname( \*Remote );
-        my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
-        my $localname = gethostbyaddr( $localiaddr, AF_INET )
-          || "localhost";
-        my $localaddr = inet_ntoa($localiaddr) || "127.0.0.1";
 
         Remote->blocking(1);
 
-        # Parse request line
-        my $line = $self->_get_line( \*Remote );
         next
           unless my ( $method, $uri, $protocol ) =
-          $line =~ m/\A(\w+)\s+(\S+)(?:\s+HTTP\/(\d+(?:\.\d+)?))?\z/;
+          $self->_parse_request_line( \*Remote );
 
         unless ( uc($method) eq 'RESTART' ) {
 
             # Fork
             if ( $options->{fork} ) { next if $pid = fork }
 
-            close HTTPDaemon if defined $pid;
+            $self->_handler( $class, $port, $method, $uri, $protocol );
 
-            # Ignore broken pipes as an HTTP server should
-            local $SIG{PIPE} = sub { close Remote };
+            $daemon->close if defined $pid;
 
-            local *STDIN  = \*Remote;
-            local *STDOUT = \*Remote;
-
-            # We better be careful and just use 1.0
-            $protocol = '1.0';
-
-            my ( $path, $query_string ) = split /\?/, $uri, 2;
-
-            # Initialize CGI environment
-            local %ENV = (
-                PATH_INFO      => $path         || '',
-                QUERY_STRING   => $query_string || '',
-                REMOTE_ADDR    => $peeraddr,
-                REMOTE_HOST    => $peername,
-                REQUEST_METHOD => $method       || '',
-                SERVER_NAME    => $localname,
-                SERVER_PORT    => $port,
-                SERVER_PROTOCOL => "HTTP/$protocol",
-                %ENV,
-            );
-
-            # Parse headers
-            if ( $protocol >= 1 ) {
-                while (1) {
-                    my $line = $self->_get_line( \*STDIN );
-                    last if $line eq '';
-                    next
-                      unless my ( $name, $value ) =
-                      $line =~ m/\A(\w(?:-?\w+)*):\s(.+)\z/;
-
-                    $name = uc $name;
-                    $name = 'COOKIE' if $name eq 'COOKIES';
-                    $name =~ tr/-/_/;
-                    $name = 'HTTP_' . $name
-                      unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
-                    if ( exists $ENV{$name} ) {
-                        $ENV{$name} .= "; $value";
-                    }
-                    else {
-                        $ENV{$name} = $value;
-                    }
-                }
-            }
-
-            # Pass flow control to Catalyst
-            $class->handle_request;
         }
         else {
-            my $ipaddr = _inet_addr($peeraddr);
-            my $ready  = 0;
+            my $sockdata = $self->_socket_data( \*Remote );
+            my $ipaddr   = _inet_addr( $sockdata->{peeraddr} );
+            my $ready    = 0;
             while ( my ( $ip, $mask ) = each %$allowed and not $ready ) {
                 $ready = ( $ipaddr & _inet_addr($mask) ) == _inet_addr($ip);
             }
@@ -241,7 +194,7 @@ sub run {
     continue {
         close Remote;
     }
-    close HTTPDaemon;
+    $daemon->close;
 
     if ($restart) {
         $SIG{CHLD} = 'DEFAULT';
@@ -250,6 +203,120 @@ sub run {
     }
 
     exit;
+}
+
+sub _handler {
+    my ( $self, $class, $port, $method, $uri, $protocol ) = @_;
+
+    # Ignore broken pipes as an HTTP server should
+    local $SIG{PIPE} = sub { close Remote };
+
+    local *STDIN  = \*Remote;
+    local *STDOUT = \*Remote;
+
+    # We better be careful and just use 1.0
+    $protocol = '1.0';
+
+    my $sockdata    = $self->_socket_data( \*Remote );
+    my %copy_of_env = %ENV;
+
+    my $sel = IO::Select->new;
+    $sel->add( \*STDIN );
+
+    while (1) {
+        my ( $path, $query_string ) = split /\?/, $uri, 2;
+
+        # Initialize CGI environment
+        local %ENV = (
+            PATH_INFO    => $path         || '',
+            QUERY_STRING => $query_string || '',
+            REMOTE_ADDR     => $sockdata->{peeraddr},
+            REMOTE_HOST     => $sockdata->{peername},
+            REQUEST_METHOD  => $method || '',
+            SERVER_NAME     => $sockdata->{localname},
+            SERVER_PORT     => $port,
+            SERVER_PROTOCOL => "HTTP/$protocol",
+            %copy_of_env,
+        );
+
+        # Parse headers
+        if ( $protocol >= 1 ) {
+            while (1) {
+                my $line = $self->_get_line( \*STDIN );
+                last if $line eq '';
+                next
+                  unless my ( $name, $value ) =
+                  $line =~ m/\A(\w(?:-?\w+)*):\s(.+)\z/;
+
+                $name = uc $name;
+                $name = 'COOKIE' if $name eq 'COOKIES';
+                $name =~ tr/-/_/;
+                $name = 'HTTP_' . $name
+                  unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
+                if ( exists $ENV{$name} ) {
+                    $ENV{$name} .= "; $value";
+                }
+                else {
+                    $ENV{$name} = $value;
+                }
+            }
+        }
+
+        # Pass flow control to Catalyst
+        $class->handle_request;
+
+        my $connection = lc $ENV{HTTP_CONNECTION};
+        last
+          unless $self->_keep_alive()
+          && index( $connection, 'keep-alive' ) > -1
+          && index( $connection, 'te' ) == -1          # opera stuff
+          && $sel->can_read(5);
+
+        last
+          unless ( $method, $uri, $protocol ) =
+          $self->_parse_request_line( \*STDIN );
+    }
+
+    close Remote;
+}
+
+sub _keep_alive {
+    my ( $self, $keepalive ) = @_;
+
+    my $r = $self->{_keepalive} || 0;
+    $self->{_keepalive} = $keepalive if defined $keepalive;
+
+    return $r;
+
+}
+
+sub _parse_request_line {
+    my ( $self, $handle ) = @_;
+
+    # Parse request line
+    my $line = $self->_get_line($handle);
+    return ()
+      unless my ( $method, $uri, $protocol ) =
+      $line =~ m/\A(\w+)\s+(\S+)(?:\s+HTTP\/(\d+(?:\.\d+)?))?\z/;
+    return ( $method, $uri, $protocol );
+}
+
+sub _socket_data {
+    my ( $self, $handle ) = @_;
+
+    my $remote_sockaddr = getpeername($handle);
+    my ( undef, $iaddr ) = sockaddr_in($remote_sockaddr);
+    my $local_sockaddr = getsockname($handle);
+    my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
+
+    my $data = {
+        peername => gethostbyaddr( $iaddr, AF_INET ) || "localhost",
+        peeraddr => inet_ntoa($iaddr) || "127.0.0.1",
+        localname => gethostbyaddr( $localiaddr, AF_INET ) || "localhost",
+        localaddr => inet_ntoa($localiaddr) || "127.0.0.1",
+    };
+
+    return $data;
 }
 
 sub _get_line {
@@ -280,6 +347,8 @@ L<Catalyst>, L<Catalyst::Engine>.
 Sebastian Riedel, <sri@cpan.org>
 
 Dan Kubb, <dan.kubb-cpan@onautopilot.com>
+
+Sascha Kiefer, <esskar@cpan.org>
 
 =head1 THANKS
 
