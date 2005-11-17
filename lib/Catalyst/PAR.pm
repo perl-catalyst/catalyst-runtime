@@ -54,7 +54,6 @@ sub package {
             return if $name =~ /^\W*lib/;
             return if $name =~ /\.par$/;
             return if $name !~ /\w+/;
-            warn "$name\n";
             push @files, $name;
         },
         '.'
