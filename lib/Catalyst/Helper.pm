@@ -80,6 +80,7 @@ sub mk_app {
         $self->_mk_apptest;
         $self->_mk_images;
         $self->_mk_favicon;
+        $self->_mk_package;
     }
     $self->_mk_cgi;
     $self->_mk_fastcgi;
@@ -439,6 +440,14 @@ sub _mk_favicon {
     my $favicon = pack "H*", $hex;
     $self->mk_file( File::Spec->catfile( $root, "favicon.ico" ), $favicon );
 
+}
+
+sub _mk_package {
+    my $self      = shift;
+    my $script    = $self->{script};
+    my $appprefix = $self->{appprefix};
+    $self->render_file( 'package', "$script\/$appprefix\_package.pl" );
+    chmod 0700, "$script/$appprefix\_package.pl";
 }
 
 =head1 HELPERS
@@ -963,7 +972,65 @@ This behavior can be suppressed with the C<-nonew> option.
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri\@oook.de>
+Sebastian Riedel, C<sri@oook.de>
+
+=head1 COPYRIGHT
+
+Copyright 2004 Sebastian Riedel. All rights reserved.
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__package__
+[% startperl %] -w
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Catalyst::PAR;
+
+my $help = 0;
+
+GetOptions( 'help|?' => \$help );
+
+pod2usage(1) if $help;
+
+my $par = Catalyst::PAR->new->package( {
+    par    => $ARGV[0] || '[% appprefix %].par',
+    engine => $ARGV[1],
+    class  => '[% name %]'
+} );
+
+1;
+
+=head1 NAME
+
+[% appprefix %]_package.pl - Package a Catalyst application
+
+=head1 SYNOPSIS
+
+[% appprefix %]_package.pl [par] [engine]
+
+ Options:
+   -help     display this help and exits
+
+ Examples:
+   [% appprefix %]_package.pl [% appprefix %].par FastCGI
+   [% appprefix %]_package.pl foo_linux_i386_apache2.par Apache2
+
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+   perldoc pp
+
+=head1 DESCRIPTION
+
+Package a Catalyst application with L<PAR>.
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 

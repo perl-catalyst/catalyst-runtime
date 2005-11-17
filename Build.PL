@@ -36,7 +36,8 @@ my $build = Module::Build->new(
     recommends => {
         'Catalyst::Engine::Apache' => '1.00',
         FCGI                       => 0,
-        'FCGI::ProcManager'        => 0
+        'FCGI::ProcManager'        => 0,
+        PAR                        => 0
     },
     create_makefile_pl => 'passthrough',
     create_readme      => 1,
@@ -79,6 +80,8 @@ else {
 qq/ Install "FCGI::ProcManager" for multiprocess FastCGI external support.\n/
       if ($@);
 }
+eval "use PAR ()";
+print qq/ Install "PAR" for PAR packaging support.\n/ if $@;
 
 print <<"EOF";
 
