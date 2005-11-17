@@ -2,7 +2,8 @@ package Catalyst::Engine::FastCGI;
 
 use strict;
 use base 'Catalyst::Engine::CGI';
-use FCGI;
+eval "use FCGI";
+die "Please install FCGI\n" if $@;
 
 =head1 NAME
 
@@ -62,7 +63,7 @@ sub run {
     }
 
     $options ||= {};
-    
+
     my %env;
 
     my $request =
@@ -71,18 +72,18 @@ sub run {
       );
 
     my $proc_manager;
-    
-    if ( $listen ) {
+
+    if ($listen) {
         require FCGI::ProcManager;
         $options->{nproc} ||= 1;
-        
-        $proc_manager
-            = FCGI::ProcManager->new( { n_processes => $options->{nproc} } );
-          
+
+        $proc_manager =
+          FCGI::ProcManager->new( { n_processes => $options->{nproc} } );
+
         if ( $options->{pidfile} ) {
             $proc_manager->pm_write_pid_file( $options->{pidfile} );
         }
-        
+
         $proc_manager->pm_manage();
     }
 

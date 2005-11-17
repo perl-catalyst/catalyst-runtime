@@ -7,7 +7,6 @@ use File::Path;
 use IO::File;
 use FindBin;
 use Template;
-use Catalyst;
 use Catalyst::Utils;
 use Catalyst::Exception;
 
@@ -57,6 +56,10 @@ Create the main application skeleton.
 
 sub mk_app {
     my ( $self, $name ) = @_;
+
+    # Needs to be here for PAR
+    require Catalyst;
+
     return 0 if $name =~ /[^\w\:]/;
     $self->{name} = $name;
     $self->{dir}  = $name;
