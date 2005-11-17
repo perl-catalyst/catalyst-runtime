@@ -64,6 +64,10 @@ sub package {
     my $par_test = File::Spec->catfile( $FindBin::Bin, '..', 'par_test.pl' );
     unlink $par_test;
 
+    my $classes = '';
+    for my $req ( split ',', $options->{classes} ) {
+        $classes .= "require $req;\n";
+    }
     my $version  = $Catalyst::VERSION;
     my $class    = $options->{class};
     my $tmp_file = IO::File->new("> $par_test");
@@ -73,6 +77,7 @@ BEGIN { \$ENV{CATALYST_ENGINE} = '$engine' };
 use lib 'lib';
 require $class;
 import $class;
+$classes
 EOF
     $tmp_file->close;
 

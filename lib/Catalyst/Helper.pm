@@ -993,12 +993,14 @@ use Pod::Usage;
 use Catalyst::PAR;
 
 my $core      = 0;
+my $classes   = '';
 my $engine    = 'CGI';
 my $help      = 0;
 my $multiarch = 0;
 my $par       = '[% appprefix %].par';
 
 GetOptions(
+    'classes=s' => \$classes,
     'core'      => \$core,
     'engine=s'  => \$engine,
     'help|?'    => \$help,
@@ -1009,6 +1011,7 @@ GetOptions(
 pod2usage(1) if $help;
 
 Catalyst::PAR->new->package( {
+    classes   => $classes,
     core      => $core,
     engine    => $engine,
     par       => $par,
@@ -1027,6 +1030,8 @@ Catalyst::PAR->new->package( {
 [% appprefix %]_package.pl
 
  Options:
+   -classes      comma separated list of additional classes to
+                 include in package
    -core         also include modules bundled with Perl (defaults to false)
    -engine       engine to use for dependency detection (defaults to CGI)
    -help         display this help and exits
@@ -1034,8 +1039,9 @@ Catalyst::PAR->new->package( {
    -par          name for the par archive (defaults to [% appprefix %].par)
 
  Examples:
-   [% appprefix %]_package.pl [% appprefix %].par FastCGI
-   [% appprefix %]_package.pl foo_linux_i386_apache2.par Apache2
+   [% appprefix %]_package.pl -engine FastCGI
+   [% appprefix %]_package.pl -par foo_linux_i386_apache2.par -engine Apache2
+   [% appprefix %]_package.pl -classes Test::More,Foo::Bar -par foo.par
 
  See also:
    perldoc Catalyst::Manual
