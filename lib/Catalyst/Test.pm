@@ -7,7 +7,7 @@ use Catalyst::Exception;
 use Catalyst::Utils;
 use UNIVERSAL::require;
 
-$ENV{CATALYST_ENGINE} = 'CGI';
+$ENV{CATALYST_ENGINE} ||= 'CGI';
 
 =head1 NAME
 
