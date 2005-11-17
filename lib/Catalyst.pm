@@ -26,7 +26,6 @@ require Catalyst::Test;
 
 require Catalyst::Engine::HTTP;
 require Catalyst::Engine::CGI;
-require Catalyst::Engine::FastCGI;
 
 require Catalyst::Controller;
 require Catalyst::Model;
