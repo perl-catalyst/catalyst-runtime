@@ -7,6 +7,10 @@ use HTTP::Status;
 use NEXT;
 use Socket;
 
+# For PAR
+require Catalyst::Engine::HTTP::Restarter;
+require Catalyst::Engine::HTTP::Restarter::Watcher;
+
 =head1 NAME
 
 Catalyst::Engine::HTTP - Catalyst HTTP Engine
