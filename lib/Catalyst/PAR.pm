@@ -52,6 +52,8 @@ sub package {
         sub {
             my $name = $File::Find::name;
             return if $name =~ /^\W*lib/;
+            return if $name =~ /^\W*blib/;
+            return if $name =~ /^\W*_build/;
             return if $name =~ /\.par$/;
             return if $name !~ /\w+/;
             push @files, $name;
