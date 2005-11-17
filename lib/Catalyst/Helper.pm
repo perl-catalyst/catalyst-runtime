@@ -992,25 +992,28 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::PAR;
 
-my $core = 0;
-my $engine = 'CGI';
-my $help = 0;
-my $par = '[% appprefix %].par';
+my $core      = 0;
+my $engine    = 'CGI';
+my $help      = 0;
+my $multiarch = 0;
+my $par       = '[% appprefix %].par';
 
 GetOptions(
-    'core'     => \$core,
-    'engine=s' => \$engine,
-    'help|?'   => \$help,
-    'par=s'    => \$par
+    'core'      => \$core,
+    'engine=s'  => \$engine,
+    'help|?'    => \$help,
+    'multiarch' => \$multiarch,
+    'par=s'     => \$par
 );
 
 pod2usage(1) if $help;
 
 Catalyst::PAR->new->package( {
-    core   => $core,
-    engine => $engine,
-    par    => $par,
-    class  => '[% name %]'
+    core      => $core,
+    engine    => $engine,
+    par       => $par,
+    multiarch => $multiarch,
+    class     => '[% name %]'
 } );
 
 1;
@@ -1024,10 +1027,11 @@ Catalyst::PAR->new->package( {
 [% appprefix %]_package.pl
 
  Options:
-   -core     also include modules bundled with Perl (defaults to false)
-   -engine   engine to use for dependency detection (defaults to CGI)
-   -help     display this help and exits
-   -par      name for the par archive (defaults to [% appprefix %].par)
+   -core         also include modules bundled with Perl (defaults to false)
+   -engine       engine to use for dependency detection (defaults to CGI)
+   -help         display this help and exits
+   -multiarch    enable multiarch support (defaults to false)
+   -par          name for the par archive (defaults to [% appprefix %].par)
 
  Examples:
    [% appprefix %]_package.pl [% appprefix %].par FastCGI

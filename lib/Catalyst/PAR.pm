@@ -86,7 +86,8 @@ EOF
         'o' => $par,
         'a' => [@files],
         'p' => 1,
-        'B' => $options->{core}
+        'B' => $options->{core},
+        'm' => $options->{multiarch}
     );
     App::Packer::PAR->new(
         frontend  => 'Module::ScanDeps',
