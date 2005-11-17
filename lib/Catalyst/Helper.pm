@@ -651,7 +651,7 @@ plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 
 all_pod_coverage_ok();
 __cgi__
-[% startperl %] -w
+[% startperl %]
 
 BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
 
@@ -689,7 +689,7 @@ it under the same terms as Perl itself.
 
 =cut
 __fastcgi__
-[% startperl %] -w
+[% startperl %]
 
 BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
 
@@ -758,7 +758,7 @@ it under the same terms as Perl itself.
 
 =cut
 __server__
-[% startperl %] -w
+[% startperl %]
 
 BEGIN { 
     $ENV{CATALYST_ENGINE} ||= 'HTTP';
@@ -861,7 +861,7 @@ it under the same terms as Perl itself.
 
 =cut
 __test__
-[% startperl %] -w
+[% startperl %]
 
 use strict;
 use Getopt::Long;
@@ -916,7 +916,7 @@ it under the same terms as Perl itself.
 
 =cut
 __create__
-[% startperl %] -w
+[% startperl %]
 
 use strict;
 use Getopt::Long;
@@ -989,7 +989,7 @@ it under the same terms as Perl itself.
 
 =cut
 __package__
-[% startperl %] -w
+[% startperl %]
 
 use strict;
 use Getopt::Long;
