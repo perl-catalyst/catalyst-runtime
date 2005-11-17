@@ -2,7 +2,6 @@ package Catalyst::Helper;
 
 use strict;
 use base 'Class::Accessor::Fast';
-use Config;
 use File::Spec;
 use File::Path;
 use IO::File;
@@ -64,7 +63,7 @@ sub mk_app {
     $self->{dir} =~ s/\:\:/-/g;
     $self->{script}    = File::Spec->catdir( $self->{dir}, 'script' );
     $self->{appprefix} = Catalyst::Utils::appprefix($name);
-    $self->{startperl} = $Config{startperl};
+    $self->{startperl} = '#!/usr/bin/perl -w';
     $self->{scriptgen} = $Catalyst::CATALYST_SCRIPT_GEN || 4;
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }

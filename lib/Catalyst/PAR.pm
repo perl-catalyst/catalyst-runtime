@@ -5,6 +5,7 @@ use base 'Class::Accessor::Fast';
 use FindBin;
 use IO::File;
 use File::Spec;
+use File::Find;
 require Catalyst;
 
 =head1 NAME
@@ -43,6 +44,22 @@ sub package {
     eval "use Module::ScanDeps ()";
     die "Please install Module::ScanDeps" if $@;
 
+    chdir File::Spec->catdir( $FindBin::Bin, '..' );
+
+    # Find additional files
+    my @files;
+    finddepth(
+        sub {
+            my $name = $File::Find::name;
+            return if $name =~ /^\W*lib/;
+            return if $name =~ /\.par$/;
+            return if $name !~ /\w+/;
+            warn "$name\n";
+            push @files, $name;
+        },
+        '.'
+    );
+
     my $par_test = File::Spec->catfile( $FindBin::Bin, '..', 'par_test.pl' );
     unlink $par_test;
 
@@ -56,28 +73,17 @@ use $class;
 EOF
     $tmp_file->close;
 
-#    my $main = File::Spec->catfile( $FindBin::Bin, 'main.pl' );
-#    unlink $main;
-
-#    my $version   = $Catalyst::VERSION;
-#    my $main_file = IO::File->new("> $main");
-#    print $main_file <<"EOF";
-#print "$class on Catalyst $version.\\n";
-#EOF
-#    $main_file->close;
-
-    chdir File::Spec->catdir( $FindBin::Bin, '..' );
-    my %opt = ( 'x' => 1, 'n' => 0, 'o' => $par, 'a' => ['.'] );
+    # Create package
+    my %opt = ( 'x' => 1, 'n' => 0, 'o' => $par, 'a' => [@files] );
     App::Packer::PAR->new(
         frontend  => 'Module::ScanDeps',
         backend   => 'PAR::Packer',
         frontopts => \%opt,
         backopts  => \%opt,
-        args => [ 'par_test.pl' ],
+        args      => ['par_test.pl'],
     )->go;
 
     unlink $par_test;
-#    unlink $main;
 }
 
 =back
