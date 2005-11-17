@@ -6,7 +6,6 @@ use FindBin;
 use IO::File;
 use File::Spec;
 use File::Find;
-require Catalyst;
 
 =head1 NAME
 
@@ -73,6 +72,9 @@ EOF
     $tmp_file->close;
 
     # Create package
+    local $SIG{__WARN__} = sub { };
+    open my $olderr, '>&STDERR';
+    open STDERR, '>', File::Spec->devnull;
     my %opt = ( 'x' => 1, 'n' => 0, 'o' => $par, 'a' => [@files] );
     App::Packer::PAR->new(
         frontend  => 'Module::ScanDeps',
@@ -81,6 +83,7 @@ EOF
         backopts  => \%opt,
         args      => ['par_test.pl'],
     )->go;
+    open STDERR, '>&', $olderr;
 
     unlink $par_test;
 }

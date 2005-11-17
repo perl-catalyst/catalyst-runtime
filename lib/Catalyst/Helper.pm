@@ -989,15 +989,21 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::PAR;
 
+my $engine = 'CGI';
 my $help = 0;
+my $par = '[% appprefix %].par';
 
-GetOptions( 'help|?' => \$help );
+GetOptions(
+    'engine=s' => \$engine,
+    'help|?'   => \$help,
+    'par=s'    => \$par
+);
 
 pod2usage(1) if $help;
 
-my $par = Catalyst::PAR->new->package( {
-    par    => $ARGV[0] || '[% appprefix %].par',
-    engine => $ARGV[1],
+Catalyst::PAR->new->package( {
+    engine => $engine,
+    par    => $par,
     class  => '[% name %]'
 } );
 
@@ -1009,10 +1015,12 @@ my $par = Catalyst::PAR->new->package( {
 
 =head1 SYNOPSIS
 
-[% appprefix %]_package.pl [par] [engine]
+[% appprefix %]_package.pl
 
  Options:
+   -engine   engine to use for dependency detection
    -help     display this help and exits
+   -par      name for the par archive
 
  Examples:
    [% appprefix %]_package.pl [% appprefix %].par FastCGI
