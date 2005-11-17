@@ -22,6 +22,7 @@ use attributes;
 require Catalyst::Helper;
 require Catalyst::PAR;
 require Catalyst::Build;
+require Catalyst::Test;
 
 require Catalyst::Engine::HTTP;
 require Catalyst::Engine::CGI;
