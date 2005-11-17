@@ -39,6 +39,8 @@ Options may also be specified;
   nproc           Specify a number of processes for
                   FCGI::ProcManager
   pidfile         Specify a filename for the pid file
+  manager         Specify a FCGI::ProcManager sub-class
+  detach          Detach from console
 
 =cut
 
@@ -74,17 +76,28 @@ sub run {
     my $proc_manager;
 
     if ($listen) {
-        require FCGI::ProcManager;
-        $options->{nproc} ||= 1;
+        $options->{manager} ||= "FCGI::ProcManager";
+        $options->{nproc}   ||= 1;
+        
+        $self->daemon_fork() if $options->{detach};
+        
+        if ( $options->{manager} ) {
+            eval "use $options->{manager}; 1" or die $@;
 
-        $proc_manager =
-          FCGI::ProcManager->new( { n_processes => $options->{nproc} } );
+            $proc_manager
+                = $options->{manager}->new( {
+                    n_processes => $options->{nproc},
+                    pid_fname   => $options->{pidfile},
+                } );
+                
+            # detach *before* the ProcManager inits
+            $self->daemon_detach() if $options->{detach};
 
-        if ( $options->{pidfile} ) {
-            $proc_manager->pm_write_pid_file( $options->{pidfile} );
+            $proc_manager->pm_manage();
         }
-
-        $proc_manager->pm_manage();
+        elsif ( $options->{detach} ) {
+            $self->daemon_detach();
+        }            
     }
 
     while ( $request->Accept >= 0 ) {
@@ -109,6 +122,39 @@ sub write {
     # FastCGI does not stream data properly if using 'print $handle',
     # but a syswrite appears to work properly.
     *STDOUT->syswrite($buffer);
+}
+
+=item $self->daemon_fork()
+
+Performs the first part of daemon initialisation.  Specifically,
+forking.  STDERR, etc are still connected to a terminal.
+
+=cut
+
+sub daemon_fork {
+    require POSIX;
+    fork && exit;
+}
+
+=item $self->daemon_detach( )
+
+Performs the second part of daemon initialisation.  Specifically,
+disassociates from the terminal.
+
+However, this does B<not> change the current working directory to "/",
+as normal daemons do.  It also does not close all open file
+descriptors (except STDIN, STDOUT and STDERR, which are re-opened from
+F</dev/null>).
+
+=cut
+
+sub daemon_detach {
+    my $self = shift;
+    print "FastCGI daemon started (pid $$)\n";
+    open STDIN, "+</dev/null" or die $!;
+    open STDOUT, ">&STDIN" or die $!;
+    open STDERR, ">&STDIN" or die $!;
+    POSIX::setsid();
 }
 
 1;

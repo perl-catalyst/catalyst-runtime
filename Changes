@@ -3,7 +3,8 @@ This file documents the revision history for Perl extension Catalyst.
 5.57
         - Added PAR support
         - Added keep-alive support and bug fixes to HTTP engine.
-          (Sascha Kiefer) 
+          (Sascha Kiefer)
+        - Added daemonize option to FastCGI engine. (Sam Vilain)
 
 5.56   2005-11-16 10:33:00
         - Fixed FastCGI engine to not clobber the global %ENV on each

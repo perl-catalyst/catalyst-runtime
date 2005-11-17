@@ -701,13 +701,15 @@ use lib "$FindBin::Bin/../lib";
 use [% name %];
 
 my $help = 0;
-my ( $listen, $nproc, $pidfile );
+my ( $listen, $nproc, $pidfile, $manager, $detach );
  
 GetOptions(
     'help|?'      => \$help,
     'listen|l=s'  => \$listen,
     'nproc|n=i'   => \$nproc,
     'pidfile|p=s' => \$pidfile,
+    'manager|M=s' => \$manager,
+    'daemon|d'    => \$detach,
 );
 
 pod2usage(1) if $help;
@@ -716,6 +718,8 @@ pod2usage(1) if $help;
     $listen, 
     {   nproc   => $nproc,
         pidfile => $pidfile, 
+        manager => $manager,
+        detach  => $detach,
     }
 );
 
@@ -740,6 +744,10 @@ pod2usage(1) if $help;
                  requires -listen)
    -p -pidfile   specify filename for pid file
                  (requires -listen)
+   -d -daemon    daemonize (requires -listen)
+   -M -manager   specify alternate process manager
+                 (FCGI::ProcessManager sub-class)
+                 or empty string to disable
 
 =head1 DESCRIPTION
 
