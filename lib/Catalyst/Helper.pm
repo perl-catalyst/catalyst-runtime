@@ -992,11 +992,13 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::PAR;
 
+my $core = 0;
 my $engine = 'CGI';
 my $help = 0;
 my $par = '[% appprefix %].par';
 
 GetOptions(
+    'core'     => \$core,
     'engine=s' => \$engine,
     'help|?'   => \$help,
     'par=s'    => \$par
@@ -1005,6 +1007,7 @@ GetOptions(
 pod2usage(1) if $help;
 
 Catalyst::PAR->new->package( {
+    core   => $core,
     engine => $engine,
     par    => $par,
     class  => '[% name %]'
@@ -1021,9 +1024,10 @@ Catalyst::PAR->new->package( {
 [% appprefix %]_package.pl
 
  Options:
-   -engine   engine to use for dependency detection
+   -core     also include modules bundled with Perl (defaults to false)
+   -engine   engine to use for dependency detection (defaults to CGI)
    -help     display this help and exits
-   -par      name for the par archive
+   -par      name for the par archive (defaults to [% appprefix %].par)
 
  Examples:
    [% appprefix %]_package.pl [% appprefix %].par FastCGI

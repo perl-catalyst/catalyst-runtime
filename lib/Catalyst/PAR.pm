@@ -80,7 +80,14 @@ EOF
     local $SIG{__WARN__} = sub { };
     open my $olderr, '>&STDERR';
     open STDERR, '>', File::Spec->devnull;
-    my %opt = ( 'x' => 1, 'n' => 0, 'o' => $par, 'a' => [@files], 'p' => 1 );
+    my %opt = (
+        'x' => 1,
+        'n' => 0,
+        'o' => $par,
+        'a' => [@files],
+        'p' => 1,
+        'B' => $options->{core}
+    );
     App::Packer::PAR->new(
         frontend  => 'Module::ScanDeps',
         backend   => 'PAR::Packer',
