@@ -6,6 +6,7 @@ use FindBin;
 use IO::File;
 use File::Spec;
 use File::Find;
+require Catalyst;
 
 =head1 NAME
 
@@ -61,13 +62,15 @@ sub package {
     my $par_test = File::Spec->catfile( $FindBin::Bin, '..', 'par_test.pl' );
     unlink $par_test;
 
+    my $version  = $Catalyst::VERSION;
     my $class    = $options->{class};
     my $tmp_file = IO::File->new("> $par_test");
     print $tmp_file <<"EOF";
+die "$class on Catalyst $version\n" if \$0 !~ /par_test.pl\.\\w+\$/;
 BEGIN { \$ENV{CATALYST_ENGINE} = '$engine' };
-use FindBin;
 use lib 'lib';
-use $class;
+require $class;
+import $class;
 EOF
     $tmp_file->close;
 
@@ -75,7 +78,7 @@ EOF
     local $SIG{__WARN__} = sub { };
     open my $olderr, '>&STDERR';
     open STDERR, '>', File::Spec->devnull;
-    my %opt = ( 'x' => 1, 'n' => 0, 'o' => $par, 'a' => [@files] );
+    my %opt = ( 'x' => 1, 'n' => 0, 'o' => $par, 'a' => [@files], 'B' => 1 );
     App::Packer::PAR->new(
         frontend  => 'Module::ScanDeps',
         backend   => 'PAR::Packer',
