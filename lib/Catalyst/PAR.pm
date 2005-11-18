@@ -31,7 +31,7 @@ Package Catalyst Applications.
 sub package {
     my ( $self, $options ) = @_;
 
-    my $par    = $options->{par}    || 'application.par';
+    my $par    = $options->{output} || 'application.par';
     my $engine = $options->{engine} || 'CGI';
 
     # Check for PAR

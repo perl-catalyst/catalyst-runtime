@@ -934,20 +934,20 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
 
-my $help = 0;
-my $nonew = 0;
+my $force = 0;
+my $help  = 0;
 my $short = 0;
 
 GetOptions(
+    'force'  => \$force,
     'help|?' => \$help,
-    'nonew'  => \$nonew,
     'short'  => \$short
  );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
 my $helper =
-    Catalyst::Helper->new( { '.newfiles' => !$nonew, short => $short } );
+    Catalyst::Helper->new( { '.newfiles' => !$force, short => $short } );
 
 pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
@@ -962,8 +962,8 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 [% appprefix %]_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
+   -force    don't create a .new file where a file to be created exists
    -help     display this help and exits
-   -nonew    don't create a .new file where a file to be created exists
    -short    use short types, like C instead of Controller...
 
  Examples:
@@ -985,7 +985,7 @@ Create a new Catalyst Component.
 
 Existing component files are not overwritten.  If any of the component files
 to be created already exist the file will be written with a '.new' suffix.
-This behavior can be suppressed with the C<-nonew> option.
+This behavior can be suppressed with the C<-force> option.
 
 =head1 AUTHOR
 
@@ -1012,7 +1012,7 @@ my $classes   = '';
 my $engine    = 'CGI';
 my $help      = 0;
 my $multiarch = 0;
-my $par       = '[% appprefix %].par';
+my $output    = '[% appprefix %].par';
 
 GetOptions(
     'classes=s' => \$classes,
@@ -1020,7 +1020,7 @@ GetOptions(
     'engine=s'  => \$engine,
     'help|?'    => \$help,
     'multiarch' => \$multiarch,
-    'par=s'     => \$par
+    'output=s'  => \$output
 );
 
 pod2usage(1) if $help;
@@ -1029,8 +1029,8 @@ Catalyst::PAR->new->package( {
     classes   => $classes,
     core      => $core,
     engine    => $engine,
-    par       => $par,
     multiarch => $multiarch,
+    output    => $output,
     class     => '[% name %]'
 } );
 
@@ -1051,12 +1051,12 @@ Catalyst::PAR->new->package( {
    -engine       engine to use for dependency detection (defaults to CGI)
    -help         display this help and exits
    -multiarch    enable multiarch support (defaults to false)
-   -par          name for the par archive (defaults to [% appprefix %].par)
+   -output       name for the par archive (defaults to [% appprefix %].par)
 
  Examples:
    [% appprefix %]_package.pl -engine FastCGI
-   [% appprefix %]_package.pl -par foo_linux_i386_apache2.par -engine Apache2
-   [% appprefix %]_package.pl -classes Test::More,Foo::Bar -par foo.par
+   [% appprefix %]_package.pl -o foo_linux_i386_apache2.par -engine Apache2
+   [% appprefix %]_package.pl -classes Test::More,Foo::Bar -o foo.par
 
  See also:
    perldoc Catalyst::Manual

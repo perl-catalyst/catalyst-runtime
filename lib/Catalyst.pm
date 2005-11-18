@@ -613,8 +613,11 @@ sub setup {
         <<"EOF") if ( $ENV{CATALYST_SCRIPT_GEN} && ( $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::CATALYST_SCRIPT_GEN ) );
 You are running an old script!
 
-  Please update by running:
-    catalyst.pl -nonew -scripts $class
+  Please update by running (this will overwrite existing files):
+    catalyst.pl -force -scripts $class
+
+  or (this will not overwrite existing files):
+    catalyst.pl -scripts $class
 EOF
 
     if ( $class->debug ) {
