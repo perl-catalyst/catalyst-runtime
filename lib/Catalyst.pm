@@ -289,7 +289,9 @@ sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
 =item $c->error($arrayref)
 
-Returns an arrayref containing error messages.
+Returns an arrayref containing error messages.  If Catalyst encounters an
+error while processing a request, it stores the error in $c->error.  This
+method should not be used to store non-fatal error messages.
 
     my @error = @{ $c->error };
 
@@ -297,7 +299,8 @@ Add a new error.
 
     $c->error('Something bad happened');
 
-Clear errors.
+Clear errors.  You probably don't want to clear the errors unless you are
+implementing a custom error screen.
 
     $c->error(0);
 

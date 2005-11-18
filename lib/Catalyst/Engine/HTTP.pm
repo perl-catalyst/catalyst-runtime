@@ -228,8 +228,8 @@ sub _handler {
 
         # Initialize CGI environment
         local %ENV = (
-            PATH_INFO    => $path         || '',
-            QUERY_STRING => $query_string || '',
+            PATH_INFO       => $path         || '',
+            QUERY_STRING    => $query_string || '',
             REMOTE_ADDR     => $sockdata->{peeraddr},
             REMOTE_HOST     => $sockdata->{peername},
             REQUEST_METHOD  => $method || '',
