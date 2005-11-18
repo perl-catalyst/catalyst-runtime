@@ -939,9 +939,9 @@ my $help  = 0;
 my $short = 0;
 
 GetOptions(
-    'force'  => \$force,
-    'help|?' => \$help,
-    'short'  => \$short
+    'nonew|force' => \$force,
+    'help|?'      => \$help,
+    'short'       => \$short
  );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
