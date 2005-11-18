@@ -11,7 +11,7 @@ $ENV{CATALYST_ENGINE} ||= 'CGI';
 
 =head1 NAME
 
-Catalyst::Test - Test Catalyst applications
+Catalyst::Test - Test Catalyst Applications
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Catalyst::Test - Test Catalyst applications
     # Tests with inline apps need to use Catalyst::Engine::Test
     package TestApp;
 
-    use Catalyst qw[-Engine=Test];
+    use Catalyst;
 
     sub foo : Global {
             my ( $self, $c ) = @_;
@@ -47,7 +47,7 @@ Catalyst::Test - Test Catalyst applications
 
 =head1 DESCRIPTION
 
-Test Catalyst applications.
+Test Catalyst Applications.
 
 =head2 METHODS
 
