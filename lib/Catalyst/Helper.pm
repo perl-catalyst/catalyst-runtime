@@ -60,7 +60,10 @@ sub mk_app {
     # Needs to be here for PAR
     require Catalyst;
 
-    return 0 if $name =~ /[^\w\:]/;
+    if ( $name =~ /[^\w\:]/ ) {
+        warn "Error: Invalid application name.\n";
+        return 0;
+    }
     $self->{name} = $name;
     $self->{dir}  = $name;
     $self->{dir} =~ s/\:\:/-/g;
