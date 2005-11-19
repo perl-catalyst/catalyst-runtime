@@ -19,9 +19,7 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item appprefix($class)
+=head2 appprefix($class)
 
 	MyApp::Foo becomes myapp_foo
 
@@ -34,7 +32,7 @@ sub appprefix {
     return $class;
 }
 
-=item class2appclass($class);
+=head2 class2appclass($class);
 
     MyApp::C::Foo::Bar becomes MyApp
     My::App::C::Foo::Bar becomes My::App
@@ -50,7 +48,7 @@ sub class2appclass {
     return $appname;
 }
 
-=item class2classprefix($class);
+=head2 class2classprefix($class);
 
     MyApp::C::Foo::Bar becomes MyApp::C
     My::App::C::Foo::Bar becomes My::App::C
@@ -66,7 +64,7 @@ sub class2classprefix {
     return $prefix;
 }
 
-=item class2classsuffix($class);
+=head2 class2classsuffix($class);
 
     MyApp::C::Foo::Bar becomes C::Foo::Bar
 
@@ -79,7 +77,7 @@ sub class2classsuffix {
     return $class;
 }
 
-=item class2env($class);
+=head2 class2env($class);
 
 Returns the environment name for class.
 
@@ -94,7 +92,7 @@ sub class2env {
     return uc($class);
 }
 
-=item class2prefix( $class, $case );
+=head2 class2prefix( $class, $case );
 
 Returns the uri prefix for a class. If case is false the prefix is converted to lowercase.
 
@@ -113,7 +111,7 @@ sub class2prefix {
     return $prefix;
 }
 
-=item class2tempdir( $class [, $create ] );
+=head2 class2tempdir( $class [, $create ] );
 
 Returns a tempdir for a class. If create is true it will try to create the path.
 
@@ -142,7 +140,7 @@ sub class2tempdir {
     return $tmpdir->stringify;
 }
 
-=item home($class)
+=head2 home($class)
 
 Returns home directory for given class.
 
@@ -175,7 +173,7 @@ sub home {
     return $home;
 }
 
-=item prefix($class, $name);
+=head2 prefix($class, $name);
 
 Returns a prefixed action.
 
@@ -190,7 +188,7 @@ sub prefix {
     return $name;
 }
 
-=item request($uri)
+=head2 request($uri)
 
 Returns an L<HTTP::Request> object for a uri.
 
@@ -211,8 +209,6 @@ sub request {
     }
     return $request;
 }
-
-=back
 
 =head1 AUTHOR
 

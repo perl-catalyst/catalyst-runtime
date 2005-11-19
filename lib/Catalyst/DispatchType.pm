@@ -15,27 +15,23 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->list($c)
+=head2 $self->list($c)
 
 =cut
 
 sub list { }
 
-=item $self->match( $c, $path )
+=head2 $self->match( $c, $path )
 
 =cut
 
 sub match { die "Abstract method!" }
 
-=item $self->register( $c, $action )
+=head2 $self->register( $c, $action )
 
 =cut
 
 sub register { }
-
-=back
 
 =head1 AUTHOR
 

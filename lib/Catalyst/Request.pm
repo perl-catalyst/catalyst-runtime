@@ -75,17 +75,15 @@ thus hiding the details of the particular engine implementation.
 
 =head1 METHODS
 
-=over 4
-
-=item $req->action
+=head2 $req->action
 
 Returns the requested action as a L<Catalyst::Action> object.
 
-=item $req->address
+=head2 $req->address
 
 Returns the IP address of the client.
 
-=item $req->arguments
+=head2 $req->arguments
 
 Returns a reference to an array containing the arguments.
 
@@ -102,11 +100,11 @@ For example, if your action was
 and the URI for the request was C<http://.../foo/moose/bah>, the string C<bah>
 would be the first and only argument.
 
-=item $req->args
+=head2 $req->args
 
 Shortcut for arguments.
 
-=item $req->base
+=head2 $req->base
 
 Contains the URI base. This will always have a trailing slash.
 
@@ -130,7 +128,7 @@ sub base {
     return $self->{base};
 }
 
-=item $req->body
+=head2 $req->body
 
 Returns the message body of the request, unless Content-Type is
 C<application/x-www-form-urlencoded> or C<multipart/form-data>.
@@ -143,7 +141,7 @@ sub body {
     return $self->{_body}->body;
 }
 
-=item $req->body_parameters
+=head2 $req->body_parameters
 
 Returns a reference to a hash containing body (POST) parameters. Values can
 be either a scalar or an arrayref containing scalars.
@@ -153,7 +151,7 @@ be either a scalar or an arrayref containing scalars.
 
 These are the parameters from the POST part of the request, if any.
     
-=item $req->body_params
+=head2 $req->body_params
 
 Shortcut for body_parameters.
 
@@ -166,19 +164,19 @@ sub body_parameters {
     return $self->{body_parameters};
 }
 
-=item $req->content_encoding
+=head2 $req->content_encoding
 
 Shortcut for $req->headers->content_encoding.
 
-=item $req->content_length
+=head2 $req->content_length
 
 Shortcut for $req->headers->content_length.
 
-=item $req->content_type
+=head2 $req->content_type
 
 Shortcut for $req->headers->content_type.
 
-=item $req->cookie
+=head2 $req->cookie
 
 A convenient method to access $req->cookies.
 
@@ -206,7 +204,7 @@ sub cookie {
     }
 }
 
-=item $req->cookies
+=head2 $req->cookies
 
 Returns a reference to a hash containing the cookies.
 
@@ -215,17 +213,17 @@ Returns a reference to a hash containing the cookies.
 The cookies in the hash are indexed by name, and the values are L<CGI::Cookie>
 objects.
 
-=item $req->header
+=head2 $req->header
 
 Shortcut for $req->headers->header.
 
-=item $req->headers
+=head2 $req->headers
 
 Returns an L<HTTP::Headers> object containing the headers for the current request.
 
     print $c->request->headers->header('X-Catalyst');
 
-=item $req->hostname
+=head2 $req->hostname
 
 Returns the hostname of the client.
     
@@ -246,20 +244,20 @@ sub hostname {
     return $self->{hostname};
 }
 
-=item $req->input
+=head2 $req->input
 
 Alias for $req->body.
 
-=item $req->match
+=head2 $req->match
 
 This contains the matching part of a Regex action. Otherwise
 it returns the same as 'action'.
 
-=item $req->method
+=head2 $req->method
 
 Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
-=item $req->param
+=head2 $req->param
 
 Returns GET and POST parameters with a CGI.pm-compatible param method. This 
 is an alternative method for accessing parameters in $c->req->parameters.
@@ -312,7 +310,7 @@ sub param {
     }
 }
 
-=item $req->parameters
+=head2 $req->parameters
 
 Returns a reference to a hash containing GET and POST parameters. Values can
 be either a scalar or an arrayref containing scalars.
@@ -322,7 +320,7 @@ be either a scalar or an arrayref containing scalars.
 
 This is the combination of C<query_parameters> and C<body_parameters>.
 
-=item $req->params
+=head2 $req->params
 
 Shortcut for $req->parameters.
 
@@ -335,11 +333,11 @@ sub parameters {
     return $self->{parameters};
 }
 
-=item $req->path
+=head2 $req->path
 
 Returns the path, i.e. the part of the URI after $req->base, for the current request.
 
-=item $req->path_info
+=head2 $req->path_info
 
 Alias for path, added for compability with L<CGI>.
 
@@ -365,11 +363,11 @@ sub path {
     return $path;
 }
 
-=item $req->protocol
+=head2 $req->protocol
 
 Returns the protocol (HTTP/1.0 or HTTP/1.1) used for the current request.
 
-=item $req->query_parameters
+=head2 $req->query_parameters
 
 Returns a reference to a hash containing query string (GET) parameters. Values can
 be either a scalar or an arrayref containing scalars.
@@ -377,7 +375,7 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->query_parameters->{field};
     print $c->request->query_parameters->{field}->[0];
     
-=item $req->read( [$maxlength] )
+=head2 $req->read( [$maxlength] )
 
 Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
@@ -389,21 +387,21 @@ You have to set MyApp->config->{parse_on_demand} to use this directly.
 
 sub read { shift->{_context}->read(@_); }
 
-=item $req->referer
+=head2 $req->referer
 
 Shortcut for $req->headers->referer. Returns the referring page.
 
-=item $req->secure
+=head2 $req->secure
 
 Returns true or false, indicating whether the connection is secure (https).
 
-=item $req->snippets
+=head2 $req->snippets
 
 Returns a reference to an array containing regex snippets.
 
     my @snippets = @{ $c->request->snippets };
 
-=item $req->upload
+=head2 $req->upload
 
 A convenient method to access $req->uploads.
 
@@ -461,7 +459,7 @@ sub upload {
     }
 }
 
-=item $req->uploads
+=head2 $req->uploads
 
 Returns a reference to a hash containing uploads. Values can be either a
 hashref or a arrayref containing L<Catalyst::Request::Upload> objects.
@@ -478,21 +476,19 @@ sub uploads {
     return $self->{uploads};
 }
 
-=item $req->uri
+=head2 $req->uri
 
 Returns a URI object for the current request. Stringifies to the URI text.
 
-=item $req->user
+=head2 $req->user
 
 Returns the currently logged in user. Deprecated. The method recommended for
 newer plugins is $c->user.
 
-=item $req->user_agent
+=head2 $req->user_agent
 
 Shortcut to $req->headers->user_agent. Returns the user agent (browser)
 version string.
-
-=back
 
 =head1 AUTHORS
 

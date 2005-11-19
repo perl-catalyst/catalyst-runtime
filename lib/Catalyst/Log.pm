@@ -71,16 +71,17 @@ sub _log {
     my $level   = shift;
     my $time    = localtime(time);
     my $message = join( "\n", @_ );
-    $self->{body} .= sprintf( "[%s] [catalyst] [%s] %s\n", 
-		     $time, $level, $message ) ;
+    $self->{body} .=
+      sprintf( "[%s] [catalyst] [%s] %s\n", $time, $level, $message );
 }
 
 sub _flush {
-    my $self    = shift;
-    if ( $self->abort || ! $self->body ) {
-	$self->abort(undef);
-    } else {
-	print( STDERR $self->body);
+    my $self = shift;
+    if ( $self->abort || !$self->body ) {
+        $self->abort(undef);
+    }
+    else {
+        print( STDERR $self->body );
     }
     $self->body(undef);
 }
@@ -122,40 +123,34 @@ Your logging object is expected to provide the interface described here.
 
 =head1 LOG LEVELS
 
-=over 4
-
-=item debug
+=head2 debug
 
     $log->is_debug;
     $log->debug($message);
 
-=item info
+=head2 info
 
     $log->is_info;
     $log->info($message);
 
-=item warn
+=head2 warn
 
     $log->is_warn;
     $log->warn($message);
 
-=item error
+=head2 error
 
     $log->is_error;
     $log->error($message);
 
-=item fatal
+=head2 fatal
 
     $log->is_fatal;
     $log->fatal($message);
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item new
+=head2 new
 
 Constructor. Defaults to enable all levels unless levels are provided in
 arguments.
@@ -163,37 +158,37 @@ arguments.
     $log = Catalyst::Log->new;
     $log = Catalyst::Log->new( 'warn', 'error' );
 
-=item levels
+=head2 levels
 
 Set log levels
 
     $log->levels( 'warn', 'error', 'fatal' );
 
-=item enable
+=head2 enable
 
 Enable log levels
 
     $log->enable( 'warn', 'error' );
 
-=item disable
+=head2 disable
 
 Disable log levels
 
     $log->disable( 'warn', 'error' );
 
-=item is_debug
+=head2 is_debug
 
-=item is_error
+=head2 is_error
 
-=item is_fatal
+=head2 is_fatal
 
-=item is_info
+=head2 is_info
 
-=item is_warn
+=head2 is_warn
 
 Is the log level active?
 
-=item abort
+=head2 abort
 
 Should Catalyst emit logs for this request? Will be reset at the end of 
 each request. 
@@ -202,10 +197,6 @@ each request.
 to use Log4Perl or another logger, you should call it like this:
 
     $c->log->abort(1) if $c->log->can('abort');
-
-=back
-
-
 
 =head1 SEE ALSO
 

@@ -74,9 +74,7 @@ Catalyst Base Class
 
 =head1 METHODS
 
-=over 4
-
-=item $self->action_namespace($c)
+=head2 $self->action_namespace($c)
 
 =cut
 
@@ -87,7 +85,7 @@ sub action_namespace {
       || '';
 }
 
-=item $self->register_actions($c)
+=head2 $self->register_actions($c)
 
 =cut
 
@@ -154,8 +152,6 @@ sub _parse_attrs {
     }
     return \%attributes;
 }
-
-=back
 
 =head1 SEE ALSO
 

@@ -29,13 +29,11 @@ This is the Catalyst Exception class.
 
 =head1 METHODS
 
-=over 4
+=head2 throw( $message )
 
-=item throw( $message )
+=head2 throw( message => $message )
 
-=item throw( message => $message )
-
-=item throw( error => $error )
+=head2 throw( error => $error )
 
 Throws a fatal exception.
 
@@ -51,8 +49,6 @@ sub throw {
 
     Carp::croak($message);
 }
-
-=back
 
 =head1 AUTHOR
 

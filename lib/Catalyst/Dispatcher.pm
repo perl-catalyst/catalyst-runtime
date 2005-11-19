@@ -38,9 +38,7 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->detach( $c, $command [, \@arguments ] )
+=head2 $self->detach( $c, $command [, \@arguments ] )
 
 =cut
 
@@ -50,7 +48,7 @@ sub detach {
     die $Catalyst::DETACH;
 }
 
-=item $self->dispatch($c)
+=head2 $self->dispatch($c)
 
 =cut
 
@@ -70,7 +68,7 @@ sub dispatch {
     }
 }
 
-=item $self->forward( $c, $command [, \@arguments ] )
+=head2 $self->forward( $c, $command [, \@arguments ] )
 
 =cut
 
@@ -168,7 +166,7 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
     return $c->state;
 }
 
-=item $self->prepare_action($c)
+=head2 $self->prepare_action($c)
 
 =cut
 
@@ -203,7 +201,7 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-=item $self->get_action( $action, $namespace )
+=head2 $self->get_action( $action, $namespace )
 
 =cut
 
@@ -222,7 +220,7 @@ sub get_action {
     }
 }
 
-=item $self->get_actions( $c, $action, $namespace )
+=head2 $self->get_actions( $c, $action, $namespace )
 
 =cut
 
@@ -237,7 +235,7 @@ sub get_actions {
     return map { $_->get_action($action) } @match;
 }
 
-=item $self->get_containers( $namespace )
+=head2 $self->get_containers( $namespace )
 
 =cut
 
@@ -279,7 +277,7 @@ sub get_containers {
     return map { $_->getNodeValue } @match;
 }
 
-=item $self->register( $c, $action )
+=head2 $self->register( $c, $action )
 
 =cut
 
@@ -339,7 +337,7 @@ sub register {
     $parent->getNodeValue->actions->{ $action->name } = $action;
 }
 
-=item $self->setup_actions( $class, $component )
+=head2 $self->setup_actions( $class, $component )
 
 =cut
 
@@ -413,8 +411,6 @@ sub setup_actions {
     # List all public actions
     $_->list($c) for @{ $self->dispatch_types };
 }
-
-=back
 
 =head1 AUTHOR
 

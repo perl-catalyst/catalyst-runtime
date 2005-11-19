@@ -17,9 +17,7 @@ This is the FastCGI engine.
 
 This class overloads some methods from C<Catalyst::Engine::CGI>.
 
-=over 4
-
-=item $self->run($c, $listen, { option => value, ... })
+=head2 $self->run($c, $listen, { option => value, ... })
  
 Starts the FastCGI server.  If C<$listen> is set, then it specifies a
 location to listen for FastCGI requests;
@@ -78,18 +76,19 @@ sub run {
     if ($listen) {
         $options->{manager} ||= "FCGI::ProcManager";
         $options->{nproc}   ||= 1;
-        
+
         $self->daemon_fork() if $options->{detach};
-        
+
         if ( $options->{manager} ) {
             eval "use $options->{manager}; 1" or die $@;
 
-            $proc_manager
-                = $options->{manager}->new( {
+            $proc_manager = $options->{manager}->new(
+                {
                     n_processes => $options->{nproc},
                     pid_fname   => $options->{pidfile},
-                } );
-                
+                }
+            );
+
             # detach *before* the ProcManager inits
             $self->daemon_detach() if $options->{detach};
 
@@ -97,7 +96,7 @@ sub run {
         }
         elsif ( $options->{detach} ) {
             $self->daemon_detach();
-        }            
+        }
     }
 
     while ( $request->Accept >= 0 ) {
@@ -107,7 +106,7 @@ sub run {
     }
 }
 
-=item $self->write($c, $buffer)
+=head2 $self->write($c, $buffer)
 
 =cut
 
@@ -124,7 +123,7 @@ sub write {
     *STDOUT->syswrite($buffer);
 }
 
-=item $self->daemon_fork()
+=head2 $self->daemon_fork()
 
 Performs the first part of daemon initialisation.  Specifically,
 forking.  STDERR, etc are still connected to a terminal.
@@ -136,7 +135,7 @@ sub daemon_fork {
     fork && exit;
 }
 
-=item $self->daemon_detach( )
+=head2 $self->daemon_detach( )
 
 Performs the second part of daemon initialisation.  Specifically,
 disassociates from the terminal.
@@ -151,16 +150,14 @@ F</dev/null>).
 sub daemon_detach {
     my $self = shift;
     print "FastCGI daemon started (pid $$)\n";
-    open STDIN, "+</dev/null" or die $!;
-    open STDOUT, ">&STDIN" or die $!;
-    open STDERR, ">&STDIN" or die $!;
+    open STDIN,  "+</dev/null" or die $!;
+    open STDOUT, ">&STDIN"     or die $!;
+    open STDERR, ">&STDIN"     or die $!;
     POSIX::setsid();
 }
 
 1;
 __END__
-
-=back
 
 =head1 WEB SERVER CONFIGURATIONS
 

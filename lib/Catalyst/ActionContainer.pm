@@ -24,9 +24,7 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item get_action
+=head2 get_action
 
 =cut
 
@@ -36,11 +34,9 @@ sub get_action {
     return;
 }
 
-=item actions
+=head2 actions
 
-=item part
-
-=back
+=head2 part
 
 =head1 AUTHOR
 

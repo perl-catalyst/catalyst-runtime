@@ -30,13 +30,11 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->finalize_output
+=head2 $self->finalize_output
 
 <obsolete>, see finalize_body
 
-=item $self->finalize_body($c)
+=head2 $self->finalize_body($c)
 
 Finalize body.  Prints the response output.
 
@@ -56,7 +54,7 @@ sub finalize_body {
     }
 }
 
-=item $self->finalize_cookies($c)
+=head2 $self->finalize_cookies($c)
 
 =cut
 
@@ -83,7 +81,7 @@ sub finalize_cookies {
     }
 }
 
-=item $self->finalize_error($c)
+=head2 $self->finalize_error($c)
 
 =cut
 
@@ -98,9 +96,11 @@ sub finalize_error {
 
         # For pretty dumps
         local $Data::Dumper::Terse = 1;
-        $error = join '',
-          map { '<p><code class="error">' . encode_entities($_) . '</code></p>' }
-          @{ $c->error };
+        $error = join '', map {
+                '<p><code class="error">'
+              . encode_entities($_)
+              . '</code></p>'
+        } @{ $c->error };
         $error ||= 'No output';
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
         $name = "<h1>$name</h1>";
@@ -248,13 +248,13 @@ EOF
 
 }
 
-=item $self->finalize_headers($c)
+=head2 $self->finalize_headers($c)
 
 =cut
 
 sub finalize_headers { }
 
-=item $self->finalize_read($c)
+=head2 $self->finalize_read($c)
 
 =cut
 
@@ -264,7 +264,7 @@ sub finalize_read {
     undef $self->{_prepared_read};
 }
 
-=item $self->finalize_uploads($c)
+=head2 $self->finalize_uploads($c)
 
 =cut
 
@@ -281,7 +281,7 @@ sub finalize_uploads {
     }
 }
 
-=item $self->prepare_body($c)
+=head2 $self->prepare_body($c)
 
 =cut
 
@@ -302,7 +302,7 @@ sub prepare_body {
     }
 }
 
-=item $self->prepare_body_chunk($c)
+=head2 $self->prepare_body_chunk($c)
 
 =cut
 
@@ -312,7 +312,7 @@ sub prepare_body_chunk {
     $c->request->{_body}->add($chunk);
 }
 
-=item $self->prepare_body_parameters($c)
+=head2 $self->prepare_body_parameters($c)
 
 =cut
 
@@ -321,13 +321,13 @@ sub prepare_body_parameters {
     $c->request->body_parameters( $c->request->{_body}->param );
 }
 
-=item $self->prepare_connection($c)
+=head2 $self->prepare_connection($c)
 
 =cut
 
 sub prepare_connection { }
 
-=item $self->prepare_cookies($c)
+=head2 $self->prepare_cookies($c)
 
 =cut
 
@@ -339,13 +339,13 @@ sub prepare_cookies {
     }
 }
 
-=item $self->prepare_headers($c)
+=head2 $self->prepare_headers($c)
 
 =cut
 
 sub prepare_headers { }
 
-=item $self->prepare_parameters($c)
+=head2 $self->prepare_parameters($c)
 
 =cut
 
@@ -372,15 +372,15 @@ sub prepare_parameters {
     }
 }
 
-=item $self->prepare_path($c)
+=head2 $self->prepare_path($c)
 
 =cut
 
 sub prepare_path { }
 
-=item $self->prepare_request($c)
+=head2 $self->prepare_request($c)
 
-=item $self->prepare_query_parameters($c)
+=head2 $self->prepare_query_parameters($c)
 
 =cut
 
@@ -398,7 +398,7 @@ sub prepare_query_parameters {
     }
 }
 
-=item $self->prepare_read($c)
+=head2 $self->prepare_read($c)
 
 =cut
 
@@ -409,13 +409,13 @@ sub prepare_read {
     $self->read_position(0);
 }
 
-=item $self->prepare_request(@arguments)
+=head2 $self->prepare_request(@arguments)
 
 =cut
 
 sub prepare_request { }
 
-=item $self->prepare_uploads($c)
+=head2 $self->prepare_uploads($c)
 
 =cut
 
@@ -444,13 +444,13 @@ sub prepare_uploads {
     }
 }
 
-=item $self->prepare_write($c)
+=head2 $self->prepare_write($c)
 
 =cut
 
 sub prepare_write { }
 
-=item $self->read($c, [$maxlength])
+=head2 $self->read($c, [$maxlength])
 
 =cut
 
@@ -483,7 +483,7 @@ sub read {
     }
 }
 
-=item $self->read_chunk($c, $buffer, $length)
+=head2 $self->read_chunk($c, $buffer, $length)
 
 Each engine inplements read_chunk as its preferred way of reading a chunk
 of data.
@@ -492,22 +492,22 @@ of data.
 
 sub read_chunk { }
 
-=item $self->read_length
+=head2 $self->read_length
 
 The length of input data to be read.  This is obtained from the Content-Length
 header.
 
-=item $self->read_position
+=head2 $self->read_position
 
 The amount of input data that has already been read.
 
-=item $self->run($c)
+=head2 $self->run($c)
 
 =cut
 
 sub run { }
 
-=item $self->write($c, $buffer)
+=head2 $self->write($c, $buffer)
 
 =cut
 
@@ -521,8 +521,6 @@ sub write {
 
     print STDOUT $buffer;
 }
-
-=back
 
 =head1 AUTHORS
 

@@ -38,27 +38,25 @@ the current client request.
 
 =head1 METHODS
 
-=over 4
-
-=item $res->body($text)
+=head2 $res->body($text)
 
     $c->response->body('Catalyst rocks!');
 
 Sets or returns the output (text or binary data).
 
-=item $res->content_encoding
+=head2 $res->content_encoding
 
 Shortcut for $res->headers->content_encoding.
 
-=item $res->content_length
+=head2 $res->content_length
 
 Shortcut for $res->headers->content_length.
 
-=item $res->content_type
+=head2 $res->content_type
 
 Shortcut for $res->headers->content_type.
 
-=item $res->cookies
+=head2 $res->cookies
 
 Returns a reference to a hash containing cookies to be set. The keys of the
 hash are the cookies' names, and their corresponding values are hash
@@ -70,35 +68,31 @@ The keys of the hash reference on the right correspond to the L<CGI::Cookie>
 parameters of the same name, except they are used without a leading dash.
 Possible parameters are:
 
-=over 4
+=head2 value
 
-=item value
+=head2 expires
 
-=item expires
+=head2 domain
 
-=item domain
+=head2 path
 
-=item path
+=head2 secure
 
-=item secure
-
-=back
-
-=item $res->header
+=head2 $res->header
 
 Shortcut for $res->headers->header.
 
-=item $res->headers
+=head2 $res->headers
 
 Returns an L<HTTP::Headers> object, which can be used to set headers.
 
     $c->response->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
 
-=item $res->output
+=head2 $res->output
 
 Alias for $res->body.
 
-=item $res->redirect( $url, $status )
+=head2 $res->redirect( $url, $status )
 
 Causes the response to redirect to the specified URL.
 
@@ -121,21 +115,19 @@ sub redirect {
     return $self->location;
 }
 
-=item $res->status
+=head2 $res->status
 
 Sets or returns the HTTP status.
 
     $c->response->status(404);
     
-=item $res->write( $data )
+=head2 $res->write( $data )
 
 Writes $data to the output stream.
 
 =cut
 
 sub write { shift->{_context}->write(@_); }
-
-=back
 
 =head1 AUTHORS
 

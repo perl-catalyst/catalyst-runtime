@@ -31,13 +31,9 @@ Catalyst::AttrContainer
 
 =head1 METHODS
 
-=over 4
+=head2 FETCH_CODE_ATTRIBUTES
 
-=item FETCH_CODE_ATTRIBUTES
-
-=item MODIFY_CODE_ATTRIBUTES
-
-=back
+=head2 MODIFY_CODE_ATTRIBUTES
 
 =head1 SEE ALSO
 

@@ -27,9 +27,7 @@ L<Module::Build> extension for Catalyst.
 
 =head1 METHODS
 
-=over 4
-
-=item ACTION_install
+=head2 ACTION_install
 
 =cut
 
@@ -39,7 +37,7 @@ sub ACTION_install {
     $self->ACTION_install_extras;
 }
 
-=item ACTION_fakeinstall
+=head2 ACTION_fakeinstall
 
 =cut
 
@@ -50,7 +48,7 @@ sub ACTION_fakeinstall {
     $self->ACTION_install_extras;
 }
 
-=item ACTION_install_extras
+=head2 ACTION_install_extras
 
 =cut
 
@@ -88,8 +86,6 @@ sub _find_extras {
     }
     return @files;
 }
-
-=back
 
 =head1 AUTHOR
 

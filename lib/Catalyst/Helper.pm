@@ -539,9 +539,7 @@ Catalyst based application.
 
 =head1 METHODS
 
-=over 4
-
-=item default
+=head2 default
 
 =cut
 
@@ -558,7 +556,7 @@ sub default : Private {
 #
 # Uncomment and modify this end action after adding a View component
 #
-#=item end
+#=head2 end
 #
 #=cut
 #
@@ -568,8 +566,6 @@ sub default : Private {
 #    # Forward to View unless response body is already defined
 #    $c->forward('View::') unless $c->response->body;
 #}
-
-=back
 
 =head1 AUTHOR
 
@@ -1100,12 +1096,10 @@ Catalyst [% long_type %].
 [% IF long_type == 'Controller' %]
 =head1 METHODS
 
-=over 4
-
 #
 # Uncomment and modify this or add new actions to fit your needs
 #
-#=item default
+#=head2 default
 #
 #=cut
 #
@@ -1115,8 +1109,6 @@ Catalyst [% long_type %].
 #    # Hello World
 #    $c->response->body('[% class %] is on Catalyst!');
 #}
-
-=back
 
 [% END %]
 =head1 AUTHOR

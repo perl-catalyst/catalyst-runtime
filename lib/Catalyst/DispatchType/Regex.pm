@@ -16,9 +16,7 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->list($c)
+=head2 $self->list($c)
 
 =cut
 
@@ -33,7 +31,7 @@ sub list {
       if ( @{ $self->{compiled} } );
 }
 
-=item $self->match( $c, $path )
+=head2 $self->match( $c, $path )
 
 =cut
 
@@ -58,7 +56,7 @@ sub match {
     return 0;
 }
 
-=item $self->register( $c, $action )
+=head2 $self->register( $c, $action )
 
 =cut
 
@@ -81,7 +79,7 @@ sub register {
     return 0;
 }
 
-=item $self->register_regex($c, $re, $action)
+=head2 $self->register_regex($c, $re, $action)
 
 =cut
 
@@ -96,8 +94,6 @@ sub register_regex {
         }
     );
 }
-
-=back
 
 =head1 AUTHOR
 

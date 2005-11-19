@@ -7,7 +7,7 @@ use HTTP::Status;
 use NEXT;
 use Socket;
 use IO::Socket::INET ();
-use IO::Select ();
+use IO::Select       ();
 
 # For PAR
 require Catalyst::Engine::HTTP::Restarter;
@@ -37,9 +37,7 @@ This is the Catalyst engine specialized for development and testing.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->finalize_headers($c)
+=head2 $self->finalize_headers($c)
 
 =cut
 
@@ -55,7 +53,7 @@ sub finalize_headers {
     $self->NEXT::finalize_headers($c);
 }
 
-=item $self->finalize_read($c)
+=head2 $self->finalize_read($c)
 
 =cut
 
@@ -69,7 +67,7 @@ sub finalize_read {
     return $self->NEXT::finalize_read($c);
 }
 
-=item $self->prepare_read($c)
+=head2 $self->prepare_read($c)
 
 =cut
 
@@ -82,7 +80,7 @@ sub prepare_read {
     return $self->NEXT::prepare_read($c);
 }
 
-=item $self->read_chunk($c, $buffer, $length)
+=head2 $self->read_chunk($c, $buffer, $length)
 
 =cut
 
@@ -108,7 +106,7 @@ sub read_chunk {
     }
 }
 
-=item run
+=head2 run
 
 =cut
 
@@ -228,8 +226,8 @@ sub _handler {
 
         # Initialize CGI environment
         local %ENV = (
-            PATH_INFO       => $path         || '',
-            QUERY_STRING    => $query_string || '',
+            PATH_INFO    => $path         || '',
+            QUERY_STRING => $query_string || '',
             REMOTE_ADDR     => $sockdata->{peeraddr},
             REMOTE_HOST     => $sockdata->{peername},
             REQUEST_METHOD  => $method || '',
@@ -335,8 +333,6 @@ sub _get_line {
 }
 
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
-
-=back
 
 =head1 SEE ALSO
 

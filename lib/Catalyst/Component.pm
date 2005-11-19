@@ -49,9 +49,7 @@ component loader with config() support and a process() method placeholder.
 
 =head1 METHODS
 
-=over 4
-
-=item new($c)
+=head2 new($c)
 
 =cut
 
@@ -64,14 +62,14 @@ sub new {
     return $self->NEXT::new( { %{ $self->config }, %{$arguments} } );
 }
 
-# remember to leave blank lines between the consecutive =item's
-# otherwise the pod tools don't recognize the subsequent =items
+# remember to leave blank lines between the consecutive =head2's
+# otherwise the pod tools don't recognize the subsequent =head2s
 
-=item $c->config
+=head2 $c->config
 
-=item $c->config($hashref)
+=head2 $c->config($hashref)
 
-=item $c->config($key, $value, ...)
+=head2 $c->config($key, $value, ...)
 
 =cut
 
@@ -87,7 +85,7 @@ sub config {
     return $self->_config;
 }
 
-=item $c->process()
+=head2 $c->process()
 
 =cut
 
@@ -96,8 +94,6 @@ sub process {
     Catalyst::Exception->throw( message => ( ref $_[0] || $_[0] )
           . " did not override Catalyst::Component::process" );
 }
-
-=back
 
 =head1 SEE ALSO
 

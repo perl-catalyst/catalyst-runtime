@@ -22,9 +22,7 @@ Package Catalyst Applications.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->package(\%options)
+=head2 $self->package(\%options)
 
 =cut
 
@@ -105,8 +103,6 @@ EOF
 
     unlink $par_test;
 }
-
-=back
 
 =head1 AUTHOR
 

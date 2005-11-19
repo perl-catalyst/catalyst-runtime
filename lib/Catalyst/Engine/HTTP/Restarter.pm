@@ -84,11 +84,7 @@ and restart the server when any changes are detected.
 
 =head1 METHODS
 
-=over 4
-
-=item run
-
-=back
+=head2 run
 
 =head1 SEE ALSO
 

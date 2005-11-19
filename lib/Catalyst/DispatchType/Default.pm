@@ -15,9 +15,7 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
-
-=item $self->match( $c, $path )
+=head2 $self->match( $c, $path )
 
 =cut
 
@@ -39,8 +37,6 @@ sub match {
     }
     return 0;
 }
-
-=back
 
 =head1 AUTHOR
 

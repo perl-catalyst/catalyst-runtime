@@ -197,43 +197,37 @@ they are loaded in exactly the order in which they appear.
 
 The following flags are supported:
 
-=over 4
-
-=item -Debug
+=head2 -Debug
 
 Enables debug output.
 
-=item -Engine
+=head2 -Engine
 
 Forces Catalyst to use a specific engine. Omit the
 C<Catalyst::Engine::> prefix of the engine name, i.e.:
 
     use Catalyst qw/-Engine=CGI/;
 
-=item -Home
+=head2 -Home
 
 Forces Catalyst to use a specific home directory, e.g.:
 
     use Catalyst qw[-Home=/usr/sri];
 
-=item -Log
+=head2 -Log
 
 Specifies log level.
-
-=back
 
 =head1 METHODS
 
 =head2 Information about the current request
 
-=over 4
-
-=item $c->action
+=head2 $c->action
 
 Returns a L<Catalyst::Action> object for the current action, which
 stringifies to the action name. See L<Catalyst::Action>.
 
-=item $c->namespace
+=head2 $c->namespace
 
 Returns the namespace of the current action, i.e., the uri prefix
 corresponding to the controller of the current action. For example:
@@ -241,22 +235,18 @@ corresponding to the controller of the current action. For example:
     # in Controller::Foo::Bar
     $c->namespace; # returns 'foo/bar';
 
-=item $c->request
+=head2 $c->request
 
-=item $c->req
+=head2 $c->req
 
 Returns the current L<Catalyst::Request> object. See
 L<Catalyst::Request>.
 
-=back
-
 =head2 Processing and response to the current request
 
-=over 4
+=head2 $c->forward( $action [, \@arguments ] )
 
-=item $c->forward( $action [, \@arguments ] )
-
-=item $c->forward( $class, $method, [, \@arguments ] )
+=head2 $c->forward( $class, $method, [, \@arguments ] )
 
 Forwards processing to a private action. If you give a class name but no
 method, C<process()> is called. You may also optionally pass arguments
@@ -273,9 +263,9 @@ C<$c-E<gt>req-E<gt>args> will be restored to the previous values.
 
 sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
 
-=item $c->detach( $action [, \@arguments ] )
+=head2 $c->detach( $action [, \@arguments ] )
 
-=item $c->detach( $class, $method, [, \@arguments ] )
+=head2 $c->detach( $class, $method, [, \@arguments ] )
 
 The same as C<forward>, but doesn't return.
 
@@ -283,11 +273,11 @@ The same as C<forward>, but doesn't return.
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
-=item $c->error
+=head2 $c->error
 
-=item $c->error($error, ...)
+=head2 $c->error($error, ...)
 
-=item $c->error($arrayref)
+=head2 $c->error($arrayref)
 
 Returns an arrayref containing error messages.  If Catalyst encounters an
 error while processing a request, it stores the error in $c->error.  This
@@ -316,13 +306,13 @@ sub error {
     return $c->{error} || [];
 }
 
-=item $c->response
+=head2 $c->response
 
-=item $c->res
+=head2 $c->res
 
 Returns the current L<Catalyst::Response> object.
 
-=item $c->stash
+=head2 $c->stash
 
 Returns a hashref to the stash, which may be used to store data and pass
 it between components during a request. You can also set hash keys by
@@ -350,19 +340,15 @@ sub stash {
     return $c->{stash};
 }
 
-=item $c->state
+=head2 $c->state
 
 Contains the return value of the last executed action.
 
-=back
-
 =head2 Component Accessors
 
-=over 4
+=head2 $c->comp($name)
 
-=item $c->comp($name)
-
-=item $c->component($name)
+=head2 $c->component($name)
 
 Gets a component object by name. This method is no longer recommended,
 unless you want to get a specific component by full
@@ -404,7 +390,7 @@ sub component {
     return sort keys %{ $c->components };
 }
 
-=item $c->controller($name)
+=head2 $c->controller($name)
 
 Gets a L<Catalyst::Controller> instance by name.
 
@@ -419,7 +405,7 @@ sub controller {
     return $c->comp("C::$name");
 }
 
-=item $c->model($name)
+=head2 $c->model($name)
 
 Gets a L<Catalyst::Model> instance by name.
 
@@ -434,7 +420,7 @@ sub model {
     return $c->comp("M::$name");
 }
 
-=item $c->view($name)
+=head2 $c->view($name)
 
 Gets a L<Catalyst::View> instance by name.
 
@@ -449,19 +435,15 @@ sub view {
     return $c->comp("V::$name");
 }
 
-=back
-
 =head2 Class data and helper classes
 
-=over 4
-
-=item $c->config
+=head2 $c->config
 
 Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config({ db => 'dsn:SQLite:foo.db' });
 
-=item $c->debug
+=head2 $c->debug
 
 Overload to enable debug messages (same as -Debug option).
 
@@ -469,17 +451,17 @@ Overload to enable debug messages (same as -Debug option).
 
 sub debug { 0 }
 
-=item $c->dispatcher
+=head2 $c->dispatcher
 
 Returns the dispatcher instance. Stringifies to class name. See
 L<Catalyst::Dispatcher>.
 
-=item $c->engine
+=head2 $c->engine
 
 Returns the engine instance. Stringifies to the class name. See
 L<Catalyst::Engine>.
 
-=item $c->log
+=head2 $c->log
 
 Returns the logging object instance. Unless it is already set, Catalyst
 sets this up with a L<Catalyst::Log> object. To use your own log class:
@@ -492,13 +474,9 @@ L<Catalyst::Log> man page.
 
 =cut
 
-=back
-
 =head2 Utility methods
 
-=over 4
-
-=item $c->path_to(@path)
+=head2 $c->path_to(@path)
 
 Merges C<@path> with C<$c-E<gt>config-E<gt>{home}> and returns a
 L<Path::Class> object.
@@ -516,7 +494,7 @@ sub path_to {
     else { return file( $c->config->{home}, @path ) }
 }
 
-=item $c->plugin( $name, $class, @args )
+=head2 $c->plugin( $name, $class, @args )
 
 Helper method for plugins. It creates a classdata accessor/mutator and
 loads and instantiates the given class.
@@ -551,7 +529,7 @@ sub plugin {
       if $class->debug;
 }
 
-=item MyApp->setup
+=head2 MyApp->setup
 
 Initializes the dispatcher and engine, loads any plugins, and loads the
 model, view, and controller components. You may also specify an array
@@ -683,7 +661,7 @@ EOF
     $class->log->_flush() if $class->log->can('_flush');
 }
 
-=item $c->uri_for( $path, [ @args ] )
+=head2 $c->uri_for( $path, [ @args ] )
 
 Merges path with C<$c-E<gt>request-E<gt>base> for absolute uri's and
 with C<$c-E<gt>namespace> for relative uri's, then returns a
@@ -713,7 +691,7 @@ sub uri_for {
         $base )->canonical;
 }
 
-=item $c->welcome_message
+=head2 $c->welcome_message
 
 Returns the Catalyst welcome HTML page.
 
@@ -858,32 +836,28 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.po
 EOF
 }
 
-=back
-
 =head1 INTERNAL METHODS
 
 These methods are not meant to be used by end users.
 
-=over 4
-
-=item $c->components
+=head2 $c->components
 
 Returns a hash of components.
 
-=item $c->context_class
+=head2 $c->context_class
 
 Returns or sets the context class.
 
-=item $c->counter
+=head2 $c->counter
 
 Returns a hashref containing coderefs and execution counts (needed for
 deep recursion detection).
 
-=item $c->depth
+=head2 $c->depth
 
 Returns the number of actions on the current internal execution stack.
 
-=item $c->dispatch
+=head2 $c->dispatch
 
 Dispatches a request to actions.
 
@@ -891,11 +865,11 @@ Dispatches a request to actions.
 
 sub dispatch { my $c = shift; $c->dispatcher->dispatch( $c, @_ ) }
 
-=item $c->dispatcher_class
+=head2 $c->dispatcher_class
 
 Returns or sets the dispatcher class.
 
-=item $c->dump_these
+=head2 $c->dump_these
 
 Returns a list of 2-element array references (name, structure) pairs
 that will be dumped on the error page in debug mode.
@@ -907,11 +881,11 @@ sub dump_these {
     [ Request => $c->req ], [ Response => $c->res ], [ Stash => $c->stash ],;
 }
 
-=item $c->engine_class
+=head2 $c->engine_class
 
 Returns or sets the engine class.
 
-=item $c->execute( $class, $coderef )
+=head2 $c->execute( $class, $coderef )
 
 Execute a coderef in given class and catch exceptions. Errors are available
 via $c->error.
@@ -975,7 +949,7 @@ sub execute {
     return $c->state;
 }
 
-=item $c->finalize
+=head2 $c->finalize
 
 Finalizes the request.
 
@@ -1007,7 +981,7 @@ sub finalize {
     return $c->response->status;
 }
 
-=item $c->finalize_body
+=head2 $c->finalize_body
 
 Finalizes body.
 
@@ -1015,7 +989,7 @@ Finalizes body.
 
 sub finalize_body { my $c = shift; $c->engine->finalize_body( $c, @_ ) }
 
-=item $c->finalize_cookies
+=head2 $c->finalize_cookies
 
 Finalizes cookies.
 
@@ -1023,7 +997,7 @@ Finalizes cookies.
 
 sub finalize_cookies { my $c = shift; $c->engine->finalize_cookies( $c, @_ ) }
 
-=item $c->finalize_error
+=head2 $c->finalize_error
 
 Finalizes error.
 
@@ -1031,7 +1005,7 @@ Finalizes error.
 
 sub finalize_error { my $c = shift; $c->engine->finalize_error( $c, @_ ) }
 
-=item $c->finalize_headers
+=head2 $c->finalize_headers
 
 Finalizes headers.
 
@@ -1068,11 +1042,11 @@ sub finalize_headers {
     $c->response->{_finalized_headers} = 1;
 }
 
-=item $c->finalize_output
+=head2 $c->finalize_output
 
 An alias for finalize_body.
 
-=item $c->finalize_read
+=head2 $c->finalize_read
 
 Finalizes the input after reading is complete.
 
@@ -1080,7 +1054,7 @@ Finalizes the input after reading is complete.
 
 sub finalize_read { my $c = shift; $c->engine->finalize_read( $c, @_ ) }
 
-=item $c->finalize_uploads
+=head2 $c->finalize_uploads
 
 Finalizes uploads. Cleans up any temporary files.
 
@@ -1088,7 +1062,7 @@ Finalizes uploads. Cleans up any temporary files.
 
 sub finalize_uploads { my $c = shift; $c->engine->finalize_uploads( $c, @_ ) }
 
-=item $c->get_action( $action, $namespace )
+=head2 $c->get_action( $action, $namespace )
 
 Gets an action in a given namespace.
 
@@ -1096,7 +1070,7 @@ Gets an action in a given namespace.
 
 sub get_action { my $c = shift; $c->dispatcher->get_action(@_) }
 
-=item $c->get_actions( $action, $namespace )
+=head2 $c->get_actions( $action, $namespace )
 
 Gets all actions of a given name in a namespace and all parent
 namespaces.
@@ -1105,7 +1079,7 @@ namespaces.
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
-=item handle_request( $class, @arguments )
+=head2 handle_request( $class, @arguments )
 
 Called to handle each HTTP request.
 
@@ -1153,7 +1127,7 @@ sub handle_request {
     return $status;
 }
 
-=item $c->prepare( @arguments )
+=head2 $c->prepare( @arguments )
 
 Creates a Catalyst context from an engine-specific request (Apache, CGI,
 etc.).
@@ -1231,7 +1205,7 @@ sub prepare {
     return $c;
 }
 
-=item $c->prepare_action
+=head2 $c->prepare_action
 
 Prepares action.
 
@@ -1239,7 +1213,7 @@ Prepares action.
 
 sub prepare_action { my $c = shift; $c->dispatcher->prepare_action( $c, @_ ) }
 
-=item $c->prepare_body
+=head2 $c->prepare_body
 
 Prepares message body.
 
@@ -1268,7 +1242,7 @@ sub prepare_body {
     }
 }
 
-=item $c->prepare_body_chunk( $chunk )
+=head2 $c->prepare_body_chunk( $chunk )
 
 Prepares a chunk of data before sending it to L<HTTP::Body>.
 
@@ -1279,7 +1253,7 @@ sub prepare_body_chunk {
     $c->engine->prepare_body_chunk( $c, @_ );
 }
 
-=item $c->prepare_body_parameters
+=head2 $c->prepare_body_parameters
 
 Prepares body parameters.
 
@@ -1290,7 +1264,7 @@ sub prepare_body_parameters {
     $c->engine->prepare_body_parameters( $c, @_ );
 }
 
-=item $c->prepare_connection
+=head2 $c->prepare_connection
 
 Prepares connection.
 
@@ -1301,7 +1275,7 @@ sub prepare_connection {
     $c->engine->prepare_connection( $c, @_ );
 }
 
-=item $c->prepare_cookies
+=head2 $c->prepare_cookies
 
 Prepares cookies.
 
@@ -1309,7 +1283,7 @@ Prepares cookies.
 
 sub prepare_cookies { my $c = shift; $c->engine->prepare_cookies( $c, @_ ) }
 
-=item $c->prepare_headers
+=head2 $c->prepare_headers
 
 Prepares headers.
 
@@ -1317,7 +1291,7 @@ Prepares headers.
 
 sub prepare_headers { my $c = shift; $c->engine->prepare_headers( $c, @_ ) }
 
-=item $c->prepare_parameters
+=head2 $c->prepare_parameters
 
 Prepares parameters.
 
@@ -1329,7 +1303,7 @@ sub prepare_parameters {
     $c->engine->prepare_parameters( $c, @_ );
 }
 
-=item $c->prepare_path
+=head2 $c->prepare_path
 
 Prepares path and base.
 
@@ -1337,7 +1311,7 @@ Prepares path and base.
 
 sub prepare_path { my $c = shift; $c->engine->prepare_path( $c, @_ ) }
 
-=item $c->prepare_query_parameters
+=head2 $c->prepare_query_parameters
 
 Prepares query parameters.
 
@@ -1360,7 +1334,7 @@ sub prepare_query_parameters {
     }
 }
 
-=item $c->prepare_read
+=head2 $c->prepare_read
 
 Prepares the input for reading.
 
@@ -1368,7 +1342,7 @@ Prepares the input for reading.
 
 sub prepare_read { my $c = shift; $c->engine->prepare_read( $c, @_ ) }
 
-=item $c->prepare_request
+=head2 $c->prepare_request
 
 Prepares the engine request.
 
@@ -1376,7 +1350,7 @@ Prepares the engine request.
 
 sub prepare_request { my $c = shift; $c->engine->prepare_request( $c, @_ ) }
 
-=item $c->prepare_uploads
+=head2 $c->prepare_uploads
 
 Prepares uploads.
 
@@ -1404,7 +1378,7 @@ sub prepare_uploads {
     }
 }
 
-=item $c->prepare_write
+=head2 $c->prepare_write
 
 Prepares the output for writing.
 
@@ -1412,15 +1386,15 @@ Prepares the output for writing.
 
 sub prepare_write { my $c = shift; $c->engine->prepare_write( $c, @_ ) }
 
-=item $c->request_class
+=head2 $c->request_class
 
 Returns or sets the request class.
 
-=item $c->response_class
+=head2 $c->response_class
 
 Returns or sets the response class.
 
-=item $c->read( [$maxlength] )
+=head2 $c->read( [$maxlength] )
 
 Reads a chunk of data from the request body. This method is designed to
 be used in a while loop, reading C<$maxlength> bytes on every call.
@@ -1433,7 +1407,7 @@ directly.
 
 sub read { my $c = shift; return $c->engine->read( $c, @_ ) }
 
-=item $c->run
+=head2 $c->run
 
 Starts the engine.
 
@@ -1441,7 +1415,7 @@ Starts the engine.
 
 sub run { my $c = shift; return $c->engine->run( $c, @_ ) }
 
-=item $c->set_action( $action, $code, $namespace, $attrs )
+=head2 $c->set_action( $action, $code, $namespace, $attrs )
 
 Sets an action in a given namespace.
 
@@ -1449,7 +1423,7 @@ Sets an action in a given namespace.
 
 sub set_action { my $c = shift; $c->dispatcher->set_action( $c, @_ ) }
 
-=item $c->setup_actions($component)
+=head2 $c->setup_actions($component)
 
 Sets up actions for a component.
 
@@ -1457,7 +1431,7 @@ Sets up actions for a component.
 
 sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 
-=item $c->setup_components
+=head2 $c->setup_components
 
 Sets up components.
 
@@ -1519,7 +1493,7 @@ qq/Couldn't instantiate component "$component", "new() didn't return a object"/
     }
 }
 
-=item $c->setup_dispatcher
+=head2 $c->setup_dispatcher
 
 Sets up dispatcher.
 
@@ -1556,7 +1530,7 @@ sub setup_dispatcher {
     $class->dispatcher( $dispatcher->new );
 }
 
-=item $c->setup_engine
+=head2 $c->setup_engine
 
 Sets up engine.
 
@@ -1680,7 +1654,7 @@ qq/Couldn't load engine "$engine" (maybe you forgot to install it?), "$@"/
     $class->engine( $engine->new );
 }
 
-=item $c->setup_home
+=head2 $c->setup_home
 
 Sets up the home directory.
 
@@ -1707,7 +1681,7 @@ sub setup_home {
     }
 }
 
-=item $c->setup_log
+=head2 $c->setup_log
 
 Sets up log.
 
@@ -1734,7 +1708,7 @@ sub setup_log {
     }
 }
 
-=item $c->setup_plugins
+=head2 $c->setup_plugins
 
 Sets up plugins.
 
@@ -1762,11 +1736,11 @@ sub setup_plugins {
     }
 }
 
-=item $c->stack
+=head2 $c->stack
 
 Returns the stack.
 
-=item $c->write( $data )
+=head2 $c->write( $data )
 
 Writes $data to the output stream. When using this method directly, you
 will need to manually set the C<Content-Length> header to the length of
@@ -1783,7 +1757,7 @@ sub write {
     return $c->engine->write( $c, @_ );
 }
 
-=item version
+=head2 version
 
 Returns the Catalyst version number. Mostly useful for "powered by"
 messages in template systems.
@@ -1791,8 +1765,6 @@ messages in template systems.
 =cut
 
 sub version { return $Catalyst::VERSION }
-
-=back
 
 =head1 INTERNAL ACTIONS
 
@@ -1883,23 +1855,19 @@ Wiki:
 
 =head1 SEE ALSO
 
-=over 4
+=head2 L<Catalyst::Manual> - The Catalyst Manual
 
-=item L<Catalyst::Manual> - The Catalyst Manual
+=head2 L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
 
-=item L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
+=head2 L<Catalyst::Engine> - Core engine
 
-=item L<Catalyst::Engine> - Core engine
+=head2 L<Catalyst::Log> - Log class.
 
-=item L<Catalyst::Log> - Log class.
+=head2 L<Catalyst::Request> - Request object
 
-=item L<Catalyst::Request> - Request object
+=head2 L<Catalyst::Response> - Response object
 
-=item L<Catalyst::Response> - Response object
-
-=item L<Catalyst::Test> - The test suite.
-
-=back
+=head2 L<Catalyst::Test> - The test suite.
 
 =head1 CREDITS
 

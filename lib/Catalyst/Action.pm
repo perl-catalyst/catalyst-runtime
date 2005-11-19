@@ -27,15 +27,13 @@ See L<Catalyst>.
 
 =head1 METHODS
 
-=over 4
+=head2 attributes
 
-=item attributes
+=head2 class
 
-=item class
+=head2 code
 
-=item code
-
-=item execute
+=head2 execute
 
 =cut
 
@@ -45,13 +43,11 @@ sub execute {    # Execute ourselves against a context
     return $c->execute( $self->class, $self );
 }
 
-=item namespace
+=head2 namespace
 
-=item reverse
+=head2 reverse
 
-=item name
-
-=back
+=head2 name
 
 =head1 AUTHOR
 

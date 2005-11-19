@@ -35,13 +35,11 @@ This class provides accessors and methods to handle client upload requests.
 
 =head1 METHODS
 
-=over 4
-
-=item $upload->new
+=head2 $upload->new
 
 Simple constructor.
 
-=item $upload->copy_to
+=head2 $upload->copy_to
 
 Copies the temporary file using L<File::Copy>. Returns true for success,
 false for failure.
@@ -55,7 +53,7 @@ sub copy_to {
     return File::Copy::copy( $self->tempname, @_ );
 }
 
-=item $upload->fh
+=head2 $upload->fh
 
 Opens a temporary file (see tempname below) and returns an L<IO::File> handle.
 
@@ -77,15 +75,15 @@ sub fh {
     return $fh;
 }
 
-=item $upload->filename
+=head2 $upload->filename
 
 Returns the client-supplied filename.
 
-=item $upload->headers
+=head2 $upload->headers
 
 Returns an L<HTTP::Headers> object for the request.
 
-=item $upload->link_to
+=head2 $upload->link_to
 
 Creates a hard link to the temporary file. Returns true for success, 
 false for failure.
@@ -99,11 +97,11 @@ sub link_to {
     return CORE::link( $self->tempname, $target );
 }
 
-=item $upload->size
+=head2 $upload->size
 
 Returns the size of the uploaded file in bytes.
 
-=item $upload->slurp
+=head2 $upload->slurp
 
 Returns a scalar containing the contents of the temporary file.
 
@@ -128,15 +126,13 @@ sub slurp {
     return $content;
 }
 
-=item $upload->tempname
+=head2 $upload->tempname
 
 Returns the path to the temporary file.
 
-=item $upload->type
+=head2 $upload->type
 
 Returns the client-supplied Content-Type.
-
-=back
 
 =head1 AUTHORS
 

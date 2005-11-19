@@ -5,7 +5,7 @@ use base 'Catalyst::Engine';
 use NEXT;
 use URI;
 
-__PACKAGE__->mk_accessors( 'env' );
+__PACKAGE__->mk_accessors('env');
 
 =head1 NAME
 
@@ -34,9 +34,7 @@ This is the Catalyst engine specialized for the CGI environment.
 
 This class overloads some methods from C<Catalyst::Engine>.
 
-=over 4
-
-=item $self->finalize_headers($c)
+=head2 $self->finalize_headers($c)
 
 =cut
 
@@ -49,13 +47,13 @@ sub finalize_headers {
     print "\015\012";
 }
 
-=item $self->prepare_connection($c)
+=head2 $self->prepare_connection($c)
 
 =cut
 
 sub prepare_connection {
     my ( $self, $c ) = @_;
-    local(*ENV) = $self->env || \%ENV;
+    local (*ENV) = $self->env || \%ENV;
 
     $c->request->address( $ENV{REMOTE_ADDR} );
 
@@ -87,13 +85,13 @@ sub prepare_connection {
     }
 }
 
-=item $self->prepare_headers($c)
+=head2 $self->prepare_headers($c)
 
 =cut
 
 sub prepare_headers {
     my ( $self, $c ) = @_;
-    local(*ENV) = $self->env || \%ENV;
+    local (*ENV) = $self->env || \%ENV;
 
     # Read headers from %ENV
     while ( my ( $header, $value ) = each %ENV ) {
@@ -103,13 +101,13 @@ sub prepare_headers {
     }
 }
 
-=item $self->prepare_path($c)
+=head2 $self->prepare_path($c)
 
 =cut
 
 sub prepare_path {
     my ( $self, $c ) = @_;
-    local(*ENV) = $self->env || \%ENV;
+    local (*ENV) = $self->env || \%ENV;
 
     my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
@@ -154,20 +152,20 @@ sub prepare_path {
     $c->request->base($base);
 }
 
-=item $self->prepare_query_parameters($c)
+=head2 $self->prepare_query_parameters($c)
 
 =cut
 
 sub prepare_query_parameters {
     my ( $self, $c ) = @_;
-    local(*ENV) = $self->env || \%ENV;
-    
+    local (*ENV) = $self->env || \%ENV;
+
     if ( $ENV{QUERY_STRING} ) {
         $self->SUPER::prepare_query_parameters( $c, $ENV{QUERY_STRING} );
     }
 }
 
-=item $self->prepare_request($c, (env => \%env))
+=head2 $self->prepare_request($c, (env => \%env))
 
 =cut
 
@@ -175,11 +173,11 @@ sub prepare_request {
     my ( $self, $c, %args ) = @_;
 
     if ( $args{env} ) {
-       $self->env( $args{env} );
+        $self->env( $args{env} );
     }
 }
 
-=item $self->prepare_write($c)
+=head2 $self->prepare_write($c)
 
 Enable autoflush on the output handle for CGI-based engines.
 
@@ -194,19 +192,17 @@ sub prepare_write {
     $self->NEXT::prepare_write($c);
 }
 
-=item $self->read_chunk($c, $buffer, $length)
+=head2 $self->read_chunk($c, $buffer, $length)
 
 =cut
 
 sub read_chunk { shift; shift; *STDIN->sysread(@_); }
 
-=item $self->run
+=head2 $self->run
 
 =cut
 
 sub run { shift; shift->handle_request(@_) }
-
-=back
 
 =head1 SEE ALSO
 
