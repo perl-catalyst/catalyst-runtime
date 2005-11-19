@@ -10,6 +10,7 @@ use File::Spec ();
 our @IGNORE =
   qw/Build Build.PL Changes MANIFEST META.yml Makefile.PL Makefile README
   _build blib lib script t inc/;
+our @CLASSES   = ();
 our $ENGINE    = 'CGI';
 our $CORE      = 0;
 our $MULTIARCH = 0;
@@ -88,6 +89,15 @@ sub catalyst_par_core {
     $CORE = $core;
 }
 
+=head2 catalyst_par_classes(@clases)
+
+=cut
+
+sub catalyst_par_classes {
+    my ( $self, @classes ) = @_;
+    push @CLASSES, @classes;
+}
+
 =head2 catalyst_par_engine($engine)
 
 =cut
@@ -148,6 +158,8 @@ sub _catalyst_par {
     my $version = $Catalyst::VERSION;
     my $class   = $self->name;
 
+    my $classes = '';
+    $classes .= "require $_;\n" for @Catalyst::Module::Install::CLASSES;
     my $tmp_file = IO::File->new(" > $par_pl ");
     print $tmp_file <<"EOF";
 die "$class on Catalyst $version\n" if \$0 !~ /par.pl\.\\w+\$/;
@@ -162,6 +174,7 @@ require Catalyst::Engine::CGI;
 require Catalyst::Controller;
 require Catalyst::Model;
 require Catalyst::View;
+$classes
 EOF
     $tmp_file->close;
 
