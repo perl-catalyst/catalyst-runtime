@@ -75,6 +75,15 @@ BEGIN { \$ENV{CATALYST_ENGINE} = '$engine' };
 use lib 'lib';
 require $class;
 import $class;
+require Catalyst::Helper;
+require Catalyst::PAR;
+require Catalyst::Build;
+require Catalyst::Test;
+require Catalyst::Engine::HTTP;
+require Catalyst::Engine::CGI;
+require Catalyst::Controller;
+require Catalyst::Model;
+require Catalyst::View;
 $classes
 EOF
     $tmp_file->close;

@@ -18,19 +18,6 @@ use URI;
 use Scalar::Util qw/weaken/;
 use attributes;
 
-# For PAR
-require Catalyst::Helper;
-require Catalyst::PAR;
-require Catalyst::Build;
-require Catalyst::Test;
-
-require Catalyst::Engine::HTTP;
-require Catalyst::Engine::CGI;
-
-require Catalyst::Controller;
-require Catalyst::Model;
-require Catalyst::View;
-
 __PACKAGE__->mk_accessors(
     qw/counter request response state action stack namespace/
 );
