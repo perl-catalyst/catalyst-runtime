@@ -14,6 +14,7 @@ our @CLASSES   = ();
 our $ENGINE    = 'CGI';
 our $CORE      = 0;
 our $MULTIARCH = 0;
+our $SCRIPT    = '';
 
 =head1 NAME
 
@@ -86,7 +87,7 @@ sub catalyst_par { Catalyst::Module::Install::_catalyst_par(@_) }
 
 sub catalyst_par_core {
     my ( $self, $core ) = @_;
-    $CORE = $core;
+    $core ? ( $CORE = $core ) : $core++;
 }
 
 =head2 catalyst_par_classes(@clases)
@@ -113,7 +114,16 @@ sub catalyst_par_engine {
 
 sub catalyst_par_multiarch {
     my ( $self, $multiarch ) = @_;
-    $MULTIARCH = $multiarch;
+    $multiarch ? ( $MULTIARCH = $multiarch ) : $multiarch++;
+}
+
+=head2 catalyst_par_script($script)
+
+=cut
+
+sub catalyst_par_script {
+    my ( $self, $script ) = @_;
+    $SCRIPT = $script;
 }
 
 package Catalyst::Module::Install;
@@ -131,6 +141,7 @@ sub _catalyst_par {
     $name = lc $name;
     $par ||= "$name.par";
     my $engine = $Module::Install::Catalyst::ENGINE || 'CGI';
+    my $script = $Module::Install::Catalyst::SCRIPT || "$name\_cgi.pl";
 
     # Check for PAR
     eval "use PAR ()";
@@ -159,22 +170,29 @@ sub _catalyst_par {
     my $class   = $self->name;
 
     my $classes = '';
-    $classes .= "require $_;\n" for @Catalyst::Module::Install::CLASSES;
+    $classes .= "    require $_;\n" for @Catalyst::Module::Install::CLASSES;
     my $tmp_file = IO::File->new(" > $par_pl ");
     print $tmp_file <<"EOF";
-die "$class on Catalyst $version\n" if \$0 !~ /par.pl\.\\w+\$/;
-BEGIN { \$ENV{CATALYST_ENGINE} = '$engine' };
-use lib "lib";
-require $class;
-import $class;
-require Catalyst::Helper;
-require Catalyst::Test;
-require Catalyst::Engine::HTTP;
-require Catalyst::Engine::CGI;
-require Catalyst::Controller;
-require Catalyst::Model;
-require Catalyst::View;
-$classes
+require lib;
+if (\$0 !~ /par.pl\.\\w+\$/) {
+    import lib '../lib';
+    require FindBin;
+    require "\$FindBin::Bin/script/$script";
+}
+else {
+    import lib 'lib';
+    \$ENV{CATALYST_ENGINE} = '$engine';
+    require $class;
+    import $class;
+    require Catalyst::Helper;
+    require Catalyst::Test;
+    require Catalyst::Engine::HTTP;
+    require Catalyst::Engine::CGI;
+    require Catalyst::Controller;
+    require Catalyst::Model;
+    require Catalyst::View;
+    $classes
+}
 EOF
     $tmp_file->close;
 
