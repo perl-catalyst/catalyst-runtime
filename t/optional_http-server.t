@@ -20,7 +20,7 @@ rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
 mkdir "$FindBin::Bin/../t/tmp";
 chdir "$FindBin::Bin/../t/tmp";
 system "perl -I$FindBin::Bin/../lib $FindBin::Bin/../script/catalyst.pl TestApp";
-chdir "$FindBin::Bin/../..";
+chdir "$FindBin::Bin/..";
 File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
 
 # remove TestApp's tests
