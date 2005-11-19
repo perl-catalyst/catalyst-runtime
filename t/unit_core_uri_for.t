@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::MockObject;
 use URI;
 
@@ -25,6 +25,13 @@ is(
     'http://127.0.0.1/foo/yada/bar/baz',
     'URI for relative path'
 );
+
+is(
+    Catalyst::uri_for( $context, '', 'arg1', 'arg2' )->as_string,
+    'http://127.0.0.1/foo/yada/arg1/arg2',
+    'URI for undef action with args'
+);
+
 
 is( Catalyst::uri_for( $context, '../quux' )->as_string,
     'http://127.0.0.1/foo/quux', 'URI for relative dot path' );

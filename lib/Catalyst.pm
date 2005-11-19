@@ -674,8 +674,11 @@ sub uri_for {
 
     # join args with '/', or a blank string
     my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
-    return URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ),
-        $base )->canonical;
+    $args =~ s/^\/// unless $path;
+    my $res =
+      URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ), $base )
+      ->canonical;
+    $res;
 }
 
 =head2 $c->welcome_message
