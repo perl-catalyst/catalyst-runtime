@@ -197,7 +197,7 @@ Returns an L<HTTP::Request> object for a uri.
 sub request {
     my $request = shift;
     unless ( ref $request ) {
-        if ( $request =~ m/http/i ) {
+        if ( $request =~ m/^http/i ) {
             $request = URI->new($request)->canonical;
         }
         else {
