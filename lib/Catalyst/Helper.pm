@@ -574,7 +574,7 @@ author('[% author %]');
 version_from('[% path %]');
 license('perl');
 
-requires( Catalyst => '5.5');
+requires( Catalyst => '5.57');
 
 install_script;
 tests( glob('t/*.t'), glob('t/*/*.t') );
