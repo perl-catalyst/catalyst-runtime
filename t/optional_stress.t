@@ -17,7 +17,7 @@ BEGIN {
       unless $ENV{TEST_STRESS};
 
     $iters = $ENV{TEST_STRESS} || 10;
-    $tests = YAML::LoadFile("$FindBin::Bin/stress.yml");
+    $tests = YAML::LoadFile("$FindBin::Bin/optional_stress.yml");
 
     my $total_tests = 0;
     map { $total_tests += scalar @{ $tests->{$_} } } keys %{$tests};
