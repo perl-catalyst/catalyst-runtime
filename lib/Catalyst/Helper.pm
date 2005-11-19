@@ -565,7 +565,6 @@ license('perl');
 requires( Catalyst => '5.57' );
 
 install_script( glob('script/*.pl') );
-tests( glob('t/*.t'), glob('t/*/*.t') );
 
 catalyst_files();
 
