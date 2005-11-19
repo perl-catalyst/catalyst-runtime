@@ -256,10 +256,9 @@ sub next_test {
         $self->{uri} = $prefix;
     }
     my $dir  = $self->{test_dir};
-    my $type = $self->{type};
-    $dir = File::Spec->catdir( $dir, $type );
+    my $type = lc $self->{type};
     $self->mk_dir($dir);
-    return File::Spec->catfile( $dir, $tname );
+    return File::Spec->catfile( $dir, "$type\_$tname" );
 }
 
 =head3 render_file
@@ -296,17 +295,6 @@ sub _mk_dirs {
     $self->mk_dir( $self->{images} );
     $self->{t} = File::Spec->catdir( $self->{dir}, 't' );
     $self->mk_dir( $self->{t} );
-
-    if ( $self->{short} ) {
-        $self->mk_dir( File::Spec->catdir( $self->{t}, 'M' ) );
-        $self->mk_dir( File::Spec->catdir( $self->{t}, 'V' ) );
-        $self->mk_dir( File::Spec->catdir( $self->{t}, 'C' ) );
-    }
-    else {
-        $self->mk_dir( File::Spec->catdir( $self->{t}, 'Model' ) );
-        $self->mk_dir( File::Spec->catdir( $self->{t}, 'View' ) );
-        $self->mk_dir( File::Spec->catdir( $self->{t}, 'Controller' ) );
-    }
 
     $self->{class} = File::Spec->catdir( split( /\:\:/, $self->{name} ) );
     $self->{mod} = File::Spec->catdir( $self->{lib}, $self->{class} );
