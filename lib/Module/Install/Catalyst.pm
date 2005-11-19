@@ -120,7 +120,7 @@ sub _catalyst_par {
     $name =~ s/::/_/g;
     $name = lc $name;
     $par ||= "$name.par";
-    my $engine = $ENGINE || 'CGI';
+    my $engine = $Module::Install::Catalyst::ENGINE || 'CGI';
 
     # Check for PAR
     eval "use PAR ()";
@@ -135,7 +135,11 @@ sub _catalyst_par {
     my $root = $FindBin::Bin;
     my $path = File::Spec->catfile( 'blib', 'lib', split( '::', $self->name ) );
     $path .= '.pm';
-    return unless -f $path;
+    unless ( -f $path ) {
+        print qq/Not writing PAR, "$path" doesn't exist\n/;
+        return 0;
+    }
+    print qq/Writing PAR "$par"\n/;
     chdir File::Spec->catdir( $root, 'blib' );
 
     my $par_pl = 'par.pl';
@@ -144,7 +148,7 @@ sub _catalyst_par {
     my $version = $Catalyst::VERSION;
     my $class   = $self->name;
 
-    my $tmp_file = IO::File->new("> $par_pl");
+    my $tmp_file = IO::File->new(" > $par_pl ");
     print $tmp_file <<"EOF";
 die "$class on Catalyst $version\n" if \$0 !~ /par.pl\.\\w+\$/;
 BEGIN { \$ENV{CATALYST_ENGINE} = '$engine' };
@@ -171,8 +175,8 @@ EOF
         'o' => $par,
         'a' => [ grep( !/par.pl/, glob '.' ) ],
         'p' => 1,
-        'B' => $CORE,
-        'm' => $MULTIARCH
+        'B' => $Module::Install::Catalyst::CORE,
+        'm' => $Module::Install::Catalyst::MULTIARCH
     );
     App::Packer::PAR->new(
         frontend  => 'Module::ScanDeps',
@@ -187,6 +191,7 @@ EOF
     unlink $par_pl;
     chdir $root;
     rmove( File::Spec->catfile( 'blib', $par ), $par );
+    return 1;
 }
 
 =head1 AUTHOR
