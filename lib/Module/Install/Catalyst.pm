@@ -76,10 +76,50 @@ sub catalyst_ignore {
 
 =cut
 
-sub catalyst_par {
+# Workaround for a namespace conflict
+sub catalyst_par { Catalyst::Module::Install::_catalyst_par(@_) }
+
+=head2 catalyst_par_core($core)
+
+=cut
+
+sub catalyst_par_core {
+    my ( $self, $core ) = @_;
+    $CORE = $core;
+}
+
+=head2 catalyst_par_engine($engine)
+
+=cut
+
+sub catalyst_par_engine {
+    my ( $self, $engine ) = @_;
+    $ENGINE = $engine;
+}
+
+=head2 catalyst_par_multiarch($multiarch)
+
+=cut
+
+sub catalyst_par_multiarch {
+    my ( $self, $multiarch ) = @_;
+    $MULTIARCH = $multiarch;
+}
+
+package Catalyst::Module::Install;
+
+use strict;
+use FindBin;
+use File::Copy::Recursive 'rmove';
+use File::Spec ();
+
+sub _catalyst_par {
     my ( $self, $par ) = @_;
 
-    $par ||= 'application.par';
+    my $name = $self->name;
+    $name =~ s/::/_/g;
+    $name = lc $name;
+    $par ||= "$name.par";
     my $engine = $ENGINE || 'CGI';
 
     # Check for PAR
@@ -93,6 +133,9 @@ sub catalyst_par {
     die "Please install Module::ScanDeps" if $@;
 
     my $root = $FindBin::Bin;
+    my $path = File::Spec->catfile( 'blib', 'lib', split( '::', $self->name ) );
+    $path .= '.pm';
+    return unless -f $path;
     chdir File::Spec->catdir( $root, 'blib' );
 
     my $par_pl = 'par.pl';
@@ -105,12 +148,10 @@ sub catalyst_par {
     print $tmp_file <<"EOF";
 die "$class on Catalyst $version\n" if \$0 !~ /par.pl\.\\w+\$/;
 BEGIN { \$ENV{CATALYST_ENGINE} = '$engine' };
-use lib 'lib';
+use lib "lib";
 require $class;
 import $class;
 require Catalyst::Helper;
-require Catalyst::PAR;
-require Catalyst::Build;
 require Catalyst::Test;
 require Catalyst::Engine::HTTP;
 require Catalyst::Engine::CGI;
@@ -140,38 +181,12 @@ EOF
         backopts  => \%opt,
         args      => ['par.pl'],
     )->go;
+
     open STDERR, '>&', $olderr;
 
     unlink $par_pl;
     chdir $root;
-    rmove File::Spec->catfile( 'blib', $par ), $par;
-}
-
-=head2 catalyst_par_core($core)
-
-=cut
-
-sub catalyst_par_core {
-    my ( $self, $core ) = @_;
-    $CORE = $core;
-}
-
-=head2 catalyst_par_engine($engine)
-
-=cut
-
-sub catalyst_par_engine {
-    my ( $self, $engine ) = @_;
-    $ENGINE = $engine;
-}
-
-=head2 catalyst_par_multiarch($multiarch)
-
-=cut
-
-sub catalyst_par_multiarch {
-    my ( $self, $multiarch ) = @_;
-    $MULTIARCH = $multiarch;
+    rmove( File::Spec->catfile( 'blib', $par ), $par );
 }
 
 =head1 AUTHOR
