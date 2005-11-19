@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib "$FindBin::Bin/../../lib";
+use lib "$FindBin::Bin/lib";
 
 use Test::More tests => 52;
 use Catalyst::Test 'TestApp';
@@ -22,9 +22,12 @@ use HTTP::Request::Common;
         'http://localhost/dump/request/',
         'Content-Type' => 'form-data',
         'Content'      => [
-            'cookies.t' => ["$FindBin::Bin/cookies.t"],
-            'headers.t' => ["$FindBin::Bin/headers.t"],
-            'uploads.t' => ["$FindBin::Bin/uploads.t"],
+            'live_engine_request_cookies.t' =>
+              ["$FindBin::Bin/live_engine_request_cookies.t"],
+            'live_engine_request_headers.t' =>
+              ["$FindBin::Bin/live_engine_request_headers.t"],
+            'live_engine_request_uploads.t' =>
+              ["$FindBin::Bin/live_engine_request_uploads.t"],
         ]
     );
 
@@ -63,11 +66,12 @@ use HTTP::Request::Common;
 
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
-        
+
         # make sure upload is accessible via legacy params->{$file}
-        is( $creq->{parameters}->{ $upload->filename }, $upload->filename, 'legacy param method ok' ); 
-        
-        ok( ! -e $upload->tempname, 'Upload temp file was deleted' );
+        is( $creq->{parameters}->{ $upload->filename },
+            $upload->filename, 'legacy param method ok' );
+
+        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
     }
 }
 
@@ -78,9 +82,9 @@ use HTTP::Request::Common;
         'http://localhost/dump/request/',
         'Content-Type' => 'multipart/form-data',
         'Content'      => [
-            'testfile' => ["$FindBin::Bin/cookies.t"],
-            'testfile' => ["$FindBin::Bin/headers.t"],
-            'testfile' => ["$FindBin::Bin/uploads.t"],
+            'testfile' => ["$FindBin::Bin/live_engine_request_cookies.t"],
+            'testfile' => ["$FindBin::Bin/live_engine_request_headers.t"],
+            'testfile' => ["$FindBin::Bin/live_engine_request_uploads.t"],
         ]
     );
 
@@ -122,8 +126,8 @@ use HTTP::Request::Common;
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->filename, $parameters{filename}, 'Upload filename' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
-        
-        ok( ! -e $upload->tempname, 'Upload temp file was deleted' );
+
+        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
     }
 }
 
@@ -133,7 +137,8 @@ use HTTP::Request::Common;
     my $request = POST(
         'http://localhost/engine/request/uploads/slurp',
         'Content-Type' => 'multipart/form-data',
-        'Content'      => [ 'slurp' => ["$FindBin::Bin/uploads.t"], ]
+        'Content'      =>
+          [ 'slurp' => ["$FindBin::Bin/live_engine_request_uploads.t"], ]
     );
 
     ok( my $response = request($request), 'Request' );

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+use lib "$FindBin::Bin/lib";
 
 our $iters;
 
@@ -43,7 +43,7 @@ EOF
             skip "Using remote server", 4;
         }
 
-        my $file = "$FindBin::Bin/../../../../01use.t";
+        my $file = "$FindBin::Bin/01use.t";
         my $fh = IO::File->new( $file, 'r' );
         my $buffer;
         if ( defined $fh ) {
