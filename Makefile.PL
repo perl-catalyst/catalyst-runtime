@@ -74,6 +74,14 @@ print qq/ Install "PAR" for PAR packaging support.\n/ if $@;
 print <<"EOF";
 
  Important:
-     The Apache engines have been moved to a separate package in Catalyst 5.5.
-     Please install Catalyst::Engine::Apache if you need Apache support.
+    The Apache engines have been moved to a separate package in Catalyst 5.5.
+    Please install Catalyst::Engine::Apache if you need Apache support.
+
+    Install Bundle::Catalyst to get everything you need to write serious
+    applications.
+
+        perl -MCPAN -e 'install Bundle::Catalyst'
+
+
+ Have fun!
 EOF
