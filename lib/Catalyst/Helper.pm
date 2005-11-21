@@ -136,9 +136,8 @@ sub mk_component {
         $type              = 'C' if $type =~ /controller/i;
         my $appdir = File::Spec->catdir( split /\:\:/, $app );
         my $test_path =
-          File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir,
-            'Controller' );
-        $type = $self->{long_type} if -d $test_path;
+          File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir, 'C' );
+        $type = $self->{long_type} unless -d $test_path;
         $self->{type}  = $type;
         $self->{name}  = $name;
         $self->{class} = "$app\::$type\::$name";
