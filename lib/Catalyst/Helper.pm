@@ -134,13 +134,16 @@ sub mk_component {
         $type              = 'M' if $type =~ /model/i;
         $type              = 'V' if $type =~ /view/i;
         $type              = 'C' if $type =~ /controller/i;
-        $type              = $self->{long_type} unless $self->{short};
-        $self->{type}      = $type;
-        $self->{name}      = $name;
-        $self->{class}     = "$app\::$type\::$name";
+        my $appdir = File::Spec->catdir( split /\:\:/, $app );
+        my $test_path =
+          File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir,
+            'Controller' );
+        $type = $self->{long_type} if -d $test_path;
+        $self->{type}  = $type;
+        $self->{name}  = $name;
+        $self->{class} = "$app\::$type\::$name";
 
         # Class
-        my $appdir = File::Spec->catdir( split /\:\:/, $app );
         my $path =
           File::Spec->catdir( $FindBin::Bin, '..', 'lib', $appdir, $type );
         my $file = $name;
@@ -880,18 +883,15 @@ use Catalyst::Helper;
 
 my $force = 0;
 my $help  = 0;
-my $short = 0;
 
 GetOptions(
     'nonew|force' => \$force,
-    'help|?'      => \$help,
-    'short'       => \$short
+    'help|?'      => \$help
  );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper =
-    Catalyst::Helper->new( { '.newfiles' => !$force, short => $short } );
+my $helper = Catalyst::Helper->new( { '.newfiles' => !$force } );
 
 pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
@@ -908,7 +908,6 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
  Options:
    -force    don't create a .new file where a file to be created exists
    -help     display this help and exits
-   -short    use short types, like C instead of Controller...
 
  Examples:
    [% appprefix %]_create.pl controller My::Controller
