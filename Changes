@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
 5.58
         - Replaced -short with auto-detection
+        - Fixed prereqs, added File::Copy::Recursive
 
 5.57    2005-11-20 22:45:00
         - Updated uri_for to accept undef actions
