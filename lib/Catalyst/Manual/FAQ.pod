@@ -8,7 +8,12 @@ Frequently Asked Questions
 
 =head2 How do I regenerate the helper scripts?
 
-Create a new app with the same name and copy scripts/ to app directory
+Outside your apps dir run the C<catalyst.pl> script with the same name, and the
+C<-scripts> switch.
+
+	catalyst.pl -scripts Foo	
+
+To overwrite (instead of creating C<.new> files) use the C<-force> switch.
 
 =head2 I have added tables to my DB - how to autogenerate the classes?
 
