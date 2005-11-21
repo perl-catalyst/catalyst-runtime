@@ -143,7 +143,7 @@ running, using the helper scripts described above.
 
 =head3 Install
 
-    $ perl -MCPAN -e 'install Bundle::Catalyst'
+    $ perl -MCPAN -e 'install Task::Catalyst'
 
 =head3 Setup
 

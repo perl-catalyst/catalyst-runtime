@@ -14,7 +14,7 @@ THE NOTES AT THE BOTTOM OF THE DOCUMENT.
 The first step is to install Catalyst, and the simplest way to do this 
 is to install the Catalyst bundle from CPAN:
 
-    $ perl -MCPAN -e 'install Bundle::Catalyst'
+    $ perl -MCPAN -e 'install Task::Catalyst'
 
 This will retrieve Catalyst and a number of useful extensions and 
 install them for you.
