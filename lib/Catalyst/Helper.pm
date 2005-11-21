@@ -538,7 +538,7 @@ sub default : Private {
 #    my ( $self, $c ) = @_;
 #
 #    # Forward to View unless response body is already defined
-#    $c->forward('View::') unless $c->response->body;
+#    $c->forward( $c->view('') ) unless $c->response->body;
 #}
 
 =head1 AUTHOR
