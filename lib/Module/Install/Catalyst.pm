@@ -145,13 +145,13 @@ sub _catalyst_par {
 
     # Check for PAR
     eval "use PAR ()";
-    die "Please install PAR" if $@;
+    die "Please install PAR\n" if $@;
     eval "use PAR::Packer ()";
-    die "Please install PAR::Packer" if $@;
+    die "Please install PAR::Packer\n" if $@;
     eval "use App::Packer::PAR ()";
-    die "Please install App::Packer::PAR" if $@;
+    die "Please install App::Packer::PAR\n" if $@;
     eval "use Module::ScanDeps ()";
-    die "Please install Module::ScanDeps" if $@;
+    die "Please install Module::ScanDeps\n" if $@;
 
     my $root = $FindBin::Bin;
     my $path = File::Spec->catfile( 'blib', 'lib', split( '::', $self->name ) );
