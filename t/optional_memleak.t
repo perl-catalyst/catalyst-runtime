@@ -20,7 +20,7 @@ plan skip_all => 'HTTP::Body >= 0.03 required for this test' if $@;
 
 our $gtop = GTop->new;
 our ( $initial, $final ) = ( 0, 0 ); 
-our $tests = YAML::LoadFile("$FindBin::Bin/stress.yml");
+our $tests = YAML::LoadFile("$FindBin::Bin/optional_stress.yml");
 
 my $total_tests = 0;
 
