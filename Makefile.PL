@@ -33,6 +33,7 @@ requires('Tree::Simple');
 requires('Tree::Simple::Visitor::FindByPath');
 requires( 'URI' => 1.35 );
 requires('File::Copy::Recursive');
+requires('Module::Install');
 
 recommends( 'Catalyst::Engine::Apache' => '1.00' );
 recommends('FCGI');
