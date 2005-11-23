@@ -4,6 +4,11 @@ This file documents the revision history for Perl extension Catalyst.
         - Improved PAR support
         - Replaced -short with auto-detection
         - Fixed prereqs, added File::Copy::Recursive
+        - Static::Simple changes:
+            - Made prepare_action play nice with other plugins by not short-
+              circuiting.
+            - Added tmpl to the ignored extensions.
+            - Fixed security problem if req->path contained '..'.
 
 5.57    2005-11-20 22:45:00
         - Updated uri_for to accept undef actions
