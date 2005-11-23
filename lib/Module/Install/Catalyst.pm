@@ -14,7 +14,7 @@ our @CLASSES   = ();
 our $ENGINE    = 'CGI';
 our $CORE      = 0;
 our $MULTIARCH = 0;
-our $SCRIPT    = '';
+our $USAGE;
 
 =head1 NAME
 
@@ -117,13 +117,13 @@ sub catalyst_par_multiarch {
     $multiarch ? ( $MULTIARCH = $multiarch ) : $multiarch++;
 }
 
-=head2 catalyst_par_script($script)
+=head2 catalyst_par_usage($usage)
 
 =cut
 
-sub catalyst_par_script {
-    my ( $self, $script ) = @_;
-    $SCRIPT = $script;
+sub catalyst_par_usage {
+    my ( $self, $usage ) = @_;
+    $USAGE = $usage;
 }
 
 package Catalyst::Module::Install;
@@ -141,7 +141,6 @@ sub _catalyst_par {
     $name = lc $name;
     $par ||= "$name.par";
     my $engine = $Module::Install::Catalyst::ENGINE || 'CGI';
-    my $script = $Module::Install::Catalyst::SCRIPT || "$name\_cgi.pl";
 
     # Check for PAR
     eval "use PAR ()";
@@ -169,18 +168,47 @@ sub _catalyst_par {
     my $version = $Catalyst::VERSION;
     my $class   = $self->name;
 
-    my $script_file    = IO::File->new("< $script");
-    my $script_content = do { local $/; <$script_file> };
-
     my $classes = '';
     $classes .= "    require $_;\n" for @Catalyst::Module::Install::CLASSES;
+
+    unlink $par_pl;
+
+    my $usage = $Module::Install::Catalyst::USAGE || <<"EOF";
+Usage:
+    parl $par [script] [arg1 arg2 arg3...]
+    $name [script] [arg1 arg2 arg3...]
+EOF
+
     my $tmp_file = IO::File->new("> $par_pl ");
     print $tmp_file <<"EOF";
-require lib;
-if (\$0 !~ /par.pl\.\\w+\$/) {
-$script_content
+if ( \$ENV{PAR_PROGNAME} ) {
+    my \$zip = \$PAR::LibCache{\$ENV{PAR_PROGNAME}}
+        || Archive::Zip->new(__FILE__);
+    if (\@ARGV == 0 ) {
+        my \@members = \$zip->membersMatching('.*script/.*\.pl');
+        my \$list = "  Available scripts:\\n";
+        for my \$member ( \@members ) {
+            my \$name = \$member->fileName;
+            \$name =~ /(\\w+\\.pl)\$/;
+            \$name = \$1;
+            next if \$name =~ /^main\.pl\$/;
+            next if \$name =~ /^par\.pl\$/;
+            \$list .= "    \$name\\n";
+        }
+        die <<"END";
+$usage
+\$list
+END
+    }
+    my \$file = shift \@ARGV;
+    \$file =~ s/^.*[\\/\\\\]//;
+    \$file =~ s/\\.[^.]*\$//i;
+    my \$member = eval { \$zip->memberNamed("./script/\$file.pl") };
+    die qq/Can't open perl script "\$file"\n/ unless \$member;
+    PAR::_run_member( \$member, 1 );
 }
 else {
+    require lib;
     import lib 'lib';
     \$ENV{CATALYST_ENGINE} = '$engine';
     require $class;
@@ -201,9 +229,9 @@ EOF
     $tmp_file->close;
 
     # Create package
-    local $SIG{__WARN__} = sub { };
-    open my $olderr, '>&STDERR';
-    open STDERR, '>', File::Spec->devnull;
+    #    local $SIG{__WARN__} = sub { };
+    #    open my $olderr, '>&STDERR';
+    #    open STDERR, '>', File::Spec->devnull;
     my %opt = (
         'x' => 1,
         'n' => 0,
@@ -221,9 +249,9 @@ EOF
         args      => ['par.pl'],
     )->go;
 
-    open STDERR, '>&', $olderr;
+    #    open STDERR, '>&', $olderr;
 
-    unlink $par_pl;
+    #    unlink $par_pl;
     chdir $root;
     rmove( File::Spec->catfile( 'blib', $par ), $par );
     return 1;
