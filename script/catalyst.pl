@@ -5,23 +5,28 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
 
-my $force   = 0;
-my $help    = 0;
-my $scripts = 0;
-my $short   = 0;
+my $force    = 0;
+my $help     = 0;
+my $makefile = 0;
+my $scripts  = 0;
+my $short    = 0;
 
 GetOptions(
     'help|?'      => \$help,
     'force|nonew' => \$force,
+    'makefile'    => \$makefile,
     'scripts'     => \$scripts,
     'short'       => \$short
 );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper =
-  Catalyst::Helper->new(
-    { '.newfiles' => !$force, 'scripts' => $scripts, 'short' => $short } );
+my $helper = Catalyst::Helper->new( {
+    '.newfiles' => !$force, 
+    'makefile'  => $makefile, 
+    'scripts'   => $scripts,
+    'short'     => $short,
+} );
 pod2usage(1) unless $helper->mk_app( $ARGV[0] );
 
 1;
@@ -38,6 +43,7 @@ catalyst.pl [options] application-name
  Options:
    -force      don't create a .new file where a file to be created exists
    -help       display this help and exits
+   -makefile   update Makefile.PL only
    -scripts    update helper scripts only
    -short      use short types, like C instead of Controller...
 

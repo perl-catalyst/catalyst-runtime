@@ -74,22 +74,30 @@ sub mk_app {
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'Catalyst developer';
-
-    unless ( $self->{scripts} ) {
+      
+    my $gen_scripts  = ( $self->{makefile} ) ? 0 : 1;
+    my $gen_makefile = ( $self->{scripts}  ) ? 0 : 1;
+    my $gen_app      = ( $self->{scripts} || $self->{makefile} ) ? 0 : 1;
+    
+    if ( $gen_app ) {
         $self->_mk_dirs;
         $self->_mk_appclass;
-        $self->_mk_makefile;
         $self->_mk_readme;
         $self->_mk_changes;
         $self->_mk_apptest;
         $self->_mk_images;
         $self->_mk_favicon;
     }
-    $self->_mk_cgi;
-    $self->_mk_fastcgi;
-    $self->_mk_server;
-    $self->_mk_test;
-    $self->_mk_create;
+    if ( $gen_makefile ) { 
+        $self->_mk_makefile;
+    }    
+    if ( $gen_scripts ) {
+        $self->_mk_cgi;
+        $self->_mk_fastcgi;
+        $self->_mk_server;
+        $self->_mk_test;
+        $self->_mk_create;
+    }
     return 1;
 }
 
@@ -220,7 +228,9 @@ sub mk_file {
     my ( $self, $file, $content ) = @_;
     if ( -e $file ) {
         print qq/ exists "$file"\n/;
-        return 0 unless ( $self->{'.newfiles'} || $self->{scripts} );
+        return 0 unless ( $self->{'.newfiles'}
+                       || $self->{scripts}
+                       || $self->{makefile} );
         if ( $self->{'.newfiles'} ) {
             if ( my $f = IO::File->new("< $file") ) {
                 my $oldcontent = join( '', (<$f>) );

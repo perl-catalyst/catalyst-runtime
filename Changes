@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.58
+        - Added -makefile to catalyst.pl to generate a new Makefile.PL.
         - Restored Catalyst::Build with a deprecation notice.
         - Improved PAR support
         - Replaced -short with auto-detection
