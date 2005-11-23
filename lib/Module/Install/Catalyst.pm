@@ -175,8 +175,11 @@ sub _catalyst_par {
 
     my $usage = $Module::Install::Catalyst::USAGE || <<"EOF";
 Usage:
-    parl $par [script] [arg1 arg2 arg3...]
-    $name [script] [arg1 arg2 arg3...]
+    [parl] $name\[.par] [script] [arguments]
+
+  Examples:
+    parl $name.par $name\_server.pl -r
+    myapp $name\_cgi.pl
 EOF
 
     my $tmp_file = IO::File->new("> $par_pl ");
