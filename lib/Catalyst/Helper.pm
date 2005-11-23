@@ -558,7 +558,7 @@ it under the same terms as Perl itself.
 __makefile__
 use inc::Module::Install;
 
-name('[% name %]');
+name('[% dir %]');
 abstract('Catalyst Application');
 author('[% author %]');
 version_from('[% path %]');
