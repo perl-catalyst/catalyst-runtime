@@ -169,15 +169,16 @@ sub _catalyst_par {
     my $version = $Catalyst::VERSION;
     my $class   = $self->name;
 
+    my $script_file    = IO::File->new("< $script");
+    my $script_content = do { local $/; <$script_file> };
+
     my $classes = '';
     $classes .= "    require $_;\n" for @Catalyst::Module::Install::CLASSES;
-    my $tmp_file = IO::File->new(" > $par_pl ");
+    my $tmp_file = IO::File->new("> $par_pl ");
     print $tmp_file <<"EOF";
 require lib;
 if (\$0 !~ /par.pl\.\\w+\$/) {
-    import lib '../lib';
-    require FindBin;
-    require "\$FindBin::Bin/script/$script";
+$script_content
 }
 else {
     import lib 'lib';

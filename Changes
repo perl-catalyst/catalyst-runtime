@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.58
+        - Improved PAR support
         - Replaced -short with auto-detection
         - Fixed prereqs, added File::Copy::Recursive
 
