@@ -14,6 +14,7 @@ our @CLASSES   = ();
 our $ENGINE    = 'CGI';
 our $CORE      = 0;
 our $MULTIARCH = 0;
+our $SCRIPT;
 our $USAGE;
 
 =head1 NAME
@@ -117,6 +118,15 @@ sub catalyst_par_multiarch {
     $multiarch ? ( $MULTIARCH = $multiarch ) : $multiarch++;
 }
 
+=head2 catalyst_par_script($script)
+
+=cut
+
+sub catalyst_par_script {
+    my ( $self, $script ) = @_;
+    $SCRIPT = $script;
+}
+
 =head2 catalyst_par_usage($usage)
 
 =cut
@@ -182,12 +192,15 @@ Usage:
     myapp $name\_cgi.pl
 EOF
 
+    my $script   = $Module::Install::Catalyst::SCRIPT;
     my $tmp_file = IO::File->new("> $par_pl ");
     print $tmp_file <<"EOF";
 if ( \$ENV{PAR_PROGNAME} ) {
     my \$zip = \$PAR::LibCache{\$ENV{PAR_PROGNAME}}
         || Archive::Zip->new(__FILE__);
-    if (\@ARGV == 0 ) {
+    my \$script = '$script';
+    \$ARGV[0] ||= \$script if \$script;
+    if ( ( \@ARGV == 0 ) || ( \$ARGV[0] eq '-h' ) || ( \$ARGV[0] eq '-help' )) {
         my \@members = \$zip->membersMatching('.*script/.*\.pl');
         my \$list = "  Available scripts:\\n";
         for my \$member ( \@members ) {
