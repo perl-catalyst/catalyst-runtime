@@ -192,6 +192,9 @@ else {
     require Catalyst::Controller;
     require Catalyst::Model;
     require Catalyst::View;
+    require Getopt::Long;
+    require Pod::Usage;
+    require Pod::Text;
     $classes
 }
 EOF
