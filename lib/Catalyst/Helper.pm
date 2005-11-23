@@ -962,6 +962,8 @@ Catalyst [% long_type %].
 [% IF long_type == 'Controller' %]
 =head1 METHODS
 
+=cut
+
 #
 # Uncomment and modify this or add new actions to fit your needs
 #
