@@ -232,9 +232,9 @@ EOF
     $tmp_file->close;
 
     # Create package
-    #    local $SIG{__WARN__} = sub { };
-    #    open my $olderr, '>&STDERR';
-    #    open STDERR, '>', File::Spec->devnull;
+    local $SIG{__WARN__} = sub { };
+    open my $olderr, '>&STDERR';
+    open STDERR, '>', File::Spec->devnull;
     my %opt = (
         'x' => 1,
         'n' => 0,
@@ -252,9 +252,9 @@ EOF
         args      => ['par.pl'],
     )->go;
 
-    #    open STDERR, '>&', $olderr;
+    open STDERR, '>&', $olderr;
 
-    #    unlink $par_pl;
+    unlink $par_pl;
     chdir $root;
     rmove( File::Spec->catfile( 'blib', $par ), $par );
     return 1;
