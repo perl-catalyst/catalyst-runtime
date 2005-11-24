@@ -2,9 +2,12 @@ package Catalyst::Build;
 
 use strict;
 use Module::Build;
-use base 'Module::Build';
 use Path::Class;
 use File::Find 'find';
+
+eval "require Module::Build";
+die "Please install Module::Build\n" if $@;
+push @ISA, 'Module::Build';
 
 our @ignore =
   qw/Build Build.PL Changes MANIFEST META.yml Makefile.PL Makefile README
@@ -39,7 +42,7 @@ This module is deprecated in favor of L<Module::Install::Catalyst>.
 
 sub new {
     my $class = shift;
-    my $self = $class->SUPER::new(@_);
+    my $self  = $class->SUPER::new(@_);
 
     my $app_name = $self->{properties}{module_name};
     warn <<"EOF";
