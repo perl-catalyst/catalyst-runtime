@@ -74,12 +74,12 @@ sub mk_app {
     $self->{author}    = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'Catalyst developer';
-      
+
     my $gen_scripts  = ( $self->{makefile} ) ? 0 : 1;
-    my $gen_makefile = ( $self->{scripts}  ) ? 0 : 1;
-    my $gen_app      = ( $self->{scripts} || $self->{makefile} ) ? 0 : 1;
-    
-    if ( $gen_app ) {
+    my $gen_makefile = ( $self->{scripts} )  ? 0 : 1;
+    my $gen_app = ( $self->{scripts} || $self->{makefile} ) ? 0 : 1;
+
+    if ($gen_app) {
         $self->_mk_dirs;
         $self->_mk_appclass;
         $self->_mk_readme;
@@ -88,10 +88,10 @@ sub mk_app {
         $self->_mk_images;
         $self->_mk_favicon;
     }
-    if ( $gen_makefile ) { 
+    if ($gen_makefile) {
         $self->_mk_makefile;
     }
-    if ( $gen_scripts ) {
+    if ($gen_scripts) {
         $self->_mk_cgi;
         $self->_mk_fastcgi;
         $self->_mk_server;
@@ -228,9 +228,10 @@ sub mk_file {
     my ( $self, $file, $content ) = @_;
     if ( -e $file ) {
         print qq/ exists "$file"\n/;
-        return 0 unless ( $self->{'.newfiles'}
-                       || $self->{scripts}
-                       || $self->{makefile} );
+        return 0
+          unless ( $self->{'.newfiles'}
+            || $self->{scripts}
+            || $self->{makefile} );
         if ( $self->{'.newfiles'} ) {
             if ( my $f = IO::File->new("< $file") ) {
                 my $oldcontent = join( '', (<$f>) );
@@ -343,13 +344,13 @@ sub _mk_makefile {
     $self->{path} .= '.pm';
     my $dir = $self->{dir};
     $self->render_file( 'makefile', "$dir\/Makefile.PL" );
-    
+
     if ( $self->{makefile} ) {
+
         # deprecate the old Build.PL file when regenerating Makefile.PL
-        $self->_deprecate_file( 
-            File::Spec->catdir( $self->{dir}, 'Build.PL' )
-        );
-    }    
+        $self->_deprecate_file(
+            File::Spec->catdir( $self->{dir}, 'Build.PL' ) );
+    }
 }
 
 sub _mk_readme {
@@ -452,7 +453,6 @@ sub _deprecate_file {
     my ( $self, $file ) = @_;
     if ( -e $file ) {
         my $oldcontent;
-        print qq/ deprecating "$file"\n/;
         if ( my $f = IO::File->new("< $file") ) {
             $oldcontent = join( '', (<$f>) );
         }
@@ -465,10 +465,10 @@ sub _deprecate_file {
             print qq/removed "$file"\n/;
             return 1;
         }
-        Catalyst::Exception->throw( 
+        Catalyst::Exception->throw(
             message => qq/Couldn't create "$file", "$!"/ );
     }
-}    
+}
 
 =head1 HELPERS
 
