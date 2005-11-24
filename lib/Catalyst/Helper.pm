@@ -603,12 +603,14 @@ author('[% author %]');
 version_from('[% path %]');
 license('perl');
 
-requires( Catalyst => '5.57' );
+include('ExtUtils::AutoInstall');
 
-install_script( glob('script/*.pl') );
+requires( Catalyst => '5.58' );
 
 catalyst_files();
 
+install_script( glob('script/*.pl') );
+auto_install();
 &WriteAll;
 __readme__
 Run script/[% appprefix %]_server.pl to test the application.

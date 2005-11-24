@@ -6,6 +6,8 @@ author('Sebastian Riedel');
 version_from('lib/Catalyst.pm');
 license('perl');
 
+include('ExtUtils::AutoInstall');
+
 requires( 'perl'               => '5.8.1' );
 requires( 'UNIVERSAL::require' => "0.10" );
 requires('Class::Accessor::Fast');
@@ -34,15 +36,30 @@ requires('Tree::Simple::Visitor::FindByPath');
 requires( 'URI' => 1.35 );
 requires('File::Copy::Recursive');
 requires('inc::Module::Install');
+requires('ExtUtils::AutoInstall');
 
-recommends( 'Catalyst::Engine::Apache' => '1.00' );
-recommends('FCGI');
-recommends('FCGI::ProcManager');
-recommends('PAR');
-recommends('CPANPLUS');
+features(
+    'Apache Support' => [
+        -default                   => 0,
+        'Catalyst::Engine::Apache' => '1.00'
+    ],
+    'FastCGI Support' => [
+        -default            => 0,
+        'FCGI'              => 0,
+        'FCGI::ProcManager' => 0
+    ],
+    'PAR Support' => [
+        -default => 0,
+        'PAR'    => 0
+    ],
+    'CPANPLUS' => [
+        -default   => 0,
+        'CPANPLUS' => 0
+    ],
+);
 
 install_script( glob('script/*.pl') );
-
+auto_install();
 &WriteAll;
 
 print( '*' x 80, "\n" );
@@ -74,7 +91,6 @@ print <<"EOF";
 
         perl -MCPANPLUS -e 'install Task::Catalyst'
         perl -MCPAN -e 'install Task::Catalyst'
-
 
  Have fun!
 EOF
