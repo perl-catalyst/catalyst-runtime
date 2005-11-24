@@ -76,18 +76,14 @@ contain the following items:
 
 a skeleton README file, which you are encouraged to expand on
 
-=item Build.PL
-
-a C<Module::Build> build script
-
 =item Changes
 
 a changes file with an initial entry for the creation of the application
 
 =item Makefile.PL
 
-an old-style MakeMaker script.  Catalyst uses the C<Module::Build> system so
-this script actually generates a Makeifle that invokes the Build script.
+Makefile.PL uses the C<Module::Install> system for packaging and distribution
+of the application.
 
 =item lib
 
@@ -105,25 +101,24 @@ a directory containing helper scripts:
 
 =over 4
 
-=item C<my_app_create.pl>
+=item C<myapp_create.pl>
 
 helper script to generate new component modules
 
-=item C<my_app_server.pl>
+=item C<myapp_server.pl>
 
 runs the generated application within a Catalyst test server, which can be
 used for testing without resorting to a full-blown web server configuration.
 
-=item C<my_app_cgi.pl>
+=item C<myapp_cgi.pl>
 
 runs the generated application as a CGI script
 
-=item C<my_app_fastcgi.pl>
+=item C<myapp_fastcgi.pl>
 
 runs the generated application as a FastCGI script
 
-
-=item C<my_app_test.pl>
+=item C<myapp_test.pl>
 
 runs an action of the generated application from the comand line.
 

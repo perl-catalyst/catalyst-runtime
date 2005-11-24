@@ -90,7 +90,7 @@ sub mk_app {
     }
     if ( $gen_makefile ) { 
         $self->_mk_makefile;
-    }    
+    }
     if ( $gen_scripts ) {
         $self->_mk_cgi;
         $self->_mk_fastcgi;
@@ -343,6 +343,13 @@ sub _mk_makefile {
     $self->{path} .= '.pm';
     my $dir = $self->{dir};
     $self->render_file( 'makefile', "$dir\/Makefile.PL" );
+    
+    if ( $self->{makefile} ) {
+        # deprecate the old Build.PL file when regenerating Makefile.PL
+        $self->_deprecate_file( 
+            File::Spec->catdir( $self->{dir}, 'Build.PL' )
+        );
+    }    
 }
 
 sub _mk_readme {
@@ -440,6 +447,28 @@ sub _mk_favicon {
     $self->mk_file( File::Spec->catfile( $root, "favicon.ico" ), $favicon );
 
 }
+
+sub _deprecate_file {
+    my ( $self, $file ) = @_;
+    if ( -e $file ) {
+        my $oldcontent;
+        print qq/ deprecating "$file"\n/;
+        if ( my $f = IO::File->new("< $file") ) {
+            $oldcontent = join( '', (<$f>) );
+        }
+        my $newfile = $file . '.deprecated';
+        if ( my $f = IO::File->new("> $newfile") ) {
+            binmode $f;
+            print $f $oldcontent;
+            print qq/created "$newfile"\n/;
+            unlink $file;
+            print qq/removed "$file"\n/;
+            return 1;
+        }
+        Catalyst::Exception->throw( 
+            message => qq/Couldn't create "$file", "$!"/ );
+    }
+}    
 
 =head1 HELPERS
 
