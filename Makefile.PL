@@ -39,6 +39,7 @@ recommends( 'Catalyst::Engine::Apache' => '1.00' );
 recommends('FCGI');
 recommends('FCGI::ProcManager');
 recommends('PAR');
+recommends('CPANPLUS');
 
 install_script( glob('script/*.pl') );
 
@@ -52,17 +53,6 @@ my $banner =
   . " again!";
 print " $banner \n";
 print( '*' x 80, "\n" );
-
-print <<'EOF';
-
-                    ____      _        _           _
-                   / ___|__ _| |_ __ _| |_   _ ___| |_
-                  | |   / _` | __/ _` | | | | / __| __|
-                  | |__| (_| | || (_| | | |_| \__ \ |_
-                   \____\__ _|\__\__ _|_|\__  |___/\__|
-                                         |___/  carpe diem!
-
-EOF
 
 eval "use FCGI";
 print qq/ Install "FCGI" for FastCGI support.\n/ if $@;
@@ -82,6 +72,7 @@ print <<"EOF";
     Install Task::Catalyst to get everything you need to start writing
     serious applications with Catalyst.
 
+        perl -MCPANPLUS -e 'install Task::Catalyst'
         perl -MCPAN -e 'install Task::Catalyst'
 
 
