@@ -1845,6 +1845,8 @@ Wiki:
 
 =head1 SEE ALSO
 
+=head2 L<Task::Catalyst> - All you need to start with Catalyst
+
 =head2 L<Catalyst::Manual> - The Catalyst Manual
 
 =head2 L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
