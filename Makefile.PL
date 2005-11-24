@@ -39,7 +39,7 @@ requires('inc::Module::Install');
 requires('ExtUtils::AutoInstall');
 
 features(
-    'Apache Support' => [
+    'Apache/mod_perl Support' => [
         -default                   => 0,
         'Catalyst::Engine::Apache' => '1.00'
     ],
@@ -52,8 +52,8 @@ features(
         -default => 0,
         'PAR'    => 0
     ],
-    'CPANPLUS' => [
-        -default   => 0,
+    'CPANPLUS (for easier installations)' => [
+        -default   => 1,
         'CPANPLUS' => 0
     ],
 );
