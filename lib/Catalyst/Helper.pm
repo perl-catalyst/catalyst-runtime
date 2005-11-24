@@ -98,7 +98,7 @@ sub mk_app {
         $self->_mk_test;
         $self->_mk_create;
     }
-    return 1;
+    return $self->{dir};
 }
 
 =head3 mk_component
@@ -115,7 +115,8 @@ sub mk_component {
     $self->{author} = $self->{author} = $ENV{'AUTHOR'}
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'A clever guy';
-    $self->{base} = File::Spec->catdir( $FindBin::Bin, '..' );
+    $self->{base} ||= File::Spec->catdir( $FindBin::Bin, '..' );
+    die $self->{base};
     unless ( $_[0] =~ /^(?:model|view|controller)$/i ) {
         my $helper = shift;
         my @args   = @_;
