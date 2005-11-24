@@ -5,6 +5,7 @@ use Module::Build;
 use Path::Class;
 use File::Find 'find';
 
+our @ISA;
 eval "require Module::Build";
 die "Please install Module::Build\n" if $@;
 push @ISA, 'Module::Build';
