@@ -50,6 +50,11 @@ sub execute {
     return $c->SUPER::execute(@_);
 }
 
+sub class_forward_test_method {
+    my ( $self, $c ) = @_;
+    $c->response->headers->header( 'X-Class-Forward-Test-Method' => 1 );
+}
+
 {
     no warnings 'redefine';
     sub Catalyst::Log::error { }

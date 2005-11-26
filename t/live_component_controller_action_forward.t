@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 44 * $iters;
+use Test::More tests => 47 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -222,4 +222,17 @@ sub run_tests {
             'Content is a serialized Catalyst::Request'
         );
     }
+
+    # test class forwards
+    {
+        ok(
+            my $response = request(
+                'http://localhost/action/forward/class_forward_test_action'),
+            'Request'
+        );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->header('X-Class-Forward-Test-Method'), 1,
+            'Test Method' );
+    }
+
 }

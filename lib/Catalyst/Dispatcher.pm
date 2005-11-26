@@ -120,8 +120,10 @@ sub forward {
 
     unless ($result) {
 
-        my $class  = ref($command) || ref( $c->component($command) );
-        my $method = shift         || 'process';
+        my $class = ref($command)
+          || ref( $c->component($command) )
+          || $c->component($command);
+        my $method = shift || 'process';
 
         unless ($class) {
             my $error =

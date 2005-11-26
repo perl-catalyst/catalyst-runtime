@@ -54,7 +54,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.58';
+our $VERSION = '5.59';
 
 sub import {
     my ( $class, @arguments ) = @_;

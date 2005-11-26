@@ -15,7 +15,7 @@ sub two : Private {
 
 sub three : Local {
     my ( $self, $c ) = @_;
-    $c->forward($self, 'four');
+    $c->forward( $self, 'four' );
 }
 
 sub four : Private {
@@ -31,7 +31,7 @@ sub five : Local {
 sub jojo : Local {
     my ( $self, $c ) = @_;
     $c->forward('one');
-    $c->forward($c->controller('Action::Forward'), 'three');
+    $c->forward( $c->controller('Action::Forward'), 'three' );
 }
 
 sub inheritance : Local {
@@ -65,19 +65,24 @@ sub args : Local {
 
 sub args_embed_relative : Local {
     my ( $self, $c ) = @_;
-    $c->forward( 'embed/ok' );
+    $c->forward('embed/ok');
 }
 
 sub args_embed_absolute : Local {
     my ( $self, $c ) = @_;
-    $c->forward( '/action/forward/embed/ok' );
+    $c->forward('/action/forward/embed/ok');
 }
 
 sub embed : Local {
     my ( $self, $c, $ok ) = @_;
-    
+
     $ok ||= 'not ok';
-    $c->res->body( $ok );
+    $c->res->body($ok);
+}
+
+sub class_forward_test_action : Local {
+    my ( $self, $c ) = @_;
+    $c->forward(qw/TestApp class_forward_test_method/);
 }
 
 1;
