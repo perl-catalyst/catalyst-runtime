@@ -110,9 +110,9 @@ sub prepare_path {
     local (*ENV) = $self->env || \%ENV;
 
     my $scheme = $c->request->secure ? 'https' : 'http';
-    my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
-    my $port      = $ENV{SERVER_PORT} || 80;
-    my $base_path = $ENV{SCRIPT_NAME} || '/';
+    my $host      = $ENV{HTTP_HOST}    || $ENV{SERVER_NAME};
+    my $port      = $ENV{SERVER_PORT}  || 80;
+    my $base_path = $ENV{REDIRECT_URL} || $ENV{SCRIPT_NAME} || '/';
 
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
