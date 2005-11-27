@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.59
+        - Fixed shebang line for generated scripts
         - Added REDIRECT_URL support
         - Fixed forward to classes ($c->forward(qw/MyApp foo/))
 
