@@ -117,7 +117,6 @@ sub mk_component {
       || eval { @{ [ getpwuid($<) ] }[6] }
       || 'A clever guy';
     $self->{base} ||= File::Spec->catdir( $FindBin::Bin, '..' );
-    die $self->{base};
     unless ( $_[0] =~ /^(?:model|view|controller)$/i ) {
         my $helper = shift;
         my @args   = @_;
