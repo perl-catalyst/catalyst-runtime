@@ -102,6 +102,7 @@ sub finalize_error {
               . '</code></p>'
         } @{ $c->error };
         $error ||= 'No output';
+        $error = "<pre>$error</pre>";
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
         $name = "<h1>$name</h1>";
 
