@@ -4,7 +4,8 @@ This file documents the revision history for Perl extension Catalyst.
         - Fixed shebang line for generated scripts
         - Added REDIRECT_URL support
         - Fixed forward to classes ($c->forward(qw/MyApp foo/))
-        - wrap use block in begin to quelch C:C3 warnings
+        - Wrap use block in begin to quelch C:C3 warnings
+        - Removed scrollbar from debug output
 
 5.58    2005-11-24 10:51:00
         - Added ExtUtils::AutoInstall support

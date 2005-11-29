@@ -219,7 +219,6 @@ EOF
             display: block;
             margin: 1em 0;
             overflow: auto;
-            white-space: pre;
         }
         div.name h1, div.error p {
             margin: 0;
