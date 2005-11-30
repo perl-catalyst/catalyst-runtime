@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Fixed forward to classes ($c->forward(qw/MyApp foo/))
         - Wrap use block in begin to quelch C:C3 warnings
         - Removed scrollbar from debug output
+        - Fixed catalyst_par_core() and catalyst_par_multiarch()
 
 5.58    2005-11-24 10:51:00
         - Added ExtUtils::AutoInstall support

@@ -88,7 +88,7 @@ sub catalyst_par { Catalyst::Module::Install::_catalyst_par(@_) }
 
 sub catalyst_par_core {
     my ( $self, $core ) = @_;
-    $core ? ( $CORE = $core ) : $core++;
+    $core ? ( $CORE = $core ) : $CORE++;
 }
 
 =head2 catalyst_par_classes(@clases)
@@ -115,7 +115,7 @@ sub catalyst_par_engine {
 
 sub catalyst_par_multiarch {
     my ( $self, $multiarch ) = @_;
-    $multiarch ? ( $MULTIARCH = $multiarch ) : $multiarch++;
+    $multiarch ? ( $MULTIARCH = $multiarch ) : $MULTIARCH++;
 }
 
 =head2 catalyst_par_script($script)
