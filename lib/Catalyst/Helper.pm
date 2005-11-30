@@ -803,7 +803,9 @@ if ( $debug ) {
     $ENV{CATALYST_DEBUG} = 1;
 }
 
-use [% name %];
+# This is require instead of use so that the engine may be
+# changed above for Restarter support.
+require [% name %];
 
 [% name %]->run( $port, $host, {
     argv          => \@argv,
