@@ -53,7 +53,7 @@ features(
         'PAR'    => 0
     ],
     'CPANPLUS (for easier installations)' => [
-        -default   => 1,
+        -default   => 0,
         'CPANPLUS' => 0
     ],
 );
