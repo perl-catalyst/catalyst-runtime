@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Catalyst.
 
 5.60
         - Fixed restarter.
+        - Added a warning if you attempt to retrieve a parameter
+          using $c->req->params('foo').
 
 5.59    2005-11-30 13:25:00
         - Fixed shebang line for generated scripts

@@ -329,7 +329,16 @@ Shortcut for $req->parameters.
 sub parameters {
     my ( $self, $params ) = @_;
     $self->{_context}->prepare_body;
-    $self->{parameters} = $params if $params;
+    if ( $params ) {
+        if ( ref $params ) {
+            $self->{parameters} = $params;
+        }
+        else {
+            $self->{_context}->log->warn( 
+                "Attempt to retrieve '$params' with req->params(), " .
+                "you probably meant to call req->param('$params')" );
+        }
+    }
     return $self->{parameters};
 }
 
