@@ -1,12 +1,24 @@
 use inc::Module::Install;
 
+# ExtUtils::AutoInstall Bootstrap Code, version 7.
+BEGIN{my$p='ExtUtils::AutoInstall';my$v=0.45;$p->VERSION||0>=$v
+or+eval"use $p $v;1"or+do{my$e=$ENV{PERL_EXTUTILS_AUTOINSTALL};
+(!defined($e)||$e!~m/--(?:default|skip|testonly)/and-t STDIN or
+eval"use ExtUtils::MakeMaker;WriteMakefile(PREREQ_PM=>{'$p',$v}
+);1"and exit)and print"==> $p $v required. Install it from CP".
+"AN? [Y/n] "and<STDIN>!~/^n/i and print"*** Installing $p\n"and
+do{if (eval '$>' and lc(`sudo -V`) =~ /version/){system('sudo',
+$^X,"-MCPANPLUS","-e","CPANPLUS::install $p");eval"use $p $v;1"
+||system('sudo', $^X, "-MCPAN", "-e", "CPAN::install $p")}eval{
+require CPANPLUS;CPANPLUS::install$p};eval"use $p $v;1"or eval{
+require CPAN;CPAN::install$p};eval"use $p $v;1"||die"*** Please
+manually install $p $v from cpan.org first...\n"}}}
+
 name('Catalyst');
 abstract('Catalyst Web Framework');
 author('Sebastian Riedel');
 version_from('lib/Catalyst.pm');
 license('perl');
-
-include('ExtUtils::AutoInstall');
 
 requires( 'perl'               => '5.8.1' );
 requires( 'UNIVERSAL::require' => "0.10" );
@@ -36,7 +48,6 @@ requires('Tree::Simple::Visitor::FindByPath');
 requires( 'URI' => 1.35 );
 requires('File::Copy::Recursive');
 requires('Module::Install::Admin');
-requires('ExtUtils::AutoInstall');
 
 features(
     'Apache/mod_perl Support' => [
