@@ -1,7 +1,11 @@
 package Module::Install::Catalyst;
 
 use strict;
-use base 'Module::Install::Base';
+
+our @ISA;
+require Module::Install::Base;
+@ISA = qw/Module::Install::Base/;
+
 use File::Find;
 use FindBin;
 use File::Copy::Recursive 'rcopy';
