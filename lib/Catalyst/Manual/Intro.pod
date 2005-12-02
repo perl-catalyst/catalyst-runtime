@@ -448,7 +448,7 @@ controller it's in.
 C<index> is much like C<default> except that it takes no arguments
 and it is weighted slightly higher in the matching process. It is
 useful as a static entry point to a controller, e.g. to have a static
-welcome page.
+welcome page. Note that it's also weighted higher than Path.
 
 =item * B<begin : Private>
 

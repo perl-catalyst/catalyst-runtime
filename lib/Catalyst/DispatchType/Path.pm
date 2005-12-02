@@ -25,7 +25,8 @@ sub list {
     my $paths = Text::SimpleTable->new( [ 36, 'Path' ], [ 37, 'Private' ] );
     for my $path ( sort keys %{ $self->{paths} } ) {
         my $action = $self->{paths}->{$path};
-        $paths->row( "/$path", "/$action" );
+        $path = "/$path" unless $path eq '/';
+        $paths->row( "$path", "/$action" );
     }
     $c->log->debug( "Loaded Path actions:\n" . $paths->draw )
       if ( keys %{ $self->{paths} } );
@@ -38,6 +39,7 @@ sub list {
 sub match {
     my ( $self, $c, $path ) = @_;
 
+    $path ||= '/';
     if ( my $action = $self->{paths}->{$path} ) {
         $c->req->action($path);
         $c->req->match($path);
@@ -62,7 +64,7 @@ sub register {
     foreach my $r ( @{ $attrs->{Path} || [] } ) {
         unless ($r) {
             $r = $action->namespace;
-            $r = '' if $r eq '/';
+            $r = '/' unless $r;
         }
         elsif ( $r !~ m!^/! ) {    # It's a relative path
             $r = $action->namespace . "/$r";
@@ -92,6 +94,7 @@ sub register {
 sub register_path {
     my ( $self, $c, $path, $action ) = @_;
     $path =~ s!^/!!;
+    $path = '/' unless $path;
     $self->{paths}{$path} = $action;
 }
 

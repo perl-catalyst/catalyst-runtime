@@ -21,10 +21,10 @@ __PACKAGE__->mk_accessors(
 );
 
 # Preload these action types
-our @PRELOAD = qw/Path Regex/;
+our @PRELOAD = qw/Index Path Regex/;
 
 # Postload these action types
-our @POSTLOAD = qw/Index Default/;
+our @POSTLOAD = qw/Default/;
 
 =head1 NAME
 
@@ -178,12 +178,13 @@ sub prepare_action {
     my @path = split /\//, $c->req->path;
     $c->req->args( \my @args );
 
-    push( @path, '/' ) unless @path;    # Root action
+    unshift( @path, '' );    # Root action
 
   DESCEND: while (@path) {
         $path = join '/', @path;
+        $path =~ s#^/##;
 
-        $path = '' if $path eq '/';     # Root action
+        $path = '' if $path eq '/';    # Root action
 
         # Check out dispatch types to see if any will handle the path at
         # this level
