@@ -1,5 +1,3 @@
-use inc::Module::Install;
-
 # ExtUtils::AutoInstall Bootstrap Code, version 7.
 BEGIN {
     my $p = 'ExtUtils::AutoInstall';
@@ -37,6 +35,8 @@ manually install $p $v from cpan.org first...\n";
           }
       }
 }
+
+use inc::Module::Install;
 
 name('Catalyst');
 abstract('Catalyst Web Framework');
