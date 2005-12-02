@@ -606,7 +606,7 @@ license('perl');
 
 include('ExtUtils::AutoInstall');
 
-requires( Catalyst => '5.58' );
+requires( Catalyst => '5.60' );
 
 catalyst_files();
 
