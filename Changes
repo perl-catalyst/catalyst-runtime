@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Fixed restarter and -d debug switch in server.pl.
         - Added a warning if you attempt to retrieve a parameter
           using $c->req->params('foo').
+        - Fixed the Module::Install::Catalyst @ISA bug
 
 5.59    2005-11-30 13:25:00
         - Fixed shebang line for generated scripts
