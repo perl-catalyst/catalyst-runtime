@@ -555,6 +555,8 @@ Catalyst based application.
 
 =head1 METHODS
 
+=cut
+
 =head2 default
 
 =cut
