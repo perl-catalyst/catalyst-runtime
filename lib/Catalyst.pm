@@ -43,7 +43,7 @@ our $DETACH    = "catalyst_detach\n";
 require Module::Pluggable::Fast;
 
 # Helper script generation
-our $CATALYST_SCRIPT_GEN = 21;
+our $CATALYST_SCRIPT_GEN = 22;
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
@@ -54,7 +54,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.59';
+our $VERSION = '5.60';
 
 sub import {
     my ( $class, @arguments ) = @_;
