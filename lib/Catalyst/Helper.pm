@@ -803,8 +803,8 @@ if ( $debug ) {
     $ENV{CATALYST_DEBUG} = 1;
 }
 
-# This is require instead of use so that the engine may be
-# changed above for Restarter support.
+# This is require instead of use so that the above environment
+# variables can be set at runtime.
 require [% name %];
 
 [% name %]->run( $port, $host, {

@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.60
+5.60    2005-12-01 22:15:00
         - Fixed Path and index actions in the appclass,
           including those that attach to /
         - Index is now weighted higher than Path
