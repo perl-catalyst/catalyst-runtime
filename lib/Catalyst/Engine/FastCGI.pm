@@ -57,7 +57,7 @@ sub run {
             umask($old_umask);
         }
     }
-    else {
+    elsif ( $^O ne 'MSWin32' ) {
         -S STDIN
           or die "STDIN is not a socket; specify a listen location";
     }
