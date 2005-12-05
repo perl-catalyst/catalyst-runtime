@@ -1,11 +1,19 @@
 # CGI
 <IfModule @CGI_MODULE@>
     ScriptAlias /cgi/ @ServerRoot@/tmp/TestApp/script/testapp_cgi.pl/
+
+    # REDIRECT_URL test
+    <IfModule mod_rewrite.c>
+        <Location /rewrite>
+            RewriteEngine on
+            RewriteRule /rewrite/(.*) /cgi/$1
+        </Location>
+    </IfModule>
 </IfModule>
 
 # FastCGI
 <IfModule mod_fastcgi.c>
     FastCgiIpcDir @ServerRoot@/tmp/tmp
-    FastCgiServer @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl -idle-timeout 300 -processes 5
+    FastCgiServer @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl -idle-timeout 300 -processes 1
     ScriptAlias /fastcgi/ @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl/
 </IfModule>

@@ -112,7 +112,14 @@ sub prepare_path {
     my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
     my $port      = $ENV{SERVER_PORT} || 80;
-    my $base_path = $ENV{SCRIPT_NAME} || '/';
+    my $base_path;
+    if ( exists $ENV{REDIRECT_URL} ) {
+        $base_path = $ENV{REDIRECT_URL};
+        $base_path =~ s/$ENV{PATH_INFO}$//;
+    }
+    else {
+        $base_path = $ENV{SCRIPT_NAME} || '/';
+    }
 
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
