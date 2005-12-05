@@ -76,7 +76,7 @@ requires('Module::Install::Admin');
 features(
     'Apache/mod_perl Support' => [
         -default                   => 0,
-        'Catalyst::Engine::Apache' => '1.00'
+        'Catalyst::Engine::Apache' => '1.01'
     ],
     'FastCGI Support' => [
         -default            => 0,
