@@ -54,7 +54,7 @@ sub catalyst_files {
         push @files, $name;
     }
     closedir CATDIR;
-    my @path = split '::', $self->name;
+    my @path = split '-', $self->name;
     for my $orig (@files) {
         my $path = File::Spec->catdir( 'blib', 'lib', @path, $orig );
         rcopy( $orig, $path );
