@@ -249,7 +249,7 @@ EOF
     $c->res->{body} .= ( ' ' x 512 );
 
     # Return 500
-    $c->res->status(500) unless $c->res->status;
+    $c->res->status(500);
 }
 
 =head2 $self->finalize_headers($c)
