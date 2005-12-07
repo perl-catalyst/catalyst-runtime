@@ -46,6 +46,8 @@ feature 'CPANPLUS (for easier installations)',
   -default   => 0,
   'CPANPLUS' => 0;
 
+bundle 'Module::Install' => '0.40';
+
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
