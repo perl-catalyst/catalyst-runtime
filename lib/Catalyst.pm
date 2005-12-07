@@ -10,6 +10,7 @@ use Catalyst::Request;
 use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
+use File::stat;
 use NEXT;
 use Text::SimpleTable;
 use Path::Class;
@@ -1015,7 +1016,20 @@ sub finalize_headers {
 
     # Content-Length
     if ( $c->response->body && !$c->response->content_length ) {
-        $c->response->content_length( bytes::length( $c->response->body ) );
+        # get the length from a filehandle
+        if ( ref $c->response->body && $c->response->body->can('read') ) {
+            if ( my $stat = stat $c->response->body ) {
+                $c->response->content_length( $stat->size );
+            }
+            else {
+                $c->log->warn( 
+                    'Serving filehandle without a content-length' );
+            }
+        }
+        else {
+            $c->response->content_length( 
+                bytes::length( $c->response->body ) );
+        }
     }
 
     # Errors

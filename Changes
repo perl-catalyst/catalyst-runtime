@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.62
+        - Automatically determine Content-Length when serving a
+          filehandle.
         - Exceptions now return status 500
         - Updated for Module::Install 0.40
         - Fixed additional file installation for multi level app names
