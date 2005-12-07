@@ -600,21 +600,16 @@ it under the same terms as Perl itself.
 __makefile__
 use inc::Module::Install;
 
-name('[% dir %]');
-abstract('Catalyst Application');
-author('[% author %]');
-version_from('[% path %]');
-license('perl');
+name '[% dir %]';
+all_from '[% path %]';
 
-include('ExtUtils::AutoInstall');
+requires Catalyst => '5.62';
 
-requires( Catalyst => '5.60' );
+catalyst_files;
 
-catalyst_files();
-
-install_script( glob('script/*.pl') );
-auto_install();
-&WriteAll;
+install_script glob('script/*.pl');
+auto_install;
+WriteAll;
 __readme__
 Run script/[% appprefix %]_server.pl to test the application.
 __changes__

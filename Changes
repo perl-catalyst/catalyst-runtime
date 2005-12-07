@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.62
+        - Updated for Module::Install 0.40
         - Fixed additional file installation for multi level app names
         - Added REDIRECT_URL support for applications running behind
           a RewriteRule in Apache. (Carl Franks)
