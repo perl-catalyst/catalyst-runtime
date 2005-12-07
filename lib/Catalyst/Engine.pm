@@ -104,7 +104,7 @@ sub finalize_error {
         $error ||= 'No output';
         $error = "<pre>$error</pre>";
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
-        $name = "<h1>$name</h1>";
+        $name  = "<h1>$name</h1>";
 
         # Don't show context in the dump
         delete $c->req->{_context};
@@ -142,12 +142,10 @@ EOF
 <pre>
 (en) Please come back later
 (de) Bitte versuchen sie es spaeter nocheinmal
-(nl) Gelieve te komen later terug
+(at) Konnten's bitt'schoen spaeter nochmal reinschauen
 (no) Vennligst prov igjen senere
-(fr) Veuillez revenir plus tard
-(es) Vuelto por favor mas adelante
-(pt) Voltado por favor mais tarde
-(it) Ritornato prego più successivamente
+(dk) Venligst prov igen senere
+(pl) Prosze sprobowac pozniej
 </pre>
 
         $name = '';
@@ -246,6 +244,12 @@ EOF
 </body>
 </html>
 
+
+    # Trick IE
+    $c->res->{body} .= ( ' ' x 512 );
+
+    # Return 500
+    $c->res->status(500) unless $c->res->status;
 }
 
 =head2 $self->finalize_headers($c)
