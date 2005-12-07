@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Added REDIRECT_URL support for applications running behind
           a RewriteRule in Apache. (Carl Franks)
         - Fixed FastCGI engine under win32. (Carl Franks)
+        - Bugfix for $c->model and friends (defined).
 
 5.61    2005-12-02 00:00:00
         - Fixed ExtUtils::AutoInstall Bootstrap Code in Makefile.PL

@@ -388,7 +388,7 @@ Gets a L<Catalyst::Controller> instance by name.
 sub controller {
     my ( $c, $name ) = @_;
     my $controller = $c->comp("Controller::$name");
-    return $controller if $controller;
+    return $controller if defined $controller;
     return $c->comp("C::$name");
 }
 
@@ -403,7 +403,7 @@ Gets a L<Catalyst::Model> instance by name.
 sub model {
     my ( $c, $name ) = @_;
     my $model = $c->comp("Model::$name");
-    return $model if $model;
+    return $model if defined $model;
     return $c->comp("M::$name");
 }
 
@@ -418,7 +418,7 @@ Gets a L<Catalyst::View> instance by name.
 sub view {
     my ( $c, $name ) = @_;
     my $view = $c->comp("View::$name");
-    return $view if $view;
+    return $view if defined $view;
     return $c->comp("V::$name");
 }
 
