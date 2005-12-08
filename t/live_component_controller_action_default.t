@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 12*$iters;
+use Test::More tests => 12 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -29,7 +29,7 @@ sub run_tests {
           TestApp::Controller::Action::Default->begin
           TestApp::Controller::Action::Default->default
           TestApp::View::Dump::Request->process
-	  TestApp->end
+          TestApp->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -53,16 +53,20 @@ sub run_tests {
         );
 
         ok( $response = request('http://localhost/foo/bar/action'), 'Request' );
-        is( $response->code, 404, 'Invalid URI returned 404' );
+        is( $response->code, 500, 'Invalid URI returned 500' );
     }
-    
+
     # test that args are passed properly to default
     {
         my $creq;
-        my $expected = [ qw/action default arg1 arg2/ ];
-        
-        ok( my $response = request('http://localhost/action/default/arg1/arg2'), 'Request' );
-        ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
+        my $expected = [qw/action default arg1 arg2/];
+
+        ok( my $response = request('http://localhost/action/default/arg1/arg2'),
+            'Request' );
+        ok(
+            eval '$creq = ' . $response->content,
+            'Unserialize Catalyst::Request'
+        );
         is_deeply( $creq->{arguments}, $expected, 'Arguments ok' );
     }
 }
