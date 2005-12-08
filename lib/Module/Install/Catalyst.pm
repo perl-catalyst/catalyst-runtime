@@ -11,6 +11,8 @@ use FindBin;
 use File::Copy::Recursive 'rcopy';
 use File::Spec ();
 
+my $SAFETY = 0;
+
 our @IGNORE =
   qw/Build Build.PL Changes MANIFEST META.yml Makefile.PL Makefile README
   _build blib lib script t inc/;
@@ -96,6 +98,8 @@ sub catalyst_ignore {
 # Workaround for a namespace conflict
 sub catalyst_par {
     my ( $self, $par ) = @_;
+    return if $SAFETY;
+    $SAFETY++;
     print <<EOF;
 *** Module::Install::Catalyst
 EOF
