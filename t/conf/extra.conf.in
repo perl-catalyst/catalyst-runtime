@@ -16,4 +16,5 @@
     FastCgiIpcDir @ServerRoot@/tmp/tmp
     FastCgiServer @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl -idle-timeout 300 -processes 1
     ScriptAlias /fastcgi/ @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl/
+    Alias       /noslash  @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl
 </IfModule>

@@ -137,7 +137,7 @@ sub prepare_path {
         $port = $c->request->secure ? 443 : 80;
     }
 
-    my $path = $base_path . $ENV{PATH_INFO};
+    my $path = $base_path . ( $ENV{PATH_INFO} || '' );
     $path =~ s{^/+}{};
 
     my $uri = URI->new;
