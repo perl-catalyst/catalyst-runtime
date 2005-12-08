@@ -605,7 +605,7 @@ all_from '[% path %]';
 
 requires Catalyst => '5.62';
 
-catalyst_files;
+catalyst;
 
 install_script glob('script/*.pl');
 auto_install;

@@ -44,7 +44,7 @@ our $DETACH    = "catalyst_detach\n";
 require Module::Pluggable::Fast;
 
 # Helper script generation
-our $CATALYST_SCRIPT_GEN = 24;
+our $CATALYST_SCRIPT_GEN = 25;
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
@@ -1016,19 +1016,18 @@ sub finalize_headers {
 
     # Content-Length
     if ( $c->response->body && !$c->response->content_length ) {
+
         # get the length from a filehandle
         if ( ref $c->response->body && $c->response->body->can('read') ) {
             if ( my $stat = stat $c->response->body ) {
                 $c->response->content_length( $stat->size );
             }
             else {
-                $c->log->warn( 
-                    'Serving filehandle without a content-length' );
+                $c->log->warn('Serving filehandle without a content-length');
             }
         }
         else {
-            $c->response->content_length( 
-                bytes::length( $c->response->body ) );
+            $c->response->content_length( bytes::length( $c->response->body ) );
         }
     }
 

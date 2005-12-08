@@ -35,6 +35,16 @@ L<Module::Install> extension for Catalyst.
 
 =head1 METHODS
 
+=head2 catalyst
+
+=cut
+
+sub catalyst {
+    my $self = shift;
+    $self->catalyst_files;
+    $self->catalyst_par;
+}
+
 =head2 catalyst_files
 
 =cut
