@@ -43,8 +43,14 @@ L<Module::Install> extension for Catalyst.
 
 sub catalyst {
     my $self = shift;
+    print <<EOF;
+*** Module::Install::Catalyst
+EOF
     $self->catalyst_files;
     $self->catalyst_par;
+    print <<EOF;
+*** Module::Install::Catalyst finished.
+EOF
 }
 
 =head2 catalyst_files
@@ -100,9 +106,6 @@ sub catalyst_par {
     my ( $self, $par ) = @_;
     return if $SAFETY;
     $SAFETY++;
-    print <<EOF;
-*** Module::Install::Catalyst
-EOF
     my $name  = $self->name;
     my $usage = $USAGE;
     $usage =~ s/"/\\"/g;
@@ -114,7 +117,6 @@ catalyst_par :: all
 EOF
     print <<EOF;
 Please run "make catalyst_par" to create the PAR package!
-*** Module::Install::Catalyst finished.
 EOF
 }
 
