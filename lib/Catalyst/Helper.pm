@@ -734,7 +734,7 @@ pod2usage(1) if $help;
                  (requires -listen)
    -d -daemon    daemonize (requires -listen)
    -M -manager   specify alternate process manager
-                 (FCGI::ProcessManager sub-class)
+                 (FCGI::ProcManager sub-class)
                  or empty string to disable
 
 =head1 DESCRIPTION
