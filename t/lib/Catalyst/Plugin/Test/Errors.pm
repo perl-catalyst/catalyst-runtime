@@ -21,7 +21,10 @@ sub error {
         $c->response->status(500);
     }
 
-    $c->response->headers->push_header( 'X-Catalyst-Error' => $_[0] );
+    my $error = $_[0];
+    $error =~ s/\n/, /g;
+
+    $c->response->headers->push_header( 'X-Catalyst-Error' => $error );
 
     $c->NEXT::error(@_);
 }
