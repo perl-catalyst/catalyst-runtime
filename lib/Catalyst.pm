@@ -923,6 +923,7 @@ sub execute {
             push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
         }
     }
+    my $last = ${ $c->stack }[-1];
     pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
@@ -931,7 +932,9 @@ sub execute {
         else {
             unless ( ref $error ) {
                 chomp $error;
-                $error = qq/Caught exception "$error"/;
+                my $class = $last->class;
+                my $name  = $last->name;
+                $error = qq/Caught exception in $class->$name "$error"/;
             }
             $c->error($error);
             $c->state(0);

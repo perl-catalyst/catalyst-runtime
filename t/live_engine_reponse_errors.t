@@ -54,7 +54,7 @@ close STDERR;    # i'm naughty :)
     );
     like(
         $response->header('X-Catalyst-Error'),
-        qr/^Caught exception "I'm going to die!"$/,
+        qr/"I'm going to die!"$/,
         'Catalyst Error'
     );
 }
