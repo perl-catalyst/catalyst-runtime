@@ -7,7 +7,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Automatically determine Content-Length when serving a
           filehandle.
         - Exceptions now return status 500
-        - Updated for Module::Install 0.40
+        - Updated for Module::Install 0.44
         - Fixed additional file installation for multi level app names
         - Added REDIRECT_URL support for applications running behind
           a RewriteRule in Apache. (Carl Franks)

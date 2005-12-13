@@ -30,7 +30,7 @@ requires 'Tree::Simple';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
-requires 'Module::Install::Admin' => '0.29';
+requires 'Module::Install::Admin::Bundle' => '0.04';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,
@@ -45,8 +45,6 @@ feature 'PAR Support',
 feature 'CPANPLUS (for easier installations)',
   -default   => 0,
   'CPANPLUS' => 0;
-
-bundle 'Module::Install' => '0.40';
 
 install_script glob('script/*.pl');
 auto_install;
