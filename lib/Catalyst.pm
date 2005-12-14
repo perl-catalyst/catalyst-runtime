@@ -592,7 +592,9 @@ EOF
 
         {
             no strict 'refs';
-            @plugins = grep { /^Catalyst::Plugin/ } @{"$class\::ISA"};
+            @plugins = 
+                map  { $_ . ' ' . ( $_->VERSION || '' ) }
+                grep { /^Catalyst::Plugin/ } @{"$class\::ISA"};
         }
 
         if (@plugins) {
