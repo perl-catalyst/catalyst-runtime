@@ -34,7 +34,7 @@ requires 'Module::Install::Admin::Bundle' => '0.04';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,
-  'Catalyst::Engine::Apache' => '1.02';
+  'Catalyst::Engine::Apache' => '1.03';
 
 feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
 
