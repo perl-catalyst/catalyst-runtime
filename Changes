@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.62
+        - Static::Simple: Fixed bug in ignore_dirs under win32.
         - Display version numbers of loaded plugins. (Curtis Poe)
         - Added class and method for catched exceptions messages
         - Updated PAR support to use "make catalyst_par",

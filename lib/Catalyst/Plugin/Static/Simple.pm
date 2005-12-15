@@ -9,7 +9,7 @@ use IO::File;
 use MIME::Types;
 use NEXT;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 __PACKAGE__->mk_classdata( qw/_static_mime_types/ );
 __PACKAGE__->mk_accessors( qw/_static_file
@@ -130,13 +130,13 @@ sub _locate_static_file {
                 next DIR_CHECK;
             }
         } else {
-            $dir =~ s/\/$//xms;
+            $dir =~ s/(\/|\\)$//xms;
             if ( -d $dir && -f $dir . '/' . $path ) {
                 
                 # do we need to ignore the file?
                 for my $ignore ( @{ $c->config->{static}->{ignore_dirs} } ) {
-                    $ignore =~ s{/$}{};
-                    if ( $path =~ /^$ignore\// ) {
+                    $ignore =~ s{(/|\\)$}{};
+                    if ( $path =~ /^$ignore(\/|\\)/ ) {
                         $c->_debug_msg( "Ignoring directory `$ignore`" )
                             if ( $c->config->{static}->{debug} );
                         next DIR_CHECK;
