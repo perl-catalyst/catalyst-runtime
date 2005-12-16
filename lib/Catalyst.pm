@@ -1559,7 +1559,7 @@ sub setup_engine {
         $engine = 'Catalyst::Engine::' . $ENV{ uc($class) . '_ENGINE' };
     }
 
-    if ( !$engine && $ENV{MOD_PERL} ) {
+    if ( $ENV{MOD_PERL} ) {
 
         # create the apache method
         {
@@ -1575,21 +1575,25 @@ sub setup_engine {
 
         if ( $software eq 'mod_perl' ) {
 
-            if ( $version >= 1.99922 ) {
-                $engine = 'Catalyst::Engine::Apache2::MP20';
-            }
+            if ( !$engine ) {
+                
+                if ( $version >= 1.99922 ) {
+                    $engine = 'Catalyst::Engine::Apache2::MP20';
+                }
+    
+                elsif ( $version >= 1.9901 ) {
+                    $engine = 'Catalyst::Engine::Apache2::MP19';
+                }
+    
+                elsif ( $version >= 1.24 ) {
+                    $engine = 'Catalyst::Engine::Apache::MP13';
+                }
+    
+                else {
+                    Catalyst::Exception->throw( message =>
+                          qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
+                }
 
-            elsif ( $version >= 1.9901 ) {
-                $engine = 'Catalyst::Engine::Apache2::MP19';
-            }
-
-            elsif ( $version >= 1.24 ) {
-                $engine = 'Catalyst::Engine::Apache::MP13';
-            }
-
-            else {
-                Catalyst::Exception->throw( message =>
-                      qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
             }
 
             # install the correct mod_perl handler
