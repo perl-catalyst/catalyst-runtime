@@ -30,7 +30,7 @@ requires 'Tree::Simple';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
-requires 'Module::Install::Admin::Bundle' => '0.04';
+requires 'Module::Install::Admin' => '0.45';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,
