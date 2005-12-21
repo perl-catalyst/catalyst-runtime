@@ -599,7 +599,7 @@ C<end> method; see L<Catalyst::Plugin::FillInForm>).
             $c->stash->{errors}   = $c->error;
             $c->stash->{template} = 'errors.tt';
             $c->forward('MyApp::View::TT');
-            $c->{error} = [];
+            $c->error(0);
         }
     
         return 1 if $c->response->status =~ /^3\d\d$/;
