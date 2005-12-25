@@ -525,7 +525,8 @@ use warnings;
 # Set flags and add plugins for the application
 #
 #         -Debug: activates the debug mode for very useful log messages
-# Static::Simple: will serve static files from the applications root directory
+# Static::Simple: will serve static files from the application's root 
+# directory
 #
 use Catalyst qw/-Debug Static::Simple/;
 
