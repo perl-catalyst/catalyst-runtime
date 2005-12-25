@@ -784,7 +784,7 @@ sub welcome_message {
                  <p>Welcome to the wonderful world of Catalyst.
                     This <a href="http://en.wikipedia.org/wiki/MVC">MVC</a>
                     framework will make web development something you had
-                    never expected it to be: Fun, rewarding and quick.</p>
+                    never expected it to be: Fun, rewarding, and quick.</p>
                  <h2>What to do now?</h2>
                  <p>That really depends  on what <b>you</b> want to do.
                     We do, however, provide you with a few starting points.</p>
@@ -795,12 +795,12 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.po
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
                     helper scripts to generate <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AController%3A%3A&amp;mode=all">controllers</a>,
-                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&amp;mode=all">models</a> and
-                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&amp;mode=all">views</a>,
+                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&amp;mode=all">models</a>, and
+                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&amp;mode=all">views</a>;
                     they can save you a lot of work.</p>
                     <pre><code>script/${prefix}_create.pl -help</code></pre>
                     <p>Also, be sure to check out the vast and growing
-                    collection of <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3APlugin%3A%3A&amp;mode=all">plugins for Catalyst on CPAN</a>,
+                    collection of <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3APlugin%3A%3A&amp;mode=all">plugins for Catalyst on CPAN</a>;
                     you are likely to find what you need there.
                     </p>
 
