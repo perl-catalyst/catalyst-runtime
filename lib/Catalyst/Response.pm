@@ -56,6 +56,10 @@ Shortcut for $res->headers->content_length.
 
 Shortcut for $res->headers->content_type.
 
+This value is typically set by your view or plugin. For example,
+L<Catalyst::Plugin::Static::Simple> will guess the mime type based on the file
+it found, while L<Catalyst::View::TT> defaults to C<text/html>.
+
 =head2 $res->cookies
 
 Returns a reference to a hash containing cookies to be set. The keys of the
