@@ -17,6 +17,8 @@ use Path::Class;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
 use Scalar::Util qw/weaken/;
+use Tree::Simple qw/use_weak_refs/;
+use Tree::Simple::Visitor::FindByUID;
 use attributes;
 
 __PACKAGE__->mk_accessors(
@@ -896,6 +898,7 @@ sub execute {
       : ( caller(1) )[3];
 
     my $action = '';
+    
     if ( $c->debug ) {
         $action = "$code";
         $action = "/$action" unless $action =~ /\-\>/;
@@ -910,7 +913,41 @@ sub execute {
         }
 
         $action = "-> $action" if $callsub =~ /forward$/;
+
+        my $node = Tree::Simple->new( {
+            action  => $action,
+            elapsed => undef,       # to be filled in later
+        } );
+        $node->setUID( "$code" . $c->counter->{"$code"} );
+        
+        unless ( ( $code->name =~ /^_.*/ )
+            && ( !$c->config->{show_internal_actions} ) )
+        {         
+            # is this a root-level call or a forwarded call?
+            if ( $callsub =~ /forward$/ ) {
+           
+                # forward, locate the caller
+                if ( my $parent = $c->stack->[-1] ) {
+                    my $visitor = Tree::Simple::Visitor::FindByUID->new;
+                    $visitor->searchForUID( 
+                        "$parent" . $c->counter->{"$parent"} );
+                    $c->{stats}->accept( $visitor );
+                    if ( my $result = $visitor->getResult ) {
+                        $result->addChild( $node );
+                    }
+                }
+                else {
+                    # forward with no caller may come from a plugin
+                    $c->{stats}->addChild( $node );
+                }
+            }
+            else {
+                # root-level call
+                $c->{stats}->addChild( $node );
+            }
+        }
     }
+    
     push( @{ $c->stack }, $code );
     my $elapsed = 0;
     my $start   = 0;
@@ -922,14 +959,27 @@ sub execute {
         unless ( ( $code->name =~ /^_.*/ )
             && ( !$c->config->{show_internal_actions} ) )
         {
-            push @{ $c->{stats} }, [ $action, sprintf( '%fs', $elapsed ) ];
+            # FindByUID uses an internal die, so we save the existing error
+            my $error = $@;
+            
+            # locate the node in the tree and update the elapsed time
+            my $visitor = Tree::Simple::Visitor::FindByUID->new;
+            $visitor->searchForUID( "$code" . $c->counter->{"$code"} );
+            $c->{stats}->accept( $visitor );
+            if ( my $result = $visitor->getResult ) {
+                my $value = $result->getNodeValue;
+                $value->{elapsed} = sprintf( '%fs', $elapsed );
+                $result->setNodeValue( $value );
+            }
+            
+            # restore error
+            $@ = $error || undef;
         }
     }
     my $last = ${ $c->stack }[-1];
     pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-
         if ( $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
         else {
             unless ( ref $error ) {
@@ -1099,11 +1149,11 @@ sub handle_request {
     # Always expect worst case!
     my $status = -1;
     eval {
-        my @stats = ();
+        my $stats = ( $class->debug ) ? Tree::Simple->new : q{};
 
         my $handler = sub {
             my $c = $class->prepare(@arguments);
-            $c->{stats} = \@stats;
+            $c->{stats} = $stats;
             $c->dispatch;
             return $c->finalize;
         };
@@ -1116,8 +1166,16 @@ sub handle_request {
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
             my $t = Text::SimpleTable->new( [ 64, 'Action' ], [ 9, 'Time' ] );
-
-            for my $stat (@stats) { $t->row( $stat->[0], $stat->[1] ) }
+            
+            $stats->traverse( sub {
+                my $action = shift;
+                my $stat = $action->getNodeValue;
+                $t->row( 
+                    ( q{ } x $action->getDepth ) . $stat->{action},
+                    $stat->{elapsed} || '??'
+                );
+            } );
+            
             $class->log->info(
                 "Request took ${elapsed}s ($av/s)\n" . $t->draw );
         }
