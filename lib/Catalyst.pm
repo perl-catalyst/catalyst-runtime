@@ -892,15 +892,8 @@ sub execute {
     $class = $c->components->{$class} || $class;
     $c->state(0);
 
-    my $callsub =
-        ( caller(0) )[0]->isa('Catalyst::Action')
-      ? ( caller(2) )[3]
-      : ( caller(1) )[3];
-
-    my $action = '';
-    
     if ( $c->debug ) {
-        $action = "$code";
+        my $action = "$code";
         $action = "/$action" unless $action =~ /\-\>/;
         $c->counter->{"$code"}++;
 
@@ -911,6 +904,14 @@ sub execute {
             $c->state(0);
             return $c->state;
         }
+        
+        # determine if the call was the result of a forward
+        my $callsub_index = ( caller(0) )[0]->isa('Catalyst::Action') ? 2 : 1;
+        if ( ( caller($callsub_index) )[3] =~ /^NEXT/ ) {
+            # work around NEXT if execute was extended by a plugin
+            $callsub_index += 3;
+        }
+        my $callsub = ( caller($callsub_index) )[3];        
 
         $action = "-> $action" if $callsub =~ /forward$/;
 
