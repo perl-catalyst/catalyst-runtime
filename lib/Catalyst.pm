@@ -366,13 +366,23 @@ sub component {
 
             if ( exists $c->components->{$try} ) {
 
-                return $c->components->{$try};
+                my $comp = $c->components->{$try};
+                if ( ref $comp && $comp->can('ACCEPT_CONTEXT') ) {
+                    return $comp->ACCEPT_CONTEXT($c);
+                }
+                else { return $comp }
             }
         }
 
         foreach my $component ( keys %{ $c->components } ) {
-
-            return $c->components->{$component} if $component =~ /$name/i;
+            my $comp;
+            $comp = $c->components->{$component} if $component =~ /$name/i;
+            if ($comp) {
+                if ( ref $comp && $comp->can('ACCEPT_CONTEXT') ) {
+                    return $comp->ACCEPT_CONTEXT($c);
+                }
+                else { return $comp }
+            }
         }
 
     }
@@ -594,9 +604,9 @@ EOF
 
         {
             no strict 'refs';
-            @plugins = 
-                map  { $_ . ' ' . ( $_->VERSION || '' ) }
-                grep { /^Catalyst::Plugin/ } @{"$class\::ISA"};
+            @plugins =
+              map { $_ . ' ' . ( $_->VERSION || '' ) }
+              grep { /^Catalyst::Plugin/ } @{"$class\::ISA"};
         }
 
         if (@plugins) {
@@ -904,51 +914,57 @@ sub execute {
             $c->state(0);
             return $c->state;
         }
-        
+
         # determine if the call was the result of a forward
         my $callsub_index = ( caller(0) )[0]->isa('Catalyst::Action') ? 2 : 1;
         if ( ( caller($callsub_index) )[3] =~ /^NEXT/ ) {
+
             # work around NEXT if execute was extended by a plugin
             $callsub_index += 3;
         }
-        my $callsub = ( caller($callsub_index) )[3];        
+        my $callsub = ( caller($callsub_index) )[3];
 
         $action = "-> $action" if $callsub =~ /forward$/;
 
-        my $node = Tree::Simple->new( {
-            action  => $action,
-            elapsed => undef,       # to be filled in later
-        } );
+        my $node = Tree::Simple->new(
+            {
+                action  => $action,
+                elapsed => undef,     # to be filled in later
+            }
+        );
         $node->setUID( "$code" . $c->counter->{"$code"} );
-        
+
         unless ( ( $code->name =~ /^_.*/ )
             && ( !$c->config->{show_internal_actions} ) )
-        {         
+        {
+
             # is this a root-level call or a forwarded call?
             if ( $callsub =~ /forward$/ ) {
-           
+
                 # forward, locate the caller
                 if ( my $parent = $c->stack->[-1] ) {
                     my $visitor = Tree::Simple::Visitor::FindByUID->new;
-                    $visitor->searchForUID( 
+                    $visitor->searchForUID(
                         "$parent" . $c->counter->{"$parent"} );
-                    $c->{stats}->accept( $visitor );
+                    $c->{stats}->accept($visitor);
                     if ( my $result = $visitor->getResult ) {
-                        $result->addChild( $node );
+                        $result->addChild($node);
                     }
                 }
                 else {
+
                     # forward with no caller may come from a plugin
-                    $c->{stats}->addChild( $node );
+                    $c->{stats}->addChild($node);
                 }
             }
             else {
+
                 # root-level call
-                $c->{stats}->addChild( $node );
+                $c->{stats}->addChild($node);
             }
         }
     }
-    
+
     push( @{ $c->stack }, $code );
     my $elapsed = 0;
     my $start   = 0;
@@ -960,19 +976,20 @@ sub execute {
         unless ( ( $code->name =~ /^_.*/ )
             && ( !$c->config->{show_internal_actions} ) )
         {
+
             # FindByUID uses an internal die, so we save the existing error
             my $error = $@;
-            
+
             # locate the node in the tree and update the elapsed time
             my $visitor = Tree::Simple::Visitor::FindByUID->new;
             $visitor->searchForUID( "$code" . $c->counter->{"$code"} );
-            $c->{stats}->accept( $visitor );
+            $c->{stats}->accept($visitor);
             if ( my $result = $visitor->getResult ) {
                 my $value = $result->getNodeValue;
                 $value->{elapsed} = sprintf( '%fs', $elapsed );
-                $result->setNodeValue( $value );
+                $result->setNodeValue($value);
             }
-            
+
             # restore error
             $@ = $error || undef;
         }
@@ -1150,7 +1167,7 @@ sub handle_request {
     # Always expect worst case!
     my $status = -1;
     eval {
-        my $stats = ( $class->debug ) ? Tree::Simple->new : q{};
+        my $stats = ( $class->debug ) ? Tree::Simple->new: q{};
 
         my $handler = sub {
             my $c = $class->prepare(@arguments);
@@ -1167,16 +1184,16 @@ sub handle_request {
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
             my $t = Text::SimpleTable->new( [ 64, 'Action' ], [ 9, 'Time' ] );
-            
-            $stats->traverse( sub {
-                my $action = shift;
-                my $stat = $action->getNodeValue;
-                $t->row( 
-                    ( q{ } x $action->getDepth ) . $stat->{action},
-                    $stat->{elapsed} || '??'
-                );
-            } );
-            
+
+            $stats->traverse(
+                sub {
+                    my $action = shift;
+                    my $stat   = $action->getNodeValue;
+                    $t->row( ( q{ } x $action->getDepth ) . $stat->{action},
+                        $stat->{elapsed} || '??' );
+                }
+            );
+
             $class->log->info(
                 "Request took ${elapsed}s ($av/s)\n" . $t->draw );
         }
@@ -1519,7 +1536,7 @@ sub setup_components {
 
         my $instance;
 
-        eval { $instance = $component->new( $context, $config ); };
+        eval { $instance = $component->COMPONENT( $context, $config ); };
 
         if ( my $error = $@ ) {
 
@@ -1635,19 +1652,19 @@ sub setup_engine {
         if ( $software eq 'mod_perl' ) {
 
             if ( !$engine ) {
-                
+
                 if ( $version >= 1.99922 ) {
                     $engine = 'Catalyst::Engine::Apache2::MP20';
                 }
-    
+
                 elsif ( $version >= 1.9901 ) {
                     $engine = 'Catalyst::Engine::Apache2::MP19';
                 }
-    
+
                 elsif ( $version >= 1.24 ) {
                     $engine = 'Catalyst::Engine::Apache::MP13';
                 }
-    
+
                 else {
                     Catalyst::Exception->throw( message =>
                           qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );

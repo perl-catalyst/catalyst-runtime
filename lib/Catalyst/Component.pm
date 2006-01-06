@@ -62,6 +62,31 @@ sub new {
     return $self->NEXT::new( { %{ $self->config }, %{$arguments} } );
 }
 
+=head2 COMPONENT($c)
+
+=cut
+
+sub COMPONENT {
+    my ( $self, $c ) = @_;
+
+    # Temporary fix, some components does not pass context to constructor
+    my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
+
+    if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
+        return $new;
+    }
+    else {
+        if ( my $new = $self->new( $c, $arguments ) ) {
+            return $new;
+        }
+        else {
+            my $class = ref $self || $self;
+            my $new = { %{ $self->config }, %{$arguments} };
+            return bless $new, $class;
+        }
+    }
+}
+
 # remember to leave blank lines between the consecutive =head2's
 # otherwise the pod tools don't recognize the subsequent =head2s
 
