@@ -23,7 +23,7 @@ requires 'NEXT';
 requires 'Path::Class' => 0.09;
 requires 'Scalar::Util';
 requires 'Template';
-requires 'Text::SimpleTable';
+requires 'Text::SimpleTable' => 0.03;
 requires 'Test::MockObject';
 requires 'Time::HiRes';
 requires 'Tree::Simple';
