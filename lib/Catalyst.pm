@@ -1,7 +1,7 @@
 package Catalyst;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Component';
 use bytes;
 use UNIVERSAL::require;
 use Catalyst::Exception;
@@ -10,6 +10,7 @@ use Catalyst::Request;
 use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
+use Catalyst::Controller;
 use File::stat;
 use NEXT;
 use Text::SimpleTable;
@@ -71,7 +72,7 @@ sub import {
 
     unless ( $caller->isa('Catalyst') ) {
         no strict 'refs';
-        push @{"$caller\::ISA"}, $class;
+        push @{"$caller\::ISA"}, $class, 'Catalyst::Controller';
     }
 
     $caller->arguments( [@arguments] );
@@ -1544,7 +1545,7 @@ sub setup_components {
     my $callback = sub {
         my ( $component, $context ) = @_;
 
-        unless ( $component->isa('Catalyst::Component') ) {
+        unless ( $component->can('COMPONENT') ) {
             return $component;
         }
 

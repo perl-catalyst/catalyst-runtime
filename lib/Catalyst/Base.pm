@@ -44,7 +44,7 @@ sub _AUTO : Private {
 sub _ACTION : Private {
     my ( $self, $c ) = @_;
     if (   ref $c->action
-        && $c->action->isa('Catalyst::Action')
+        && $c->action->can('execute')
         && $c->req->action )
     {
         $c->action->execute($c);
