@@ -575,10 +575,10 @@ sub setup {
     $class->setup_home( delete $flags->{home} );
 
     # YAML config support
-    my $conffile = $class->config->{file}
-      || ( Catalyst::Utils::appprefix( ref $class || $class ) . '.yml' );
-    my $confpath = $class->path_to($conffile);
-    my $conf     = {};
+    my $confpath = $class->config->{file}
+      || $class->path_to(
+        ( Catalyst::Utils::appprefix( ref $class || $class ) . '.yml' ) );
+    my $conf = {};
     $conf = YAML::LoadFile($confpath) if -f $confpath;
     my $oldconf = $class->config;
     $class->config( { %$oldconf, %$conf } );
