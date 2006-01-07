@@ -444,6 +444,12 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config({ db => 'dsn:SQLite:foo.db' });
 
+You can also use a L<YAML> config file like myapp.yml in your
+applications home directory.
+
+    ---
+    db: dsn:SQLite:foo.db
+
 =head2 $c->debug
 
 Overload to enable debug messages (same as -Debug option).
