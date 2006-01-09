@@ -934,15 +934,20 @@ sub execute {
         }
 
         # determine if the call was the result of a forward
-        my $callsub_index = ( caller(0) )[0]->isa('Catalyst::Action') ? 2 : 1;
-        if ( ( caller($callsub_index) )[3] =~ /^NEXT/ ) {
-
-            # work around NEXT if execute was extended by a plugin
-            $callsub_index += 3;
+        # this is done by walking up the call stack and looking for a calling
+        # sub of Catalyst::forward before the eval
+        my $callsub = q{};
+        for my $index (1..10) {
+            last 
+                if ( ( caller($index) )[0] eq 'Catalyst'
+                && ( caller($index) )[3] eq '(eval)' );
+            
+            if ( (caller($index))[3] =~ /forward$/ ) {
+                $callsub = (caller($index))[3];
+                $action = "-> $action";
+                last;
+            }
         }
-        my $callsub = ( caller($callsub_index) )[3];
-
-        $action = "-> $action" if $callsub =~ /forward$/;
 
         my $node = Tree::Simple->new(
             {
