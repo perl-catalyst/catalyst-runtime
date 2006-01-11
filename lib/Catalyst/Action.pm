@@ -13,6 +13,9 @@ use overload (
     # Codulate to encapsulated action coderef
     '&{}' => sub { shift->{code} },
 
+    # Make general $stuff still work
+    fallback => 1,
+
 );
 
 =head1 NAME
