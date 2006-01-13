@@ -63,7 +63,7 @@ sub disable {
 sub _dump {
     my $self = shift;
     local $Data::Dumper::Terse = 1;
-    $self->info( Dumper( $_[0] ) );
+    $self->info( Dumper( @_ ) );
 }
 
 sub _log {
