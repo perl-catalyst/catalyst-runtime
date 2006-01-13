@@ -81,9 +81,14 @@ sub _flush {
         $self->abort(undef);
     }
     else {
-        print( STDERR $self->body );
+        $self->_send_to_log( $self->body );
     }
     $self->body(undef);
+}
+
+sub _send_to_log {
+    my $self = shift;
+    print STDERR @_;
 }
 
 1;
@@ -112,10 +117,9 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This module provides the default, simple logging functionality for
-Catalyst.
-If you want something different set C<$c->log> in your application
-module, e.g.:
+This module provides the default, simple logging functionality for Catalyst.
+If you want something different set C<< $c->log >> in your application module,
+e.g.:
 
     $c->log( MyLogger->new );
 
@@ -197,6 +201,14 @@ each request.
 to use Log4Perl or another logger, you should call it like this:
 
     $c->log->abort(1) if $c->log->can('abort');
+
+=head2 _send_to_log
+
+ $log->_send_to_log( @messages );
+
+This protected method is what actually sends the log information to STDERR.
+You may subclass this module and override this method to get finer control
+over the log output.
 
 =head1 SEE ALSO
 
