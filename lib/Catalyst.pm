@@ -59,7 +59,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.62';
+our $VERSION = '6.00';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -937,14 +937,14 @@ sub execute {
         # this is done by walking up the call stack and looking for a calling
         # sub of Catalyst::forward before the eval
         my $callsub = q{};
-        for my $index (1..10) {
-            last 
-                if ( ( caller($index) )[0] eq 'Catalyst'
+        for my $index ( 1 .. 10 ) {
+            last
+              if ( ( caller($index) )[0] eq 'Catalyst'
                 && ( caller($index) )[3] eq '(eval)' );
-            
-            if ( (caller($index))[3] =~ /forward$/ ) {
-                $callsub = (caller($index))[3];
-                $action = "-> $action";
+
+            if ( ( caller($index) )[3] =~ /forward$/ ) {
+                $callsub = ( caller($index) )[3];
+                $action  = "-> $action";
                 last;
             }
         }
