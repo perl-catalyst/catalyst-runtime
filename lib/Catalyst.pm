@@ -471,10 +471,16 @@ L<Catalyst::Engine>.
 
 =head2 $c->log
 
-Returns the logging object instance. Unless it is already set, Catalyst
-sets this up with a L<Catalyst::Log> object. To use your own log class:
+Returns the logging object instance. Unless it is already set, Catalyst sets
+this up with a L<Catalyst::Log> object. To use your own log class, set the
+logger with the C<< __PACKAGE__->log >> method prior to calling
+C<< __PACKAGE__->setup >>.
 
-    $c->log( MyLogger->new );
+ __PACKAGE__->log( MyLogger->new );
+ __PACKAGE__->setup;
+
+And later:
+
     $c->log->info( 'Now logging with my own logger!' );
 
 Your log class should implement the methods described in the
