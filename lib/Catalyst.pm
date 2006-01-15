@@ -246,7 +246,10 @@ in an arrayref. The action will receive the arguments in C<@_> and
 C<$c-E<gt>req-E<gt>args>. Upon returning from the function,
 C<$c-E<gt>req-E<gt>args> will be restored to the previous values.
 
-    $c->forward('/foo');
+Any data C<return>ed from the action forwarded to, will be returned by the
+call to to forward.
+
+    my $foodata = $c->forward('/foo');
     $c->forward('index');
     $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
