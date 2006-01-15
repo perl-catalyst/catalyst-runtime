@@ -247,7 +247,7 @@ C<$c-E<gt>req-E<gt>args>. Upon returning from the function,
 C<$c-E<gt>req-E<gt>args> will be restored to the previous values.
 
 Any data C<return>ed from the action forwarded to, will be returned by the
-call to to forward.
+call to forward.
 
     my $foodata = $c->forward('/foo');
     $c->forward('index');
