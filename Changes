@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-6.00
+5.62    2006-01-17 16:30:00
         - Added YAML config support
         - Added COMPONENT() and ACCEPT_CONTEXT() support
         - Action list in debug mode is now displayed as a tree in the
