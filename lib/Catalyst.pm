@@ -830,6 +830,7 @@ sub welcome_message {
                  <p>If you want to jump right into web development with Catalyst
                     you might want to check out the documentation.</p>
                  <pre><code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
+perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
 perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a></code></pre>
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
