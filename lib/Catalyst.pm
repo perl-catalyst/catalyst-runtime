@@ -926,7 +926,7 @@ via $c->error.
 
 sub execute {
     my ( $c, $class, $code ) = @_;
-    $class = $c->components->{$class} || $class;
+    $class = $c->component($class) || $class;
     $c->state(0);
 
     if ( $c->debug ) {
