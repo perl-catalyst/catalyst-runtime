@@ -27,7 +27,7 @@ requires 'Text::SimpleTable' => 0.03;
 requires 'Test::MockObject';
 requires 'Test::NoWarnings' => 0.082;
 requires 'Time::HiRes';
-requires 'Tree::Simple';
+requires 'Tree::Simple' => 1.15;
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
