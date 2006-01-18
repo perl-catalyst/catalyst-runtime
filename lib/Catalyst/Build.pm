@@ -37,7 +37,7 @@ This module is deprecated in favor of L<Module::Install::Catalyst>.
 
 =over 4
 
-=item ACTION_install
+=item new
 
 =cut
 
@@ -63,6 +63,10 @@ EOF
 
     return $self;
 }
+
+=item ACTION_install
+
+=cut
 
 sub ACTION_install {
     my $self = shift;
