@@ -538,11 +538,10 @@ stage, without processing further actions.
 
 =head4 URL Path Handling
 
-You can pass variable arguments as part of the URL path. In this case,
-you must use regex action keys with '^' and '$' anchors, and the
-arguments must be separated with forward slashes (/) in the URL. For
-example, suppose you want to handle C</foo/$bar/$baz>, where C<$bar> and
-C<$baz> may vary:
+You can pass variable arguments as part of the URL path, separated with 
+forward slashes (/). If the action is a Regex or LocalRegex, the '$' anchor 
+must be used. For example, suppose you want to handle C</foo/$bar/$baz>, 
+where C<$bar> and C<$baz> may vary:
 
     sub foo : Regex('^foo$') { my ($self, $context, $bar, $baz) = @_; }
 
@@ -559,6 +558,10 @@ Catalyst matches actions in most specific to least specific order:
 
 So Catalyst would never mistakenly dispatch the first two URLs to the
 '^foo$' action.
+
+If a Regex or LocalRegex action doesn't use the '$' anchor, the action will 
+still match a URL containing arguments, however the arguments won't be 
+available via C<@_>.
 
 =head4 Parameter Processing
 
