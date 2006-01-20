@@ -15,7 +15,7 @@ requires 'HTTP::Body'    => 0.5;
 requires 'HTTP::Headers' => 1.59;
 requires 'HTTP::Request';
 requires 'HTTP::Response';
-requires 'HTTP::Request::AsCGI';
+requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
 requires 'MIME::Types';
 requires 'Module::Pluggable::Fast' => 0.16;
