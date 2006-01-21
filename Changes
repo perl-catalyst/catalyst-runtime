@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.63
+        - Updated prereq versions
+
 5.62    2006-01-17 16:30:00
         - Large update to the tutorial (castaway)
         - Added YAML config support
