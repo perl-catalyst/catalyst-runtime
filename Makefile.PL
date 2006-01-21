@@ -31,7 +31,7 @@ requires 'Tree::Simple' => 1.15;
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
-requires 'Module::Install::Admin' => '0.45';
+requires 'Module::Install::Admin' => '0.54';
 requires 'Module::Install' => '0.54';
 requires 'YAML' => '0.52';
 
