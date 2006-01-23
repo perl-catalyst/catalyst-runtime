@@ -628,13 +628,18 @@ in your Catalyst application, then make the following changes:
 
 =head3 lib/MyApp.pm
 
-  use Catalyst qw/Session::FastMmap Authentication::CDBI/;
+  use Catalyst qw/
+      Authentication
+      Authentication::Store::DBIC
+      Authentication::Credential::Password
+  /;
 
-  __PACKAGE__->config->{authentication} = {
-    'user_class'        => 'ScratchPad::M::MyDB::Customer',
+  __PACKAGE__->config->{authentication}->{dbic} = {
+    'user_class'        => 'My::Model::DBIC::User',
     'user_field'        => 'username',
-    'password_field'    => 'password',
-    'password_hash'     => '',
+    'password_field'    => 'password'
+    'password_type'     => 'hashed',
+    'password_hash_type'=> 'SHA-1'
   };
 
   sub auto : Private {
@@ -642,25 +647,17 @@ in your Catalyst application, then make the following changes:
     my $login_path = 'user/login';
 
     # allow people to actually reach the login page!
-    if ($c->req->path eq $login_path) {
+    if ($c->request->path eq $login_path) {
       return 1;
     }
 
-    # if we have a user ... we're OK
-    if ( $c->req->user ) {
-      $c->session->{'authed_user'} =
-        MyApp::M::MyDB::Customer->retrieve(
-          'username' => $c->req->user
-        );
-    }
-
-    # otherwise they're not logged in
-    else {
+    # if a user doesn't exist, force login
+    if ( !$c->user_exists ) {
       # force the login screen to be shown
-      $c->res->redirect($c->req->base . $login_path);
+      $c->response->redirect($c->request->base . $login_path);
     }
 
-    # continue with the processing chain
+    # otherwise, we have a user - continue with the processing chain
     return 1;
   }
 
@@ -674,35 +671,32 @@ in your Catalyst application, then make the following changes:
     # default form message
     $c->stash->{'message'} = 'Please enter your username and password';
 
-    if ( $c->req->param('username') ) {
+    if ( $c->request->param('username') ) {
       # try to log the user in
-      $c->session_login(
-        $c->req->param('username'),
-        $c->req->param('password'),
-      );
-
-      # if we have a user we're logged in
-      if ( $c->req->user ) {
-        $c->res->redirect('/some/page');
+      # login() is provided by ::Authentication::Credential::Password
+      if( $c->login(
+        $c->request->param('username'),
+        $c->request->param('password'),
+        );
+        
+        # if login() returns 1, user is now logged in
+        $c->response->redirect('/some/page');
       }
 
       # otherwise we failed to login, try again!
-      else {
-        $c->stash->{'message'} = 
-           'Unable to authenticate the login details supplied';
-      }
+      $c->stash->{'message'} = 
+         'Unable to authenticate the login details supplied';
     }
   }
 
   sub logout : Path('/user/logout') {
     my ($self, $c) = @_;
-    # logout the session, and remove information we've stashed
-    $c->session_logout;
-    delete $c->session->{'authed_user'};
+    # log the user out
+    $c->logout;
 
     # do the 'default' action
-    $c->res->redirect($c->req->base);
-}
+    $c->response->redirect($c->request->base);
+  }
 
 
 =head3 root/base/user/login.tt
@@ -720,6 +714,66 @@ in your Catalyst application, then make the following changes:
   </form>
   [% INCLUDE footer.tt %]
 
+=head2 Role-based Authorization
+
+For more advanced access control, you may want to consider using role-based
+authorization. This means you can assign different roles to each user, e.g.
+"user", "admin", etc.
+
+The C<login> and C<logout> methods and view template are exactly the same as
+in the previous example.
+
+The L<Catalyst::Plugin::Authorization::Roles> plugin is required when
+implementing roles:
+
+ use Catalyst qw/
+    Authentication
+    Authentication::Credential::Password
+    Authentication::Store::Htpasswd
+    Authorization::Roles
+  /;
+
+Roles are implemented automatically when using
+L<Catalyst::Authetication::Store::Htpasswd>:
+
+  # no additional role configuration required
+  __PACKAGE__->config->{authentication}{htpasswd} = "passwdfile";
+
+Or can be set up manually when using L<Catalyst::Authentication::Store::DBIC>:
+
+  # Authorization using a many-to-many role relationship
+  __PACKAGE__->config->{authorization}{dbic} = {
+    'role_class'           => 'My::Model::DBIC::Role',
+    'role_field'           => 'name',
+    'user_role_user_field' => 'user',
+
+    # DBIx::Class only (omit if using Class::DBI)
+    'role_rel'             => 'user_role',
+
+    # Class::DBI only, (omit if using DBIx::Class)
+    'user_role_class'      => 'My::Model::CDBI::UserRole'
+    'user_role_role_field' => 'role',
+  };
+
+To restrict access to any action, you can use the C<check_user_roles> method:
+
+  sub restricted : Local {
+     my ( $self, $c ) = @_;
+
+     $c->detach("unauthorized")
+       unless $c->check_user_roles( "admin" );
+
+     # do something restricted here
+  }
+
+You can also use the C<assert_user_roles> method. This just gives an error if
+the current user does not have one of the required roles:
+
+  sub also_restricted : Global {
+    my ( $self, $c ) = @_;
+    $c->assert_user_roles( qw/ user admin / );
+  }
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
@@ -729,6 +783,7 @@ Marcus Ramberg, C<mramberg@cpan.org>
 Jesse Sheidlower, C<jester@panix.com>
 Andy Grundman, C<andy@hybridized.org> 
 Chisel Wright, C<pause@herlpacker.co.uk>
+Will Hawes, C<info@whawes.co.uk>
 
 =head1 COPYRIGHT
 
