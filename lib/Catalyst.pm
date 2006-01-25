@@ -21,7 +21,8 @@ use Scalar::Util qw/weaken/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
-use YAML ();
+use JSON;
+use File::Slurp;
 
 __PACKAGE__->mk_accessors(
     qw/counter request response state action stack namespace/
@@ -448,11 +449,12 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config({ db => 'dsn:SQLite:foo.db' });
 
-You can also use a L<YAML> config file like myapp.yml in your
+You can also use a L<JSON> config file like myapp.json in your
 applications home directory.
 
-    ---
-    db: dsn:SQLite:foo.db
+    {
+        "db": "dsn:SQLite:foo.db"
+    }
 
 =head2 $c->debug
 
@@ -590,12 +592,15 @@ sub setup {
 
     $class->setup_home( delete $flags->{home} );
 
-    # YAML config support
+    # JSON config support
     my $confpath = $class->config->{file}
       || $class->path_to(
-        ( Catalyst::Utils::appprefix( ref $class || $class ) . '.yml' ) );
+        ( Catalyst::Utils::appprefix( ref $class || $class ) . '.json' ) );
     my $conf = {};
-    $conf = YAML::LoadFile($confpath) if -f $confpath;
+    if ( -f $confpath ) {
+        my $content = read_file("$confpath");
+        $conf = jsonToObj($content);
+    }
     my $oldconf = $class->config;
     $class->config( { %$oldconf, %$conf } );
 

@@ -32,8 +32,9 @@ requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
 requires 'Module::Install::Admin' => '0.54';
-requires 'Module::Install' => '0.54';
-requires 'YAML' => '0.52';
+requires 'Module::Install'        => '0.54';
+requires 'JSON';
+requires 'File::Slurp';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,

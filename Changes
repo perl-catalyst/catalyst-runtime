@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.64
+
+        - Switched to JSON from YAML for the default config file
+
 5.63
         - Updated prereq versions
 
