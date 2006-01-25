@@ -360,7 +360,7 @@ sub _mk_config {
     my $dir       = $self->{dir};
     my $appprefix = $self->{appprefix};
     $self->render_file( 'config',
-        File::Spec->catfile( $dir, "$appprefix.json" ) );
+        File::Spec->catfile( $dir, "$appprefix.yml" ) );
 }
 
 sub _mk_readme {
@@ -616,9 +616,8 @@ install_script glob('script/*.pl');
 auto_install;
 WriteAll;
 __config__
-{
-    "name" : "[% name %]"
-}
+---
+name: [% name %]
 __readme__
 Run script/[% appprefix %]_server.pl to test the application.
 __changes__
@@ -784,7 +783,7 @@ my $port          = 3000;
 my $keepalive     = 0;
 my $restart       = 0;
 my $restart_delay = 1;
-my $restart_regex = '\.yml$|\.yaml$|\.json|\.pm$';
+my $restart_regex = '\.yml$|\.yaml$|\.pm$';
 
 my @argv = @ARGV;
 
@@ -845,7 +844,7 @@ require [% name %];
    -rd -restartdelay  delay between file checks
    -rr -restartregex  regex match files that trigger
                       a restart when modified
-                      (defaults to '\.yml$|\.yaml$|\.json|\.pm$')
+                      (defaults to '\.yml$|\.yaml$|\.pm$')
 
  See also:
    perldoc Catalyst::Manual
