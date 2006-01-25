@@ -617,7 +617,7 @@ auto_install;
 WriteAll;
 __config__
 {
-    "name": "[% name %]"
+    "name" : "[% name %]"
 }
 __readme__
 Run script/[% appprefix %]_server.pl to test the application.
