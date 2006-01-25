@@ -373,7 +373,7 @@ sub component {
             if ( exists $c->components->{$try} ) {
 
                 my $comp = $c->components->{$try};
-                if ( ref $comp && $comp->can('ACCEPT_CONTEXT') ) {
+                if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
                     return $comp->ACCEPT_CONTEXT($c);
                 }
                 else { return $comp }
@@ -1584,7 +1584,7 @@ sub setup_components {
         }
 
         Catalyst::Exception->throw( message =>
-qq/Couldn't instantiate component "$component", "new() didn't return a object"/
+qq/Couldn't instantiate component "$component", "COMPONENT() didn't return a object"/
           )
           unless ref $instance;
         return $instance;
