@@ -1,8 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.64
-
-        - Switched to YAML::Syck
+        - Removed YAML support
 
 5.63
         - Updated prereq versions

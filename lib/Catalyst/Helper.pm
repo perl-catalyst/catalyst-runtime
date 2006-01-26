@@ -82,7 +82,6 @@ sub mk_app {
 
     if ($gen_app) {
         $self->_mk_dirs;
-        $self->_mk_config;
         $self->_mk_appclass;
         $self->_mk_readme;
         $self->_mk_changes;
@@ -355,14 +354,6 @@ sub _mk_makefile {
     }
 }
 
-sub _mk_config {
-    my $self      = shift;
-    my $dir       = $self->{dir};
-    my $appprefix = $self->{appprefix};
-    $self->render_file( 'config',
-        File::Spec->catfile( $dir, "$appprefix.yml" ) );
-}
-
 sub _mk_readme {
     my $self = shift;
     my $dir  = $self->{dir};
@@ -542,6 +533,11 @@ use Catalyst qw/-Debug Static::Simple/;
 our $VERSION = '0.01';
 
 #
+# Configure the application
+#
+__PACKAGE__->config( { name => '[% name %]' } );
+
+#
 # Start the application
 #
 __PACKAGE__->setup;
@@ -615,9 +611,6 @@ catalyst;
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
-__config__
----
-name: [% name %]
 __readme__
 Run script/[% appprefix %]_server.pl to test the application.
 __changes__
