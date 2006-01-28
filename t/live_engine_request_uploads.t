@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 52;
+use Test::More tests => 59;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -145,4 +145,33 @@ use HTTP::Request::Common;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->content, ( $request->parts )[0]->content, 'Content' );
+}
+
+{
+    my $request = POST(
+        'http://localhost/dump/request',
+        'Content-Type' => 'multipart/form-data',
+        'Content'      =>
+          [ 'file' => ["$FindBin::Bin/catalyst_130pix.gif"], ]
+    );
+
+    # Sending wrong Content-Length here and see if subequent requests fail
+    $request->header('Content-Length' => $request->header('Content-Length') + 1);
+
+    ok( my $response = request($request), 'Request' );
+    ok( !$response->is_success, 'Response Error' );
+
+    $request = POST(
+        'http://localhost/dump/request',
+        'Content-Type' => 'multipart/form-data',
+        'Content'      =>
+          [ 'file1' => ["$FindBin::Bin/catalyst_130pix.gif"],
+            'file2' => ["$FindBin::Bin/catalyst_130pix.gif"], ]
+    );
+
+    ok( $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    like( $response->content, qr/file1 => bless/, 'Upload with name file1');
+    like( $response->content, qr/file2 => bless/, 'Upload with name file2');
 }

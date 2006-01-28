@@ -312,6 +312,13 @@ sub prepare_body {
         while ( my $buffer = $self->read($c) ) {
             $c->prepare_body_chunk($buffer);
         }
+
+        # paranoia against wrong Content-Length header
+        my $remaining = $self->read_length - $self->read_position;
+        if ($remaining > 0) {
+            $self->finalize_read($c);
+            Catalyst::Exception->throw("Wrong Content-Length value: ". $self->read_length);
+        }
     }
 }
 
