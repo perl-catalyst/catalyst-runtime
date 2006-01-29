@@ -365,7 +365,6 @@ sub path {
     my $path     = $self->uri->path;
     my $location = $self->base->path;
     $path =~ s/^(\Q$location\E)?//;
-    $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
     $path =~ s/^\///;
     $self->{path} = $path;
 
