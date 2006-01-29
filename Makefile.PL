@@ -1,5 +1,7 @@
 use inc::Module::Install;
 
+perl_version '5.8.1';
+
 name 'Catalyst';
 all_from 'lib/Catalyst.pm';
 

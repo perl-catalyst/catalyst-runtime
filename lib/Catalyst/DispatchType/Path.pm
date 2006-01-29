@@ -64,7 +64,7 @@ sub register {
     foreach my $r ( @{ $attrs->{Path} || [] } ) {
         unless ($r) {
             $r = $action->namespace;
-            $r = '/' unless $r;
+            $r = '/' unless length $r;
         }
         elsif ( $r !~ m!^/! ) {    # It's a relative path
             $r = $action->namespace . "/$r";
@@ -94,7 +94,7 @@ sub register {
 sub register_path {
     my ( $self, $c, $path, $action ) = @_;
     $path =~ s!^/!!;
-    $path = '/' unless $path;
+    $path = '/' unless length $path;
     $self->{paths}{$path} = $action;
 }
 
