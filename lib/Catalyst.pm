@@ -51,7 +51,7 @@ our $CATALYST_SCRIPT_GEN = 26;
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
-  engine_class context_class request_class response_class/;
+  engine_class context_class request_class response_class setup_finished/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->engine_class('Catalyst::Engine::CGI');
@@ -447,6 +447,17 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config( { db => 'dsn:SQLite:foo.db' } );
 
+=cut
+
+sub config {
+    my $c = shift;
+
+    $c->log->warn("Setting config after setup has been run is not a good idea.")
+      if ( @_ and $c->setup_finished );
+
+    $c->NEXT::config(@_);
+}
+
 =head2 $c->debug
 
 Overload to enable debug messages (same as -Debug option).
@@ -672,6 +683,8 @@ EOF
         $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
     $class->log->_flush() if $class->log->can('_flush');
+
+    $class->setup_finished(1);
 }
 
 =head2 $c->uri_for( $path, [ @args ] )
