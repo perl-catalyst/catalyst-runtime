@@ -6,6 +6,9 @@ Catalyst::Manual - User guide and reference for Catalyst
 
 This is the comprehensive user guide and reference for Catalyst.
 
+L<Catalyst::Manual::About>
+    Explanation (without code) of what Catalyst is and why to use it.
+
 L<Catalyst::Manual::Intro>
     Introduction to Catalyst.
 

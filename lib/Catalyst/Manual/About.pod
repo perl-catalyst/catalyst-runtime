@@ -1,0 +1,111 @@
+=head1 NAME
+
+Catalyst::Manual::About - Basic explanation of Catalyst
+
+=head1 DESCRIPTION
+
+This document is a basic introduction to the I<why> of Catalyst. It does
+not teach you how to write Catalyst applications; for an introduction to
+that please see L<Catalyst::Manual::Intro>. Rather, it explains the
+basics of what Catalyst is typically used for, and why you might want
+to use Catalyst to build your applications.
+
+=head2 What is Catalyst? The short summary
+
+Catalyst is a web application framework. This means that you use it to
+help build applications that run on the web, or that run using protocols
+used for the web. Catalyst is designed to make it easy to manage the
+various tasks you need to do to run an application on the web, either by
+doing them itself, or by letting you "plug in" existing Perl modules
+that do what you need. There are a number of things you typically do
+with a web application, for example:
+
+=over 4
+
+=item * Interact with a web server
+
+If you're on the web, you're relying on a web server, a program that
+sends files over the web. There are a number of these, and your
+application has to do the right thing to make sure that your data works
+with the web server you're using. If you change your web server, you
+don't want to have to rewrite your entire application to work with the
+new one.
+
+=item * Do something based on a URI
+
+So that C<http://www.mysite.com/catalog/view/23> will go to a "view" of
+item 23 in your catalog, and C<http://www.mysite.com/order_status/7582>
+will display the status of order 7582, and
+C<http://www.mysite.com/add_comment/?page=8> will display a form to add
+a comment to page 8.
+
+=item * Interact with a data store
+
+You probably use a database to keep track of your information. Your
+application needs an easy way to interact with your database, so you can
+create, edit, and retrieve your data.
+
+=item * Handle forms
+
+When a user submits a form, you process it, and make sure it's been
+filled in properly, and then then do something based on the
+result--submitting an order, updating a record, sending e-mail, or going
+back to the form if there's an error.
+
+=item * Display results
+
+You have an application running on the web, people need to see
+things. You usually want to display things on a web browser; you will
+probably be using a template system to help generate HTML code; you
+might need other kinds of display, such as PDF files or RSS feeds.
+
+=item * Manage users
+
+You might need the concept of a "user", someone who's allowed to use
+your system, and is allowed to do certain things only. Perhaps normal
+users can only view or modify their own information; administrative
+users can view or modify anything; normal users can only order items for
+their own account; normal users can view things but not modify them;
+order-processing users can send records to a different part of the
+system; and so forth. You need a way of ensuring that people are who
+they say they are, and that people only do the things they're allowed to
+do.
+
+=item * Develop the application itself
+
+When you're writing or modifying the application, you want to have
+access to detailed logs of what it is doing. You want to be able to
+write tests to ensure that it does what it's supposed to, and that new
+changes don't break the existing code.
+
+=back
+
+Catalyst makes it easy to do all of these tasks, and many more. It is
+extremely flexible in terms of what it allows you to do, and very fast.
+It has a very large number of "plugins" that interact with existing Perl
+modules so that you can easily using them from within your application.
+
+=head3 What B<isn't> Catalyst?
+
+Catalyst is not an out-of-the-box solution that allows you to set up a
+complete working e-commerce application in ten minutes. (There are,
+however, several systems built on top of Catalyst that can get you very
+close to a working app.) It is not designed for end users, but for
+working programmers.
+
+=head2 Some background
+
+=head2 The MVC pattern
+
+=head1 AUTHOR
+
+Jesse Sheidlower, C<jester@panix.com>
+
+=head1 SEE ALSO
+
+L<Catalyst>, L<Catalyst::Manual::Intro>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it
+under the same terms as Perl itself.

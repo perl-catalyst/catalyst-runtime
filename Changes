@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Catalyst.
 
         - Fixed path dispatch to canonicalise correctly
             (see http://dev.catalyst.perl.org/ticket/62)
+        - Added Catalyst::Manual::About
 
 5.64
         - Removed YAML support
