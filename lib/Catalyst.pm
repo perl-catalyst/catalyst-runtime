@@ -21,7 +21,6 @@ use Scalar::Util qw/weaken/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
-use YAML ();
 
 __PACKAGE__->mk_accessors(
     qw/counter request response state action stack namespace/
@@ -600,15 +599,6 @@ sub setup {
     }
 
     $class->setup_home( delete $flags->{home} );
-
-    # YAML config support
-    my $confpath = $class->config->{file}
-      || $class->path_to(
-        ( Catalyst::Utils::appprefix( ref $class || $class ) . '.yml' ) );
-    my $conf = {};
-    $conf = YAML::LoadFile($confpath) if -f $confpath;
-    my $oldconf = $class->config;
-    $class->config( { %$oldconf, %$conf } );
 
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
