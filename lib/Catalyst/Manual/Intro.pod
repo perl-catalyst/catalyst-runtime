@@ -4,7 +4,7 @@ Catalyst::Manual::Intro - Introduction to Catalyst
 
 =head1 DESCRIPTION
 
-This is a brief introduction toCatalyst. It explains the most important
+This is a brief introduction to Catalyst. It explains the most important
 features of how Catalyst works and shows how to get a simple application
 up and running quickly. For an introduction (without code) to Catalyst
 itself, and why you should be using it, see L<Catalyst::Manual::About>.
