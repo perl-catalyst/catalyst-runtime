@@ -35,6 +35,7 @@ requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
 requires 'Module::Install::Admin' => '0.54';
 requires 'Module::Install'        => '0.54';
+requires 'YAML'                   => '0.55';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,

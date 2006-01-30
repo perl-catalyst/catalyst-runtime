@@ -1,13 +1,12 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.64
+        - Updated YAML support
         - Fixed path dispatch to canonicalise correctly
             (see http://dev.catalyst.perl.org/ticket/62)
         - Added Catalyst::Manual::About
 
-5.64
-        - Removed YAML support
-
-5.63
+5.63    2006-01-22 00:00:00
         - Updated prereq versions
 
 5.62    2006-01-17 16:30:00
