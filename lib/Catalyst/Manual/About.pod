@@ -33,11 +33,11 @@ new one.
 
 =item * Do something based on a URI
 
-So that C<http://www.mysite.com/catalog/view/23> will go to a "view" of
-item 23 in your catalog, and C<http://www.mysite.com/order_status/7582>
-will display the status of order 7582, and
-C<http://www.mysite.com/add_comment/?page=8> will display a form to add
-a comment to page 8.
+So that C<http://www.mysite.com/catalog/display/23> will go to a
+"display" of item 23 in your catalog, and
+C<http://www.mysite.com/order_status/7582> will display the status of
+order 7582, and C<http://www.mysite.com/add_comment/?page=8> will
+display a form to add a comment to page 8.
 
 =item * Interact with a data store
 
@@ -96,6 +96,107 @@ working programmers.
 =head2 Some background
 
 =head2 The MVC pattern
+
+MVC, or Model-View-Controller, is a model currently favored for web
+applications. This design pattern is originally from the Smalltalk
+programming language. The basic idea is that the three main areas of an
+application--handling application flow (Controller), processing
+information (Model), and outputting the results (View)--are kept
+separate, so that it is possible to change or replace any one without
+affecting the others.
+
+Discussions of MVC often degenerate into nitpicky arguments about the
+history of the pattern, and exactly what "usually" or "should" go into
+the Controller or the Model. We have no interest in joining such a
+debate. In any case, Catalyst does not enforce any particular setup; you
+are free to put any sort of code in any part of your application, and
+this discussion (and others elsewhere in the Catalyst documentation) is
+only a suggestion based on what we think works well. In most Catalyst
+applications, each branch of MVC will be made of up of several Perl
+modules that can handle different needs in your application.
+
+The purpose of the B<Model> is to access and modify data. Typically
+the Model will interact with a relational database, but it's also
+common to use other data sources, such as the L<Plucene> search
+engine, an LDAP server, etc.
+
+The purpose of the B<View> is to present data to the user. Typical Views
+use a templating module to generate HTML code, using L<Template
+Toolkit|Template>, L<Mason|HTML::Mason>, L<HTML::Template>, or the like,
+but it's also possible to generate PDF output, send email, etc., from a
+View. In Catalyst the View is usually a small module, just gluing some
+other module into Catalyst; the display logic is written within the
+template itself.
+
+The Controller is Catalyst itself. When a request is made to Catalyst,
+it will be received by one of your Controller modules; this module
+will figure out what the user is trying to do, gather the necessary
+data from a Model, and send it to a View for display.
+
+=head3 A simple example
+
+The general idea is that you should be able to change things around
+without affecting the rest of your application. Let's look at a very
+simple example (keeping in mind that there are many ways of doing this,
+and what we're discussing is one possible way, not the only
+way). Suppose you have a record to display. It doesn't matter if it's a
+catalog entry, a library book, a music CD, a personnel record, or
+anything else, but let's pretend it's a catalog entry. A user is given a
+URL such as C<http://www.mysite.com/catalog/display/2782>. Now what?
+
+First, Catalyst figures out that you're using the "catalog" Controller
+(how Catalyst figures this out is entirely up to you; URL dispatching is
+I<extremely> flexible in Catalyst). Then Catalyst sees that you want to
+use a "display" method in your Controller. Somewhere in this process,
+it's possible that you'll have authentication and authorization routines
+to make sure that the user is registered and is allowed to display a
+record. The Controller's display method will then extract "2782" as the
+record you want to retrieve, and make a request to a Model for that
+record. The Controller will then look at what the Model returns: if
+there's no record, the Controller will ask the View to display an error
+message, otherwise it will hand the View the record and ask the View to
+display it. In either case, the View will then generate an HTML page,
+which Catalyst will display to the user's browser, using whatever web
+server you've configured.
+
+How does this help you?
+
+In many ways. Suppose you have a small catalog now, and you're using a
+lightweight database such as SQLite, or even a text file. But eventually
+your site grows, and you need to upgrade to something more
+powerful--MySQL or Postgres, or even Oracle or DB2. If your Model is
+separate, you only have to change one thing, the Model; your Controller
+can expect that if it issues a query to the Model, it will get the right
+kind of result back. 
+
+What about the View? The idea is that your template is concerned almost
+entirely with display, so that you can hand it off to a designer who
+doesn't have to worry about how to write code. If you get all the data
+in the Controller and then pass it to the View, the template isn't
+responsible for any kind of data processing. And if you want to change
+your output, it's simple: just write a new View. If your Controller is
+already getting the data you need, you pass it in the same way, and
+whether you display the results to a web browser, generate a PDF, or
+e-mail the results back to the user, the Controller hardly changes at
+all. 
+
+And throughout the whole process, most of the tools you need are either
+part of Catalyst (the parameter-processing routines that extract "2782"
+from the URL, for example) or are easily plugged into it (the
+authentication routines, the plugins for using Template Toolkit as your
+View).
+
+Now, Catalyst doesn't enforce very much at all. You can connect to a
+database, issue queries, and act on them from within your View, if you
+want. You can handle paging (i.e. retrieving only a portion of the total
+records possible) in your Controller or your Model. It's up to you. In
+some cases there might be very good reasons to do things a certain way
+(issuing database queries from a template seems to defeat the whole
+purpose of separation-of-concerns, and will drive your designer crazy),
+while in others it's just a matter of personal preference (perhaps your
+template, rather than your Controller, is the better place to decide
+what to display if you get an empty result). Catalyst just gives you the
+tools.
 
 =head1 AUTHOR
 

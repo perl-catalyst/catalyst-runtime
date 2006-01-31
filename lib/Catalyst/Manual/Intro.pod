@@ -31,7 +31,8 @@ well-known Perl modules you may want to use for each.
 
 =item * B<Model>
 
-Access and modify content (data). L<Class::DBI>, L<Plucene>, L<Net::LDAP>...
+Access and modify content (data). L<Class::DBI>, L<DBIx::Class>,
+L<Plucene>, L<Net::LDAP>...
 
 =item * B<View>
 
