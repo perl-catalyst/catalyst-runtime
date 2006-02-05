@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.64
+        - Fixed bug in FastCGI proc manager mode where pm_post_dispatch
+          was not run. (Eric Wong)
         - Cleaned up generated tests
         - Updated YAML support to use ConfigLoader
         - Fixed path dispatch to canonicalise correctly

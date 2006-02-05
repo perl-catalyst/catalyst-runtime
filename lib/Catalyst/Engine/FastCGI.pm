@@ -102,7 +102,7 @@ sub run {
     while ( $request->Accept >= 0 ) {
         $proc_manager && $proc_manager->pm_pre_dispatch();
         $class->handle_request( env => \%env );
-        $proc_manager && $proc_manager->pm_pre_dispatch();
+        $proc_manager && $proc_manager->pm_post_dispatch();
     }
 }
 
