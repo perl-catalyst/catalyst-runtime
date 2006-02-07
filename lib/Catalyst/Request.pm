@@ -251,7 +251,8 @@ Alias for $req->body.
 =head2 $req->match
 
 This contains the matching part of a Regex action. Otherwise
-it returns the same as 'action'.
+it returns the same as 'action', except for default actions,
+which return an empty string.
 
 =head2 $req->method
 
