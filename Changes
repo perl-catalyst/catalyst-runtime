@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.64    2006-02-07 13:13:13
+5.64    2006-02-07 20:29:00
         - Fixed bug in FastCGI proc manager mode where pm_post_dispatch
           was not run. (Eric Wong)
         - Cleaned up generated tests
