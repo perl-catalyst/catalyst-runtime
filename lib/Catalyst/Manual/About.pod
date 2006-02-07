@@ -33,17 +33,24 @@ new one.
 
 =item * Do something based on a URI
 
-So that C<http://www.mysite.com/catalog/display/23> will go to a
-"display" of item 23 in your catalog, and
+It's typical for web applications to use URIs as a main way for users to
+interact with the rest of the application; various elements of the URI
+will indicate what the application needs to do. Thus,
+C<http://www.mysite.com/add_record.cgi?name=John&title=President> will
+add a person named "John" whose title is "President" to your database,
+and C<http://www.mysite.com/catalog/display/23> will go to a "display"
+of item 23 in your catalog, and
 C<http://www.mysite.com/order_status/7582> will display the status of
 order 7582, and C<http://www.mysite.com/add_comment/?page=8> will
-display a form to add a comment to page 8.
+display a form to add a comment to page 8. Your application needs to
+have a regular way of processing these URIs so it knows what to do
+when such a request comes in.
 
 =item * Interact with a data store
 
 You probably use a database to keep track of your information. Your
-application needs an easy way to interact with your database, so you can
-create, edit, and retrieve your data.
+application needs to interact with your database, so you can create,
+edit, and retrieve your data.
 
 =item * Handle forms
 
@@ -83,7 +90,22 @@ changes don't break the existing code.
 Catalyst makes it easy to do all of these tasks, and many more. It is
 extremely flexible in terms of what it allows you to do, and very fast.
 It has a very large number of "plugins" that interact with existing Perl
-modules so that you can easily using them from within your application.
+modules so that you can easily use them from within your
+application. Interact with a web server? Catalyst lets you use a number
+of different ones, and even comes with a built-in server for testing or
+local deployment. Do something based on a URI? Catalyst has extremely
+flexible systems for figuring out what to do based on a URI. Interact
+with a data store?  Catalyst has many plugins for different databases
+and database frameworks, and for other non-database storage
+systems. Handle forms?  Catalyst has plugins available for several form
+creation and validation systems that make it easy for the programmer to
+manage. Display results?  Catalyst has plugins available for a number of
+template modules and other output packages. Manage users? Catalyst has
+plugins that handle sessions, authentication, and authorization, in any
+way you need. Developing the application? Catalyst has detailed logging
+built-in, which you can configure as necessary, and supports the easy
+creation of new tests--some of which are automatically created when you
+begin writing a new application.
 
 =head3 What B<isn't> Catalyst?
 
@@ -95,6 +117,41 @@ working programmers.
 
 =head2 Some background
 
+=head2 Web programming: The Olden Days
+
+Perl has long been favored for web applications. There are a wide
+variety of ways to use Perl on the web, and things have changed over
+time. It's possible to handle everything with very raw Perl code:
+C<print "Content-type: text/html\n\n<center><h1>Hello
+World!</h1></center>";> for example, or
+
+    my @query_elements = split(/&/, $ENV{'QUERY_STRING'});
+    foreach my $element (@query_elements) {
+        my ($name, $value) = split(/=/, $element);
+        # do something with your parameters, or kill yourself
+        # in frustration for having to program like this
+    }
+
+Much better than this is to use Lincoln Stein's great L<CGI> module,
+which smoothly handles a wide variety of common tasks--parameter
+parsing, generating form elements from Perl data structures, printing
+http headers, escaping text, and very many more, all with your choice of
+functional or object-oriented style. While L<CGI> was revolutionary and
+is still widely used, it has various drawbacks that make it unsuitable
+for larger applications: it is slow, your code with it generally
+combines application logic and display code, and it makes it very
+difficult to handle larger applications with complicated control flow.
+
+A variety of frameworks followed, of which the most widely used is
+probably L<CGI::Application>, which encourages the development of
+modular code, with easy-to-understand control-flow handling, the use of
+plugins and templating systems, and the like. Other systems include
+L<AxKit>, which is designed for use with XML running under mod_perl, and
+L<Maypole>--upon which Catalyst was originally based--designed for the
+easy development of powerful web databases. Is it not the purpose of
+this document to criticize or even evaluate these other frameworks; they
+may be useful for you and if so we encourage you to give them a try.
+
 =head2 The MVC pattern
 
 MVC, or Model-View-Controller, is a model currently favored for web
@@ -103,7 +160,8 @@ programming language. The basic idea is that the three main areas of an
 application--handling application flow (Controller), processing
 information (Model), and outputting the results (View)--are kept
 separate, so that it is possible to change or replace any one without
-affecting the others.
+affecting the others, and so that if you're interested in one particular
+aspect, you know where to find it.
 
 Discussions of MVC often degenerate into nitpicky arguments about the
 history of the pattern, and exactly what "usually" or "should" go into
