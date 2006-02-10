@@ -9,20 +9,143 @@ available to extend the runtime functionality of Catalyst. Most plugins
 are not distributed with Catalyst but should be available from CPAN.
 They typically require additional modules from CPAN.
 
-This list is almost certainly outdated by the time you read this, so be
-sure to check the Catalyst::Plugin namespace for additional plugins.
+This list is almost certainly outdated by the time you read this and some
+plugins may even be deprecated or now part of core L<Catalyst>. Be sure 
+to check the Catalyst::Plugin namespace for additional plugins and consult 
+the mailing list ( L<http://dev.catalyst.perl.org/wiki/Support> ) for advice 
+on the current status or preferred use of your chosen plugin/framework.
 
 =head1 PLUGINS
+
+=head2 Catalyst::Plugin::Account::AutoDiscovery
+
+L<Catalyst Plugin for Account Auto-Discovery> provides Account Auto-Discovery
+for Catalyst.
+
+=head2 Catalyst::Plugin::Acme::Scramble
+
+L<Catalyst::Plugin::Acme::Scramble> Implements a potent meme about how easily 
+we can read scrambled text if the first and last letters remain constant. 
+Operates on text/plain and text/html served by your Catalyst application.
+
+=head2 Catalyst::Plugin::AtomPP
+
+L<Catalyst::Plugin::AtomPP> allows you to dispatch AtomPP methods.
+
+=head2 Catalyst::Plugin::AtomServer
+
+L<Catalyst::Plugin::AtomServer> is a plugin that implements the necessary 
+bits to make it easy to build an Atom API server for any Catalyst-based 
+application.
+
+=head2 Catalyst::Plugin::Authentication
+
+L<Catalyst::Plugin::Authentication> is a infrastructure plugin for the 
+Catalyst authentication framework. Now the recommended way to do any form
+of Authentication.
+
+=head2 Catalyst::Plugin::Authentication::Basic::Remote
+
+L<Catalyst::Plugin::Authentication::Basic::Remote> is a authentication plugin 
+that allows you to use a remote host's Basic authentication.
 
 =head2 Catalyst::Plugin::Authentication::CDBI
 
 L<Catalyst::Plugin::Authentication::CDBI> is a CDBI (C<Class::DBI>)
 authentication plugin.  Note that it requires a session plugin.
 
+=head2 Catalyst::Plugin::Authentication::CDBI::Basic
+
+L<Catalyst::Plugin::Authentication::CDBI::Basic> provides Basic Authorization 
+for Catalyst. 
+Replaced by L<Catalyst::Plugin::Authentication::Credential::HTTP>
+
+=head2 Catalyst::Plugin::Authentication::Credential::Atom
+
+L<Catalyst::Plugin::Authentication::Credential::Atom> is a plugin which
+implements WSSE and Basic authentication for Catalyst applications using 
+L<Catalyst::Plugin:AtomServer>
+
+=head2 Catalyst::Plugin::Authentication::Credential::Flickr
+
+L<Catalyst::Plugin::Authentication::Credential::Flickr> is a plugin which
+provides authentication via Flickr, using it's API
+
+=head2 Catalyst::Plugin::Authentication::Credential::HTTP
+
+L<Catalyst::Plugin::Authentication::Credential::HTTP> is a plugin that 
+lets you do HTTP Basic authentication for Catalyst.
+
+=head2 Catalyst::Plugin::Authentication::Credential::Password
+
+L<Catalyst::Plugin::Authentication::Credential::Password> takes a username 
+(or userid) and a password, and tries various methods of comparing a 
+password based on what the chosen store's user objects support.
+Part of the Authentication Framework <Catalyst::Plugin::Authentication>
+
+
+=head2 Catalyst::Plugin::Authentication::Credential::TypeKey
+
+L<Catalyst::Plugin::Authentication::Credential::TypeKey> integrates 
+L<Authen::TypeKey> with L<Catalyst::Plugin::Authentication>
+
 =head2 Catalyst::Plugin::Authentication::LDAP
 
 L<Catalyst::Plugin::Authentication::LDAP> is a plugin allowing you 
-to authenticate your web users using an LDAP server. 
+to authenticate your web users using an LDAP server. Soon to be replaced
+by L<Catalyst::Plugin::Authentication::Store::LDAP>
+
+=head2 Catalyst::Plugin::Authentication::OpenID
+
+L<Catalyst::Plugin::Authentication::OpenID> is a plugin that implements 
+support for OpenID authentication. For more information on OpenID, take 
+a look at L<http://www.openid.net/>.
+
+=head2 Catalyst::Plugin::Authentication::Simple
+
+Replaced by new L<Catalyst::Plugin::Authentication framework>
+
+=head2 Catalyst::Plugin::Authentication::Store
+
+L<Catalyst::Plugin::Authentication::Store> is the core store documentation
+
+=head2 Catalyst::Plugin::Authentication::Store::DBIC
+
+L<Catalyst::Plugin::Authentication::Store::DBIC> is a plugin that lets 
+you do authentication and authorization against a DBIx::Class or 
+Class::DBI model.
+
+=head2 Catalyst::Plugin::Authentication::Store::Htpasswd
+
+L<Catalyst::Plugin::Authentication::Store::Htpasswd> uses L<Authen::Htpasswd> 
+to let your application use C<.htpasswd> files for it's 
+authentication storage.
+
+=head2 Catalyst::Plugin::Authentication::Store::Minimal
+
+L<Catalyst::Plugin::Authentication::Store::Minimal> lets you create a very 
+quick and dirty user database in your application's config hash. 
+Great for getting up and running quickly.
+
+=head2 Catalyst::Plugin::Authentication::User::Hash
+
+L<Catalyst::Plugin::Authentication::User::Hash> is an easy authentication 
+user object based on hashes. 
+See L<Catalyst::Plugin::Authentication::Store::Minimal> for more info.
+
+=head2 Catalyst::Plugin::Authorization::ACL
+
+
+=head2 Catalyst::Plugin::Authorization::ACL::Engine
+
+
+=head2 Catalyst::Plugin::Authorization::CDBI::GroupToken
+
+
+=head2 Catalyst::Plugin::Authorization::Roles
+
+L<Catalyst::Plugin::Authorization::Roles> provides role based authorization 
+for Catalyst based on L<Catalyst::Plugin::Authentication>. 
 
 =head2 Catalyst::Plugin::Browser
 
@@ -38,25 +161,82 @@ L<Catalyst::Plugin::Cache::FileCache>, and
 L<Catalyst::Plugin::Cache::Memcached> all provide a cache method
 enabling easy access to a shared cache.
 
-=head2 Catalyst::Plugin::Compress::Zlib
+=head2 Catalyst::Plugin::CDBI::Transaction
 
-L<Catalyst::Plugin::Compress::Zlib> supplies Zlib compression for
-Catalyst.
+
+=head2 Catalyst::Plugin::Charsets::Japanese
+
 
 =head2 Catalyst::Plugin::Compress::Bzip2
 
 L<Catalyst::Plugin::Compress::Bzip2> compresses a response using
 bzip compression.
 
+=head2 Catalyst::Plugin::Compress::Deflate
+
+
+=head2 Catalyst::Plugin::Compress::Gzip
+
+
+=head2 Catalyst::Plugin::Compress::Zlib
+
+L<Catalyst::Plugin::Compress::Zlib> supplies Zlib compression for
+Catalyst.
+
+=head2 Catalyst::Plugin::Config::JSON
+
+
+=head2 Catalyst::Plugin::ConfigLoader
+
+
+=head2 Catalyst::Plugin::ConfigLoader::INI
+
+
+=head2 Catalyst::Plugin::ConfigLoader::JSON
+
+
+=head2 Catalyst::Plugin::ConfigLoader::Perl
+
+
+=head2 Catalyst::Plugin::ConfigLoader::XML
+
+
+=head2 Catalyst::Plugin::ConfigLoader::YAML
+
+
+=head2 Catalyst::Plugin::Config::YAML
+
+
+=head2 Catalyst::Plugin::DateTime
+
+
 =head2 Catalyst::Plugin::DefaultEnd
 
 L<Catalyst::Plugin::DefaultEnd> creates a sane, standard end method for
 your application.
 
+=head2 Catalyst::Plugin::Devel::InPageLogs
+
+
+=head2 Catalyst::Plugin::Devel::InPageLogs::Log
+
+
+=head2 Catalyst::Plugin::Dumper
+
+
 =head2 Catalyst::Plugin::Email
 
 L<Catalyst::Plugin::Email> sends email with Catalyst and L<Email::Send>
 and L<Email::MIME::Creator>.
+
+=head2 Catalyst::Plugin::Email::Japanese
+
+
+=head2 Catalyst::Plugin::Email::Page
+
+
+=head2 Catalyst::Plugin::EmailValid
+
 
 =head2 Catalyst::Plugin::FillInForm
 
@@ -67,6 +247,9 @@ radio buttons, checkboxes, and select tags.  C<HTML::FillInForm> is a
 subclass of C<HTML::Parser> and uses it to parse the HTML and insert the
 values into the form tags.
 
+=head2 Catalyst::Plugin::Flavour
+
+
 =head2 Catalyst::Plugin::FormValidator
 
 L<Catalyst::Plugin::FormValidator> is a form validator plugin that uses
@@ -74,17 +257,41 @@ L<Data::FormValidator> to validate and set up form data from your
 request parameters. It's a quite thin wrapper around that module, so
 most of the relevant information can be found there.
 
+=head2 Catalyst::Plugin::FormValidator::Simple
+
+
 =head2 Catalyst::Plugin::Geography
 
 L<Catalyst::Plugin::Geography> allows you to retrieve various kinds
 of geographical information. You can retrieve the country or code from
 the current user, from a given IP address, or from a given hostname.
 
+=head2 Catalyst::Plugin::Geography::Implementation
+
+
+=head2 Catalyst::Plugin::HashedCookies
+
+
+=head2 Catalyst::Plugin::HTML::Scrubber
+
+
+=head2 Catalyst::Plugin::HTML::Widget
+
+
 =head2 Catalyst::Plugin::I18N
 
 L<Catalyst::Plugin::I18N> is an internationalization plugin for
 Catalyst.  Supports C<mo>/C<po> files and Maketext classes under your
 application's I18N namespace.
+
+=head2 Catalyst::Plugin::JSONRPC
+
+
+=head2 Catalyst::Plugin::Message
+
+
+=head2 Catalyst::Plugin::MobileAgent
+
 
 =head2 Catalyst::Plugin::Observe
 
@@ -104,6 +311,12 @@ frequently accessed pages by caching the entire output of your page.
 Subsequent requests to the page will receive the page very quickly from
 cache.
 
+=head2 Catalyst::Plugin::Params::Nested
+
+
+=head2 Catalyst::Plugin::Params::Nested::Expander
+
+
 =head2 Catalyst::Plugin::Pluggable
 
 L<Catalyst::Plugin::Pluggable> is a plugin for pluggable Catalyst
@@ -115,6 +328,12 @@ L<Catalyst::Plugin::Prototype> is a plugin for the Prototype JavaScript
 library. This Plugin allows you to easily implement AJAX functionality
 without actually knowing Javascript.
 
+=head2 Catalyst::Plugin::Redirect
+
+
+=head2 Catalyst::Plugin::RequestToken
+
+
 =head2 Catalyst::Plugin::RequireSSL
 
 Use L<Catalyst::Plugin::RequireSSL> if you would like to force visitors
@@ -123,12 +342,24 @@ page in non-SSL mode will receive a redirect into SSL mode. Useful for
 login pages, shopping carts, user registration forms, and other
 sensitive data.
 
+=head2 Catalyst::Plugin::SanitizeUrl
+
+
+=head2 Catalyst::Plugin::SanitizeUrl::PrepAction
+
+
+=head2 Catalyst::Plugin::Scheduler
+
+
 =head2 Catalyst::Plugin::Session
 
 The L<Catalyst::Plugin::Session> series of modules provide an easy way to
 include session handling in an application. You can choose from several
 different backend storage methods and combine that with your choice of
 client-side storage methods.
+
+=head2 Catalyst::Plugin::Session::CGISession
+
 
 =head2 Catalyst::Plugin::Session::FastMmap
 
@@ -137,22 +368,88 @@ based on C<Cache::FastMMap>, which uses an mmap'ed file to act as a
 shared memory interprocess cache. This is an older session plugin; you may
 wish to look at L<Catalyst::Plugin::Session> instead.
 
+=head2 Catalyst::Plugin::Session::Flex
+
+
+=head2 Catalyst::Plugin::Session::Manager
+
+
+=head2 Catalyst::Plugin::Session::Manager::Client::Cookie
+
+
+=head2 Catalyst::Plugin::Session::Manager::Client::Rewrite
+
+
+=head2 Catalyst::Plugin::Session::Manager::Client::StickyQuery
+
+
+=head2 Catalyst::Plugin::Session::Manager::Storage::CDBI
+
+
+=head2 Catalyst::Plugin::Session::Manager::Storage::FastMmap
+
+
+=head2 Catalyst::Plugin::Session::Manager::Storage::File
+
+
+=head2 Catalyst::Plugin::Session::PerUser
+
+
+=head2 Catalyst::Plugin::Session::State
+
+
+=head2 Catalyst::Plugin::Session::State::Cookie
+
+
+=head2 Catalyst::Plugin::Session::State::URI
+
+
+=head2 Catalyst::Plugin::Session::Store
+
+
+=head2 Catalyst::Plugin::Session::Store::CDBI
+
+
+=head2 Catalyst::Plugin::Session::Store::DBI
+
+
+=head2 Catalyst::Plugin::Session::Store::Dummy
+
+
+=head2 Catalyst::Plugin::Session::Store::FastMmap
+
+
+=head2 Catalyst::Plugin::Session::Store::File
+
+
+=head2 Catalyst::Plugin::Session::Store::Memcached
+
+
+=head2 Catalyst::Plugin::Session::Test::Store
+
+
+=head2 Catalyst::Plugin::Singleton
+
+
 =head2 Catalyst::Plugin::SRU
 
 L<Catalyst::Plugin::SRU> allows your controller class to dispatch SRU
 actions (C<explain>, C<scan>, and C<searchRetrieve>) from its own class.
 
-=head2 Catalyst::Plugin::Static::Simple
+=head2 Catalyst::Plugin::StackTrace
 
-L<Catalyst::Plugin::Static::Simple> serves static files in your
-application without requiring a single line of code. This plugin is now
-included in the core Catalyst distribution.
 
 =head2 Catalyst::Plugin::Static
 
 L<Catalyst::Plugin::Static> is a plugin to serve static files from
 C<$c-E<gt>config-E<gt>{root}>. Intended chiefly for development
 purposes.
+
+=head2 Catalyst::Plugin::Static::Simple
+
+L<Catalyst::Plugin::Static::Simple> serves static files in your
+application without requiring a single line of code. This plugin is now
+included in the core Catalyst distribution.
 
 =head2 Catalyst::Plugin::SubRequest
 
@@ -176,6 +473,18 @@ tasks (see L<http://textism.com>).
 L<Catalyst::Plugin::Unicode> provides a Unicode-aware Catalyst. On
 request, it decodes all params from UTF-8 octets into a sequence of
 logical characters. On response, it encodes the body into UTF-8 octets.
+
+=head2 Catalyst::Plugin::Unicode::Encoding
+
+
+=head2 Catalyst::Plugin::Upload::Basename
+
+
+=head2 Catalyst::Plugin::Upload::MD5
+
+
+=head2 Catalyst::Plugin::Upload::MIME
+
 
 =head2 Catalyst::Plugin::XMLRPC
 
@@ -245,11 +554,15 @@ L<Catalyst::View::TT> is a Template Toolkit view. See L<Template::Manual>.
 
 Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
 
-Marcus Ramberg E<lt>mramberg@cpan.orgE<gt>
+Gavin Henry E<lt>ghenry@suretecsystems.com<gt>
 
 Jesse Sheidlower E<lt>jester@panix.comE<gt>
+
+Marcus Ramberg E<lt>mramberg@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+
