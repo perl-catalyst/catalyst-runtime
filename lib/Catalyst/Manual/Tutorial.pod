@@ -23,7 +23,7 @@ Catalyst includes a helper script, C<catalyst.pl>, that will set up a
 skeleton application for you:
 
     $ catalyst MyApp
-    
+
     created "MyApp"
     created "MyApp/script"
     created "MyApp/lib"
@@ -87,7 +87,7 @@ Catalyst provides:
     +--------------------------------------+---------------------------------------+
     | /default                             | MyApp                                 |
     '--------------------------------------+---------------------------------------'
-    
+
     [...] [catalyst] [info] MyApp powered by Catalyst 5.5
     You can connect to your server at http://localhost:3000
 
@@ -104,7 +104,7 @@ and hit return twice):
     Connected to localhost.
     Escape character is '^]'.
     GET / HTTP/1.0
-    
+
     HTTP/1.0 200 OK
     Date: Mon, 07 Nov 2005 14:57:39 GMT
     Content-Length: 5525
@@ -188,7 +188,7 @@ explain more about those later.
 =head2 Debugging
 
 The simplest way to debug your Catalyst application is to run it using
-the built-in mini-server as described in L</Getting Started>. 
+the built-in mini-server as described in L<Getting started>. 
 
 If you want to output any debugging information to the console, then
 call C<< $context->log->debug() >>, passing it a string to output. For
@@ -330,7 +330,7 @@ This a private action which will not be matched to a path like our
 done. Only one end action will be called, if there is one in a
 controller, it will be prefered over one in the application module, and
 so on.
- 
+
 Since we're writing a simple application, just add an end action like
 this to F<tutorial.pm>:
 

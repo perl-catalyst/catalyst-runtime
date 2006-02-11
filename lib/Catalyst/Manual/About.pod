@@ -115,8 +115,6 @@ however, several systems built on top of Catalyst that can get you very
 close to a working app.) It is not designed for end users, but for
 working programmers.
 
-=head2 Some background
-
 =head2 Web programming: The Olden Days
 
 Perl has long been favored for web applications. There are a wide

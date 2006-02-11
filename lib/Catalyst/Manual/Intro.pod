@@ -636,7 +636,7 @@ be reset.
         my $first_argument = $c->req->args[0]; # now = 'test1'
         # do something...
     }
-    
+
 As you can see from these examples, you can just use the method name as
 long as you are referring to methods in the same controller. If you want
 to forward to a method in another controller, or the main application,
@@ -808,7 +808,7 @@ stash to pass data to your templates.
         name => 'My Application',
         root => '/home/joeuser/myapp/root'
     );
-    
+
     __PACKAGE__->setup;
 
     sub end : Private {

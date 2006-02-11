@@ -19,7 +19,7 @@ on the current status or preferred use of your chosen plugin/framework.
 
 =head2 Catalyst::Plugin::Account::AutoDiscovery
 
-L<Catalyst Plugin for Account Auto-Discovery> provides Account Auto-Discovery
+L<Catalyst::Plugin::Account::AutoDiscovery> provides Account Auto-Discovery
 for Catalyst.
 
 =head2 Catalyst::Plugin::Acme::Scramble
@@ -64,7 +64,7 @@ Replaced by L<Catalyst::Plugin::Authentication::Credential::HTTP>
 
 L<Catalyst::Plugin::Authentication::Credential::Atom> is a plugin which
 implements WSSE and Basic authentication for Catalyst applications using 
-L<Catalyst::Plugin:AtomServer>
+L<Catalyst::Plugin::AtomServer>
 
 =head2 Catalyst::Plugin::Authentication::Credential::Flickr
 
@@ -103,7 +103,7 @@ a look at L<http://www.openid.net/>.
 
 =head2 Catalyst::Plugin::Authentication::Simple
 
-Replaced by new L<Catalyst::Plugin::Authentication framework>
+Replaced by new L<Catalyst::Plugin::Authentication> framework
 
 =head2 Catalyst::Plugin::Authentication::Store
 

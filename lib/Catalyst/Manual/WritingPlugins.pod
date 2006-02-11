@@ -108,7 +108,7 @@ the rest of the arguments to the next handler in row by calling it via
     $c->NEXT::handler-name( @_ );
 
 if you already C<shift>ed it out of C<@_>. Remember to C<use> C<NEXT>.
- 
+
 =head2 Storage and Configuration
 
 Some Plugins use their accessor names as a storage point, e.g.
@@ -131,16 +131,16 @@ Here's a simple example Plugin that shows how to overload C<prepare>
 to add a unique ID to every request:
 
     package Catalyst::Plugin::RequestUUID;
-    
+
     use warnings;
     use strict;
-    
+
     use Catalyst::Request;
     use Data::UUID;
     use NEXT;    
 
     our $VERSION = 0.01;
-    
+
     {   # create a uuid accessor
         package Catalyst::Request;
         __PACKAGE__->mk_accessors('uuid');
@@ -148,7 +148,7 @@ to add a unique ID to every request:
 
     sub prepare {
       my $class = shift;
-      
+
       # Turns the engine-specific request into a Catalyst context .
       my $c = $class->NEXT::prepare( @_ );
 

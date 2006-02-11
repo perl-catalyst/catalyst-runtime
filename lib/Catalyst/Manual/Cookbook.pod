@@ -74,16 +74,16 @@ Catalyst Controller module 'upload' action:
         if ( $c->request->parameters->{form_submit} eq 'yes' ) {
 
             if ( my $upload = $c->request->upload('my_file') ) {
-            
+
                 my $filename = $upload->filename;
                 my $target   = "/tmp/upload/$filename";
-                
+
                 unless ( $upload->link_to($target) || $upload->copy_to($target) ) {
                     die( "Failed to copy '$filename' to '$target': $!" );
                 }
             }
         }
-        
+
         $c->stash->{template} = 'file_upload.html';
     }
 
@@ -113,7 +113,7 @@ And in the controller:
                 my $upload   = $c->req->upload($field);
                 my $filename = $upload->filename;
                 my $target   = "/tmp/upload/$filename";
-                
+
                 unless ( $upload->link_to($target) || $upload->copy_to($target) ) {
                     die( "Failed to copy '$filename' to '$target': $!" );
                 }
@@ -343,7 +343,7 @@ authentication, authorization, and access check phases.
 
 For more information see the FastCGI documentation, the C<FCGI> module 
 and L<http://www.fastcgi.com/>.
- 
+
 =head2 Serving static content
 
 Serving static content in Catalyst can be somewhat tricky; this recipe
@@ -410,7 +410,7 @@ Edit the file and add the following methods:
     # serve all files under /static as static files
     sub default : Path('/static') {
         my ( $self, $c ) = @_;
-    
+
         # Optional, allow the browser to cache the content
         $c->res->headers->header( 'Cache-Control' => 'max-age=86400' );
 
@@ -420,7 +420,7 @@ Edit the file and add the following methods:
     # also handle requests for /favicon.ico
     sub favicon : Path('/favicon.ico') {
         my ( $self, $c ) = @_;
-    
+
         $c->serve_static;
     }
 
@@ -461,7 +461,7 @@ config for this application under mod_perl 1.x:
         use lib qw(/var/www/MyApp/lib);
     </Perl>
     PerlModule MyApp
-    
+
     <VirtualHost *>
         ServerName myapp.example.com
         DocumentRoot /var/www/MyApp/root
@@ -495,8 +495,8 @@ the Catalyst Request object:
   $c->req->args([qw/arg1 arg2 arg3/]);
   $c->forward('/wherever');
 
-(See L<Catalyst::Manual::Intro#Flow_Control> for more information on
-passing arguments via C<forward>.)
+(See the L<Catalyst::Manual::Intro> Flow_Control section for more 
+information on passing arguments via C<forward>.)
 
 =head2 Configure your application
 
@@ -594,21 +594,21 @@ C<end> method; see L<Catalyst::Plugin::FillInForm>).
 
     sub end : Private {
         my ( $self, $c ) = @_;
-    
+
         if ( scalar @{ $c->error } ) {
             $c->stash->{errors}   = $c->error;
             $c->stash->{template} = 'errors.tt';
             $c->forward('MyApp::View::TT');
             $c->error(0);
         }
-    
+
         return 1 if $c->response->status =~ /^3\d\d$/;
         return 1 if $c->response->body;
-    
+
         unless ( $c->response->content_type ) {
             $c->response->content_type('text/html; charset=utf-8');
         }
-    
+
         $c->forward('MyApp::View::TT');
     }
 
@@ -678,7 +678,7 @@ in your Catalyst application, then make the following changes:
         $c->request->param('username'),
         $c->request->param('password'),
         );
-        
+
         # if login() returns 1, user is now logged in
         $c->response->redirect('/some/page');
       }
