@@ -717,12 +717,15 @@ sub uri_for {
     $namespace = '' if $path =~ /^\//;
     $path =~ s/^\///;
 
+    my $params = (scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {});
+
     # join args with '/', or a blank string
     my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
     $args =~ s/^\/// unless $path;
     my $res =
       URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ), $base )
       ->canonical;
+    $res->query_form(%$params);
     $res;
 }
 

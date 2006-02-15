@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::MockObject;
 use URI;
 
@@ -35,6 +35,12 @@ is(
 
 is( Catalyst::uri_for( $context, '../quux' )->as_string,
     'http://127.0.0.1/foo/quux', 'URI for relative dot path' );
+
+is(
+    Catalyst::uri_for( $context, 'quux', { param1 => 'value1' } )->as_string,
+    'http://127.0.0.1/foo/yada/quux?param1=value1',
+    'URI for undef action with query params'
+);
 
 $request->mock( 'base',  sub { URI->new('http://localhost:3000/') } );
 $request->mock( 'match', sub { 'orderentry/contract' } );
