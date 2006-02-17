@@ -178,6 +178,14 @@ C<My::Module>.
 
     use Catalyst qw/My::Module/;
 
+If your plugin starts with a name other than C<Catalyst::Plugin::>, you can
+fully qualify the name by using a unary plus:
+
+    use Catalyst qw/
+        My::Module
+        +Fully::Qualified::Plugin::Name
+    /;
+
 Special flags like C<-Debug> and C<-Engine> can also be specified as
 arguments when Catalyst is loaded:
 
@@ -534,12 +542,7 @@ loads and instantiates the given class.
 
 sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
-    $plugin->require;
-
-    if ( my $error = $UNIVERSAL::require::ERROR ) {
-        Catalyst::Exception->throw(
-            message => qq/Couldn't load instant plugin "$plugin", "$error"/ );
-    }
+    $class->_register_plugin($plugin, 1);
 
     eval { $plugin->import };
     $class->mk_classdata($name);
@@ -1841,24 +1844,62 @@ Sets up plugins.
 
 =cut
 
-sub setup_plugins {
-    my ( $class, $plugins ) = @_;
+=head2 $c->registered_plugins 
 
-    $plugins ||= [];
-    for my $plugin ( reverse @$plugins ) {
+Returns a sorted list of the plugins which have either been stated in the
+import list or which have been added via C<< MyApp->plugin(@args); >>.
 
-        $plugin = "Catalyst::Plugin::$plugin";
+If passed a given plugin name, it will report a boolean value indicating
+whether or not that plugin is loaded.  A fully qualified name is required if
+the plugin name does not begin with C<Catalyst::Plugin::>.
+
+ if ($c->registered_plugins('Some::Plugin')) {
+     ...
+ }
+
+=cut
+
+{
+    my %PLUGINS;
+    sub registered_plugins { 
+        my $proto = shift;
+        return sort keys %PLUGINS unless @_;
+        my $plugin = shift;
+        return 1 if exists $PLUGINS{$plugin};
+        return exists $PLUGINS{"Catalyst::Plugin::$plugin"};
+    }
+
+    sub _register_plugin {
+        my ( $proto, $plugin, $instant ) = @_;
+        my $class = ref $proto || $proto;
 
         $plugin->require;
 
-        if ($@) {
+        if ( my $error = $@ ) {
+            my $type = $instant ? "instant " : '';
             Catalyst::Exception->throw(
-                message => qq/Couldn't load plugin "$plugin", "$@"/ );
+                message => qq/Couldn't load ${type}plugin "$plugin", $error/ );
         }
 
-        {
+        $PLUGINS{$plugin} = 1;        
+        unless ($instant) {
             no strict 'refs';
             unshift @{"$class\::ISA"}, $plugin;
+        }
+        return $class;
+    }
+
+    sub setup_plugins {
+        my ( $class, $plugins ) = @_;
+
+        $plugins ||= [];
+        for my $plugin ( reverse @$plugins ) {
+
+            unless ( $plugin =~ s/\A\+// ) {
+                $plugin = "Catalyst::Plugin::$plugin";
+            }
+
+            $class->_register_plugin($plugin);
         }
     }
 }

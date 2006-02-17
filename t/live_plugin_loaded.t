@@ -13,6 +13,7 @@ my @expected = qw[
   Catalyst::Plugin::Test::Errors
   Catalyst::Plugin::Test::Headers
   Catalyst::Plugin::Test::Plugin
+  TestApp::Plugin::FullyQualified
 ];
 
 my $expected = join( ", ", @expected );

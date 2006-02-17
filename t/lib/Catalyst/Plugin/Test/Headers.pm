@@ -17,7 +17,7 @@ sub prepare {
 
     {
         no strict 'refs';
-        my $plugins = join( ', ', sort grep { m/^Catalyst::Plugin/ } @{ $class . '::ISA' } );
+        my $plugins = join ', ', $class->registered_plugins;
         $c->response->header( 'X-Catalyst-Plugins' => $plugins );
     }
 

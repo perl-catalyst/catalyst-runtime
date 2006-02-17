@@ -1,7 +1,12 @@
 package TestApp;
 
 use strict;
-use Catalyst qw/Test::Errors Test::Headers Test::Plugin/;
+use Catalyst qw/
+    Test::Errors 
+    Test::Headers 
+    Test::Plugin
+    +TestApp::Plugin::FullyQualified
+/;
 use Catalyst::Utils;
 
 our $VERSION = '0.01';
