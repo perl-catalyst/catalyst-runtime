@@ -14,10 +14,13 @@ is to install the Catalyst bundle from CPAN:
     $ perl -MCPAN -e 'install Task::Catalyst'
 
 This will retrieve Catalyst and a number of useful extensions and 
-install them for you.
+install them for you. This process might not be totally painless
+though, and you might want to look at CatInABox 
+L<http://use.perl.org/~jk2addict/journal/28071>, especially if you are
+on a system that lacks a compiler.
 
 
-=head2 Setting up your application
+=head2 The very basics - Setting up the skeleton application.
 
 Catalyst includes a helper script, C<catalyst.pl>, that will set up a 
 skeleton application for you:
@@ -26,46 +29,13 @@ skeleton application for you:
 
     created "MyApp"
     created "MyApp/script"
-    created "MyApp/lib"
-    created "MyApp/root"
-    created "MyApp/root/static"
-    created "MyApp/root/static/images"
-    created "MyApp/t"
-    created "MyApp/t/Model"
-    created "MyApp/t/View"
-    created "MyApp/t/Controller"
-    created "MyApp/lib/MyApp"
-    created "MyApp/lib/MyApp/Model"
-    created "MyApp/lib/MyApp/View"
-    created "MyApp/lib/MyApp/Controller"
-    created "MyApp/lib/MyApp.pm"
-    created "MyApp/Build.PL"
-    created "MyApp/Makefile.PL"
-    created "MyApp/README"
-    created "MyApp/Changes"
-    created "MyApp/t/01app.t"
-    created "MyApp/t/02pod.t"
-    created "MyApp/t/03podcoverage.t"
-    created "MyApp/root/static/images/catalyst_logo.png"
-    created "MyApp/root/static/images/btn_120x50_built.png"
-    created "MyApp/root/static/images/btn_120x50_built_shadow.png"
-    created "MyApp/root/static/images/btn_120x50_powered.png"
-    created "MyApp/root/static/images/btn_120x50_powered_shadow.png"
-    created "MyApp/root/static/images/btn_88x31_built.png"
-    created "MyApp/root/static/images/btn_88x31_built_shadow.png"
-    created "MyApp/root/static/images/btn_88x31_powered.png"
-    created "MyApp/root/static/images/btn_88x31_powered_shadow.png"
-    created "MyApp/root/favicon.ico"
-    created "MyApp/script/myapp_cgi.pl"
-    created "MyApp/script/myapp_fastcgi.pl"
-    created "MyApp/script/myapp_server.pl"
-    created "MyApp/script/myapp_test.pl"
+    ... output snipped
     created "MyApp/script/myapp_create.pl"
 
-This creates the directory structure shown, populated with skeleton 
+This creates the directory structure, populated with skeleton 
 files.
 
-=head2 Testing out the sample application
+=head2 Testing out the skeleton application
 
 You can test out your new application by running the server script that
 Catalyst provides:
@@ -150,6 +120,12 @@ L<Catalyst::Plugin::Session::Store::File>
 L<Catalyst::Plugin::Session::State::Cookie>
 
 L<Catalyst::Plugin::Authentication>
+
+L<Catalyst::Plugin::Authentication::Store::Minimal>
+
+L<Catalyst::Plugin::Authentication::::Minimal>
+
+L<Catalyst::Plugin::Authentication::Credential::Password>
 
 L<Catalyst::Plugin::Authorization::Roles>
 
@@ -254,23 +230,22 @@ commented out code which we will ignore for now. To make something
 happen when our URL is visited, we will write a "greet" action which
 looks like this:
 
- sub greet : Local
- {
-    my ($self, $context) = @_;
+  sub greet : Local {
+    my ($self, $c) = @_;
 
-    my $name = $context->req->params->{name};
-    $context->log->debug("Got name: $name\n");
+    my $name = $context->req->param('name');
+    $c->log->debug("Got name: $name\n");
 
-    if(!$name)
-    {
-       $context->stash->{message} = 'Please fill in a name!';
+    if ($c->req->method eq 'POST') {
+       if(!$name) {
+            $c->stash->{message} = 'Please fill in a name!';
+        }
+        else {
+            $c->stash->{message} = "Hello $name!";     
+        }
     }
-    else
-    {
-        $context->stash->{message} = "Hello $name!";     
-    }
-    $context->stash->{template} = 'greet.tt';
- }
+    $c->stash->{template} = 'greet.tt';
+  }
 
 Whew! So, what does all this do? Lets take it one step at a time.
 The subroutine declaration gives the action a name.  To the right of the
@@ -281,34 +256,31 @@ from the namespace minus the tutorial::controller portion, that is
 common to all controllers, and the action name itself.  Because it is a
 URI, we use forward slashes instead of double colons.  So, in summary,
 when a user requests http://localhost:3000/users/greet" the "greet"
-action defined above in the users controller will be executed.
+action defined above in the Users controller will be executed.
 
 The second line retrieves the parameters Catalyst gives us when it calls
 our method. The first is the instance of our Users class, and the second
-is commonly called the context. The context is the magical object
-containing any information you need from catalyst, or want to send to
+is commonly called the context, and named $c. The context is the magical 
+object containing any information you need from catalyst, or want to send to
 it. You will see it used frequently in Catalyst applications, and a list
 of all its methods is available in the L<Catalyst> POD.
 
-On the third line we use the ->params method of the $context request
+On the third line we use the ->param method of the $context request
 object to retrieve one of the query parameters, just like in L<CGI>.
 
-On the fourth, we make a debug output of this object on the server console. 
-(NB where does ->debug go if we're running under CGI or mod_perl?)
-(NB what is $self good for under CGI/mod_perl/anything?)
+On the fourth, we make a debug output of this object on the server console,
+or the error log if running under CGI or mod_perl.
 
-Next, we check if the name field contains anything (or is "true"), if it
-isnt, we assign an error message to a "message" field in the stash. The
-stash is yet another method of the context object, it allows us to pass
-data on to other methods we call later, most usefully the View modules.
+Next, if we have a post request, we check if the name field contains anything 
+(or is "true"), if it isnt, we assign an error message to a "message" field in 
+the stash. The stash is yet another method of the context object, it allows us
+to pass data on to other methods we call later, most usefully the View modules.
 
 If the username did contain a value, then we just set our message to
 greet the user by name.
 
 Finally, we set the special "template" variable in the stash to the name
 of the template we want our view to use to display this page.
-(NB doing the param name checking this way will also complain when we
-visit the form for the first time, check for presence of params at all?)
 
 =head2 Viewing
 
@@ -337,7 +309,7 @@ this to F<tutorial.pm>:
  sub end : Private
  {
    my ($self, $context) = @_;
-   $context->forward('tutorial::View::TToolkit');
+   $context->forward('tutorial::View::TToolkit') unless $c->res->body();
  }
 
 The first line declares the end sub, and marks it as a Private action.
@@ -358,12 +330,20 @@ for example, using [% c.config.name %] in our template will output
 "tutorial", our project name.
 
 All that remains is to create a simple template called "greet.tt",
-containing a form with a text field called "name", and place it in the
-F<root> directory. By default, templates are searched for here, but we
-can change that, which brings us to..
+containing a form with a text field called "name" like below.
 
-(NB Can we ask catalyst which paths exist to provide a dynamic list of
-them? (eg greet, age etc .. regexed paths??)
+    <p>[%message%]</p>
+    <form action="[%c.req.uri%]" method="post">
+    <input type="text" name="name"/>
+    </form>
+
+In the example above, we use [%c.req.uri%], since we're posting to ourself.
+if we post to another action, we commonly use the uri_for method, like this:
+
+ [% c.uri_for('/users/greet')%]
+
+Place this file in the F<root> directory, . By default, templates are 
+searched for here, but we can change that, which brings us to..
 
 =head2 Configuring
 
@@ -436,30 +416,30 @@ controller.
 
  sub create : Local
  {
-    my ($self, $context) = @_;
+    my ($self, $c) = @_;
     my ($username, $passwd1, $passwd2) = map { $context->req->param($_)} 
        ('username', 'password', 'passwordverify');
 
     if($username && $passwd1 && $passwd2)
     {
-       if($context->config->{authentication}{users}{$username})
+       if($c->config->{authentication}{users}{$username})
        {
-          $context->stash->{message} = 'Sorry that user already exists';
-          $context->stash->{username} = $username;
+          $c->stash->{message} = 'Sorry that user already exists';
+          $c->stash->{username} = $username;
        }
        elsif($passwd1 eq $passwd2)
        {
-          $context->config->({%{$context->config},
+          $c->config->({%{$context->config},
              ($username => { password => $passwd1}});
-          $context->stash->{message} = 'User created!';
+          $c->stash->{message} = 'User created!';
        }
        else
        {
-          $context->stash->{username} = $username;
-          $context->stash->{message} = 'Passwords don't match!';
+          $c->stash->{username} = $username;
+          $c->stash->{message} = 'Passwords don't match!';
        }
     }
-    $context->stash->{template} = 'usercreate.tt';
+    $c->stash->{template} = 'usercreate.tt';
  }
 
 All this is doing is checking that all the appropriate fields are filled, 
@@ -472,10 +452,9 @@ So our that users can login, we need a login page:
  sub login : Local
  {
     my ($self, $context) = @_;
-    $context->stash->{template} = 'userlogin.tt';
-    if(!$context->login())
-    {
-       $context->stash->{message} = 'Login failed.';
+    $c->stash->{template} = 'userlogin.tt';
+    if(!$c->login()) {
+       $c->stash->{message} = 'Login failed.';
     }
  }
 
@@ -523,26 +502,21 @@ make a restricted I<localhost:3000/users/groups> page like this:
  sub groups : Local
  {
     my ($self, $context) = @_;
-    if($context->check_user_roles('admin'))
-    {
+    if($c->check_user_roles('admin')) {
        # Now we can do things only an admin will see
-       if(my $params = $context->req->params)
-       {
-          my $users = $context->config->{authentication}{users};
-          foreach my $u (keys %$params)
-          {
+       if(my $params = $c->req->params) {
+          my $users = $c->config->{authentication}{users};
+          foreach my $u (keys %$params) {
              $users->{$u}{roles} = $params->{$u} if($users->{$u});
           }
           $context->stash->{message} = 'Updated user roles!';
        }
-       else
-       {
+       else {
            $context->stash->{users} = $context->config->{authentication};
        }
        $context->stash->{template} = 'usersgroups.tt';
     }
-    else
-    {
+    else {
         $context->stash->{message} = 'Admins Only!';
         $context->stash->{template} = 'error.tt';
     }
@@ -581,25 +555,21 @@ module in the Model::UserData namespace for each table in your database.
 Now we need a form for our users to enter/edit their personal greetings in,
 we'll make a I<localhost:3000/users/editgreeting> page: 
 
- sub editgreeting : Local
- {
-    my ($self, $context) = @_;
-    if($context->req->params->{greeting})
-    {
-       if(!$context->user_exists)
-       {
-          $context->stash->{message} = "You're not logged in!";
+ sub editgreeting : Local {
+    my ($self, $c) = @_;
+    if($c->req->params->{greeting}) {
+       if(!$c->user_exists) {
+          $c->stash->{message} = "You're not logged in!";
        }
-       else
-       {
+       else {
           my $grtable = $context->model('UserData::Greetings');
           my $record = $grtable->find_or_create(user => $context->user->id);
           $record->greeting($context->req->params->{greeting};
           $record->update;
-          $context->stash->{message} = 'Greeting updated';
+          $c->stash->{message} = 'Greeting updated';
        }
     }
-    $context->stash->{template} = 'usersgreeting.tt';
+    $c->stash->{template} = 'usersgreeting.tt';
  }
 
 Using C<< $context->user_exists >> from the Authentication plugin, this checks
