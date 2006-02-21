@@ -137,6 +137,13 @@ To get started all you need to do is type:
 
 B<catalyst.pl tutorial>
 
+=for commentary
+Poor choice of application name - searching for "tutorial" in the docs
+also results in discussion of the tutorial process, which is probably
+not what the reader wants.
+
+=cut
+
 This should create a directory called F<tutorial> and fill it with the
 default (standard) Catalyst installation. Change to this directory
 because we will be running all further commands from inside the
@@ -167,9 +174,9 @@ The simplest way to debug your Catalyst application is to run it using
 the built-in mini-server as described in L<Getting started>. 
 
 If you want to output any debugging information to the console, then
-call C<< $context->log->debug() >>, passing it a string to output. For
+call C<< $c->log->debug() >>, passing it a string to output. For
 data structures, use Data::Dumper and call C<<
-$context->log->debug(Dumper($structure)) >>
+$c->log->debug(Dumper($structure)) >>
 
 =head2 Model/View/Controller
 
@@ -233,7 +240,7 @@ looks like this:
   sub greet : Local {
     my ($self, $c) = @_;
 
-    my $name = $context->req->param('name');
+    my $name = $c->req->param('name');
     $c->log->debug("Got name: $name\n");
 
     if ($c->req->method eq 'POST') {
@@ -260,13 +267,16 @@ action defined above in the Users controller will be executed.
 
 The second line retrieves the parameters Catalyst gives us when it calls
 our method. The first is the instance of our Users class, and the second
-is commonly called the context, and named $c. The context is the magical 
-object containing any information you need from catalyst, or want to send to
-it. You will see it used frequently in Catalyst applications, and a list
-of all its methods is available in the L<Catalyst> POD.
+is commonly called the context, and named $c.  From now on, whenever we 
+are talking about the context object, it will be represented as $c in the code.
 
-On the third line we use the ->param method of the $context request
-object to retrieve one of the query parameters, just like in L<CGI>.
+The context is the magical object containing any information you need from catalyst, 
+or want to send to it, and is passed from action to action. You will see it used 
+frequently in Catalyst applications, and a list of all its methods is available in 
+the L<Catalyst> POD.
+
+On the third line we use the ->param method of the context's request object
+to retrieve one of the query parameters, just like in L<CGI>.
 
 On the fourth, we make a debug output of this object on the server console,
 or the error log if running under CGI or mod_perl.
@@ -306,10 +316,9 @@ so on.
 Since we're writing a simple application, just add an end action like
 this to F<tutorial.pm>:
 
- sub end : Private
- {
-   my ($self, $context) = @_;
-   $context->forward('tutorial::View::TToolkit') unless $c->res->body();
+ sub end : Private {
+   my ($self, $c) = @_;
+   $c->forward('tutorial::View::TToolkit') unless $c->res->body();
  }
 
 The first line declares the end sub, and marks it as a Private action.
@@ -332,10 +341,13 @@ for example, using [% c.config.name %] in our template will output
 All that remains is to create a simple template called "greet.tt",
 containing a form with a text field called "name" like below.
 
+    <html><head><title> [% c.name %]</head><body>
     <p>[%message%]</p>
     <form action="[%c.req.uri%]" method="post">
     <input type="text" name="name"/>
+    <input type="submit" value="Submit" name="submit"/>
     </form>
+    </body></html>
 
 In the example above, we use [%c.req.uri%], since we're posting to ourself.
 if we post to another action, we commonly use the uri_for method, like this:
@@ -343,7 +355,7 @@ if we post to another action, we commonly use the uri_for method, like this:
  [% c.uri_for('/users/greet')%]
 
 Place this file in the F<root> directory, . By default, templates are 
-searched for here, but we can change that, which brings us to..
+searched for here, but we can change that, which brings us to...
 
 =head2 Configuring
 
@@ -414,29 +426,24 @@ export our data to disk and read it back into the config on startup)
 To allow creation of new users we'll add a create action to our Users 
 controller.
 
- sub create : Local
- {
+ sub create : Local {
     my ($self, $c) = @_;
-    my ($username, $passwd1, $passwd2) = map { $context->req->param($_)} 
+    my ($username, $passwd1, $passwd2) = map { $c->req->param($_)} 
        ('username', 'password', 'passwordverify');
 
-    if($username && $passwd1 && $passwd2)
-    {
-       if($c->config->{authentication}{users}{$username})
-       {
+    if($username && $passwd1 && $passwd2) {
+       if($c->config->{authentication}{users}{$username}) {
           $c->stash->{message} = 'Sorry that user already exists';
           $c->stash->{username} = $username;
        }
-       elsif($passwd1 eq $passwd2)
-       {
-          $c->config->({%{$context->config},
-             ($username => { password => $passwd1}});
+       elsif($passwd1 eq $passwd2) {
+            $c->config->{authentication}->{users}->{$username} =
+                {password => $passwd1};
           $c->stash->{message} = 'User created!';
        }
-       else
-       {
+       else {
           $c->stash->{username} = $username;
-          $c->stash->{message} = 'Passwords don't match!';
+          $c->stash->{message} = 'Passwords do not match!';
        }
     }
     $c->stash->{template} = 'usercreate.tt';
@@ -447,16 +454,44 @@ the password fields contain the same data, and then adding the user to the
 config hash.  All the checks produce a message which can be displayed to 
 the user via the View.
 
-So our that users can login, we need a login page: 
+The usercreate.tt template looks like this:
 
- sub login : Local
- {
-    my ($self, $context) = @_;
-    $c->stash->{template} = 'userlogin.tt';
-    if(!$c->login()) {
-       $c->stash->{message} = 'Login failed.';
-    }
+ <html><head><title>[% c.config.name %]</title></head><body>
+ <h1>Create a new user</h1>
+ <p> [% c.stash.message %] </p>
+ <form action="/users/create" method="post">
+ <p>User Name: <input type="text" name="username"/></p>
+ <p>Password: <input type="password" name="password"/></p>
+ <p>Confirm Password: <input type="password" name="passwordverify"/></p>
+ <p><input type="submit" name="submit" value="submit"></p>
+ </form>
+ </body></html>
+
+So our that users can login, we need a login action which we put in the
+Users controller:
+
+ sub login : Local {
+     my ($self, $c) = @_;
+     $c->stash->{template} = 'userlogin.tt';
+     if(!$c->login()) {
+             $c->stash->{message} = 'Please login.';
+     }
+     else {
+         $c->stash->{message} = "Welcome " . $c->user->id;
+     }
  }
+
+
+And the userlogin.tt template:
+
+ <html><head><title>[% c.config.name %]</title></head><body>
+<p> [% c.stash.message %] </p>
+ <form name='login' action='/users/login' method='post'>
+ <p>Username: <input type='text' name='user' /></p>
+ <p>Password: <input type='password' name='password' /></p>
+ <p><input type="submit" /></form>
+ </body></html>
+
 
 Verrrry simple. Since Credential::Password's "login" call extracts the 
 username/password data from the query itself (assuming we use a standard 
@@ -472,15 +507,28 @@ our collection, and the Auth modules will automatically use them;
 
 Magic!
 
+=head2 Exercise
+
+As an exercise for the reader, do the following:
+
+Change users/greet and greet.tt so that the welcome message greets the
+user by name.
+
+Enforce user logging in by adding an auto action in tutorial.pm (see
+the L<Catalyst> documentation to find out about the auto action).
+
 =head2 Authorising
 
-Authentication is about verifying users, Authorisation is about allowing
-them to do things. Catalyst currently has two Authorisation modules,
-Roles and ACL. The Roles module allows you to define groups which you
-can assign your users to, and then allow access to areas of your website
-to the groups. The ACL module lets you do more fine grained
-access/restriction by allowing of denying access however you like. (It
-also supports Roles as done by the roles module.)
+Authentication is about verifying users, Authorisation is about
+allowing them to do things. Catalyst currently has two Authorisation
+modules, Roles and ACL. The Roles module allows you to define groups
+which you can assign your users to, and then allow access to areas of
+your website to the groups. The ACL module lets you do more fine
+grained access/restriction by allowing of denying access however you
+like. (It also supports Roles as done by the roles module.)  This
+example uses Catalyst::Plugin::Authorization::Roles.  To use this add
+"Authorization::Roles" into the "use Catalyst" statement in
+tutorial.pm.
 
 Adding Roles via the Minimal store we are already using is quite simple,
 we just add a roles key to each user, defining the names of the roles
@@ -489,19 +537,18 @@ they belong to.
  authentication => { 'users' =>
                             { 'fred' => 
                                { 'password' => 'fred1234',
-                                 'roles'       => ['admin'] 
+                                 'roles'       => ['admin']
                                }
                             }
                          }
 
 We need an interface for our admins to administer the roles, i.e. assign
 the users to groups. To restrict access to certain actions, we just need
-to call C<< $context->check_user_roles() >> in each action. So we can
+to call C<< $c->check_user_roles() >> in each action. So we can
 make a restricted I<localhost:3000/users/groups> page like this:
 
- sub groups : Local
- {
-    my ($self, $context) = @_;
+ sub groups : Local {
+    my ($self, $c) = @_;
     if($c->check_user_roles('admin')) {
        # Now we can do things only an admin will see
        if(my $params = $c->req->params) {
@@ -509,16 +556,16 @@ make a restricted I<localhost:3000/users/groups> page like this:
           foreach my $u (keys %$params) {
              $users->{$u}{roles} = $params->{$u} if($users->{$u});
           }
-          $context->stash->{message} = 'Updated user roles!';
+          $c->stash->{message} = 'Updated user roles!';
        }
        else {
-           $context->stash->{users} = $context->config->{authentication};
+           $c->stash->{users} = $c->config->{authentication};
        }
-       $context->stash->{template} = 'usersgroups.tt';
+       $c->stash->{template} = 'usersgroups.tt';
     }
     else {
-        $context->stash->{message} = 'Admins Only!';
-        $context->stash->{template} = 'error.tt';
+        $c->stash->{message} = 'Admins Only!';
+        $c->stash->{template} = 'error.tt';
     }
  }
 
@@ -527,7 +574,34 @@ default in the check_user_roles method), is a member of the admin group.
 If it is, then we display the usergroups template, and update the users
 hash as required. Otherwise, we just show the user an error page.
 
+For this simple example, the usersgroups.tt and error.tt templates could
+both look like this:
+
+ <html><head><title>[% c.config.name %]</title></head><body>
+ <p>[% c.stash.message %]</p>
+ <p>[% c.stash.users %]</p>
+ </body></html>
+
 And that's all there is to it.
+
+=for authors
+So it's not clear what the groups action is doing - and with the
+current template, nothing happens.  Running through the sample code,
+it's clear what's happening, (which is very little), but the purpose,
+and how to display data is not clear.
+
+=cut
+
+So that you can test this out properly without having to go to the
+trouble of deleting browser cookies manually, we will add a logout
+action in the Users controller:
+
+ sub logout : Local {
+    my ($self, $c) = @_;
+    $c->stash->{message} = "You have successfully logged out";
+    $c->logout;
+ }
+
 
 =head2 Data Storage (Modelling)
 
@@ -562,9 +636,9 @@ we'll make a I<localhost:3000/users/editgreeting> page:
           $c->stash->{message} = "You're not logged in!";
        }
        else {
-          my $grtable = $context->model('UserData::Greetings');
-          my $record = $grtable->find_or_create(user => $context->user->id);
-          $record->greeting($context->req->params->{greeting};
+          my $grtable = $c->model('UserData::Greetings');
+          my $record = $grtable->find_or_create(user => $c->user->id);
+          $record->greeting($c->req->params->{greeting};
           $record->update;
           $c->stash->{message} = 'Greeting updated';
        }
@@ -572,7 +646,7 @@ we'll make a I<localhost:3000/users/editgreeting> page:
     $c->stash->{template} = 'usersgreeting.tt';
  }
 
-Using C<< $context->user_exists >> from the Authentication plugin, this checks
+Using C<< $c->user_exists >> from the Authentication plugin, this checks
 whether the user is logged in already. If they are, if they are, and they have
 entered a new greeting, we use DBIx::Class' C<find_or_create> to fetch or
 create a new record in the greetings table for the user. Once we have the
@@ -595,7 +669,7 @@ or
 
 =head3 Apache
 
-Apache also needs configuring, we need to tell it to load your
+Apache also needs to be configured: we need to tell it to load your
 application. You can either use Catalyst for your entire website, or
 subsections. Use the Location directive to choose a path to run your
 application under: 
@@ -624,15 +698,25 @@ application is accessed.
 
 =head3 FastCGI
 
-These instructions apply to the use of C<mod_fastcgi> under Apache (either 1 or 2 series).
+These instructions apply to the use of C<mod_fastcgi> under Apache
+(either 1 or 2 series).
 
-There are 3 ways to attach a program to a URL with C<mod_fastcgi>; we'll examine all of them, and explain how to avoid having the C<myapp_fastcgi.pl> substring in the user-visible URLs.
+There are 3 ways to attach a program to a URL with C<mod_fastcgi>;
+we'll examine all of them, and explain how to avoid having the
+C<myapp_fastcgi.pl> substring in the user-visible URLs.
 
-In all of these examples, we assume that the C<DocumentRoot> is C</var>, that our app is called C<MyApp> and is kept in C</usr>, that you want the users to access the app either from the root of the server-uri-space, or from C</theapp>. We also assume that the general FastCGI settings (C<FastCgiIpcDir>, loading the module) are already correct (they don't depend on Catalyst or your application layout).
+In all of these examples, we assume that the C<DocumentRoot> is
+C</var>, that our app is called C<MyApp> and is kept in C</usr>, that
+you want the users to access the app either from the root of the
+server-uri-space, or from C</theapp>. We also assume that the general
+FastCGI settings (C<FastCgiIpcDir>, loading the module) are already
+correct (they don't depend on Catalyst or your application layout).
 
 =head4 static application
 
-In this setup, you tell C<mod_fastcgi> that a particular I<file> is to be run as a FastCGI handler. Put this somewhere in Apache's configuration:
+In this setup, you tell C<mod_fastcgi> that a particular I<file> is to
+be run as a FastCGI handler. Put this somewhere in Apache's
+configuration:
 
   FastCgiServer /usr/apps/MyApp/script/myapp_fastcgi.pl
   Alias / /usr/apps/MyApp/script/myapp_fastcgi.pl/
@@ -641,11 +725,16 @@ If you want your app under C</theapp>, change the C<Alias> line to:
 
   Alias /theapp /usr/apps/MyApp/script/myapp_fastcgi.pl
 
-Note the detail of the trailing C</ >: this is a general rule af the C<Alias> directive, both sides must end with C</ >, or both must not; you can't have one with C</ > and the other without, or strange things happen.
+Note the detail of the trailing C</ >: this is a general rule af the
+C<Alias> directive, both sides must end with C</ >, or both must not;
+you can't have one with C</ > and the other without, or strange things
+happen.
 
 =head4 dynamic application
 
-In this setup, you tell C<mod_fastcgi> that certain files are to be treated as FastCGI handlers, in the same way you have to tell C<mod_cgi>. Put this in the configuration:
+In this setup, you tell C<mod_fastcgi> that certain files are to be
+treated as FastCGI handlers, in the same way you have to tell
+C<mod_cgi>. Put this in the configuration:
 
   FastCgiConfig -autoUpdate
 
@@ -664,16 +753,23 @@ Again, if you want your app under C</theapp>, change the C<Alias> line to:
 
 =head4 external server
 
-In this setup, the application is started separately from Apache, and communicates via a socket with C<mod_fastcgi>. This can be useful if you need to have a particular environment for your application (maybe different between applications), or you want to run them on different machines, or under different users for security reasons.
+In this setup, the application is started separately from Apache, and
+communicates via a socket with C<mod_fastcgi>. This can be useful if
+you need to have a particular environment for your application (maybe
+different between applications), or you want to run them on different
+machines, or under different users for security reasons.
 
-If you want to use a UNIX socket (on the filesystem), put this in Apache's configuration:
+If you want to use a UNIX socket (on the filesystem), put this in
+Apache's configuration:
 
   FastCgiExternalServer /tmp/somewhere -socket /tmp/myapp-socket
   Alias / /tmp/somewhere/
 
-Note that C</tmp> should I<not> exist: it's just a name to connect the two parts.
+Note that C</tmp> should I<not> exist: it's just a name to connect the
+two parts.
 
-Again, if you want your app under C</theapp>, change the C<Alias> line to:
+Again, if you want your app under C</theapp>, change the C<Alias> line
+to:
 
   Alias /theapp /tmp/somewhere
 
@@ -682,7 +778,9 @@ Then start your Catalyst application:
   $ cd /usr/apps/MyApp
   $ ./script/myapp_fastcgi -l /tmp/myapp-socket
 
-If you want to use a TCP socket, simply change the C</tmp> to a C<host:port> pair, both in Apache's configuration and on the command line of your application.
+If you want to use a TCP socket, simply change the C</tmp> to a
+C<host:port> pair, both in Apache's configuration and on the command
+line of your application.
 
 =head2 Upgrading
 
@@ -691,32 +789,35 @@ installing the new Catalyst package, just run:
 
 B<catalyst.pl -scripts>
 
-One level above your application directory. This will update the scripts
-directory only, and leave the rest of your app alone, If you wish to make use
-of other parts of Catalyst that have been updated, leave off the B<-scripts>
-argument, this will cause .new files to appear, for each module that has
-either been updated, or is different to the original because you have changed
-it. To find out what these changes are, type: 
+One level above your application directory. This will update the
+scripts directory only, and leave the rest of your app alone, If you
+wish to make use of other parts of Catalyst that have been updated,
+leave off the B<-scripts> argument, this will cause .new files to
+appear, for each module that has either been updated, or is different
+to the original because you have changed it. To find out what these
+changes are, type:
 
 B<diff MyApp/lib/MyApp/View/TT.pm MyApp/lib/MyApp/View/TT.pm.new>
 
-for each of the changed files. (This is a Unix command, Windows users will
-need to find some equivalent). Copy any changes you need into your original
-file, then remove the .new files. (This makes life less complicated when the
-next upgrade comes around.) 
+for each of the changed files. (This is a Unix command, Windows users
+will need to find some equivalent). Copy any changes you need into
+your original file, then remove the .new files. (This makes life less
+complicated when the next upgrade comes around.)
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Jess Robinson, C<jrobinson@cpan.org>
 Andrew Ford, C<A.Ford@ford-mason.co.uk>
 Marcus Ramberg, C<mramberg@cpan.org>
+Kieren Diment, C<kd@totaldatasolution.com>
 
 Please send comments, corrections and suggestions for improvements to
 jrobinson@cpan.org
 
 =head1 TODO
 
-Add template examples.
+Finish DBIC examples with templates and tested code.  Make
+/users/groups do something "useful"
 
 Many other things..
 
