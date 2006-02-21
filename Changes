@@ -1,7 +1,10 @@
 This file documents the revision history for Perl extension Catalyst.
 
-	- Support optional hashref as last param for parameters in uri_for.
-    - Updated tutorial to be more complete.
+5.65    2006-02-21 10:34:00
+        - Added plugin introspection.
+        - Support optional hashref as last param for parameters in uri_for.
+        - Updated tutorial to be more complete.
+        - Applied args patch from antirice (Fixes Ticket #67)
 
 5.64    2006-02-07 20:29:00
         - Fixed bug in FastCGI proc manager mode where pm_post_dispatch

@@ -196,6 +196,7 @@ sub prepare_action {
         # If not, move the last part path to args
         unshift @args, pop @path;
     }
+    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for @args;
 
     $c->log->debug( 'Path is "' . $c->req->match . '"' )
       if ( $c->debug && $c->req->match );

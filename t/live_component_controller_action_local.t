@@ -120,7 +120,7 @@ sub run_tests {
         );
         like(
             $response->content,
-            qr/arguments => \[\s*'foo%2Fbar'\s*\]/,
+            qr~arguments => \[\s*'foo/bar'\s*\]~,
             "Parameters don't split on %2F"
         );
     }
