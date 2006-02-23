@@ -44,6 +44,7 @@ sub match {
 
     foreach my $compiled ( @{ $self->{compiled} || [] } ) {
         if ( my @snippets = ( $path =~ $compiled->{re} ) ) {
+            next unless $compiled->{action}->match($c);
             $c->req->action( $compiled->{path} );
             $c->req->match($path);
             $c->req->snippets( \@snippets );

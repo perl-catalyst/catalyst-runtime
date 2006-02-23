@@ -24,7 +24,7 @@ sub match {
     return if @{ $c->req->args };
     my $result = $c->get_action( 'index', $path );
 
-    if ($result) {
+    if ($result && $result->match($c)) {
         $c->action($result);
         $c->namespace( $result->namespace );
         $c->req->action('index');

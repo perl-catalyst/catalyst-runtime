@@ -46,6 +46,16 @@ sub execute {    # Execute ourselves against a context
     return $c->execute( $self->class, $self );
 }
 
+=head2 match
+
+=cut
+
+sub match {
+    my ( $self, $c ) = @_;
+    return 1 unless exists $self->attributes->{Args};
+    return scalar(@{$c->req->args}) == $self->attributes->{Args}[0];
+}
+
 =head2 namespace
 
 =head2 reverse

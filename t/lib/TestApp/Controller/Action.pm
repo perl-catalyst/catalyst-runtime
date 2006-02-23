@@ -12,6 +12,7 @@ sub begin : Private {
 sub default : Private {
     my ( $self, $c ) = @_;
     $c->res->output("Error - TestApp::Controller::Action\n");
+    $c->res->status(404);
 }
 
 1;

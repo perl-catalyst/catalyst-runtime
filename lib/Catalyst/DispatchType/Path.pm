@@ -42,6 +42,7 @@ sub match {
 
     $path ||= '/';
     if ( my $action = $self->{paths}->{$path} ) {
+        return 0 unless $action->match($c);
         $c->req->action($path);
         $c->req->match($path);
         $c->action($action);

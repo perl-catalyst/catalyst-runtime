@@ -8,7 +8,7 @@ sub one : Action Relative {
     $c->forward('TestApp::View::Dump::Request');
 }
 
-sub two : Action Local {
+sub two : Action Local Args(2) {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }

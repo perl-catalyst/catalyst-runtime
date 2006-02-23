@@ -25,7 +25,7 @@ sub match {
     my $result = ( $c->get_actions( 'default', $c->req->path ) )[-1];
 
     # Find default on namespace or super
-    if ($result) {
+    if ($result && $result->match($c)) {
         $c->action($result);
         $c->namespace( $result->namespace );
         $c->req->action('default');

@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 30*$iters;
+use Test::More tests => 32*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -44,7 +44,7 @@ sub run_tests {
     }
 
     {
-        ok( my $response = request('http://localhost/action/local/two'),
+        ok( my $response = request('http://localhost/action/local/two/1/2'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
@@ -60,6 +60,12 @@ sub run_tests {
             qr/^bless\( .* 'Catalyst::Request' \)$/s,
             'Content is a serialized Catalyst::Request'
         );
+    }
+
+    {
+         ok( my $response = request('http://localhost/action/local/two'),
+               'Request' );
+         ok( !$response->is_success, 'Request with wrong number of args failed' );
     }
 
     {
@@ -106,13 +112,13 @@ sub run_tests {
     {
         ok(
             my $response =
-              request('http://localhost/action/local/two/foo%2Fbar'),
+              request('http://localhost/action/local/one/foo%2Fbar'),
             'Request'
         );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->header('X-Catalyst-Action'),
-            'action/local/two', 'Test Action' );
+            'action/local/one', 'Test Action' );
         is(
             $response->header('X-Test-Class'),
             'TestApp::Controller::Action::Local',
