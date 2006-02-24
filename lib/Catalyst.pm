@@ -701,7 +701,9 @@ EOF
 Merges path with C<$c-E<gt>request-E<gt>base> for absolute uri's and
 with C<$c-E<gt>namespace> for relative uri's, then returns a
 normalized L<URI> object. If any args are passed, they are added at the
-end of the path.
+end of the path.  If the last argument to uri_for is a hash reference,
+it is assumed to contain GET parameter key/value pairs, which will be
+appended to the URI in standard fashion.
 
 =cut
 
