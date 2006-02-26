@@ -84,6 +84,7 @@ sub mk_app {
         $self->_mk_dirs;
         $self->_mk_config;
         $self->_mk_appclass;
+        $self->_mk_rootclass;
         $self->_mk_readme;
         $self->_mk_changes;
         $self->_mk_apptest;
@@ -340,6 +341,15 @@ sub _mk_appclass {
     $self->render_file( 'appclass', "$mod.pm" );
 }
 
+sub _mk_rootclass {
+    my $self = shift;
+    my $c    = $self->{c};
+    my $name = $self->{name};
+    $self->{rootname} =
+      $self->{short} ? "$name\::C::Root" : "$name\::Controller::Root";
+    $self->render_file( 'rootclass', File::Spec->catfile( $c, "Root.pm" ) );
+}
+
 sub _mk_makefile {
     my $self = shift;
     $self->{path} = File::Spec->catfile( 'lib', split( '::', $self->{name} ) );
@@ -557,6 +567,42 @@ __PACKAGE__->setup;
 =head1 DESCRIPTION
 
 Catalyst based application.
+
+=head1 AUTHOR
+
+[% author %]
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+1;
+__rootclass__
+package [% rootname %];
+
+use strict;
+use warnings;
+use base 'Catalyst::Controller';
+
+#
+# A empty namespace attaches this Controller to the root
+#
+__PACKAGE__->config->{namespace} = '';
+
+=head1 NAME
+
+[% rootname %] - Root Controller of this Catalyst based application
+
+=head1 SYNOPSIS
+
+See L<[% name %]>.
+
+=head1 DESCRIPTION
+
+Root Controller of this Catalyst based application.
 
 =head1 METHODS
 

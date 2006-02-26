@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.66
+        - Added Root controller concept
+
 5.65    2006-02-21 10:34:00
         - Added plugin introspection.
         - Support optional hashref as last param for parameters in uri_for.
