@@ -346,6 +346,59 @@ sub stash {
 
 Contains the return value of the last executed action.
 
+=cut
+
+# search via regex
+sub _comp_search {
+    my ($c, @names) = @_;
+
+    foreach my $name (@names) {
+        foreach my $component ( keys %{ $c->components } ) {
+            my $comp = $c->components->{$component} if $component =~ /$name/i;
+            if ($comp) {
+                if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
+                    return $comp->ACCEPT_CONTEXT($c);
+                }
+                else { return $comp }
+            }
+        }
+    }
+
+    return undef;
+}
+
+# try explicit component names
+sub _comp_explicit {
+    my ($c, @names) = @_;
+
+    foreach my $try (@names) {
+        if ( exists $c->components->{$try} ) {
+            my $comp = $c->components->{$try};
+            if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
+                return $comp->ACCEPT_CONTEXT($c);
+            }
+            else { return $comp }
+        }
+    }
+
+    return undef;
+}
+
+# like component, but try just these prefixes before regex searching,
+#  and do not try to return "sort keys %{ $c->components }"
+sub _comp_prefixes {
+    my ($c, $name, @prefixes) = @_;
+
+    my $appclass = ref $c || $c;
+
+    my @names = map { "${appclass}::${_}::${name}" } @prefixes;
+
+    my $comp = $c->_comp_explicit(@names);
+    return $comp if defined($comp);
+    $comp = $c->_comp_search($name);
+    return $comp;
+}
+
 =head2 Component Accessors
 
 =head2 $c->comp($name)
@@ -374,29 +427,11 @@ sub component {
               qw/Model M Controller C View V/
         );
 
-        foreach my $try (@names) {
+        my $comp = $c->_comp_explicit(@names);
+        return $comp if defined($comp);
 
-            if ( exists $c->components->{$try} ) {
-
-                my $comp = $c->components->{$try};
-                if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
-                    return $comp->ACCEPT_CONTEXT($c);
-                }
-                else { return $comp }
-            }
-        }
-
-        foreach my $component ( keys %{ $c->components } ) {
-            my $comp;
-            $comp = $c->components->{$component} if $component =~ /$name/i;
-            if ($comp) {
-                if ( ref $comp && $comp->can('ACCEPT_CONTEXT') ) {
-                    return $comp->ACCEPT_CONTEXT($c);
-                }
-                else { return $comp }
-            }
-        }
-
+        $comp = $c->_comp_search($name);
+        return $comp if defined($comp);
     }
 
     return sort keys %{ $c->components };
@@ -412,9 +447,7 @@ Gets a L<Catalyst::Controller> instance by name.
 
 sub controller {
     my ( $c, $name ) = @_;
-    my $controller = $c->comp("Controller::$name");
-    return $controller if defined $controller;
-    return $c->comp("C::$name");
+    return $c->_comp_prefixes($name, qw/Controller C/);
 }
 
 =head2 $c->model($name)
@@ -427,9 +460,7 @@ Gets a L<Catalyst::Model> instance by name.
 
 sub model {
     my ( $c, $name ) = @_;
-    my $model = $c->comp("Model::$name");
-    return $model if defined $model;
-    return $c->comp("M::$name");
+    return $c->_comp_prefixes($name, qw/Model M/);
 }
 
 =head2 $c->view($name)
@@ -442,9 +473,7 @@ Gets a L<Catalyst::View> instance by name.
 
 sub view {
     my ( $c, $name ) = @_;
-    my $view = $c->comp("View::$name");
-    return $view if defined $view;
-    return $c->comp("V::$name");
+    return $c->_comp_prefixes($name, qw/View V/);
 }
 
 =head2 Class data and helper classes
