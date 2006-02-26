@@ -332,6 +332,9 @@ sub _mk_dirs {
         $self->{c} = File::Spec->catdir( $self->{mod}, 'Controller' );
         $self->mk_dir( $self->{c} );
     }
+    my $name = $self->{name};
+    $self->{rootname} =
+      $self->{short} ? "$name\::C::Root" : "$name\::Controller::Root";
     $self->{base} = File::Spec->rel2abs( $self->{dir} );
 }
 
@@ -343,11 +346,8 @@ sub _mk_appclass {
 
 sub _mk_rootclass {
     my $self = shift;
-    my $c    = $self->{c};
-    my $name = $self->{name};
-    $self->{rootname} =
-      $self->{short} ? "$name\::C::Root" : "$name\::Controller::Root";
-    $self->render_file( 'rootclass', File::Spec->catfile( $c, "Root.pm" ) );
+    $self->render_file( 'rootclass',
+        File::Spec->catfile( $self->{c}, "Root.pm" ) );
 }
 
 sub _mk_makefile {
@@ -556,6 +556,10 @@ our $VERSION = '0.01';
 #
 __PACKAGE__->setup;
 
+#
+# IMPORTANT: Please look into [% rootname %] for more
+#
+
 =head1 NAME
 
 [% name %] - Catalyst based application
@@ -567,6 +571,10 @@ __PACKAGE__->setup;
 =head1 DESCRIPTION
 
 Catalyst based application.
+
+=head1 SEE ALSO
+
+L<[% rootname %]>, L<Catalyst>
 
 =head1 AUTHOR
 
@@ -588,13 +596,14 @@ use warnings;
 use base 'Catalyst::Controller';
 
 #
-# A empty namespace attaches this Controller to the root
+# Sets the actions in this controller to be registered with no prefix
+# so they function identically to actions created in MyApp.pm
 #
 __PACKAGE__->config->{namespace} = '';
 
 =head1 NAME
 
-[% rootname %] - Root Controller of this Catalyst based application
+[% rootname %] - Root Controller for this Catalyst based application
 
 =head1 SYNOPSIS
 
@@ -602,7 +611,7 @@ See L<[% name %]>.
 
 =head1 DESCRIPTION
 
-Root Controller of this Catalyst based application.
+Root Controller for this Catalyst based application.
 
 =head1 METHODS
 

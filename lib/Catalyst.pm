@@ -58,7 +58,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.65';
+our $VERSION = '5.66';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -542,7 +542,7 @@ loads and instantiates the given class.
 
 sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
-    $class->_register_plugin($plugin, 1);
+    $class->_register_plugin( $plugin, 1 );
 
     eval { $plugin->import };
     $class->mk_classdata($name);
@@ -722,7 +722,8 @@ sub uri_for {
     $namespace = '' if $path =~ /^\//;
     $path =~ s/^\///;
 
-    my $params = (scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {});
+    my $params =
+      ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     # join args with '/', or a blank string
     my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
@@ -1863,7 +1864,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 
 {
     my %PLUGINS;
-    sub registered_plugins { 
+
+    sub registered_plugins {
         my $proto = shift;
         return sort keys %PLUGINS unless @_;
         my $plugin = shift;
@@ -1883,7 +1885,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
                 message => qq/Couldn't load ${type}plugin "$plugin", $error/ );
         }
 
-        $PLUGINS{$plugin} = 1;        
+        $PLUGINS{$plugin} = 1;
         unless ($instant) {
             no strict 'refs';
             unshift @{"$class\::ISA"}, $plugin;
