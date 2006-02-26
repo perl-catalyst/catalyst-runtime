@@ -80,7 +80,8 @@ Catalyst Base Class
 
 sub action_namespace {
     my ( $self, $c ) = @_;
-    return Catalyst::Utils::class2prefix( ref $self,
+    return $self->config->{namespace} if exists $self->config->{namespace};
+    return Catalyst::Utils::class2prefix( ref($self) || $self,
         $c->config->{case_sensitive} )
       || '';
 }
