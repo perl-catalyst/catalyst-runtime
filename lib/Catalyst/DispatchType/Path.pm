@@ -60,31 +60,10 @@ sub match {
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my $attrs = $action->attributes;
-    my @register;
-
-    foreach my $r ( @{ $attrs->{Path} || [] } ) {
-        unless ($r) {
-            $r = $action->namespace;
-            $r = '/' unless length $r;
-        }
-        elsif ( $r !~ m!^/! ) {    # It's a relative path
-            $r = $action->namespace . "/$r";
-        }
-        push( @register, $r );
-    }
-
-    if ( $attrs->{Global} || $attrs->{Absolute} ) {
-        push( @register, $action->name );    # Register sub name against root
-    }
-
-    if ( $attrs->{Local} || $attrs->{Relative} ) {
-        push( @register, join( '/', $action->namespace, $action->name ) );
-
-        # Register sub name as a relative path
-    }
+    my @register = @{$action->attributes->{Path}||[]};
 
     $self->register_path( $c, $_, $action ) for @register;
+
     return 1 if @register;
     return 0;
 }
