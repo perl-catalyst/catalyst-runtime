@@ -4,7 +4,7 @@ use strict;
 use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_config/;
+__PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
 =head1 NAME
 

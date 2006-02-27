@@ -1892,14 +1892,13 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 =cut
 
 {
-    my %PLUGINS;
 
     sub registered_plugins {
         my $proto = shift;
-        return sort keys %PLUGINS unless @_;
+        return sort keys %{$proto->_plugins} unless @_;
         my $plugin = shift;
-        return 1 if exists $PLUGINS{$plugin};
-        return exists $PLUGINS{"Catalyst::Plugin::$plugin"};
+        return 1 if exists $proto->_plugins->{$plugin};
+        return exists $proto->_plugins->{"Catalyst::Plugin::$plugin"};
     }
 
     sub _register_plugin {
@@ -1914,7 +1913,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
                 message => qq/Couldn't load ${type}plugin "$plugin", $error/ );
         }
 
-        $PLUGINS{$plugin} = 1;
+        $proto->_plugins->{$plugin} = 1;        
         unless ($instant) {
             no strict 'refs';
             unshift @{"$class\::ISA"}, $plugin;
@@ -1925,6 +1924,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
     sub setup_plugins {
         my ( $class, $plugins ) = @_;
 
+        $class->_plugins( {} ) unless $class->_plugins;
         $plugins ||= [];
         for my $plugin ( reverse @$plugins ) {
 
