@@ -60,7 +60,7 @@ sub match {
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my @register = @{$action->attributes->{Path}||[]};
+    my @register = @{ $action->attributes->{Path} || [] };
 
     $self->register_path( $c, $_, $action ) for @register;
 
@@ -77,6 +77,7 @@ sub register_path {
     $path =~ s!^/!!;
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
+
     $self->{paths}{$path} = $action;
 }
 

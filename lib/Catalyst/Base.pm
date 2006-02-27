@@ -86,6 +86,12 @@ sub action_namespace {
       || '';
 }
 
+=head2 $self->path_prefix($c)
+
+=cut
+
+sub path_prefix { shift->action_namespace(@_); }
+
 =head2 $self->register_actions($c)
 
 =cut
@@ -163,26 +169,43 @@ sub _parse_Global_attr {
     return $self->_parse_Path_attr( $c, $name, "/$name" );
 }
 
-*_parse_Absolute_attr = \&_parse_Global_attr;
+sub _parse_Absolute_attr { shift->_parse_Global_attr(@_); }
 
 sub _parse_Local_attr {
     my ( $self, $c, $name, $value ) = @_;
     return $self->_parse_Path_attr( $c, $name, $name );
 }
 
-*_parse_Relative_attr = \&_parse_Local_attr;
+sub _parse_Relative_attr { shift->_parse_Local_attr(@_); }
 
 sub _parse_Path_attr {
     my ( $self, $c, $name, $value ) = @_;
     $value ||= '';
     if ( $value =~ m!^/! ) {
         return ( 'Path', $value );
-    } elsif ( length $value ) {
-        return ( 'Path', join( '/', $self->action_namespace($c), $value ) );
-    } else {
-        return ( 'Path', $self->action_namespace($c) );
+    }
+    elsif ( length $value ) {
+        return ( 'Path', join( '/', $self->path_prefix($c), $value ) );
+    }
+    else {
+        return ( 'Path', $self->path_prefix($c) );
     }
 }
+
+sub _parse_Regex_attr {
+    my ( $self, $c, $name, $value ) = @_;
+    return ( 'Regex', $value );
+}
+
+sub _parse_Regexp_attr { shift->_parse_Regex_attr(@_); }
+
+sub _parse_LocalRegex_attr {
+    my ( $self, $c, $name, $value ) = @_;
+    unless ( $value =~ s/^\^// ) { $value = "(?:.*?)$value"; }
+    return ( 'Regex', '^' . $self->path_prefix($c) . "/${value}" );
+}
+
+sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
 
 =head1 SEE ALSO
 
