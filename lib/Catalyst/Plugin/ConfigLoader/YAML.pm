@@ -3,8 +3,6 @@ package Catalyst::Plugin::ConfigLoader::YAML;
 use strict;
 use warnings;
 
-use File::Slurp;
-
 =head1 NAME
 
 Catalyst::Plugin::ConfigLoader::YAML - Load YAML config files
@@ -46,7 +44,9 @@ sub load {
         return YAML::LoadFile( $file );
     }
     else {
-        my $content = read_file( $file );
+        open( my $fh, $file ) or die $!;
+        my $content = do { local $/; <$fh> };
+        close $fh;
         return YAML::Syck::Load( $content );
     }
 }
