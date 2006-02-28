@@ -92,7 +92,7 @@ L<Authen::TypeKey> with L<Catalyst::Plugin::Authentication>
 =head2 Catalyst::Plugin::Authentication::LDAP
 
 L<Catalyst::Plugin::Authentication::LDAP> is a plugin allowing you 
-to authenticate your web users using an LDAP server. Soon to be replaced
+to authenticate your web users using an LDAP server. Replaced
 by L<Catalyst::Plugin::Authentication::Store::LDAP>
 
 =head2 Catalyst::Plugin::Authentication::OpenID
@@ -121,6 +121,11 @@ L<Catalyst::Plugin::Authentication::Store::Htpasswd> uses L<Authen::Htpasswd>
 to let your application use C<.htpasswd> files for it's 
 authentication storage.
 
+=head2 Catalyst::Plugin::Authentication::Store::LDAP
+
+L<Catalyst::Plugin::Authentication::Store::LDAP> the new LDAP store. Use this 
+instead of L<Catalyst::Plugin::Authentication::LDAP>
+
 =head2 Catalyst::Plugin::Authentication::Store::Minimal
 
 L<Catalyst::Plugin::Authentication::Store::Minimal> lets you create a very 
@@ -135,12 +140,13 @@ See L<Catalyst::Plugin::Authentication::Store::Minimal> for more info.
 
 =head2 Catalyst::Plugin::Authorization::ACL
 
-
-=head2 Catalyst::Plugin::Authorization::ACL::Engine
-
+L<Catalyst::Plugin::Authorization::ACL> This module provides Access Control 
+List style path protection, with arbitrary rules for L<Catalyst> applications. 
+It operates only on the Catalyst private namespace, at least at the moment.
 
 =head2 Catalyst::Plugin::Authorization::CDBI::GroupToken
 
+No longer on the CPAN
 
 =head2 Catalyst::Plugin::Authorization::Roles
 
@@ -554,7 +560,7 @@ L<Catalyst::View::TT> is a Template Toolkit view. See L<Template::Manual>.
 
 Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
 
-Gavin Henry E<lt>ghenry@suretecsystems.com<gt>
+Gavin Henry E<lt>ghenry@suretecsystems.comE<gt>
 
 Jesse Sheidlower E<lt>jester@panix.comE<gt>
 
