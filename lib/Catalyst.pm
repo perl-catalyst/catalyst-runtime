@@ -17,7 +17,7 @@ use Text::SimpleTable;
 use Path::Class;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
-use Scalar::Util qw/weaken/;
+use Scalar::Util qw/weaken blessed/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
@@ -1165,7 +1165,7 @@ sub finalize_headers {
     if ( $c->response->body && !$c->response->content_length ) {
 
         # get the length from a filehandle
-        if ( ref $c->response->body && $c->response->body->can('read') ) {
+        if ( blessed($c->response->body) && $c->response->body->can('read') ) {
             if ( my $stat = stat $c->response->body ) {
                 $c->response->content_length( $stat->size );
             }
