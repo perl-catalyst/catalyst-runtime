@@ -110,7 +110,7 @@ sub redirect {
 
     if (@_) {
         my $location = shift;
-        my $status   = shift || 302;
+        my $status   = shift || 301;
 
         $self->location($location);
         $self->status($status);

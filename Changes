@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.66
+	- Change redirect to use a 301, not a 302
         - Added Root controller concept
         - Updated ConfigLoader plugin to version 0.04
 
