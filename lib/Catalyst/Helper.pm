@@ -269,7 +269,7 @@ sub next_test {
         $self->{prefix} = $prefix;
         $prefix         = lc $prefix;
         $prefix =~ s/-/\//g;
-        $self->{uri} = $prefix;
+        $self->{uri} = "/$prefix";
     }
     my $dir  = $self->{test_dir};
     my $type = lc $self->{type};
