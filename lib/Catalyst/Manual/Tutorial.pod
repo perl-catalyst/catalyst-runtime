@@ -25,12 +25,12 @@ on a system that lacks a compiler.
 Catalyst includes a helper script, C<catalyst.pl>, that will set up a 
 skeleton application for you:
 
-    $ catalyst MyApp
+    $ catalyst tutorial
 
-    created "MyApp"
-    created "MyApp/script"
+    created "tutorial"
+    created "tutorial/script"
     ... output snipped
-    created "MyApp/script/myapp_create.pl"
+    created "tutorial/script/tutorial_create.pl"
 
 This creates the directory structure, populated with skeleton 
 files.
@@ -40,8 +40,8 @@ files.
 You can test out your new application by running the server script that
 Catalyst provides:
 
-    $ cd MyApp
-    $ script/myapp_server.pl 
+    $ cd tutorial
+    $ script/tutorial_server.pl 
 
     [...] [catalyst] [debug] Debug messages enabled
     [...] [catalyst] [debug] Loaded plugins:
@@ -50,15 +50,15 @@ Catalyst provides:
     '------------------------------------------------------------------------------'
     [...] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
     [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [...] [catalyst] [debug] Found home "/home/users/me/MyApp"
+    [...] [catalyst] [debug] Found home "/home/users/me/tutorial"
     [...] [catalyst] [debug] Loaded Private actions:
     .--------------------------------------+---------------------------------------.
     | Private                              | Class                                 |
     +--------------------------------------+---------------------------------------+
-    | /default                             | MyApp                                 |
+    | /default                             | tutorial                              |
     '--------------------------------------+---------------------------------------'
 
-    [...] [catalyst] [info] MyApp powered by Catalyst 5.5
+    [...] [catalyst] [info] tutorial powered by Catalyst 5.66
     You can connect to your server at http://localhost:3000
 
 (Note that each line logged by Catalyst begins with a timestamp, which has
@@ -80,13 +80,13 @@ and hit return twice):
     Content-Length: 5525
     Content-Type: text/html; charset=utf-8
     Status: 200
-    X-Catalyst: 5.5
+    X-Catalyst: 5.66
 
     [...]
     Connection closed by foreign host.
     $
 
-You can see the full welcome message by visting
+You can see the full welcome message by visiting
 http://localhost:3000/ with your browser.
 
 More trace messages will appear in the original terminal window:
@@ -106,11 +106,11 @@ More trace messages will appear in the original terminal window:
 The server will continue running until you interrupt it.
 
 The application can also be tested from the command line using the generated
-helper script, C<script/myapp_test.pl>.
+helper script, C<script/tutorial_test.pl>.
 
 =head2 Getting started
 
-So you picked Catalyst. Good choice. I assume you've installed it as
+So you picked Catalyst. Good choice. I assume you have installed it as
 well. For this tutorial you will also need the following modules:
 
 L<Catalyst::Plugin::Session>
@@ -133,9 +133,10 @@ L<DBD::SQLite>
 
 ...
 
-To get started all you need to do is type:
+If you have not already done this following the example above, then to get 
+started all you need to do is type:
 
-B<catalyst.pl tutorial>
+    catalyst.pl tutorial
 
 =for commentary
 Poor choice of application name - searching for "tutorial" in the docs
@@ -149,17 +150,20 @@ default (standard) Catalyst installation. Change to this directory
 because we will be running all further commands from inside the
 F<tutorial> directory.
 
-If you now run the built-in mini-server with
-B<script/tutorial_server.pl>, it will show some standard debug messages
-in the console screen (more about those in a minute), and then inform
-you that you can now connect to the test server on port 3000. Point your
-browser at localhost:3000 to see the built-in catalyst welcome screen.
+If you now run the built-in mini-server with:
+    
+    script/tutorial_server.pl
 
-The other important thing catalyst.pl did was create your root
+it will show some standard debug messages in the console screen 
+(more about those in a minute), and then inform you that you can now 
+connect to the test server on port 3000. Point your browser at 
+http://localhost:3000/ to see the built-in catalyst welcome screen.
+
+The other important thing B<catalyst.pl> did was create your root
 controller. This file is a standard perl module like all the other
-controllers that you might add to your application.  It lives in the
+controllers that you might add to your application. It lives in the
 F<lib/> directory, and will have the same name as you supplied to the
-command above, in our case it is F<tutorial.pm>. Alongside this file is
+command above. In our case it is F<tutorial.pm>. Alongside this file is
 a directory of the same name, which is the top level namespace for the
 entire application. Thus every other module we create will be
 "tutorial::something";
@@ -175,21 +179,23 @@ the built-in mini-server as described in L<Getting started>.
 
 If you want to output any debugging information to the console, then
 call C<< $c->log->debug() >>, passing it a string to output. For
-data structures, use Data::Dumper and call C<<
+data structures, use L<Data::Dumper> and call C<<
 $c->log->debug(Dumper($structure)) >>
 
 =head2 Model/View/Controller
 
 The recommended method for code organization in a Catalyst application
 is known as the "Model View Controller" design pattern (also referred to
-"MVC"). The point of the MVC pattern is to divorce the dependencies of
+"MVC". See L<http://en.wikipedia.org/wiki/Model-view-controller>). 
+
+The point of the MVC pattern is to divorce the dependencies of
 parts of the application from each other, and give them standard
 interfaces. Following this theory of organization should give your code
-all the benefits of modularity.  The main benefits are interchangability
+all the benefits of modularity. The main benefits are interchangeability
 of parts and reusable code.
 
 Thus you could replace your file data storage with a database or your
-oracle database with a mysql database and not have to change any of your
+Oracle database with a MySQL database and not have to change any of your
 controlling or view logic. Or you could later decide to output
 information from your application as RSS instead of HTML just by adding
 a new view module.
@@ -229,7 +235,7 @@ will be sent to the I<users/greet> URL. To create a controller that
 serves the I<users> namespace, we run the following command in our
 F<tutorial> directory:
 
-B<script/tutorial_create.pl controller Users>
+    script/tutorial_create.pl controller Users
 
 This will create a Users.pm in F<lib/tutorial/Controller>. Open this
 file in an editor and take a look. You will notice there is some
@@ -256,24 +262,34 @@ looks like this:
 
 Whew! So, what does all this do? Lets take it one step at a time.
 The subroutine declaration gives the action a name.  To the right of the
-name there is an attribute type that looks like this:  " : Local".  That
-defines which URIs will translate to this action.  "Local", matches
-exactly one URI: /users/greet. The URI matched by "Local" is composed
-from the namespace minus the tutorial::controller portion, that is
-common to all controllers, and the action name itself.  Because it is a
-URI, we use forward slashes instead of double colons.  So, in summary,
-when a user requests http://localhost:3000/users/greet" the "greet"
-action defined above in the Users controller will be executed.
+name there is an attribute type that looks like this:   
+
+    : Local 
+    
+That defines which URIs will translate to this action. "Local", matches
+exactly one URI: 
+
+    /users/greet
+    
+The URI matched by "Local" is composed from the namespace minus the 
+tutorial::controller portion, that is common to all controllers, 
+and the action name itself.  Because it is a URI, we use forward slashes 
+instead of double colons.  So, in summary, when a user requests:
+ 
+    http://localhost:3000/users/greet
+    
+the "greet" action defined above in the Users controller will be executed.
 
 The second line retrieves the parameters Catalyst gives us when it calls
 our method. The first is the instance of our Users class, and the second
 is commonly called the context, and named $c.  From now on, whenever we 
-are talking about the context object, it will be represented as $c in the code.
+are talking about the context object, it will be represented as $c in 
+the code.
 
-The context is the magical object containing any information you need from catalyst, 
-or want to send to it, and is passed from action to action. You will see it used 
-frequently in Catalyst applications, and a list of all its methods is available in 
-the L<Catalyst> POD.
+The context is the magical object containing any information you need from 
+catalyst, or want to send to it, and is passed from action to action. 
+You will see it used frequently in Catalyst applications, and a list of all 
+its methods is available in the L<Catalyst> POD.
 
 On the third line we use the ->param method of the context's request object
 to retrieve one of the query parameters, just like in L<CGI>.
@@ -282,9 +298,10 @@ On the fourth, we make a debug output of this object on the server console,
 or the error log if running under CGI or mod_perl.
 
 Next, if we have a post request, we check if the name field contains anything 
-(or is "true"), if it isnt, we assign an error message to a "message" field in 
-the stash. The stash is yet another method of the context object, it allows us
-to pass data on to other methods we call later, most usefully the View modules.
+(or is "true"), if it isn't, we assign an error message to a "message" field 
+in the stash. The stash is yet another method of the context object, it allows 
+us to pass data on to other methods we call later, most usefully the View 
+modules.
 
 If the username did contain a value, then we just set our message to
 greet the user by name.
@@ -299,7 +316,7 @@ actually display the page/form in the first place, and our results? As
 previously mentioned, we'll use Template Toolkit for our viewing. To
 create out TT based view, just run the following command:
 
-B<script/tutorial_create.pl view TToolkit TT>
+    script/tutorial_create.pl view TToolkit TT
 
 Notice that this time we not only gave it the type of module we wanted
 to create (a view), and a name, but also a third argument, "TT". This is
@@ -310,16 +327,16 @@ To use the view, the easiest way is to set up a standard "end" action.
 This a private action which will not be matched to a path like our
 "greet" action, but instead will be called after all other processing is
 done. Only one end action will be called, if there is one in a
-controller, it will be prefered over one in the application module, and
+controller, it will be preferred over one in the application module, and
 so on.
 
 Since we're writing a simple application, just add an end action like
 this to F<tutorial.pm>:
 
- sub end : Private {
-   my ($self, $c) = @_;
-   $c->forward('tutorial::View::TToolkit') unless $c->res->body();
- }
+    sub end : Private {
+        my ($self, $c) = @_;
+        $c->forward('tutorial::View::TToolkit') unless $c->res->body();
+    }
 
 The first line declares the end sub, and marks it as a Private action.
 (The second and last attribute type we'll be using). The second line
@@ -327,8 +344,8 @@ collects our standard parameters as shown in the controller's greet action.
 
 The third line directs Catalyst to pass processing on to our TToolkit
 view. The forward method, when just passed a class name, calls process
-on that classs. The standard TT view's process method renders the
-template named in the templare variable in the stash, using all the
+on that class. The standard TT view's process method renders the
+template named in the template variable in the stash, using all the
 other variables in the stash as values to fill it in.
 
 NB: This is such a common way to end you processing that there is a
@@ -352,9 +369,9 @@ containing a form with a text field called "name" like below.
 In the example above, we use [%c.req.uri%], since we're posting to ourself.
 if we post to another action, we commonly use the uri_for method, like this:
 
- [% c.uri_for('/users/greet')%]
+    [% c.uri_for('/users/greet')%]
 
-Place this file in the F<root> directory, . By default, templates are 
+Place this file in the F<root> directory. By default, templates are 
 searched for here, but we can change that, which brings us to...
 
 =head2 Configuring
@@ -378,7 +395,7 @@ call in F<tutorial.pm> like this:
 And move the F<greet.tt> file from F<root> to the F<templates> directory
 (after creating it).
 
-Now we can run our application again by killing (ctrl-c) and restarting
+Now we can run our application again by killing (B<ctrl-c>) and restarting
 B<script/tutorial_server.pl>. Try connecting to
 I<localhost:3000/users/greet> with a browser and see what happens. What
 happens if you try to visit I<localhost:3000/users> ? 
@@ -485,7 +502,7 @@ Users controller:
 And the userlogin.tt template:
 
  <html><head><title>[% c.config.name %]</title></head><body>
-<p> [% c.stash.message %] </p>
+ <p> [% c.stash.message %] </p>
  <form name='login' action='/users/login' method='post'>
  <p>Username: <input type='text' name='user' /></p>
  <p>Password: <input type='password' name='password' /></p>
@@ -525,8 +542,8 @@ modules, Roles and ACL. The Roles module allows you to define groups
 which you can assign your users to, and then allow access to areas of
 your website to the groups. The ACL module lets you do more fine
 grained access/restriction by allowing of denying access however you
-like. (It also supports Roles as done by the roles module.)  This
-example uses Catalyst::Plugin::Authorization::Roles.  To use this add
+like (It also supports Roles as done by the roles module). This
+example uses L<Catalyst::Plugin::Authorization::Roles>. To use this add
 "Authorization::Roles" into the "use Catalyst" statement in
 tutorial.pm.
 
@@ -545,7 +562,7 @@ they belong to.
 We need an interface for our admins to administer the roles, i.e. assign
 the users to groups. To restrict access to certain actions, we just need
 to call C<< $c->check_user_roles() >> in each action. So we can
-make a restricted I<localhost:3000/users/groups> page like this:
+make a restricted I<http://localhost:3000/users/groups> page like this:
 
  sub groups : Local {
     my ($self, $c) = @_;
@@ -621,13 +638,13 @@ that contains a "user" field and a "greeting" field. The simplest way to
 create a model of your database is to use these helper modules, for example
 with L<DBIx::Class>: 
 
-B<script/tutorial_create.pl model UserData DBIC dbi:SQLite:/path/to/mydb.db>
+    script/tutorial_create.pl model UserData DBIC dbi:SQLite:/path/to/mydb.db
 
 This will cause the DBIx::Class Loader to inspect your database, and create a
 module in the Model::UserData namespace for each table in your database. 
 
 Now we need a form for our users to enter/edit their personal greetings in,
-we'll make a I<localhost:3000/users/editgreeting> page: 
+we'll make a I<http://localhost:3000/users/editgreeting> page: 
 
  sub editgreeting : Local {
     my ($self, $c) = @_;
@@ -658,7 +675,7 @@ the new value in the database.
 Now that we have the basics together, we can try running our application on a
 "real" server instead of just using the test server that catalyst comes
 with. L<Catalyst::Engine> is the module used to implement various types of
-servers to run it on. The currect popular ones are Apache and FastCGI. To
+servers to run it on. The current popular ones are Apache and FastCGI. To
 force the use of a particular engine we can use the -Engine flag to Catalyst: 
 
  use Catalyst qw/-Engine=Apache/;
@@ -676,7 +693,7 @@ application under:
 
  <Location />
    SetHandler                perl-script
-   PerlResponseHandler  MyApp
+   PerlResponseHandler  tutorial
  </Location>
 
 You will need to install the perl modules of your application into one of
@@ -684,7 +701,7 @@ perls library directories, as listed by B<perl -V>, so that Apache can find
 them. Alternatively you can use the C<PerlSwitches> directive to tell Apache
 where to look: 
 
- PerlSwitches -I/path/to/MyApp/
+ PerlSwitches -I/path/to/tutorial/
 
 These instructions are for using Apache2 and mod_perl 2.0. If you are using
 mod_perl 1.3 or 1.99, please refer to either L<Catalyst::Engine::Apache::MP13>
@@ -694,7 +711,7 @@ If you wish to ensure that Apache pre-loads your application, use the
 PerlModule directive. This means that there will be less of a delay when your
 application is accessed. 
 
- PerlModule MyApp
+ PerlModule tutorial
 
 =head3 FastCGI
 
@@ -703,10 +720,10 @@ These instructions apply to the use of C<mod_fastcgi> under Apache
 
 There are 3 ways to attach a program to a URL with C<mod_fastcgi>;
 we'll examine all of them, and explain how to avoid having the
-C<myapp_fastcgi.pl> substring in the user-visible URLs.
+C<tutorial_fastcgi.pl> substring in the user-visible URLs.
 
 In all of these examples, we assume that the C<DocumentRoot> is
-C</var>, that our app is called C<MyApp> and is kept in C</usr>, that
+C</var>, that our app is called C<tutorial> and is kept in C</usr>, that
 you want the users to access the app either from the root of the
 server-uri-space, or from C</theapp>. We also assume that the general
 FastCGI settings (C<FastCgiIpcDir>, loading the module) are already
@@ -718,14 +735,14 @@ In this setup, you tell C<mod_fastcgi> that a particular I<file> is to
 be run as a FastCGI handler. Put this somewhere in Apache's
 configuration:
 
-  FastCgiServer /usr/apps/MyApp/script/myapp_fastcgi.pl
-  Alias / /usr/apps/MyApp/script/myapp_fastcgi.pl/
+  FastCgiServer /usr/apps/tutorial/script/tutorial_fastcgi.pl
+  Alias / /usr/apps/tutorial/script/tutorial_fastcgi.pl/
 
 If you want your app under C</theapp>, change the C<Alias> line to:
 
-  Alias /theapp /usr/apps/MyApp/script/myapp_fastcgi.pl
+  Alias /theapp /usr/apps/tutorial/script/tutorial_fastcgi.pl
 
-Note the detail of the trailing C</ >: this is a general rule af the
+Note the detail of the trailing C</ >: this is a general rule of the
 C<Alias> directive, both sides must end with C</ >, or both must not;
 you can't have one with C</ > and the other without, or strange things
 happen.
@@ -738,18 +755,18 @@ C<mod_cgi>. Put this in the configuration:
 
   FastCgiConfig -autoUpdate
 
-  <Directory /usr/apps/MyApp/script>
+  <Directory /usr/apps/tutorial/script>
    Options +ExecCGI
    <Files *_fastcgi.pl>
     SetHandles fastcgi-script
    </Files>
   </Directory>
 
-  Alias / /usr/apps/MyApp/script/myapp_fastcgi.pl/
+  Alias / /usr/apps/tutorial/script/tutorial_fastcgi.pl/
 
 Again, if you want your app under C</theapp>, change the C<Alias> line to:
 
-  Alias /theapp /usr/apps/MyApp/script/myapp_fastcgi.pl
+  Alias /theapp /usr/apps/tutorial/script/tutorial_fastcgi.pl
 
 =head4 external server
 
@@ -762,7 +779,7 @@ machines, or under different users for security reasons.
 If you want to use a UNIX socket (on the filesystem), put this in
 Apache's configuration:
 
-  FastCgiExternalServer /tmp/somewhere -socket /tmp/myapp-socket
+  FastCgiExternalServer /tmp/somewhere -socket /tmp/tutorial-socket
   Alias / /tmp/somewhere/
 
 Note that C</tmp> should I<not> exist: it's just a name to connect the
@@ -775,8 +792,8 @@ to:
 
 Then start your Catalyst application:
 
-  $ cd /usr/apps/MyApp
-  $ ./script/myapp_fastcgi -l /tmp/myapp-socket
+  $ cd /usr/apps/tutorial
+  $ ./script/tutorial_fastcgi -l /tmp/tutorial-socket
 
 If you want to use a TCP socket, simply change the C</tmp> to a
 C<host:port> pair, both in Apache's configuration and on the command
@@ -787,7 +804,7 @@ line of your application.
 Upgrading your application to newer Catalyst versions is quite simple. After
 installing the new Catalyst package, just run: 
 
-B<catalyst.pl -scripts>
+    catalyst.pl -scripts
 
 One level above your application directory. This will update the
 scripts directory only, and leave the rest of your app alone, If you
@@ -797,7 +814,7 @@ appear, for each module that has either been updated, or is different
 to the original because you have changed it. To find out what these
 changes are, type:
 
-B<diff MyApp/lib/MyApp/View/TT.pm MyApp/lib/MyApp/View/TT.pm.new>
+    diff tutorial/lib/tutorial/View/TT.pm tutorial/lib/tutorial/View/TT.pm.new
 
 for each of the changed files. (This is a Unix command, Windows users
 will need to find some equivalent). Copy any changes you need into
@@ -810,9 +827,10 @@ Jess Robinson, C<jrobinson@cpan.org>
 Andrew Ford, C<A.Ford@ford-mason.co.uk>
 Marcus Ramberg, C<mramberg@cpan.org>
 Kieren Diment, C<kd@totaldatasolution.com>
+Gavin Henry, C<ghenry@cpan.org>
 
 Please send comments, corrections and suggestions for improvements to
-jrobinson@cpan.org
+jrobinson@cpan.org, ghenry@cpan.org
 
 =head1 TODO
 
