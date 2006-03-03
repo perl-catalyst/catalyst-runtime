@@ -36,13 +36,17 @@ requires 'File::Copy::Recursive';
 requires 'Module::Install::Admin' => '0.54';
 requires 'Module::Install'        => '0.54';
 requires 'YAML'                   => '0.55';
-requires 'Data::Visitor'		  => '0.02';
+requires 'Data::Visitor'          => '0.02';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,
   'Catalyst::Engine::Apache' => '1.05';
 
 feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
+
+feature 'Test::WWW::Mechanize::Catalyst Support',
+  -default                         => 0,
+  'Test::WWW::Mechanize::Catalyst' => 0;
 
 feature 'PAR Support',
   -default => 0,

@@ -992,16 +992,18 @@ use Pod::Usage;
 use Catalyst::Helper;
 
 my $force = 0;
+my $mech  = 0;
 my $help  = 0;
 
 GetOptions(
-    'nonew|force' => \$force,
-    'help|?'      => \$help
+    'nonew|force'    => \$force,
+    'mech|mechanize' => \$mech,
+    'help|?'         => \$help
  );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new( { '.newfiles' => !$force } );
+my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
 
 pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 
@@ -1016,11 +1018,13 @@ pod2usage(1) unless $helper->mk_component( '[% name %]', @ARGV );
 [% appprefix %]_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
-   -force    don't create a .new file where a file to be created exists
-   -help     display this help and exits
+   -force        don't create a .new file where a file to be created exists
+   -mechanize    use Test::WWW::Mechanize::Catalyst for tests if available
+   -help         display this help and exits
 
  Examples:
    [% appprefix %]_create.pl controller My::Controller
+   [% appprefix %]_create.pl -mechanize controller My::Controller
    [% appprefix %]_create.pl view My::View
    [% appprefix %]_create.pl view MyView TT
    [% appprefix %]_create.pl view TT TT
@@ -1105,12 +1109,24 @@ it under the same terms as Perl itself.
 __comptest__
 use strict;
 use warnings;
-[% IF long_type == 'Controller' %]use Test::More tests => 3;
+[% IF long_type == 'Controller' %][% IF mech %]our $test_count;
+use Test::More;
+
+eval "use Test::WWW::Mechanize::Catalyst '[% app %]'";
+plan $@
+    ? ( skip_all => 'Test::WWW::Mechanize::Catalyst required' )
+    : ( tests => 2 );
+
+ok( my $mech = Test::WWW::Mechanize::Catalyst->new, 'Created mech object' );
+
+$mech->get_ok( 'http://localhost[% uri %]' );
+[% ELSE %]use Test::More tests => 3;
 
 BEGIN { use_ok 'Catalyst::Test', '[% app %]' }
 BEGIN { use_ok '[% class %]' }
 
 ok( request('[% uri %]')->is_success, 'Request should succeed' );
+[% END %]
 [% ELSE %]use Test::More tests => 1;
 
 BEGIN { use_ok '[% class %]' }
