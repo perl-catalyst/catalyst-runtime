@@ -1109,8 +1109,7 @@ it under the same terms as Perl itself.
 __comptest__
 use strict;
 use warnings;
-[% IF long_type == 'Controller' %][% IF mech %]our $test_count;
-use Test::More;
+[% IF long_type == 'Controller' %][% IF mech %]use Test::More;
 
 eval "use Test::WWW::Mechanize::Catalyst '[% app %]'";
 plan $@
