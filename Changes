@@ -1,10 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.66
+5.66    2006-03-10 17:48:00
         - Added Test::WWW::Mechanize::Catalyst support
         - Cleaned generated tests
-	- Change redirect to use a 301, not a 302
-        - Added Root controller concept
+	- Added Root controller concept
         - Updated ConfigLoader plugin to version 0.04
 
 5.65    2006-02-21 10:34:00

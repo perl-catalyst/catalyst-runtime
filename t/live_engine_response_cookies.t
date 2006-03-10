@@ -37,7 +37,7 @@ my $expected = {
     ok( my $response = request('http://localhost/engine/response/cookies/two'),
         'Request' );
     ok( $response->is_redirect, 'Response Redirection 3xx' );
-    is( $response->code, 301, 'Response Code' );
+    is( $response->code, 302, 'Response Code' );
     is( $response->header('X-Catalyst-Action'),
         'engine/response/cookies/two', 'Test Action' );
 
