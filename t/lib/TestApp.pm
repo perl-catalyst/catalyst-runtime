@@ -55,9 +55,22 @@ sub execute {
     return $c->SUPER::execute(@_);
 }
 
-sub class_forward_test_method {
+sub class_forward_test_method :Private {
     my ( $self, $c ) = @_;
     $c->response->headers->header( 'X-Class-Forward-Test-Method' => 1 );
+}
+
+sub loop_test : Local {
+    my ( $self, $c ) = @_;
+
+    for( 1..1001 ) {
+        $c->forward( 'class_forward_test_method' );
+    }
+}
+
+sub recursion_test : Local {
+    my ( $self, $c ) = @_;
+    $c->forward( 'recursion_test' );
 }
 
 {

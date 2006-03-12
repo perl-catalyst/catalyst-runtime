@@ -971,18 +971,21 @@ sub execute {
     $class = $c->component($class) || $class;
     $c->state(0);
 
+    if ($c->depth >= $RECURSION) {
+        my $action = "$code";
+        $action = "/$action" unless $action =~ /\-\>/;
+        my $error = qq/Deep recursion detected calling "$action"/;
+        $c->log->error($error);
+        $c->error($error);
+        $c->state(0);
+        return $c->state;
+    }
+
+
     if ( $c->debug ) {
         my $action = "$code";
         $action = "/$action" unless $action =~ /\-\>/;
         $c->counter->{"$code"}++;
-
-        if ( $c->counter->{"$code"} > $RECURSION ) {
-            my $error = qq/Deep recursion detected in "$action"/;
-            $c->log->error($error);
-            $c->error($error);
-            $c->state(0);
-            return $c->state;
-        }
 
         # determine if the call was the result of a forward
         # this is done by walking up the call stack and looking for a calling
