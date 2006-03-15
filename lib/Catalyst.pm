@@ -219,7 +219,7 @@ Specifies log level.
 
 =head1 METHODS
 
-=head2 Information about the current request
+=head2 INFORMATION ABOUT THE CURRENT REQUEST
 
 =head2 $c->action
 
@@ -241,7 +241,7 @@ corresponding to the controller of the current action. For example:
 Returns the current L<Catalyst::Request> object. See
 L<Catalyst::Request>.
 
-=head2 Processing and response to the current request
+=head2 PROCESSING AND RESPONSE TO THE CURRENT REQUEST
 
 =head2 $c->forward( $action [, \@arguments ] )
 
@@ -399,7 +399,7 @@ sub _comp_prefixes {
     return $comp;
 }
 
-=head2 Component Accessors
+=head2 COMPONENT ACCESSORS
 
 =head2 $c->comp($name)
 
@@ -538,7 +538,7 @@ L<Catalyst::Log> man page.
 
 =cut
 
-=head2 Utility methods
+=head2 UTILITY METHODS
 
 =head2 $c->path_to(@path)
 
@@ -1232,7 +1232,7 @@ namespaces.
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
-=head2 handle_request( $class, @arguments )
+=head2 $c->handle_request( $class, @arguments )
 
 Called to handle each HTTP request.
 
@@ -1942,7 +1942,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 
 =head2 $c->stack
 
-Returns the stack.
+Returns an arrayref of the internal execution stack (actions that are currently
+executing).
 
 =head2 $c->write( $data )
 
