@@ -399,6 +399,17 @@ sub _comp_prefixes {
     return $comp;
 }
 
+# Return a component if only one matches.
+sub _comp_singular {
+    my ($c, @prefixes) = @_;
+
+    my $appclass = ref $c || $c;
+
+    my ($comp,$rest) = map { $c->_comp_search("^${appclass}::${_}::") } 
+	@prefixes;
+    return $comp unless $rest;
+}
+
 =head2 COMPONENT ACCESSORS
 
 =head2 $c->comp($name)
@@ -443,11 +454,15 @@ Gets a L<Catalyst::Controller> instance by name.
 
     $c->controller('Foo')->do_stuff;
 
+If name is omitted, will return the controller for the dispatched action.
+
 =cut
 
 sub controller {
     my ( $c, $name ) = @_;
-    return $c->_comp_prefixes($name, qw/Controller C/);
+    return $c->_comp_prefixes($name, qw/Controller C/)
+	if ($name);
+    return $c->component($c->action->class);
 }
 
 =head2 $c->model($name)
@@ -456,11 +471,19 @@ Gets a L<Catalyst::Model> instance by name.
 
     $c->model('Foo')->do_stuff;
 
+If the name is omitted, it will look for a config setting 'default_model',
+or check if there is only one model, and forward to it if that's the case.
+
 =cut
 
 sub model {
     my ( $c, $name ) = @_;
-    return $c->_comp_prefixes($name, qw/Model M/);
+    return $c->_comp_prefixes($name, qw/Model M/)
+	if $name;
+    return $c->comp($c->config->{default_model})
+	if $c->config->{default_model};
+    return $c->_comp_singular(qw/Model M/);
+
 }
 
 =head2 $c->view($name)
@@ -469,11 +492,18 @@ Gets a L<Catalyst::View> instance by name.
 
     $c->view('Foo')->do_stuff;
 
+If the name is omitted, it will look for a config setting 'default_view',
+or check if there is only one view, and forward to it if that's the case.
+
 =cut
 
 sub view {
     my ( $c, $name ) = @_;
-    return $c->_comp_prefixes($name, qw/View V/);
+    return $c->_comp_prefixes($name, qw/View V/)
+	if $name;
+    return $c->comp($c->config->{default_view})
+	if $c->config->{default_view};
+    return $c->_comp_singular(qw/View V/);
 }
 
 =head2 Class data and helper classes

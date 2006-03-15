@@ -31,7 +31,8 @@ L<Module::Build> extension for Catalyst.
 
 =head1 DEPRECATION NOTICE
 
-This module is deprecated in favor of L<Module::Install::Catalyst>.
+This module is deprecated in favor of L<Module::Install::Catalyst>. It's
+only left here for compability with older applications.
 
 =head1 METHODS
 

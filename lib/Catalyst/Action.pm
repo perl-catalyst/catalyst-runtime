@@ -46,7 +46,7 @@ Returns the class name of this action
 
 Returns a code reference to this action
 
-=head2 execute <c>
+=head2 execute( $c )
 
 Execute this action against a context
 
@@ -58,9 +58,9 @@ sub execute {    # Execute ourselves against a context
     return $c->execute( $self->class, $self );
 }
 
-=head2 match <context>
+=head2 match( $c )
 
-Check Args setting, and makes sure number of args matches the setting.
+Check Args attribute, and makes sure number of args matches the setting.
 
 =cut
 
