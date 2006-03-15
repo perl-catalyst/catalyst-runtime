@@ -17,17 +17,28 @@ See L<Catalyst>.
 
 =head2 $self->list($c)
 
+abstract method, to be implemented by dispatchtypes. Called to display
+info in debug log.
+
 =cut
 
 sub list { }
 
 =head2 $self->match( $c, $path )
 
+abstract method, to be implemented by dispatchtypes. Returns true if the
+dispatch type matches the given path
+
 =cut
 
 sub match { die "Abstract method!" }
 
 =head2 $self->register( $c, $action )
+
+abstract method, to be implemented by dispatchtypes. Takes a
+context object and a L<Catalyst::Action> object. 
+
+Should return true if it registers something, or false otherwise.
 
 =cut
 

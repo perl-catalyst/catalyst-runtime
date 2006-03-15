@@ -18,6 +18,8 @@ See L<Catalyst>.
 
 =head2 $self->list($c)
 
+Output a table of all regex actions, and their private equivalent.
+
 =cut
 
 sub list {
@@ -32,6 +34,9 @@ sub list {
 }
 
 =head2 $self->match( $c, $path )
+
+Check path against compiled regexes, and set action to any matching
+action. Returns 1 on success and 0 on failure.
 
 =cut
 
@@ -59,6 +64,11 @@ sub match {
 
 =head2 $self->register( $c, $action )
 
+Registers one or more regex actions for an action object.\
+Also registers them as literal paths.
+
+Returns 1 on if any regexps were registered.
+
 =cut
 
 sub register {
@@ -76,6 +86,9 @@ sub register {
 }
 
 =head2 $self->register_regex($c, $re, $action)
+
+Register an individual regex on the action. Usually called from the 
+register action.
 
 =cut
 

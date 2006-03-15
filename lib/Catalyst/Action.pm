@@ -28,15 +28,27 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
+This class represents a Catalyst Action. You can access the object for the 
+currently dispatched action via $c->action
+
 =head1 METHODS
 
 =head2 attributes
 
+The sub attributes that are set for this action, like Local, Path, Private
+and so on.
+
 =head2 class
+
+Returns the class name of this action
 
 =head2 code
 
-=head2 execute
+Returns a code reference to this action
+
+=head2 execute <c>
+
+Execute this action against a context
 
 =cut
 
@@ -46,7 +58,9 @@ sub execute {    # Execute ourselves against a context
     return $c->execute( $self->class, $self );
 }
 
-=head2 match
+=head2 match <context>
+
+Check Args setting, and makes sure number of args matches the setting.
 
 =cut
 
@@ -58,9 +72,15 @@ sub match {
 
 =head2 namespace
 
+Returns the private namespace this action lives in.
+
 =head2 reverse
 
+Returns the private path for this action.
+
 =head2 name
+
+returns the sub name of this action.
 
 =head1 AUTHOR
 

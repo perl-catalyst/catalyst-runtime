@@ -17,6 +17,9 @@ See L<Catalyst>.
 
 =head2 $self->match( $c, $path )
 
+Check if default action matches, and set action if it does. 
+Will be called last for each controller.
+
 =cut
 
 sub match {

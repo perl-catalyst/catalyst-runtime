@@ -19,6 +19,8 @@ See L<Catalyst>.
 
 =head2 $self->list($c)
 
+Debug output for Path dispatch points
+
 =cut
 
 sub list {
@@ -34,6 +36,8 @@ sub list {
 }
 
 =head2 $self->match( $c, $path )
+
+Check for paths that match the given path.
 
 =cut
 
@@ -55,6 +59,8 @@ sub match {
 
 =head2 $self->register( $c, $action )
 
+Call register_path for every path attribute in the given $action.
+
 =cut
 
 sub register {
@@ -69,6 +75,8 @@ sub register {
 }
 
 =head2 $self->register_path($c, $path, $action)
+
+register an action at a given path.
 
 =cut
 

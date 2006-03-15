@@ -38,7 +38,14 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
+This is the class that maps public urls to actions in your Catalyst
+application based on the attributes you set.
+
 =head1 METHODS
+
+=item new 
+
+Construct a new dispatcher.
 
 =cut
 
@@ -76,6 +83,8 @@ it with a C<+>, like so:
 
 =head2 $self->detach( $c, $command [, \@arguments ] )
 
+Documented in L<Catalyst>
+
 =cut
 
 sub detach {
@@ -85,6 +94,10 @@ sub detach {
 }
 
 =head2 $self->dispatch($c)
+
+Delegate the dispatch to the action that matched the url, or return a
+message about unknown resource
+
 
 =cut
 
@@ -105,6 +118,8 @@ sub dispatch {
 }
 
 =head2 $self->forward( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
 
 =cut
 
@@ -206,6 +221,8 @@ qq/Couldn't forward to command "$command". Invalid action or component./;
 
 =head2 $self->prepare_action($c)
 
+Find an dispatch type that matches $c->req->path, and set args from it.
+
 =cut
 
 sub prepare_action {
@@ -244,6 +261,8 @@ sub prepare_action {
 
 =head2 $self->get_action( $action, $namespace )
 
+returns a named action from a given namespace.
+
 =cut
 
 sub get_action {
@@ -277,6 +296,8 @@ sub get_actions {
 }
 
 =head2 $self->get_containers( $namespace )
+
+Return all the action containers for a given namespace, inclusive
 
 =cut
 
@@ -319,6 +340,10 @@ sub get_containers {
 }
 
 =head2 $self->register( $c, $action )
+
+Make sure all required dispatch types for this action are loaded, then
+pass the action to our dispatch types so they can register it if required.
+Also, set up the tree with the action containers.
 
 =cut
 
@@ -378,7 +403,8 @@ sub register {
     $parent->getNodeValue->actions->{ $action->name } = $action;
 }
 
-=head2 $self->setup_actions( $class, $component )
+=head2 $self->setup_actions( $class, $context )
+
 
 =cut
 
