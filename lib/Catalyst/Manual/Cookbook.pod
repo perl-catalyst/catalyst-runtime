@@ -135,135 +135,166 @@ displaying this message.
 For more information about uploads and usable methods look at
 L<Catalyst::Request::Upload> and L<Catalyst::Request>.
 
-=head2 Authentication with Catalyst::Plugin::Authentication::CDBI
+=head2 Authentication with Catalyst::Plugin::Authentication
 
-There are (at least) two ways to implement authentication with this plugin:
-1) only checking username and password;
-2) checking username, password, and the roles the user has
+In this example, we'll use the
+L<Catalyst::Plugin::Authentication::Store::DBIC> store and the
+L<Catalyst::Plugin::Authentication::Credential::Password> credentials.
 
-For both variants you'll need the following code in your MyApp package:
+In the lib/MyApp.pm package, we'll need to change the C<use Catalyst;>
+line to include the following modules:
 
-    use Catalyst qw/Session::FastMmap Static Authentication::CDBI/;
+    use Catalyst qw/
+        ConfigLoader 
+        Authentication
+        Authentication::Store::DBIC
+        Authentication::Credential::Password
+        Session
+        Session::Store::FastMmap
+        Session::State::Cookie
+        HTML::Widget
+        Static::Simple
+        /;
 
-    MyApp->config( authentication => { user_class => 'MyApp::M::MyApp::Users',
-                                       user_field => 'email',
-                                       password_field => 'password' });
+The Session, Session::Store::* and Session::State::* modules listed above
+ensure that we stay logged-in across multiple page-views.
 
-'user_class' is a Class::DBI class for your users table.
-'user_field' tells which field is used for username lookup (might be 
-email, first name, surname etc.).
-'password_field' is, well, password field in your table and by default 
-password is stored in plain text. Authentication::CDBI looks for 'user' 
-and 'password' fields in table, if they're not defined in the config.
+In our MyApp.yml configuration file, we'll need to add:
 
-In PostgreSQL, the users table might be something like:
+    authentication:
+      dbic:
+        user_class: MyApp::Model::DBIC::User
+        user_field: username
+        password_field: password
+        password_type: hashed
+        password_hash_type: SHA-1
 
- CREATE TABLE users (
-   user_id   serial,
-   name      varchar(100),
-   surname   varchar(100),
-   password  varchar(100),
-   email     varchar(100),
-   primary key(user_id)
- );
+'user_class' is a DBIx::Class package for your users table.
+'user_field' tells which field (column) is used for username lookup.
+'password_field' is the password field in your table.
+The above settings for 'password_type' and 'password_hash_type' ensure that
+the password won't be stored in the database in clear text.
 
-We'll discuss the first variant for now:
-1. user:password login/auth without roles
+In SQLite, the users table might be something like:
 
-To log in a user you might use an action like this:
+    CREATE TABLE user (
+        id       INTEGER PRIMARY KEY,
+        username VARCHAR(100),
+        password VARCHAR(100)
+    );
 
-    sub login : Local {
-        my ($self, $c) = @_;
-        if ($c->req->params->{username}) {
-            $c->session_login($c->req->params->{username}, 
-                              $c->req->params->{password} );
-            if ($c->req->{user}) {
-                $c->forward('/restricted_area');
+Now we need to create a DBIC::SchemaLoader component for this database
+(changing "myapp.db" to wherever your SQLite database is).
+
+    script/myapp_create.pl model DBIC DBIC::SchemaLoader 'dbi:SQLite:myapp.db'
+
+Now we can start creating our page controllers and templates.
+For our homepage, we create the file "root/index.tt" containing:
+
+    <html>
+    <body>
+    [% IF c.user %]
+        <p>hello [% c.user.username %]</p>
+        <p><a href="[% c.uri_for( '/logout' ) %]">logout</a></p>
+    [% ELSE %]
+        <p><a href="[% c.uri_for( '/login' ) %]">login</a></p>
+    [% END %]
+    </body>
+    </html>
+
+If the user is logged in, they will be shown their name, and a logout link.
+Otherwise, they will be shown a login link.
+
+To display the homepage, we can uncomment the C<default> and C<end>
+subroutines in lib/MyApp/Controller/Root.pm and populate them as so:
+
+    sub default : Private {
+        my ( $self, $c ) = @_;
+    
+        $c->stash->{template} = 'index.tt';
+    }
+
+    sub end : Private {
+        my ( $self, $c ) = @_;
+    
+        $c->forward( $c->view('TT') )
+            unless $c->response->body || $c->response->redirect;
+    }
+
+The login template is very simple, as L<HTML::Widget> will handle the
+HTML form creation for use. This is saved as "root/login.tt".
+
+    <html>
+    <head>
+    <link href="[% c.uri_for('/static/simple.css') %]" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    [% result %]
+    </body>
+    </html>
+
+For the HTML form to look correct, we also copy the C<simple.css> file
+from the L<HTML::Widget> distribution into our "root/static" folder.
+This file is automatically server by the L<Catalyst::Plugin::Static::Simple>
+module which we loaded in our lib/MyApp.pm package.
+
+To handle login requests, we first create a controller, like so:
+
+    script/myapp_create.pl controller Login
+
+In the lib/MyApp/Controller/Login.pm package, we can then uncomment the
+C<default> subroutine, and populate it, as below.
+
+First the widget is created, it needs the 'action' set, and 'username' and
+'password' fields and a submit button added.
+
+Then, if we've received a username and password in the request, we attempt
+to login. If successful, we redirect to the homepage; if not the login form
+will be displayed again.
+
+    sub default : Private {
+        my ( $self, $c ) = @_;
+    
+        $c->widget->method('POST')->action( $c->uri_for('/login') );
+        $c->widget->element( 'Textfield', 'username' )->label( 'Username' );
+        $c->widget->element( 'Password', 'password' )->label( 'Password' );
+        $c->widget->element( 'Submit' )->value( 'Login' );
+        
+        my $result = $c->widget->process( $c->req );
+        
+        if ( my $user = $result->param('username')
+            and my $pass = $result->param('password') )
+        {    
+            if ( $c->login( $user, $pass ) ) {
+                $c->response->redirect( $c->uri_for( "/" ) );
+                return;
             }
         }
+        
+        $c->stash->{template} = 'login.tt';
+        $c->stash->{result}   = $result;
     }
 
-This action should not go in your MyApp class...if it does, it will
-conflict with the built-in method of the same name.  Instead, put it
-in a Controller class.
+To handle logout's, we create a new controller:
 
-$c->req->params->{username} and $c->req->params->{password} are html 
-form parameters from a login form. If login succeeds, then 
-$c->req->{user} contains the username of the authenticated user.
+    script/myapp_create.pl controller Logout
 
-If you want to remember the user's login status in between further 
-requests, then just use the C<$c-E<gt>session_login> method. Catalyst will 
-create a session id and session cookie and automatically append session 
-id to all urls. So all you have to do is just check $c->req->{user} 
-where needed.
+Then in the lib/MyApp/Controller/Logout.pm package, we change the
+C<default> subroutine, to logout and then redirect back to the
+homepage.
 
-To log out a user, just call $c->session_logout.
-
-Now let's take a look at the second variant:
-2. user:password login/auth with roles
-
-To use roles you need to add the following parameters to  MyApp->config in the 'authentication' section:
-
-    role_class      => 'MyApp::M::MyApp::Roles',
-    user_role_class => 'MyApp::M::MyApp::UserRoles',
-    user_role_user_field => 'user_id',
-    user_role_role_field => 'role_id',
-
-Corresponding tables in PostgreSQL could look like this:
-
- CREATE TABLE roles (
-   role_id  serial,
-   name     varchar(100),
-   primary key(role_id)
- );
-
- CREATE TABLE user_roles (
-   user_role_id  serial,
-   user_id       int,
-   role_id       int,
-   primary key(user_role_id),
-   foreign key(user_id) references users(user_id),
-   foreign key(role_id) references roles(role_id)
- );
-
-The 'roles' table is a list of role names and the 'user_role' table is 
-used for the user -> role lookup.
-
-Now if a logged-in user wants to see a location which is allowed only 
-for people with an 'admin' role, in your controller you can check it 
-with:
-
-    sub add : Local {
-        my ($self, $c) = @_;
-        if ($c->roles(qw/admin/)) {
-            $c->res->output("Your account has the role 'admin.'");
-        } else {
-            $c->res->output("You're not allowed to be here.");
-        }
+    sub default : Private {
+        my ( $self, $c ) = @_;
+    
+        $c->logout;
+        
+        $c->response->redirect( $c->uri_for( "/" ) );
     }
 
-One thing you might need is to forward non-authenticated users to a login 
-form if they try to access restricted areas. If you want to do this 
-controller-wide (if you have one controller for your admin section) then it's 
-best to add a user check to a 'begin' action:
+Remember that to test this, we would first need to add a user to the
+database, ensuring that the password field is saved as the SHA1 hash
+of our desired password.
 
-    sub begin : Private {
-        my ($self, $c) = @_;
-        unless ($c->req->{user}) {
-            $c->req->action(undef);  ## notice this!!
-            $c->forward('/user/login');
-        }
-    }
-
-Pay attention to $c->req->action(undef). This is needed because of the
-way $c->forward works - C<forward> to C<login> gets called, but after
-that Catalyst will still execute the action defined in the URI (e.g. if
-you tried to go to C</add>, then first 'begin' will forward to 'login',
-but after that 'add' will nonetheless be executed). So
-$c->req->action(undef) undefines any actions that were to be called and
-forwards the user where we want him/her to be.
-
-And this is all you need to do. 
 
 =head2 Pass-through login (and other actions)
 
@@ -523,16 +554,6 @@ Now create C<myapp.yml> in your application home:
   # DO NOT USE TABS FOR INDENTATION OR label/value SEPARATION!!!
   name:     MyApp
 
-  # authentication; perldoc Catalyst::Plugin::Authentication::CDBI
-  authentication:
-    user_class:           'MyApp::M::MyDB::Customer'
-    user_field:           'username'
-    password_field:       'password'
-    password_hash:        'md5'
-    role_class:           'MyApp::M::MyDB::Role'
-    user_role_class:      'MyApp::M::MyDB::PersonRole'
-    user_role_user_field: 'person'
-
   # session; perldoc Catalyst::Plugin::Session::FastMmap
   session:
     expires:        '3600'
@@ -564,19 +585,23 @@ This is equivalent to:
 
 See also L<YAML>.
 
-=head2 Using existing CDBI (etc.) classes with Catalyst
+=head2 Using existing DBIC (etc.) classes with Catalyst
 
 Many people have existing Model classes that they would like to use with
 Catalyst (or, conversely, they want to write Catalyst models that can be
 used outside of Catalyst, e.g.  in a cron job). It's trivial to write a
 simple component in Catalyst that slurps in an outside Model:
 
-    package MyApp::M::Catalog;
-    use base qw/Catalyst::Base Some::Other::CDBI::Module::Catalog/;
+    package MyApp::Model::DB;
+    use base qw/Catalyst::Model::DBIC::Schema/;
+    __PACKAGE__->config(
+        schema_class => 'Some::DBIC::Schema',
+        connect_info => ['dbi:SQLite:foo.db', '', '', {AutoCommit=>1}];
+    );
     1;
 
-and that's it! Now C<Some::Other::CDBI::Module::Catalog> is part of your
-Cat app as C<MyApp::M::Catalog>.
+and that's it! Now C<Some::DBIC::Schema> is part of your
+Cat app as C<MyApp::Model::DB>.
 
 =head2 Delivering a Custom Error Page
 

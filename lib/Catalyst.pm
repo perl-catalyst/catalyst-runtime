@@ -258,7 +258,7 @@ call to forward.
 
     my $foodata = $c->forward('/foo');
     $c->forward('index');
-    $c->forward(qw/MyApp::Model::CDBI::Foo do_stuff/);
+    $c->forward(qw/MyApp::Model::DBIC::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
 
 =cut

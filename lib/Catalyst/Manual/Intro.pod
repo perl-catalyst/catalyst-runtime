@@ -31,7 +31,7 @@ well-known Perl modules you may want to use for each.
 
 =item * B<Model>
 
-Access and modify content (data). L<Class::DBI>, L<DBIx::Class>,
+Access and modify content (data). L<DBIx::Class>, L<Class::DBI>,
 L<Plucene>, L<Net::LDAP>...
 
 =item * B<View>
@@ -123,8 +123,8 @@ and loads them.
 
 =item * B<Pre-Built Components for Popular Modules>
 
-See L<Catalyst::Model::CDBI> for L<Class::DBI>, or L<Catalyst::View::TT>
-for L<Template Toolkit|Template>.
+See L<Catalyst::Model::DBIC::Schema> for L<DBIx::Class>, or
+L<Catalyst::View::TT> for L<Template Toolkit|Template>.
 
 =item * B<Built-in Test Framework>
 
@@ -761,7 +761,8 @@ eyecandy debug screen. ;)
 =head4 Models
 
 To show how to define models, again we'll use an already-existing base
-class, this time for L<Class::DBI>: L<Catalyst::Model::CDBI>.
+class, this time for L<DBIx::Class>: L<Catalyst::Model::DBIC::Schema>.
+We'll also need L<DBIx::Class::Schema::Loader>.
 
 But first, we need a database.
 
@@ -782,50 +783,33 @@ But first, we need a database.
 
     % sqlite /tmp/myapp.db < myapp.sql
 
-Now we can create a CDBI component for this database.
+Now we can create a DBIC::SchemaLoader component for this database.
 
-    package MyApp::Model::CDBI;
+    script/myapp_create.pl model DBIC DBIC::SchemaLoader 'dbi:SQLite:/tmp/myapp.db'
 
-    use strict;
-    use base 'Catalyst::Model::CDBI';
+L<DBIx::Class::Schema::Loader> automatically loads table layouts and
+relationships. Use the stash to pass data to your templates.
 
-    __PACKAGE__->config(
-        dsn           => 'dbi:SQLite:/tmp/myapp.db',
-        relationships => 1
-    );
-
-    1;
-
-Catalyst automatically loads table layouts and relationships. Use the
-stash to pass data to your templates.
-
-    package MyApp;
-
-    use strict;
-    use Catalyst '-Debug';
-
-    __PACKAGE__->config(
-        name => 'My Application',
-        root => '/home/joeuser/myapp/root'
-    );
-
-    __PACKAGE__->setup;
-
-    sub end : Private {
-        my ( $self, $c ) = @_;
-        $c->stash->{template} ||= 'index.tt';
-        $c->forward('MyApp::View::TT');
-    }
+We add the following to MyApp/Controller/Root.pm
 
     sub view : Global {
         my ( $self, $c, $id ) = @_;
-        $c->stash->{item} = MyApp::Model::CDBI::Foo->retrieve($id);
+        
+        $c->stash->{item} = $c->model('DBIC::Foo')->find($id);
     }
 
     1;
+    
+    sub end : Private {
+        my ( $self, $c ) = @_;
+        
+        $c->stash->{template} ||= 'index.tt';
+        $c->forward( $c->view('TT') );
+    }
 
-    # Then, in a TT template:
-    The id is [% item.data %]
+We then create a new template file "root/index.tt" containing:
+
+    The Id's data is [% item.data %]
 
 Models do not have to be part of your Catalyst application; you
 can always call an outside module that serves as your Model:
@@ -833,9 +817,14 @@ can always call an outside module that serves as your Model:
     # in a Controller
     sub list : Local {
       my ( $self, $c ) = @_;
+      
       $c->stash->{template} = 'list.tt';
-      use Some::Outside::CDBI::Module;
-      my @records = Some::Outside::CDBI::Module->retrieve_all;
+      
+      use Some::Outside::DBIC::Module;
+      my @records = Some::Outside::DBIC::Module->search({
+        artist => 'sri',
+        });
+      
       $c->stash->{records} = \@records;
     }
 
@@ -852,12 +841,16 @@ write Catalyst models that can be used outside of Catalyst, e.g.
 in a cron job), it's trivial to write a simple component in
 Catalyst that slurps in an outside Model:
 
-    package MyApp::Model::Catalog;
-    use base qw/Catalyst::Base Some::Other::CDBI::Module::Catalog/;
+    package MyApp::Model::DB;
+    use base qw/Catalyst::Model::DBIC::Schema/;
+    __PACKAGE__->config(
+        schema_class => 'Some::DBIC::Schema',
+        connect_info => ['dbi:SQLite:foo.db', '', '', {AutoCommit=>1}];
+    );
     1;
 
-and that's it! Now C<Some::Other::CDBI::Module::Catalog> is part of your
-Cat app as C<MyApp::Model::Catalog>.
+and that's it! Now C<Some::DBIC::Schema> is part of your
+Cat app as C<MyApp::Model::DB>.
 
 =head4 Controllers
 

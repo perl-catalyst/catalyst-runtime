@@ -635,7 +635,7 @@ example another website, or RSS feeds.
 
 If you have or want a database, there are still choices to be made, there are
 several modules about for accessing databases via OO. The best known are
-probably L<Class::DBI> and L<DBIx::Class>. Catalyst supports making models
+probably L<DBIx::Class> and L<Class::DBI>. Catalyst supports making models
 using either of these.  
 
 For a simple example, we will allow our users to store their favourite
