@@ -475,6 +475,12 @@ The usercreate.tt template looks like this:
 
  <html><head><title>[% c.config.name %]</title></head><body>
  <h1>Create a new user</h1>
+ <h2>Current users are:</h2>
+ <p>
+    [% FOREACH key = c.config.authentication.users.keys %]
+        [% key %]<br/>
+    [% END %]
+ </p>
  <p> [% c.stash.message %] </p>
  <form action="/users/create" method="post">
  <p>User Name: <input type="text" name="username"/></p>
