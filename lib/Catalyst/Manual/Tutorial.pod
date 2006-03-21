@@ -661,7 +661,7 @@ we'll make a I<http://localhost:3000/users/editgreeting> page:
        else {
           my $grtable = $c->model('UserData::Greetings');
           my $record = $grtable->find_or_create(user => $c->user->id);
-          $record->greeting($c->req->params->{greeting};
+          $record->greeting($c->req->params->{greeting});
           $record->update;
           $c->stash->{message} = 'Greeting updated';
        }
