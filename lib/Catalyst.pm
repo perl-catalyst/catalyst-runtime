@@ -291,11 +291,6 @@ Add a new error.
 
     $c->error('Something bad happened');
 
-Clear errors.  You probably don't want to clear the errors unless you are
-implementing a custom error screen.
-
-    $c->error(0);
-
 =cut
 
 sub error {
@@ -306,6 +301,22 @@ sub error {
     }
     elsif ( defined $_[0] ) { $c->{error} = undef }
     return $c->{error} || [];
+}
+
+=head2 $c->clear_errors
+
+Clear errors.  You probably don't want to clear the errors unless you are
+implementing a custom error screen.
+
+This is equivalent to running
+
+    $c->error(0);
+
+=cut
+
+sub clear_errors {
+    my $c = shift;
+    $c->error(0);
 }
 
 =head2 $c->response
