@@ -681,18 +681,11 @@ the new value in the database.
 Now that we have the basics together, we can try running our application on a
 "real" server instead of just using the test server that catalyst comes
 with. L<Catalyst::Engine> is the module used to implement various types of
-servers to run it on. The current popular ones are Apache and FastCGI. To
-force the use of a particular engine we can use the -Engine flag to Catalyst: 
-
- use Catalyst qw/-Engine=Apache/;
-
-or
-
- use Catalyst qw/-Engine=FastCGI/;
+servers to run it on. The current popular ones are Apache and FastCGI.
 
 =head3 Apache
 
-Apache also needs to be configured: we need to tell it to load your
+Apache needs to be configured: we need to tell it to load your
 application. You can either use Catalyst for your entire website, or
 subsections. Use the Location directive to choose a path to run your
 application under: 
