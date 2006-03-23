@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Catalyst.
 	- Added lots of API documentation.
 	- Changed default behaviors for $c->model/$c->controller/$c->view
 	  to more sane settings.
+    - added the clear_errors method - an alias for error(0)
 
 5.66    2006-03-10 17:48:00
         - Added Test::WWW::Mechanize::Catalyst support
