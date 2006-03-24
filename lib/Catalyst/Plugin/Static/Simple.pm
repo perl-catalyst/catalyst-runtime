@@ -9,7 +9,7 @@ use IO::File;
 use MIME::Types;
 use NEXT;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 __PACKAGE__->mk_classdata( qw/_static_mime_types/ );
 __PACKAGE__->mk_accessors( qw/_static_file
@@ -18,6 +18,8 @@ __PACKAGE__->mk_accessors( qw/_static_file
 sub prepare_action {
     my $c = shift;
     my $path = $c->req->path;
+    
+    $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 
     # is the URI in a static-defined path?
     foreach my $dir ( @{ $c->config->{static}->{dirs} } ) {
@@ -26,7 +28,7 @@ sub prepare_action {
             $c->error( "Error compiling static dir regex '$dir': $@" );
         }
         if ( $path =~ $re ) {
-            if ( $c->_locate_static_file ) {
+            if ( $c->_locate_static_file( $path ) ) {
                 $c->_debug_msg( 'from static directory' )
                     if ( $c->config->{static}->{debug} );
             } else {
@@ -40,7 +42,7 @@ sub prepare_action {
     # Does the path have an extension?
     if ( $path =~ /.*\.(\S{1,})$/xms ) {
         # and does it exist?
-        $c->_locate_static_file;
+        $c->_locate_static_file( $path );
     }
     
     return $c->NEXT::ACTUAL::prepare_action(@_);
@@ -109,9 +111,9 @@ sub setup {
 # Search through all included directories for the static file
 # Based on Template Toolkit INCLUDE_PATH code
 sub _locate_static_file {
-    my $c = shift;
+    my ( $c, $path ) = @_;
     
-    my $path = catdir( no_upwards( splitdir( $c->req->path ) ) );
+    $path = catdir( no_upwards( splitdir( $path ) ) );
     
     my @ipaths = @{ $c->config->{static}->{include_path} };
     my $dpaths;
@@ -165,12 +167,10 @@ sub _locate_static_file {
 
 sub _serve_static {
     my $c = shift;
-    
-    my $path = $c->req->path;    
-    my $type = $c->_ext_to_type;
-    
+           
     my $full_path = $c->_static_file;
-    my $stat = stat $full_path;
+    my $type      = $c->_ext_to_type( $full_path );
+    my $stat      = stat $full_path;
 
     $c->res->headers->content_type( $type );
     $c->res->headers->content_length( $stat->size );
@@ -199,10 +199,9 @@ sub _serve_static {
 
 # looks up the correct MIME type for the current file extension
 sub _ext_to_type {
-    my $c = shift;
-    my $path = $c->req->path;
+    my ( $c, $full_path ) = @_;
     
-    if ( $path =~ /.*\.(\S{1,})$/xms ) {
+    if ( $full_path =~ /.*\.(\S{1,})$/xms ) {
         my $ext = $1;
         my $user_types = $c->config->{static}->{mime_types};
         my $type = $user_types->{$ext} 
@@ -250,43 +249,69 @@ Catalyst::Plugin::Static::Simple - Make serving static pages painless.
 
     use Catalyst;
     MyApp->setup( qw/Static::Simple/ );
+    # that's it; static content is automatically served by
+    # Catalyst, though you can configure things or bypass
+    # Catalyst entirely in a production environment
 
 =head1 DESCRIPTION
 
-The Static::Simple plugin is designed to make serving static content in your
-application during development quick and easy, without requiring a single
-line of code from you.
+The Static::Simple plugin is designed to make serving static content in
+your application during development quick and easy, without requiring a
+single line of code from you.
 
-It will detect static files used in your application by looking for file
-extensions in the URI.  By default, you can simply load this plugin and it
-will immediately begin serving your static files with the correct MIME type.
-The light-weight MIME::Types module is used to map file extensions to
-IANA-registered MIME types.
+This plugin detects static files by looking at the file extension in the
+URL (such as B<.css> or B<.png> or B<.js>). The plugin uses the
+lightweight L<MIME::Types> module to map file extensions to
+IANA-registered MIME types, and will serve your static files with the
+correct MIME type directly to the browser, without being processed
+through Catalyst.
 
 Note that actions mapped to paths using periods (.) will still operate
 properly.
 
-You may further tweak the operation by adding configuration options, described
-below.
+Though Static::Simple is designed to work out-of-the-box, you can tweak
+the operation by adding various configuration options. In a production
+environment, you will probably want to use your webserver to deliver
+static content; for an example see L<USING WITH APACHE>, below.
+
+=head1 DEFAULT BEHAVIOR
+
+By default, Static::Simple will deliver all files having extensions
+(that is, bits of text following a period (C<.>)), I<except> files
+having the extensions C<tmpl>, C<tt>, C<tt2>, C<html>, and
+C<xhtml>. These files, and all files without extensions, will be
+processed through Catalyst. If L<MIME::Types> doesn't recognize an
+extension, it will be served as C<text/plain>.
+
+To restate: files having the extensions C<tmpl>, C<tt>, C<tt2>, C<html>,
+and C<xhtml> I<will not> be served statically by default, they will be
+processed by Catalyst. Thus if you want to use C<.html> files from
+within a Catalyst app as static files, you need to change the
+configuration of Static::Simple. Note also that files having any other
+extension I<will> be served statically, so if you're using any other
+extension for template files, you should also change the configuration.
+
+Logging of static files is turned off by default.
 
 =head1 ADVANCED CONFIGURATION
 
-Configuration is completely optional and is specified within 
-MyApp->config->{static}.  If you use any of these options, the module will
-probably feel less "simple" to you!
+Configuration is completely optional and is specified within
+C<MyApp-E<gt>config-E<gt>{static}>.  If you use any of these options,
+this module will probably feel less "simple" to you!
 
-=head2 Aborting request logging
+=head2 Enabling request logging
 
-Since Catalyst 5.50, there has been added support for dropping logging for a 
-request. This is enabled by default for static files, as static requests tend
-to clutter the log output.  However, if you want logging of static requests, 
-you can enable it by setting MyApp->config->{static}->{no_logs} to 0.
+Since Catalyst 5.50, logging of static requests is turned off by
+default; static requests tend to clutter the log output and rarely
+reveal anything useful. However, if you want to enable logging of static
+requests, you can do so by setting
+C<MyApp-E<gt>config-E<gt>{static}-E<gt>{no_logs}> to 0.
 
 =head2 Forcing directories into static mode
 
-Define a list of top-level directories beneath your 'root' directory that
-should always be served in static mode.  Regular expressions may be
-specified using qr//.
+Define a list of top-level directories beneath your 'root' directory
+that should always be served in static mode.  Regular expressions may be
+specified using C<qr//>.
 
     MyApp->config->{static}->{dirs} = [
         'static',
@@ -296,10 +321,10 @@ specified using qr//.
 =head2 Including additional directories
 
 You may specify a list of directories in which to search for your static
-files.  The directories will be searched in order and will return the first
-file found.  Note that your root directory is B<not> automatically added to
-the search path when you specify an include_path.  You should use
-MyApp->config->{root} to add it.
+files. The directories will be searched in order and will return the
+first file found. Note that your root directory is B<not> automatically
+added to the search path when you specify an C<include_path>. You should
+use C<MyApp-E<gt>config-E<gt>{root}> to add it.
 
     MyApp->config->{static}->{include_path} = [
         '/path/to/overlay',
@@ -307,7 +332,7 @@ MyApp->config->{root} to add it.
         MyApp->config->{root}
     ];
     
-With the above setting, a request for the file /images/logo.jpg will search
+With the above setting, a request for the file C</images/logo.jpg> will search
 for the following files, returning the first one found:
 
     /path/to/overlay/images/logo.jpg
@@ -315,9 +340,9 @@ for the following files, returning the first one found:
     /your/app/home/root/images/logo.jpg
     
 The include path can contain a subroutine reference to dynamically return a
-list of available directories.  This method will receive the $c object as a
+list of available directories.  This method will receive the C<$c> object as a
 parameter and should return a reference to a list of directories.  Errors can
-be reported using die().  This method will be called every time a file is
+be reported using C<die()>.  This method will be called every time a file is
 requested that appears to be a static file (i.e. it has an extension).
 
 For example:
@@ -334,26 +359,27 @@ For example:
     
 =head2 Ignoring certain types of files
 
-There are some file types you may not wish to serve as static files.  Most
-important in this category are your raw template files.  By default, files
-with the extensions tmpl, tt, tt2, html, and xhtml will be ignored by
-Static::Simple in the interest of security.  If you wish to define your own
-extensions to ignore, use the ignore_extensions option:
+There are some file types you may not wish to serve as static files.
+Most important in this category are your raw template files.  By
+default, files with the extensions C<tmpl>, C<tt>, C<tt2>, C<html>, and
+C<xhtml> will be ignored by Static::Simple in the interest of security.
+If you wish to define your own extensions to ignore, use the
+C<ignore_extensions> option:
 
     MyApp->config->{static}->{ignore_extensions} 
-        = [ qw/tmpl tt tt2 html xhtml/ ];
+        = [ qw/html asp php/ ];
     
 =head2 Ignoring entire directories
 
-To prevent an entire directory from being served statically, you can use the
-ignore_dirs option.  This option contains a list of relative directory paths
-to ignore.  If using include_path, the path will be checked against every
-included path.
+To prevent an entire directory from being served statically, you can use
+the C<ignore_dirs> option.  This option contains a list of relative
+directory paths to ignore.  If using C<include_path>, the path will be
+checked against every included path.
 
     MyApp->config->{static}->{ignore_dirs} = [ qw/tmpl css/ ];
     
-For example, if combined with the above include_path setting, this
-ignore_dirs value will ignore the following directories if they exist:
+For example, if combined with the above C<include_path> setting, this
+C<ignore_dirs> value will ignore the following directories if they exist:
 
     /path/to/overlay/tmpl
     /path/to/overlay/css
@@ -364,8 +390,8 @@ ignore_dirs value will ignore the following directories if they exist:
 
 =head2 Custom MIME types
 
-To override or add to the default MIME types set by the MIME::Types module,
-you may enter your own extension to MIME type mapping. 
+To override or add to the default MIME types set by the L<MIME::Types>
+module, you may enter your own extension to MIME type mapping.
 
     MyApp->config->{static}->{mime_types} = {
         jpg => 'image/jpg',
@@ -375,8 +401,8 @@ you may enter your own extension to MIME type mapping.
 =head2 Compatibility with other plugins
 
 Since version 0.12, Static::Simple plays nice with other plugins.  It no
-longer short-circuits the prepare_action stage as it was causing too many
-compatibility issues with other plugins.
+longer short-circuits the C<prepare_action> stage as it was causing too
+many compatibility issues with other plugins.
 
 =head2 Debugging information
 
@@ -397,27 +423,34 @@ directory.  This approach is recommended for production installations.
         SetHandler default-handler
     </Location>
 
+Using this approach Apache will bypass any handling of these directories
+through Catalyst. You can leave Static::Simple as part of your
+application, and it will continue to function on a development server,
+or using Catalyst's built-in server.
+
 =head1 INTERNAL EXTENDED METHODS
 
 Static::Simple extends the following steps in the Catalyst process.
 
 =head2 prepare_action 
 
-prepare_action is used to first check if the request path is a static file.
-If so, we skip all other prepare_action steps to improve performance.
+C<prepare_action> is used to first check if the request path is a static
+file.  If so, we skip all other C<prepare_action> steps to improve
+performance.
 
 =head2 dispatch
 
-dispatch takes the file found during prepare_action and writes it to the
-output.
+C<dispatch> takes the file found during C<prepare_action> and writes it
+to the output.
 
 =head2 finalize
 
-finalize serves up final header information and displays any log messages.
+C<finalize> serves up final header information and displays any log
+messages.
 
 =head2 setup
 
-setup initializes all default values.
+C<setup> initializes all default values.
 
 =head1 SEE ALSO
 
@@ -431,6 +464,7 @@ Andy Grundman, <andy@hybridized.org>
 =head1 CONTRIBUTORS
 
 Marcus Ramberg, <mramberg@cpan.org>
+Jesse Sheidlower, <jester@panix.com>
 
 =head1 THANKS
 

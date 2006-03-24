@@ -1,16 +1,18 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.67   
-	- Looping and recursion tests plus a fix
-	- Added lots of API documentation.
-	- Changed default behaviors for $c->model/$c->controller/$c->view
-	  to more sane settings.
-    - added the clear_errors method - an alias for error(0)
+        - Static::Simple: Unescape the URI path before looking for the file.
+          This fixes issues with files that have spaces.
+        - Looping and recursion tests plus a fix
+        - Added lots of API documentation.
+        - Changed default behaviors for $c->model/$c->controller/$c->view
+          to more sane settings.
+        - added the clear_errors method - an alias for error(0)
 
 5.66    2006-03-10 17:48:00
         - Added Test::WWW::Mechanize::Catalyst support
         - Cleaned generated tests
-	- Added Root controller concept
+        - Added Root controller concept
         - Updated ConfigLoader plugin to version 0.04
 
 5.65    2006-02-21 10:34:00
