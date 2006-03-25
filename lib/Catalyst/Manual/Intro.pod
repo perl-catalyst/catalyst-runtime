@@ -12,7 +12,7 @@ itself, and why you should be using it, see L<Catalyst::Manual::About>.
 =head2 What is Catalyst?
 
 Catalyst is an elegant web application framework, extremely flexible yet
-extremely simple. It's similar to Ruby on Rails, Spring (Java) and
+extremely simple. It's similar to Ruby on Rails, Spring (Java), and
 L<Maypole>, upon which it was originally based.
 
 =head3 MVC
@@ -42,15 +42,15 @@ L<Mason|HTML::Mason>, L<HTML::Template>...
 =item * B<Controller>
 
 Control the whole request phase, check parameters, dispatch actions, flow
-control. Catalyst!
+control. Catalyst itself!
 
 =back
 
 If you're unfamiliar with MVC and design patterns, you may want to check
 out the original book on the subject, I<Design Patterns>, by Gamma,
-Helm, Johnson, and Vlissides, also known as the Gang of Four (GoF). You
-can also just Google it.  Many, many web application frameworks are
-based on MVC, including all those listed above.
+Helm, Johnson, and Vlissides, also known as the Gang of Four (GoF).
+Many, many web application frameworks are based on MVC, including all
+those listed above.
 
 =head3 Flexibility
 
@@ -110,7 +110,7 @@ simple way.
 =item * B<Building Block Interface>
 
 Components interoperate very smoothly. For example, Catalyst
-automatically makes a L<Context> object available to every
+automatically makes a L<context> object available to every
 component. Via the context, you can access the request object, share
 data between components, and control the flow of your
 application. Building a Catalyst application feels a lot like snapping
@@ -169,7 +169,7 @@ Catalyst in action:
 
 =back
 
-Dead easy!
+Easy!
 
 =head2 How It Works
 
@@ -209,7 +209,7 @@ parameter:
 
 =item * B<name>
 
-Name of your application.
+The name of your application.
 
 =back
 
@@ -277,7 +277,6 @@ information.
 =item * L<Catalyst::Log>
 
     $c->log
-
     $c->log->debug('Something happened');
     $c->log->info('Something you should know');
 
@@ -308,18 +307,19 @@ to maintain more persistent data, use a session.
 
 =head3 Actions
 
-A Catalyst controller is defined by its actions. An action is a sub with
-a special attribute. You've already seen some examples of actions in
-this document. The URL (for example http://localhost.3000/foo/bar)
-consists of two parts, the base (http://localhost:3000/ in this example)
-and the path (foo/bar).  Please note that the trailing slash after the
-hostname[:port] always belongs to base and not to the action.
+A Catalyst controller is defined by its actions. An action is a
+subroutine with a special attribute. You've already seen some examples
+of actions in this document. The URL (for example
+http://localhost.3000/foo/bar) consists of two parts, the base
+(http://localhost:3000/ in this example) and the path (foo/bar).  Please
+note that the trailing slash after the hostname[:port] always belongs to
+base and not to the action.
 
 Catalyst supports several types of actions:
 
 =over 4
 
-=item * B<Literal>
+=item * B<Literal> (B<Path> actions)
 
     package MyApp::Controller::My::Controller;
     sub bar : Path('foo/bar') { }
@@ -379,7 +379,7 @@ C<$c-E<gt>req-E<gt>snippets-E<gt>[0]> would be "23". If you want to pass
 arguments at the end of your URL, you must use regex action keys. See
 L</URL Path Handling> below.
 
-=item * B<Top-level>
+=item * B<Top-level> (B<Global>)
 
     package MyApp; 
     sub foo : Global { }
@@ -387,7 +387,7 @@ L</URL Path Handling> below.
 Matches http://localhost:3000/foo. The function name is mapped directly
 to the application base.
 
-=item * B<Namespace-Prefixed>
+=item * B<Namespace-Prefixed> (B<Local>)
 
     package MyApp::Controller::My::Controller; 
     sub foo : Local { }
@@ -422,9 +422,9 @@ C<$c-E<gt>forward('/catalog/order/process/bar')>.
 =back
 
 B<Note:> After seeing these examples, you probably wonder what the point
-is of defining names for regex and path actions. Actually, every public
-action is also a private one, so you have one unified way of addressing
-components in your C<forward>s.
+is of defining names for regex and path actions. Every public action is
+also a private one, so you have one unified way of addressing components
+in your C<forward>s.
 
 =head4 Built-in Private Actions
 
@@ -678,12 +678,12 @@ method.
 
 =head3 Components
 
-Catalyst has an uncommonly flexible component system. You can define as many
-L<Models>, L<Views>, and L<Controllers> as you like.
+Catalyst has an uncommonly flexible component system. You can define as
+many L<Models>, L<Views>, and L<Controllers> as you like.
 
-All components must inherit from L<Catalyst::Base>, which provides a simple
-class structure and some common class methods like C<config> and C<new>
-(constructor).
+All components must inherit from L<Catalyst::Base>, which provides a
+simple class structure and some common class methods like C<config> and
+C<new> (constructor).
 
     package MyApp::Controller::Catalog;
 
