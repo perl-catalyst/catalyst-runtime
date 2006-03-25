@@ -14,7 +14,8 @@ use Catalyst::Controller;
 use File::stat;
 use NEXT;
 use Text::SimpleTable;
-use Path::Class;
+use Path::Class::Dir;
+use Path::Class::File;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI;
 use Scalar::Util qw/weaken blessed/;
@@ -594,9 +595,9 @@ For example:
 
 sub path_to {
     my ( $c, @path ) = @_;
-    my $path = dir( $c->config->{home}, @path );
+    my $path = Path::Class::Dir->new( $c->config->{home}, @path );
     if ( -d $path ) { return $path }
-    else { return file( $c->config->{home}, @path ) }
+    else { return Path::Class::File->new( $c->config->{home}, @path ) }
 }
 
 =head2 $c->plugin( $name, $class, @args )
@@ -1883,7 +1884,7 @@ sub setup_home {
 
     if ($home) {
         $class->config->{home} ||= $home;
-        $class->config->{root} ||= dir($home)->subdir('root');
+        $class->config->{root} ||= Path::Class::Dir->new($home)->subdir('root');
     }
 }
 
