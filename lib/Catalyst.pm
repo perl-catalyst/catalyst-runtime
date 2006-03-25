@@ -362,17 +362,11 @@ Contains the return value of the last executed action.
 
 # search via regex
 sub _comp_search {
-    my ($c, @names) = @_;
+    my ( $c, @names ) = @_;
 
     foreach my $name (@names) {
         foreach my $component ( keys %{ $c->components } ) {
-            my $comp = $c->components->{$component} if $component =~ /$name/i;
-            if ($comp) {
-                if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
-                    return $comp->ACCEPT_CONTEXT($c);
-                }
-                else { return $comp }
-            }
+            return $c->components->{$component} if $component =~ /$name/i;
         }
     }
 
@@ -381,16 +375,10 @@ sub _comp_search {
 
 # try explicit component names
 sub _comp_explicit {
-    my ($c, @names) = @_;
+    my ( $c, @names ) = @_;
 
     foreach my $try (@names) {
-        if ( exists $c->components->{$try} ) {
-            my $comp = $c->components->{$try};
-            if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
-                return $comp->ACCEPT_CONTEXT($c);
-            }
-            else { return $comp }
-        }
+        return $c->components->{$try} if ( exists $c->components->{$try} );
     }
 
     return undef;
@@ -399,7 +387,7 @@ sub _comp_explicit {
 # like component, but try just these prefixes before regex searching,
 #  and do not try to return "sort keys %{ $c->components }"
 sub _comp_prefixes {
-    my ($c, $name, @prefixes) = @_;
+    my ( $c, $name, @prefixes ) = @_;
 
     my $appclass = ref $c || $c;
 
@@ -413,13 +401,22 @@ sub _comp_prefixes {
 
 # Return a component if only one matches.
 sub _comp_singular {
-    my ($c, @prefixes) = @_;
+    my ( $c, @prefixes ) = @_;
 
     my $appclass = ref $c || $c;
 
-    my ($comp,$rest) = map { $c->_comp_search("^${appclass}::${_}::") } 
-	@prefixes;
+    my ( $comp, $rest ) =
+      map { $c->_comp_search("^${appclass}::${_}::") } @prefixes;
     return $comp unless $rest;
+}
+
+# Filter a component before returning by calling ACCEPT_CONTEXT if available
+sub _filter_component {
+    my ( $c, $comp, @args ) = @_;
+    if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
+        return $comp->ACCEPT_CONTEXT( $c, @args );
+    }
+    else { return $comp }
 }
 
 =head2 COMPONENT ACCESSORS
@@ -451,10 +448,10 @@ sub component {
         );
 
         my $comp = $c->_comp_explicit(@names);
-        return $comp if defined($comp);
+        return $c->_filter_component( $comp, @_ ) if defined($comp);
 
         $comp = $c->_comp_search($name);
-        return $comp if defined($comp);
+        return $c->_filter_component( $comp, @_ ) if defined($comp);
     }
 
     return sort keys %{ $c->components };
@@ -471,10 +468,11 @@ If name is omitted, will return the controller for the dispatched action.
 =cut
 
 sub controller {
-    my ( $c, $name ) = @_;
-    return $c->_comp_prefixes($name, qw/Controller C/)
-	if ($name);
-    return $c->component($c->action->class);
+    my ( $c, $name, @args ) = @_;
+    return $c->_filter_component( $c->_comp_prefixes( $name, qw/Controller C/ ),
+        @args )
+      if ($name);
+    return $c->component( $c->action->class );
 }
 
 =head2 $c->model($name)
@@ -489,12 +487,13 @@ or check if there is only one model, and forward to it if that's the case.
 =cut
 
 sub model {
-    my ( $c, $name ) = @_;
-    return $c->_comp_prefixes($name, qw/Model M/)
-	if $name;
-    return $c->comp($c->config->{default_model})
-	if $c->config->{default_model};
-    return $c->_comp_singular(qw/Model M/);
+    my ( $c, $name, @args ) = @_;
+    return $c->_filter_component( $c->_comp_prefixes( $name, qw/Model M/ ),
+        @args )
+      if $name;
+    return $c->component( $c->config->{default_model} )
+      if $c->config->{default_model};
+    return $c->_filter_component( $c->_comp_singular(qw/Model M/), @args );
 
 }
 
@@ -510,12 +509,13 @@ or check if there is only one view, and forward to it if that's the case.
 =cut
 
 sub view {
-    my ( $c, $name ) = @_;
-    return $c->_comp_prefixes($name, qw/View V/)
-	if $name;
-    return $c->comp($c->config->{default_view})
-	if $c->config->{default_view};
-    return $c->_comp_singular(qw/View V/);
+    my ( $c, $name, @args ) = @_;
+    return $c->_filter_component( $c->_comp_prefixes( $name, qw/View V/ ),
+        @args )
+      if $name;
+    return $c->component( $c->config->{default_view} )
+      if $c->config->{default_view};
+    return $c->_filter_component( $c->_comp_singular(qw/View V/) );
 }
 
 =head2 Class data and helper classes
@@ -1013,7 +1013,7 @@ sub execute {
     $class = $c->component($class) || $class;
     $c->state(0);
 
-    if ($c->depth >= $RECURSION) {
+    if ( $c->depth >= $RECURSION ) {
         my $action = "$code";
         $action = "/$action" unless $action =~ /\-\>/;
         my $error = qq/Deep recursion detected calling "$action"/;
@@ -1022,7 +1022,6 @@ sub execute {
         $c->state(0);
         return $c->state;
     }
-
 
     if ( $c->debug ) {
         my $action = "$code";
@@ -1210,7 +1209,8 @@ sub finalize_headers {
     if ( $c->response->body && !$c->response->content_length ) {
 
         # get the length from a filehandle
-        if ( blessed($c->response->body) && $c->response->body->can('read') ) {
+        if ( blessed( $c->response->body ) && $c->response->body->can('read') )
+        {
             if ( my $stat = stat $c->response->body ) {
                 $c->response->content_length( $stat->size );
             }
@@ -1940,7 +1940,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 
     sub registered_plugins {
         my $proto = shift;
-        return sort keys %{$proto->_plugins} unless @_;
+        return sort keys %{ $proto->_plugins } unless @_;
         my $plugin = shift;
         return 1 if exists $proto->_plugins->{$plugin};
         return exists $proto->_plugins->{"Catalyst::Plugin::$plugin"};
@@ -1958,7 +1958,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
                 message => qq/Couldn't load ${type}plugin "$plugin", $error/ );
         }
 
-        $proto->_plugins->{$plugin} = 1;        
+        $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
             no strict 'refs';
             unshift @{"$class\::ISA"}, $plugin;
