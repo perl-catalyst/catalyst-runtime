@@ -155,11 +155,19 @@ use HTTP::Request::Common;
           [ 'file' => ["$FindBin::Bin/catalyst_130pix.gif"], ]
     );
 
-    # Sending wrong Content-Length here and see if subequent requests fail
-    $request->header('Content-Length' => $request->header('Content-Length') + 1);
+    # LWP will auto-correct Content-Length when using a remote server
+    SKIP:
+    {
+        if ( $ENV{CATALYST_SERVER} ) {
+            skip 'Using remote server', 2;
+        }
 
-    ok( my $response = request($request), 'Request' );
-    ok( !$response->is_success, 'Response Error' );
+        # Sending wrong Content-Length here and see if subequent requests fail
+        $request->header('Content-Length' => $request->header('Content-Length') + 1);
+
+        ok( my $response = request($request), 'Request' );
+        ok( !$response->is_success, 'Response Error' );
+    }
 
     $request = POST(
         'http://localhost/dump/request',
@@ -169,7 +177,7 @@ use HTTP::Request::Common;
             'file2' => ["$FindBin::Bin/catalyst_130pix.gif"], ]
     );
 
-    ok( $response = request($request), 'Request' );
+    ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     like( $response->content, qr/file1 => bless/, 'Upload with name file1');
