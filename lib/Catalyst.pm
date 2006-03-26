@@ -767,7 +767,7 @@ EOF
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $path, [ @args ] )
+=head2 $c->uri_for( $path, @args?, \%query_values? )
 
 Merges path with C<$c-E<gt>request-E<gt>base> for absolute uri's and
 with C<$c-E<gt>namespace> for relative uri's, then returns a
