@@ -1144,21 +1144,28 @@ sub finalize {
         $c->log->error($error);
     }
 
-    $c->finalize_uploads;
-
-    # Error
-    if ( $#{ $c->error } >= 0 ) {
-        $c->finalize_error;
+    # Allow engine to handle finalize flow (for POE)
+    if ( $c->engine->can('finalize') ) {
+        $c->engine->finalize( $c );
     }
+    else {
 
-    $c->finalize_headers;
+        $c->finalize_uploads;
 
-    # HEAD request
-    if ( $c->request->method eq 'HEAD' ) {
-        $c->response->body('');
+        # Error
+        if ( $#{ $c->error } >= 0 ) {
+            $c->finalize_error;
+        }
+
+        $c->finalize_headers;
+
+        # HEAD request
+        if ( $c->request->method eq 'HEAD' ) {
+            $c->response->body('');
+        }
+
+        $c->finalize_body;
     }
-
-    $c->finalize_body;
 
     return $c->response->status;
 }
@@ -1386,15 +1393,21 @@ sub prepare {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
-    $c->prepare_request(@arguments);
-    $c->prepare_connection;
-    $c->prepare_query_parameters;
-    $c->prepare_headers;
-    $c->prepare_cookies;
-    $c->prepare_path;
+    # Allow engine to direct the prepare flow (for POE)
+    if ( $c->engine->can('prepare') ) {
+        $c->engine->prepare( $c, @arguments );
+    }
+    else {
+        $c->prepare_request(@arguments);
+        $c->prepare_connection;
+        $c->prepare_query_parameters;
+        $c->prepare_headers;
+        $c->prepare_cookies;
+        $c->prepare_path;
 
-    # On-demand parsing
-    $c->prepare_body unless $c->config->{parse_on_demand};
+        # On-demand parsing
+        $c->prepare_body unless $c->config->{parse_on_demand};
+    }
 
     my $method  = $c->req->method  || '';
     my $path    = $c->req->path    || '';
