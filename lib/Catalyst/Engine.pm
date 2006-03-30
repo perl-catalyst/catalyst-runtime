@@ -39,15 +39,16 @@ Finalize body.  Prints the response output.
 
 sub finalize_body {
     my ( $self, $c ) = @_;
-    if ( ref $c->response->body && $c->response->body->can('read') ) {
-        while ( !$c->response->body->eof() ) {
-            $c->response->body->read( my $buffer, $CHUNKSIZE );
+    my $body = $c->response->body;
+    if ( ref $body && ($body->can('read') || ref($body) eq 'GLOB') ) {
+        while ( !eof $body ) {
+            read $body, my $buffer, $CHUNKSIZE;
             last unless $self->write( $c, $buffer );
         }
-        $c->response->body->close();
+        close $body;
     }
     else {
-        $self->write( $c, $c->response->body );
+        $self->write( $c, $body );
     }
 }
 
@@ -315,6 +316,7 @@ sub prepare_body {
 
     unless ( $c->request->{_body} ) {
         $c->request->{_body} = HTTP::Body->new( $type, $self->read_length );
+        $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp} if exists $c->config->{uploadtmp};
     }
 
     if ( $self->read_length > 0 ) {
