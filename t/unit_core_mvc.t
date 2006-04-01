@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 13;
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ push @complist,$thingie;
 
     use base qw/Catalyst/;
 
-    __PACKAGE__->components( { map { ( $_, $_ ) } @complist } );
+    __PACKAGE__->components( { map { ( ref($_)||$_ , $_ ) } @complist } );
 }
 
 is( MyApp->view('View'), 'MyApp::V::View', 'V::View ok' );
@@ -38,3 +38,15 @@ is( MyApp->view('V'), 'MyApp::View::V', 'View::V ok' );
 is( MyApp->controller('C'), 'MyApp::Controller::C', 'Controller::C ok' );
 
 is( MyApp->model('M'), 'MyApp::Model::M', 'Model::M ok' );
+
+is_deeply( [ sort MyApp->views ],
+           [ qw/V View/ ],
+           'views ok' );
+
+is_deeply( [ sort MyApp->controllers ],
+           [ qw/C Controller Model::Dummy::Model/ ],
+           'controllers ok');
+
+is_deeply( [ sort MyApp->models ],
+           [ qw/Dummy::Model M Model Test::Object/ ],
+           'models ok');

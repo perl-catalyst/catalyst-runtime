@@ -399,6 +399,29 @@ sub _comp_prefixes {
     return $comp;
 }
 
+# Find possible names for a prefix 
+
+sub _comp_names {
+    my ( $c, @prefixes ) = @_;
+
+    my $appclass = ref $c || $c;
+
+    my @pre = map { "${appclass}::${_}::" } @prefixes;
+
+    my @names;
+
+    COMPONENT: foreach my $comp ($c->component) {
+        foreach my $p (@pre) {
+            if ($comp =~ s/^$p//) {
+                push(@names, $comp);
+                next COMPONENT;
+            }
+        }
+    }
+
+    return @names;
+}
+
 # Return a component if only one matches.
 sub _comp_singular {
     my ( $c, @prefixes ) = @_;
@@ -475,6 +498,17 @@ sub controller {
     return $c->component( $c->action->class );
 }
 
+=head2 $c->controllers
+
+Returns the available names which can be passed to $c->controller
+
+=cut
+
+sub controllers {
+    my ( $c ) = @_;
+    return $c->_comp_names(qw/Controller C/);
+}
+
 =head2 $c->model($name)
 
 Gets a L<Catalyst::Model> instance by name.
@@ -497,6 +531,17 @@ sub model {
 
 }
 
+=head2 $c->models
+
+Returns the available names which can be passed to $c->model
+
+=cut
+
+sub models {
+    my ( $c ) = @_;
+    return $c->_comp_names(qw/Model M/);
+}
+
 =head2 $c->view($name)
 
 Gets a L<Catalyst::View> instance by name.
@@ -516,6 +561,17 @@ sub view {
     return $c->component( $c->config->{default_view} )
       if $c->config->{default_view};
     return $c->_filter_component( $c->_comp_singular(qw/View V/) );
+}
+
+=head2 $c->views
+
+Returns the available names which can be passed to $c->view
+
+=cut
+
+sub views {
+    my ( $c ) = @_;
+    return $c->_comp_names(qw/View V/);
 }
 
 =head2 Class data and helper classes

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.67   
+        - Added $c->models/views/controllers
         - Static::Simple: Unescape the URI path before looking for the file.
           This fixes issues with files that have spaces.
         - Looping and recursion tests plus a fix
