@@ -43,7 +43,7 @@ application based on the attributes you set.
 
 =head1 METHODS
 
-=item new 
+=head2 new 
 
 Construct a new dispatcher.
 

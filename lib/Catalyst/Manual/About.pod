@@ -94,6 +94,8 @@ It has a very large number of "plugins" that interact with existing Perl
 modules so that you can easily use them from within your
 application. 
 
+=over 4
+
 =item * Interact with a web server? 
 
 Catalyst lets you use a number of different ones, and even comes with a
@@ -129,6 +131,8 @@ authorization, in any way you need.
 Catalyst has detailed logging built-in, which you can configure as
 necessary, and supports the easy creation of new tests--some of which
 are automatically created when you begin writing a new application.
+
+=back
 
 =head3 What B<isn't> Catalyst?
 
