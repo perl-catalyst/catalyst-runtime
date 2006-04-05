@@ -42,7 +42,7 @@ sub finalize_body {
     my $body = $c->response->body;
     if ( ref $body && ($body->can('read') || ref($body) eq 'GLOB') ) {
         while ( !eof $body ) {
-            read $body, my $buffer, $CHUNKSIZE;
+            read $body, my ($buffer), $CHUNKSIZE;
             last unless $self->write( $c, $buffer );
         }
         close $body;
