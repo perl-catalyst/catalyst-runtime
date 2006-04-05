@@ -208,7 +208,7 @@ sub _catalyst_par {
     die "Please install Module::ScanDeps\n" if $@;
 
     my $root = $FindBin::Bin;
-    $class_name = s/-/::/g;
+    $class_name =~ s/-/::/g;
     my $path = File::Spec->catfile( 'blib', 'lib', split( '::', $class_name ) );
     $path .= '.pm';
     unless ( -f $path ) {
