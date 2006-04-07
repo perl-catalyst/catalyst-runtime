@@ -554,6 +554,11 @@ use Catalyst qw/-Debug ConfigLoader Static::Simple/;
 our $VERSION = '0.01';
 
 #
+# Configure the application 
+#
+__PACKAGE__->config( name => '[% name %]' );
+
+#
 # Start the application
 #
 __PACKAGE__->setup;
