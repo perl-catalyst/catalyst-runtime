@@ -19,7 +19,7 @@ __PACKAGE__->mk_accessors(
     qw/tree dispatch_types registered_dispatch_types
       method_action_class action_container_class
       preload_dispatch_types postload_dispatch_types
-	  action_hash
+      action_hash container_hash
       /
 );
 
@@ -59,7 +59,14 @@ sub new {
     # set the default pre- and and postloads
     $obj->preload_dispatch_types( \@PRELOAD );
     $obj->postload_dispatch_types( \@POSTLOAD );
-	$obj->action_hash({});
+    $obj->action_hash(    {} );
+    $obj->container_hash( {} );
+
+    # Create the root node of the tree
+    my $container =
+      Catalyst::ActionContainer->new( { part => '/', actions => {} } );
+    $obj->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
+
     return $obj;
 }
 
@@ -273,7 +280,7 @@ sub get_action {
     $namespace ||= '';
     $namespace = '' if $namespace eq '/';
 
-	return $self->action_hash->{ "$namespace/$name" };
+    return $self->action_hash->{"$namespace/$name"};
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -299,40 +306,18 @@ Return all the action containers for a given namespace, inclusive
 
 sub get_containers {
     my ( $self, $namespace ) = @_;
+    $namespace ||= '';
+    $namespace = '' if $namespace eq '/';
 
-    # If the namespace is / just return the root ActionContainer
+    my @containers;
 
-    return ( $self->tree->getNodeValue )
-      if ( !$namespace || ( $namespace eq '/' ) );
+    do {
+        push @containers, $self->container_hash->{$namespace};
+    } while ( $namespace =~ s#/[^/]+$## );
 
-    # Use a visitor to recurse down the tree finding the ActionContainers
-    # for each namespace in the chain.
+    return reverse grep { defined } @containers, $self->container_hash->{''};
 
-    my $visitor = Tree::Simple::Visitor::FindByPath->new;
-    my @path = split( '/', $namespace );
-    $visitor->setSearchPath(@path);
-    $self->tree->accept($visitor);
-
-    my @match = $visitor->getResults;
-    @match = ( $self->tree ) unless @match;
-
-    if ( !defined $visitor->getResult ) {
-
-        # If we don't manage to match, the visitor doesn't return the last
-        # node is matched, so foo/bar/baz would only find the 'foo' node,
-        # not the foo and foo/bar nodes as it should. This does another
-        # single-level search to see if that's the case, and the 'last unless'
-        # should catch any failures - or short-circuit this if this *is* a
-        # bug in the visitor and gets fixed.
-
-        if ( my $extra = $path[ ( scalar @match ) - 1 ] ) {
-            $visitor->setSearchPath($extra);
-            $match[-1]->accept($visitor);
-            push( @match, $visitor->getResult ) if defined $visitor->getResult;
-        }
-    }
-
-    return map { $_->getNodeValue } @match;
+    my @parts = split '/', $namespace;
 }
 
 =head2 $self->register( $c, $action )
@@ -368,52 +353,43 @@ sub register {
     return unless $reg + $priv;
 
     my $namespace = $action->namespace;
-	my $name = $action->name;
+    my $name      = $action->name;
 
-	my $node = $self->find_or_create_namespace_node( $namespace );
+    my $container = $self->find_or_create_action_container($namespace);
 
     # Set the method value
-    $node->getNodeValue->actions->{ $name } = $action;
+    $container->add_action($action);
 
-	my $path = "$namespace/$name";
-
-	if ( exists $self->action_hash->{$path} and $self->action_hash->{$path} != $action ) {
-		warn "inconsistency: $path is already registered";
-	}
-
-	$self->action_hash->{$path} = $action;
+    $self->action_hash->{"$namespace/$name"} = $action;
+    $self->container_hash->{$namespace} = $container;
 }
 
-sub find_or_create_namespace_node {
-	my ( $self, $namespace ) = @_;
-	
-    my $tree  ||= $self->tree;
+sub find_or_create_action_container {
+    my ( $self, $namespace ) = @_;
 
-	return $tree unless $namespace;
+    my $tree ||= $self->tree;
 
-	my @namespace = split '/', $namespace;
-	return $self->_find_or_create_namespace_node( $tree, @namespace );
+    return $tree->getNodeValue unless $namespace;
+
+    my @namespace = split '/', $namespace;
+    return $self->_find_or_create_namespace_node( $tree, @namespace )
+      ->getNodeValue;
 }
 
 sub _find_or_create_namespace_node {
-	my ( $self, $parent, $part, @namespace ) = @_;
+    my ( $self, $parent, $part, @namespace ) = @_;
 
-	return $parent unless $part;
+    return $parent unless $part;
 
-	my $child = ( grep { $_->getNodeValue->part eq $part } $parent->getAllChildren )[0];
+    my $child =
+      ( grep { $_->getNodeValue->part eq $part } $parent->getAllChildren )[0];
 
-	unless ($child) {
-		# Create a new tree node and an ActionContainer to form
-		# its value.
+    unless ($child) {
+        my $container = Catalyst::ActionContainer->new($part);
+        $parent->addChild( $child = Tree::Simple->new($container) );
+    }
 
-		my $container =
-		  Catalyst::ActionContainer->new(
-			{ part => $part, actions => {} } );
-
-		$parent->addChild( $child = Tree::Simple->new($container) );
-	}
-
-	$self->_find_or_create_namespace_node( $child, @namespace );
+    $self->_find_or_create_namespace_node( $child, @namespace );
 }
 
 =head2 $self->setup_actions( $class, $context )
@@ -432,11 +408,6 @@ sub setup_actions {
     my @classes =
       $self->do_load_dispatch_types( @{ $self->preload_dispatch_types } );
     @{ $self->registered_dispatch_types }{@classes} = (1) x @classes;
-
-    # Create the root node of the tree
-    my $container =
-      Catalyst::ActionContainer->new( { part => '/', actions => {} } );
-    $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 
     foreach my $comp ( values %{ $c->components } ) {
         $comp->register_actions($c) if $comp->can('register_actions');
@@ -496,7 +467,7 @@ sub do_load_dispatch_types {
         push @loaded, $class;
     }
 
-	return @loaded;
+    return @loaded;
 }
 
 =head1 AUTHOR

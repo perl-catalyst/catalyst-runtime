@@ -12,6 +12,14 @@ use overload (
 
 );
 
+sub new {
+    my ( $class, $fields ) = @_;
+
+    $fields = { part => $fields, actions => {} } unless ref $fields;
+
+    $class->SUPER::new($fields);
+}
+
 =head1 NAME
 
 Catalyst::ActionContainer - Catalyst Action Container
@@ -37,6 +45,18 @@ sub get_action {
     my ( $self, $name ) = @_;
     return $self->actions->{$name} if defined $self->actions->{$name};
     return;
+}
+
+=head2 add_action($action, [ $name ])
+
+Adds an action, optionally providing a name to override $action->name
+
+=cut
+
+sub add_action {
+    my ( $self, $action, $name ) = @_;
+    my $name ||= $action->name;
+    $self->actions->{$name} = $action;
 }
 
 =head2 actions
