@@ -19,6 +19,7 @@ __PACKAGE__->mk_accessors(
     qw/tree dispatch_types registered_dispatch_types
       method_action_class action_container_class
       preload_dispatch_types postload_dispatch_types
+	  action_hash
       /
 );
 
@@ -58,6 +59,7 @@ sub new {
     # set the default pre- and and postloads
     $obj->preload_dispatch_types( \@PRELOAD );
     $obj->postload_dispatch_types( \@POSTLOAD );
+	$obj->action_hash({});
     return $obj;
 }
 
@@ -271,13 +273,7 @@ sub get_action {
     $namespace ||= '';
     $namespace = '' if $namespace eq '/';
 
-    my @match = $self->get_containers($namespace);
-
-    return unless @match;
-
-    if ( my $action = $match[-1]->get_action($name) ) {
-        return $action if $action->namespace eq $namespace;
-    }
+	return $self->action_hash->{ "$namespace/$name" };
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -372,10 +368,20 @@ sub register {
     return unless $reg + $priv;
 
     my $namespace = $action->namespace;
+	my $name = $action->name;
+
 	my $node = $self->find_or_create_namespace_node( $namespace );
 
     # Set the method value
-    $node->getNodeValue->actions->{ $action->name } = $action;
+    $node->getNodeValue->actions->{ $name } = $action;
+
+	my $path = "$namespace/$name";
+
+	if ( exists $self->action_hash->{$path} and $self->action_hash->{$path} != $action ) {
+		warn "inconsistency: $path is already registered";
+	}
+
+	$self->action_hash->{$path} = $action;
 }
 
 sub find_or_create_namespace_node {
