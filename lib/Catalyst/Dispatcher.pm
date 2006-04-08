@@ -19,7 +19,7 @@ __PACKAGE__->mk_accessors(
     qw/tree dispatch_types registered_dispatch_types
       method_action_class action_container_class
       preload_dispatch_types postload_dispatch_types
-    /
+      /
 );
 
 # Preload these action types
@@ -50,15 +50,15 @@ Construct a new dispatcher.
 =cut
 
 sub new {
-    my $self = shift;
+    my $self  = shift;
     my $class = ref($self) || $self;
-                                    
-    my $obj = $class->SUPER::new( @_ );
-                                       
+
+    my $obj = $class->SUPER::new(@_);
+
     # set the default pre- and and postloads
-    $obj->preload_dispatch_types(  \@PRELOAD );        
+    $obj->preload_dispatch_types( \@PRELOAD );
     $obj->postload_dispatch_types( \@POSTLOAD );
-    return $obj;                        
+    return $obj;
 }
 
 =head2 $self->preload_dispatch_types
@@ -416,17 +416,11 @@ sub setup_actions {
     $self->method_action_class('Catalyst::Action');
     $self->action_container_class('Catalyst::ActionContainer');
 
-    # Preload action types
-    for my $type ( @{$self->preload_dispatch_types} ) {
-        my $class = ($type =~ /^\+(.*)$/) ? $1 : "Catalyst::DispatchType::${type}";
-        eval "require $class";
-        Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
-          if $@;
-        push @{ $self->dispatch_types }, $class->new;
-        $self->registered_dispatch_types->{$class} = 1;
-    }
+    my @classes =
+      $self->do_load_dispatch_types( @{ $self->preload_dispatch_types } );
+    @{ $self->registered_dispatch_types }{@classes} = (1) x @classes;
 
-    # We use a tree
+    # Create the root node of the tree
     my $container =
       Catalyst::ActionContainer->new( { part => '/', actions => {} } );
     $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
@@ -435,14 +429,7 @@ sub setup_actions {
         $comp->register_actions($c) if $comp->can('register_actions');
     }
 
-    # Postload action types
-    for my $type ( @{$self->postload_dispatch_types} ) {
-        my $class = ($type =~ /^\+(.*)$/) ? $1 : "Catalyst::DispatchType::${type}";
-        eval "require $class";
-        Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
-          if $@;
-        push @{ $self->dispatch_types }, $class->new;
-    }
+    $self->do_load_dispatch_types( @{ $self->postload_dispatch_types } );
 
     return unless $c->debug;
 
@@ -477,6 +464,26 @@ sub setup_actions {
 
     # List all public actions
     $_->list($c) for @{ $self->dispatch_types };
+}
+
+sub do_load_dispatch_types {
+    my ( $self, @types ) = @_;
+
+    my @loaded;
+
+    # Preload action types
+    for my $type (@types) {
+        my $class =
+          ( $type =~ /^\+(.*)$/ ) ? $1 : "Catalyst::DispatchType::${type}";
+        eval "require $class";
+        Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
+          if $@;
+        push @{ $self->dispatch_types }, $class->new;
+
+        push @loaded, $class;
+    }
+
+	return @loaded;
 }
 
 =head1 AUTHOR
