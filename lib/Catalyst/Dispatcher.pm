@@ -132,103 +132,109 @@ Documented in L<Catalyst>
 
 =cut
 
-
 sub forward {
-	my ( $self, $c, $command ) = splice( @_, 0, 3 );
+    my ( $self, $c, $command ) = splice( @_, 0, 3 );
 
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
     }
 
-	my $args = [ @{ $c->request->arguments } ];
+    my $args = [ @{ $c->request->arguments } ];
 
-	@$args = @{ pop @_ } if ( ref( $_[-1] ) eq 'ARRAY' );
+    @$args = @{ pop @_ } if ( ref( $_[-1] ) eq 'ARRAY' );
 
     my $action = $self->_invoke_as_path( $c, $command, $args )
-		      || $self->_invoke_as_component( $c, $command, shift );
+      || $self->_invoke_as_component( $c, $command, shift );
 
-	unless ( $action ) {
-		my $error = qq/Couldn't forward to command "$command": / . qq/Invalid action or component./;
-		$c->error($error);
-		$c->log->debug($error) if $c->debug;
-		return 0;
-	}
+    unless ($action) {
+        my $error =
+            qq/Couldn't forward to command "$command": /
+          . qq/Invalid action or component./;
+        $c->error($error);
+        $c->log->debug($error) if $c->debug;
+        return 0;
+    }
 
-	#push @$args, @_;
+    #push @$args, @_;
 
-	local $c->request->{arguments} = $args;
-	$action->execute($c);
+    local $c->request->{arguments} = $args;
+    $action->execute($c);
 
     return $c->state;
 }
 
 sub _action_rel2abs {
-	my ( $self, $c, $path ) = @_;
-	
-	unless ( $path =~ m#^/# ) {
-		my $namespace = $c->stack->[-1]->namespace;
-		$path = "$namespace/$path";
-	}
+    my ( $self, $c, $path ) = @_;
 
-	$path =~ s#^/##;
-	return $path;
+    unless ( $path =~ m#^/# ) {
+        my $namespace = $c->stack->[-1]->namespace;
+        $path = "$namespace/$path";
+    }
+
+    $path =~ s#^/##;
+    return $path;
 }
 
 sub _invoke_as_path {
-	my ( $self, $c, $rel_path, $args ) = @_;
+    my ( $self, $c, $rel_path, $args ) = @_;
 
-	return if ref $rel_path; # it must be a string
+    return if ref $rel_path;    # it must be a string
 
-	my $path = $self->_action_rel2abs( $c, $rel_path );
-	
-	my ($tail, @extra_args);
-	while ( ( $path, $tail ) = ( $path =~ m#^(?:(.*)/)?(\w+)?$# ) ) { # allow $path to be empty
-		if ( my $action = $c->get_action( $tail, $path ) ) {
-			push @$args, @extra_args;
-			return $action;
-		} else {
-			return unless $path; # if a match on the global namespace failed then the whole lookup failed
-		}
+    my $path = $self->_action_rel2abs( $c, $rel_path );
 
-		unshift @extra_args, $tail;
-	}
+    my ( $tail, @extra_args );
+    while ( ( $path, $tail ) = ( $path =~ m#^(?:(.*)/)?(\w+)?$# ) )
+    {                           # allow $path to be empty
+        if ( my $action = $c->get_action( $tail, $path ) ) {
+            push @$args, @extra_args;
+            return $action;
+        }
+        else {
+            return
+              unless $path
+              ; # if a match on the global namespace failed then the whole lookup failed
+        }
+
+        unshift @extra_args, $tail;
+    }
 }
 
 sub _find_component_class {
-	my ( $self, $c, $component ) = @_;
+    my ( $self, $c, $component ) = @_;
 
-	return ref($component)
-	|| ref( $c->component($component) )
-	|| $c->component($component)
+    return ref($component)
+      || ref( $c->component($component) )
+      || $c->component($component);
 }
 
 sub _invoke_as_component {
-	my ( $self, $c, $component, $method ) = @_;
+    my ( $self, $c, $component, $method ) = @_;
 
-	my $class = $self->_find_component_class( $c, $component ) || return 0;
-	$method ||= "process";
+    my $class = $self->_find_component_class( $c, $component ) || return 0;
+    $method ||= "process";
 
-	if ( my $code = $class->can($method) ) {
-		return $self->method_action_class->new(
-			{
-				name      => $method,
-				code      => $code,
-				reverse   => "$class->$method",
-				class     => $class,
-				namespace => Catalyst::Utils::class2prefix(
-					$class, $c->config->{case_sensitive}
-				),
-			}
-		);
-	} else {
-		my $error =
-		  qq/Couldn't forward to "$class". Does not implement "$method"/;
-		$c->error($error);
-		$c->log->debug($error)
-		  if $c->debug;
-		return 0;
-	}
+    if ( my $code = $class->can($method) ) {
+        return $self->method_action_class->new(
+            {
+                name      => $method,
+                code      => $code,
+                reverse   => "$class->$method",
+                class     => $class,
+                namespace => Catalyst::Utils::class2prefix(
+                    $class, $c->config->{case_sensitive}
+                ),
+            }
+        );
+    }
+    else {
+        my $error =
+          qq/Couldn't forward to "$class". Does not implement "$method"/;
+        $c->error($error);
+        $c->log->debug($error)
+          if $c->debug;
+        return 0;
+    }
 }
 
 =head2 $self->prepare_action($c)

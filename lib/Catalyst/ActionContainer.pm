@@ -55,7 +55,7 @@ Adds an action, optionally providing a name to override $action->name
 
 sub add_action {
     my ( $self, $action, $name ) = @_;
-    my $name ||= $action->name;
+    $name ||= $action->name;
     $self->actions->{$name} = $action;
 }
 
