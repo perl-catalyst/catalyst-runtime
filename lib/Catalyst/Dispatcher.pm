@@ -382,39 +382,32 @@ sub find_or_create_namespace_node {
 	my ( $self, $namespace ) = @_;
 	
     my $tree  ||= $self->tree;
-    my $visitor ||= Tree::Simple::Visitor::FindByPath->new;
-
 
 	return $tree unless $namespace;
 
 	my @namespace = split '/', $namespace;
-	return $self->_find_or_create_namespace_node( $tree, $visitor, @namespace );
+	return $self->_find_or_create_namespace_node( $tree, @namespace );
 }
 
 sub _find_or_create_namespace_node {
-	my ( $self, $parent, $visitor, $part, @namespace ) = @_;
+	my ( $self, $parent, $part, @namespace ) = @_;
 
 	return $parent unless $part;
 
-	$visitor->setSearchPath($part);
-	$parent->accept($visitor);
-	my $child = $visitor->getResult;
+	my $child = ( grep { $_->getNodeValue->part eq $part } $parent->getAllChildren )[0];
 
 	unless ($child) {
-
 		# Create a new tree node and an ActionContainer to form
 		# its value.
 
 		my $container =
 		  Catalyst::ActionContainer->new(
 			{ part => $part, actions => {} } );
-		$child = $parent->addChild( Tree::Simple->new($container) );
-		$visitor->setSearchPath($part);
-		$parent->accept($visitor);
-		$child = $visitor->getResult;
+
+		$parent->addChild( $child = Tree::Simple->new($container) );
 	}
 
-	$self->_find_or_create_namespace_node( $child, $visitor, @namespace );
+	$self->_find_or_create_namespace_node( $child, @namespace );
 }
 
 =head2 $self->setup_actions( $class, $context )
