@@ -379,36 +379,42 @@ sub register {
 }
 
 sub find_or_create_namespace_node {
-	my ( $self, $namespace, $parent, $visitor ) = @_;
+	my ( $self, $namespace ) = @_;
+	
+    my $tree  ||= $self->tree;
+    my $visitor ||= Tree::Simple::Visitor::FindByPath->new;
 
-    $parent  ||= $self->tree;
-    $visitor ||= Tree::Simple::Visitor::FindByPath->new;
 
-    if ($namespace) {
-        for my $part ( split '/', $namespace ) {
-            $visitor->setSearchPath($part);
-            $parent->accept($visitor);
-            my $child = $visitor->getResult;
+	return $tree unless $namespace;
 
-            unless ($child) {
+	my @namespace = split '/', $namespace;
+	return $self->_find_or_create_namespace_node( $tree, $visitor, @namespace );
+}
 
-                # Create a new tree node and an ActionContainer to form
-                # its value.
+sub _find_or_create_namespace_node {
+	my ( $self, $parent, $visitor, $part, @namespace ) = @_;
 
-                my $container =
-                  Catalyst::ActionContainer->new(
-                    { part => $part, actions => {} } );
-                $child = $parent->addChild( Tree::Simple->new($container) );
-                $visitor->setSearchPath($part);
-                $parent->accept($visitor);
-                $child = $visitor->getResult;
-            }
+	return $parent unless $part;
 
-            $parent = $child;
-        }
-    }
+	$visitor->setSearchPath($part);
+	$parent->accept($visitor);
+	my $child = $visitor->getResult;
 
-	return $parent;
+	unless ($child) {
+
+		# Create a new tree node and an ActionContainer to form
+		# its value.
+
+		my $container =
+		  Catalyst::ActionContainer->new(
+			{ part => $part, actions => {} } );
+		$child = $parent->addChild( Tree::Simple->new($container) );
+		$visitor->setSearchPath($part);
+		$parent->accept($visitor);
+		$child = $visitor->getResult;
+	}
+
+	$self->_find_or_create_namespace_node( $child, $visitor, @namespace );
 }
 
 =head2 $self->setup_actions( $class, $context )
