@@ -372,8 +372,17 @@ sub register {
     return unless $reg + $priv;
 
     my $namespace = $action->namespace;
-    my $parent    = $self->tree;
-    my $visitor   = Tree::Simple::Visitor::FindByPath->new;
+	my $node = $self->find_or_create_namespace_node( $namespace );
+
+    # Set the method value
+    $node->getNodeValue->actions->{ $action->name } = $action;
+}
+
+sub find_or_create_namespace_node {
+	my ( $self, $namespace, $parent, $visitor ) = @_;
+
+    $parent  ||= $self->tree;
+    $visitor ||= Tree::Simple::Visitor::FindByPath->new;
 
     if ($namespace) {
         for my $part ( split '/', $namespace ) {
@@ -399,8 +408,7 @@ sub register {
         }
     }
 
-    # Set the method value
-    $parent->getNodeValue->actions->{ $action->name } = $action;
+	return $parent;
 }
 
 =head2 $self->setup_actions( $class, $context )
