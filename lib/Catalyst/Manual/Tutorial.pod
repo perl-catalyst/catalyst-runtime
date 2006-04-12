@@ -763,7 +763,7 @@ C<mod_cgi>. Put this in the configuration:
   <Directory /usr/apps/tutorial/script>
    Options +ExecCGI
    <Files *_fastcgi.pl>
-    SetHandles fastcgi-script
+    SetHandler fastcgi-script
    </Files>
   </Directory>
 
