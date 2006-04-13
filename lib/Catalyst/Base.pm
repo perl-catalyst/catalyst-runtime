@@ -136,18 +136,22 @@ sub register_actions {
             next;
         }
         my $reverse = $namespace ? "$namespace/$method" : $method;
-        my $action = $self->_action_class->new(
-            {
-                name       => $method,
-                code       => $code,
-                reverse    => $reverse,
-                namespace  => $namespace,
-                class      => $class,
-                attributes => $attrs,
-            }
+        my $action = $self->create_action(
+            name       => $method,
+            code       => $code,
+            reverse    => $reverse,
+            namespace  => $namespace,
+            class      => $class,
+            attributes => $attrs,
         );
+
         $c->dispatcher->register( $c, $action );
     }
+}
+
+sub create_action {
+    my $self = shift;
+    $self->_action_class->new( { @_ } );
 }
 
 sub _parse_attrs {
