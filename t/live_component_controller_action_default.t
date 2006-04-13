@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 12 * $iters;
+use Test::More tests => 16 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -69,4 +69,28 @@ sub run_tests {
         );
         is_deeply( $creq->{arguments}, $expected, 'Arguments ok' );
     }
+    
+    
+    # Test that /foo and /foo/ both do the same thing
+    {
+        my @expected = qw[
+          TestApp::Controller::Action->begin
+          TestApp::Controller::Action->default
+          TestApp->end
+        ];
+        
+        my $expected = join( ", ", @expected );
+        
+        ok( my $response = request('http://localhost/action'), 'Request' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 
+            'Executed actions for /action'
+        );
+        
+        ok( $response = request('http://localhost/action/'), 'Request' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 
+            'Executed actions for /action/'
+        );
+    }   
 }
