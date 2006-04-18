@@ -22,6 +22,7 @@ use Scalar::Util qw/weaken blessed/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
+use Carp qw/croak/;
 
 __PACKAGE__->mk_accessors(
     qw/counter request response state action stack namespace/
@@ -298,6 +299,7 @@ sub error {
     my $c = shift;
     if ( $_[0] ) {
         my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+        croak @$error unless ref $c;
         push @{ $c->{error} }, @$error;
     }
     elsif ( defined $_[0] ) { $c->{error} = undef }

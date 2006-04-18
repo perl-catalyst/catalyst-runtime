@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Applied patch from GEOFFR to allow normal filehandles.
         - Refactored Dispatcher internals for better readability and speedup
           (stress tests run 12% faster)
+        - Allow $c->error to run as a class method
 
 5.66    2006-03-10 17:48:00
         - Added Test::WWW::Mechanize::Catalyst support

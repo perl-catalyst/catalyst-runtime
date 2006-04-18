@@ -7,6 +7,7 @@ all_from 'lib/Catalyst.pm';
 
 requires 'perl'               => '5.8.1';
 requires 'UNIVERSAL::require' => "0.10";
+requires 'Carp';
 requires 'Class::Accessor::Fast';
 requires 'Class::Data::Inheritable';
 requires 'Class::Inspector';
