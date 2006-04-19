@@ -28,4 +28,17 @@ sub change_base : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub uri_with : Local {
+    my ( $self, $c ) = @_;
+
+    # change the current uri
+    my $uri   = $c->req->uri_with( { b => 1 } );
+    my %query = $uri->query_form;
+    
+    $c->res->header( 'X-Catalyst-Param-a' => $query{ a } );
+    $c->res->header( 'X-Catalyst-Param-b' => $query{ b } );
+    
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;

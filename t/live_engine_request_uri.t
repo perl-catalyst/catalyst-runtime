@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 23;
+use Test::More tests => 35;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -58,4 +58,28 @@ my $creq;
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->{uri}->query, 'text=Catalyst%20Rocks', 'Query string ok' );
     is( $creq->{parameters}->{text}, 'Catalyst Rocks', 'Unescaped param ok' );
+}
+
+# test that uri_with adds params
+{
+    ok( my $response = request('http://localhost/engine/request/uri/uri_with'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    ok( !defined $response->header( 'X-Catalyst-Param-a' ), 'param "a" ok' );
+    is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
+}
+
+# test that uri_with adds params (and preserves)
+{
+    ok( my $response = request('http://localhost/engine/request/uri/uri_with?a=1'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
+    is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
+}
+
+# test that uri_with replaces params (and preserves)
+{
+    ok( my $response = request('http://localhost/engine/request/uri/uri_with?a=1&b=2'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
+    is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
 }

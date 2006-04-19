@@ -4,6 +4,7 @@ use strict;
 use base 'Class::Accessor::Fast';
 
 use IO::Socket qw[AF_INET inet_aton];
+use Carp;
 
 __PACKAGE__->mk_accessors(
     qw/action address arguments cookies headers match method
@@ -488,6 +489,27 @@ sub uploads {
 =head2 $req->uri
 
 Returns a URI object for the current request. Stringifies to the URI text.
+
+=head2 $req->uri_with( { key => 'value' } );
+
+Returns a rewriten URI object for the current uri. Key/value pairs passed in
+will override existing parameters. Unmodified pairs will be preserved.
+
+=cut
+
+sub uri_with {
+    my( $self, $args ) = @_;
+    
+    carp( 'No arguments passed to uri_with()' ) unless $args;
+    
+    my $uri = $self->uri->clone;
+    
+    $uri->query_form( {
+        $uri->query_form,
+        %$args
+    } );
+    return $uri;
+}
 
 =head2 $req->user
 

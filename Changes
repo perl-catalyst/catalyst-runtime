@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.67   
+	- Added $c->req->uri_with() helper
         - ConfigLoader: Updated to version 0.05
         - Fix up Engine to avoid a new 5.8.8 warning
         - Added app name with :: support for PAR
