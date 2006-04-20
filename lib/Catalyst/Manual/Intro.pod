@@ -633,7 +633,7 @@ be reset.
 
     sub check_message : Private {
         my ( $self, $c ) = @_;
-        my $first_argument = $c->req->args[0]; # now = 'test1'
+        my $first_argument = $c->req->args->[0]; # now = 'test1'
         # do something...
     }
 
