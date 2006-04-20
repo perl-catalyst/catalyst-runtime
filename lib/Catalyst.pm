@@ -996,7 +996,7 @@ perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.po
                          <a href="http://lists.rawmode.org/mailman/listinfo/catalyst">Mailing-List</a>
                      </li>
                      <li>
-                         <a href="irc://irc.perl.org/catalyst">IRC channel #catalyst-talk on irc.perl.org</a>
+                         <a href="irc://irc.perl.org/catalyst">IRC channel #catalyst on irc.perl.org</a>
                      </li>
                  </ul>
                  <h2>In conclusion</h2>
@@ -2156,7 +2156,7 @@ L<DBD::SQLite>, are not thread-safe.
 
 IRC:
 
-    Join #catalyst-talk on irc.perl.org.
+    Join #catalyst on irc.perl.org.
 
 Mailing Lists:
 
