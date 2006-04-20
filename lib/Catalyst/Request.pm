@@ -6,6 +6,7 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;
+use URI::QueryParams;
 
 __PACKAGE__->mk_accessors(
     qw/action address arguments cookies headers match method
@@ -508,12 +509,12 @@ sub uri_with {
         if( $isa_ref and $isa_ref ne 'ARRAY' ) {
             croak( "Non-array reference ($isa_ref) passed to uri_with()" );
         }
-        utf8::encode( $_ ) for $isa_ref ? @$value : $value ;
+        utf8::encode( $_ ) for $isa_ref ? @$value : $value;
     };
     my $uri = $self->uri->clone;
     
     $uri->query_form( {
-        $uri->query_form,
+        %{ $uri->query_form_hash },
         %$args
     } );
     return $uri;
