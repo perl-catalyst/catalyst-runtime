@@ -6,7 +6,7 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;
-use URI::QueryParams;
+use URI::QueryParam;
 
 __PACKAGE__->mk_accessors(
     qw/action address arguments cookies headers match method
