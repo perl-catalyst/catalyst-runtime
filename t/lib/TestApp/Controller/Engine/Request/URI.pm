@@ -41,4 +41,15 @@ sub uri_with : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub uri_with_utf8 : Local {
+    my ( $self, $c ) = @_;
+
+    # change the current uri
+    my $uri = $c->req->uri_with( { unicode => "\x{2620}" } );
+    
+    $c->res->header( 'X-Catalyst-uri-with' => "$uri" );
+    
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;

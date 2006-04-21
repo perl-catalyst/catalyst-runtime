@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::MockObject;
 use URI;
 
@@ -42,6 +42,13 @@ is(
     'URI for undef action with query params'
 );
 
+# test with utf-8
+is(
+    Catalyst::uri_for( $context, 'quux', { param1 => "\x{2620}" } )->as_string,
+    'http://127.0.0.1/foo/yada/quux?param1=%E2%98%A0',
+    'URI for undef action with query params in unicode'
+);
+
 $request->mock( 'base',  sub { URI->new('http://localhost:3000/') } );
 $request->mock( 'match', sub { 'orderentry/contract' } );
 is(
@@ -60,3 +67,4 @@ is(
     is( Catalyst::uri_for( $context, '/bar/baz' )->as_string,
         'http://127.0.0.1/bar/baz', 'URI with no base or match' );
 }
+

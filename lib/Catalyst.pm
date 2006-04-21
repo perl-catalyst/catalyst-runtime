@@ -22,6 +22,7 @@ use Scalar::Util qw/weaken blessed/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
+use utf8;
 use Carp qw/croak/;
 
 __PACKAGE__->mk_accessors(
@@ -854,6 +855,14 @@ sub uri_for {
     my $params =
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
+    for my $value ( values %$params ) {
+        my $isa_ref = ref $value;
+        if( $isa_ref and $isa_ref ne 'ARRAY' ) {
+            croak( "Non-array reference ($isa_ref) passed to uri_for()" );
+        }
+        utf8::encode( $_ ) for $isa_ref ? @$value : $value;
+    };
+    
     # join args with '/', or a blank string
     my $args = ( scalar @args ? '/' . join( '/', @args ) : '' );
     $args =~ s/^\/// unless $path;
