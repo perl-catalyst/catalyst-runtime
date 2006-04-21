@@ -286,10 +286,21 @@ returns a named action from a given namespace.
 sub get_action {
     my ( $self, $name, $namespace ) = @_;
     return unless $name;
-    $namespace ||= '';
-    $namespace = '' if $namespace eq '/';
+
+    $namespace = join("/", grep { length } split '/', $namespace || "" );
 
     return $self->action_hash->{"$namespace/$name"};
+}
+
+=head2 $self->get_action_by_path( $path );
+
+returns the named action by it's full path.
+
+=cut
+
+sub get_action_by_path {
+    my ( $self, $path ) = @_;
+    $self->action_hash->{$path};
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -299,8 +310,8 @@ sub get_action {
 sub get_actions {
     my ( $self, $c, $action, $namespace ) = @_;
     return [] unless $action;
-    $namespace ||= '';
-    $namespace = '' if $namespace eq '/';
+
+    $namespace = join("/", grep { length } split '/', $namespace || "" );
 
     my @match = $self->get_containers($namespace);
 

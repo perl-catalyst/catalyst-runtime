@@ -1198,6 +1198,23 @@ sub execute {
     return $c->state;
 }
 
+=head2 $c->_localize_fields( sub { }, \%keys );
+
+=cut
+
+sub _localize_fields {
+    my ( $c, $localized, $code ) = ( @_ );
+
+    my $request = delete $localized->{request} || {};
+    my $response = delete $localized->{response} || {};
+    
+    local @{ $c }{ keys %$localized } = values %$localized;
+    local @{ $c->request }{ keys %$request } = values %$request;
+    local @{ $c->response }{ keys %$response } = values %$response;
+
+    $code->();
+}
+
 =head2 $c->finalize
 
 Finalizes the request.
