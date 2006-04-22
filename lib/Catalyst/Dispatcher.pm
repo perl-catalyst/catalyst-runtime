@@ -287,7 +287,7 @@ sub get_action {
     my ( $self, $name, $namespace ) = @_;
     return unless $name;
 
-    $namespace = join("/", grep { length } split '/', $namespace || "" );
+    $namespace = join( "/", grep { length } split '/', $namespace || "" );
 
     return $self->action_hash->{"$namespace/$name"};
 }
@@ -300,6 +300,7 @@ returns the named action by it's full path.
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
+    $path = "/$path" unless $path =~ /\//;
     $self->action_hash->{$path};
 }
 
@@ -311,7 +312,7 @@ sub get_actions {
     my ( $self, $c, $action, $namespace ) = @_;
     return [] unless $action;
 
-    $namespace = join("/", grep { length } split '/', $namespace || "" );
+    $namespace = join( "/", grep { length } split '/', $namespace || "" );
 
     my @match = $self->get_containers($namespace);
 
