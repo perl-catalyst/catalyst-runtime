@@ -264,6 +264,18 @@ call to forward.
     $c->forward(qw/MyApp::Model::DBIC::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
 
+Note that forward implies an C<<eval { }>> around the call (well, actually
+C<execute> does), thus de-fatalizing all 'dies' within the called action. If
+you want C<die> to propagate you need to do something like:
+
+    $c->forward('foo');
+    die $c->error if $c->error;
+
+Or make sure to always return true values from your actions and write your code
+like this:
+
+    $c->forward('foo') || return;
+
 =cut
 
 sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
