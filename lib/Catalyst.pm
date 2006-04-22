@@ -26,7 +26,7 @@ use utf8;
 use Carp qw/croak/;
 
 __PACKAGE__->mk_accessors(
-    qw/counter request response state action stack namespace/
+    qw/counter request response state action stack namespace stats/
 );
 
 attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
@@ -1090,95 +1090,14 @@ sub execute {
         return $c->state;
     }
 
-    if ( $c->debug ) {
-        my $action = "$code";
-        $action = "/$action" unless $action =~ /\-\>/;
-        $c->counter->{"$code"}++;
-
-        # determine if the call was the result of a forward
-        # this is done by walking up the call stack and looking for a calling
-        # sub of Catalyst::forward before the eval
-        my $callsub = q{};
-        for my $index ( 1 .. 10 ) {
-            last
-              if ( ( caller($index) )[0] eq 'Catalyst'
-                && ( caller($index) )[3] eq '(eval)' );
-
-            if ( ( caller($index) )[3] =~ /forward$/ ) {
-                $callsub = ( caller($index) )[3];
-                $action  = "-> $action";
-                last;
-            }
-        }
-
-        my $node = Tree::Simple->new(
-            {
-                action  => $action,
-                elapsed => undef,     # to be filled in later
-            }
-        );
-        $node->setUID( "$code" . $c->counter->{"$code"} );
-
-        unless ( ( $code->name =~ /^_.*/ )
-            && ( !$c->config->{show_internal_actions} ) )
-        {
-
-            # is this a root-level call or a forwarded call?
-            if ( $callsub =~ /forward$/ ) {
-
-                # forward, locate the caller
-                if ( my $parent = $c->stack->[-1] ) {
-                    my $visitor = Tree::Simple::Visitor::FindByUID->new;
-                    $visitor->searchForUID(
-                        "$parent" . $c->counter->{"$parent"} );
-                    $c->{stats}->accept($visitor);
-                    if ( my $result = $visitor->getResult ) {
-                        $result->addChild($node);
-                    }
-                }
-                else {
-
-                    # forward with no caller may come from a plugin
-                    $c->{stats}->addChild($node);
-                }
-            }
-            else {
-
-                # root-level call
-                $c->{stats}->addChild($node);
-            }
-        }
-    }
+    my $stats_info = $c->_stats_start_execute( $code );
 
     push( @{ $c->stack }, $code );
-    my $elapsed = 0;
-    my $start   = 0;
-    $start = [gettimeofday] if $c->debug;
+    
     eval { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) };
-    $elapsed = tv_interval($start) if $c->debug;
 
-    if ( $c->debug ) {
-        unless ( ( $code->name =~ /^_.*/ )
-            && ( !$c->config->{show_internal_actions} ) )
-        {
-
-            # FindByUID uses an internal die, so we save the existing error
-            my $error = $@;
-
-            # locate the node in the tree and update the elapsed time
-            my $visitor = Tree::Simple::Visitor::FindByUID->new;
-            $visitor->searchForUID( "$code" . $c->counter->{"$code"} );
-            $c->{stats}->accept($visitor);
-            if ( my $result = $visitor->getResult ) {
-                my $value = $result->getNodeValue;
-                $value->{elapsed} = sprintf( '%fs', $elapsed );
-                $result->setNodeValue($value);
-            }
-
-            # restore error
-            $@ = $error || undef;
-        }
-    }
+    $c->_stats_finish_execute( $stats_info );
+    
     my $last = ${ $c->stack }[-1];
     pop( @{ $c->stack } );
 
@@ -1196,6 +1115,110 @@ sub execute {
         }
     }
     return $c->state;
+}
+
+sub _stats_start_execute {
+    my ( $c, $code ) = @_;
+
+    return unless $c->debug;
+
+    my $action = "$code";
+
+    $action = "/$action" unless $action =~ /\-\>/;
+    $c->counter->{"$code"}++;
+
+    # determine if the call was the result of a forward
+    # this is done by walking up the call stack and looking for a calling
+    # sub of Catalyst::forward before the eval
+    my $callsub = q{};
+    for my $index ( 2 .. 11 ) {
+        last
+        if ( ( caller($index) )[0] eq 'Catalyst'
+            && ( caller($index) )[3] eq '(eval)' );
+
+        if ( ( caller($index) )[3] =~ /forward$/ ) {
+            $callsub = ( caller($index) )[3];
+            $action  = "-> $action";
+            last;
+        }
+    }
+
+    my $node = Tree::Simple->new(
+        {
+            action  => $action,
+            elapsed => undef,     # to be filled in later
+            comment => "",
+        }
+    );
+    $node->setUID( "$code" . $c->counter->{"$code"} );
+
+    unless ( ( $code->name =~ /^_.*/ )
+        && ( !$c->config->{show_internal_actions} ) )
+    {
+        # is this a root-level call or a forwarded call?
+        if ( $callsub =~ /forward$/ ) {
+
+            # forward, locate the caller
+            if ( my $parent = $c->stack->[-1] ) {
+                my $visitor = Tree::Simple::Visitor::FindByUID->new;
+                $visitor->searchForUID(
+                    "$parent" . $c->counter->{"$parent"} );
+                $c->stats->accept($visitor);
+                if ( my $result = $visitor->getResult ) {
+                    $result->addChild($node);
+                }
+            }
+            else {
+
+                # forward with no caller may come from a plugin
+                $c->stats->addChild($node);
+            }
+        }
+        else {
+
+            # root-level call
+            $c->stats->addChild($node);
+        }
+    }
+
+    my $start = [gettimeofday];
+    my $elapsed = tv_interval($start);
+
+    return {
+        code    => $code,
+        elapsed => $elapsed,
+        start   => $start,
+        node    => $node,
+      }
+}
+
+sub _stats_finish_execute {
+    my ( $c, $info ) = @_;
+
+    return unless $c->debug;
+
+    my ( $code, $start, $elapsed ) = @{ $info }{qw/code start elapsed/};
+
+    unless ( ( $code->name =~ /^_.*/ )
+        && ( !$c->config->{show_internal_actions} ) )
+    {
+
+        # FindByUID uses an internal die, so we save the existing error
+        my $error = $@;
+
+        # locate the node in the tree and update the elapsed time
+        my $visitor = Tree::Simple::Visitor::FindByUID->new;
+        $visitor->searchForUID( "$code" . $c->counter->{"$code"} );
+        $c->stats->accept($visitor);
+        if ( my $result = $visitor->getResult ) {
+            my $value = $result->getNodeValue;
+            $value->{elapsed} = sprintf( '%fs', $elapsed );
+            $result->setNodeValue($value);
+        }
+
+        # restore error
+        $@ = $error || undef;
+    }
 }
 
 =head2 $c->_localize_fields( sub { }, \%keys );
@@ -1381,7 +1404,7 @@ sub handle_request {
 
         my $handler = sub {
             my $c = $class->prepare(@arguments);
-            $c->{stats} = $stats;
+            $c->stats($stats);
             $c->dispatch;
             return $c->finalize;
         };
@@ -1399,7 +1422,7 @@ sub handle_request {
                 sub {
                     my $action = shift;
                     my $stat   = $action->getNodeValue;
-                    $t->row( ( q{ } x $action->getDepth ) . $stat->{action},
+                    $t->row( ( q{ } x $action->getDepth ) . $stat->{action} . $stat->{comment},
                         $stat->{elapsed} || '??' );
                 }
             );
