@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.67   
+5.67    2006-04-23 08:50:00
 	- Added $c->req->uri_with() helper
         - ConfigLoader: Updated to version 0.05
         - Fix up Engine to avoid a new 5.8.8 warning
@@ -9,7 +9,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Static::Simple: Unescape the URI path before looking for the file.
           This fixes issues with files that have spaces.
         - Looping and recursion tests plus a fix
-        - Added lots of API documentation.
+        - Added lots of API documentation. Refactored main pod.
         - Changed default behaviors for $c->model/$c->controller/$c->view
           to more sane settings.
         - added the clear_errors method - an alias for error(0)

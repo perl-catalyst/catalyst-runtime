@@ -40,14 +40,19 @@ catalyst - Bootstrap a Catalyst application
 
 catalyst.pl [options] application-name
 
+'catalyst.pl' creates a skeleton for a new application, and allows you to
+upgrade the skeleton of your old application.
+
  Options:
    -force      don't create a .new file where a file to be created exists
-   -help       display this help and exits
-   -makefile   update Makefile.PL only
-   -scripts    update helper scripts only
-   -short      use short types, like C instead of Controller...
+   -help       display this help and exit
+   -makefile   only update Makefile.PL
+   -scripts    only update helper scripts
+   -short      use short names, M/V/C instead of Model/View/Controller.
 
- application-name must be a valid Perl module name and can include "::"
+ application-name must be a valid Perl module name and can include "::", 
+ which will be converted to '-' in the project name.
+
 
  Examples:
     catalyst.pl My::App
