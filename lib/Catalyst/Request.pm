@@ -68,7 +68,7 @@ Catalyst::Request - provides information about the current client request
     $req->user;
     $req->user_agent;
 
-See also L<Catalyst>.
+See also L<Catalyst>, L<Catalyst::Request::Upload>.
 
 =head1 DESCRIPTION
 

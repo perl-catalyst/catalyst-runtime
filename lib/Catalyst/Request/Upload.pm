@@ -6,8 +6,9 @@ use base 'Class::Accessor::Fast';
 use Catalyst::Exception;
 use File::Copy ();
 use IO::File   ();
+use File::Spec::Unix;
 
-__PACKAGE__->mk_accessors(qw/filename headers size tempname type/);
+__PACKAGE__->mk_accessors(qw/filename headers size tempname type basename/);
 
 sub new { shift->SUPER::new( ref( $_[0] ) ? $_[0] : {@_} ) }
 
@@ -17,6 +18,7 @@ Catalyst::Request::Upload - handles file upload requests
 
 =head1 SYNOPSIS
 
+    $upload->basename;
     $upload->copy_to;
     $upload->fh;
     $upload->filename;
@@ -135,6 +137,23 @@ sub slurp {
 
     return $content;
 }
+
+sub basename {
+    my $self = shift;
+    unless ( $self->{basename} ) {
+        my $basename = $self->filename;
+        $basename =~ s|\\|/|g;
+        $basename = ( File::Spec::Unix->splitpath($basename) )[2];
+        $basename =~ s|[^\w\.-]+|_|g;
+        $self->{basename} = $basename;
+    }
+
+    return $self->{basename};
+}
+
+=head2 $upload->basename
+
+Returns basename for C<filename>.
 
 =head2 $upload->tempname
 
