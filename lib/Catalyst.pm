@@ -881,7 +881,7 @@ sub uri_for {
         if( $isa_ref and $isa_ref ne 'ARRAY' ) {
             croak( "Non-array reference ($isa_ref) passed to uri_for()" );
         }
-        utf8::encode( $_ ) for $isa_ref ? @$value : $value;
+        utf8::encode( $_ ) for grep { defined } $isa_ref ? @$value : $value;
     };
     
     # join args with '/', or a blank string
