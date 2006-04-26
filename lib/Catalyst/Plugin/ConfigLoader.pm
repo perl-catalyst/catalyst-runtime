@@ -10,7 +10,7 @@ use Module::Pluggable::Fast
     require => 1;
 use Data::Visitor::Callback;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -68,10 +68,7 @@ sub setup {
         for( @files ) {
             next unless -f $_;
             my $config = $loader->load( $_ );
-            if( $config ) {
-                $c->config( $config );
-                last;
-            }
+            $c->config( $config ) if $config;
         }
     }
 
