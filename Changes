@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.68    2006-04-26 12:23:00
+        - ConfigLoader: Updated to version 0.06
+        - fixed undef warnings in uri_for() and uri_with()
+
 5.678   2006-04-24 12:30:00
         - Re-release of 5.67 without OSX metadata files.
 
