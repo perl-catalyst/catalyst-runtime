@@ -145,7 +145,7 @@ EOF
         $infos = <<"";
 <pre>
 (en) Please come back later
-(fr) 
+(fr) SVP veuillez revenir plus tard
 (de) Bitte versuchen sie es spaeter nocheinmal
 (at) Konnten's bitt'schoen spaeter nochmal reinschauen
 (no) Vennligst prov igjen senere
