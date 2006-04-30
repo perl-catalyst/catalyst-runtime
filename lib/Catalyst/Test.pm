@@ -75,8 +75,10 @@ sub import {
     }
 
     else {
-        $class->require;
-        die $@ if $@;
+        unless( $class->can("can") ) {
+            $class->require;
+            die $@ if $@;
+        }
         $class->import;
 
         $request = sub { local_request( $class, @_ ) };
