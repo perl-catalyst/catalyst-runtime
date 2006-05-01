@@ -80,7 +80,7 @@ multiple Catalyst applications.
 
 =item * B<Unrestrained URL-to-Action Dispatching>
 
-Catalyst allows you to dispatch any URLs to any application L<Actions>,
+Catalyst allows you to dispatch any URLs to any application L</Actions>,
 even through regular expressions! Unlike most other frameworks, it
 doesn't require mod_rewrite or class and method names in URLs.
 
@@ -110,7 +110,7 @@ simple way.
 =item * B<Building Block Interface>
 
 Components interoperate very smoothly. For example, Catalyst
-automatically makes a L<context> object available to every
+automatically makes a L</Context> object available to every
 component. Via the context, you can access the request object, share
 data between components, and control the flow of your
 application. Building a Catalyst application feels a lot like snapping
@@ -223,7 +223,7 @@ C<$context-E<gt>config-E<gt>{$param_name}>.
 
 Catalyst automatically blesses a Context object into your application
 class and makes it available everywhere in your application. Use the
-Context to directly interact with Catalyst and glue your L<Components>
+Context to directly interact with Catalyst and glue your L</Components>
 together. For example, if you need to use the Context from within a
 Template Toolkit template, it's already there:
 
@@ -440,7 +440,7 @@ displaying a generic frontpage for the main app, or an error page for
 individual controllers.
 
 If C<default> isn't acting how you would expect, look at using a
-L<Literal> C<Path> action (with an empty path string). The difference is
+L</Literal> C<Path> action (with an empty path string). The difference is
 that C<Path> takes arguments relative from the namespace and C<default>
 I<always> takes arguments relative from the root, regardless of what
 controller it's in.
@@ -679,7 +679,7 @@ method.
 =head3 Components
 
 Catalyst has an uncommonly flexible component system. You can define as
-many L<Models>, L<Views>, and L<Controllers> as you like.
+many L</Models>, L</Views>, and L</Controllers> as you like.
 
 All components must inherit from L<Catalyst::Base>, which provides a
 simple class structure and some common class methods like C<config> and
@@ -845,7 +845,7 @@ Catalyst that slurps in an outside Model:
     use base qw/Catalyst::Model::DBIC::Schema/;
     __PACKAGE__->config(
         schema_class => 'Some::DBIC::Schema',
-        connect_info => ['dbi:SQLite:foo.db', '', '', {AutoCommit=>1}];
+        connect_info => ['dbi:SQLite:foo.db', '', '', {AutoCommit=>1}]
     );
     1;
 
