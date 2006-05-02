@@ -332,9 +332,11 @@ sub get_containers {
 
     my @containers;
 
-    do {
-        push @containers, $self->container_hash->{$namespace};
-    } while ( $namespace =~ s#/[^/]+$## );
+    if ( length $namespace ) {
+        do {
+            push @containers, $self->container_hash->{$namespace};
+        } while ( $namespace =~ s#/[^/]+$## );
+    }
 
     return reverse grep { defined } @containers, $self->container_hash->{''};
 
