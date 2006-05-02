@@ -116,20 +116,21 @@ sub run_tests {
         is( $response->content, 'abort end', 'Content OK' );
     }
     
-    # test auto + failing auto + default + end
+    # test auto + default (bug on invocation of default twice)
     {
         my @expected = qw[
-          TestApp::Controller::Action::Auto::Abort->begin
+          TestApp::Controller::Action::Auto::Default->begin
           TestApp::Controller::Action::Auto->auto
-          TestApp::Controller::Action::Auto::Abort->auto
-          TestApp::Controller::Action::Auto::Abort->end
+          TestApp::Controller::Action::Auto::Default->auto
+          TestApp::Controller::Action::Auto::Default->default
+          TestApp::Controller::Action::Auto::Default->end
         ];
     
         my $expected = join( ", ", @expected );
     
-        ok( my $response = request('http://localhost/action/auto/abort/anything'), 'auto + failing auto + default' );
+        ok( my $response = request('http://localhost/action/auto/default/moose'), 'auto + default' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'abort end', 'Content OK' );
+        is( $response->content, 'default (auto: 1)', 'Content OK' );
     }
 }
