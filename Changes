@@ -1,5 +1,17 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.6900   2006-05-03 11.17:00
+        - Stupid pause indexer can't count.
+        - Better fix for Catalyst::Test
+        - more tests.
+
+5.682   2006-04-27 13:51:00
+        - Damn OSX attributes again :( 
+
+5.681   2006-04-27 08:47:00
+        - Updated manifest.
+        - Add basename to core . (Deprecates Catalyst::Plugin::Basename)
+    
 5.68    2006-04-26 12:23:00
         - ConfigLoader: Updated to version 0.06
         - fixed undef warnings in uri_for() and uri_with()

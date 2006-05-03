@@ -61,7 +61,7 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = '5.678';
+our $VERSION = '5.6900';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1082,7 +1082,10 @@ that will be dumped on the error page in debug mode.
 
 sub dump_these {
     my $c = shift;
-    [ Request => $c->req ], [ Response => $c->res ], [ Stash => $c->stash ],;
+    [ Request => $c->req ], 
+    [ Response => $c->res ], 
+    [ Stash => $c->stash ],
+    [ Config => $c->config ];
 }
 
 =head2 $c->engine_class
