@@ -33,3 +33,6 @@ t/conf/mime.types
 t/htdocs
 t/logs
 t/var
+
+# No tarballs!
+\.gz$

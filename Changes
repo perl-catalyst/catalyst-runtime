@@ -1,9 +1,12 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.6900   2006-05-03 11.17:00
+5.6902  2006-05-04 13:00:00
+        - Remove tarballs and OSX metadata files.
+
+5.6901  2006-05-03 11.17:00
         - Module::Install didn't overwrite META.yml. 
 
-5.6900   2006-05-03 11.17:00
+5.6900  2006-05-03 11.17:00
         - Stupid pause indexer can't count.
         - Better fix for Catalyst::Test
         - more tests.
