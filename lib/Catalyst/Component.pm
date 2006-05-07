@@ -100,14 +100,16 @@ sub COMPONENT {
 
 sub config {
     my $self = shift;
-    $self->_config( {} ) unless $self->_config;
-    if (@_) {
-        my $config = @_ > 1 ? {@_} : $_[0];
-        while ( my ( $key, $val ) = each %$config ) {
-            $self->_config->{$key} = $val;
-        }
+    my $config = $self->_config;
+    unless ($config) {
+        $self->_config( {} );
+        $config = {};
     }
-    return $self->_config;
+    if (@_) {
+        $config = { %{$config}, %{@_ > 1 ? {@_} : $_[0]} };
+        $self->_config($config);
+    }
+    return $config;
 }
 
 =head2 $c->process()
