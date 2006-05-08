@@ -360,7 +360,7 @@ template will output "tutorial", our project name.
 All that remains is to create a simple template called "greet.tt",
 containing a form with a text field called "name" like below.
 
-    <html><head><title> [% c.name %]</head><body>
+    <html><head><title> [% c.config.name %]</head><body>
     <p>[% message %]</p>
     <form action="[% c.req.uri %]" method="post">
     <input type="text" name="name"/>
