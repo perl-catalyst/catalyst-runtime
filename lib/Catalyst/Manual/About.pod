@@ -213,10 +213,10 @@ well. In most Catalyst applications, each branch of MVC will be made of
 up of several Perl modules that can handle different needs in your
 application.
 
-The purpose of the B<Model> is to access and modify data. Typically
-the Model will interact with a relational database, but it's also
-common to use other data sources, such as the L<Plucene> search
-engine or an LDAP server.
+The purpose of the B<Model> is to access and modify data. Typically the
+Model will interact with a relational database, but it's also common to
+use other data sources, such as the L<Xapian|Catalyst::Model::Xapian>
+search engine or an LDAP server.
 
 The purpose of the B<View> is to present data to the user. Typical Views
 use a templating module to generate HTML code, using L<Template
