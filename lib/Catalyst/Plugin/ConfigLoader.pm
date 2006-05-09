@@ -10,7 +10,7 @@ use Module::Pluggable::Fast
     require => 1;
 use Data::Visitor::Callback;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ Catalyst::Plugin::ConfigLoader - Load config files of various types
     # ConfigLoader should be first in your list so
     # other plugins can get the config information
     use Catalyst qw( ConfigLoader ... );
-	
+    
     # by default myapp.* will be loaded
     # you can specify a file if you'd like
     __PACKAGE__->config( file = > 'config.yaml' );    
@@ -68,6 +68,9 @@ sub setup {
         for( @files ) {
             next unless -f $_;
             my $config = $loader->load( $_ );
+            
+            _fix_syntax( $config );
+            
             $c->config( $config ) if $config;
         }
     }
@@ -102,6 +105,23 @@ sub finalize_config {
         }
     );
     $v->visit( $c->config );
+}
+
+sub _fix_syntax {
+    my $config     = shift;
+    my @components = (
+        map +{
+            prefix => $_ eq 'Component' ? '' : $_ . '::',
+            values => delete $config->{ lc $_ } || delete $config->{ $_ }
+        }, qw( Component Model View Controller )
+    );
+
+    foreach my $comp ( @components ) {
+        my $prefix = $comp->{ prefix };
+        foreach my $element ( keys %{ $comp->{ values } } ) {
+            $config->{ "$prefix$element" } = $comp->{ values }->{ $element };
+        }
+    }
 }
 
 =head1 AUTHOR

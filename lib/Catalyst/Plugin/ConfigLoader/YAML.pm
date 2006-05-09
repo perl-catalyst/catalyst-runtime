@@ -74,6 +74,10 @@ it under the same terms as Perl itself.
 
 =item * L<Catalyst::Plugin::ConfigLoader>
 
+=item * L<YAML>
+
+=item * L<YAML::Syck>
+
 =back
 
 =cut

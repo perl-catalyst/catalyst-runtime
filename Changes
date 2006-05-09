@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
         - Fix ->config failing to copy _config for subclassing
+        - ConfigLoader: Updated to version 0.07
 
 5.6902  2006-05-04 13:00:00
         - Remove tarballs and OSX metadata files.
