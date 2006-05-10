@@ -102,8 +102,7 @@ sub config {
     my $self = shift;
     my $config = $self->_config;
     unless ($config) {
-        $self->_config( {} );
-        $config = {};
+        $self->_config( $config = {} );
     }
     if (@_) {
         $config = { %{$config}, %{@_ > 1 ? {@_} : $_[0]} };
