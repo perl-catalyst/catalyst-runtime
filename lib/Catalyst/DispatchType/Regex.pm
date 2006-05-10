@@ -48,11 +48,11 @@ sub match {
     # Check path against plain text first
 
     foreach my $compiled ( @{ $self->{compiled} || [] } ) {
-        if ( my @snippets = ( $path =~ $compiled->{re} ) ) {
+        if ( my @captures = ( $path =~ $compiled->{re} ) ) {
             next unless $compiled->{action}->match($c);
             $c->req->action( $compiled->{path} );
             $c->req->match($path);
-            $c->req->snippets( \@snippets );
+            $c->req->captures( \@captures );
             $c->action( $compiled->{action} );
             $c->namespace( $compiled->{action}->namespace );
             return 1;

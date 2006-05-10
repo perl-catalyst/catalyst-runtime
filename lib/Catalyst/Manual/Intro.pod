@@ -373,9 +373,9 @@ http://localhost:3000/catalog/foo/widget23 as well.
 
 For both LocalRegex and Regex actions, if you use capturing parentheses
 to extract values within the matching URL, those values are available in
-the C<$c-E<gt>req-E<gt>snippets> array. In the above example, "widget23"
+the C<$c-E<gt>req-E<gt>captures> array. In the above example, "widget23"
 would capture "23" in the above example, and
-C<$c-E<gt>req-E<gt>snippets-E<gt>[0]> would be "23". If you want to pass
+C<$c-E<gt>req-E<gt>captures-E<gt>[0]> would be "23". If you want to pass
 arguments at the end of your URL, you must use regex action keys. See
 L</URL Path Handling> below.
 

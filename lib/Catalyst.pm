@@ -164,7 +164,7 @@ Catalyst - The Elegant MVC Web Application Framework
     sub details : Regex('^product/(\w+)/details$') {
         my ( $self, $c ) = @_;
         # extract the (\w+) from the URI
-        my $product = $c->req->snippets->[0];
+        my $product = $c->req->captures->[0];
     }
 
 See L<Catalyst::Manual::Intro> for additional information.
@@ -867,7 +867,7 @@ sub uri_for {
     my $basepath = $base->path;
     $basepath =~ s/\/$//;
     $basepath .= '/';
-    my $namespace = $c->namespace;
+    my $namespace = $c->namespace || '';
 
     # massage namespace, empty if absolute path
     $namespace =~ s/^\///;
@@ -1495,7 +1495,7 @@ sub prepare {
                     parameters       => {},
                     query_parameters => {},
                     secure           => 0,
-                    snippets         => [],
+                    captures         => [],
                     uploads          => {}
                 }
             ),

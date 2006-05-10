@@ -10,7 +10,7 @@ use URI::QueryParam;
 
 __PACKAGE__->mk_accessors(
     qw/action address arguments cookies headers match method
-      protocol query_parameters secure snippets uri user/
+      protocol query_parameters secure captures uri user/
 );
 
 *args         = \&arguments;
@@ -19,6 +19,7 @@ __PACKAGE__->mk_accessors(
 *params       = \&parameters;
 *query_params = \&query_parameters;
 *path_info    = \&path;
+*snippets     = \&captures;
 
 sub content_encoding { shift->headers->content_encoding(@_) }
 sub content_length   { shift->headers->content_length(@_) }
@@ -61,7 +62,7 @@ Catalyst::Request - provides information about the current client request
     $req->read;
     $req->referer;
     $req->secure;
-    $req->snippets;
+    $req->captures; # previously knows as snippets
     $req->upload;
     $req->uploads;
     $req->uri;
@@ -407,11 +408,16 @@ Shortcut for $req->headers->referer. Returns the referring page.
 
 Returns true or false, indicating whether the connection is secure (https).
 
+=head2 $req->captures
+
+Returns a reference to an array containing regex captures.
+
+    my @captures = @{ $c->request->captures };
+
 =head2 $req->snippets
 
-Returns a reference to an array containing regex snippets.
-
-    my @snippets = @{ $c->request->snippets };
+C<captures> used to be called snippets. This is still available for backwoards
+compatibility, but is considered deprecated.
 
 =head2 $req->upload
 
