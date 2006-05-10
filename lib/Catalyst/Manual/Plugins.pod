@@ -515,10 +515,11 @@ classes, either by doing so within the Catalyst model classes
 themselves, or by inheriting from existing C<Class::DBI>
 classes.
 
-=head2 Catalyst::Model::DBIC
+=head2 Catalyst::Model::DBIC::Schema
 
-L<Catalyst::Model::DBIC> is a L<DBIx::Class> model class built on top of
-L<DBIx::Class::Loader>.
+L<Catalyst::Model::DBIC::Schema> is a L<DBIx::Class> model class that can
+use either an explicit DBIx::Class::Schema or one automatically loaded from
+your database via DBIx::Class::Schema::Loader
 
 =head2 Catalyst::Model::Plucene
 

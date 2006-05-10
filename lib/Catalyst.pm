@@ -91,7 +91,7 @@ Catalyst - The Elegant MVC Web Application Framework
     catalyst.pl MyApp
 
     # add models, views, controllers
-    script/myapp_create.pl model Database DBIC dbi:SQLite:/path/to/db
+    script/myapp_create.pl model Database DBIC::SchemaLoader dbi:SQLite:/path/to/db
     script/myapp_create.pl view TT TT
     script/myapp_create.pl controller Search
 
