@@ -725,6 +725,9 @@ Catalyst> line.
 sub setup {
     my ( $class, @arguments ) = @_;
 
+    $class->log->warn("Running setup twice is not a good idea.")
+      if ( $class->setup_finished );
+
     unless ( $class->isa('Catalyst') ) {
 
         Catalyst::Exception->throw(
