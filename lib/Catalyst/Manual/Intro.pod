@@ -161,6 +161,10 @@ running, using the helper scripts described above.
 Now visit these locations with your favorite browser or user agent to see
 Catalyst in action:
 
+(NOTE: Although we create a controller here, we don't actually use it.
+Both of these URLs should take you to the welcome page.)
+
+
 =over 4
 
 =item http://localhost:3000/
