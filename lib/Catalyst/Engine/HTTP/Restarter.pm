@@ -19,7 +19,10 @@ sub run {
         close STDOUT;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
-            directory => File::Spec->catdir( $FindBin::Bin, '..' ),
+            directory => ( 
+                $options->{restart_directory} || 
+                File::Spec->catdir( $FindBin::Bin, '..' )
+            ),
             regex     => $options->{restart_regex},
             delay     => $options->{restart_delay},
         );
