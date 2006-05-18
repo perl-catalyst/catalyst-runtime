@@ -47,23 +47,12 @@ This is the universal base class for Catalyst components
 It provides you with a generic new() for instantiation through Catalyst's
 component loader with config() support and a process() method placeholder.
 
-=head1 ACCEPT_CONTEXT
-
-Catalyst components are normally initalized during server startup, either
-as a Class or a Instance. However, some compoents require information about
-the current request. To do so, they can implement an ACCEPT_CONTEXT method.
-
-The ACCEPT_CONTEXT method is called on the component as initalized at startup,
-with the current $c object, and should return itself. It can do whatever it 
-likes with $c, such as extracting a path to use in the component or something
-similar. 
-
-This call happens for every $c->comp/controller/model/view call.
-
-
 =head1 METHODS
 
-=head2 new($c)
+=head2 new($c, $arguments)
+
+Called by COMPONENT to instantiate the component; should return an object
+to be stored in the application's component hash.
 
 =cut
 
@@ -76,7 +65,15 @@ sub new {
     return $self->NEXT::new( { %{ $self->config }, %{$arguments} } );
 }
 
-=head2 COMPONENT($c)
+=head2 COMPONENT($c, $arguments)
+
+If this method is present (as it is on all Catalyst::Component subclasses,
+it is called by Catalyst during setup_components with the application class
+as $c and any config entry on the application for this component (for example,
+in the case of MyApp::Controller::Foo this would be
+MyApp->config->{'Controller::Foo'}). The arguments are expected to be a hashref
+and are merged with the __PACKAGE__->config hashref before calling ->new to
+instantiate the component.
 
 =cut
 
@@ -134,6 +131,20 @@ sub process {
     Catalyst::Exception->throw( message => ( ref $_[0] || $_[0] )
           . " did not override Catalyst::Component::process" );
 }
+
+=head1 OPTIONAL METHODS
+
+=head2 ACCEPT_CONTEXT($c, @args)
+
+Catalyst components are normally initalized during server startup, either
+as a Class or a Instance. However, some components require information about
+the current request. To do so, they can implement an ACCEPT_CONTEXT method.
+
+If this method is present, it is called during $c->comp/controller/model/view
+with the current $c and any additional args (e.g. $c->model('Foo', qw/bar baz/)
+would cause your MyApp::Model::Foo instance's ACCEPT_CONTEXT to be called with
+($c, 'bar', 'baz')) and the return value of this method is returned to the
+calling code in the application rather than the component itself.
 
 =head1 SEE ALSO
 
