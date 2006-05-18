@@ -202,7 +202,9 @@ The following flags are supported:
 
 =head2 -Debug
 
-Enables debug output.
+Enables debug output. You can also force this setting from the system
+environment with CATALYST_DEBUG or <MYAPP>_DEBUG. The environment settings
+override the app, with <MYAPP>_DEBUG having highest priority.
 
 =head2 -Engine
 
@@ -319,6 +321,7 @@ sub stash {
     my $c = shift;
     if (@_) {
         my $stash = @_ > 1 ? {@_} : $_[0];
+	croak('stash takes a hash or hashref') unless ref $stash;
         while ( my ( $key, $val ) = each %$stash ) {
             $c->{stash}->{$key} = $val;
         }
@@ -488,7 +491,7 @@ Gets a L<Catalyst::Model> instance by name.
     $c->model('Foo')->do_stuff;
 
 If the name is omitted, it will look for a config setting 'default_model',
-or check if there is only one model, and forward to it if that's the case.
+or check if there is only one view, and return it if that's the case.
 
 =cut
 
@@ -590,6 +593,8 @@ sub component {
 
         $comp = $c->_comp_search($name);
         return $c->_filter_component( $comp, @_ ) if defined($comp);
+
+	croak("Unable to find component $name");
     }
 
     return sort keys %{ $c->components };

@@ -47,6 +47,20 @@ This is the universal base class for Catalyst components
 It provides you with a generic new() for instantiation through Catalyst's
 component loader with config() support and a process() method placeholder.
 
+=head1 ACCEPT_CONTEXT
+
+Catalyst components are normally initalized during server startup, either
+as a Class or a Instance. However, some compoents require information about
+the current request. To do so, they can implement an ACCEPT_CONTEXT method.
+
+The ACCEPT_CONTEXT method is called on the component as initalized at startup,
+with the current $c object, and should return itself. It can do whatever it 
+likes with $c, such as extracting a path to use in the component or something
+similar. 
+
+This call happens for every $c->comp/controller/model/view call.
+
+
 =head1 METHODS
 
 =head2 new($c)
