@@ -1,5 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - Separated execute and dispatch on Catalyst::Action
         - cleaned up logging and debug output
         - minor doc fixes
         - Added warning for setup being called twice

@@ -27,7 +27,7 @@ sub _BEGIN : Private {
     my ( $self, $c ) = @_;
     my $begin = ( $c->get_actions( 'begin', $c->namespace ) )[-1];
     return 1 unless $begin;
-    $begin->execute($c);
+    $begin->dispatch( $c );
     return !@{ $c->error };
 }
 
@@ -35,7 +35,7 @@ sub _AUTO : Private {
     my ( $self, $c ) = @_;
     my @auto = $c->get_actions( 'auto', $c->namespace );
     foreach my $auto (@auto) {
-        $auto->execute($c);
+        $auto->dispatch( $c );
         return 0 unless $c->state;
     }
     return 1;
@@ -47,7 +47,7 @@ sub _ACTION : Private {
         && $c->action->can('execute')
         && $c->req->action )
     {
-        $c->action->execute($c);
+        $c->action->dispatch( $c );
     }
     return !@{ $c->error };
 }
@@ -56,7 +56,7 @@ sub _END : Private {
     my ( $self, $c ) = @_;
     my $end = ( $c->get_actions( 'end', $c->namespace ) )[-1];
     return 1 unless $end;
-    $end->execute($c);
+    $end->dispatch( $c );
     return !@{ $c->error };
 }
 

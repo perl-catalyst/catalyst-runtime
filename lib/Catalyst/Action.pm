@@ -10,8 +10,8 @@ use overload (
     # Stringify to reverse for debug output etc.
     q{""} => sub { shift->{reverse} },
 
-    # Codulate to encapsulated action coderef
-    '&{}' => sub { shift->{code} },
+    # Codulate to execute to invoke the encapsulated action coderef
+    '&{}' => sub { my $self = shift; sub { $self->execute(@_); }; },
 
     # Make general $stuff still work
     fallback => 1,
@@ -46,16 +46,28 @@ Returns the class name of this action
 
 Returns a code reference to this action
 
-=head2 execute( $c )
+=head2 dispatch( $c )
 
-Execute this action against a context
+Dispatch this action against a context
 
 =cut
 
-sub execute {    # Execute ourselves against a context
+sub dispatch {    # Execute ourselves against a context
     my ( $self, $c ) = @_;
     local $c->namespace = $self->namespace;
     return $c->execute( $self->class, $self );
+}
+
+=head2 execute( $controller, $c, @args )
+
+Execute this action's coderef against a given controller with a given
+context and arguments
+
+=cut
+
+sub execute {
+  my $self = shift;
+  $self->{code}->(@_);
 }
 
 =head2 match( $c )
@@ -67,7 +79,7 @@ Check Args attribute, and makes sure number of args matches the setting.
 sub match {
     my ( $self, $c ) = @_;
     return 1 unless exists $self->attributes->{Args};
-    return scalar(@{$c->req->args}) == $self->attributes->{Args}[0];
+    return scalar( @{ $c->req->args } ) == $self->attributes->{Args}[0];
 }
 
 =head2 namespace

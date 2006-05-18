@@ -159,7 +159,7 @@ sub forward {
     #push @$args, @_;
 
     local $c->request->{arguments} = $args;
-    $action->execute($c);
+    $action->dispatch( $c );
 
     return $c->state;
 }
