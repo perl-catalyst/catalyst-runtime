@@ -1,6 +1,6 @@
 =head1 NAME
 
-Catalyst::Manual::About - Basic explanation of Catalyst
+Catalyst::Manual::About - The philosophy of Catalyst
 
 =head1 DESCRIPTION
 

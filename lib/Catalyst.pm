@@ -795,7 +795,7 @@ EOF
         }
 
         if (@plugins) {
-            my $t = Text::SimpleTable->new(76);
+            my $t = Text::SimpleTable->new(74);
             $t->row($_) for @plugins;
             $class->log->debug( "Loaded plugins:\n" . $t->draw );
         }
@@ -827,7 +827,7 @@ EOF
     $class->setup_components;
 
     if ( $class->debug ) {
-        my $t = Text::SimpleTable->new( [ 65, 'Class' ], [ 8, 'Type' ] );
+        my $t = Text::SimpleTable->new( [ 63, 'Class' ], [ 8, 'Type' ] );
         for my $comp ( sort keys %{ $class->components } ) {
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
             $t->row( $comp, $type );
@@ -870,7 +870,7 @@ sub uri_for {
     my $namespace = $c->namespace || '';
 
     # massage namespace, empty if absolute path
-    $namespace =~ s/^\///;
+    $namespace =~ s/^\/// if $namespace;
     $namespace .= '/' if $namespace;
     $path ||= '';
     $namespace = '' if $path =~ /^\//;
@@ -931,7 +931,6 @@ sub welcome_message {
                 text-align: left;
                 background-color: #ccc;
                 border: 1px solid #aaa;
-                -moz-border-radius: 10px;
             }
             p, h1, h2 {
                 margin-left: 20px;
@@ -961,7 +960,6 @@ sub welcome_message {
                 margin: 10px;
                 background-color: #fff;
                 border: 1px solid #aaa;
-                -moz-border-radius: 10px;
             }
             h1 {
                 font-size: 0.9em;
@@ -1280,7 +1278,7 @@ sub finalize {
 
     # Allow engine to handle finalize flow (for POE)
     if ( $c->engine->can('finalize') ) {
-        $c->engine->finalize( $c );
+        $c->engine->finalize($c);
     }
     else {
 
@@ -1443,7 +1441,7 @@ sub handle_request {
             $elapsed = sprintf '%f', $elapsed;
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
-            my $t = Text::SimpleTable->new( [ 64, 'Action' ], [ 9, 'Time' ] );
+            my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
 
             $stats->traverse(
                 sub {
@@ -1521,9 +1519,8 @@ sub prepare {
     if ( $c->debug ) {
         my $secs = time - $START || 1;
         my $av = sprintf '%.3f', $COUNT / $secs;
-        $c->log->debug('**********************************');
-        $c->log->debug("* Request $COUNT ($av/s) [$$]");
-        $c->log->debug('**********************************');
+        my $time = localtime time;
+        $c->log->info("*** Request $COUNT ($av/s) [$$] [$time] ***");
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
@@ -1544,7 +1541,7 @@ sub prepare {
     }
 
     my $method  = $c->req->method  || '';
-    my $path    = $c->req->path    || '';
+    my $path    = $c->req->path    || '/';
     my $address = $c->req->address || '';
 
     $c->log->debug(qq/"$method" request for "$path" from "$address"/)
@@ -1581,7 +1578,7 @@ sub prepare_body {
     $c->prepare_uploads;
 
     if ( $c->debug && keys %{ $c->req->body_parameters } ) {
-        my $t = Text::SimpleTable->new( [ 37, 'Key' ], [ 36, 'Value' ] );
+        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ 36, 'Value' ] );
         for my $key ( sort keys %{ $c->req->body_parameters } ) {
             my $param = $c->req->body_parameters->{$key};
             my $value = defined($param) ? $param : '';
@@ -1675,7 +1672,7 @@ sub prepare_query_parameters {
     $c->engine->prepare_query_parameters( $c, @_ );
 
     if ( $c->debug && keys %{ $c->request->query_parameters } ) {
-        my $t = Text::SimpleTable->new( [ 37, 'Key' ], [ 36, 'Value' ] );
+        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ 36, 'Value' ] );
         for my $key ( sort keys %{ $c->req->query_parameters } ) {
             my $param = $c->req->query_parameters->{$key};
             my $value = defined($param) ? $param : '';
@@ -1715,8 +1712,8 @@ sub prepare_uploads {
 
     if ( $c->debug && keys %{ $c->request->uploads } ) {
         my $t = Text::SimpleTable->new(
-            [ 12, 'Key' ],
-            [ 28, 'Filename' ],
+            [ 12, 'Parameter' ],
+            [ 26, 'Filename' ],
             [ 18, 'Type' ],
             [ 9,  'Size' ]
         );

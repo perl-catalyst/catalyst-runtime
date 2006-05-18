@@ -43,15 +43,15 @@ Catalyst provides:
     $ cd tutorial
     $ script/tutorial_server.pl 
 
-    [...] [catalyst] [debug] Debug messages enabled
-    [...] [catalyst] [debug] Loaded plugins:
+    [debug] Debug messages enabled
+    [debug] Loaded plugins:
     .------------------------------------------------------------------------------.
     | Catalyst::Plugin::Static::Simple                                             |
     '------------------------------------------------------------------------------'
-    [...] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
-    [...] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [...] [catalyst] [debug] Found home "/home/users/me/tutorial"
-    [...] [catalyst] [debug] Loaded Private actions:
+    [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [debug] Found home "/home/users/me/tutorial"
+    [debug] Loaded Private actions:
     .--------------------------------------+---------------------------------------.
     | Private                              | Class                                 |
     +--------------------------------------+---------------------------------------+
@@ -91,12 +91,10 @@ http://localhost:3000/ with your browser.
 
 More trace messages will appear in the original terminal window:
 
-    [...] [catalyst] [debug] **********************************
-    [...] [catalyst] [debug] * Request 1 (0.063/s) [2148]
-    [...] [catalyst] [debug] **********************************
-    [...] [catalyst] [debug] Arguments are ""
-    [...] [catalyst] [debug] "GET" request for "" from localhost
-    [...] [catalyst] [info] Request took 0.046883s (21.330/s)
+    [debug] *** Request 1 (0.063/s) [2148]
+    [debug] Arguments are ""
+    [debug] "GET" request for "/" from localhost
+    [info] Request took 0.046883s (21.330/s)
     .------------------------------------------------------------------+-----------.
     | Action                                                           | Time      |
     +------------------------------------------------------------------+-----------+

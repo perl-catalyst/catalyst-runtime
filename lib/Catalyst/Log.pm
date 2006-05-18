@@ -63,16 +63,14 @@ sub disable {
 sub _dump {
     my $self = shift;
     local $Data::Dumper::Terse = 1;
-    $self->info( Dumper( @_ ) );
+    $self->info( Dumper(@_) );
 }
 
 sub _log {
     my $self    = shift;
     my $level   = shift;
-    my $time    = localtime(time);
     my $message = join( "\n", @_ );
-    $self->{body} .=
-      sprintf( "[%s] [catalyst] [%s] %s\n", $time, $level, $message );
+    $self->{body} .= sprintf( "[%s] %s\n", $level, $message );
 }
 
 sub _flush {

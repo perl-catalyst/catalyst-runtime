@@ -4,7 +4,6 @@ use warnings;
 use Test::More tests => 24;
 use Test::NoWarnings;    # Adds an extra test.
 
-my $timestamp = '\[\w{3}\s\w{3}\s[ 123]\d\s\d{2}:\d{2}:\d{2}\s\d{4}\]';
 my $LOG;
 
 BEGIN {
@@ -37,13 +36,14 @@ can_ok $log, "_flush";
 $log->_flush;
 ok @MESSAGES, '... and flushing the log should succeed';
 is scalar @MESSAGES, 1, '... with one log message';
-like $MESSAGES[0], qr/^$timestamp \[catalyst\] \[info\] hello there!$/,
+like $MESSAGES[0], qr/^\[info\] hello there!$/,
     '... which should match the format we expect';
 
 {
 
     package Catalyst::Log::Subclass;
-    our @ISA = 'Catalyst::Log';
+    use Moose;
+    extends 'Catalyst::Log';
 
     sub _send_to_log {
         my $self = shift;
@@ -69,6 +69,6 @@ $log->_flush;
 ok @MESSAGES, '... and flushing the log should succeed';
 is scalar @MESSAGES, 2, '... with two log messages';
 is $MESSAGES[0], '---', '... with the first one being our new data';
-like $MESSAGES[1], qr/^$timestamp \[catalyst\] \[info\] hi there!$/,
+like $MESSAGES[1], qr/^\[info\] hi there!$/,
     '... which should match the format we expect';
 

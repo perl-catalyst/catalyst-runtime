@@ -1,5 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - cleaned up logging and debug output
+        - minor doc fixes
         - Added warning for setup being called twice
         - Fix pod to use DBIC::Schema instead of DBIC model
         - Fix ->config failing to copy _config for subclassing

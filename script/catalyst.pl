@@ -3,7 +3,8 @@
 use strict;
 use Getopt::Long;
 use Pod::Usage;
-use Catalyst::Helper;
+eval 'use Catalyst::Helper "1.0";';
+die "Please install Catalyst::Helper!\n" if $@;
 
 my $force    = 0;
 my $help     = 0;
@@ -21,12 +22,14 @@ GetOptions(
 
 pod2usage(1) if ( $help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new( {
-    '.newfiles' => !$force, 
-    'makefile'  => $makefile, 
-    'scripts'   => $scripts,
-    'short'     => $short,
-} );
+my $helper = Catalyst::Helper->new(
+    {
+        '.newfiles' => !$force,
+        'makefile'  => $makefile,
+        'scripts'   => $scripts,
+        'short'     => $short,
+    }
+);
 pod2usage(1) unless $helper->mk_app( $ARGV[0] );
 
 1;

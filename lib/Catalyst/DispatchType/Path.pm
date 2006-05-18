@@ -25,7 +25,7 @@ Debug output for Path dispatch points
 
 sub list {
     my ( $self, $c ) = @_;
-    my $paths = Text::SimpleTable->new( [ 36, 'Path' ], [ 37, 'Private' ] );
+    my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
     for my $path ( sort keys %{ $self->{paths} } ) {
         my $action = $self->{paths}->{$path};
         $path = "/$path" unless $path eq '/';

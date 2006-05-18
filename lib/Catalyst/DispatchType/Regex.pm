@@ -24,7 +24,7 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $re = Text::SimpleTable->new( [ 36, 'Regex' ], [ 37, 'Private' ] );
+    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ 36, 'Private' ] );
     for my $regex ( @{ $self->{compiled} } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
@@ -73,7 +73,7 @@ Returns 1 on if any regexps were registered.
 
 sub register {
     my ( $self, $c, $action ) = @_;
-    my $attrs = $action->attributes;
+    my $attrs    = $action->attributes;
     my @register = @{ $attrs->{'Regex'} || [] };
 
     foreach my $r (@register) {

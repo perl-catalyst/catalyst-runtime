@@ -292,11 +292,11 @@ sub get_action {
     return $self->action_hash->{"$namespace/$name"};
 }
 
-=head2 $self->get_action_by_path( $path );
+=head2 $self->get_action_by_path( $path ); 
+   
+Returns the named action by its full path. 
 
-returns the named action by it's full path.
-
-=cut
+=cut 
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
@@ -442,7 +442,7 @@ sub setup_actions {
 
     my $privates = Text::SimpleTable->new(
         [ 20, 'Private' ],
-        [ 38, 'Class' ],
+        [ 36, 'Class' ],
         [ 12, 'Method' ]
     );
 

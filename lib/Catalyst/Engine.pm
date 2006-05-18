@@ -40,7 +40,7 @@ Finalize body.  Prints the response output.
 sub finalize_body {
     my ( $self, $c ) = @_;
     my $body = $c->response->body;
-    if ( ref $body && ($body->can('read') || ref($body) eq 'GLOB') ) {
+    if ( ref $body && ( $body->can('read') || ref($body) eq 'GLOB' ) ) {
         while ( !eof $body ) {
             read $body, my ($buffer), $CHUNKSIZE;
             last unless $self->write( $c, $buffer );
@@ -93,7 +93,7 @@ sub finalize_error {
     my ( $self, $c ) = @_;
 
     $c->res->content_type('text/html; charset=utf-8');
-    my $name = $c->config->{name} || 'Catalyst Application';
+    my $name = $c->config->{name} || join(' ', split('::', ref $c));
 
     my ( $title, $error, $infos );
     if ( $c->debug ) {
@@ -120,9 +120,9 @@ sub finalize_error {
         # Don't show response header state in dump
         delete $c->res->{_finalized_headers};
 
-        my $req   = encode_entities Dumper $c->req;
-        my $res   = encode_entities Dumper $c->res;
-        my $stash = encode_entities Dumper $c->stash;
+        my $req   = _fixup_debug_info($c->req);
+        my $res   = _fixup_debug_info($c->res);
+        my $stash = _fixup_debug_info($c->stash);
 
         my @infos;
         my $i = 0;
@@ -180,13 +180,13 @@ EOF
         body {
             font-family: "Bitstream Vera Sans", "Trebuchet MS", Verdana,
                          Tahoma, Arial, helvetica, sans-serif;
-            color: #ddd;
+            color: #333;
             background-color: #eee;
             margin: 0px;
             padding: 0px;
         }
         :link, :link:hover, :visited, :visited:hover {
-            color: #ddd;
+            color: #000;
         }
         div.box {
             position: relative;
@@ -194,30 +194,26 @@ EOF
             border: 1px solid #aaa;
             padding: 4px;
             margin: 10px;
-            -moz-border-radius: 10px;
         }
         div.error {
-            background-color: #977;
+            background-color: #cce;
             border: 1px solid #755;
             padding: 8px;
             margin: 4px;
             margin-bottom: 10px;
-            -moz-border-radius: 10px;
         }
         div.infos {
-            background-color: #797;
+            background-color: #eee;
             border: 1px solid #575;
             padding: 8px;
             margin: 4px;
             margin-bottom: 10px;
-            -moz-border-radius: 10px;
         }
         div.name {
-            background-color: #779;
+            background-color: #cce;
             border: 1px solid #557;
             padding: 8px;
             margin: 4px;
-            -moz-border-radius: 10px;
         }
         code.error {
             display: block;
@@ -317,7 +313,8 @@ sub prepare_body {
 
     unless ( $c->request->{_body} ) {
         $c->request->{_body} = HTTP::Body->new( $type, $self->read_length );
-        $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp} if exists $c->config->{uploadtmp};
+        $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp}
+          if exists $c->config->{uploadtmp};
     }
 
     if ( $self->read_length > 0 ) {
@@ -327,9 +324,10 @@ sub prepare_body {
 
         # paranoia against wrong Content-Length header
         my $remaining = $self->read_length - $self->read_position;
-        if ($remaining > 0) {
+        if ( $remaining > 0 ) {
             $self->finalize_read($c);
-            Catalyst::Exception->throw("Wrong Content-Length value: ". $self->read_length);
+            Catalyst::Exception->throw(
+                "Wrong Content-Length value: " . $self->read_length );
         }
     }
 }
@@ -576,6 +574,13 @@ sub write {
     }
 
     print STDOUT $buffer;
+}
+
+sub _fixup_debug_info {
+    my $info   = encode_entities Dumper shift;
+     my @info = split "\n", $info; 
+     pop @info; shift @info;
+     return join "\n",@info;    
 }
 
 =head2 $self->finalize_output
