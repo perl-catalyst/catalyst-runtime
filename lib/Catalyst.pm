@@ -593,8 +593,6 @@ sub component {
 
         $comp = $c->_comp_search($name);
         return $c->_filter_component( $comp, @_ ) if defined($comp);
-
-	croak("Unable to find component $name");
     }
 
     return sort keys %{ $c->components };
