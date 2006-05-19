@@ -10,8 +10,9 @@ requires 'UNIVERSAL::require' => "0.10";
 requires 'Carp';
 requires 'Class::Accessor::Fast';
 requires 'Class::Data::Inheritable';
-requires 'Class::Inspector';
+requires 'Class::Inspector' => '1.06';
 requires 'CGI::Cookie';
+requires 'Data::Dump';
 requires 'File::Modified';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => 0.5;
@@ -80,6 +81,10 @@ print <<"EOF";
  Important:
     Install Task::Catalyst to get everything you need to start writing
     serious applications with Catalyst.
+
+    Note that Catalyst::Helper has been split into a separate distribution,
+    and is required for using catalyst.pl to make new distributions. It is
+    included with Task::Catalyst
 
         perl -MCPANPLUS -e 'install Task::Catalyst'
         perl -MCPAN -e 'install Task::Catalyst'

@@ -3,7 +3,7 @@ package Catalyst::Engine;
 use strict;
 use base 'Class::Accessor::Fast';
 use CGI::Cookie;
-use Data::Dumper;
+use Data::Dump qw/dump/;
 use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
@@ -99,7 +99,6 @@ sub finalize_error {
     if ( $c->debug ) {
 
         # For pretty dumps
-        local $Data::Dumper::Terse = 1;
         $error = join '', map {
                 '<p><code class="error">'
               . encode_entities($_)
@@ -120,15 +119,11 @@ sub finalize_error {
         # Don't show response header state in dump
         delete $c->res->{_finalized_headers};
 
-        my $req   = _fixup_debug_info($c->req);
-        my $res   = _fixup_debug_info($c->res);
-        my $stash = _fixup_debug_info($c->stash);
-
         my @infos;
         my $i = 0;
         for my $dump ( $c->dump_these ) {
             my $name  = $dump->[0];
-            my $value = encode_entities( Dumper $dump->[1] );
+            my $value = encode_entities( dump( $dump->[1] ));
             push @infos, sprintf <<"EOF", $name, $value;
 <h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
 <div id="dump_$i">
@@ -576,12 +571,6 @@ sub write {
     print STDOUT $buffer;
 }
 
-sub _fixup_debug_info {
-    my $info   = encode_entities Dumper shift;
-     my @info = split "\n", $info; 
-     pop @info; shift @info;
-     return join "\n",@info;    
-}
 
 =head2 $self->finalize_output
 

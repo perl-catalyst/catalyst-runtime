@@ -25,6 +25,8 @@ use attributes;
 use utf8;
 use Carp qw/croak/;
 
+BEGIN { require 5.008001; }
+
 __PACKAGE__->mk_accessors(
     qw/counter request response state action stack namespace stats/
 );

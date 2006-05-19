@@ -2,7 +2,7 @@ package Catalyst::Log;
 
 use strict;
 use base 'Class::Accessor::Fast';
-use Data::Dumper;
+use Data::Dump;
 
 our %LEVELS = ();
 
@@ -62,8 +62,7 @@ sub disable {
 
 sub _dump {
     my $self = shift;
-    local $Data::Dumper::Terse = 1;
-    $self->info( Dumper(@_) );
+    $self->info( Data::Dump::dump(@_) );
 }
 
 sub _log {

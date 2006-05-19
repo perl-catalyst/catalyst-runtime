@@ -608,8 +608,8 @@ Cat app as C<MyApp::Model::DB>.
 By default, Catalyst will display its own error page whenever it
 encounters an error in your application. When running under C<-Debug>
 mode, the error page is a useful screen including the error message and
-a full Data::Dumper output of the C<$c> context object. When not in
-C<-Debug>, users see a simple "Please come back later" screen.
+L<Data::Dump> output of the relevant parts of the C<$c> context object. 
+When not in C<-Debug>, users see a simple "Please come back later" screen.
 
 To use a custom error page, use a special C<end> method to short-circuit
 the error processing. The following is an example; you might want to

@@ -177,8 +177,8 @@ the built-in mini-server as described in L<Getting started>.
 
 If you want to output any debugging information to the console, then
 call C<< $c->log->debug() >>, passing it a string to output. For data
-structures, C<use> L<Data::Dumper> and call C<<
-$c->log->debug(Dumper($structure)) >>
+structures, C<use> L<Data::Dump> qw/dump/; and call 
+C<< $c->log->debug(dump($structure)) >>
 
 =head2 Model/View/Controller
 
