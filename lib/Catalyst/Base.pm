@@ -157,7 +157,7 @@ sub create_action {
                     ? $args{attributes}{ActionClass}[0]
                     : $self->_action_class);
 
-    unless ( $class->can("can") ) {
+    unless ( Class::Inspector->loaded($class) ) {
       $class->require;
       die "Couldn't load action class ${class}: $@" if $@;
     }

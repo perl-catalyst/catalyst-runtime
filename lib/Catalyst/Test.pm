@@ -5,6 +5,7 @@ use warnings;
 
 use Catalyst::Exception;
 use Catalyst::Utils;
+use Class::Inspector;
 use UNIVERSAL::require;
 
 =head1 NAME
@@ -75,7 +76,7 @@ sub import {
     }
 
     else {
-        unless( $class->can("can") ) {
+        unless( Class::Inspector->loaded( $class ) ) {
             $class->require;
             die $@ if $@;
         }
