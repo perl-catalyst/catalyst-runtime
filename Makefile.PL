@@ -45,10 +45,6 @@ feature 'Apache/mod_perl Support',
 
 feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
 
-feature 'Test::WWW::Mechanize::Catalyst Support',
-  -default                         => 0,
-  'Test::WWW::Mechanize::Catalyst' => 0;
-
 feature 'PAR Support',
   -default => 0,
   'PAR'    => 0;
