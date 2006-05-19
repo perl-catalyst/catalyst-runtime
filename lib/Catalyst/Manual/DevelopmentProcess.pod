@@ -1,0 +1,91 @@
+=head1 Catalyst Development Process
+
+Below you will find information related to the Catalyst Development Process
+
+=head1 Aims of the Catalyst Core Team
+
+The main current goals of the Catalyst core development team continue to
+be stability, performance and a more paced addition of features, with a
+focus on extensibility. Extensive improvements to the documentation are
+also expected in the short term.
+
+The Catalyst Roadmap at http://dev.catalyst.perl.org/roadmap will remain
+as is, and continues to reflect the specific priorities and schedule for
+future releases.
+
+=head1 Charter for the Catalyst Core Team
+
+=head2 Intention
+
+The intention of the Catalyst Core Team is to maintain and support the 
+Catalyst framework, in order for it to be a viable and stable framework
+for developing web based MVC applications. This includes both technical
+decisions about the Catalyst core distribution, and public relations 
+relating to the Catalyst Framework as a whole.
+
+The main priority for development is stability for the users of the framework,
+while improving usability and extensibility, as well as improving documentation
+and ease of deployment.
+
+=head2 Membership
+
+The Catalyst Core Team consists of the developers that have full commit
+privileges to the entire Catalyst source tree. 
+
+In addition, the core team may accept members that have non-technical roles
+such as marketing, legal, or ecconomic responsibilities.
+
+
+At the time of conception, the Core Team consists of the following people:
+
+=over 4
+
+=item Andy Grundman
+
+=item Christian Hansen
+
+=item Brian Cassidy
+
+=item Marcus Ramberg
+
+=item Jesse Sheidlower
+
+=item Matt S. Trout
+
+=item Yuval Kogman
+
+=back
+
+New members of the Core Team must be accepted by a 2/3 majority by the
+current members.
+
+=head2 Technical Decisions.
+
+Any change to the Catalyst core which can not be concieved as a correction of
+an error in the current feature set will need to be accepted by at least 3
+members of the Core Team before it can be commited to the trunk (which is
+the basis for CPAN releases). Anyone with access is at any time free to make
+a branch to develop a proof of concept for a feature to be committed to trunk.
+
+=head2 Organizational and Philosophical Decisions.
+
+Any such decision should be decided by majority vote. Thus it should be a 
+goal of the organization that its membership number should at any time be
+an odd number, to render it effective with regards to decision making. The
+exceptions to this rule are changes to this charter and additions to
+the membership of the core team, which require 2/3 majority.
+
+=head2 CPAN Releases
+
+Planned releases to CPAN should be performed by the release manager, at the
+time of writing Marcus Ramberg, or the backup release manager, at the time
+of writing Andy Grundman. In the case of critical error correction, any member
+of the Core Team can perform a rescue release.
+
+=head2 Public statements from the Core Team
+
+The Core Team should strive to appear publicly as a group when answering
+questions or other correspondance. In cases where this is not possible, the
+same order as for CPAN Releases applies.
+
+
