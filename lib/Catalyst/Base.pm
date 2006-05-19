@@ -151,7 +151,18 @@ sub register_actions {
 
 sub create_action {
     my $self = shift;
-    $self->_action_class->new( { @_ } );
+    my %args = @_;
+
+    my $class = (exists $args{attributes}{ActionClass}
+                    ? $args{attributes}{ActionClass}[0]
+                    : $self->_action_class);
+
+    unless ( $class->can("can") ) {
+      $class->require;
+      die "Couldn't load action class ${class}: $@" if $@;
+    }
+    
+    return $class->new( \%args );
 }
 
 sub _parse_attrs {
@@ -219,6 +230,14 @@ sub _parse_LocalRegex_attr {
 }
 
 sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
+
+sub _parse_ActionClass_attr {
+    my ( $self, $c, $name, $value ) = @_;
+    unless ( $value =~ s/^\+// ) {
+      $value = join('::', $self->_action_class, $value );
+    }
+    return ( 'ActionClass', $value );
+}
 
 =head1 SEE ALSO
 
