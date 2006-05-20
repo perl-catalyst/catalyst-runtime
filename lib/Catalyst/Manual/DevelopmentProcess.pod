@@ -80,7 +80,7 @@ majority.
 =head2 CPAN Releases
 
 Planned releases to CPAN should be performed by the release manager, at
-the time of writing Marcus Ramberg, or the backup release manager, at
+the time of writing Marcus Ramberg, or the deputy release manager, at
 the time of writing Andy Grundman. In the case of critical error
 correction, any member of the Core Team can perform a rescue release.
 
