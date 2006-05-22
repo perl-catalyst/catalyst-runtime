@@ -1,4 +1,4 @@
-use inc::Module::Install;
+use inc::Module::Install 0.62;
 
 perl_version '5.8.1';
 
@@ -35,8 +35,8 @@ requires 'Tree::Simple' => 1.15;
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
-requires 'Module::Install::Admin' => '0.54';
-requires 'Module::Install'        => '0.54';
+requires 'Module::Install::Admin' => '0.62';
+requires 'Module::Install'        => '0.62';
 requires 'YAML'                   => '0.55';
 requires 'Data::Visitor'          => '0.02';
 
