@@ -94,10 +94,10 @@ sub prepare_headers {
     local (*ENV) = $self->env || \%ENV;
 
     # Read headers from %ENV
-    while ( my ( $header, $value ) = each %ENV ) {
+    foreach my $header ( keys %ENV ) {
         next unless $header =~ /^(?:HTTP|CONTENT|COOKIE)/i;
         ( my $field = $header ) =~ s/^HTTPS?_//;
-        $c->req->headers->header( $field => $value );
+        $c->req->headers->header( $field => $ENV{$header} );
     }
 }
 

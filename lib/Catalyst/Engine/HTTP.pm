@@ -178,8 +178,10 @@ sub run {
             my $sockdata = $self->_socket_data( \*Remote );
             my $ipaddr   = _inet_addr( $sockdata->{peeraddr} );
             my $ready    = 0;
-            while ( my ( $ip, $mask ) = each %$allowed and not $ready ) {
+            foreach my $ip ( keys %$allowed ) {
+                my $mask = $allowed->{$ip};
                 $ready = ( $ipaddr & _inet_addr($mask) ) == _inet_addr($ip);
+                last if $ready;
             }
             if ($ready) {
                 $restart = 1;

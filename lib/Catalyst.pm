@@ -324,8 +324,8 @@ sub stash {
     if (@_) {
         my $stash = @_ > 1 ? {@_} : $_[0];
 	croak('stash takes a hash or hashref') unless ref $stash;
-        while ( my ( $key, $val ) = each %$stash ) {
-            $c->{stash}->{$key} = $val;
+        foreach my $key ( keys %$stash ) {
+            $c->{stash}->{$key} = $stash->{$key};
         }
     }
     return $c->{stash};

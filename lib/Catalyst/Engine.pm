@@ -62,15 +62,18 @@ sub finalize_cookies {
     my ( $self, $c ) = @_;
 
     my @cookies;
-    while ( my ( $name, $cookie ) = each %{ $c->response->cookies } ) {
+
+    foreach my $name ( keys %{ $c->response->cookies } ) {
+
+        my $val = $c->response->cookies->{$name};
 
         my $cookie = CGI::Cookie->new(
             -name    => $name,
-            -value   => $cookie->{value},
-            -expires => $cookie->{expires},
-            -domain  => $cookie->{domain},
-            -path    => $cookie->{path},
-            -secure  => $cookie->{secure} || 0
+            -value   => $val->{value},
+            -expires => $val->{expires},
+            -domain  => $val->{domain},
+            -path    => $val->{path},
+            -secure  => $val->{secure} || 0
         );
 
         push @cookies, $cookie->as_string;
@@ -388,13 +391,15 @@ sub prepare_parameters {
     my ( $self, $c ) = @_;
 
     # We copy, no references
-    while ( my ( $name, $param ) = each %{ $c->request->query_parameters } ) {
+    foreach my $name ( keys %{ $c->request->query_parameters } ) {
+        my $param = $c->request->query_parameters->{$name};
         $param = ref $param eq 'ARRAY' ? [ @{$param} ] : $param;
         $c->request->parameters->{$name} = $param;
     }
 
     # Merge query and body parameters
-    while ( my ( $name, $param ) = each %{ $c->request->body_parameters } ) {
+    foreach my $name ( keys %{ $c->request->body_parameters } ) {
+        my $param = $c->request->body_parameters->{$name};
         $param = ref $param eq 'ARRAY' ? [ @{$param} ] : $param;
         if ( my $old_param = $c->request->parameters->{$name} ) {
             if ( ref $old_param eq 'ARRAY' ) {
