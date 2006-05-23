@@ -42,8 +42,7 @@ like $MESSAGES[0], qr/^\[info\] hello there!$/,
 {
 
     package Catalyst::Log::Subclass;
-    use Moose;
-    extends 'Catalyst::Log';
+    use base qw/Catalyst::Log/;
 
     sub _send_to_log {
         my $self = shift;
