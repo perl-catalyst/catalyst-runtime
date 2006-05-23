@@ -15,6 +15,9 @@ Loads YAML files. Example:
     name: TestApp
     Controller::Foo:
         foo: bar
+    Model::Baz:
+        qux: xyzzy
+    
 
 =head1 METHODS
 

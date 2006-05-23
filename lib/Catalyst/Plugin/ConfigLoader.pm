@@ -10,7 +10,7 @@ use Module::Pluggable::Fast
     require => 1;
 use Data::Visitor::Callback;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Catalyst::Plugin::ConfigLoader - Load config files of various types
     
     # by default myapp.* will be loaded
     # you can specify a file if you'd like
-    __PACKAGE__->config( file = > 'config.yaml' );    
+    __PACKAGE__->config( file => 'config.yaml' );    
 
 =head1 DESCRIPTION
 
@@ -49,10 +49,8 @@ loaded, set the C<config()> section.
 =cut
 
 sub setup {
-    my $c    = shift;
-    my $path = $c->config->{ file } || $c->path_to( Catalyst::Utils::appprefix( ref $c || $c ) );
-
-    my( $extension ) = ( $path =~ /\.(.{1,4})$/ );
+    my $c = shift;
+    my( $path, $extension ) = $c->get_config_path;
     
     for my $loader ( $c->_config_loaders ) {
         my @files;
@@ -68,10 +66,26 @@ sub setup {
         for( @files ) {
             next unless -f $_;
             my $config = $loader->load( $_ );
+
+            $c->log->debug( "Loaded Config $_" ) if $c->debug;
             
+            next if !$config;
+
             _fix_syntax( $config );
             
-            $c->config( $config ) if $config;
+            # merge hashes 1 level down
+            for my $key ( keys %$config ) {
+                if( exists $c->config->{ $key } ) {
+                    my $isa_ref = ref $config->{ $key };
+
+                    next if !$isa_ref or $isa_ref ne 'HASH';
+
+                    my %temp = ( %{ $c->config->{ $key } }, %{ $config->{ $key } } );
+                    $config->{ $key } = \%temp;
+                }
+            }
+            
+            $c->config( $config );
         }
     }
 
@@ -105,6 +119,47 @@ sub finalize_config {
         }
     );
     $v->visit( $c->config );
+}
+
+=head2 get_config_path
+
+This method determines the path, filename prefix and file extension to be used
+for config loading. It returns the path (up to the filename less the
+extension) to check and the specific extension to use (if it was specified).
+
+The order of preference is specified as:
+
+=over 4
+
+=item * C<$ENV{ MYAPP_CONFIG }>
+
+=item * C<$c->config->{ file }>
+
+=item * C<$c->path_to( $application_prefix )>
+
+=back
+
+If either of the first two user-specified options are directories, the
+application prefix will be added on to the end of the path.
+
+=cut
+
+sub get_config_path {
+    my $c       = shift;
+    my $appname = ref $c || $c;
+    my $prefix  = Catalyst::Utils::appprefix( $appname );
+    my $path    = $ENV{ Catalyst::Utils::class2env( $appname ) . '_CONFIG' }
+        || $c->config->{ file }
+        || $c->path_to( $prefix );
+
+    my( $extension ) = ( $path =~ /\.(.{1,4})$/ );
+    
+    if( -d $path ) {
+        $path  =~ s/[\/\\]$//;
+        $path .= "/$prefix";
+    }
+    
+    return( $path, $extension );
 }
 
 sub _fix_syntax {
