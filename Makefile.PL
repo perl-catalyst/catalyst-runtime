@@ -32,23 +32,12 @@ requires 'Time::HiRes';
 requires 'Tree::Simple' => 1.15;
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => 1.35;
-requires 'File::Copy::Recursive';
-requires 'Module::Install::Admin' => '0.62';
-requires 'Module::Install'        => '0.62';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,
   'Catalyst::Engine::Apache' => '1.05';
 
 feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
-
-feature 'PAR Support',
-  -default => 0,
-  'PAR'    => 0;
-
-feature 'CPANPLUS (for easier installations)',
-  -default   => 0,
-  'CPANPLUS' => 0;
 
 install_script glob('script/*.pl');
 WriteAll;
