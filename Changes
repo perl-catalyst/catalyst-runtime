@@ -1,5 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - Split out Catalyst::Helper into a new distribution
+        - un-bundled the plugins as they are now pre-reqs for Catalyst::Helper
         - nuked each() out of core with prejudice (due to lurking buglets)
         - Added tests from phaylon for dispatcher precedence
         - Use Class::Inspector->loaded($class) instead of $class->can('can')
@@ -12,7 +14,6 @@ This file documents the revision history for Perl extension Catalyst.
         - Added warning for setup being called twice
         - Fix pod to use DBIC::Schema instead of DBIC model
         - Fix ->config failing to copy _config for subclassing
-        - ConfigLoader: Updated to version 0.08
         - Updated log format
         - Updated debug dump
 
