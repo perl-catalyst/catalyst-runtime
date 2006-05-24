@@ -16,7 +16,7 @@ leaving you full freedom to customize them.
 This is pretty simple. It works just like the normal dispatch attributes you
 are used to, like Local or Private:
 
-  sub Hello : Local Action('SayBefore') { 
+  sub Hello :Local :ActionClass('SayBefore') { 
 	$c->res->output( 'Hello '.$c->stash->{what} );
   }
 
