@@ -21,12 +21,10 @@ requires 'HTTP::Request';
 requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
-requires 'MIME::Types';
 requires 'Module::Pluggable::Fast' => 0.16;
 requires 'NEXT';
 requires 'Path::Class' => 0.09;
 requires 'Scalar::Util';
-requires 'Template';
 requires 'Text::SimpleTable' => 0.03;
 requires 'Test::MockObject';
 requires 'Test::NoWarnings' => 0.082;
@@ -37,8 +35,6 @@ requires 'URI' => 1.35;
 requires 'File::Copy::Recursive';
 requires 'Module::Install::Admin' => '0.62';
 requires 'Module::Install'        => '0.62';
-requires 'YAML'                   => '0.55';
-requires 'Data::Visitor'          => '0.02';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,
@@ -55,7 +51,6 @@ feature 'CPANPLUS (for easier installations)',
   'CPANPLUS' => 0;
 
 install_script glob('script/*.pl');
-auto_install;
 WriteAll;
 
 print( '*' x 80, "\n" );
