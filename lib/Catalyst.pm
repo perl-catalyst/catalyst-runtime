@@ -3,7 +3,6 @@ package Catalyst;
 use strict;
 use base 'Catalyst::Component';
 use bytes;
-use UNIVERSAL::require;
 use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Request;
@@ -1873,11 +1872,8 @@ sub setup_dispatcher {
         $dispatcher = $class->dispatcher_class;
     }
 
-    $dispatcher->require;
-
-    if ($@) {
-        Catalyst::Exception->throw(
-            message => qq/Couldn't load dispatcher "$dispatcher", "$@"/ );
+    unless (Class::Inspector->loaded($dispatcher)) {
+        require Class::Inspector->filename($dispatcher);
     }
 
     # dispatcher instance
@@ -1968,12 +1964,8 @@ sub setup_engine {
         $engine = $class->engine_class;
     }
 
-    $engine->require;
-
-    if ($@) {
-        Catalyst::Exception->throw( message =>
-qq/Couldn't load engine "$engine" (maybe you forgot to install it?), "$@"/
-        );
+    unless (Class::Inspector->loaded($engine)) {
+        require Class::Inspector->filename($engine);
     }
 
     # check for old engines that are no longer compatible
@@ -2101,12 +2093,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        $plugin->require;
-
-        if ( my $error = $@ ) {
-            my $type = $instant ? "instant " : '';
-            Catalyst::Exception->throw(
-                message => qq/Couldn't load ${type}plugin "$plugin", $error/ );
+        unless (Class::Inspector->loaded($plugin)) {
+            require Class::Inspector->filename($plugin);
         }
 
         $proto->_plugins->{$plugin} = 1;

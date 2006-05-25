@@ -158,8 +158,7 @@ sub create_action {
                     : $self->_action_class);
 
     unless ( Class::Inspector->loaded($class) ) {
-      $class->require;
-      die "Couldn't load action class ${class}: $@" if $@;
+        require Class::Inspector->filename($class);
     }
     
     return $class->new( \%args );

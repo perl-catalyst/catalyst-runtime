@@ -6,7 +6,6 @@ name 'Catalyst';
 all_from 'lib/Catalyst.pm';
 
 requires 'perl'               => '5.8.1';
-requires 'UNIVERSAL::require' => "0.10";
 requires 'Carp';
 requires 'Class::Accessor::Fast';
 requires 'Class::Data::Inheritable';
@@ -15,23 +14,23 @@ requires 'CGI::Cookie';
 requires 'Data::Dump';
 requires 'File::Modified';
 requires 'HTML::Entities';
-requires 'HTTP::Body'    => 0.5;
-requires 'HTTP::Headers' => 1.64;
+requires 'HTTP::Body'    => '0.5';
+requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request';
 requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
 requires 'Module::Pluggable::Fast' => 0.16;
 requires 'NEXT';
-requires 'Path::Class' => 0.09;
+requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
-requires 'Text::SimpleTable' => 0.03;
+requires 'Text::SimpleTable' => '0.03';
 requires 'Test::MockObject';
-requires 'Test::NoWarnings' => 0.082;
+requires 'Test::NoWarnings' => '0.082';
 requires 'Time::HiRes';
-requires 'Tree::Simple' => 1.15;
+requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
-requires 'URI' => 1.35;
+requires 'URI' => '1.35';
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,

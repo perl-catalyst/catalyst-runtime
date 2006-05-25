@@ -2,7 +2,6 @@ package Catalyst::Exception;
 
 use strict;
 use vars qw[@ISA $CATALYST_EXCEPTION_CLASS];
-use UNIVERSAL::require;
 
 BEGIN {
     push( @ISA, $CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base' );
