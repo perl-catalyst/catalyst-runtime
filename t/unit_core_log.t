@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
-use Test::NoWarnings;    # Adds an extra test.
+use Test::More tests => 23;
 
 my $LOG;
 

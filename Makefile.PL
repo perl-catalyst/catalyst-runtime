@@ -26,7 +26,6 @@ requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Text::SimpleTable' => '0.03';
 requires 'Test::MockObject';
-requires 'Test::NoWarnings' => '0.082';
 requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
