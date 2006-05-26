@@ -41,7 +41,8 @@ WriteAll;
 
 print( '*' x 80, "\n" );
 my $banner =
-  (qw/andyg chansen draven fordmason mst naughton sri jester/)[ int( rand(8) ) ]
+  (qw/andyg chansen draven fordmason mst naughton sri jester
+      nothingmuch LTJake/)[ int( rand(10) ) ]
   . " is the greatest and gabb is "
   . ( (localtime)[2] > 12 ? "drunk" : "hung over" )
   . " again!";
