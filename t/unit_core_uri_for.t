@@ -2,17 +2,18 @@ use strict;
 use warnings;
 
 use Test::More tests => 9;
-use Test::MockObject;
 use URI;
 
-my $request = Test::MockObject->new;
-$request->mock( 'base', sub { URI->new('http://127.0.0.1/foo') } );
-
-my $context = Test::MockObject->new;
-$context->mock( 'request',   sub { $request } );
-$context->mock( 'namespace', sub { 'yada' } );
-
 use_ok('Catalyst');
+
+my $request = Catalyst::Request->new( {
+                base => URI->new('http://127.0.0.1/foo')
+              } );
+
+my $context = Catalyst->new( {
+                request => $request,
+                namespace => 'yada',
+              } );
 
 is(
     Catalyst::uri_for( $context, '/bar/baz' )->as_string,
@@ -49,8 +50,8 @@ is(
     'URI for undef action with query params in unicode'
 );
 
-$request->mock( 'base',  sub { URI->new('http://localhost:3000/') } );
-$request->mock( 'match', sub { 'orderentry/contract' } );
+$request->base( URI->new('http://localhost:3000/') );
+$request->match( 'orderentry/contract' );
 is(
     Catalyst::uri_for( $context, '/Orderentry/saveContract' )->as_string,
     'http://localhost:3000/Orderentry/saveContract',
@@ -58,11 +59,9 @@ is(
 );
 
 {
-    $request->mock( 'base', sub { URI->new('http://127.0.0.1/') } );
+    $request->base( URI->new('http://127.0.0.1/') );
 
-    my $context = Test::MockObject->new;
-    $context->mock( 'request',   sub { $request } );
-    $context->mock( 'namespace', sub { '' } );
+    $context->namespace('');
 
     is( Catalyst::uri_for( $context, '/bar/baz' )->as_string,
         'http://127.0.0.1/bar/baz', 'URI with no base or match' );

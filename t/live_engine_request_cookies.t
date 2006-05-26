@@ -10,7 +10,7 @@ use Test::More tests => 13;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
-use CGI::Cookie;
+use CGI::Simple::Cookie;
 use HTTP::Headers;
 use HTTP::Request::Common;
 use URI;
@@ -28,10 +28,11 @@ use URI;
         'Content is a serialized Catalyst::Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     isa_ok( $creq, 'Catalyst::Request' );
-    isa_ok( $creq->cookies->{Catalyst}, 'CGI::Cookie', 'Cookie Catalyst' );
+    isa_ok( $creq->cookies->{Catalyst}, 'CGI::Simple::Cookie',
+            'Cookie Catalyst' );
     is( $creq->cookies->{Catalyst}->name, 'Catalyst', 'Cookie Catalyst name' );
     is( $creq->cookies->{Catalyst}->value, 'Cool', 'Cookie Catalyst value' );
-    isa_ok( $creq->cookies->{Cool}, 'CGI::Cookie', 'Cookie Cool' );
+    isa_ok( $creq->cookies->{Cool}, 'CGI::Simple::Cookie', 'Cookie Cool' );
     is( $creq->cookies->{Cool}->name,  'Cool',     'Cookie Cool name' );
     is( $creq->cookies->{Cool}->value, 'Catalyst', 'Cookie Cool value' );
 

@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::MockObject;
 
 my %non_unix = (
     MacOS   => 1,
@@ -24,15 +23,17 @@ else {
 	plan tests => 3;
 }
 
-my $context = Test::MockObject->new;
-
 use_ok('Catalyst');
 
-$context->mock( 'config', sub { { home => '/home/sri/my-app/' } } );
+my $context = 'Catalyst';
+
+my $config = Catalyst->config;
+
+$config->{home} = '/home/sri/my-app/';
 
 is( Catalyst::path_to( $context, 'foo' ), '/home/sri/my-app/foo', 'Unix path' );
 
-$context->mock( 'config', sub { { home => '/Users/sri/myapp' } } );
+$config->{home} = '/Users/sri/myapp/';
 
 is( Catalyst::path_to( $context, 'foo', 'bar' ),
     '/Users/sri/myapp/foo/bar', 'deep Unix path' );

@@ -2,7 +2,7 @@ package Catalyst::Engine;
 
 use strict;
 use base 'Class::Accessor::Fast';
-use CGI::Cookie;
+use CGI::Simple::Cookie;
 use Data::Dump qw/dump/;
 use HTML::Entities;
 use HTTP::Body;
@@ -54,7 +54,8 @@ sub finalize_body {
 
 =head2 $self->finalize_cookies($c)
 
-Create CGI::Cookies from $c->res->cookies, and set them as response headers.
+Create CGI::Simple::Cookie objects from $c->res->cookies, and set them as
+response headers.
 
 =cut
 
@@ -67,7 +68,7 @@ sub finalize_cookies {
 
         my $val = $c->response->cookies->{$name};
 
-        my $cookie = CGI::Cookie->new(
+        my $cookie = CGI::Simple::Cookie->new(
             -name    => $name,
             -value   => $val->{value},
             -expires => $val->{expires},
@@ -363,7 +364,7 @@ sub prepare_connection { }
 
 =head2 $self->prepare_cookies($c)
 
-Parse cookies from header. Sets a L<CGI::Cookie> object.
+Parse cookies from header. Sets a L<CGI::Simple::Cookie> object.
 
 =cut
 
@@ -371,7 +372,7 @@ sub prepare_cookies {
     my ( $self, $c ) = @_;
 
     if ( my $header = $c->request->header('Cookie') ) {
-        $c->req->cookies( { CGI::Cookie->parse($header) } );
+        $c->req->cookies( { CGI::Simple::Cookie->parse($header) } );
     }
 }
 
