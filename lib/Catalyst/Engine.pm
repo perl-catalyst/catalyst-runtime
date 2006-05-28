@@ -8,6 +8,7 @@ use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
+use Scalar::Util ();
 
 # input position and length
 __PACKAGE__->mk_accessors(qw/read_position read_length/);
@@ -68,13 +69,17 @@ sub finalize_cookies {
 
         my $val = $c->response->cookies->{$name};
 
-        my $cookie = CGI::Simple::Cookie->new(
-            -name    => $name,
-            -value   => $val->{value},
-            -expires => $val->{expires},
-            -domain  => $val->{domain},
-            -path    => $val->{path},
-            -secure  => $val->{secure} || 0
+        my $cookie = (
+            Scalar::Util::blessed($val)
+            ? $val
+            : CGI::Simple::Cookie->new(
+                -name    => $name,
+                -value   => $val->{value},
+                -expires => $val->{expires},
+                -domain  => $val->{domain},
+                -path    => $val->{path},
+                -secure  => $val->{secure} || 0
+            )
         );
 
         push @cookies, $cookie->as_string;
