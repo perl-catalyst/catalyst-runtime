@@ -649,6 +649,9 @@ L<Catalyst::Log> man page.
 
 Overload to enable debug messages (same as -Debug option).
 
+Note that this is a static method, not an accessor and should be overloaded
+by declaring "sub debug { 1 }" in your MyApp.pm, not by calling $c->debug(1).
+
 =cut
 
 sub debug { 0 }
