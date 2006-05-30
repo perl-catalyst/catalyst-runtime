@@ -11,6 +11,7 @@ use Catalyst::DispatchType::Index;
 use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
+use Scalar::Util ();
 
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
@@ -133,19 +134,33 @@ Documented in L<Catalyst>
 =cut
 
 sub forward {
-    my ( $self, $c, $command ) = splice( @_, 0, 3 );
+    my ( $self, $c, $command, @extra_params ) = @_;
 
     unless ($command) {
         $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
     }
 
-    my $args = [ @{ $c->request->arguments } ];
+    my @args;
+    
+    if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
+        @args = @{ pop @extra_params }
+    } else {
+        # this is a copy, it may take some abuse from ->_invoke_as_path if the path had trailing parts
+        @args = @{ $c->request->arguments };
+    }
 
-    @$args = @{ pop @_ } if ( ref( $_[-1] ) eq 'ARRAY' );
+    my $action;
 
-    my $action = $self->_invoke_as_path( $c, $command, $args )
-      || $self->_invoke_as_component( $c, $command, shift );
+    # forward to a string path ("/foo/bar/gorch") or action object which stringifies to that
+    $action = $self->_invoke_as_path( $c, "$command", \@args );
+
+    # forward to a component ( "MyApp::*::Foo" or $c->component("...") - a path or an object)
+    unless ($action) {
+        my $method = @extra_params ? $extra_params[0] : "process";
+        $action = $self->_invoke_as_component( $c, $command, $method );
+    }
+
 
     unless ($action) {
         my $error =
@@ -158,7 +173,7 @@ sub forward {
 
     #push @$args, @_;
 
-    local $c->request->{arguments} = $args;
+    local $c->request->{arguments} = \@args;
     $action->dispatch( $c );
 
     return $c->state;
@@ -178,8 +193,6 @@ sub _action_rel2abs {
 
 sub _invoke_as_path {
     my ( $self, $c, $rel_path, $args ) = @_;
-
-    return if ref $rel_path;    # it must be a string
 
     my $path = $self->_action_rel2abs( $c, $rel_path );
 
@@ -212,7 +225,6 @@ sub _invoke_as_component {
     my ( $self, $c, $component, $method ) = @_;
 
     my $class = $self->_find_component_class( $c, $component ) || return 0;
-    $method ||= "process";
 
     if ( my $code = $class->can($method) ) {
         return $self->method_action_class->new(
