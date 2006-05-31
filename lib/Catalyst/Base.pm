@@ -166,7 +166,9 @@ sub create_action {
 
 sub _parse_attrs {
     my ( $self, $c, $name, @attrs ) = @_;
-    my %attributes;
+
+    my %raw_attributes;
+
     foreach my $attr (@attrs) {
 
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
@@ -177,14 +179,25 @@ sub _parse_attrs {
             if ( defined $value ) {
                 ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
             }
+            push( @{ $raw_attributes{$key} }, $value );
+        }
+    }
+
+    my %final_attributes;
+
+    foreach my $key (keys %raw_attributes) {
+
+        foreach my $value (@{$raw_attributes{$key}}) {
+
             my $meth = "_parse_${key}_attr";
             if ( $self->can($meth) ) {
                 ( $key, $value ) = $self->$meth( $c, $name, $value );
             }
-            push( @{ $attributes{$key} }, $value );
+            push( @{ $final_attributes{$key} }, $value );
         }
     }
-    return \%attributes;
+
+    return \%final_attributes;
 }
 
 sub _parse_Global_attr {
