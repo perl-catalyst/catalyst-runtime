@@ -62,7 +62,7 @@ sub new {
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( { %{ $self->config }, %{$arguments} } );
+    return $self->NEXT::new( $self->merge_config_hashes( $self->config, $arguments ) );
 }
 
 =head2 COMPONENT($c, $arguments)
@@ -92,7 +92,7 @@ sub COMPONENT {
         }
         else {
             my $class = ref $self || $self;
-            my $new = { %{ $self->config }, %{$arguments} };
+            my $new   = $self->merge_config_hashes( $self->config, $arguments );
             return bless $new, $class;
         }
     }
@@ -116,8 +116,10 @@ sub config {
         $self->_config( $config = {} );
     }
     if (@_) {
-        $config = { %{$config}, %{@_ > 1 ? {@_} : $_[0]} };
-        $self->_config($config);
+        my $newconfig = { %{@_ > 1 ? {@_} : $_[0]} };
+        $self->_config(
+            $self->merge_config_hashes( $config, $newconfig )
+        );
     }
     return $config;
 }
@@ -130,6 +132,32 @@ sub process {
 
     Catalyst::Exception->throw( message => ( ref $_[0] || $_[0] )
           . " did not override Catalyst::Component::process" );
+}
+
+=head2 $c->merge_hash_config( $hashref, $hashref )
+
+Merges two hashes together recursively, giving right-hand precedence.
+
+=cut
+
+sub merge_config_hashes {
+    my ( $self, $lefthash, $righthash ) = @_;
+
+    my %merged = %$lefthash;
+    for my $key ( keys %$righthash ) {
+        my $right_ref = ( ref $righthash->{ $key } || '' ) eq 'HASH';
+        my $left_ref  = ( ( exists $lefthash->{ $key } && ref $lefthash->{ $key } ) || '' ) eq 'HASH';
+        if( $right_ref and $left_ref ) {
+            $merged{ $key } = $self->merge_config_hashes(
+                $lefthash->{ $key }, $righthash->{ $key }
+            );
+        }
+        else {
+            $merged{ $key } = $righthash->{ $key };
+        }
+    }
+    
+    return \%merged;
 }
 
 =head1 OPTIONAL METHODS
