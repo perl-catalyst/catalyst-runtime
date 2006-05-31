@@ -85,7 +85,8 @@ Determine the namespace for actions in this component.
 
 sub action_namespace {
     my ( $self, $c ) = @_;
-    return $self->config->{namespace} if exists $self->config->{namespace};
+    my $hash = (ref $self ? $self : $self->config);
+    return $hash->{namespace} if exists $hash->{namespace};
     return Catalyst::Utils::class2prefix( ref($self) || $self,
         $c->config->{case_sensitive} )
       || '';
