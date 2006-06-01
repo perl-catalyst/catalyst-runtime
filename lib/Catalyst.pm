@@ -105,7 +105,7 @@ Catalyst - The Elegant MVC Web Application Framework
     ### in lib/MyApp.pm
     use Catalyst qw/-Debug/; # include plugins here as well
     
-	### In libMyApp/Controller/Root.pm (autocreated)
+	### In lib/MyApp/Controller/Root.pm (autocreated)
     sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
         my ( $self, $c, @args ) = @_; # args are qw/1 2/ for /foo/1/2
         $c->stash->{template} = 'foo.tt'; # set the template
