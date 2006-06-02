@@ -423,6 +423,21 @@ C<MyApp::Controller::Catalog::Order::Process> controller must, if called
 from elsewhere, be reached with
 C<$c-E<gt>forward('/catalog/order/process/bar')>.
 
+=item * B<Args>
+
+Args is not an action type per se, but an action modifier - it adds a match
+restriction to any action it's provided to, requiring only as many path parts
+as are specified for the action to be valid - for example in
+MyApp::Controller::Foo,
+
+  sub bar :Local
+
+would match any URL starting /foo/bar/. To restrict this you can do
+
+  sub bar :Local :Args(1)
+
+to only match /foo/bar/*/
+
 =back
 
 B<Note:> After seeing these examples, you probably wonder what the point
