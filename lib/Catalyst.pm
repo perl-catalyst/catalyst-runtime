@@ -776,8 +776,9 @@ sub setup {
         }
     }
 
-    $class->log->warn(
-        <<"EOF") if ( $ENV{CATALYST_SCRIPT_GEN} && ( $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::CATALYST_SCRIPT_GEN ) );
+    eval { require Catalyst::Devel; };
+    if( !$@ && $ENV{CATALYST_SCRIPT_GEN} && ( $ENV{CATALYST_SCRIPT_GEN} < $Catalyst::Devel::CATALYST_SCRIPT_GEN ) ) {
+        $class->log->warn(<<"EOF");
 You are running an old script!
 
   Please update by running (this will overwrite existing files):
@@ -786,7 +787,8 @@ You are running an old script!
   or (this will not overwrite existing files):
     catalyst.pl -scripts $class
 EOF
-
+    }
+    
     if ( $class->debug ) {
 
         my @plugins = ();
