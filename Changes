@@ -1,5 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - added ability to set action attributes from controller config
         - added merge_config_hashes() as a convenience method
         - Swapped out CGI::Cookie in favour of CGI::Simple::Cookie
         - Removed test dependencies on Test::NoWarnings, Test::MockObject

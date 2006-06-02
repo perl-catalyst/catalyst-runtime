@@ -878,20 +878,47 @@ application.
 
     package MyApp::Controller::Login;
 
-    sub sign-in : Local { }
-    sub new-password : Local { }
-    sub sign-out : Local { }
+    use base qw/Catalyst::Controller/;
+
+    sub sign_in : Path("sign-in") { }
+    sub new_password : Path("new-password") { }
+    sub sign_out : Path("sign-out") { }
 
     package MyApp::Controller::Catalog;
+
+    use base qw/Catalyst::Controller/;
 
     sub view : Local { }
     sub list : Local { }
 
     package MyApp::Controller::Cart;
 
+    use base qw/Catalyst::Controller/;
+
     sub add : Local { }
     sub update : Local { }
     sub order : Local { }
+
+Note that you can also supply attributes via the Controller's config so long
+as you have at least one attribute on a subref to be exported (:Action is
+commonly used for this) - for example the following is equivalent to the same
+controller above
+
+    package MyApp::Controller::Login;
+
+    use base qw/Catalyst::Controller/;
+
+    __PACKAGE__->config(
+      actions => {
+        'sign_in' => { Path => 'sign-in' },
+        'new_password' => { Path => 'new-password' },
+        'sign_out' => { Path => 'sign-out' },
+      },
+    );
+
+    sub sign_in : Action { }
+    sub new_password : Action { }
+    sub sign_out : Action { }
 
 =head3 Testing
 

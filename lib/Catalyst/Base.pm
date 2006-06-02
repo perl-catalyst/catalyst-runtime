@@ -85,7 +85,7 @@ Determine the namespace for actions in this component.
 
 sub action_namespace {
     my ( $self, $c ) = @_;
-    my $hash = (ref $self ? $self : $self->config);
+    my $hash = (ref $self ? $self : $self->config); # hate app-is-class
     return $hash->{namespace} if exists $hash->{namespace};
     return Catalyst::Utils::class2prefix( ref($self) || $self,
         $c->config->{case_sensitive} )
@@ -184,11 +184,22 @@ sub _parse_attrs {
         }
     }
 
+    my $hash = (ref $self ? $self : $self->config); # hate app-is-class
+
+    if (exists $hash->{actions} || exists $hash->{action}) {
+      my $a = $hash->{actions} || $hash->{action};
+      %raw_attributes = ((exists $a->{'*'} ? %{$a->{'*'}} : ()),
+                         %raw_attributes,
+                         (exists $a->{$name} ? %{$a->{$name}} : ()));
+    }
+
     my %final_attributes;
 
     foreach my $key (keys %raw_attributes) {
 
-        foreach my $value (@{$raw_attributes{$key}}) {
+        my $raw = $raw_attributes{$key};
+
+        foreach my $value (ref($raw) ? @$raw : $raw) {
 
             my $meth = "_parse_${key}_attr";
             if ( $self->can($meth) ) {

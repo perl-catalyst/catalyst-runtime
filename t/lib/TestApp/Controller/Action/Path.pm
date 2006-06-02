@@ -3,12 +3,19 @@ package TestApp::Controller::Action::Path;
 use strict;
 use base 'TestApp::Controller::Action';
 
-sub one : Action Path("a path with spaces") {
+__PACKAGE__->config(
+    actions => {
+      'one' => { 'Path' => [ 'a path with spaces' ] },
+      'two' => { 'Path' => "åäö" },
+    },
+);
+
+sub one : Action Path("this_will_be_overriden") {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
 
-sub two : Action Path("åäö") {
+sub two : Action {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
