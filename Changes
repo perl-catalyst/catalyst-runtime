@@ -1,5 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - added Catalyst::Base->action_for('methodname')
         - checked and tested :Args multimethod dispatch
         - added ability to set action attributes from controller config
         - added merge_config_hashes() as a convenience method

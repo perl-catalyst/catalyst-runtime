@@ -60,6 +60,14 @@ sub _END : Private {
     return !@{ $c->error };
 }
 
+sub new {
+  my $self = shift;
+  my $app = $_[0];
+  my $new = $self->NEXT::new(@_);
+  $new->{application} = $app;
+  return $new;
+}
+
 =head1 NAME
 
 Catalyst::Base - Catalyst Base Class
@@ -77,6 +85,19 @@ dispatch of actions for controllers.
 
 =head1 METHODS
 
+=head2 $self->action_for('name')
+
+Returns the Catalyst::Action object (if any) for a given method name in
+this component.
+
+=cut
+
+sub action_for {
+    my ( $self, $name ) = @_;
+    my $app = ($self->isa('Catalyst') ? $self : $self->{application});
+    return $app->dispatcher->get_action($name, $self->action_namespace);
+}
+
 =head2 $self->action_namespace($c)
 
 Returns the private namespace for actions in this component. Defaults to a value
@@ -87,6 +108,9 @@ from the controller name (for e.g. MyApp::Controller::Foo::Bar becomes
 
 sub action_namespace {
     my ( $self, $c ) = @_;
+    unless ( $c ) {
+        $c = ($self->isa('Catalyst') ? $self : $self->{application});
+    }
     my $hash = (ref $self ? $self : $self->config); # hate app-is-class
     return $hash->{namespace} if exists $hash->{namespace};
     return Catalyst::Utils::class2prefix( ref($self) || $self,
@@ -104,6 +128,9 @@ overriden from the "path" config key.
 
 sub path_prefix {
     my ( $self, $c ) = @_;
+    unless ( $c ) {
+        $c = ($self->isa('Catalyst') ? $self : $self->{application});
+    }
     my $hash = (ref $self ? $self : $self->config); # hate app-is-class
     return $hash->{path} if exists $hash->{path};
     return shift->action_namespace(@_);
