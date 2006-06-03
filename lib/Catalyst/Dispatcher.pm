@@ -312,6 +312,7 @@ Returns the named action by its full path.
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
+    $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
     $self->action_hash->{$path};
 }
@@ -353,6 +354,27 @@ sub get_containers {
     return reverse grep { defined } @containers, $self->container_hash->{''};
 
     my @parts = split '/', $namespace;
+}
+
+=head2 $self->uri_for_action($action, \@captures)
+
+Takes a Catalyst::Action object and action parameters and returns a URI
+part such that if $c->req->path were this URI part, this action would be
+dispatched to with $c->req->captures set to the supplied arrayref.
+
+If the action object is not available for external dispatch or the dispatcher
+cannot determine an appropriate URI, this method will return undef.
+
+=cut
+
+sub uri_for_action {
+    my ( $self, $action, $captures) = @_;
+    $captures ||= [];
+    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
+        my $uri = $dispatch_type->uri_for_action( $action, $captures );
+        return $uri if defined($uri);
+    }
+    return undef;
 }
 
 =head2 $self->register( $c, $action )

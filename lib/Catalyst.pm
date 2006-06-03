@@ -865,6 +865,11 @@ end of the path.  If the last argument to uri_for is a hash reference,
 it is assumed to contain GET parameter key/value pairs, which will be
 appended to the URI in standard fashion.
 
+Instead of $path, you can also optionally pass a $action object which will
+be resolved to a path using $c->dispatcher->uri_for_action; if the first
+element of @args is an arrayref it is treated as a list of captures to be
+passed to uri_for_action.
+
 =cut
 
 sub uri_for {
@@ -874,6 +879,14 @@ sub uri_for {
     $basepath =~ s/\/$//;
     $basepath .= '/';
     my $namespace = $c->namespace || '';
+
+    if ( Scalar::Util::blessed($path) ) { # action object
+        my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
+                         ? shift(@args)
+                         : [] );
+        $path = $c->dispatcher->uri_for_action($path, $captures);
+        return undef unless defined($path);
+    }
 
     # massage namespace, empty if absolute path
     $namespace =~ s/^\/// if $namespace;

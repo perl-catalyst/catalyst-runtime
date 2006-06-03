@@ -44,6 +44,18 @@ Should return true if it registers something, or false otherwise.
 
 sub register { }
 
+=head2 $self->uri_for_action( $action, \@captures )
+
+abstract method, to be implemented by dispatchtypes. Takes a
+L<Catalyst::Action> object and an arrayref of captures, and should
+return either a URI part which if placed in $c->req->path would cause
+$self->match to match this action and set $c->req->captures to the supplied
+arrayref, or undef if unable to do so.
+
+=cut
+
+sub uri_for_action { }
+
 =head1 AUTHOR
 
 Matt S Trout

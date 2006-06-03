@@ -93,6 +93,29 @@ sub register_path {
     return 1;
 }
 
+=head2 $self->uri_for_action($action, $captures)
+
+get a URI part for an action; always returns undef is $captures is set
+since Path actions don't have captures
+
+=cut
+
+sub uri_for_action {
+    my ( $self, $action, $captures ) = @_;
+
+    return undef if @$captures;
+
+    if (my $paths = $action->attributes->{Path}) {
+        my $path = $paths->[0];
+        $path = '/' unless length($path);
+        $path = "/${path}" unless ($path =~ m/^\//);
+        $path = URI->new($path)->canonical;
+        return $path;
+    } else {
+        return undef;
+    }
+}
+
 =head1 AUTHOR
 
 Matt S Trout

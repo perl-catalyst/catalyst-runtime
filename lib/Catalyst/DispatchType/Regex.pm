@@ -3,6 +3,7 @@ package Catalyst::DispatchType::Regex;
 use strict;
 use base qw/Catalyst::DispatchType::Path/;
 use Text::SimpleTable;
+use Text::Balanced ();
 
 =head1 NAME
 
@@ -102,6 +103,38 @@ sub register_regex {
             path   => $re,
         }
     );
+}
+
+=head2 $self->uri_for_action($action, $captures)
+
+returns a URI for this action if it can find a regex attributes that contains
+the correct number of () captures. Note that this may function incorrectly
+in the case of nested captures - if your regex does (...(..))..(..) you'll
+need to pass the first and third captures only.
+
+=cut
+
+sub uri_for_action {
+    my ( $self, $action, $captures ) = @_;
+
+    if (my $regexes = $action->attributes->{Regex}) {
+        REGEX: foreach my $orig (@$regexes) {
+            my $re = "$orig";
+            $re =~ s/^\^//;
+            $re =~ s/\$$//;
+            my $final = '/';
+            my @captures = @$captures;
+            while (my ($front, $rest) = split(/\(/, $re, 2)) {
+                ($rest, $re) =
+                    Text::Balanced::extract_bracketed("(${rest}", '(');
+                next REGEX unless @captures;
+                $final .= $front.shift(@captures);
+            }
+            next REGEX if @captures;
+            return $final;
+         }
+    }
+    return undef;
 }
 
 =head1 AUTHOR

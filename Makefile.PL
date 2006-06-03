@@ -29,6 +29,7 @@ requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
+requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 
 feature 'Apache/mod_perl Support',
   -default                   => 0,

@@ -37,6 +37,23 @@ sub match {
     return 0;
 }
 
+=head2 $self->uri_for_action( $action, $captures )
+
+get a URI part for an action; always returns undef is $captures is set
+since index actions don't have captures
+
+=cut
+
+sub uri_for_action {
+    my ( $self, $action, $captures ) = @_;
+
+    return undef if @$captures;
+
+    return undef unless $action->name eq 'index';
+
+    return "/".$action->namespace;
+}
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
