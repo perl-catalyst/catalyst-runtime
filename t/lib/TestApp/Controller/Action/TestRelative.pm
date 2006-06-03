@@ -1,7 +1,11 @@
-package TestApp::Controller::Action::Relative;
+package TestApp::Controller::Action::TestRelative;
 
 use strict;
 use base 'TestApp::Controller::Action';
+
+__PACKAGE__->config(
+  path => 'action/relative'
+);
 
 sub relative : Local {
     my ( $self, $c ) = @_;

@@ -148,8 +148,8 @@ sub run_tests {
     }
     {
         my @expected = qw[
-          TestApp::Controller::Action::Relative->begin
-          TestApp::Controller::Action::Relative->relative
+          TestApp::Controller::Action::TestRelative->begin
+          TestApp::Controller::Action::TestRelative->relative
           TestApp::Controller::Action::Forward->one
           TestApp::Controller::Action::Forward->two
           TestApp::Controller::Action::Forward->three
@@ -170,7 +170,7 @@ sub run_tests {
             'action/relative/relative', 'Test Action' );
         is(
             $response->header('X-Test-Class'),
-            'TestApp::Controller::Action::Relative',
+            'TestApp::Controller::Action::TestRelative',
             'Test Class'
         );
         is( $response->header('X-Catalyst-Executed'),
@@ -183,8 +183,8 @@ sub run_tests {
     }
     {
         my @expected = qw[
-          TestApp::Controller::Action::Relative->begin
-          TestApp::Controller::Action::Relative->relative_two
+          TestApp::Controller::Action::TestRelative->begin
+          TestApp::Controller::Action::TestRelative->relative_two
           TestApp::Controller::Action::Forward->one
           TestApp::Controller::Action::Forward->two
           TestApp::Controller::Action::Forward->three
@@ -211,7 +211,7 @@ sub run_tests {
         );
         is(
             $response->header('X-Test-Class'),
-            'TestApp::Controller::Action::Relative',
+            'TestApp::Controller::Action::TestRelative',
             'Test Class'
         );
         is( $response->header('X-Catalyst-Executed'),

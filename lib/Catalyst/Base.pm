@@ -79,7 +79,9 @@ dispatch of actions for controllers.
 
 =head2 $self->action_namespace($c)
 
-Determine the namespace for actions in this component.
+Returns the private namespace for actions in this component. Defaults to a value
+from the controller name (for e.g. MyApp::Controller::Foo::Bar becomes
+"foo/bar") or can be overriden from the "namespace" config key.
 
 =cut
 
@@ -94,11 +96,18 @@ sub action_namespace {
 
 =head2 $self->path_prefix($c)
 
-alias for action_namespace
+Returns the default path prefix for :Local, :LocalRegex and relative :Path
+actions in this component. Defaults to the action_namespace or can be
+overriden from the "path" config key.
 
 =cut
 
-sub path_prefix { shift->action_namespace(@_); }
+sub path_prefix {
+    my ( $self, $c ) = @_;
+    my $hash = (ref $self ? $self : $self->config); # hate app-is-class
+    return $hash->{path} if exists $hash->{path};
+    return shift->action_namespace(@_);
+}
 
 =head2 $self->register_actions($c)
 
