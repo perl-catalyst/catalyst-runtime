@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 22;
+use Test::More tests => 28;
 use Catalyst::Test 'TestApp';
 use Data::Dumper;
 
@@ -29,6 +29,11 @@ my @tests = (
     'index vs. Local',      { path => '/loc_vs_index',   expect => 'index' },
     'index vs. LocalRegex', { path => '/locre_vs_index', expect => 'index' },
     'index vs. Path',       { path => '/path_vs_index',  expect => 'index' },
+
+    'multimethod zero',     { path => '/multimethod',    expect => 'zero' },
+    'multimethod one',      { path => '/multimethod/1',  expect => 'one 1' },
+    'multimethod two',      { path => '/multimethod/1/2',
+                                                         expect => 'two 1 2' },
 );
 
 while ( @tests ) {

@@ -26,10 +26,11 @@ Debug output for Path dispatch points
 sub list {
     my ( $self, $c ) = @_;
     my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
-    for my $path ( sort keys %{ $self->{paths} } ) {
-        my $action = $self->{paths}->{$path};
-        $path = "/$path" unless $path eq '/';
-        $paths->row( "$path", "/$action" );
+    foreach my $path ( sort keys %{ $self->{paths} } ) {
+        foreach my $action ( @{ $self->{paths}->{$path} } ) {
+            $path = "/$path" unless $path eq '/';
+            $paths->row( "$path", "/$action" );
+        }
     }
     $c->log->debug( "Loaded Path actions:\n" . $paths->draw )
       if ( keys %{ $self->{paths} } );
@@ -45,8 +46,9 @@ sub match {
     my ( $self, $c, $path ) = @_;
 
     $path ||= '/';
-    if ( my $action = $self->{paths}->{$path} ) {
-        return 0 unless $action->match($c);
+
+    foreach my $action ( @{ $self->{paths}->{$path} || [] } ) {
+        next unless $action->match($c);
         $c->req->action($path);
         $c->req->match($path);
         $c->action($action);
@@ -86,7 +88,9 @@ sub register_path {
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
 
-    $self->{paths}{$path} = $action;
+    unshift( @{ $self->{paths}{$path} ||= [] }, $action);
+
+    return 1;
 }
 
 =head1 AUTHOR
