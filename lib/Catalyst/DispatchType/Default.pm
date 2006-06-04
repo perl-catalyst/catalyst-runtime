@@ -17,8 +17,12 @@ See L<Catalyst>.
 
 =head2 $self->match( $c, $path )
 
-Check if default action matches, and set action if it does. 
-Will be called last for each controller.
+If path is empty (i.e. all path parts have been converted into args),
+attempts to find a default for the namespace constructed from the args,
+or the last inherited default otherwise and will match that.
+
+If path is not empty, never matches since Default will only match if all
+other possibilities have been exhausted.
 
 =cut
 

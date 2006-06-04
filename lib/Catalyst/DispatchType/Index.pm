@@ -18,7 +18,8 @@ See L<Catalyst>.
 =head2 $self->match( $c, $path )
 
 Check if there's an index action for a given path, and set it up to use it
-if there is.
+if there is; only matches a full URI - if $c->req->args is already set
+this DispatchType is guaranteed not to match.
 
 =cut
 

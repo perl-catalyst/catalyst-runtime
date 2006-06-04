@@ -36,8 +36,10 @@ sub list {
 
 =head2 $self->match( $c, $path )
 
-Check path against compiled regexes, and set action to any matching
-action. Returns 1 on success and 0 on failure.
+Checks path against every compiled regex, and offers the action for any regex
+which matches a chance to match the request. If it succeeds, sets action,
+match and captures on $c->req and returns 1. If not, returns 0 without
+altering $c.
 
 =cut
 
@@ -65,10 +67,10 @@ sub match {
 
 =head2 $self->register( $c, $action )
 
-Registers one or more regex actions for an action object.\
+Registers one or more regex actions for an action object.
 Also registers them as literal paths.
 
-Returns 1 on if any regexps were registered.
+Returns 1 if any regexps were registered.
 
 =cut
 
@@ -89,7 +91,7 @@ sub register {
 =head2 $self->register_regex($c, $re, $action)
 
 Register an individual regex on the action. Usually called from the 
-register action.
+register method.
 
 =cut
 

@@ -38,7 +38,9 @@ sub list {
 
 =head2 $self->match( $c, $path )
 
-Check for paths that match the given path.
+For each action registered to this exact path, offers the action a chance to
+match the path (in the order in which they were registered). Succeeds on the
+first action that matches, if any; if not, returns 0.
 
 =cut
 
@@ -61,7 +63,7 @@ sub match {
 
 =head2 $self->register( $c, $action )
 
-Call register_path for every path attribute in the given $action.
+Calls register_path for every Path attribute for the given $action.
 
 =cut
 
@@ -78,7 +80,7 @@ sub register {
 
 =head2 $self->register_path($c, $path, $action)
 
-register an action at a given path.
+Registers an action at a given path.
 
 =cut
 
