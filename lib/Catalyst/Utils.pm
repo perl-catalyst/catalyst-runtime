@@ -229,7 +229,12 @@ sub ensure_class_loaded {
         eval "require $class";
         $error = $@;
     }
+
     die $error if $error;
+    die "require $class was successful but the package is not defined"
+        unless Class::Inspector->loaded($class);
+
+    return 1;
 }
 
 
