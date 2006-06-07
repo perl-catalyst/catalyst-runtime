@@ -6,6 +6,7 @@ use File::Spec;
 use HTTP::Request;
 use Path::Class;
 use URI;
+use Class::Inspector;
 
 =head1 NAME
 
@@ -210,9 +211,32 @@ sub request {
     return $request;
 }
 
+=head2 ensure_class_loaded($class_name)
+
+Loads the class unless it already has been loaded.
+
+=cut
+
+sub ensure_class_loaded {
+    my $class = shift;
+
+    return if Class::Inspector->loaded( $class ); # if a symbol entry exists we don't load again
+
+    # this hack is so we don't overwrite $@ if the load did not generate an error
+    my $error;
+    {
+        local $@;
+        eval "require $class";
+        $error = $@;
+    }
+    die $error if $error;
+}
+
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>
+Yuval Kogman, C<nothingmuch@woobling.org>
 
 =head1 COPYRIGHT
 
