@@ -1,6 +1,6 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial::Debugging - Catalyst Tutorial – Part 6: Debugging
+Catalyst::Manual::Tutorial::Debugging - Catalyst Tutorial - Part 6: Debugging
 
 
 
@@ -8,7 +8,7 @@ Catalyst::Manual::Tutorial::Debugging - Catalyst Tutorial – Part 6: Debugging
 
 This is B<Part 6 of 9> for the Catalyst tutorial.
 
-L<Totorial Overview|Catalyst::Manual::Tutorial>
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
 =over 4
 
@@ -22,7 +22,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
 
 =item 4
 
@@ -54,7 +54,8 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 
 =head1 DESCRIPTION
 
-This part of the tutorial takes a brief look at the primary options available for troubleshooting Catalyst applications.
+This part of the tutorial takes a brief look at the primary options
+available for troubleshooting Catalyst applications.
 
 Note that when it comes to debugging and troubleshooting, there are two camps:
 
@@ -76,22 +77,33 @@ Catalyst is able to easily accommodate both styles of debugging.
 
 =head1 LOG STATEMENTS
 
-Folks in the former group can use Catalyst's C<$c-E<gt>log> facility.  For example, if you add the following code to a controller action method:
+Folks in the former group can use Catalyst's C<$c-E<gt>log> facility.
+For example, if you add the following code to a controller action
+method:
 
     $c->log->debug("This is a test log message");
 
-Then the Catalyst development server will display your message along with the other debug output.  To accomplish the same thing in a TTSite view use:
+Then the Catalyst development server will display your message along
+with the other debug output.  To accomplish the same thing in a TTSite
+view use:
 
     [% Catalyst.log.debug("This is a test log message") %]
 
-You can also use L<Data::Dumper|Data::Dumper> in both Catalyst code 
-(C<$c-E<gt>log-E<gt>dumper($myvar)>) and TT templates (C<[% Dumper.dump(book) %]> as discussed in earlier parts of the tutorial.
+You can also use L<Data::Dumper|Data::Dumper> in both Catalyst code
+(C<$c-E<gt>log-E<gt>dumper($myvar)>) and TT templates (C<[%
+Dumper.dump(book) %]> as discussed in earlier parts of the tutorial.
 
 
 
 =head1 RUNNING CATALYST UNDER THE PERL DEBUGGER
 
-Members of the interactive debuggers fan club will also be at home with Catalyst applications.  One approach to this style of Perl debugging is to embed breakpoints in your code.  For example, open C<lib/MyApp/Controller/Books.pm> in your editor and add the C<DB::single=1> line as follows inside the C<list> method (I like to "left-justify" my debug statements so I don't forget to remove them, but you can obviously indent them if you prefer):
+Members of the interactive debuggers fan club will also be at home with
+Catalyst applications.  One approach to this style of Perl debugging is
+to embed breakpoints in your code.  For example, open
+C<lib/MyApp/Controller/Books.pm> in your editor and add the
+C<DB::single=1> line as follows inside the C<list> method (I like to
+"left-justify" my debug statements so I don't forget to remove them, but
+you can obviously indent them if you prefer):
 
     sub list : Local {
         # Retrieve the usual perl OO '$self' for this object. $c is the Catalyst
@@ -131,16 +143,25 @@ This will start the interactive debugger and produce output similar to:
     
       DB<1> 
 
-Press the C<c> key and hit C<Enter> to continue executing the Catalyst development server under the debugger.  Although execution speed will be slightly slower than normal, you should soon see the usual Catalyst startup debug information.
+Press the C<c> key and hit C<Enter> to continue executing the Catalyst
+development server under the debugger.  Although execution speed will be
+slightly slower than normal, you should soon see the usual Catalyst
+startup debug information.
 
-Now point your browser to L<http://localhost:3000/books/list> and log in.  Once the breakpoint is encountered in the C<MyApp::Controller::list> method, the console session running the development server will drop to the Perl debugger prompt:
+Now point your browser to L<http://localhost:3000/books/list> and log
+in.  Once the breakpoint is encountered in the
+C<MyApp::Controller::list> method, the console session running the
+development server will drop to the Perl debugger prompt:
 
     MyApp::Controller::Books::list(/home/me/MyApp/script/../lib/MyApp/Controller/Books.pm:40):
     40:         $c->stash->{books} = [$c->model('MyAppDB::Book')->all];
     
       DB<1>
 
-You now have the full Perl debugger at your disposal.  First use the C<next> feature by typing C<n> to execute the C<all> method on the Book model (C<n> jumps over method/subroutine calls; you can also use C<s> to C<single-step> into methods/subroutines):
+You now have the full Perl debugger at your disposal.  First use the
+C<next> feature by typing C<n> to execute the C<all> method on the Book
+model (C<n> jumps over method/subroutine calls; you can also use C<s> to
+C<single-step> into methods/subroutines):
 
       DB<1> n
     SELECT me.id, me.authors, me.title, me.rating FROM books me:
@@ -149,7 +170,10 @@ You now have the full Perl debugger at your disposal.  First use the C<next> fea
     
       DB<1>
 
-This takes you to the next line of code where the template name is set.  Notice that because we enabled C<DBIX_CLASS_STORAGE_DBI_DEBUG=1> earlier, SQL debug output also shows up in the development server debug output.
+This takes you to the next line of code where the template name is set.
+Notice that because we enabled C<DBIX_CLASS_STORAGE_DBI_DEBUG=1>
+earlier, SQL debug output also shows up in the development server debug
+output.
 
 Next, list the methods available on our C<Book> model:
 
@@ -178,7 +202,8 @@ We can also play with the model directly:
 
 This uses the Perl debugger C<x> command to display the title of a book.
 
-Next we inspect the C<books> element of the Catalyst C<stash> (the C<4> argument to the C<x> command limits the depth of the dump to 4 levels):
+Next we inspect the C<books> element of the Catalyst C<stash> (the C<4>
+argument to the C<x> command limits the depth of the dump to 4 levels):
 
       DB<3> x 4 $c->stash->{books}
     0  ARRAY(0xa8f3b7c)
@@ -190,17 +215,23 @@ Next we inspect the C<books> element of the Catalyst C<stash> (the C<4> argument
           '_in_storage' => 1
     <lines removed for brevity>
 
-Then enter the C<c> command to continue processing until the next breakpoint is hit (or the application exits):
+Then enter the C<c> command to continue processing until the next
+breakpoint is hit (or the application exits):
 
       DB<4> c
     SELECT author.id, author.first_name, author.last_name FROM ...
 
-Finally, press C<Ctrl+C> to break out of the development server.  Because we are running inside the Perl debugger, you will drop to the debugger prompt.  Press C<q> to exit the debugger and return to your OS shell prompt:
+Finally, press C<Ctrl+C> to break out of the development server.
+Because we are running inside the Perl debugger, you will drop to the
+debugger prompt.  Press C<q> to exit the debugger and return to your OS
+shell prompt:
 
       DB<4> q
     $
 
-For more information on using the Perl debugger, please see C<perldebug> and C<perldebtut>.  You can also type C<h> or C<h h> at the debugger prompt to view the built-in help screens.
+For more information on using the Perl debugger, please see C<perldebug>
+and C<perldebtut>.  You can also type C<h> or C<h h> at the debugger
+prompt to view the built-in help screens.
 
 
 
@@ -210,9 +241,7 @@ Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright 2006, Kennedy Clark, under Creative Commons License (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
 Version: .94
 

@@ -1,14 +1,13 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial::Authorization - Catalyst Tutorial – Part 5: Authorization
-
+Catalyst::Manual::Tutorial::Authorization - Catalyst Tutorial - Part 5: Authorization
 
 
 =head1 OVERVIEW
 
 This is B<Part 5 of 9> for the Catalyst tutorial.
 
-L<Totorial Overview|Catalyst::Manual::Tutorial>
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
 =over 4
 
@@ -22,7 +21,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
 
 =item 4
 
@@ -54,9 +53,15 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 
 =head1 DESCRIPTION
 
-This part of the tutorial adds role-based authorization to the existing authentication implemented in Part 4.  It provides simple examples of how to use roles in both TT templates and controller actions.  The first half looks at manually configured authorization.  The second half looks at how the ACL authorization plugin can simplify your code.
+This part of the tutorial adds role-based authorization to the existing
+authentication implemented in Part 4.  It provides simple examples of
+how to use roles in both TT templates and controller actions.  The first
+half looks at manually configured authorization.  The second half looks
+at how the ACL authorization plugin can simplify your code.
 
-B<TIP>: Note that all of the code for this part of the tutorial can be pulled from the Catalyst Subversion repository in one step with the following command:
+B<TIP>: Note that all of the code for this part of the tutorial can be
+pulled from the Catalyst Subversion repository in one step with the
+following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
@@ -136,7 +141,8 @@ Edit C<myapp.yml> and update it to match (everything from the "authorization:" l
 
 =head2 Add Role-Specific Logic to the "Book List" Template
 
-Open C<root/src/books/list.tt2> in your editor and add the following lines to the bottom of the file:
+Open C<root/src/books/list.tt2> in your editor and add the following
+lines to the bottom of the file:
 
     <p>Hello [% Catalyst.user.username %], you have the following roles:</p>
     
@@ -165,9 +171,15 @@ This code displays a different combination of links depending on the roles assig
 
 =head2 Limit C<Books::add> to C<admin> Users
 
-C<IF> statements in TT templates simply control the output that is sent to the user's browser; it provides no real enforcement (if users know or guess the appropriate URLs, they are still perfectly free to hit any action within your application).  We need to enhance the controller logic to wrap restricted actions with role validation logic.  
+C<IF> statements in TT templates simply control the output that is sent
+to the user's browser; it provides no real enforcement (if users know or
+guess the appropriate URLs, they are still perfectly free to hit any
+action within your application).  We need to enhance the controller
+logic to wrap restricted actions with role validation logic.
 
-For example, we might want to restrict the "formless create" action to admin-level users by editing C<lib/MyApp/Controller/Books.pm> and updating C<url_create> to match the following code:
+For example, we might want to restrict the "formless create" action to
+admin-level users by editing C<lib/MyApp/Controller/Books.pm> and
+updating C<url_create> to match the following code:
 
     =head2 url_create
 
@@ -217,9 +229,20 @@ For example, we might want to restrict the "formless create" action to admin-lev
     }
 
 
-To add authorization, we simply write the main code of this method in an C<if> statement that calls C<check_user_roles>.  If the user does not have the appropriate permissions, they receive an "Unauthorized!" message.  Note that we intentionally chose to display the message this way to demonstrate that TT templates will not be used if the response body has already been set.  In reality you would probably want to use a technique that maintains the visual continuity of your template layout (for example, using the "status" or "error" message feature added in Part 2).
+To add authorization, we simply write the main code of this method in an
+C<if> statement that calls C<check_user_roles>.  If the user does not
+have the appropriate permissions, they receive an "Unauthorized!"
+message.  Note that we intentionally chose to display the message this
+way to demonstrate that TT templates will not be used if the response
+body has already been set.  In reality you would probably want to use a
+technique that maintains the visual continuity of your template layout
+(for example, using the "status" or "error" message feature added in
+Part 2).
 
-B<TIP>: If you want to keep your existing C<url_create> method, you can create a new copy and comment out the original by making it look like a Pod comment.  For example, put something like C<=begin> before C<sub add : Local {> and C<=end> after the closing C<}>.
+B<TIP>: If you want to keep your existing C<url_create> method, you can
+create a new copy and comment out the original by making it look like a
+Pod comment.  For example, put something like C<=begin> before C<sub add
+: Local {> and C<=end> after the closing C<}>.
 
 
 =head2 Try Out Authentication And Authorization
@@ -228,33 +251,48 @@ Press C<Ctrl-C> to kill the previous server instance (if it's still running) and
 
     $ script/myapp_server.pl
 
-Now trying going to L<http://localhost:3000/books/list> and you should be taken to the login page (you might have to C<Shift+Reload> your browser).  Try logging in with both C<test01> and C<test02> (both use a password of C<mypass>) and notice how the roles information updates at the bottom of the "Book List" page. Also try the C<Logout> link on the book list page.
+Now trying going to L<http://localhost:3000/books/list> and you should
+be taken to the login page (you might have to C<Shift+Reload> your
+browser).  Try logging in with both C<test01> and C<test02> (both use a
+password of C<mypass>) and notice how the roles information updates at
+the bottom of the "Book List" page. Also try the C<Logout> link on the
+book list page.
 
-Now the "url_create" URL will work if you are already logged in as user C<test01>, but receive an authorization failure if you are logged in as C<test02>.  Try:
+Now the "url_create" URL will work if you are already logged in as user
+C<test01>, but receive an authorization failure if you are logged in as
+C<test02>.  Try:
 
     http://localhost:3000/books/url_create/test/1/6
 
-while logged in as each user.  Use one of the 'Logout' links (or go to L<http://localhost:3000/logout> in you browser directly) when you are done.
+while logged in as each user.  Use one of the 'Logout' links (or go to
+L<http://localhost:3000/logout> in you browser directly) when you are
+done.
 
 
 
 =head1 ENABLE ACL-BASED AUTHORIZATION
 
-This section takes a brief look at how the L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL> can automate much of the work required to perform role-based authorization in a Catalyst application.
+This section takes a brief look at how the
+L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
+can automate much of the work required to perform role-based
+authorization in a Catalyst application.
 
 
 =head2 Add the C<Catalyst::Plugin::Authorization::ACL> Plugin
 
-Open C<lib/MyApp.pm> in your editor and add the following plugin to the C<use Catalyst> statement:
+Open C<lib/MyApp.pm> in your editor and add the following plugin to the
+C<use Catalyst> statement:
 
     Authorization::ACL
 
-Note that the remaining C<use Catalyst> plugins from earlier sections are not shown here, but they should still be included.
+Note that the remaining C<use Catalyst> plugins from earlier sections
+are not shown here, but they should still be included.
 
 
 =head2 Add ACL Rules to the Application Class
 
-Open C<lib/MyApp.pm> in your editor and add the following B<BELOW> the C<__PACKAGE__-E<gt>setup;> statement:
+Open C<lib/MyApp.pm> in your editor and add the following B<BELOW> the
+C<__PACKAGE__-E<gt>setup;> statement:
 
     # Authorization::ACL Rules
     __PACKAGE__->deny_access_unless(
@@ -270,19 +308,35 @@ Open C<lib/MyApp.pm> in your editor and add the following B<BELOW> the C<__PACKA
             [qw/user admin/],
         );
 
-Each of the three statements above comprises an ACL plugin "rule".  The first two rules only allow admin-level users to create new books using the form (both the form itself and the data submission logic are protected).  The third statement allows both users and admin to delete books.  The C</books/url_create> action will continue to be protected by the "manually configured" authorization created earlier in this part of the tutorial.
+Each of the three statements above comprises an ACL plugin "rule".  The
+first two rules only allow admin-level users to create new books using
+the form (both the form itself and the data submission logic are
+protected).  The third statement allows both users and admin to delete
+books.  The C</books/url_create> action will continue to be protected by
+the "manually configured" authorization created earlier in this part of
+the tutorial.
 
-The ACL plugin permits you to apply allow/deny logic in a variety of ways.  The following provides a basic overview of the capabilities:
+The ACL plugin permits you to apply allow/deny logic in a variety of
+ways.  The following provides a basic overview of the capabilities:
 
 =over 4
 
 =item * 
 
-The ACL plugin only operates on the Catalyst "private namespace".  You are using the private namespace when you use C<Local> actions.  C<Path>, C<Regex>, and C<Global> allow you to specify actions where the path and the namespace differ -- the ACL plugin will not work in these cases.
+The ACL plugin only operates on the Catalyst "private namespace".  You
+are using the private namespace when you use C<Local> actions.  C<Path>,
+C<Regex>, and C<Global> allow you to specify actions where the path and
+the namespace differ -- the ACL plugin will not work in these cases.
 
 =item * 
 
-Each rule is expressed in a separate C<__PACKAGE__-E<gt>deny_access_unless()> or C<__PACKAGE__-E<gt>allow_access_if()> line (there are several other methods that can be used for more complex policies, see the C<METHODS> portion of the L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL> documentation for more details).
+Each rule is expressed in a separate
+C<__PACKAGE__-E<gt>deny_access_unless()> or
+C<__PACKAGE__-E<gt>allow_access_if()> line (there are several other
+methods that can be used for more complex policies, see the C<METHODS>
+portion of the
+L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
+documentation for more details).
 
 =item * 
 
@@ -290,7 +344,12 @@ Each rule can contain multiple roles but only a single path.
 
 =item * 
 
-The rules are tried in order (with the "most specific" rules tested first), and processing stops at the first "match" where an allow or deny is specified.  Rules "fall through" if there is not a "match" (where a "match" means the user has the specified role).  If a "match" is found, then processing stops there and the appropriate allow/deny action is taken.
+The rules are tried in order (with the "most specific" rules tested
+first), and processing stops at the first "match" where an allow or deny
+is specified.  Rules "fall through" if there is not a "match" (where a
+"match" means the user has the specified role).  If a "match" is found,
+then processing stops there and the appropriate allow/deny action is
+taken.
 
 =item * 
 
@@ -298,16 +357,24 @@ If none of the rules match, then access is allowed.
 
 =item * 
 
-The rules currently need to be specific in the application class C<lib\MyApp.pm> B<after> the C<__PACKAGE__-E<gt>setup;> line.
+The rules currently need to be specific in the application class
+C<lib\MyApp.pm> B<after> the C<__PACKAGE__-E<gt>setup;> line.
 
 =back
 
 
 =head2 Add a Method to Handle Access Violations
 
-By default, L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL> throws an exception when authorization fails.  This will take the user to the Catalyst debug screen, or a "Please come back later" message if you are not using the C<-Debug> flag. This step uses the C<access_denied> method in order to provide more appropriate feedback to the user.
+By default,
+L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
+throws an exception when authorization fails.  This will take the user
+to the Catalyst debug screen, or a "Please come back later" message if
+you are not using the C<-Debug> flag. This step uses the
+C<access_denied> method in order to provide more appropriate feedback to
+the user.
 
-Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following method:
+Open C<lib/MyApp/Controller/Books.pm> in your editor and add the
+following method:
 
     =head2 access_denied
     
@@ -330,9 +397,16 @@ Then run the Catalyst development server script:
 
     $ script/myapp_server.pl
 
-Log in as C<test02>.  Once at the book list, click the "Create" link to try the C<form_create> action.  You should receive a red "Unauthorized!" error message at the top of the list.  (Note that in reality you would probably want to place the "Create" link code in C<root/src/books/list.tt2> inside an C<IF> statement that only displays the list to admin-level users.)  If you log in as C<test01> you should be able to view the C<form_create> form and add a new book.
+Log in as C<test02>.  Once at the book list, click the "Create" link to
+try the C<form_create> action.  You should receive a red "Unauthorized!"
+error message at the top of the list.  (Note that in reality you would
+probably want to place the "Create" link code in
+C<root/src/books/list.tt2> inside an C<IF> statement that only displays
+the list to admin-level users.)  If you log in as C<test01> you should
+be able to view the C<form_create> form and add a new book.
 
-When you are done, use one of the 'Logout' links (or go to the L<http://localhost:3000/logout> URL directly) when you are done.
+When you are done, use one of the 'Logout' links (or go to the
+L<http://localhost:3000/logout> URL directly) when you are done.
 
 
 
@@ -342,9 +416,7 @@ Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright 2006, Kennedy Clark, under Creative Commons License (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
 Version: .94
 

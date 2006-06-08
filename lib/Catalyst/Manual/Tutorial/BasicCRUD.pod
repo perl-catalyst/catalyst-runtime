@@ -1,14 +1,13 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial::BasicCRUD - Catalyst Tutorial – Part 3: Basic CRUD
-
+Catalyst::Manual::Tutorial::BasicCRUD - Catalyst Tutorial - Part 3: Basic CRUD
 
 
 =head1 OVERVIEW
 
 This is B<Part 3 of 9> for the Catalyst tutorial.
 
-L<Totorial Overview|Catalyst::Manual::Tutorial>
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
 =over 4
 
@@ -54,9 +53,19 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 
 =head1 DESCRIPTION
 
-This part of the tutorial builds on the fairly primitive application created in Part 2 to add basic support for Create, Read, Update, and Delete (CRUD) of C<Book> objects.  Note that the 'list' function in Part 2 already implements the Read portion of Crud (although Read normally refers to reading a single object; you could implement full read functionality using the techniques introduced below).  This section will focus on the Create and Delete aspects of CRUD.  More advanced capabilities, including full Update functionality, will be addressed in Part 8.
+This part of the tutorial builds on the fairly primitive application
+created in Part 2 to add basic support for Create, Read, Update, and
+Delete (CRUD) of C<Book> objects.  Note that the 'list' function in Part
+2 already implements the Read portion of Crud (although Read normally
+refers to reading a single object; you could implement full read
+functionality using the techniques introduced below).  This section will
+focus on the Create and Delete aspects of CRUD.  More advanced
+capabilities, including full Update functionality, will be addressed in
+Part 8.
 
-B<TIP>: Note that all of the code for this part of the tutorial can be pulled from the Catalyst Subversion repository in one step with the following command:
+B<TIP>: Note that all of the code for this part of the tutorial can be
+pulled from the Catalyst Subversion repository in one step with the
+following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
@@ -65,7 +74,9 @@ B<TIP>: Note that all of the code for this part of the tutorial can be pulled fr
 
 =head1 FORMLESS SUBMISSION
 
-Our initial attempt at object creation will utilize the "URL arguments" feature of Catalyst (we will employ the more common form-based submission in the sections that follow).
+Our initial attempt at object creation will utilize the "URL arguments"
+feature of Catalyst (we will employ the more common form-based
+submission in the sections that follow).
 
 
 =head2 Include a Create Action in the Books Controller
@@ -112,7 +123,13 @@ Edit C<lib/MyApp/Controller/Books.pm> and enter the following method:
         $c->stash->{template} = 'books/create_done.tt2';
     }
 
-Notice that Catalyst takes "extra slash-separated information" from the URL and passes it as arguments in C<@_>.  The C<url_create> action then uses a simple call to the DBIC C<create> method to add the requested information to the database (with a separate call to C<add_to_book_authors> to update the join table).  As do virtually all controller methods (at least the ones that directly handle user input), it then sets the template that should handle this request.
+Notice that Catalyst takes "extra slash-separated information" from the
+URL and passes it as arguments in C<@_>.  The C<url_create> action then
+uses a simple call to the DBIC C<create> method to add the requested
+information to the database (with a separate call to
+C<add_to_book_authors> to update the join table).  As do virtually all
+controller methods (at least the ones that directly handle user input),
+it then sets the template that should handle this request.
 
 
 =head2 Include a Template for the C<url_create> Action:
@@ -142,37 +159,59 @@ Edit C<root/src/books/create_done.tt2> and then enter:
     [% Dumper.dump(book) %]
     </pre>
 
-The TT C<USE> directive allows access to a variety of plugin modules (we are talking TT plugins here, not Catalyst plugins) to add extra functionality to the base TT capabilities.  Here, the plugin allows L<Data::Dumper|Data::Dumper> "pretty printing" of objects and variables.  Other than that, the rest of the code should be familiar from the examples in Part 2.
+The TT C<USE> directive allows access to a variety of plugin modules (we
+are talking TT plugins here, not Catalyst plugins) to add extra
+functionality to the base TT capabilities.  Here, the plugin allows
+L<Data::Dumper|Data::Dumper> "pretty printing" of objects and variables.
+Other than that, the rest of the code should be familiar from the
+examples in Part 2.
 
-B<IMPORTANT NOTE> As mentioned earlier, the C<MyApp::View::TT.pm> view class created by TTSite redefines the name used to access the Catalyst context object in TT templates from the usual C<c> to C<Catalyst>.
+B<IMPORTANT NOTE> As mentioned earlier, the C<MyApp::View::TT.pm> view
+class created by TTSite redefines the name used to access the Catalyst
+context object in TT templates from the usual C<c> to C<Catalyst>.
 
 
 =head2 Try the C<url_create> Feature
 
-If the application is still running from before, use C<Ctrl-C> to kill it.  Then restart the server:
+If the application is still running from before, use C<Ctrl-C> to kill
+it.  Then restart the server:
 
     $ script/myapp_server.pl
 
-Note that new path for C</books/url_create> appears in the startup debug output.
+Note that new path for C</books/url_create> appears in the startup debug
+output.
 
-B<TIP>: You can use C<script/myapp_server.pl -r> to have the development server auto-detect changed files and reload itself (if your browser acts odd, you should also try throwing in a C<-k>).  If you make changes to just the TT templates, you do not need to reload the development server (only changes to "compiled code" such as Controller and Model C<.pm> files require a reload).
+B<TIP>: You can use C<script/myapp_server.pl -r> to have the development
+server auto-detect changed files and reload itself (if your browser acts
+odd, you should also try throwing in a C<-k>).  If you make changes to
+just the TT templates, you do not need to reload the development server
+(only changes to "compiled code" such as Controller and Model C<.pm>
+files require a reload).
 
 Next, use your browser to enter the following URL:
 
     http://localhost:3000/books/url_create/TCPIP_Illustrated_Vol-2/5/4
 
-Your browser should display " Added book 'TCPIP_Illustrated_Vol-2' by 'Stevens' with a rating of 5." along with a dump of the new book model object.  You should also see the following DBIC debug messages displayed in the development server log messages:
+Your browser should display " Added book 'TCPIP_Illustrated_Vol-2' by
+'Stevens' with a rating of 5." along with a dump of the new book model
+object.  You should also see the following DBIC debug messages displayed
+in the development server log messages:
 
     INSERT INTO books (rating, title) VALUES (?, ?): `5', `TCPIP_Illustrated_Vol-2'
     INSERT INTO book_authors (author_id, book_id) VALUES (?, ?): `4', `6'
 
-If you then click the "Return to list" link, you should find that there are now six books shown (if necessary, Shift-Reload your browser at the C</books/list> page).
+If you then click the "Return to list" link, you should find that there
+are now six books shown (if necessary, Shift-Reload your browser at the
+C</books/list> page).
 
 
 
 =head1 MANUALLY BUILDING A CREATE FORM
 
-Although the C<url_create> action in the previous step does begin to reveal the power and flexibility of both Catalyst and DBIC, it's obviously not a very realistic example of how users should be expected to enter data.  This section begins to address that concern.
+Although the C<url_create> action in the previous step does begin to
+reveal the power and flexibility of both Catalyst and DBIC, it's
+obviously not a very realistic example of how users should be expected
+to enter data.  This section begins to address that concern.
 
 
 =head2 Add Method to Display The Form
@@ -210,12 +249,14 @@ Open C<root/src/books/form_create.tt2> in your editor and enter:
     <input type="submit" name="Submit" value="Submit">
     </form>
 
-Note that we have specified the target of the form data as C<form_create_do>, the method created in the section that follows.
+Note that we have specified the target of the form data as
+C<form_create_do>, the method created in the section that follows.
 
 
 =head2 Add Method to Process Form Values and Update Database
 
-Edit C<lib/MyApp/Controller/Books.pm> and add the following method to save the form information to the databse:
+Edit C<lib/MyApp/Controller/Books.pm> and add the following method to
+save the form information to the databse:
 
     =head2 form_create_do
     
@@ -257,20 +298,30 @@ If the application is still running from before, use C<Ctrl-C> to kill it.  Then
 
     $ script/myapp_server.pl
 
-Point your browser to L<http://localhost:3000/books/form_create> and enter "TCP/IP Illustrated, Vol 3" for the title, a rating of 5, and an author ID of 4.  You should then be forwarded to the same C<create_done.tt2> template seen in earlier examples.  Finally, click "Return to list" to view the full list of books.
+Point your browser to L<http://localhost:3000/books/form_create> and
+enter "TCP/IP Illustrated, Vol 3" for the title, a rating of 5, and an
+author ID of 4.  You should then be forwarded to the same
+C<create_done.tt2> template seen in earlier examples.  Finally, click
+"Return to list" to view the full list of books.
 
-B<Note:> Having the user enter the primary key ID for the author is obviously a bit crude; we will address this concern with a drop-down list in Part 8.
+B<Note:> Having the user enter the primary key ID for the author is
+obviously a bit crude; we will address this concern with a drop-down
+list in Part 8.
 
 
 
 =head1 A SIMPLE DELETE FEATURE
 
-Turning out attention to the delete portion of CRUD, this section illustrates some basic techniques that can be used to remove information from the database.
+Turning out attention to the delete portion of CRUD, this section
+illustrates some basic techniques that can be used to remove information
+from the database.
 
 
 =head2 Include a Delete Link in the List
 
-Edit C<root/src/books/list.tt2> and update it to the following (two sections have changed: 1) the additional '<th>Links</th>' table header, and 2) the four lines for the Delete link near the bottom).
+Edit C<root/src/books/list.tt2> and update it to the following (two
+sections have changed: 1) the additional '<th>Links</th>' table header,
+and 2) the four lines for the Delete link near the bottom).
 
     [% # This is a TT comment.  The '-' at the end "chomps" the newline.  You won't -%]
     [% # see this "chomping" in your browser because HTML ignores blank lines, but  -%]
@@ -307,12 +358,15 @@ Edit C<root/src/books/list.tt2> and update it to the following (two sections hav
     [% END -%]
     </table>
 
-The additional code is obviously designed to add a new column to the right side of the table with a C<Delete> "button" (for simplicity, links will be used instead of full HTML buttons).
+The additional code is obviously designed to add a new column to the
+right side of the table with a C<Delete> "button" (for simplicity, links
+will be used instead of full HTML buttons).
 
 
 =head2 Add a Delete Action to the Controller
 
-Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following method:
+Open C<lib/MyApp/Controller/Books.pm> in your editor and add the
+following method:
 
     =head2 Delete 
     
@@ -334,23 +388,43 @@ Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following metho
         $c->forward('list');
     }
 
-This method first deletes the book with the specified primary key ID.  However, it also removes the corresponding entry from the C<book_authors> table.  Note that C<delete_all> was used instead of C<delete>: whereas C<delete_all> also removes the join table entries in C<book_authors>, C<delete> does not.
+This method first deletes the book with the specified primary key ID.
+However, it also removes the corresponding entry from the
+C<book_authors> table.  Note that C<delete_all> was used instead of
+C<delete>: whereas C<delete_all> also removes the join table entries in
+C<book_authors>, C<delete> does not.
 
-Then, rather than forwarding to a "delete done" page as we did with the earlier create example, it simply sets the C<status_msg> to display a notification to the user as the normal list view is rendered.  
+Then, rather than forwarding to a "delete done" page as we did with the
+earlier create example, it simply sets the C<status_msg> to display a
+notification to the user as the normal list view is rendered.
 
-The C<delete> action uses the context C<forward> method to return the user to the book list.  The C<detach> method could have also been used.  Whereas C<forward> I<returns> to the original action once it is completed, C<detach> does I<not> return.  Other than that, the two are equivalent.
+The C<delete> action uses the context C<forward> method to return the
+user to the book list.  The C<detach> method could have also been used.
+Whereas C<forward> I<returns> to the original action once it is
+completed, C<detach> does I<not> return.  Other than that, the two are
+equivalent.
 
-Another alternative to C<forward> would be to use C<$c-E<gt>response-E<gt>redirect($c-E<gt>uri_for('/books/list'))>.  The C<forward> and C<redirect> operations differ in several important respects that stem from the fact that redirects cause the client browser to issue an entirely new HTTP request.  In doing so, this results in a new URL showing in the browser window.  And, because the stash information is reset for every request, the "Book deleted" message would not be displayed.
+Another alternative to C<forward> would be to use
+C<$c-E<gt>response-E<gt>redirect($c-E<gt>uri_for('/books/list'))>.  The
+C<forward> and C<redirect> operations differ in several important
+respects that stem from the fact that redirects cause the client browser
+to issue an entirely new HTTP request.  In doing so, this results in a
+new URL showing in the browser window.  And, because the stash
+information is reset for every request, the "Book deleted" message would
+not be displayed.
 
 
 =head2 Try the Delete Feature
 
-If the application is still running from before, use C<Ctrl-C> to kill it.  Then restart the server:
+If the application is still running from before, use C<Ctrl-C> to kill
+it.  Then restart the server:
 
     $ script/myapp_server.pl
 
-Then point your browser to L<http://localhost:3000/books/list> and click the "Delete" link next to "TCPIP_Illustrated_Vol-2".  A green "Book deleted" status message should display at the top of the page, along with a list of the six remaining books.
-
+Then point your browser to L<http://localhost:3000/books/list> and click
+the "Delete" link next to "TCPIP_Illustrated_Vol-2".  A green "Book
+deleted" status message should display at the top of the page, along
+with a list of the six remaining books.
 
 
 =head1 AUTHOR
@@ -359,9 +433,8 @@ Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
 Version: .94
 

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial::Testing - Catalyst Tutorial – Part 7: Testing
+Catalyst::Manual::Tutorial::Testing - Catalyst Tutorial - Part 7: Testing
 
 
 
@@ -8,7 +8,7 @@ Catalyst::Manual::Tutorial::Testing - Catalyst Tutorial – Part 7: Testing
 
 This is B<Part 7 of 9> for the Catalyst tutorial.
 
-L<Totorial Overview|Catalyst::Manual::Tutorial>
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
 =over 4
 
@@ -22,7 +22,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
 
 =item 4
 
@@ -55,9 +55,16 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 =head1 DESCRIPTION
 
 
-You may have noticed that the Catalyst Helper scripts automatically create C<.t> test scripts under the C<t> directory.  This part of the tutorial briefly looks at how these tests can be used to not only ensure that your application is working correctly at the present time, but also provide automated regression testing as you upgrade various pieces of your application over time.
+You may have noticed that the Catalyst Helper scripts automatically
+create C<.t> test scripts under the C<t> directory.  This part of the
+tutorial briefly looks at how these tests can be used to not only ensure
+that your application is working correctly at the present time, but also
+provide automated regression testing as you upgrade various pieces of
+your application over time.
 
-B<TIP>: Note that all of the code for this part of the tutorial can be pulled from the Catalyst Subversion repository in one step with the following command:
+B<TIP>: Note that all of the code for this part of the tutorial can be
+pulled from the Catalyst Subversion repository in one step with the
+following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
@@ -66,11 +73,16 @@ B<TIP>: Note that all of the code for this part of the tutorial can be pulled fr
 
 =head1 RUNNING THE "CANNED" CATALYST TESTS
 
-There are a variety of ways to run Catalyst and Perl tests (for example, C<perl Makefile.PL> and C<make test>, but one of the easiest is with the C<prove> command.  For example, to run all of the tests in the C<t> directory, enter:
+There are a variety of ways to run Catalyst and Perl tests (for example,
+C<perl Makefile.PL> and C<make test>, but one of the easiest is with the
+C<prove> command.  For example, to run all of the tests in the C<t>
+directory, enter:
 
     $ prove --lib lib t
 
-The redirection used by the Authentication plugins will cause the default C<t/01app.t> to fail.  You can fix this by changing the line in C<t/01app.t> that read:
+The redirection used by the Authentication plugins will cause the
+default C<t/01app.t> to fail.  You can fix this by changing the line in
+C<t/01app.t> that read:
 
     ok( request('/')->is_success, 'Request should succeed' );
 
@@ -78,22 +90,37 @@ to:
 
     ok( request('/login')->is_success, 'Request should succeed' );
 
-So that a redirect is not necessary.  Also, the C<t/controller_Books.t> and C<t/controller_Logout.t> default test cases will fail because of the authorization.  You can delete these two files to prevent false error messages:
+So that a redirect is not necessary.  Also, the C<t/controller_Books.t>
+and C<t/controller_Logout.t> default test cases will fail because of the
+authorization.  You can delete these two files to prevent false error
+messages:
 
     $ rm t/controller_Books.t
     $ rm t/controller_Logout.t
 
-As you can see in the C<prove> command line above, the C<--lib> option is used to set the location of the Catalyst C<lib> directory.  With this command, you will get all of the usual development server debug output, something most people prefer to disable while running tests cases.  Although you can edit the C<lib/MyApp.pm> to comment out the C<-Debug> plugin, it's generally easier to simply set the C<CATALYST_DEBUG=0> environment variable.  For example:
+As you can see in the C<prove> command line above, the C<--lib> option
+is used to set the location of the Catalyst C<lib> directory.  With this
+command, you will get all of the usual development server debug output,
+something most people prefer to disable while running tests cases.
+Although you can edit the C<lib/MyApp.pm> to comment out the C<-Debug>
+plugin, it's generally easier to simply set the C<CATALYST_DEBUG=0>
+environment variable.  For example:
 
     CATALYST_DEBUG=0 prove --lib lib t
 
-During the C<t/02pod> and C<t/03podcoverage> tests, you might notice the C<all skipped: set TEST_POD to enable this test> warning message.  To execute the Pod-related tests, add C<TEST_POD=1> to the C<prove> command:
+During the C<t/02pod> and C<t/03podcoverage> tests, you might notice the
+C<all skipped: set TEST_POD to enable this test> warning message.  To
+execute the Pod-related tests, add C<TEST_POD=1> to the C<prove>
+command:
 
     $ CATALYST_DEBUG=0 TEST_POD=1 prove --lib lib t
 
-If you omitted the Pod comments from any of the methods that were inserted, you might have to go back and fix them to get these tests to pass. :-)
+If you omitted the Pod comments from any of the methods that were
+inserted, you might have to go back and fix them to get these tests to
+pass. :-)
 
-Another useful option is the C<verbose> (C<-v>) option to C<prove>.  It prints the name of each test case as it is being run:
+Another useful option is the C<verbose> (C<-v>) option to C<prove>.  It
+prints the name of each test case as it is being run:
 
     $ CATALYST_DEBUG=0 TEST_POD=1 prove --lib lib -v t
 
@@ -101,20 +128,32 @@ Another useful option is the C<verbose> (C<-v>) option to C<prove>.  It prints t
 
 =head1 RUNNING A SINGLE TEST
 
-You can also run a single script by appending its name to the C<prove> command. For example:
+You can also run a single script by appending its name to the C<prove>
+command. For example:
 
     $ CATALYST_DEBUG=0 prove --lib lib t/01app.t
 
-Note that you can also run tests directly from Perl without C<prove>.  For example:
+Note that you can also run tests directly from Perl without C<prove>.
+For example:
 
     $ CATALYST_DEBUG=0 perl -Ilib t/01app.t
 
 
 =head1 ADDING YOUR OWN TEST SCRIPT
 
-Although the Catalyst helper scripts provide a basic level of checks "for free," testing can become significantly more helpful when you write your own script to exercise the various parts of your application.  The L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> module is very popular for writing these sorts of test cases.  This module extends L<Test::WWW::Mechanize|Test::WWW::Mechanize> (and therefore L<WWW::Mechanize|WWW::Mechanize>) to allow you to automate the action of a user "clicking around" inside your application.  It gives you all the benefits of testing on a live system without the messiness of having to use an actual web server.
+Although the Catalyst helper scripts provide a basic level of checks
+"for free," testing can become significantly more helpful when you write
+your own script to exercise the various parts of your application.  The
+L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> module
+is very popular for writing these sorts of test cases.  This module
+extends L<Test::WWW::Mechanize|Test::WWW::Mechanize> (and therefore
+L<WWW::Mechanize|WWW::Mechanize>) to allow you to automate the action of
+a user "clicking around" inside your application.  It gives you all the
+benefits of testing on a live system without the messiness of having to
+use an actual web server.
 
-To create a sample test case, open the C<t/live_app01.t> file in your editor and enter the following:
+To create a sample test case, open the C<t/live_app01.t> file in your
+editor and enter the following:
 
     #!/usr/bin/perl
     
@@ -208,11 +247,21 @@ To create a sample test case, open the C<t/live_app01.t> file in your editor and
     $ua2->get_ok("http://localhost/books/url_create/TestTitle2/2/5", "'test02' add");
     $ua2->content_contains("Unauthorized!", "Check 'test02' cannot add");
 
-The C<live_app.t> test cases uses copious comments to explain each step of the process.  In addition to the techniques shown here, there are a variety of other methods available in L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> (for example, regex-based matching).  Consult the documentation for more detail.
+The C<live_app.t> test cases uses copious comments to explain each step
+of the process.  In addition to the techniques shown here, there are a
+variety of other methods available in
+L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> (for
+example, regex-based matching).  Consult the documentation for more
+detail.
 
-B<TIP>: For I<unit tests> vs. the "full application tests" approach used by L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst>, see L<Catalyst::Test|Catalyst::Test>.
+B<TIP>: For I<unit tests> vs. the "full application tests" approach used
+by L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst>, see
+L<Catalyst::Test|Catalyst::Test>.
 
-B<Note:> The test script does not test the C<form_create> and C<form_create_do> actions.  That is left as an exercise for the reader (you should be able to complete that logic using the existing code as a template).
+B<Note:> The test script does not test the C<form_create> and
+C<form_create_do> actions.  That is left as an exercise for the reader
+(you should be able to complete that logic using the existing code as a
+template).
 
 To run the new test script, use a command such as:
 
@@ -222,19 +271,33 @@ or
 
     $ DBIX_CLASS_STORAGE_DBI_DEBUG=0 CATALYST_DEBUG=0 prove --lib lib -v t/live_app01.t
 
-Experiment with the C<DBIX_CLASS_STORAGE_DBI_DEBUG>, C<CATALYST_DEBUG> and C<-v> settings.  If you find that there are errors, use the techniques discussed in the "Catalyst Debugging" section (Part 6) to isolate and fix the problem.
+Experiment with the C<DBIX_CLASS_STORAGE_DBI_DEBUG>, C<CATALYST_DEBUG>
+and C<-v> settings.  If you find that there are errors, use the
+techniques discussed in the "Catalyst Debugging" section (Part 6) to
+isolate and fix the problem.
 
-If you want to run the test case under the Perl interactive debugger, try a command such as:
+If you want to run the test case under the Perl interactive debugger,
+try a command such as:
 
     $ DBIX_CLASS_STORAGE_DBI_DEBUG=0 CATALYST_DEBUG=0 perl -d -Ilib t/live_app01.t
 
-Note that although the tutorial uses a single custom test case for simplicity, you may wish to break your tests into different files for better organization.
+Note that although the tutorial uses a single custom test case for
+simplicity, you may wish to break your tests into different files for
+better organization.
 
 
 
 =head1 SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
-You may wish to leverage the techniques discussed in this tutorial to maintain both a "production database" for your live application and a "testing database" for your test cases.  One advantage to L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> is that it runs your full application; however, this can complicate things when you want to support multiple databases.  One solution is to allow the database specification to be overridden with an environment variable.  For example, open C<lib/MyApp/Model/MyAppDB.pm> in your editor and change the C<__PACKAGE__-E<gt>config(...> declaration to resemble:
+You may wish to leverage the techniques discussed in this tutorial to
+maintain both a "production database" for your live application and a
+"testing database" for your test cases.  One advantage to
+L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> is that
+it runs your full application; however, this can complicate things when
+you want to support multiple databases.  One solution is to allow the
+database specification to be overridden with an environment variable.
+For example, open C<lib/MyApp/Model/MyAppDB.pm> in your editor and
+change the C<__PACKAGE__-E<gt>config(...> declaration to resemble:
 
     my $dsn = $ENV{MYAPP_DSN} ||= 'dbi:SQLite:myapp.db';
     __PACKAGE__->config(
@@ -253,7 +316,10 @@ Then, when you run your test case, you can use commands such as:
     $ cp myapp.db myappTEST.db
     $ CATALYST_DEBUG=0 MYAPP_DSN="dbi:SQLite:myappTEST.db" prove --lib lib -v t/live_app01.t
 
-This will modify the DSN only while the test case is running.  If you launch your normal application without the C<MYAPP_DSN> environment variable defined, it will default to the same C<dbi:SQLite:myapp.db> as before.
+This will modify the DSN only while the test case is running.  If you
+launch your normal application without the C<MYAPP_DSN> environment
+variable defined, it will default to the same C<dbi:SQLite:myapp.db> as
+before.
 
 
 
@@ -263,9 +329,8 @@ Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
 Version: .94
 

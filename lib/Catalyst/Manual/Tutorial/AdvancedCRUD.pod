@@ -1,6 +1,6 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial::AdvancedCRUD - Catalyst Tutorial – Part 8: Advanced CRUD
+Catalyst::Manual::Tutorial::AdvancedCRUD - Catalyst Tutorial - Part 8: Advanced CRUD
 
 
 
@@ -8,7 +8,7 @@ Catalyst::Manual::Tutorial::AdvancedCRUD - Catalyst Tutorial – Part 8: Advanced 
 
 This is B<Part 8 of 9> for the Catalyst tutorial.
 
-L<Totorial Overview|Catalyst::Manual::Tutorial>
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
 =over 4
 
@@ -22,7 +22,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
 
 =item 4
 
@@ -54,15 +54,38 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 
 =head1 DESCRIPTION
 
-This part of the tutorial explores more advanced functionality for Create, Read, Update, and Delete (CRUD) than we saw in Part 3.  In particular, it looks at a number of techniques that can be useful for the Update portion of CRUD, such as automated form generation, validation of user-entered data, and automated transfer of data between forms and model objects.
+This part of the tutorial explores more advanced functionality for
+Create, Read, Update, and Delete (CRUD) than we saw in Part 3.  In
+particular, it looks at a number of techniques that can be useful for
+the Update portion of CRUD, such as automated form generation,
+validation of user-entered data, and automated transfer of data between
+forms and model objects.
 
-In keeping with the Catalyst (and Perl) spirit of flexibility, there are many different ways approach advanced CRUD operations in a Catalyst environment.  One alternative is to use L<Catalyst::Helper::Controller::Scaffold|Catalyst::Helper::Controller::Scaffold> to instantly construct a set of Controller methods and templates for basic CRUD operations.  Although a popular subject in Quicktime movies that serve as promotional material for various frameworks, more real-world applications require more control.  Other options include L<Data::FormValidator|Data::FormValidator> and L<HTML::FillInForm|HTML::FillInForm>.
+In keeping with the Catalyst (and Perl) spirit of flexibility, there are
+many different ways approach advanced CRUD operations in a Catalyst
+environment.  One alternative is to use
+L<Catalyst::Helper::Controller::Scaffold|Catalyst::Helper::Controller::Scaffold>
+to instantly construct a set of Controller methods and templates for
+basic CRUD operations.  Although a popular subject in Quicktime movies
+that serve as promotional material for various frameworks, more
+real-world applications require more control.  Other options include
+L<Data::FormValidator|Data::FormValidator> and
+L<HTML::FillInForm|HTML::FillInForm>.
 
-Here, we will make use of the L<HTML::Widget|HTML::Widget> to not only ease form creation, but to also provide validation of the submitted data.  The approached used by the part of the tutorial is to slowly incorporate additional L<HTML::Widget|HTML::Widget> functionality in a step-wise fashion (we start with fairly simple form creation and then move on to more complex and "magical" features such as validation and auto-population/auto-saving).
+Here, we will make use of the L<HTML::Widget|HTML::Widget> to not only
+ease form creation, but to also provide validation of the submitted
+data.  The approached used by the part of the tutorial is to slowly
+incorporate additional L<HTML::Widget|HTML::Widget> functionality in a
+step-wise fashion (we start with fairly simple form creation and then
+move on to more complex and "magical" features such as validation and
+auto-population/auto-saving).
 
-B<Note:> Part 8 of the tutorial is optional.  Users who do not which to use L<HTML::Widget|HTML::Widget> may skip this section.
+B<Note:> Part 8 of the tutorial is optional.  Users who do not which to
+use L<HTML::Widget|HTML::Widget> may skip this section.
 
-B<TIP>: Note that all of the code for this part of the tutorial can be pulled from the Catalyst Subversion repository in one step with the following command:
+B<TIP>: Note that all of the code for this part of the tutorial can be
+pulled from the Catalyst Subversion repository in one step with the
+following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
@@ -71,19 +94,22 @@ B<TIP>: Note that all of the code for this part of the tutorial can be pulled fr
 
 =head1 C<HTML::WIDGET> FORM CREATION
 
-This section looks at how L<HTML::Widget|HTML::Widget> can be used to add additional functionality to the manually created form from Part 3.
+This section looks at how L<HTML::Widget|HTML::Widget> can be used to
+add additional functionality to the manually created form from Part 3.
 
 
 =head2 Add the C<HTML::Widget> Plugin
 
-Open C<lib/MyApp.pm> in your editor and add the following to the list of plugins (be sure to leave the existing plugins enabled:
+Open C<lib/MyApp.pm> in your editor and add the following to the list of
+plugins (be sure to leave the existing plugins enabled:
 
     HTML::Widget
 
 
 =head2 Add a Form Creation Helper Method
 
-Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following method:
+Open C<lib/MyApp/Controller/Books.pm> in your editor and add the
+following method:
 
     =head2 make_book_widget
     
@@ -113,12 +139,19 @@ Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following metho
         return $w;
     }
 
-This method provides a central location (so it can be called by multiple actions, such as create and edit) that builds an HTML::Wiget-based form with the appropriate fields.  The "Get Authors" code uses DBIC to retrieve a list of model objects and then uses C<map> to quickly create a hash where the hash keys are the database primary keys from the authors table and the associated values are the last names of the authors.
+This method provides a central location (so it can be called by multiple
+actions, such as create and edit) that builds an HTML::Wiget-based form
+with the appropriate fields.  The "Get Authors" code uses DBIC to
+retrieve a list of model objects and then uses C<map> to quickly create
+a hash where the hash keys are the database primary keys from the
+authors table and the associated values are the last names of the
+authors.
 
 
 =head2 Add Actions to Display and Save the Form
 
-Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following methods:
+Open C<lib/MyApp/Controller/Books.pm> in your editor and add the
+following methods:
 
     =head2 hw_create
     
@@ -174,12 +207,18 @@ Open C<lib/MyApp/Controller/Books.pm> in your editor and add the following metho
     
     }
 
-Note how we use C<make_book_widget> to build the core parts of the form in one location, but we set the action (the URL the form is sent to when the user clicks the 'Submit' button) separately in C<hw_create>.  Doing so allows us to have the same form submit the data to different actions (e.g., C<hw_create_do> for a create operation but C<hw_update_do> to update an existing book object).
+Note how we use C<make_book_widget> to build the core parts of the form
+in one location, but we set the action (the URL the form is sent to when
+the user clicks the 'Submit' button) separately in C<hw_create>.  Doing
+so allows us to have the same form submit the data to different actions
+(e.g., C<hw_create_do> for a create operation but C<hw_update_do> to
+update an existing book object).
 
 
 =head2 Update the CSS
 
-Edit C<root/src/ttsite.css> and add the following lines to the bottom of the file:
+Edit C<root/src/ttsite.css> and add the following lines to the bottom of
+the file:
 
     label {
         display: block;
@@ -202,7 +241,11 @@ Edit C<root/src/ttsite.css> and add the following lines to the bottom of the fil
         color: [% site.col.error %];
     }
 
-These changes will display form elements vertically and also show error messages in red.  Note that we are pulling the color scheme settings from the C<root/lib/config/col> file that was created by the TTSite helper.  This allows us to change the color used by various error styles in the CCS from a single location.
+These changes will display form elements vertically and also show error
+messages in red.  Note that we are pulling the color scheme settings
+from the C<root/lib/config/col> file that was created by the TTSite
+helper.  This allows us to change the color used by various error styles
+in the CCS from a single location.
 
 
 =head2 Create a Template Page To Display The Form
@@ -217,7 +260,8 @@ C<root/src/books/hw_form.tt2>
 
 =head2 Add Links for Create and Update via C<HTML::Widget>
 
-Open C<root/src/books/list.tt2> in your editor and add the following to the bottom of the existing file:
+Open C<root/src/books/list.tt2> in your editor and add the following to
+the bottom of the existing file:
 
     <p>
       HTML::Widget:
@@ -228,25 +272,50 @@ Open C<root/src/books/list.tt2> in your editor and add the following to the bott
 
 =head2 Test The <HTML::Widget> Create Form
 
-Press C<Ctrl-C> to kill the previous server instance (if it's still running) and restart it:
+Press C<Ctrl-C> to kill the previous server instance (if it's still
+running) and restart it:
 
     $ script/myapp_server.pl
 
-Login as C<test01>.  Once at the Book List page, click the HTML::Widget "Create" link to display for form produced by C<make_book_widget>.  Fill out the form with the following values: Title = "Internetworking with TCP/IP Vol. II", Rating = "4", and Author = "Comer".  Click Submit, and you will be returned to the Create/Update Book page with a "Book created" status message displayed.  Click "Return to book list" to view the newly created book on the main list.
+Login as C<test01>.  Once at the Book List page, click the HTML::Widget
+"Create" link to display for form produced by C<make_book_widget>.  Fill
+out the form with the following values: Title = "Internetworking with
+TCP/IP Vol. II", Rating = "4", and Author = "Comer".  Click Submit, and
+you will be returned to the Create/Update Book page with a "Book
+created" status message displayed.  Click "Return to book list" to view
+the newly created book on the main list.
 
-Also note that this implementation allows you to can create books with bogus information.  Although we have constrained the authors with the drop-down list, there are no restrictions on items such as the length of the title (for example, you can create a one-letter title) and value for the rating (you can use any number you want, and even non-numeric values with SQLite).  The next section seeks to address this concern.
+Also note that this implementation allows you to can create books with
+bogus information.  Although we have constrained the authors with the
+drop-down list, there are no restrictions on items such as the length of
+the title (for example, you can create a one-letter title) and value for
+the rating (you can use any number you want, and even non-numeric values
+with SQLite).  The next section seeks to address this concern.
 
-B<Note:> Depending on the database you are using and how you established the columns in your tables, the database could obviously provide various levels of "type enforcement" on your data.  The key point being made in the previous paragraph is that the I<web application> itself is not performing any validation.
+B<Note:> Depending on the database you are using and how you established
+the columns in your tables, the database could obviously provide various
+levels of "type enforcement" on your data.  The key point being made in
+the previous paragraph is that the I<web application> itself is not
+performing any validation.
 
 
 =head1 C<HTML::WIDGET> VALIDATION AND FILTERING
 
-Although the use of L<HTML::Widget|HTML::Widget> in the previous section did provide an automated mechanism to build the form, the real power of this module stems from functionality that can automatically validate and filter the user input.  Validation uses constraints to be sure that users input appropriate data (for example, that the email field of a form contains a valid email address).  Filtering can be used to remove extraneous whitespace from fields or to escape meta-characters in user input.
+Although the use of L<HTML::Widget|HTML::Widget> in the previous section
+did provide an automated mechanism to build the form, the real power of
+this module stems from functionality that can automatically validate and
+filter the user input.  Validation uses constraints to be sure that
+users input appropriate data (for example, that the email field of a
+form contains a valid email address).  Filtering can be used to remove
+extraneous whitespace from fields or to escape meta-characters in user
+input.
 
 
 =head2 Add Constraints and Filters to the Widget Creation Method
 
-Open C<lib/MyApp/Controller/Books.pm> in your editor and update the C<make_book_widget> method to match the following (new sections have been marked with a C<*** NEW:> comment):
+Open C<lib/MyApp/Controller/Books.pm> in your editor and update the
+C<make_book_widget> method to match the following (new sections have
+been marked with a C<*** NEW:> comment):
 
     sub make_book_widget {
         my ($self, $c) = @_;
@@ -293,7 +362,9 @@ The main changes are:
 
 =item *
 
-The C<Select> element for C<authors> is changed from a single-select drop-down to a multi-select list by adding calls to C<multiple> (set to C<true>) and C<size> (set to the number of rows to display).
+The C<Select> element for C<authors> is changed from a single-select
+drop-down to a multi-select list by adding calls to C<multiple> (set to
+C<true>) and C<size> (set to the number of rows to display).
 
 =item *
 
@@ -308,7 +379,9 @@ Two filters are run on every field to remove and escape unwanted input.
 
 =head2 Rebuild the Form Submission Method to Include Validation
 
-Edit C<lib/MyApp/Controller/Books.pm> and change C<hw_create_do> to match the following code (enough of the code is different that you probably want to cut and paste this over code the existing method):
+Edit C<lib/MyApp/Controller/Books.pm> and change C<hw_create_do> to
+match the following code (enough of the code is different that you
+probably want to cut and paste this over code the existing method):
 
     sub hw_create_do : Local {
         my ($self, $c) = @_;
@@ -365,15 +438,28 @@ The key changes to C<hw_create_do> are:
 
 =item *
 
-C<hw_create_do> no longer does a C<detach> to C<hw_create> to redisplay the form.  Now that C<hw_create_do> has to process the form in order to perform the validation, we go ahead and build a complete set of form presentation logic into C<hw_create_do> (for example, C<hw_create_do> now has a C<$c-E<gt>stash-E<gt>{template}> line).  Note that if we process the form in C<hw_create_do> I<and> forward/detach back to <hw_create>, we would end up with C<make_book_widget> being called twice, resulting in a duplicate set of elements being added to the form.
+C<hw_create_do> no longer does a C<detach> to C<hw_create> to redisplay
+the form.  Now that C<hw_create_do> has to process the form in order to
+perform the validation, we go ahead and build a complete set of form
+presentation logic into C<hw_create_do> (for example, C<hw_create_do>
+now has a C<$c-E<gt>stash-E<gt>{template}> line).  Note that if we
+process the form in C<hw_create_do> I<and> forward/detach back to
+<hw_create>, we would end up with C<make_book_widget> being called
+twice, resulting in a duplicate set of elements being added to the form.
 
 =item *
 
-C<$w-E<gt>process($c-E<gt>req)> is called to run the validation logic.  Not only does this set the C<has_errors> flag if validation errors are encountered, it returns a string containing any field-specific warning messages.
+C<$w-E<gt>process($c-E<gt>req)> is called to run the validation logic.
+Not only does this set the C<has_errors> flag if validation errors are
+encountered, it returns a string containing any field-specific warning
+messages.
 
 =item *
 
-An C<if> statement checks if any validation errors were encountered.  If so, C<$c-E<gt>stash-E<gt>{error_msg}> is set and the input form is redisplayed.  If no errors were found, the object is created in a manner similar to the prior version of the C<hw_create_do> method.
+An C<if> statement checks if any validation errors were encountered.  If
+so, C<$c-E<gt>stash-E<gt>{error_msg}> is set and the input form is
+redisplayed.  If no errors were found, the object is created in a manner
+similar to the prior version of the C<hw_create_do> method.
 
 =back
 
@@ -384,12 +470,19 @@ Press C<Ctrl-C> to kill the previous server instance (if it's still running) and
 
     $ script/myapp_server.pl
 
-Now try adding a book with various errors: title less than 5 characters, non-numeric rating, a rating of 0 or 6, etc.  Also try selecting one, two, and zero authors.  When you click Submit, the HTML::Widget C<constraint> items will validate the logic and insert feedback as appropriate.
+Now try adding a book with various errors: title less than 5 characters,
+non-numeric rating, a rating of 0 or 6, etc.  Also try selecting one,
+two, and zero authors.  When you click Submit, the HTML::Widget
+C<constraint> items will validate the logic and insert feedback as
+appropriate.
 
 
 =head1 Enable C<DBIx::Class::HTMLWidget> Support
 
-In this section we will take advantage of some of the "auto-population" features of C<DBIx::Class::HTMLWidget>.  Enabling C<DBIx::Class::HTMLWidget> provides two additional methods to your DBIC model classes: 
+In this section we will take advantage of some of the "auto-population"
+features of C<DBIx::Class::HTMLWidget>.  Enabling
+C<DBIx::Class::HTMLWidget> provides two additional methods to your DBIC
+model classes:
 
 =over 4
 
@@ -403,23 +496,30 @@ Takes data from the database and transfers it to your form widget.
 
 populate_from_widget()
 
-Takes data from a form widget and uses it to update the corresponding records in the database.
+Takes data from a form widget and uses it to update the corresponding
+records in the database.
 
 =back
 
-In other words, the two methods are a mirror image of each other: one reads from the database while the other writes to the database.
+In other words, the two methods are a mirror image of each other: one
+reads from the database while the other writes to the database.
 
 
 =head2 Add C<DBIx::Class::HTMLWidget> to DBIC Model
 
-In order to use L<DBIx::Class::HTMLWidget|DBIx::Class::HTMLWidget>, we need to add C<HTMLWidget> to the C<load_components> line of DBIC result source files that need to use the C<fill_widget> and C<populate_from_widget> methods.  In this case, open C<lib/MyAppDB/Book.pm> and update the C<load_components> line to match:
+In order to use L<DBIx::Class::HTMLWidget|DBIx::Class::HTMLWidget>, we
+need to add C<HTMLWidget> to the C<load_components> line of DBIC result
+source files that need to use the C<fill_widget> and
+C<populate_from_widget> methods.  In this case, open
+C<lib/MyAppDB/Book.pm> and update the C<load_components> line to match:
 
 	__PACKAGE__->load_components(qw/PK::Auto Core HTMLWidget/);
 
 
 =head2 Use C<populate_from_widget> in C<hw_create_do>
 
-Edit C<lib/MyApp/Controller/Books.pm> and update C<hw_create_do> to match the following code:
+Edit C<lib/MyApp/Controller/Books.pm> and update C<hw_create_do> to
+match the following code:
 
     =head2 hw_create_do
     
@@ -468,7 +568,13 @@ Edit C<lib/MyApp/Controller/Books.pm> and update C<hw_create_do> to match the fo
         $c->stash->{template} = 'books/hw_form.tt2';
     }
 
-In this version of C<hw_create_do> we removed the logic that manually pulled the form variables and used them to call C<$c-E<gt>model('MyAppDB::Book')-E<gt>create> and replaced it with a single call to C<$book-E<gt>populate_from_widget>.  Note that we still have to call C<$book-E<gt>add_to_book_authors> once per author because C<populate_from_widget> does not currently handle the relationships between tables.
+In this version of C<hw_create_do> we removed the logic that manually
+pulled the form variables and used them to call
+C<$c-E<gt>model('MyAppDB::Book')-E<gt>create> and replaced it with a
+single call to C<$book-E<gt>populate_from_widget>.  Note that we still
+have to call C<$book-E<gt>add_to_book_authors> once per author because
+C<populate_from_widget> does not currently handle the relationships
+between tables.
 
 
 

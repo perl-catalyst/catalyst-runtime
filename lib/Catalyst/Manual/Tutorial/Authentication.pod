@@ -1,6 +1,6 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial::Authentication - Catalyst Tutorial – Part 4: Authentication
+Catalyst::Manual::Tutorial::Authentication - Catalyst Tutorial - Part 4: Authentication
 
 
 
@@ -8,7 +8,7 @@ Catalyst::Manual::Tutorial::Authentication - Catalyst Tutorial – Part 4: Authent
 
 This is B<Part 4 of 9> for the Catalyst tutorial.
 
-L<Totorial Overview|Catalyst::Manual::Tutorial>
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
 =over 4
 
@@ -22,7 +22,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
 
 =item 4
 
@@ -54,11 +54,15 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 
 =head1 DESCRIPTION
 
-Now that we finally have a simple yet functional application, we can focus on providing authentication (with authorization coming in Part 5).
+Now that we finally have a simple yet functional application, we can
+focus on providing authentication (with authorization coming in Part 5).
 
-This part of the tutorial is divided into two main sections: 1) basic, cleartext authentication and 2) hash-based authentication.
+This part of the tutorial is divided into two main sections: 1) basic,
+cleartext authentication and 2) hash-based authentication.
 
-B<TIP>: Note that all of the code for this part of the tutorial can be pulled from the Catalyst Subversion repository in one step with the following command:
+B<TIP>: Note that all of the code for this part of the tutorial can be
+pulled from the Catalyst Subversion repository in one step with the
+following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
@@ -72,7 +76,10 @@ This section explores how add authentication logic to a Catalyst application.
 
 =head2 Add Users and Roles to the Database
 
-First, we add both user and role information to the database (we add the role information here although it will not be used until the authorization section, Part 5).  Create a new SQL script file by opening C<myapp02.sql> in your editor and insert:
+First, we add both user and role information to the database (we add the
+role information here although it will not be used until the
+authorization section, Part 5).  Create a new SQL script file by opening
+C<myapp02.sql> in your editor and insert:
 
     --
     -- Add users and roles tables, along with a many-to-many join table
@@ -115,9 +122,12 @@ Then load this into the C<myapp.db> database with the following command:
 
 =head2 Add User and Role Information to Dbic Schema
 
-This step adds DBIC-based classes for the user-related database tables (the role information will not be used until the Part 5):
+This step adds DBIC-based classes for the user-related database tables
+(the role information will not be used until the Part 5):
 
-Edit C<lib/MyAppDB.pm> and update the contents to match (only the C<MyAppDB =E<gt> [qw/Book BookAuthor Author User UserRole Role/]> line has changed):
+Edit C<lib/MyAppDB.pm> and update the contents to match (only the
+C<MyAppDB =E<gt> [qw/Book BookAuthor Author User UserRole Role/]> line
+has changed):
 
     package MyAppDB;
     
@@ -344,12 +354,24 @@ Edit C<lib/MyApp.pm> and update it as follows (everything below C<DefaultEnd> is
             Session::State::Cookie
             /;
 
-The three C<Authentication> plugins work together to support Authentication while the C<Session> plugins are required to maintain state across multiple HTTP requests.  Note that there are several options for L<Session::Store|Catalyst::Plugin::Session::Store> (although L<Session::Store::FastMmap|Catalyst::Plugin::Session::Store::FastMmap> is generally a good choice if you are on Unix; try L<Cache::FileCache|Catalyst::Plugin::Cache::FileCache> if you are on Win32) -- consult L<Session::Store|Catalyst::Plugin::Session::Store> and its subclasses for additional information.
+The three C<Authentication> plugins work together to support
+Authentication while the C<Session> plugins are required to maintain
+state across multiple HTTP requests.  Note that there are several
+options for L<Session::Store|Catalyst::Plugin::Session::Store> (although
+L<Session::Store::FastMmap|Catalyst::Plugin::Session::Store::FastMmap>
+is generally a good choice if you are on Unix; try
+L<Cache::FileCache|Catalyst::Plugin::Cache::FileCache> if you are on
+Win32) -- consult L<Session::Store|Catalyst::Plugin::Session::Store> and
+its subclasses for additional information.
 
 
 =head2 Configure Authentication
 
-Although C<__PACKAGE__-E<gt>config(name =E<gt> 'value');> is still supported, newer Catalyst applications tend to place all configuration information in C<myapp.yml> and automatically load this information into C<MyApp-E<gt>config> using the L<ConfigLoader|Catalyst::Plugin::ConfigLoader> plugin.
+Although C<__PACKAGE__-E<gt>config(name =E<gt> 'value');> is still
+supported, newer Catalyst applications tend to place all configuration
+information in C<myapp.yml> and automatically load this information into
+C<MyApp-E<gt>config> using the
+L<ConfigLoader|Catalyst::Plugin::ConfigLoader> plugin.
 
 Edit the C<myapp.yml> YAML and update it to match:
 
@@ -374,7 +396,11 @@ Edit the C<myapp.yml> YAML and update it to match:
 
 Inline comments in the code above explain how each field is being used.
 
-B<TIP>: Although YAML uses a very simple and easy-to-ready format, it does require the use of a consistent level of indenting.  Be sure you line up everything on a given 'level' with the same number of indents.  Also, be sure not to use C<tab> characters (YAML does not support them because they are handled inconsistently across editors). 
+B<TIP>: Although YAML uses a very simple and easy-to-ready format, it
+does require the use of a consistent level of indenting.  Be sure you
+line up everything on a given 'level' with the same number of indents.
+Also, be sure not to use C<tab> characters (YAML does not support them
+because they are handled inconsistently across editors).
 
 
 =head2 Add Login and Logout Controllers
@@ -384,7 +410,10 @@ Use the Catalyst create script to create two stub controller files:
     $ script/myapp_create.pl controller Login
     $ script/myapp_create.pl controller Logout
 
-B<NOTE>: You could easily use a single controller here.  For example, you could have a C<User> controller with both C<login> and C<logout> actions.  Remember, Catalyst is designed to be very flexible, and leaves such matters up to you, the designer and programmer.
+B<NOTE>: You could easily use a single controller here.  For example,
+you could have a C<User> controller with both C<login> and C<logout>
+actions.  Remember, Catalyst is designed to be very flexible, and leaves
+such matters up to you, the designer and programmer.
 
 Then open C<lib/MyApp/Controller/Login.pm> and add:
 
@@ -418,7 +447,12 @@ Then open C<lib/MyApp/Controller/Login.pm> and add:
         $c->stash->{template} = 'login.tt2';
     }
 
-This controller fetches the C<username> and C<password> values from the login form and attempts to perform a login.  If successful, it redirects the user to the book list page.  If the login fails, the user will stay at the login page but receive an error message.  If the C<username> and C<password> values are not present in the form, the user will be taken to the empty login form.
+This controller fetches the C<username> and C<password> values from the
+login form and attempts to perform a login.  If successful, it redirects
+the user to the book list page.  If the login fails, the user will stay
+at the login page but receive an error message.  If the C<username> and
+C<password> values are not present in the form, the user will be taken
+to the empty login form.
 
 Next, create a corresponding method in C<lib/MyApp/Controller/Logout.pm>:
 
@@ -465,7 +499,12 @@ Create a login form by opening C<root/src/login.tt2> and inserting:
 
 =head2 Add Valid User Check
 
-We need something that provides enforcement for the authentication mechanism -- a I<global> mechanism that prevents users who have not passed authentication from reaching any pages except the login page.  This is generally done via an C<auto> action/method (prior to Catalyst v5.66, this sort of thing would go in C<MyApp.pm>, but starting in v5.66, the preferred location is C<lib/MyApp/Controller/Root.pm>).
+We need something that provides enforcement for the authentication
+mechanism -- a I<global> mechanism that prevents users who have not
+passed authentication from reaching any pages except the login page.
+This is generally done via an C<auto> action/method (prior to Catalyst
+v5.66, this sort of thing would go in C<MyApp.pm>, but starting in
+v5.66, the preferred location is C<lib/MyApp/Controller/Root.pm>).
 
 Edit the existing C<lib/MyApp/Controller/Root.pm> class file and insert the following method:
 
@@ -499,30 +538,44 @@ Edit the existing C<lib/MyApp/Controller/Root.pm> class file and insert the foll
         return 1;
     }
 
-B<Note:> Catalyst provides a number of different types of actions, such as C<Local>, C<Regex>, and C<Private>.  You should refer to L<Catalyst::Manual::Intro|Catalyst::Manual::Intro> for a more detailed explanation, but the following bullet points provide a quick introduction:
+B<Note:> Catalyst provides a number of different types of actions, such
+as C<Local>, C<Regex>, and C<Private>.  You should refer to
+L<Catalyst::Manual::Intro|Catalyst::Manual::Intro> for a more detailed
+explanation, but the following bullet points provide a quick
+introduction:
 
 =over 4
 
 =item *
 
-The majority of application use C<Local> actions for items that respond to user requests and C<Private> actions for those that do not directly respond to user input.
+The majority of application use C<Local> actions for items that respond
+to user requests and C<Private> actions for those that do not directly
+respond to user input.
 
 =item *
 
-There are five types of C<Private> actions: C<begin>, C<end>, C<default>, C<index>, and C<auto>.
+There are five types of C<Private> actions: C<begin>, C<end>,
+C<default>, C<index>, and C<auto>.
 
 =item *
 
-Unlike the other private C<Private> actions where only a single method is called for each request, I<every> auto action along the chain of namespaces will be called.
+Unlike the other private C<Private> actions where only a single method
+is called for each request, I<every> auto action along the chain of
+namespaces will be called.
 
 =back
 
-By placing the authentication enforcement code inside the C<auto> method of C<lib/MyApp/Controller/Root.pm> (or C<lib/MyApp.pm>), it will be called for I<every> request that is received by the entire application.
+By placing the authentication enforcement code inside the C<auto> method
+of C<lib/MyApp/Controller/Root.pm> (or C<lib/MyApp.pm>), it will be
+called for I<every> request that is received by the entire application.
 
 
 =head2 Displaying Content Only to Authenticated Users
 
-Let's say you want to provide some information on the login page that changes depending on whether the user has authenticated yet.  To do this, open C<root/src/login.tt2> in your editor and add the following lines to the bottom of the file:
+Let's say you want to provide some information on the login page that
+changes depending on whether the user has authenticated yet.  To do
+this, open C<root/src/login.tt2> in your editor and add the following
+lines to the bottom of the file:
 
     <p>
     [%
@@ -543,19 +596,39 @@ Let's say you want to provide some information on the login page that changes de
        comments.
     %]
 
-Although most of the code is comments, the middle few lines provide a "you are already logged in" reminder if the user returns to the login page after they have already authenticated.  For users who have not yet authenticated, a "You need to log in..." message is displayed (note the use of an IF-THEN-ELSE construct in TT).
+Although most of the code is comments, the middle few lines provide a
+"you are already logged in" reminder if the user returns to the login
+page after they have already authenticated.  For users who have not yet
+authenticated, a "You need to log in..." message is displayed (note the
+use of an IF-THEN-ELSE construct in TT).
 
 
 =head2 Try Out Authentication
 
-Press C<Ctrl-C> to kill the previous server instance (if it's still running) and 
-restart it:
+Press C<Ctrl-C> to kill the previous server instance (if it's still
+running) and restart it:
 
     $ script/myapp_server.pl
 
-B<IMPORTANT NOTE>: If you happen to be using Internet Explorer, you may need to use the command C<script/myapp_server.pl -k> to enable the keepalive feature in the development server.  Otherwise, the HTTP redirect on successful login may not work correctly with IE (it seems to work without –k if you are running the web browser and development server on the same machine).  If you are using browser a browser other than IE, it should work either way.  If you want to make keepalive the default, you can edit C<script/myapp_server.pl> and change the initialization value for C<$keepalive> to C<1>.  (You will need to do this every time you create a new Catalyst application or rebuild the C<myapp_server.pl> script.)
+B<IMPORTANT NOTE>: If you happen to be using Internet Explorer, you may
+need to use the command C<script/myapp_server.pl -k> to enable the
+keepalive feature in the development server.  Otherwise, the HTTP
+redirect on successful login may not work correctly with IE (it seems to
+work without -k if you are running the web browser and development
+server on the same machine).  If you are using browser a browser other
+than IE, it should work either way.  If you want to make keepalive the
+default, you can edit C<script/myapp_server.pl> and change the
+initialization value for C<$keepalive> to C<1>.  (You will need to do
+this every time you create a new Catalyst application or rebuild the
+C<myapp_server.pl> script.)
 
-Now trying going to L<http://localhost:3000/books/list> and you should be redirected to the login page, hitting Shift+Reload if necessary (the "You are already logged in" message should I<not> appear -- if it does, click the C<logout> button and try again).  Make note of the C<***Root::auto User not found...> debug message in the development server output.  Enter username C<test01> and password C<mypass>, and you should be taken to the Book List page.  
+Now trying going to L<http://localhost:3000/books/list> and you should
+be redirected to the login page, hitting Shift+Reload if necessary (the
+"You are already logged in" message should I<not> appear -- if it does,
+click the C<logout> button and try again).  Make note of the
+C<***Root::auto User not found...> debug message in the development
+server output.  Enter username C<test01> and password C<mypass>, and you
+should be taken to the Book List page.
 
 Open C< root/src/books/list.tt2> and add the following lines to the bottom:
 
@@ -564,24 +637,40 @@ Open C< root/src/books/list.tt2> and add the following lines to the bottom:
       <a href="[% Catalyst.uri_for('form_create') %]">Create</a>
     </p>
 
-Reload your browser and you should now see a "Login" link at the bottom of the page (as mentioned earlier, you can update template files without reloading the development server).  Click this link to return to the login page.  This time you I<should> see the "You are already logged in" message.
+Reload your browser and you should now see a "Login" link at the bottom
+of the page (as mentioned earlier, you can update template files without
+reloading the development server).  Click this link to return to the
+login page.  This time you I<should> see the "You are already logged in"
+message.
 
-Finally, click the C<You can logout here> link on the C</login> page.  You should stay at the login page, but the message should change to "You need to log in to use this application."
+Finally, click the C<You can logout here> link on the C</login> page.
+You should stay at the login page, but the message should change to "You
+need to log in to use this application."
 
 
 
 =head1 USING PASSWORD HASHES
 
-In this section we increase the security of our system by converting from cleartext passwords to SHA-1 password hashes.
+In this section we increase the security of our system by converting
+from cleartext passwords to SHA-1 password hashes.
 
-B<Note:> This section is optional.  You can skip it and the rest of the tutorial will function normally.  
+B<Note:> This section is optional.  You can skip it and the rest of the
+tutorial will function normally.
 
-Note that even with the techniques shown in this section, the browser still transmits the passwords in cleartext to your application.  We are just avoiding the I<storage> of cleartext passwords in the database by using a SHA-1 hash.  If you are concerned about cleartext passwords between the browser and your application, consider using SSL/TLS.
+Note that even with the techniques shown in this section, the browser
+still transmits the passwords in cleartext to your application.  We are
+just avoiding the I<storage> of cleartext passwords in the database by
+using a SHA-1 hash.  If you are concerned about cleartext passwords
+between the browser and your application, consider using SSL/TLS.
 
 
 =head2 Get a SHA-1 Hash for the Password
 
-Catalyst uses the C<Digest > module to support a variety of hashing algorithms.  Here we will use SHA-1 (SHA = Secure Hash Algorithm).  First, we should compute the SHA-1 hash for the "mypass" password we are using.  The following command-line Perl script provides a "quick and dirty" way to do this:
+Catalyst uses the C<Digest> module to support a variety of hashing
+algorithms.  Here we will use SHA-1 (SHA = Secure Hash Algorithm).
+First, we should compute the SHA-1 hash for the "mypass" password we are
+using.  The following command-line Perl script provides a "quick and
+dirty" way to do this:
 
     $ perl -MDigest::SHA -e 'print Digest::SHA::sha1_hex("mypass"), "\n"'
     e727d1464ae12436e899a726da5b2f11d8381b26
@@ -590,7 +679,9 @@ Catalyst uses the C<Digest > module to support a variety of hashing algorithms. 
 
 =head2 Switch to SHA-1 Password Hashes in the Database
 
-Next, we need to change the C<password> column of our C<users> table to store this hash value vs. the existing cleartext password.  Open C<myapp03.sql> in your editor and enter:
+Next, we need to change the C<password> column of our C<users> table to
+store this hash value vs. the existing cleartext password.  Open
+C<myapp03.sql> in your editor and enter:
 
     --
     -- Convert passwords to SHA-1 hashes
@@ -603,12 +694,15 @@ Then use the following command to update the SQLite database:
 
     $ sqlite3 myapp.db < myapp03.sql
 
-B<Note:> We are using SHA-1 hashes here, but many other hashing algorithms are supported.  See C<Digest > for more information.
+B<Note:> We are using SHA-1 hashes here, but many other hashing
+algorithms are supported.  See C<Digest> for more information.
 
 
-=head2 Enable SHA-1 Hash Passwords in C<Catalyst::Plugin::Authentication::Store::DBIC>
+=head2 Enable SHA-1 Hash Passwords in
+C<Catalyst::Plugin::Authentication::Store::DBIC>
 
-Edit C<myapp.yml> and update it to match (the C<password_type> and C<password_hash_type> are new, everything else is the same):
+Edit C<myapp.yml> and update it to match (the C<password_type> and
+C<password_hash_type> are new, everything else is the same):
 
     ---
     name: MyApp
@@ -636,13 +730,14 @@ Edit C<myapp.yml> and update it to match (the C<password_type> and C<password_ha
 
 =head2 Try Out the Hashed Passwords
 
-Press C<Ctrl-C> to kill the previous server instance (if it's still running) and restart it:
+Press C<Ctrl-C> to kill the previous server instance (if it's still
+running) and restart it:
 
     $ script/myapp_server.pl
 
-You should now be able to go to L<http://localhost:3000/books/list> and login as before.  When done, click the "Logout" link on the login page (or point your browser at L<http://localhost:3000/logout>).
-
-
+You should now be able to go to L<http://localhost:3000/books/list> and
+login as before.  When done, click the "Logout" link on the login page
+(or point your browser at L<http://localhost:3000/logout>).
 
 =head1 AUTHOR
 
@@ -652,7 +747,8 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark. All rights reserved.
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 Version: .94
 

@@ -6,7 +6,10 @@ Catalyst::Manual::Tutorial - Catalyst Tutorial: Overview
 
 =head1 DESCRIPTION
 
-The Catalyst framework is a flexible and comprehensive environment for quickly building high-functionality web applications.  This tutorial is design to provide a rapid introduction to its basics and most commonly used features while focusing on real-world best practices.
+The Catalyst framework is a flexible and comprehensive environment for
+quickly building high-functionality web applications.  This tutorial is
+design to provide a rapid introduction to its basics and most commonly
+used features while focusing on real-world best practices.
 
 The tutorial is broken down into the following sections:
 
@@ -14,48 +17,51 @@ The tutorial is broken down into the following sections:
 
 =item *
 
-L<Introduction|Catalyst::Manual::Tutorial01_Intro>
+L<Introduction|Catalyst::Manual::Tutorial_Intro>
 
 =item * 
 
-L<Catalyst Basics|Catalyst::Manual::Tutorial02_CatalystBasics>
+L<Catalyst Basics|Catalyst::Manual::Tutorial_CatalystBasics>
 
 =item * 
 
-L<CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+L<CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
 
 =item * 
 
-L<Authentication|Catalyst::Manual::Tutorial04_Authentication>
+L<Authentication|Catalyst::Manual::Tutorial_Authentication>
 
 =item * 
 
-L<Authorization|Catalyst::Manual::Tutorial05_Authorization>
+L<Authorization|Catalyst::Manual::Tutorial_Authorization>
 
 =item * 
 
-L<Debugging|Catalyst::Manual::Tutorial06_Debugging>
+L<Debugging|Catalyst::Manual::Tutorial_Debugging>
 
 =item * 
 
-L<Testing|Catalyst::Manual::Tutorial07_Testing>
+L<Testing|Catalyst::Manual::Tutorial_Testing>
 
 =item * 
 
-L<CRUD|Catalyst::Manual::Tutorial08_AdvancedCRUD>
+L<CRUD|Catalyst::Manual::Tutorial_AdvancedCRUD>
 
 =item * 
 
-L<Appendicies|Catalyst::Manual::Tutorial09_Appendicies>
+L<Appendicies|Catalyst::Manual::Tutorial_Appendicies>
 
 =back
 
 
-Full source code is available for each section via the main Catalyst Subversion repository at L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/>.  See the end of each section for the specifics on retrieving code for that section.
+Full source code is available for each section via the main Catalyst
+Subversion repository at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/>.  See the
+end of each section for the specifics on retrieving code for that
+section.
 
-A tarball of the final application is available at C<to_be_compled_in_final_version>.
-
-
+A tarball of the final application is available at
+C<to_be_compled_in_final_version>.
 
 =head1 Detailed Table Of Contents
 
@@ -80,7 +86,6 @@ DATABASES
 WHERE TO GET WORKING CODE
 
 =back
-
 
 
 =head2 Part 2: Catalyst Application Development Basics
@@ -148,7 +153,6 @@ Create a TT Template Page
 RUN THE APPLICATION
 
 =back
-
 
 
 =head2 Part 3: Basic CRUD
@@ -222,7 +226,6 @@ Try the Delete Feature
 =back
 
 
-
 =head2 Part 4: Authentication
 
 =over 4
@@ -239,7 +242,7 @@ Add Users and Roles to the Database
 
 =item *
 
-Add User and Role Information to Dbic Schema
+Add User and Role Information to DBIC Schema
 
 =item *
 
@@ -306,7 +309,6 @@ Try Out the Hashed Passwords
 =back
 
 
-
 =head2 Part 5: Authorization
 
 =over 4
@@ -319,7 +321,7 @@ BASIC AUTHORIZATION
 
 =item *
 
-Update Plugins to Include Support Authorization
+Update Plugins to Include Support  for Authorization
 
 =item *
 
@@ -377,7 +379,6 @@ RUNNING CATALYST UNDER THE PERL DEBUGGER
 =back
 
 
-
 =head2 Part 7: Testing
 
 =over 4
@@ -399,7 +400,6 @@ ADDING YOUR OWN TEST SCRIPT
 SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
 =back
-
 
 
 =head2 Part 8: Advanced CRUD
@@ -479,7 +479,6 @@ Use populate_from_widget in hw_create_do
 =back
 
 =back
-
 
 
 =head2 Part 9: Appendices
