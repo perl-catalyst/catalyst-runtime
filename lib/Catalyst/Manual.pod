@@ -4,28 +4,62 @@ Catalyst::Manual - User guide and reference for Catalyst
 
 =head1 DESCRIPTION
 
-This is the comprehensive user guide and reference for Catalyst.
+This is the (table of contents page of the) comprehensive user guide and
+reference for Catalyst.
+
+=item *
 
 L<Catalyst::Manual::About>
-    Explanation (without code) of what Catalyst is and why to use it.
 
-L<Catalyst::Manual::Intro>
-    Introduction to Catalyst.
+Explanation (without code) of what Catalyst is and why to use it.
+
+=item *
+
+L<Catalyst::Manual::Intro> - Introduction to Catalyst. This is a
+detailed, if unsystematic, look at the basic concepts of Catalyst and
+what the best practices are for writing applications with it.
+
+=item *
 
 L<Catalyst::Manual::Tutorial>
-    A simple step by step tutorial.
+
+A detailed step-by-step tutorial going through a single application
+thoroughly.
+
+=item *
 
 L<Catalyst::Manual::Plugins>
-    Catalyst Plugins and Components.
+
+Catalyst Plugins and Components. A brief look at some of the very many
+modules for extending Catalyst.
+
+=item *
 
 L<Catalyst::Manual::Cookbook>
-    Cooking with Catalyst
+
+Cooking with Catalyst. Recipes and solutions that you might want to use
+in your code.
+
+=item *
+
+L<Catalyst::Manual::Installation>
+
+How to install Catalyst, in a variety of different ways. A closer look
+at one of the more difficult issues of using the framework--getting it.
+
+=item *
 
 L<Catalyst::Manual::WritingPlugins>
-    Writing plugins for Catalyst; the use of L<NEXT>.
+
+Writing plugins for Catalyst; the use of L<NEXT>.
+
+=item *
 
 L<Catalyst::Manual::Internals>
-    Here be dragons!
+
+Here be dragons! A very brief explanation of the Catalyst request cycle,
+the major components of Catalyst, and how you can use this knowledge
+when writing applications under Catalyst.
 
 =head1 SUPPORT
 
@@ -41,8 +75,9 @@ Mailing-Lists:
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
+Jesse Sheidlower, C<jester@panix.com>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify it
+under the same terms as Perl itself.
