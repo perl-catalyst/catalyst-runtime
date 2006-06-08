@@ -3,7 +3,6 @@
 Catalyst::Manual::Tutorial::CatalystBasics - Catalyst Tutorial - Part 2: Catalyst Application Development Basics
 
 
-
 =head1 OVERVIEW
 
 This is B<Part 2 of 9> for the Catalyst tutorial.
@@ -22,7 +21,7 @@ B<Catalyst Basics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD>
 
 =item 4
 
@@ -42,15 +41,13 @@ L<Testing|Catalyst::Manual::Tutorial::Testing>
 
 =item 8
 
-L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
+L<Advanced CRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendicies>
 
 =back
-
-
 
 =head1 DESCRIPTION
 
@@ -69,24 +66,26 @@ skeletal structure of an application.
 
 Model/View/Controller (MVC) provides an architecture that facilitates a
 clean "separation of control" between the different portions of your
-application.  Given that many other documents cover this subject in
+application. Given that many other documents cover this subject in
 detail, MVC will not be discussed in depth here (for an excellent
 introduction to MVC and general Catalyst concepts, please see
-L<Catalyst::Manual::About|Catalyst::Manual::About>.  In short:
+L<Catalyst::Manual::About>. In short:
 
 =over 4
 
 =item * Model
 
-In most applications, the model equates to the objects that are created
-from and saved to your SQL database.
+The model usually represents a data store. In most applications, the
+model equates to the objects that are created from and saved to your SQL
+database.
 
 =item * View
 
 The view takes model objects and renders them into something for the end
-user to look at.  Normally this involves a template-generation tool that
+user to look at. Normally this involves a template-generation tool that
 creates HTML for the user's web browser, but it could easily be code
-that generates other forms such as PDF documents or Excel spreadsheets.
+that generates other forms such as PDF documents, e-mails, or Excel
+spreadsheets.
 
 =item * Controller
 
@@ -97,9 +96,9 @@ them to the necessary model and view.
 
 =item * ORM
 
-The use Object-Relational Mapping (ORM) technology for database access
-(specifically, ORM provides an automated means to persist and restore
-objects to/from a relational database).
+The use of Object-Relational Mapping (ORM) technology for database
+access. Specifically, ORM provides an automated and standardized means
+to persist and restore objects to/from a relational database.
 
 =back
 
@@ -111,12 +110,11 @@ following command:
     IMPORTANT: Does not work yet.  Will be completed for final version.
 
 
-
 =head1 CREATE A CATALYST PROJECT
 
 Catalyst provides a number of helper scripts that can be used to quickly
-flesh out the basic structure of your application.  All Catalyst
-projects begin with the C<catalyst.pl> helper.
+flesh out the basic structure of your application. All Catalyst projects
+begin with the C<catalyst.pl> helper.
 
 In the case of this tutorial, use the Catalyst C<catalyst.pl> script to
 initialize the framework for an application called C<MyApp>:
@@ -127,9 +125,9 @@ initialize the framework for an application called C<MyApp>:
 The C<catalyst.pl> helper script will display the names of the
 directories and files it creates.
 
-Though it's obviously too early for any significant celebration, we
-already have a functioning application.  Run the following command to
-run this application with the built-in development web server:
+Though it's too early for any significant celebration, we already have a
+functioning application. Run the following command to run this
+application with the built-in development web server:
 
 	$ script/myapp_server.pl
 
@@ -137,8 +135,6 @@ Point your web browser to L<http://localhost:3000> (substituting a
 different hostname or IP address as appropriate) and you should be
 greeted by the Catalyst welcome screen.  Press Ctrl-C to break out of
 the development server.
-
-
 
 =head1 CREATE A SQLITE DATABASE
 
@@ -191,7 +187,7 @@ in your editor and enter:
     INSERT INTO book_authors VALUES (5, 8);
 
 B<TIP>: See Appendix 1 for tips on removing the leading spaces when
-cutting and pasting example code from Pod documents.
+cutting and pasting example code from POD documents.
 
 Then use the following command to build a C<myapp.db> SQLite database:
 
@@ -233,7 +229,6 @@ required if you do a single SQL statement on the command line).  Use
 your OS command prompt.
 
 
-
 =head1 EDIT THE LIST OF CATALYST PLUGINS
 
 One of the greatest benefits of Catalyst is that it has such a large
@@ -267,7 +262,7 @@ messages.
 
 L<Catalyst::Plugin::ConfigLoader|Catalyst::Plugin::ConfigLoader>
 
-C<ConfigLoader> provides an automatic way to load your configurable
+C<ConfigLoader> provides an automatic way to load configurable
 parameters for your application from a central YAML file (versus having
 the values hard-coded inside your Perl modules).  If you have not been
 exposed to YAML before, it is a human-readable data serialization format
@@ -275,10 +270,9 @@ that can be used to read (and write) values to/from text files.  We will
 see how to use this feature of Catalyst during the authentication and
 authorization sections (Part 4 and Part 5).
 
-
 =item *
 
-L<Catalyst::Plugin::Static::Simple|Catalyst::Plugin::Static::Simple>
+L<Catalyst::Plugin::Static::Simple>
 
 C<Static::Simple> provides an easy method of serving static content such
 as images and CSS files under the development server.
@@ -309,9 +303,9 @@ This tells Catalyst to start using three new plugins:
 
 =item * 
 
-L<Catalyst::Plugin::Dumper|Catalyst::Plugin::Dumper>
+L<Catalyst::Plugin::Dumper>
 
-Allows you to easily use L<Data::Dumper|Data::Dumper> to dump variables
+Allows you to easily use L<Data::Dumper> to dump variables
 to the logs, for example:
 
     $c->log->dumper($myvar);
@@ -327,10 +321,10 @@ L<Catalyst::Plugin::StackTrace|Catalyst::Plugin::StackTrace>
 Adds a stack trace to the standard Catalyst "debug screen" (this is the
 screen Catalyst sends to your browser when an error occurs).
 
-Note: L<Dumper|Catalyst::Plugin::Dumper> output appears on the
-console/telnet/SSH window where you issue the C<script/myapp_server.pl>
-command.  L<StackTrace|Catalyst::Plugin::StackTrace> output appears in
-your browser.
+Note: L<Dumper|Catalyst::Plugin::Dumper> output appears on the console
+window where you issue the C<script/myapp_server.pl> command.
+L<StackTrace|Catalyst::Plugin::StackTrace> output appears in your
+browser.
 
 =item * 
 
@@ -341,7 +335,7 @@ the end of each request.  Also allows you to add "dump_info=1" (precede
 with "?" or "&" depending on where it is in the URL) to I<force> the
 debug screen at the end of the Catalyst request processing cycle.
 
-TIP: Many Catalyst-related documents predate
+B<TIP>: Many Catalyst-related documents predate
 L<DefaultEnd|Catalyst::Plugin::DefaultEnd> and suggest that you add an
 C<end> action to your application class (C<MyApp.pm>) or Root.pm
 (C<MyApp/Controller/Root.pm>).  In most of these cases, you can convert
@@ -354,8 +348,6 @@ Note that when specifying plugins on the C<use Catalyst> line, you can
 omit C<Catalyst::Plugin> from the name.  Additionally, you can spread
 the plugin names across multiple lines as shown here, or place them all
 on one (or more) lines as with the default configuration.
-
-
 
 =head1 DATABASE ACCESS WITH C<DBIx::Class>
 

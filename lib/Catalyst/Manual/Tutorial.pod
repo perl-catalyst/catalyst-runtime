@@ -2,63 +2,50 @@
 
 Catalyst::Manual::Tutorial - Catalyst Tutorial: Overview
 
-
-
 =head1 DESCRIPTION
 
 The Catalyst framework is a flexible and comprehensive environment for
 quickly building high-functionality web applications.  This tutorial is
-design to provide a rapid introduction to its basics and most commonly
-used features while focusing on real-world best practices.
+designed to provide a rapid introduction to its basics and its most
+commonly used features while focusing on real-world best practices.
 
-The tutorial is broken down into the following sections:
+The tutorial is divided into the following sections:
 
 =over 4
 
 =item *
 
-L<Introduction|Catalyst::Manual::Tutorial_Intro>
+L<Introduction|Catalyst::Manual::Tutorial::Intro>
 
 =item * 
 
-L<Catalyst Basics|Catalyst::Manual::Tutorial_CatalystBasics>
+L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item * 
 
-L<CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD>
 
 =item * 
 
-L<Authentication|Catalyst::Manual::Tutorial_Authentication>
+L<Authentication|Catalyst::Manual::Tutorial::Authentication>
 
 =item * 
 
-L<Authorization|Catalyst::Manual::Tutorial_Authorization>
+L<Authorization|Catalyst::Manual::Tutorial::Authorization>
 
 =item * 
 
-L<Debugging|Catalyst::Manual::Tutorial_Debugging>
+L<Testing|Catalyst::Manual::Tutorial::Testing>
 
 =item * 
 
-L<Testing|Catalyst::Manual::Tutorial_Testing>
+L<Advanced CRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item * 
 
-L<CRUD|Catalyst::Manual::Tutorial_AdvancedCRUD>
-
-=item * 
-
-L<Appendicies|Catalyst::Manual::Tutorial_Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
-
-
-Full source code is available for each section via the main Catalyst
-Subversion repository at
-L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/>.  See the
-end of each section for the specifics on retrieving code for that
-section.
 
 A tarball of the final application is available at
 C<to_be_compled_in_final_version>.
@@ -108,8 +95,6 @@ EDIT THE LIST OF CATALYST PLUGINS
 
 DATABASE ACCESS WITH DBIx::Class
 
-=over 4
-
 =item *
 
 Create a DBIC Schema File
@@ -120,7 +105,7 @@ Create the DBIC ``Result Source'' Files
 
 =item *
 
-Use Catalyst::Model::DBIC::Schema To Load The Model Class
+Use Catalyst::Model::DBIC::Schema to Load the Model Class
 
 =back
 
@@ -136,7 +121,7 @@ CATALYST VIEWS
 
 =item *
 
-Create a Catalyst View Using TTSITE
+Create a Catalyst View Using TTSite
 
 =item *
 
@@ -153,7 +138,6 @@ Create a TT Template Page
 RUN THE APPLICATION
 
 =back
-
 
 =head2 Part 3: Basic CRUD
 
@@ -187,7 +171,7 @@ MANUALLY BUILDING A CREATE FORM
 
 =item *
 
-Add Method to Display The Form
+Add a Method to Display the Form
 
 =item *
 
@@ -199,7 +183,7 @@ Add Method to Process Form Values and Update Database
 
 =item *
 
-Test Out The Form
+Test Out the Form
 
 =back
 
@@ -224,7 +208,6 @@ Try the Delete Feature
 =back
 
 =back
-
 
 =head2 Part 4: Authentication
 
@@ -308,7 +291,6 @@ Try Out the Hashed Passwords
 
 =back
 
-
 =head2 Part 5: Authorization
 
 =over 4
@@ -321,7 +303,7 @@ BASIC AUTHORIZATION
 
 =item *
 
-Update Plugins to Include Support  for Authorization
+Update Plugins to Include Support for Authorization
 
 =item *
 
@@ -363,7 +345,6 @@ Add a Method to Handle Access Violations
 
 =back
 
-
 =head2 Part 6: Debugging
 
 =over 4
@@ -377,7 +358,6 @@ LOG STATEMENTS
 RUNNING CATALYST UNDER THE PERL DEBUGGER
 
 =back
-
 
 =head2 Part 7: Testing
 
@@ -400,7 +380,6 @@ ADDING YOUR OWN TEST SCRIPT
 SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
 =back
-
 
 =head2 Part 8: Advanced CRUD
 
@@ -479,7 +458,6 @@ Use populate_from_widget in hw_create_do
 =back
 
 =back
-
 
 =head2 Part 9: Appendices
 

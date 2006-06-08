@@ -3,10 +3,9 @@
 Catalyst::Manual::Tutorial::Intro - Catalyst Tutorial - Part 1: Introduction
 
 
-
 =head1 OVERVIEW
 
-This is B<Part 1 of 9> for the Catalyst tutorial.
+This is B<Part 1 of 9> of the Catalyst Tutorial.
 
 L<Tutorial Overview|Catalyst::Manual::Tutorial>
 
@@ -22,7 +21,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD>
 
 =item 4
 
@@ -42,21 +41,19 @@ L<Testing|Catalyst::Manual::Tutorial::Testing>
 
 =item 8
 
-L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
+L<Advanced CRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
 
-
-
 =head1 DESCRIPTION
 
-This tutorial provides a nine-part introduction to the Catalyst web
-framework.  It seeks to provide a rapid overview of many of its most
-commonly used features.  The focus is on the real-world best practices
+This tutorial provides a multipart introduction to the Catalyst web
+framework. It seeks to provide a rapid overview of many of its most
+commonly used features. The focus is on the real-world best practices
 required in the construction of nearly all Catalyst applications.
 
 Although the primary target of the tutorial is users new to the Catalyst
@@ -74,11 +71,12 @@ A simple application that lists and adds books.
 
 =item *
 
-The use of C<DBIx::Class> (DBIC) for the model.
+The use of L<DBIx::Class> (DBIC) for the model.
 
 =item * 
 
-How to write CRUD (Create, Read, Update and Delete) operations in Catalyst.
+How to write CRUD (Create, Read, Update, and Delete) operations in
+Catalyst.
 
 =item *
 
@@ -90,37 +88,40 @@ Role-based authorization ("authz").
 
 =item * 
 
-Attempts to provide an example showing current Catalyst 5.70
-practices. For example, the use of C<Catalyst::Plugin::DefaultEnd>,
-DBIC, C<Catalyst::Plugin::ConfigLoader> with myapp.yml, the use of
+Attempts to provide an example showing current (5.70) Catalyst
+practices. For example, the use of L<Catalyst::Plugin::DefaultEnd>,
+DBIC, L<Catalyst::Plugin::ConfigLoader> with C<myapp.yml>, the use of
 C<lib/MyApp/Controller/Root.pm> vs. C<lib/MyApp.pm>, etc.
 
 =item * 
 
-The use of Template Toolkit (TT) and the C<Catalyst::Helper::View::TTSite> view helper.
+The use of Template Toolkit (TT) and the
+L<Catalyst::Helper::View::TTSite> view helper.
 
 =item * 
 
-Useful techniques for troubleshooting and debugging Catalyst applications.
+Useful techniques for troubleshooting and debugging Catalyst
+applications.
 
 =item * 
 
-The use of SQLite as a database (with code also provided for MySQL and PostgreSQL).
+The use of SQLite as a database (with code also provided for MySQL and
+PostgreSQL).
 
 =item * 
 
-How to use HTML::Widget for automated form processing and validation.
+The use of HTML::Widget for automated form processing and validation.
 
 =back
 
-This tutorial intentionally seeks to make the learning process its main
-priority.  For example, the level of comments in the code found here
-would like be considered excessive in a "normal project".  Because of
-their contextual value, this tutorial will generally favor inline
-comments over a separate discussion in the text.  It also deliberately
-tries to demonstrate multiple approaches to various features (in
-general, you should try to be as consistent as possible with your own
-production code).
+This tutorial makes the learning process its main priority.  For
+example, the level of comments in the code found here would like be
+considered excessive in a "normal project".  Because of their contextual
+value, this tutorial will generally favor inline comments over a
+separate discussion in the text.  It also deliberately tries to
+demonstrate multiple approaches to various features (in general, you
+should try to be as consistent as possible with your own production
+code).
 
 Furthermore, this tutorial tries to minimize the number of controllers,
 models, TT templates, and database tables.  Although this does result in
@@ -135,12 +136,10 @@ through the Catalyst web site and at
 L<http://dev.catalyst.perl.org/wiki/UserIntroductions> and
 L<http://dev.catalyst.perl.org/>.
 
-
-
 =head1 VERSIONS AND CONVENTIONS USED IN THIS TUTORIAL
 
-This tutorial was built using the following resources.  Please note that
-you will need to make adjustments for different environments and
+This tutorial was built using the following resources. Please note that
+you may need to make adjustments for different environments and
 versions:
 
 =over 4
@@ -161,9 +160,10 @@ DBIx::Class v0.06002
 
 Catalyst Plugins
 
-You shouldn't be overly concerned about plugin version numbers, but
-there could be cases where the tutorial is impacted by what version
-plugins you use.  The plugins used in this tutorial are:
+The plugins used in this tutorial all have sufficiently stable APIs that
+you shouldn't need to worry about versions. However, there could be
+cases where the tutorial is affected by what version of plugins you
+use. The plugins used for this tutorial are:
 
 =over 4
 
@@ -249,18 +249,16 @@ Explorer).
 
 =back
 
-
-
 =head1 CATALYST INSTALLATION
 
 Unfortunately, one of the most daunting tasks faced by newcomers to
 Catalyst is getting it installed.  Although a compelling strength of
-Catalyst is that it can easily make full use of CPAN, a vast repository
-of Perl modules, this can result in initial installations that are both
-time consuming and frustrating.  However, there are a growing number of
-methods that can dramatically ease this undertaking.  Of these, the
-following are likely to be applicable to the largest number of potential
-new users:
+Catalyst is that it can easily make use of many of the modules in the
+vast repository that is CPAN, this can result in initial installations
+that are both time consuming and frustrating.  However, there are a
+growing number of methods that can dramatically ease this undertaking.
+Of these, the following are likely to be applicable to the largest
+number of potential new users:
 
 =over 4
 
@@ -293,33 +291,28 @@ complement of Catalyst plugins.
 
 =back
 
-B<IMPORTANT:> For additional information and recommendations on Catalyst
-installation, please refer to
-L<Catalyst::Manual::Installation|Catalyst::Manual::Installation>.
+For additional information and recommendations on Catalyst installation,
+please refer to L<Catalyst::Manual::Installation>.
 
 B<IMPORTANT:> Step-by-step instructions to replicate the environment on
 which this tutorial was developed can be found at
-L<Catalyst::Manual::Installation::CentOSTuorial|Catalyst::Manual::Installation::CentOSTuorial>.
+L<Catalyst::Manual::Installation::CentOS4>.
 
 Using these instructions, you should be able to build a complete CentOS
 4.X server with Catalyst and all the plugins required to run this
 tutorial.
 
-
-
 =head1 DATABASES
 
-This tutorial will primarily focus on SQLite because of its simplicity;
-however, modifications in the script required to support MySQL and
-PostgreSQL will be presented in Appendix 2.
+This tutorial will primarily focus on SQLite because of its simplicity
+of installation and use; however, modifications in the script required
+to support MySQL and PostgreSQL will be presented in Appendix 2.
 
 B<Note:> One of the advantages of the MVC design patterns is that
 applications become much more database independent.  As such, you will
 notice that only the C<.sql> files used to initialize the database
-change between database systems... the Catalyst code generally remains
-the same.
-
-
+change between database systems: the Catalyst code generally remains the
+same.
 
 =head1 WHERE TO GET WORKING CODE
 
@@ -328,7 +321,6 @@ Catalyst Subversion repository (see the note at the beginning of each
 part for the appropriate svn command to use).  Additionally, the final
 code is available as a ready-to-run tarball at
 TO_BE_ADDED_TO_FINAL_VERSION.
-
 
 =head1 AUTHOR
 
