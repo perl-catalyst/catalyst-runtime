@@ -2,8 +2,6 @@
 
 Catalyst::Manual::Tutorial::Testing - Catalyst Tutorial - Part 7: Testing
 
-
-
 =head1 OVERVIEW
 
 This is B<Part 7 of 9> for the Catalyst tutorial.
@@ -46,21 +44,18 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
 
-
-
 =head1 DESCRIPTION
 
-
 You may have noticed that the Catalyst Helper scripts automatically
-create C<.t> test scripts under the C<t> directory.  This part of the
-tutorial briefly looks at how these tests can be used to not only ensure
-that your application is working correctly at the present time, but also
-provide automated regression testing as you upgrade various pieces of
-your application over time.
+create basic C<.t> test scripts under the C<t> directory.  This part of
+the tutorial briefly looks at how these tests can be used to not only
+ensure that your application is working correctly at the present time,
+but also provide automated regression testing as you upgrade various
+pieces of your application over time.
 
 B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
@@ -68,7 +63,6 @@ following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
-
 
 
 =head1 RUNNING THE "CANNED" CATALYST TESTS
@@ -106,7 +100,7 @@ Although you can edit the C<lib/MyApp.pm> to comment out the C<-Debug>
 plugin, it's generally easier to simply set the C<CATALYST_DEBUG=0>
 environment variable.  For example:
 
-    CATALYST_DEBUG=0 prove --lib lib t
+    $ CATALYST_DEBUG=0 prove --lib lib t
 
 During the C<t/02pod> and C<t/03podcoverage> tests, you might notice the
 C<all skipped: set TEST_POD to enable this test> warning message.  To
@@ -124,8 +118,6 @@ prints the name of each test case as it is being run:
 
     $ CATALYST_DEBUG=0 TEST_POD=1 prove --lib lib -v t
 
-
-
 =head1 RUNNING A SINGLE TEST
 
 You can also run a single script by appending its name to the C<prove>
@@ -138,19 +130,17 @@ For example:
 
     $ CATALYST_DEBUG=0 perl -Ilib t/01app.t
 
-
 =head1 ADDING YOUR OWN TEST SCRIPT
 
 Although the Catalyst helper scripts provide a basic level of checks
 "for free," testing can become significantly more helpful when you write
 your own script to exercise the various parts of your application.  The
-L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> module
-is very popular for writing these sorts of test cases.  This module
-extends L<Test::WWW::Mechanize|Test::WWW::Mechanize> (and therefore
-L<WWW::Mechanize|WWW::Mechanize>) to allow you to automate the action of
+L<Test::WWW::Mechanize::Catalyst> module is very popular for writing
+these sorts of test cases.  This module extends L<Test::WWW::Mechanize>
+(and therefore L<WWW::Mechanize>) to allow you to automate the action of
 a user "clicking around" inside your application.  It gives you all the
 benefits of testing on a live system without the messiness of having to
-use an actual web server.
+use an actual web server, and a real person to do the clicking.
 
 To create a sample test case, open the C<t/live_app01.t> file in your
 editor and enter the following:
@@ -160,17 +150,19 @@ editor and enter the following:
     use strict;
     use warnings;
     
-    # Load testing framework and use 'no_plan' to dynamically pick up all tests.  Better
-    # to replace "'no_plan'" with "tests => 30" so it knows exactly how many tests need
-    # to be run (and will tell you if not), but 'no_plan' is nice for quick & dirty tests
+    # Load testing framework and use 'no_plan' to dynamically pick up
+    # all tests. Better to replace "'no_plan'" with "tests => 30" so it
+    # knows exactly how many tests need to be run (and will tell you if
+    # not), but 'no_plan' is nice for quick & dirty tests
+
     use Test::More 'no_plan';
     
     # Need to specify the name of your app as arg on next line
     # Can also do:
     #   use Test::WWW::Mechanize::Catalyst "MyApp";
+
     use ok "Test::WWW::Mechanize::Catalyst" => "MyApp";
-    
-    
+        
     # Create two 'user agents' to simulate two different users ('test01' & 'test02')
     my $ua1 = Test::WWW::Mechanize::Catalyst->new;
     my $ua2 = Test::WWW::Mechanize::Catalyst->new;
@@ -249,14 +241,12 @@ editor and enter the following:
 
 The C<live_app.t> test cases uses copious comments to explain each step
 of the process.  In addition to the techniques shown here, there are a
-variety of other methods available in
-L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> (for
-example, regex-based matching).  Consult the documentation for more
+variety of other methods available in L<Test::WWW::Mechanize::Catalyst>
+(for example, regex-based matching). Consult the documentation for more
 detail.
 
 B<TIP>: For I<unit tests> vs. the "full application tests" approach used
-by L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst>, see
-L<Catalyst::Test|Catalyst::Test>.
+by L<Test::WWW::Mechanize::Catalyst>, see L<Catalyst::Test>.
 
 B<Note:> The test script does not test the C<form_create> and
 C<form_create_do> actions.  That is left as an exercise for the reader
@@ -274,25 +264,23 @@ or
 Experiment with the C<DBIX_CLASS_STORAGE_DBI_DEBUG>, C<CATALYST_DEBUG>
 and C<-v> settings.  If you find that there are errors, use the
 techniques discussed in the "Catalyst Debugging" section (Part 6) to
-isolate and fix the problem.
+isolate and fix any problems.
 
 If you want to run the test case under the Perl interactive debugger,
 try a command such as:
 
     $ DBIX_CLASS_STORAGE_DBI_DEBUG=0 CATALYST_DEBUG=0 perl -d -Ilib t/live_app01.t
 
-Note that although the tutorial uses a single custom test case for
+Note that although this tutorial uses a single custom test case for
 simplicity, you may wish to break your tests into different files for
 better organization.
-
-
 
 =head1 SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
 You may wish to leverage the techniques discussed in this tutorial to
 maintain both a "production database" for your live application and a
 "testing database" for your test cases.  One advantage to
-L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> is that
+L<Test::WWW::Mechanize::Catalyst> is that
 it runs your full application; however, this can complicate things when
 you want to support multiple databases.  One solution is to allow the
 database specification to be overridden with an environment variable.
@@ -320,8 +308,6 @@ This will modify the DSN only while the test case is running.  If you
 launch your normal application without the C<MYAPP_DSN> environment
 variable defined, it will default to the same C<dbi:SQLite:myapp.db> as
 before.
-
-
 
 =head1 AUTHOR
 

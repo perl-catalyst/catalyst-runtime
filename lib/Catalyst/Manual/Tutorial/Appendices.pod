@@ -45,25 +45,20 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-B<Appendicies>
+B<Appendices>
 
 =back
-
-
 
 =head1 DESCRIPTION
 
 This part of the tutorial provides supporting information relevant to
 the Catalyst tutorial.
 
-
-
 =head1 APPENDIX 1: CUT AND PASTE FOR POD-BASED EXAMPLES
 
 You may notice that Pod indents example code with four spaces.  This
 section provides some quick advice to "un-indent" this text in common
 editors.
-
 
 =head2 "Un-indenting" with Vi/Vim
 
@@ -97,12 +92,9 @@ Removes four leading space from the current line through line 44
 
 =back
 
-
 =head2 "Un-indenting" with Emacs
 
 B<TODO>
-
-
 
 =head1 APPENDIX 2: USING MYSQL AND POSTGRESQL
 
@@ -120,7 +112,6 @@ Also note that the purpose of the data definition statements for this
 section are not designed to take maximum advantage of the various
 features in each database for issues such as referential integrity and
 field types/constraints.
-
 
 =head2 MySQL
 
