@@ -28,12 +28,16 @@ dramatically ease this undertaking:
 
 =item * 
 
-Matt Trout's C<cat-install>
+Matt Trout's C<cat-install> script
 
-Available at L<http://www.shadowcatsystems.co.uk/static/cat-install>,
-C<cat-install> can be a quick and painless way to get Catalyst up and
-running.  Just download the script from the link above and type C<perl
-cat-install>.
+Available at
+L<http://www.shadowcatsystems.co.uk/static/cat-install>,
+C<cat-install> can be a quick and painless way to get Catalyst
+up and running.  Just download the script from the link above
+and type C<perl cat-install>. This script automates the
+process of installing Catalyst itself and its dependencies,
+with bits of overriding so that the process does not require
+user interaction.
 
 =item * 
 
