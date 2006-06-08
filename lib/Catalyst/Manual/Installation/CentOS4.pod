@@ -150,7 +150,7 @@ Type C<yum -y update> to retrieve the latest patches.
 
 =item * 
 
-Type <yum -y install gcc expat-devel sqlite3> to install several
+Type C<yum -y install gcc expat-devel sqlite3> to install several
 packages used by Catalyst.
 
 =item * 
@@ -185,6 +185,7 @@ Type C<vi cat-install> to open the installer script, then insert the
 following lines at the bottom of the file (after the
 C<install('Catalyst');> line):
 
+    install('Digest::SHA1');
     install('Class::DBI');
     install('DBIx::Class');
     install('DBIx::Class::HTMLWidget');
