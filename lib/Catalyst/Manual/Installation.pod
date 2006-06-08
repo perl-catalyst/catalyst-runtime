@@ -30,23 +30,31 @@ dramatically ease this undertaking:
 
 Matt Trout's C<cat-install> script
 
-Available at
-L<http://www.shadowcatsystems.co.uk/static/cat-install>,
-C<cat-install> can be a quick and painless way to get Catalyst
-up and running.  Just download the script from the link above
-and type C<perl cat-install>. This script automates the
-process of installing Catalyst itself and its dependencies,
-with bits of overriding so that the process does not require
-user interaction.
+Available at L<http://www.shadowcatsystems.co.uk/static/cat-install>,
+C<cat-install> can be a quick and painless way to get Catalyst up and
+running on your system.  Just download the script from the link above
+and type C<perl cat-install>. This script automates the process of
+installing Catalyst itself and its dependencies, with bits of overriding
+so that the process does not require user interaction.
 
 =item * 
 
 Chris Laco's CatInABox
 
-Download the tarball from
+CatInABox is a complete version of Catalyst that is installed locally on
+your system, so that you don't need to go through the effort of doing a
+full install. Simply download the tarball from
 L<http://handelframework.com/downloads/CatInABox.tar.gz> and unpack it
 on your machine.  Depending on your OS platform, either run C<start.bat>
-or C<start.sh>.
+or C<start.sh> to set your bin/PERLLIB paths. This tarball contains
+everything needed to try out Catalyst including Catalyst itself,
+Template Toolkit, several Authentication modules, StackTrace, and a few
+other plugins.
+
+A special Win32 version is available upon request that contains many
+more plugins and pre-compiled modules, including DBIx::Class, DBI,
+SQLite, and Session support. If you are interested in this version,
+please send e-mail to C<claco@chrislaco.com>.
 
 =item * 
 
