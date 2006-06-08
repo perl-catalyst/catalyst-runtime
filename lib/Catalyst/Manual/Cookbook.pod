@@ -703,7 +703,7 @@ in your Catalyst application, then make the following changes:
       if( $c->login(
         $c->request->param('username'),
         $c->request->param('password'),
-        );
+        ) {
 
         # if login() returns 1, user is now logged in
         $c->response->redirect('/some/page');
