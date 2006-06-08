@@ -46,11 +46,11 @@ control. Catalyst itself!
 
 =back
 
-If you're unfamiliar with MVC and design patterns, you may want to check
-out the original book on the subject, I<Design Patterns>, by Gamma,
-Helm, Johnson, and Vlissides, also known as the Gang of Four (GoF).
-Many, many web application frameworks are based on MVC, including all
-those listed above.
+If you're unfamiliar with MVC and design patterns, you may want to
+check out the original book on the subject, I<Design Patterns>, by
+Gamma, Helm, Johnson, and Vlissides, also known as the Gang of Four
+(GoF).  Many, many web application frameworks are based on MVC, which
+is becoming a popular design method for web applications.
 
 =head3 Flexibility
 
@@ -278,6 +278,10 @@ information.
 
     $c->stash
     $c->stash->{foo} = 'bar';
+    $c->stash->{baz} = {baz => 'qox'};
+    $c->stash->{fred} = [qw/ wilma pebbles/];
+
+and so on.
 
 =back
 
