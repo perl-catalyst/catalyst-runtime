@@ -184,8 +184,7 @@ and other parts of a Catalyst application.
 
 In addition to the Model, View, and Controller components, there's a
 single class that represents your application itself. This is where you
-configure your application, load plugins, define application-wide
-actions, and extend Catalyst.
+configure your application, load plugins, and extend Catalyst.
 
     package MyApp;
 
@@ -198,16 +197,7 @@ actions, and extend Catalyst.
         # You can put anything else you want in here:
         my_configuration_variable => 'something',
     );
-
-    sub default : Private {
-        my ( $self, $context ) = @_;
-        $context->response->body('Catalyst rocks!');
-    }
-
     1;
-
-For most applications, Catalyst requires you to define only one config
-parameter:
 
 =over 4
 
@@ -311,6 +301,8 @@ to maintain more persistent data, use a session.
 
 =head3 Actions
 
+
+
 A Catalyst controller is defined by its actions. An action is a
 subroutine with a special attribute. You've already seen some examples
 of actions in this document. The URL (for example
@@ -318,6 +310,33 @@ http://localhost.3000/foo/bar) consists of two parts, the base
 (http://localhost:3000/ in this example) and the path (foo/bar).  Please
 note that the trailing slash after the hostname[:port] always belongs to
 base and not to the action.
+
+=over 4
+
+=item * B<Application Wide Actions>
+
+Actions which are called at the root level of the application
+(e.g. http:///localhost:3000/ ) go in MyApp::Controller::Root, like
+this:
+
+    package MyApp::Controller::Root;
+    use base 'Catalyst::Controller';
+    # Sets the actions in this controller to be registered with no prefix
+    # so they function identically to actions created in MyApp.pm
+    __PACKAGE__->config->{namespace} = '';
+    sub default : Private {
+        my ( $self, $context ) = @_;
+        $context->response->body('Catalyst rocks!');
+    }
+    1;
+
+
+=back
+
+For most applications, Catalyst requires you to define only one config
+parameter:
+
+=head4 Action types
 
 Catalyst supports several types of actions:
 
@@ -385,11 +404,15 @@ L</URL Path Handling> below.
 
 =item * B<Top-level> (B<Global>)
 
-    package MyApp; 
+    package MyApp::Controller::Foo;
     sub foo : Global { }
 
-Matches http://localhost:3000/foo. The function name is mapped directly
-to the application base.
+Matches http://localhost:3000/foo. The function name is mapped
+directly to the application base.  You can provide an equivalent
+function in this case  by doing the following:
+
+    package MyApp::Controller::Root
+    sub foo : Local { }
 
 =item * B<Namespace-Prefixed> (B<Local>)
 
@@ -956,6 +979,7 @@ David Naughton, C<naughton@umn.edu>
 Marcus Ramberg, C<mramberg@cpan.org>
 Jesse Sheidlower, C<jester@panix.com>
 Danijel Milicevic, C<me@danijel.de>
+Kieren Diment, C<kd@totaldatasolution.com>
 
 =head1 COPYRIGHT
 
