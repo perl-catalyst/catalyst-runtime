@@ -27,9 +27,6 @@ L<Catalyst::Manual::WritingPlugins>
 L<Catalyst::Manual::Internals>
     Here be dragons!
 
-L<Catalyst::Manual::FAQ>
-    Frequently Asked Questions.
-
 =head1 SUPPORT
 
 IRC:
