@@ -947,6 +947,103 @@ controller above
     sub new_password : Action { }
     sub sign_out : Action { }
 
+=head3 Models
+
+Models are providers of data. This data could come from anywhere - a search
+engine index, a database table, etc. Typically the data source does not have
+much to do with web applications or Catalyst - it could be used to write an
+offline report generator or a command line tool just the same.
+
+The common approach to writing a Catalyst-style model for your application is
+wrapping a generic model (e.g. L<DBIx::Class::Schema>, a bunch of XMLs, or
+anything really) with an object that contains configuration data, convenience
+methods, and so forth.
+
+#### editor: move this part to =head3 Components somehow, right after this
+#### section - this will require deeply rephrasing this paragraph.
+
+Technically, within Catalyst a model is a B<component> - an instance of the
+model's class belonging to the application. It is important to stress that the
+lifetime of these objects is per application, not per request.
+
+While the model base class (L<Catalyst::Model>) provides things like C<config>
+and stuff to better integrate the model into the application, sometimes this is
+not enough, and the model requires access to C<$c> itself.
+
+Situations where this need might arise include:
+
+=over 4
+
+=item *
+
+Interacting with another model
+
+=item *
+
+Using per-request data to control behavior
+
+=item *
+
+Using plugins in (for example L<Catalyst::Plugin::Cache>).
+
+=back
+
+From a style perspective usually it's bad to make your model "too smart" about
+things - it should worry about business logic and leave the integration details
+to the controllers. If, however, you find that it does not make sense at all to
+use an auxillary controller around the model, and the model's need to access
+C<$c> cannot be sidestepped, there exists a power tool called C<ACCEPT_CONTEXT>.
+
+#### editor note: this part is "generic" - it also applies to views and
+#### controllers.
+
+=head3 ACCEPT_CONTEXT
+
+Whenever you call $c->component("Foo") you get back an object - the instance of
+the model. If the component supports the C<ACCEPT_CONTEXT> method instead of
+returning the model itself, the return value of
+C<< $model->ACCEPT_CONTEXT( $c ) >> will be used.
+
+This means that whenever your model/view/controller needs to talk to C<$c> it
+gets a chance to do this when it's needed.
+
+A typical C<ACCEPT_CONTEXT> method will either clone the model and return one
+with the context object set, or it will return a thin wrapper that contains
+C<$c> and delegates to the per-application model object.
+
+A typicall C<ACCEPT_CONTEXT> method could look like this:
+
+	sub ACCEPT_CONTEXT {
+		my ( $self, $c, @extra_arguments ) = @_;
+		bless { %$self, c => $c }, ref($self);
+	}
+
+effectively treating $self as a B<prototype object> that gets a new parameter.
+C<@extra_arguments> comes from any trailing arguments to
+C<< $c->component( $bah, @extra_arguments ) >> (or C<< $c->model(...) >>,
+C<< $c->view(...) >> etc).
+
+The life time of this value is B<per usage>, and not per request. To make this
+per request you can use the following technique:
+
+Add a field to C<$c>, like C<my_model_instance>. Then write your
+C<ACCEPT_CONTEXT> method to look like this:
+
+	sub ACCEPT_CONTEXT {
+		my ( $self, $c ) = @_;
+
+		if ( my $per_request = $c->my_model_instance ) {
+			return $per_request;
+		} else {
+			my $new_instance = bless { %$self, c => $c }, ref($self);
+			Scalar::Util::weaken($new_instance->{c}); # or we have a circular reference
+			$c->my_model_instance( $new_instance );
+			return $new_instance;
+		}
+	}
+
+
+
 =head3 Testing
 
 Catalyst has a built-in http server for testing! (Later, you can easily
@@ -984,6 +1081,7 @@ Marcus Ramberg, C<mramberg@cpan.org>
 Jesse Sheidlower, C<jester@panix.com>
 Danijel Milicevic, C<me@danijel.de>
 Kieren Diment, C<kd@totaldatasolution.com>
+Yuval Kogman, C<nothingmuch@woobling.org>
 
 =head1 COPYRIGHT
 
