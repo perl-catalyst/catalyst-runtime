@@ -500,8 +500,9 @@ Returns a URI object for the current request. Stringifies to the URI text.
 
 =head2 $req->uri_with( { key => 'value' } );
 
-Returns a rewriten URI object for the current uri. Key/value pairs passed in
-will override existing parameters. Unmodified pairs will be preserved.
+Returns a rewritten URI object for the current request. Key/value pairs
+passed in will override existing parameters. Unmodified pairs will be
+preserved.
 
 =cut
 
