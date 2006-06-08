@@ -197,10 +197,6 @@ Catalyst::Plugin::DefaultEnd -- 0.06
 
 =item *
 
-Catalyst::Plugin::Dumper -- 0.000002
-
-=item *
-
 Catalyst::Plugin::HTML::Widget -- 1.1
 
 =item *

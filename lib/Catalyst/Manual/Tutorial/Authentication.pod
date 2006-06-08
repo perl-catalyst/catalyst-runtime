@@ -339,7 +339,6 @@ Edit C<lib/MyApp.pm> and update it as follows (everything below C<DefaultEnd> is
             ConfigLoader
             Static::Simple
             
-            Dumper
             StackTrace
             DefaultEnd
             

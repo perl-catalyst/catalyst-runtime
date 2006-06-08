@@ -2,8 +2,6 @@
 
 Catalyst::Manual::Tutorial::Debugging - Catalyst Tutorial - Part 6: Debugging
 
-
-
 =head1 OVERVIEW
 
 This is B<Part 6 of 9> for the Catalyst tutorial.
@@ -46,10 +44,9 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
-
 
 
 =head1 DESCRIPTION
@@ -57,7 +54,8 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 This part of the tutorial takes a brief look at the primary options
 available for troubleshooting Catalyst applications.
 
-Note that when it comes to debugging and troubleshooting, there are two camps:
+Note that when it comes to debugging and troubleshooting, there are two
+camps:
 
 =over 4
 
@@ -73,31 +71,29 @@ Fans of interactive debuggers.
 
 Catalyst is able to easily accommodate both styles of debugging.
 
-
-
 =head1 LOG STATEMENTS
 
 Folks in the former group can use Catalyst's C<$c-E<gt>log> facility.
-For example, if you add the following code to a controller action
-method:
+(See L<Catalyst::Log> for more detail.) For example, if you add the
+following code to a controller action method:
 
-    $c->log->debug("This is a test log message");
+    $c->log->info("Starting the foreach loop here");
+
+    $c->log->debug("Value of $id is: ".$id);
 
 Then the Catalyst development server will display your message along
-with the other debug output.  To accomplish the same thing in a TTSite
+with the other debug output. To accomplish the same thing in a TTSite
 view use:
 
     [% Catalyst.log.debug("This is a test log message") %]
 
-You can also use L<Data::Dumper|Data::Dumper> in both Catalyst code
-(C<$c-E<gt>log-E<gt>dumper($myvar)>) and TT templates (C<[%
-Dumper.dump(book) %]> as discussed in earlier parts of the tutorial.
-
-
+You can also use L<Data::Dumper> in both Catalyst code (C<use
+Data::Dumper; $c-E<gt>log-E<gt>debug("$var is: ".Dumper($var));)>) and
+TT templates (C<[% Dumper.dump(book) %]>.
 
 =head1 RUNNING CATALYST UNDER THE PERL DEBUGGER
 
-Members of the interactive debuggers fan club will also be at home with
+Members of the interactive-debugger fan club will also be at home with
 Catalyst applications.  One approach to this style of Perl debugging is
 to embed breakpoints in your code.  For example, open
 C<lib/MyApp/Controller/Books.pm> in your editor and add the
@@ -233,15 +229,14 @@ For more information on using the Perl debugger, please see C<perldebug>
 and C<perldebtut>.  You can also type C<h> or C<h h> at the debugger
 prompt to view the built-in help screens.
 
-
-
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark, under Creative Commons License (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
 Version: .94
 

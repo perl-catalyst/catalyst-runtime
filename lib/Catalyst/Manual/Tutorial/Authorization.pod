@@ -80,7 +80,6 @@ Edit C<lib/MyApp.pm> and add C<Authorization::Roles> to the list:
             ConfigLoader
             Static::Simple
             
-            Dumper
             StackTrace
             DefaultEnd
             
