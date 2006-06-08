@@ -121,6 +121,15 @@ e.g.:
     $c->log( MyLogger->new );
 
 Your logging object is expected to provide the interface described here.
+Good alternatives to consider are Log::Log4Perl and Log::Dispatch.
+
+If you want to be able to log arbitrary warnings, you can do something along
+the lines of
+
+    $SIG{__WARN__} = sub { MyApp->log->warn(@_); };
+
+however this is (a) global, (b) hairy and (c) may have unexpected side effects.
+Don't say we didn't warn you.
 
 =head1 LOG LEVELS
 
