@@ -1,847 +1,522 @@
 =head1 NAME
 
-Catalyst::Manual::Tutorial - Getting started with Catalyst
+Catalyst::Manual::Tutorial - Catalyst Tutorial: Overview
+
+
 
 =head1 DESCRIPTION
 
-This document aims to get you up and running with Catalyst.
-
-=head2 Installation
+The Catalyst framework is a flexible and comprehensive environment for quickly building high-functionality web applications.  This tutorial is design to provide a rapid introduction to its basics and most commonly used features while focusing on real-world best practices.
 
-The first step is to install Catalyst, and the simplest way to do this 
-is to install the Catalyst bundle from CPAN:
+The tutorial is broken down into the following sections:
 
-    $ perl -MCPAN -e 'install Task::Catalyst'
+=over 4
 
-This will retrieve Catalyst and a number of useful extensions and 
-install them for you. This process might not be totally painless
-though, and you might want to look at CatInABox at
-L<http://use.perl.org/~jk2addict/journal/28071>, especially if you are
-on a system that lacks a compiler.
+=item *
 
+L<Introduction|Catalyst::Manual::Tutorial01_Intro>
 
-=head2 The very basics - Setting up the skeleton application.
+=item * 
 
-Catalyst includes a helper script, C<catalyst.pl>, that will set up a 
-skeleton application for you:
+L<Catalyst Basics|Catalyst::Manual::Tutorial02_CatalystBasics>
 
-    $ catalyst.pl tutorial
+=item * 
 
-    created "tutorial"
-    created "tutorial/script"
-    ... output snipped
-    created "tutorial/script/tutorial_create.pl"
+L<CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
 
-This creates the directory structure, populated with skeleton 
-files.
+=item * 
 
-=head2 Testing out the skeleton application
+L<Authentication|Catalyst::Manual::Tutorial04_Authentication>
 
-You can test out your new application by running the server script that
-Catalyst provides:
+=item * 
 
-    $ cd tutorial
-    $ script/tutorial_server.pl 
+L<Authorization|Catalyst::Manual::Tutorial05_Authorization>
 
-    [debug] Debug messages enabled
-    [debug] Loaded plugins:
-    .------------------------------------------------------------------------------.
-    | Catalyst::Plugin::Static::Simple                                             |
-    '------------------------------------------------------------------------------'
-    [debug] Loaded dispatcher "Catalyst::Dispatcher"
-    [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [debug] Found home "/home/users/me/tutorial"
-    [debug] Loaded Private actions:
-    .--------------------------------------+---------------------------------------.
-    | Private                              | Class                                 |
-    +--------------------------------------+---------------------------------------+
-    | /default                             | tutorial                              |
-    '--------------------------------------+---------------------------------------'
+=item * 
 
-    [...] [catalyst] [info] tutorial powered by Catalyst 5.67
-    You can connect to your server at http://localhost:3000
+L<Debugging|Catalyst::Manual::Tutorial06_Debugging>
 
-(Note that each line logged by Catalyst begins with a timestamp, which has
-been replaced here with "C<...>" so that the text fits onto the lines.)
+=item * 
 
-The server is now waiting for you to make requests of it.  Try using 
-telnet to manually make a simple GET request of the server (when 
-telnet responds with "Escape character is '^]'.", type "GET / HTTP/1.0"
-and hit return twice):
+L<Testing|Catalyst::Manual::Tutorial07_Testing>
 
-    $ telnet localhost 3000
-    Trying 127.0.0.1...
-    Connected to localhost.
-    Escape character is '^]'.
-    GET / HTTP/1.0
+=item * 
 
-    HTTP/1.0 200 OK
-    Date: Mon, 07 Nov 2005 14:57:39 GMT
-    Content-Length: 5525
-    Content-Type: text/html; charset=utf-8
-    Status: 200
-    X-Catalyst: 5.67
+L<CRUD|Catalyst::Manual::Tutorial08_AdvancedCRUD>
 
-    [...]
-    Connection closed by foreign host.
-    $
+=item * 
 
-You can see the full welcome message by visiting
-http://localhost:3000/ with your browser.
+L<Appendicies|Catalyst::Manual::Tutorial09_Appendicies>
 
-More trace messages will appear in the original terminal window:
+=back
 
-    [debug] *** Request 1 (0.063/s) [2148]
-    [debug] Arguments are ""
-    [debug] "GET" request for "/" from localhost
-    [info] Request took 0.046883s (21.330/s)
-    .------------------------------------------------------------------+-----------.
-    | Action                                                           | Time      |
-    +------------------------------------------------------------------+-----------+
-    | /default                                                         | 0.000000s |
-    '------------------------------------------------------------------+-----------'
 
-The server will continue running until you interrupt it.
+Full source code is available for each section via the main Catalyst Subversion repository at L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/>.  See the end of each section for the specifics on retrieving code for that section.
 
-The application can also be tested from the command line using the generated
-helper script, C<script/tutorial_test.pl>.
+A tarball of the final application is available at C<to_be_compled_in_final_version>.
 
-=head2 Getting started
 
-So you picked Catalyst. Good choice. We assume you have installed it as
-well. For this tutorial you will also need the following modules:
 
-L<Catalyst::Plugin::Session>
+=head1 Detailed Table Of Contents
 
-L<Catalyst::Plugin::Session::Store::File>
+=head2 Part 1: Introduction
 
-L<Catalyst::Plugin::Session::State::Cookie>
+=over 4
 
-L<Catalyst::Plugin::Authentication>
+=item *
 
-L<Catalyst::Plugin::Authentication::Store::Minimal>
+VERSIONS AND CONVENTIONS USED IN THIS TUTORIAL
 
-L<Catalyst::Plugin::Authentication::::Minimal>
+=item *
 
-L<Catalyst::Plugin::Authentication::Credential::Password>
+CATALYST INSTALLATION
 
-L<Catalyst::Plugin::Authorization::Roles>
+=item *
 
-L<DBD::SQLite>
+DATABASES
 
-...
+=item *
 
-If you have not already done this following the example above, then to get 
-started all you need to do is type:
+WHERE TO GET WORKING CODE
 
-    catalyst.pl tutorial
+=back
 
-=for commentary
-Poor choice of application name - searching for "tutorial" in the docs
-also results in discussion of the tutorial process, which is probably
-not what the reader wants.
 
-=cut
 
-This should create a directory called F<tutorial> and fill it with the
-default (standard) Catalyst installation. Change to this directory
-because we will be running all further commands from inside the
-F<tutorial> directory.
+=head2 Part 2: Catalyst Application Development Basics
 
-If you now run the built-in mini-server with:
-    
-    script/tutorial_server.pl
+=over 4
 
-it will show some standard debug messages in the console screen 
-(more about those in a minute), and then inform you that you can now 
-connect to the test server on port 3000. Point your browser at 
-http://localhost:3000/ to see the built-in Catalyst welcome screen.
+=item *
 
-The other important thing B<catalyst.pl> did was create your root
-controller. This file is a standard Perl module like all the other
-controllers that you might add to your application. It lives in the
-F<lib/> directory, and will have the same name as you supplied to the
-command above. In our case it is F<tutorial.pm>. Alongside this file is
-a directory of the same name, which is the top level namespace for the
-entire application. Thus every other module we create will be
-"tutorial::something".
+CREATE A CATALYST PROJECT
 
-The root controller is used to load plugins, to configure the
-application and its plugins, and for generic private actions.  We will
-explain more about those later.
+=item *
 
-=head2 Debugging
+CREATE A SQLITE DATABASE
 
-The simplest way to debug your Catalyst application is to run it using
-the built-in mini-server as described in L<Getting started>. 
+=item *
 
-If you want to output any debugging information to the console, then
-call C<< $c->log->debug() >>, passing it a string to output. For data
-structures, C<use> L<Data::Dump> qw/dump/; and call 
-C<< $c->log->debug(dump($structure)) >>
+EDIT THE LIST OF CATALYST PLUGINS
 
-=head2 Model/View/Controller
+=item *
 
-The recommended method for code organization in a Catalyst application
-is known as the "Model View Controller" design pattern (also referred to
-"MVC". See L<http://en.wikipedia.org/wiki/Model-view-controller>). 
+DATABASE ACCESS WITH DBIx::Class
 
-The point of the MVC pattern is to separate the dependencies of parts of
-the application from each other, and give them standard
-interfaces. Following this theory of organization should give your code
-all the benefits of modularity. The main benefits are interchangeability
-of parts and reusability of code.
+=over 4
 
-Thus you could replace your flat-file data storage with a relational
-database, or your MySQL database with an Oracle database, and not have
-to change any of your Controller or View logic. Or you could later
-decide to output information from your application as RSS instead of
-HTML just by adding a new View module.
+=item *
 
-=head3 Model
+Create a DBIC Schema File
 
-Models deal with the storage of data. For a complex website, you may
-need multiple data sources, each having its own model class that
-provides an abstracted interface to it. In this tutorial we are going to
-be using a simple database.
+=item *
 
-=head3 View
+Create the DBIC ``Result Source'' Files
 
-Views are used to display information to the user. In a web framework,
-the View is generally used to output HTML to the browser. As mentioned
-previously, Views can also be used to output RSS or any other kind of
-data. One easy way to do this with Catalyst is to use a templating
-system such as L<Template Toolkit|Template>. If outputting HTML is all
-you are going to do, then you will probably only need one View.
+=item *
 
-=head3 Controller
+Use Catalyst::Model::DBIC::Schema To Load The Model Class
 
-A controller is responsible for responding to user choices, and thus
-controls what the application does. Since this is a web framework,
-Catalyst controllers are frequently used to react directly to URLs
-requested by the user. This tutorial will describe the simplest way of
-using controllers, where each path or part of a path is assigned its own
-action (or subroutine). More complex controlling mechanisms will be
-mentioned briefly, and can be read about in detail elsewhere in the
-manual.
+=back
 
+=item *
 
-=head2 Controlling
+CREATE A CATALYST CONTROLLER
 
-Now let's write our first bit of application code. First, we would like
-our application to greet our users. We'll assume for now that our users
-will be sent to the I<users/greet> URL. To create a controller that
-serves the I<users> namespace, we run the following command in our
-F<tutorial> directory:
+=item *
 
-    script/tutorial_create.pl controller Users
+CATALYST VIEWS
 
-This will create a Users.pm in F<lib/tutorial/Controller>. Open this
-file in an editor and take a look. You will notice there is some
-commented-out code which we will ignore for now. To make something
-happen when our URL is visited, we will write a "greet" action which
-looks like this:
+=over 4
 
-  sub greet : Local {
-    my ($self, $c) = @_;
+=item *
 
-    my $name = $c->req->param('name');
-    $c->log->debug("Got name: $name\n");
+Create a Catalyst View Using TTSITE
 
-    if ($c->req->method eq 'POST') {
-       if(!$name) {
-            $c->stash->{message} = 'Please fill in a name!';
-        }
-        else {
-            $c->stash->{message} = "Hello $name!";     
-        }
-    }
-    $c->stash->{template} = 'greet.tt';
-  }
+=item *
 
-Whew! So, what does all this do? Let's take it one step at a time. The
-subroutine declaration gives the action a name. To the right of the name
-there is an attribute type that looks like this:
+Globally Customize Every View
 
-    : Local 
-    
-That defines which URIs will translate to this action. "Local" matches
-exactly one URI: 
+=item *
 
-    /users/greet
-    
-The URI matched by "Local" is composed from the namespace minus the 
-tutorial::controller portion, that is common to all controllers, 
-and the action name itself.  Because it is a URI, we use forward slashes 
-instead of double colons.  So, in summary, when a user requests:
- 
-    http://localhost:3000/users/greet
-    
-the "greet" action defined above in the Users controller will be executed.
+Create a TT Template Page
 
-The second line retrieves the parameters Catalyst gives us when it calls
-our method. The first is the instance of our Users class, and the second
-is commonly called the "context", held in C<$context>, or abbreviated to
-C<$c>.  From now on, whenever we are talking about the context object,
-it will be represented as C<$c> in the code.
+=back
 
-The context is the magical object containing any information you need from 
-catalyst, or want to send to it, and is passed from action to action. 
-You will see it used frequently in Catalyst applications, and a list of all 
-its methods is available in the L<Catalyst> POD.
+=item *
 
-On the third line we use the ->param method of the context's request object
-to retrieve one of the query parameters, just like in L<CGI>.
+RUN THE APPLICATION
 
-On the fourth, we make a debug output of this object on the server console,
-or the error log if running under CGI or mod_perl.
+=back
 
-Next, if we have a post request, we check if the name field contains
-anything (or is "true"). If it isn't, we assign an error message to a
-"message" field in the stash. The stash is a special hash of the context
-object, which allows us to pass data on to other methods we call later,
-typically in the View.
 
-If the username did contain a value, then we just set our message to
-greet the user by name.
 
-Finally, we set the special "template" variable in the stash to the name
-of the template we want our View to use to display this page.
+=head2 Part 3: Basic CRUD
 
-=head2 Viewing
+=over 4
 
-OK, so reacting and checking the users data is all fine, but how do we
-actually display the page/form in the first place, and our results? In
-this tutorial, we'll use Template Toolkit for our viewing. To create our
-TT-based view, just run the following command:
+=item *
 
-    script/tutorial_create.pl view TToolkit TT
+FORMLESS SUBMISSION
 
-Notice that this time we not only gave it the type of module we wanted
-to create (a view), and a name, but also a third argument, "TT". This is
-a Catalyst helper module, which will make a standard Template Toolkit
-module for you. And that's all you need to do there.
-
-To use the view, the easiest way is to set up a standard "end" action.
-This is a special private action which will not be matched to a path
-like our "greet" action, but instead will be called after all other
-processing is done. Only one end action will be called in any request
-cycle. If there is one in a controller, it will be preferred over one in
-the application module, and so on.
+=over 4
 
-Since we're writing a simple application, just add an end action like
-this to F<tutorial.pm>:
-
-    sub end : Private {
-        my ($self, $c) = @_;
-        $c->forward('tutorial::View::TToolkit') unless $c->res->body();
-    }
-
-The first line declares the end sub, and marks it as a Private action.
-(This is the second and last attribute type we'll be using in this
-tutorial.) The second line collects our standard parameters as shown in
-the controller's greet action.
-
-The third line directs Catalyst to pass processing on to our TToolkit
-view. The forward method, when just passed a class name, calls
-C<process> on that class. The standard TT view's C<process> method
-renders the template named in the template variable in the stash, using
-all the other variables in the stash as values to fill it in.
-
-NB: This is such a common way to end your processing that there is a
-plugin which does it for you: L<Catalyst::Plugin::DefaultEnd>.
-
-Template Toolkit also has access to the entire context object via the
-special variable "c". For example, using C<[% c.config.name %]> in our
-template will output "tutorial", our project name.
-
-All that remains is to create a simple template called "greet.tt",
-containing a form with a text field called "name" like below.
-
-    <html><head><title> [% c.config.name %]</head><body>
-    <p>[% message %]</p>
-    <form action="[% c.req.uri %]" method="post">
-    <input type="text" name="name"/>
-    <input type="submit" value="Submit" name="submit"/>
-    </form>
-    </body></html>
-
-In the example above, we use C<[% c.req.uri %]>, since we're posting to
-ourself. If we post to another action, we commonly use the uri_for
-method, like this:
-
-    [% c.uri_for('/users/greet')%]
-
-Place this file in the F<root> directory. By default, templates are 
-searched for here, but we can change that, which brings us to...
-
-=head2 Configuring
-
-As previously mentioned, the configuration of modules, plugins, and so
-on is done in the main application file. This is especially true for
-bits which need to be done before an instance of them is created, for
-example Template Toolkit.
-
-The TT View looks for its templates in the F<root> directory by default.
-Since this is also the directory that static files go in, we'd rather
-have a separate F<templates> directory. To do this, change the config
-call in F<tutorial.pm> like this:
-
- __PACKAGE__->config( name => 'tutorial',
-                      'View::TToolkit' => {
-                          'INCLUDE_PATH' => __PACKAGE__->path_to('templates')
-     }
-  );
-
-And move the F<greet.tt> file from F<root> to the F<templates> directory
-(after creating it).
-
-Now we can run our application again by killing (B<ctrl-c>) and restarting
-B<script/tutorial_server.pl>. Try connecting to
-I<localhost:3000/users/greet> with a browser and see what happens. What
-happens if you try to visit I<localhost:3000/users> ? 
-
-=head2 Users and Authenticating
-
-One of the many reasons to write dynamic websites instead of just using
-static HTML is to allow us to produce different content for different
-users, as well as restricting access to pages (which we could do with
-just Apache's htpasswd system).
-
-In this tutorial, we will just be using basic authentication. When
-writing a real application, you'll want to use a database or other
-secure store to contain your user data.
-
-To add authentication, all we need to do is add the
-L<Catalyst::Plugin::Authentication> module to our main application
-file. Then we need to pick a storage method (one of the
-L<Catalyst::Plugin::Authentication::Store> modules), and a method of
-verifying the user's credentials (one of the
-L<Catalyst::Plugin::Authentication::Credential> modules). Edit
-F<tutorial.pm> to look like this:
-
- use Catalyst qw/-Debug Static::Simple Authentication 
-                Authentication::Store::Minimal 
-                Authentication::Credential::Password/;
-
-To configure, add some users to the config call. For example:
-
- authentication => { 'users' =>
-                       { 'fred' =>
-                           { 'password' => 'fred1234',
-                           }
-                       }
-                   }
-
-Generally, setting up configuration data for plugins is done based on
-the type of plugin. Check the documentation of the plugin for exact
-details; in this example we should look in
-L<Catalyst::Plugin::Authentication::Store::Minimal>.
-
-Since our user data is in the config, we can update it at runtime, and
-thus add users dynamically. (Of course, to keep them permanently we'd
-need to save our data to disk and read it back into the config on
-startup.)
-
-To allow creation of new users we'll add a C<create> action to our Users
-controller.
-
- sub create : Local {
-    my ($self, $c) = @_;
-    my ($username, $passwd1, $passwd2) = map { $c->req->param($_)} 
-       ('username', 'password', 'passwordverify');
-
-    if($username && $passwd1 && $passwd2) {
-       if($c->config->{authentication}{users}{$username}) {
-          $c->stash->{message} = 'Sorry, that user already exists';
-          $c->stash->{username} = $username;
-       }
-       elsif($passwd1 eq $passwd2) {
-            $c->config->{authentication}->{users}->{$username} =
-                {password => $passwd1};
-          $c->stash->{message} = 'User created!';
-       }
-       else {
-          $c->stash->{username} = $username;
-          $c->stash->{message} = 'Passwords do not match!';
-       }
-    }
-    $c->stash->{template} = 'usercreate.tt';
- }
-
-All this is doing is checking that all the appropriate fields are
-filled, and that the password fields contain the same data, and then
-adding the user to the config hash.  All the checks produce a message
-which can be displayed to the user via the View.
-
-The usercreate.tt template looks like this:
-
- <html><head><title>[% c.config.name %]</title></head><body>
- <h1>Create a new user</h1>
- <h2>Current users are:</h2>
- <p>
-    [% FOREACH key = c.config.authentication.users.keys %]
-        [% key %]<br/>
-    [% END %]
- </p>
- <p> [% message %] </p>
- <form action="/users/create" method="post">
- <p>User Name: <input type="text" name="username"/></p>
- <p>Password: <input type="password" name="password"/></p>
- <p>Confirm Password: <input type="password" name="passwordverify"/></p>
- <p><input type="submit" name="submit" value="submit"></p>
- </form>
- </body></html>
-
-In order for our users to be able to login, we need a C<login> action
-which we put in the Users controller:
-
- sub login : Local {
-     my ($self, $c) = @_;
-     $c->stash->{template} = 'userlogin.tt';
-     if(!$c->login()) {
-             $c->stash->{message} = 'Please login.';
-     }
-     else {
-         $c->stash->{message} = "Welcome " . $c->user->id;
-     }
- }
-
-
-And the userlogin.tt template:
-
- <html><head><title>[% c.config.name %]</title></head><body>
- <p> [% message %] </p>
- <form name='login' action='/users/login' method='post'>
- <p>Username: <input type='text' name='user' /></p>
- <p>Password: <input type='password' name='password' /></p>
- <p><input type="submit" /></form>
- </body></html>
-
-
-Very simple. Since Credential::Password's "login" call extracts the
-username/password data from the query itself (assuming we use a standard
-name for our form fields), we don't have to do anything but call it.
-
-To keep the user logged in, all we need to do is add the Session modules
-to our collection, and the Auth modules will automatically use them:
-
- use Catalyst qw/-Debug Static::Simple Authentication 
-                 Authentication::Store::Minimal 
-                 Authentication::Credential::Password
-                 Session Session::Store::File Session::State::Cookie/;
-
-Magic!
-
-=head2 Exercise
-
-As an exercise for the reader, do the following:
-
-Change C<users/greet> and C<greet.tt> so that the welcome message greets
-the user by name.
-
-Enforce user logging in by adding an C<auto> action in tutorial.pm (see
-the L<Catalyst> documentation to find out about the C<auto> action).
-
-=head2 Authorizing
-
-Authentication is about verifying users, and authorization is about
-allowing them to do things. Catalyst currently has two Authorization
-modules, Roles and ACL. The Roles module allows you to define groups
-which you can assign your users to, and then allow access to areas of
-your website to the groups. The ACL module lets you do more fine grained
-access/restriction by allowing of denying access however you like. (It
-also supports Roles as done by the roles module.) This example uses
-L<Catalyst::Plugin::Authorization::Roles>. To use this add
-"Authorization::Roles" into the "use Catalyst" statement in tutorial.pm.
-
-Adding Roles via the Minimal store we are already using is quite simple,
-we just add a roles key to each user, defining the names of the roles
-they belong to.
-
- authentication => { 'users' =>
-                            { 'fred' => 
-                               { 'password' => 'fred1234',
-                                 'roles'       => ['admin']
-                               }
-                            }
-                         }
-
-We need an interface for our admins to administer the roles, i.e. assign
-the users to groups. To restrict access to certain actions, we just need
-to call C<< $c->check_user_roles() >> in each action. So we can
-make a restricted I<http://localhost:3000/users/groups> page like this:
-
- sub groups : Local {
-    my ($self, $c) = @_;
-    if($c->check_user_roles('admin')) {
-       # Now we can do things only an admin will see
-       if (my $params = $c->req->params) {
-          my $users = $c->config->{authentication}{users};
-          foreach my $u (keys %$params) {
-             $users->{$u}{roles} = $params->{$u} if($users->{$u});
-          }
-          $c->stash->{message} = 'Updated user roles!';
-       }
-       else {
-           $c->stash->{users} = $c->config->{authentication};
-       }
-       $c->stash->{template} = 'usersgroups.tt';
-    }
-    else {
-        $c->stash->{message} = 'Admins Only!';
-        $c->stash->{template} = 'error.tt';
-    }
- }
-
-What we are doing here is checking whether the logged-in user (used by
-default in the C<check_user_roles> method) is a member of the admin
-group. If it is, then we display the usergroups template, and update
-the users hash as required. Otherwise, we just show the user an error
-page.
-
-For this simple example, the usersgroups.tt and error.tt templates could
-both look like this:
-
- <html><head><title>[% c.config.name %]</title></head><body>
- <p>[% message %]</p>
- <p>[% c.stash.users %]</p>
- </body></html>
-
-And that's all there is to it.
-
-=for authors
-So it's not clear what the groups action is doing - and with the
-current template, nothing happens.  Running through the sample code,
-it's clear what's happening (which is very little), but the purpose,
-and how to display data is not clear.
-
-=cut
-
-So that you can test this out properly without having to go to the
-trouble of deleting browser cookies manually, we will add a logout
-action in the Users controller:
-
- sub logout : Local {
-    my ($self, $c) = @_;
-    $c->stash->{message} = "You have successfully logged out";
-    $c->logout;
- }
-
-
-=head2 Data Storage (Modelling)
-
-Whether we want our users to be able to contribute to our website, or
-just create it from changeable data, we need to store the data
-somewhere. Generally this is done using a database, but models can also
-use other data sources, for example another website, or an RSS feed.
-
-If you have or want a database, there are still choices to be
-made. There are several modules for accessing databases using an
-object-oriented wrapper. The best known are probably L<DBIx::Class> and
-L<Class::DBI>. Catalyst supports making models using either of these.
-
-For a simple example, we will allow our users to store their favorite
-greeting in our database. Create a table called "greetings" in a
-database, that contains a "user" field and a "greeting" field. The
-simplest way to create a model of your database is to use these helper
-modules, for example with L<DBIx::Class>:
-
-    script/tutorial_create.pl model UserData DBIC dbi:SQLite:/path/to/mydb.db
-
-This will cause the DBIx::Class Loader to inspect your database, and create a
-module in the Model::UserData namespace for each table in your database. 
-
-Now we need a form for our users to enter/edit their personal greetings
-in, so we'll make a I<http://localhost:3000/users/editgreeting> page:
-
- sub editgreeting : Local {
-    my ($self, $c) = @_;
-    if($c->req->params->{greeting}) {
-       if(!$c->user_exists) {
-          $c->stash->{message} = "You're not logged in!";
-       }
-       else {
-          my $grtable = $c->model('UserData::Greetings');
-          my $record = $grtable->find_or_create(user => $c->user->id);
-          $record->greeting($c->req->params->{greeting});
-          $record->update;
-          $c->stash->{message} = 'Greeting updated';
-       }
-    }
-    $c->stash->{template} = 'usersgreeting.tt';
- }
-
-Using C<< $c->user_exists >> from the Authentication plugin, this checks
-whether the user is logged in already. If they are, and they have
-entered a new greeting, we use DBIx::Class' C<find_or_create> method to
-fetch or create a new record in the greetings table for the user. Once
-we have the record, we change the value of the greeting field, and call
-C<update> to store the new value in the database.
-
-=head2 Engines (Apache and FastCGI)
-
-Now that we have the basics together, we can try running our application on a
-"real" server instead of just using the test server that Catalyst comes
-with. L<Catalyst::Engine> is the module used to implement various types of
-servers to run it on. The current popular ones are Apache and FastCGI.
-
-=head3 Apache
-
-Apache needs to be configured: we need to tell it to load your
-application. You can either use Catalyst for your entire website, or
-subsections. Use the Location directive to choose a path to run your
-application under: 
-
- <Location />
-   SetHandler           perl-script
-   PerlResponseHandler  tutorial
- </Location>
-
-You will need to install the perl modules of your application into one
-of perl's library directories, as listed by B<perl -V>, so that Apache
-can find them. Alternatively you can use the C<PerlSwitches> directive
-to tell Apache where to look:
-
- PerlSwitches -I/path/to/tutorial/
-
-These instructions are for using Apache2 and mod_perl 2.0. If you are
-using mod_perl 1.3 or 1.99, please refer to either
-L<Catalyst::Engine::Apache::MP13> or L<Catalyst::Engine::Apache2::MP19>
-for details of the slightly different ways to do it.
-
-If you wish to ensure that Apache pre-loads your application, use the
-PerlModule directive. This means that there will be less of a delay when
-your application is accessed.
-
- PerlModule tutorial
-
-=head3 FastCGI
-
-These instructions apply to the use of C<mod_fastcgi> under Apache
-(either 1 or 2 series).
-
-There are 3 ways to attach a program to a URL with C<mod_fastcgi>;
-we'll examine all of them, and explain how to avoid having the
-C<tutorial_fastcgi.pl> substring in the user-visible URLs.
-
-In all of these examples, we assume that the C<DocumentRoot> is
-C</var>, that our app is called C<tutorial> and is kept in C</usr>, that
-you want the users to access the app either from the root of the
-server-uri-space, or from C</theapp>. We also assume that the general
-FastCGI settings (C<FastCgiIpcDir>, loading the module) are already
-correct (they don't depend on Catalyst or your application layout).
-
-=head4 static application
-
-In this setup, you tell C<mod_fastcgi> that a particular I<file> is to
-be run as a FastCGI handler. Put this somewhere in Apache's
-configuration:
-
-  FastCgiServer /usr/apps/tutorial/script/tutorial_fastcgi.pl
-  Alias / /usr/apps/tutorial/script/tutorial_fastcgi.pl/
-
-If you want your app under C</theapp>, change the C<Alias> line to:
-
-  Alias /theapp /usr/apps/tutorial/script/tutorial_fastcgi.pl
-
-Note the detail of the trailing C</ >: this is a general rule of the
-C<Alias> directive, both sides must end with C</ >, or both must not;
-you can't have one with C</ > and the other without, or strange things
-happen.
-
-=head4 dynamic application
-
-In this setup, you tell C<mod_fastcgi> that certain files are to be
-treated as FastCGI handlers, in the same way you have to tell
-C<mod_cgi>. Put this in the configuration:
-
-  FastCgiConfig -autoUpdate
-
-  <Directory /usr/apps/tutorial/script>
-   Options +ExecCGI
-   <Files *_fastcgi.pl>
-    SetHandler fastcgi-script
-   </Files>
-  </Directory>
-
-  Alias / /usr/apps/tutorial/script/tutorial_fastcgi.pl/
-
-Again, if you want your app under C</theapp>, change the C<Alias> line to:
-
-  Alias /theapp /usr/apps/tutorial/script/tutorial_fastcgi.pl
-
-=head4 external server
-
-In this setup, the application is started separately from Apache, and
-communicates via a socket with C<mod_fastcgi>. This can be useful if
-you need to have a particular environment for your application (maybe
-different between applications), or you want to run them on different
-machines, or under different users for security reasons.
-
-If you want to use a UNIX socket (on the filesystem), put this in
-Apache's configuration:
-
-  FastCgiExternalServer /tmp/somewhere -socket /tmp/tutorial-socket
-  Alias / /tmp/somewhere/
-
-Note that C</tmp> should I<not> exist: it's just a name to connect the
-two parts.
-
-Again, if you want your app under C</theapp>, change the C<Alias> line
-to:
-
-  Alias /theapp /tmp/somewhere
-
-Then start your Catalyst application:
-
-  $ cd /usr/apps/tutorial
-  $ ./script/tutorial_fastcgi -l /tmp/tutorial-socket
-
-If you want to use a TCP socket, simply change the C</tmp> to a
-C<host:port> pair, both in Apache's configuration and on the command
-line of your application.
-
-=head2 Upgrading
-
-Upgrading your application to newer Catalyst versions is quite
-simple. After installing the new Catalyst package, just run:
-
-    catalyst.pl -scripts
-
-One level above your application directory. This will update the scripts
-directory only, and leave the rest of your app alone. If you wish to
-make use of other parts of Catalyst that have been updated, leave off
-the B<-scripts> argument, this will cause .new files to appear, for each
-module that has either been updated, or is different to the original
-because you have changed it. To find out what these changes are, type:
-
-    diff tutorial/lib/tutorial/View/TT.pm tutorial/lib/tutorial/View/TT.pm.new
-
-for each of the changed files. (This is a Unix command; Windows users
-will need to find some equivalent.) Copy any changes you need into your
-original file, then remove the .new files. (This makes life less
-complicated when the next upgrade comes around.)
-
-=head1 AUTHORS
-
-Jess Robinson, C<jrobinson@cpan.org>
-Andrew Ford, C<A.Ford@ford-mason.co.uk>
-Marcus Ramberg, C<mramberg@cpan.org>
-Kieren Diment, C<kd@totaldatasolution.com>
-Gavin Henry, C<ghenry@cpan.org>
-
-Please send comments, corrections and suggestions for improvements to
-jrobinson@cpan.org, ghenry@cpan.org
-
-=head1 TODO
-
-Finish DBIC examples with templates and tested code. Make /users/groups
-do something "useful".
-
-Many other things....
-
-=head1 COPYRIGHT
-
-This program is free software, you can redistribute it and/or modify 
-it under the same terms as Perl itself.
+=item *
+
+Include a Create Action in the Books Controller
+
+=item *
+
+Include a Template for the url_create Action:
+
+=item *
+
+Try the url_create Feature
+
+=back
+
+=item *
+
+MANUALLY BUILDING A CREATE FORM
+
+=over 4
+
+=item *
+
+Add Method to Display The Form
+
+=item *
+
+Add a Template for the Form
+
+=item *
+
+Add Method to Process Form Values and Update Database
+
+=item *
+
+Test Out The Form
+
+=back
+
+=item *
+
+A SIMPLE DELETE FEATURE
+
+=over 4
+
+=item *
+
+Include a Delete Link in the List
+
+=item *
+
+Add a Delete Action to the Controller
+
+=item *
+
+Try the Delete Feature
+
+=back
+
+=back
+
+
+
+=head2 Part 4: Authentication
+
+=over 4
+
+=item *
+
+BASIC AUTHENTICATION
+
+=over 4
+
+=item *
+
+Add Users and Roles to the Database
+
+=item *
+
+Add User and Role Information to Dbic Schema
+
+=item *
+
+Create New ``Result Source Objects''
+
+=item *
+
+Sanity-Check Reload of Development Server
+
+=item *
+
+Include Authentication and Session Plugins
+
+=item *
+
+Configure Authentication
+
+=item *
+
+Add Login and Logout Controllers
+
+=item *
+
+Add a Login Form TT Template Page
+
+=item *
+
+Add Valid User Check
+
+=item *
+
+Displaying Content Only to Authenticated Users
+
+=item *
+
+Try Out Authentication
+
+=back
+
+=item *
+
+USING PASSWORD HASHES
+
+=over 4
+
+=item *
+
+Get a SHA-1 Hash for the Password
+
+=item *
+
+Switch to SHA-1 Password Hashes in the Database
+
+=item *
+
+Enable SHA-1 Hash Passwords in Catalyst::Plugin::Authentication::Store::DBIC
+
+=item *
+
+Try Out the Hashed Passwords
+
+=back
+
+=back
+
+
+
+=head2 Part 5: Authorization
+
+=over 4
+
+=item *
+
+BASIC AUTHORIZATION
+
+=over 4
+
+=item *
+
+Update Plugins to Include Support Authorization
+
+=item *
+
+Add Config Information for Authorization
+
+=item *
+
+Add Role-Specific Logic to the ``Book List'' Template
+
+=item *
+
+Limit Books::add to admin Users
+
+=item *
+
+Try Out Authentication And Authorization
+
+=back
+
+=item *
+
+ENABLE ACL-BASED AUTHORIZATION
+
+=over 4
+
+=item *
+
+Add the Catalyst::Plugin::Authorization::ACL Plugin
+
+=item *
+
+Add ACL Rules to the Application Class
+
+=item *
+
+Add a Method to Handle Access Violations
+
+=back
+
+=back
+
+
+=head2 Part 6: Debugging
+
+=over 4
+
+=item *
+
+LOG STATEMENTS
+
+=item *
+
+RUNNING CATALYST UNDER THE PERL DEBUGGER
+
+=back
+
+
+
+=head2 Part 7: Testing
+
+=over 4
+
+=item *
+
+RUNNING THE "CANNED" CATALYST TESTS
+
+=item *
+
+RUNNING A SINGLE TEST
+
+=item *
+
+ADDING YOUR OWN TEST SCRIPT
+
+=item *
+
+SUPPORTING BOTH PRODUCTION AND TEST DATABASES
+
+=back
+
+
+
+=head2 Part 8: Advanced CRUD
+
+=over 4
+
+=item *
+
+HTML::WIDGET FORM CREATION
+
+=over 4
+
+=item *
+
+Add the HTML::Widget Plugin
+
+=item *
+
+Add a Form Creation Helper Method
+
+=item *
+
+Add Actions to Display and Save the Form
+
+=item *
+
+Update the CSS
+
+=item *
+
+Create a Template Page To Display The Form
+
+=item *
+
+Add Links for Create and Update via HTML::Widget
+
+=item *
+
+Test The <HTML::Widget> Create Form
+
+=back
+
+=item *
+
+HTML::WIDGET VALIDATION AND FILTERING
+
+=over 4
+
+=item *
+
+Add Constraints and Filters to the Widget Creation Method
+
+=item *
+
+Rebuild the Form Submission Method to Include Validation
+
+=item *
+
+Try Out the Form
+
+=back
+
+=item *
+
+Enable DBIx::Class::HTMLWidget Support
+
+=over 4
+
+=item *
+
+Add DBIx::Class::HTMLWidget to DBIC Model
+
+=item *
+
+Use populate_from_widget in hw_create_do
+
+=back
+
+=back
+
+
+
+=head2 Part 9: Appendices
+
+=over 4
+
+=item *
+
+APPENDIX 1: CUT AND PASTE FOR POD-BASED EXAMPLES
+
+=over 4
+
+=item *
+
+"Un-indenting" with Vi/Vim
+
+=item *
+
+"Un-indenting" with Emacs
+
+=back
+
+=item *
+
+APPENDIX 2: USING MYSQL AND POSTGRESQL
+
+=over 4
+
+=item *
+
+MySQL
+
+=item *
+
+PostgreSQL
+
+=back
+
+=back
+

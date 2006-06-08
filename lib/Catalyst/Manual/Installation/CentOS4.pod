@@ -1,0 +1,203 @@
+=head1 NAME
+
+Catalyst::Manual::Installation::CentOS4 – Catalyst Installation on CentOS 4
+
+
+
+=head1 DESCRIPTION
+
+This document provides directions on how to install CentOS 4 (a rebuild of RedHat Enterprise 4) and then install Catalyst.
+
+If you already have a functioning install of CentOS, RHEL, or a comparable Linux OS, you should be able to skip this first section and go straight to the C<INSTALL CATALYST> section.
+
+
+=head1 INSTALL CENTOS
+
+These directions are written for CentOS 4.3 on an i386 machine; however, you can substitute other versions as they become available.
+
+
+=over 4
+
+=item * 
+
+Go to L<http://isoredirect.centos.org/centos/4/isos/i386/> and click the nearest mirror.
+
+=item * 
+
+Download C<CentOS-4.3-i386-bin1of4.iso> (you only need the first disk).
+
+=item * 
+
+Burn the .iso to CD.
+
+=item * 
+
+Insert the CD into your machine and power it up.
+
+=item * 
+
+Hit C<Enter> at the C<boot:> prompt.
+
+=item * 
+
+CD media test: you can either select C<OK> or C<Skip> depending on whether or not you trust your burn.
+
+=item * 
+
+The installation GUI should start.  Click next at the "Welcome to CentOS-4" screen.
+
+=item * 
+
+Select a language and click C<Next>.
+
+=item * 
+
+Select a keyboard configuration and click C<Next>.
+
+=item * 
+
+Select C<Custom> for the installation type and click C<Next>.
+
+=item * 
+
+Leave C<Automatically partition> selected on the C<Disk Partitioning Setup> and click C<Next>.
+
+=item * 
+
+Uncheck C<Review (and modify if needed) the partitions created>, but leave the rest of the default settings on the C<Automatic Partitioning> screen.  Then click C<Next>.
+
+=item * 
+
+Click C<Yes> at the C<Are you sure you want to do this?> warning.
+
+=item * 
+
+Click C<Next> on the C<Boot Loader Configuration> screen.
+
+=item * 
+
+Update the C<Network Configuration> screen as necessary and click C<Next>.
+
+=item * 
+
+Check C<Remote Login (SSH)> and click C<Next> on the C<Firewall Configuration> screen.
+
+=item * 
+
+Select additional languages as necessary.  Click C<Next>.
+
+=item * 
+
+Select the appropriate time zone and click C<Next>.
+
+=item * 
+
+Enter a root password and click C<Next>.
+
+=item * 
+
+Scroll to the bottom of the C<Package Group Selection> screen and check C<Minimal> (the last option).  Click C<Next>.
+
+=item * 
+
+Click C<Next> at the C<About to Install> screen.
+
+=item * 
+
+The installation will prepare the hard drive and then install the required rpm packages.
+
+=item * 
+
+Once the installation completes, remove the CD and click C<Reboot>.
+
+=item * 
+
+Type C<vi /etc/sysconfig/iptables> and add the following line as the third to last line of the file (I<above> the C<-A RH-Firewall-1-INPUT -j REJECT --reject-with icmp-host-prohibited> line):
+
+    -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 3000 -j ACCEPT
+
+This will allow Catalyst to make use of port 3000 (the default for the development server).
+
+Type C<service iptables restart> to restart the iptables firewall using the updated configuration.
+
+=item * 
+
+Type C<yum –y update> to retrieve the latest patches.
+
+=back
+
+
+=head1 INSTALL CATALYST
+
+=over 4
+
+=item * 
+
+Type <yum -y install gcc expat-devel sqlite3> to install several packages used by Catalyst.
+
+=item * 
+
+Type the following:
+
+    perl -MCPAN -e shell
+    
+    ...
+    
+    Are you ready for manual configuration? [yes] n
+    
+    ...
+    
+    cpan shell -- CPAN exploration and modules installation (v1.7601)
+    ReadLine support available (try 'install Bundle::CPAN')
+    
+    cpan> force install Module::Build
+    
+    ...
+    
+    cpan> quit
+
+=item * 
+
+Type C<wget http://www.shadowcatsystems.co.uk/static/cat-install> to retrieve a copy of the C<cat-install> script.
+
+=item * 
+
+Type C<vi cat-install> to open the installer script, then insert the following lines at the bottom of the file (after the C<install('Catalyst');> line):
+
+    install('Class::DBI');
+    install('DBIx::Class');
+    install('DBIx::Class::HTMLWidget');
+    install('Catalyst::Plugin::Session');
+    install('Catalyst::Plugin::Session::State::Cookie');
+    install('Catalyst::Plugin::Session::Store::FastMmap');
+    install('Catalyst::Plugin::Authorization::ACL');
+    install('Catalyst::Plugin::Authentication');
+    install('Catalyst::Plugin::Authorization::Roles');
+    install('Catalyst::Plugin::Authentication::Store::DBIC');
+    install('Catalyst::Plugin::DefaultEnd');
+    install('Catalyst::Plugin::StackTrace');
+    install('Catalyst::Plugin::Dumper');
+    install('Catalyst::Model::DBIC::Schema');
+    install('Catalyst::View::TT');
+    install('Test::WWW::Mechanize::Catalyst');
+
+=item * 
+
+Type C<perl cat-install>.  It will take a while to complete.
+
+=back
+
+You should now have a functioning Catalyst installation with the modules and plugins required to run the Catalyst tutorial.
+
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Please report any errors, issues or suggestions to the author.
+
+Copyright 2006, Kennedy Clark, under Creative Commons License (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
+
+Version: .01
+

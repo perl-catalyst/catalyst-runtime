@@ -1,0 +1,270 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial::Intro - Catalyst Tutorial – Part 1: Introduction
+
+
+
+=head1 OVERVIEW
+
+This is B<Part 1 of 9> for the Catalyst tutorial.
+
+L<Totorial Overview|Catalyst::Manual::Tutorial>
+
+=over 4
+
+=item 1
+
+B<Introduction>
+
+=item 2
+
+L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
+
+=item 3
+
+L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+
+=item 4
+
+L<Authentication|Catalyst::Manual::Tutorial::Authentication>
+
+=item 5
+
+L<Authorization|Catalyst::Manual::Tutorial::Authorization>
+
+=item 6
+
+L<Debugging|Catalyst::Manual::Tutorial::Debugging>
+
+=item 7
+
+L<Testing|Catalyst::Manual::Tutorial::Testing>
+
+=item 8
+
+L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
+
+=item 9
+
+L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+
+=back
+
+
+
+=head1 DESCRIPTION
+
+This tutorial provides a nine-part introduction to the Catalyst web framework.  It seeks to provide a rapid overview of many of its most commonly used features.  The focus is on the real-world best practices required in the construction of nearly all Catalyst applications.
+
+Although the primary target of the tutorial is users new to the Catalyst framework, experienced users may wish to review specific sections (for example, how to use DBIC for their model classes or how to add authentication and authorization to an existing application).
+
+Subjects covered include:
+
+=over 4
+
+=item * 
+
+A simple application that lists and adds books.
+
+=item *
+
+The use of C<DBIx::Class> (DBIC) for the model.
+
+=item * 
+
+How to write CRUD (Create, Read, Update and Delete) operations in Catalyst.
+
+=item *
+
+Authentication ("auth").
+
+=item * 
+
+Role-based authorization ("authz").
+
+=item * 
+
+Attempts to provide an example showing current Catalyst 5.70 practices. For example, the use of C<Catalyst::Plugin::DefaultEnd>, DBIC, C<Catalyst::Plugin::ConfigLoader> with myapp.yml, the use of C<lib/MyApp/Controller/Root.pm> vs. C<lib/MyApp.pm>, etc.
+
+=item * 
+
+The use of Template Toolkit (TT) and the C<Catalyst::Helper::View::TTSite> view helper.
+
+=item * 
+
+Useful techniques for troubleshooting and debugging Catalyst applications.
+
+=item * 
+
+The use of SQLite as a database (with code also provided for MySQL and PostgreSQL).
+
+=item * 
+
+How to use HTML::Widget for automated form processing and validation.
+
+=back
+
+This tutorial intentionally seeks to make the learning process its main priority.  For example, the level of comments in the code found here would like be considered excessive in a "normal project".  Because of their contextual value, this tutorial will generally favor inline comments over a separate discussion in the text.  It also deliberately tries to demonstrate multiple approaches to various features (in general, you should try to be as consistent as possible with your own production code).
+
+Furthermore, this tutorial tries to minimize the number of controllers, models, TT templates, and database tables.  Although this does result in things being a bit contrived at times, the concepts should be applicable to more complex environments.  More complete and complicated example applications can be found in the C<examples> area of the Catalyst Subversion repository at L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/>.
+
+B<Note:> There are a variety of other introductory materials available through the Catalyst web site and at L<http://dev.catalyst.perl.org/wiki/UserIntroductions> and L<http://dev.catalyst.perl.org/>.
+
+
+
+=head1 VERSIONS AND CONVENTIONS USED IN THIS TUTORIAL
+
+This tutorial was built using the following resources.  Please note that you will need to make adjustments for different environments and versions:
+
+=over 4
+
+=item * 
+
+OS = CentOS 4 Linux (RHEL 4)
+
+=item * 
+
+Catalyst v5.67
+
+=item * 
+
+DBIx::Class v0.06002
+
+=item * 
+
+Catalyst Plugins
+
+You shouldn't be overly concerned about plugin version numbers, but there could be cases where the tutorial is impacted by what version plugins you use.  The plugins used in this tutorial are:
+
+=over 4
+
+=item * 
+
+Catalyst::Plugin::Authentication -- 0.07
+
+=item *
+
+Authentication::Credential::Password -- 0.07
+
+=item *
+
+Catalyst::Plugin::Authentication::Store::DBIC -- 0.06
+
+=item *
+
+Catalyst::Plugin::Authorization::ACL -- 0.06
+
+=item *
+
+Catalyst::Plugin::Authorization::Roles -- 0.04
+
+=item *
+
+Catalyst::Plugin::ConfigLoader -- 0.07
+
+=item *
+
+Catalyst::Plugin::DefaultEnd -- 0.06
+
+=item *
+
+Catalyst::Plugin::Dumper -- 0.000002
+
+=item *
+
+Catalyst::Plugin::HTML::Widget -- 1.1
+
+=item *
+
+Catalyst::Plugin::Session -- 0.05
+
+=item *
+
+Catalyst::Plugin::Session::FastMmap -- 0.12
+
+=item *
+
+Catalyst::Plugin::Session::State::Cookie -- 0.02
+
+=item *
+
+Catalyst::Plugin::Session::Store::FastMmap -- 0.0
+
+=item *
+
+Catalyst::Plugin::StackTrace -- 0.0
+
+=item *
+
+Catalyst::Plugin::Static::Simple -- 0.14
+
+=back
+
+=item * 
+
+Since the web browser is being used on the same box where Perl and the Catalyst development server is running, the URL of C<http://localhost:3000> will be used (the Catalyst development server defaults to port 3000).  If you are running Perl on a different box than where your web browser is located (or using a different port number via the C<-p> I<port_number> option to the development server), then you will need to update the URL you use accordingly.
+
+=item * 
+
+Depending on the web browser you are using, you might need to hit C<Shift+Reload> to pull a fresh page when testing your application at various points.  Also, the C<-k> keepalive option to the development server can be necessary with some browsers (especially Internet Explorer).
+
+=back
+
+
+
+=head1 CATALYST INSTALLATION
+
+Unfortunately, one of the most daunting tasks faced by newcomers to Catalyst is getting it installed.  Although a compelling strength of Catalyst is that it can easily make full use of CPAN, a vast repository of Perl modules, this can result in initial installations that are both time consuming and frustrating.  However, there are a growing number of methods that can dramatically ease this undertaking.  Of these, the following are likely to be applicable to the largest number of potential new users:
+
+=over 4
+
+=item * 
+
+Matt Trout’s C<cat-install>
+
+Available at L<http://www.shadowcatsystems.co.uk/static/cat-install>, C<cat-install> can be a quick and painless way to get Catalyst up and running.  Just download the script from the link above and type C<perl cat-install>.
+
+=item * 
+
+Chris Laco's CatInABox
+
+Download the tarball from L<http://handelframework.com/downloads/CatInABox.tar.gz> and unpack it on your machine.  Depending on your OS platform, either run C<start.bat> or C<start.sh>.
+
+=item * 
+
+Pre-Built VMWare Images
+
+Under the VMWare community program, work is ongoing to develop a number of VMWare images where an entire Catalyst development environment has already been installed, complete with database engines and a full complement of Catalyst plugins.
+
+=back
+
+B<IMPORTANT:> For additional information and recommendations on Catalyst installation, please refer to L<Catalyst::Manual::Installation|Catalyst::Manual::Installation>.
+
+B<IMPORTANT:> Step-by-step instructions to replicate the environment on which this tutorial was developed can be found at L<Catalyst::Manual::Installation::CentOSTuorial|Catalyst::Manual::Installation::CentOSTuorial>.  Using these instructions, you should be able to build a complete CentOS 4.X server with Catalyst and all the plugins required to run this tutorial.
+
+
+
+=head1 DATABASES
+
+This tutorial will primarily focus on SQLite because of its simplicity; however, modifications in the script required to support MySQL and PostgreSQL will be presented in Appendix 2.
+
+B<Note:> One of the advantages of the MVC design patterns is that applications become much more database independent.  As such, you will notice that only the C<.sql> files used to initialize the database change between database systems... the Catalyst code generally remains the same.
+
+
+
+=head1 WHERE TO GET WORKING CODE
+
+Each part of the tutorial has complete code available in the main Catalyst Subversion repository (see the note at the beginning of each part for the appropriate svn command to use).  Additionally, the final code is available as a ready-to-run tarball at TO_BE_ADDED_TO_FINAL_VERSION.
+
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Please report any errors, issues or suggestions to the author.
+
+Copyright 2006, Kennedy Clark, under Creative Commons License (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
+
+Version: .94
+

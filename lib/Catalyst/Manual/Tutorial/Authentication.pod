@@ -1,0 +1,658 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial::Authentication - Catalyst Tutorial – Part 4: Authentication
+
+
+
+=head1 OVERVIEW
+
+This is B<Part 4 of 9> for the Catalyst tutorial.
+
+L<Totorial Overview|Catalyst::Manual::Tutorial>
+
+=over 4
+
+=item 1
+
+L<Introduction|Catalyst::Manual::Tutorial::Intro>
+
+=item 2
+
+L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
+
+=item 3
+
+L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+
+=item 4
+
+B<Authentication>
+
+=item 5
+
+L<Authorization|Catalyst::Manual::Tutorial::Authorization>
+
+=item 6
+
+L<Debugging|Catalyst::Manual::Tutorial::Debugging>
+
+=item 7
+
+L<Testing|Catalyst::Manual::Tutorial::Testing>
+
+=item 8
+
+L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
+
+=item 9
+
+L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+
+=back
+
+
+
+=head1 DESCRIPTION
+
+Now that we finally have a simple yet functional application, we can focus on providing authentication (with authorization coming in Part 5).
+
+This part of the tutorial is divided into two main sections: 1) basic, cleartext authentication and 2) hash-based authentication.
+
+B<TIP>: Note that all of the code for this part of the tutorial can be pulled from the Catalyst Subversion repository in one step with the following command:
+
+    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
+    IMPORTANT: Does not work yet.  Will be completed for final version.
+
+
+
+=head1 BASIC AUTHENTICATION
+
+This section explores how add authentication logic to a Catalyst application.
+
+
+=head2 Add Users and Roles to the Database
+
+First, we add both user and role information to the database (we add the role information here although it will not be used until the authorization section, Part 5).  Create a new SQL script file by opening C<myapp02.sql> in your editor and insert:
+
+    --
+    -- Add users and roles tables, along with a many-to-many join table
+    --
+    CREATE TABLE users (
+            id            INTEGER PRIMARY KEY,
+            username      TEXT,
+            password      TEXT,
+            email_address TEXT,
+            first_name    TEXT,
+            last_name     TEXT,
+            active        INTEGER
+    );
+    CREATE TABLE roles (
+            id   INTEGER PRIMARY KEY,
+            role TEXT
+    );
+    CREATE TABLE user_roles (
+            user_id INTEGER,
+            role_id INTEGER,
+            PRIMARY KEY (user_id, role_id)
+    );
+    --
+    -- Load up some initial test data
+    --
+    INSERT INTO users VALUES (1, 'test01', 'mypass', 't01@na.com', 'Joe',  'Blow', 1);
+    INSERT INTO users VALUES (2, 'test02', 'mypass', 't02@na.com', 'Jane', 'Doe',  1);
+    INSERT INTO users VALUES (3, 'test03', 'mypass', 't03@na.com', 'No',   'Go',   0);
+    INSERT INTO roles VALUES (1, 'user');
+    INSERT INTO roles VALUES (2, 'admin');
+    INSERT INTO user_roles VALUES (1, 1);
+    INSERT INTO user_roles VALUES (1, 2);
+    INSERT INTO user_roles VALUES (2, 1);
+    INSERT INTO user_roles VALUES (3, 1);
+
+Then load this into the C<myapp.db> database with the following command:
+
+    $ sqlite3 myapp.db < myapp02.sql
+
+
+=head2 Add User and Role Information to Dbic Schema
+
+This step adds DBIC-based classes for the user-related database tables (the role information will not be used until the Part 5):
+
+Edit C<lib/MyAppDB.pm> and update the contents to match (only the C<MyAppDB =E<gt> [qw/Book BookAuthor Author User UserRole Role/]> line has changed):
+
+    package MyAppDB;
+    
+    =head1 NAME 
+    
+    MyAppDB -- DBIC Schema Class
+    
+    =cut
+    
+    # Our schema needs to inherit from 'DBIx::Class::Schema'
+    use base qw/DBIx::Class::Schema/;
+    
+    # Need to load the DB Model classes here.
+    # You can use this syntax if you want:
+    #    __PACKAGE__->load_classes(qw/Book BookAuthor Author User UserRole Role/);
+    # Also, if you simply want to load all of the classes in a directory
+    # of the same name as your schema class (as we do here) you can use:
+    #    __PACKAGE__->load_classes(qw//);
+    # But the variation below is more flexible in that it can be used to 
+    # load from multiple namespaces.
+    __PACKAGE__->load_classes({
+        MyAppDB => [qw/Book BookAuthor Author User UserRole Role/]
+    });
+    
+    1;
+
+
+=head2 Create New "Result Source Objects"
+
+Create the following three files with the content shown below.
+
+C<lib/MyAppDB/User.pm>:
+
+    package MyAppDB::User;
+    
+    use base qw/DBIx::Class/;
+    
+    # Load required DBIC stuff
+    __PACKAGE__->load_components(qw/PK::Auto Core/);
+    # Set the table name
+    __PACKAGE__->table('users');
+    # Set columns in table
+    __PACKAGE__->add_columns(qw/id username password email_address first_name last_name/);
+    # Set the primary key for the table
+    __PACKAGE__->set_primary_key('id');
+    
+    #
+    # Set relationships:
+    #
+    
+    # has_many():
+    #   args:
+    #     1) Name of relationship, DBIC will create accessor with this name
+    #     2) Name of the model class referenced by this relationship
+    #     3) Column name in *foreign* table
+    __PACKAGE__->has_many(map_user_role => 'MyAppDB::UserRole', 'user_id');
+    
+    
+    =head1 NAME
+    
+    MyAppDB::User - A model object representing a person with access to the system.
+    
+    =head1 DESCRIPTION
+    
+    This is an object that represents a row in the 'users' table of your application
+    database.  It uses DBIx::Class (aka, DBIC) to do ORM.
+    
+    For Catalyst, this is designed to be used through MyApp::Model::MyAppDB.
+    Offline utilities may wish to use this class directly.
+    
+    =cut
+    
+    1;
+
+
+C<lib/MyAppDB/Role.pm>:
+
+    package MyAppDB::Role;
+    
+    use base qw/DBIx::Class/;
+    
+    # Load required DBIC stuff
+    __PACKAGE__->load_components(qw/PK::Auto Core/);
+    # Set the table name
+    __PACKAGE__->table('roles');
+    # Set columns in table
+    __PACKAGE__->add_columns(qw/id role/);
+    # Set the primary key for the table
+    __PACKAGE__->set_primary_key('id');
+    
+    #
+    # Set relationships:
+    #
+    
+    # has_many():
+    #   args:
+    #     1) Name of relationship, DBIC will create accessor with this name
+    #     2) Name of the model class referenced by this relationship
+    #     3) Column name in *foreign* table
+    __PACKAGE__->has_many(map_user_role => 'MyAppDB::UserRole', 'role_id');
+    
+    
+    =head1 NAME
+    
+    MyAppDB::Role - A model object representing a class of access permissions to 
+    the system.
+    
+    =head1 DESCRIPTION
+    
+    This is an object that represents a row in the 'roles' table of your 
+    application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
+    
+    For Catalyst, this is designed to be used through MyApp::Model::MyAppDB.
+    "Offline" utilities may wish to use this class directly.
+    
+    =cut
+    
+    1;
+
+
+C<lib/MyAppDB/UserRole.pm>:
+
+    package MyAppDB::UserRole;
+    
+    use base qw/DBIx::Class/;
+    
+    # Load required DBIC stuff
+    __PACKAGE__->load_components(qw/PK::Auto Core/);
+    # Set the table name
+    __PACKAGE__->table('user_roles');
+    # Set columns in table
+    __PACKAGE__->add_columns(qw/user_id role_id/);
+    # Set the primary key for the table
+    __PACKAGE__->set_primary_key(qw/user_id role_id/);
+    
+    #
+    # Set relationships:
+    #
+    
+    # belongs_to():
+    #   args:
+    #     1) Name of relationship, DBIC will create accessor with this name
+    #     2) Name of the model class referenced by this relationship
+    #     3) Column name in *this* table
+    __PACKAGE__->belongs_to(user => 'MyAppDB::User', 'user_id');
+    
+    # belongs_to():
+    #   args:
+    #     1) Name of relationship, DBIC will create accessor with this name
+    #     2) Name of the model class referenced by this relationship
+    #     3) Column name in *this* table
+    __PACKAGE__->belongs_to(role => 'MyAppDB::Role', 'role_id');
+    
+    
+    =head1 NAME
+    
+    MyAppDB::UserRole - A model object representing the JOIN between Users and Roles.
+    
+    =head1 DESCRIPTION
+    
+    This is an object that represents a row in the 'user_roles' table of your application
+    database.  It uses DBIx::Class (aka, DBIC) to do ORM.
+    
+    You probably won't need to use this class directly -- it will be automatically
+    used by DBIC where joins are needed.
+    
+    For Catalyst, this is designed to be used through MyApp::Model::MyAppDB.
+    Offline utilities may wish to use this class directly.
+    
+    =cut
+    
+    1;
+
+The code for these three result source classes is obviously very familiar to the C<Book>, C<Author>, and C<BookAuthor> classes created in Part 2.
+
+
+=head2 Sanity-Check Reload of Development Server
+
+We aren't ready to try out the authentication just yet; we only want to do a quick check to be sure our model loads correctly.  Press C<Ctrl-C> to kill the previous server instance (if it's still running) and restart it:
+
+    $ script/myapp_server.pl
+
+Look for the three new model objects in the startup debug output:
+
+    ...
+     .-------------------------------------------------------------------+----------.
+    | Class                                                             | Type     |
+    +-------------------------------------------------------------------+----------+
+    | MyApp::Controller::Books                                          | instance |
+    | MyApp::Controller::Root                                           | instance |
+    | MyApp::Model::MyAppDB                                             | instance |
+    | MyApp::Model::MyAppDB::Author                                     | class    |
+    | MyApp::Model::MyAppDB::Book                                       | class    |
+    | MyApp::Model::MyAppDB::BookAuthor                                 | class    |
+    | MyApp::Model::MyAppDB::Role                                       | class    |
+    | MyApp::Model::MyAppDB::User                                       | class    |
+    | MyApp::Model::MyAppDB::UserRole                                   | class    |
+    | MyApp::View::TT                                                   | instance |
+    '-------------------------------------------------------------------+----------'
+    ...
+
+Again, notice that your "result source" classes have been "re-loaded" by Catalyst under C<MyApp::Model>.
+
+
+=head2 Include Authentication and Session Plugins
+
+Edit C<lib/MyApp.pm> and update it as follows (everything below C<DefaultEnd> is new):
+
+    use Catalyst qw/
+            -Debug
+            ConfigLoader
+            Static::Simple
+            
+            Dumper
+            StackTrace
+            DefaultEnd
+            
+            Authentication
+            Authentication::Store::DBIC
+            Authentication::Credential::Password
+            
+            Session
+            Session::Store::FastMmap
+            Session::State::Cookie
+            /;
+
+The three C<Authentication> plugins work together to support Authentication while the C<Session> plugins are required to maintain state across multiple HTTP requests.  Note that there are several options for L<Session::Store|Catalyst::Plugin::Session::Store> (although L<Session::Store::FastMmap|Catalyst::Plugin::Session::Store::FastMmap> is generally a good choice if you are on Unix; try L<Cache::FileCache|Catalyst::Plugin::Cache::FileCache> if you are on Win32) -- consult L<Session::Store|Catalyst::Plugin::Session::Store> and its subclasses for additional information.
+
+
+=head2 Configure Authentication
+
+Although C<__PACKAGE__-E<gt>config(name =E<gt> 'value');> is still supported, newer Catalyst applications tend to place all configuration information in C<myapp.yml> and automatically load this information into C<MyApp-E<gt>config> using the L<ConfigLoader|Catalyst::Plugin::ConfigLoader> plugin.
+
+Edit the C<myapp.yml> YAML and update it to match:
+
+    ---
+    name: MyApp
+    authentication:
+        dbic:
+            # Note this first definition would be the same as setting
+            # __PACKAGE__->config->{authentication}->{dbic}->{user_class} = 'MyAppDB::User'
+            # in lib/MyApp.pm (IOW, each hash key becomes a "name:" in the YAML file).
+            #
+            # This is the model object created by Catalyst::Model::DBIC from your
+            # schema (you created 'MyAppDB::User' but as the Catalyst startup
+            # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
+            # NOTE: Omit 'MyAppDB::Model' to avoid a component lookup issue in Catalyst 5.66
+            user_class: MyAppDB::User
+            # This is the name of the field in your 'users' table that contains the user's name
+            user_field: username
+            # This is the name of the field in your 'users' table that contains the password
+            password_field: password
+            # Other options can go here for hashed passwords
+
+Inline comments in the code above explain how each field is being used.
+
+B<TIP>: Although YAML uses a very simple and easy-to-ready format, it does require the use of a consistent level of indenting.  Be sure you line up everything on a given 'level' with the same number of indents.  Also, be sure not to use C<tab> characters (YAML does not support them because they are handled inconsistently across editors). 
+
+
+=head2 Add Login and Logout Controllers
+
+Use the Catalyst create script to create two stub controller files:
+
+    $ script/myapp_create.pl controller Login
+    $ script/myapp_create.pl controller Logout
+
+B<NOTE>: You could easily use a single controller here.  For example, you could have a C<User> controller with both C<login> and C<logout> actions.  Remember, Catalyst is designed to be very flexible, and leaves such matters up to you, the designer and programmer.
+
+Then open C<lib/MyApp/Controller/Login.pm> and add:
+
+    =head2 default
+    
+    Login logic
+    
+    =cut
+    
+    sub default : Private {
+        my ($self, $c) = @_;
+    
+        # Get the username and password from form
+        my $username = $c->request->params->{username} || "";
+        my $password = $c->request->params->{password} || "";
+    
+        # If the username and password values were found in form
+        if ($username && $password) {
+            # Attempt to log the user in
+            if ($c->login($username, $password)) {
+                # If successful, then let them use the application
+                $c->response->redirect($c->uri_for('/books/list'));
+                return;
+            } else {
+                # Set an error message
+                $c->stash->{error_msg} = "Bad username or password.";
+            }
+        }
+    
+        # If either of above don't work out, send to the login page
+        $c->stash->{template} = 'login.tt2';
+    }
+
+This controller fetches the C<username> and C<password> values from the login form and attempts to perform a login.  If successful, it redirects the user to the book list page.  If the login fails, the user will stay at the login page but receive an error message.  If the C<username> and C<password> values are not present in the form, the user will be taken to the empty login form.
+
+Next, create a corresponding method in C<lib/MyApp/Controller/Logout.pm>:
+
+    =head2 default
+    
+    Logout logic
+    
+    =cut
+    
+    sub default : Private {
+        my ($self, $c) = @_;
+    
+        # Clear the user's state
+        $c->logout;
+    
+        # Send the user to the starting
+        $c->response->redirect($c->uri_for('/'));
+    }
+
+
+=head2 Add a Login Form TT Template Page
+
+Create a login form by opening C<root/src/login.tt2> and inserting:
+
+    [% META title = 'Login' %]
+    
+    <!-- Login form -->
+    <form method="post" action=" [% Catalyst.uri_for('/login') %] ">
+      <table>
+        <tr>
+          <td>Username:</td>
+          <td><input type="text" name="username" size="40" /></td>
+        </tr>
+        <tr>
+          <td>Password:</td>
+          <td><input type="password" name="password" size="40" /></td>
+        </tr>
+        <tr>
+          <td colspan="2"><input type="submit" name="submit" value="Submit" /></td>
+        </tr>
+      </table>
+    </form>
+
+
+=head2 Add Valid User Check
+
+We need something that provides enforcement for the authentication mechanism -- a I<global> mechanism that prevents users who have not passed authentication from reaching any pages except the login page.  This is generally done via an C<auto> action/method (prior to Catalyst v5.66, this sort of thing would go in C<MyApp.pm>, but starting in v5.66, the preferred location is C<lib/MyApp/Controller/Root.pm>).
+
+Edit the existing C<lib/MyApp/Controller/Root.pm> class file and insert the following method:
+
+    =head2 auto
+    
+    Check if there is a user and, if not, forward to login page
+    
+    =cut
+    
+    # Note that 'auto' runs after 'begin' but before your actions and that
+    # 'auto' "chain" (all from application path to most specific class are run)
+    sub auto : Private {
+        my ($self, $c) = @_;
+    
+        # Allow unauthenticated users to reach the login page
+        if ($c->request->path =~ /login/) {
+            return 1;
+        }
+    
+        # If a user doesn't exist, force login
+        if (!$c->user_exists) {
+            # Dump a log message to the development server debug output
+            $c->log->debug('***Root::auto User not found, forwarding to /login');
+            # Redirect the user to the login page
+            $c->response->redirect($c->uri_for('/login'));
+            # Return 0 to cancel 'post-auto' processing and prevent use of application
+            return 0;
+        }
+    
+        # User found, so return 1 to continue with processing after this 'auto'
+        return 1;
+    }
+
+B<Note:> Catalyst provides a number of different types of actions, such as C<Local>, C<Regex>, and C<Private>.  You should refer to L<Catalyst::Manual::Intro|Catalyst::Manual::Intro> for a more detailed explanation, but the following bullet points provide a quick introduction:
+
+=over 4
+
+=item *
+
+The majority of application use C<Local> actions for items that respond to user requests and C<Private> actions for those that do not directly respond to user input.
+
+=item *
+
+There are five types of C<Private> actions: C<begin>, C<end>, C<default>, C<index>, and C<auto>.
+
+=item *
+
+Unlike the other private C<Private> actions where only a single method is called for each request, I<every> auto action along the chain of namespaces will be called.
+
+=back
+
+By placing the authentication enforcement code inside the C<auto> method of C<lib/MyApp/Controller/Root.pm> (or C<lib/MyApp.pm>), it will be called for I<every> request that is received by the entire application.
+
+
+=head2 Displaying Content Only to Authenticated Users
+
+Let's say you want to provide some information on the login page that changes depending on whether the user has authenticated yet.  To do this, open C<root/src/login.tt2> in your editor and add the following lines to the bottom of the file:
+
+    <p>
+    [%
+       # This code illustrates how certain parts of the TT 
+       # template will only be shown to users who have logged in
+    %]
+    [% IF Catalyst.user %]
+        Please Note: You are already logged in as '[% Catalyst.user.username %]'.
+        You can <a href="[% Catalyst.uri_for('/logout') %]">logout</a> here.
+    [% ELSE %]
+        You need to log in to use this application.
+    [% END %]
+    [%#
+       Note that this whole block is a comment because the "#" appears
+       immediate after the "[%" (with no spaces in between).  Although it 
+       can be a handy way to temporarily "comment out" a whole block of 
+       TT code, it's probably a little too subtle for use in "normal" 
+       comments.
+    %]
+
+Although most of the code is comments, the middle few lines provide a "you are already logged in" reminder if the user returns to the login page after they have already authenticated.  For users who have not yet authenticated, a "You need to log in..." message is displayed (note the use of an IF-THEN-ELSE construct in TT).
+
+
+=head2 Try Out Authentication
+
+Press C<Ctrl-C> to kill the previous server instance (if it's still running) and 
+restart it:
+
+    $ script/myapp_server.pl
+
+B<IMPORTANT NOTE>: If you happen to be using Internet Explorer, you may need to use the command C<script/myapp_server.pl -k> to enable the keepalive feature in the development server.  Otherwise, the HTTP redirect on successful login may not work correctly with IE (it seems to work without –k if you are running the web browser and development server on the same machine).  If you are using browser a browser other than IE, it should work either way.  If you want to make keepalive the default, you can edit C<script/myapp_server.pl> and change the initialization value for C<$keepalive> to C<1>.  (You will need to do this every time you create a new Catalyst application or rebuild the C<myapp_server.pl> script.)
+
+Now trying going to L<http://localhost:3000/books/list> and you should be redirected to the login page, hitting Shift+Reload if necessary (the "You are already logged in" message should I<not> appear -- if it does, click the C<logout> button and try again).  Make note of the C<***Root::auto User not found...> debug message in the development server output.  Enter username C<test01> and password C<mypass>, and you should be taken to the Book List page.  
+
+Open C< root/src/books/list.tt2> and add the following lines to the bottom:
+
+    <p>
+      <a href="[% Catalyst.uri_for('/login') %]">Login</a>
+      <a href="[% Catalyst.uri_for('form_create') %]">Create</a>
+    </p>
+
+Reload your browser and you should now see a "Login" link at the bottom of the page (as mentioned earlier, you can update template files without reloading the development server).  Click this link to return to the login page.  This time you I<should> see the "You are already logged in" message.
+
+Finally, click the C<You can logout here> link on the C</login> page.  You should stay at the login page, but the message should change to "You need to log in to use this application."
+
+
+
+=head1 USING PASSWORD HASHES
+
+In this section we increase the security of our system by converting from cleartext passwords to SHA-1 password hashes.
+
+B<Note:> This section is optional.  You can skip it and the rest of the tutorial will function normally.  
+
+Note that even with the techniques shown in this section, the browser still transmits the passwords in cleartext to your application.  We are just avoiding the I<storage> of cleartext passwords in the database by using a SHA-1 hash.  If you are concerned about cleartext passwords between the browser and your application, consider using SSL/TLS.
+
+
+=head2 Get a SHA-1 Hash for the Password
+
+Catalyst uses the C<Digest > module to support a variety of hashing algorithms.  Here we will use SHA-1 (SHA = Secure Hash Algorithm).  First, we should compute the SHA-1 hash for the "mypass" password we are using.  The following command-line Perl script provides a "quick and dirty" way to do this:
+
+    $ perl -MDigest::SHA -e 'print Digest::SHA::sha1_hex("mypass"), "\n"'
+    e727d1464ae12436e899a726da5b2f11d8381b26
+    $
+
+
+=head2 Switch to SHA-1 Password Hashes in the Database
+
+Next, we need to change the C<password> column of our C<users> table to store this hash value vs. the existing cleartext password.  Open C<myapp03.sql> in your editor and enter:
+
+    --
+    -- Convert passwords to SHA-1 hashes
+    --
+    UPDATE users SET password = 'e727d1464ae12436e899a726da5b2f11d8381b26' WHERE id = 1;
+    UPDATE users SET password = 'e727d1464ae12436e899a726da5b2f11d8381b26' WHERE id = 2;
+    UPDATE users SET password = 'e727d1464ae12436e899a726da5b2f11d8381b26' WHERE id = 3;
+
+Then use the following command to update the SQLite database:
+
+    $ sqlite3 myapp.db < myapp03.sql
+
+B<Note:> We are using SHA-1 hashes here, but many other hashing algorithms are supported.  See C<Digest > for more information.
+
+
+=head2 Enable SHA-1 Hash Passwords in C<Catalyst::Plugin::Authentication::Store::DBIC>
+
+Edit C<myapp.yml> and update it to match (the C<password_type> and C<password_hash_type> are new, everything else is the same):
+
+    ---
+    name: MyApp
+    authentication:
+        dbic:
+            # Note this first definition would be the same as setting
+            # __PACKAGE__->config->{authentication}->{dbic}->{user_class} = 'MyAppDB::User'
+            # in lib/MyApp.pm (IOW, each hash key becomes a "name:" in the YAML file).
+            #
+            # This is the model object created by Catalyst::Model::DBIC from your
+            # schema (you created 'MyAppDB::User' but as the Catalyst startup
+            # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
+            # NOTE: Omit 'MyAppDB::Model' to avoid a component lookup issue in Catalyst 5.66
+            user_class: MyAppDB::User
+            # This is the name of the field in your 'users' table that contains the user's name
+            user_field: username
+            # This is the name of the field in your 'users' table that contains the password
+            password_field: password
+            # Other options can go here for hashed passwords
+            # Enabled hashed passwords
+            password_type: hashed
+            # Use the SHA-1 hashing algorithm
+            password_hash_type: SHA-1
+
+
+=head2 Try Out the Hashed Passwords
+
+Press C<Ctrl-C> to kill the previous server instance (if it's still running) and restart it:
+
+    $ script/myapp_server.pl
+
+You should now be able to go to L<http://localhost:3000/books/list> and login as before.  When done, click the "Logout" link on the login page (or point your browser at L<http://localhost:3000/logout>).
+
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Please report any errors, issues or suggestions to the author.
+
+Copyright 2006, Kennedy Clark. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Version: .94
+

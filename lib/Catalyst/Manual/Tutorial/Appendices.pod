@@ -1,0 +1,113 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial::Appendices - Catalyst Tutorial – Part 9: Appendices
+
+
+
+=head1 OVERVIEW
+
+This is B<Part 9 of 9> for the Catalyst tutorial.
+
+L<Totorial Overview|Catalyst::Manual::Tutorial>
+
+=over 4
+
+=item 1
+
+L<Introduction|Catalyst::Manual::Tutorial::Intro>
+
+=item 2
+
+L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
+
+=item 3
+
+L<Basic CRUD|Catalyst::Manual::Tutorial03_BasicCRUD>
+
+=item 4
+
+L<Authentication|Catalyst::Manual::Tutorial::Authentication>
+
+=item 5
+
+L<Authorization|Catalyst::Manual::Tutorial::Authorization>
+
+=item 6
+
+L<Debugging|Catalyst::Manual::Tutorial::Debugging>
+
+=item 7
+
+L<Testing|Catalyst::Manual::Tutorial::Testing>
+
+=item 8
+
+L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
+
+=item 9
+
+B<Appendicies>
+
+=back
+
+
+
+=head1 DESCRIPTION
+
+This part of the tutorial provides supporting information relevant to the Catalyst tutorial.
+
+
+
+=head1 APPENDIX 1: CUT AND PASTE FOR POD-BASED EXAMPLES
+
+You may notice that Pod indents example code with four spaces.  This section provides some quick advice to "un-indent" this text in common editors.
+
+
+=head2 "Un-indenting" with Vi/Vim
+
+When cutting and pasting multi-line text from Pod-based documents, the following vi/vim regexs can be helpful to "un-indent" the inserted text (do NOT type the quotes, they are only included to show spaces in the regex patterns).  I<Note that all 3 of the regexs end in 4 spaces>:
+
+=over 4
+
+=item * 
+
+":0,$s/^    "
+
+Removes four leading spaces from the entire file (from the first line, C<0>, to the last line, C<$>).
+
+=item * 
+
+":.,$s/^    "
+
+Removes the first four spaces from the line the cursor is on at the time the regex command is executed (".") to the last line of the file.
+
+=item * 
+
+":.,44s/^    "
+
+Removes four leading space from the current line through line 44 (obviously adjust the C<44> to the appropriate value in your example).
+
+=back
+
+
+=head2 "Un-indenting" with Emacs
+
+B<todo>
+
+
+
+=head1 APPENDIX 2: USING MYSQL AND POSTGRESQL
+
+The main database used in this tutorial is the very simple yet deceptively powerful SQLite.  This section provides information that can be used to "convert" the tutorial to use MySQL and PostgreSQL.  However, note that part of the beauty of the MVC architecture is that very little database-specific code is spread throughout the system (at least when MVC is "done right").  Consequently, converting from one database to another is relatively painless with most Catalyst applications.  In general, you just need to adapt the schema definition C<.sql> file you use to initialize your database and adjust a few configuration parameters.
+
+Also note that the purpose of the data definition statements for this section are not designed to take maximum advantage of the various features in each database for issues such as referential integrity and field types/constraints.
+
+
+=head2 MySQL
+
+B<todo>
+
+=head2 PostgreSQL
+
+B<todo>
+
