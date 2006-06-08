@@ -1,24 +1,28 @@
-=head1 NAME
+head1 NAME
 
 Catalyst::Manual::Installation - Catalyst Installation
 
-
-
 =head1 DESCRIPTION
 
-This section of the Catalyst tutorial looks at a number of items
-required to first get going with Catalyst development.
-
-
+How to install Catalyst.
 
 =head1 INSTALLATION
 
-On one hand, Catalyst gains immediate power and flexibility through is
-use of CPAN (the Comprehensive Perl Archive Network, an enormous global
-repository containing over 10,000 free modules).  On the other hand,
-Catalyst's reliance on CPAN can complicate initial installations.
-Fortunately, there are a growing number of methods that can dramatically
-ease this undertaking:
+On one hand, Catalyst gains immediate power and flexibility
+through its use of CPAN (the Comprehensive Perl Archive
+Network, an enormous global repository containing over 10,000
+free modules).  On the other hand, Catalyst's reliance on CPAN
+can complicate initial installations, especially in
+shared-hosting environments where you, the user, do not have
+easy control over what versions other modules are installed.
+
+It is worth stressing that the difficulties found in installing
+Catalyst are caused not by anything intrinsic to Catalyst
+itself, but rather by the interrelated dependencies of a large
+number of required modules.
+
+Fortunately, there are a growing number of methods that can
+dramatically ease this undertaking:
 
 =over 4
 
@@ -51,7 +55,6 @@ complement of Catalyst plugins.
 
 =back
 
-
 =head2 OTHER METHODS
 
 In addition to the "all-in-one" approaches mentioned above, there are a
@@ -80,12 +83,13 @@ C<http://gentoo-wiki.com/HOWTO_Catalyst_Framework> for automated
 installations.  In short, simply mount the portage overlay and type
 C<emerge catalystframework>.
 
-=items * 
+=item * 
 
 FreeBSD
 
 FreeBSD users can get up and running quickly by typing C<cd
-/usr/ports/www/p5-Catalyst && make install>.
+/usr/ports/www/p5-Catalyst && make install>, or C<portinstall
+p5-Catalyst> if C<portinstall> is installed on your system.
 
 =item * 
 
@@ -95,84 +99,26 @@ Windows users can take advantage of the PPM tool that comes with
 ActivePerl to jumpstart their Catalyst environment.  Directions are
 available at L<http://catalyst.infogami.com/katalytes/cat_on_windows>.
 
+=item *
+
+Subversion Repository
+
+Catalyst uses Subversion for version control. To checkout the latest:
+
+    $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst/
+
 =back
 
-B<NOTE:> Although all of the above methods can be used to install a base
-Catalyst system, only the VMWare image is likely to have all of the
-plugins and modules you need to complete this tutorial.  When you start
-the C<script/myapp_server.pl> development server later to run your
-application, it will tell you about any modules that are missing.  To
-add them, type something along the lines of the following
-(C<Catalyst::Model::DBIC::Schema> is used here as a representative
-example):
+B<NOTE:> Although all of the above methods can be used to
+install a base Catalyst system, only the VMWare image is
+likely to have all of the plugins and modules you need to use
+Catalyst properly, and to complete the tutorial.  When you
+start the C<script/myapp_server.pl> development server, it
+will tell you about any modules that are missing.  To add
+them, type something along the lines of the following
+(C<Catalyst::Model::DBIC::Schema> is used here as a
+representative example):
 
-    # perl -MCPAN -e shell
-    
-    cpan shell -- CPAN exploration and modules installation (v1.87)
-    ReadLine support enabled
-    
-    cpan> install Catalyst::Model::DBIC::Schema
+    # perl -MCPAN -e 'install Catalyst::Model::DBIC::Schema'
     ...
-
-
-=head2 OTHER ITEMS
-
-Although Catalyst is a very flexible platform that can be used for wide
-variety of applications, the bulk of Catalyst developers use it to build
-web applications that set on top of a relational database.
-Consequently, you will very likely need:
-
-=over 4
-
-=item * 
-
-A Web Server
-
-Although Apache is obviously an extremely popular choice, lighttpd has a
-growing following.  Catalyst applications can also be run under IIS.
-
-=item * 
-
-A Database
-
-Although other databases with support for Perl are certainly possible,
-most Catalyst applications tend to use one of the following:
-
-=item * 
-
-SQLite
-
-SQLite is a popular choice for development and testing because it does
-note require that a database daemon be running or configured.  It
-operates on C<.db> files that are generally located in the directory of
-your Catalyst application project.  More information is available at
-L<www.sqlite.org>.
-
-=item * 
-
-MySQL
-
-MySQL is an extremely popular database available at L<www.mysql.com>.
-
-=item * 
-
-PostgreSQL
-
-PostgreSQL is a well-respected database available at
-L<http://www.postgresql.org/>.
-
-=back
-
-This tutorial will primarily focus on SQLite because of its simplicity;
-however, modifications in the script required to support MySQL and
-PostgreSQL will be presented in the Appendix.
-
-B<Note:> One of the advantages of the MVC design patterns is that
-applications become much more database independent.  As such, you will
-notice that only the C<.sql> files used to initialize the database
-change between database systems... the Catalyst code all remains the
-same.
-
-=back
-
 
