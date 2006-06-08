@@ -3,7 +3,6 @@
 Catalyst::Manual::Tutorial::Authentication - Catalyst Tutorial - Part 4: Authentication
 
 
-
 =head1 OVERVIEW
 
 This is B<Part 4 of 9> for the Catalyst tutorial.
@@ -46,16 +45,16 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendicies>
 
 =back
-
 
 
 =head1 DESCRIPTION
 
 Now that we finally have a simple yet functional application, we can
-focus on providing authentication (with authorization coming in Part 5).
+focus on providing authentication (with authorization coming next in
+Part 5).
 
 This part of the tutorial is divided into two main sections: 1) basic,
 cleartext authentication and 2) hash-based authentication.
@@ -68,16 +67,15 @@ following command:
     IMPORTANT: Does not work yet.  Will be completed for final version.
 
 
-
 =head1 BASIC AUTHENTICATION
 
-This section explores how add authentication logic to a Catalyst application.
-
+This section explores how to add authentication logic to a Catalyst
+application.
 
 =head2 Add Users and Roles to the Database
 
-First, we add both user and role information to the database (we add the
-role information here although it will not be used until the
+First, we add both user and role information to the database (we will
+add the role information here although it will not be used until the
 authorization section, Part 5).  Create a new SQL script file by opening
 C<myapp02.sql> in your editor and insert:
 
@@ -120,10 +118,10 @@ Then load this into the C<myapp.db> database with the following command:
     $ sqlite3 myapp.db < myapp02.sql
 
 
-=head2 Add User and Role Information to Dbic Schema
+=head2 Add User and Role Information to DBIC Schema
 
 This step adds DBIC-based classes for the user-related database tables
-(the role information will not be used until the Part 5):
+(the role information will not be used until Part 5):
 
 Edit C<lib/MyAppDB.pm> and update the contents to match (only the
 C<MyAppDB =E<gt> [qw/Book BookAuthor Author User UserRole Role/]> line
@@ -364,7 +362,6 @@ L<Cache::FileCache|Catalyst::Plugin::Cache::FileCache> if you are on
 Win32) -- consult L<Session::Store|Catalyst::Plugin::Session::Store> and
 its subclasses for additional information.
 
-
 =head2 Configure Authentication
 
 Although C<__PACKAGE__-E<gt>config(name =E<gt> 'value');> is still
@@ -401,7 +398,6 @@ does require the use of a consistent level of indenting.  Be sure you
 line up everything on a given 'level' with the same number of indents.
 Also, be sure not to use C<tab> characters (YAML does not support them
 because they are handled inconsistently across editors).
-
 
 =head2 Add Login and Logout Controllers
 
@@ -468,7 +464,7 @@ Next, create a corresponding method in C<lib/MyApp/Controller/Logout.pm>:
         # Clear the user's state
         $c->logout;
     
-        # Send the user to the starting
+        # Send the user to the starting point
         $c->response->redirect($c->uri_for('/'));
     }
 
@@ -506,7 +502,8 @@ This is generally done via an C<auto> action/method (prior to Catalyst
 v5.66, this sort of thing would go in C<MyApp.pm>, but starting in
 v5.66, the preferred location is C<lib/MyApp/Controller/Root.pm>).
 
-Edit the existing C<lib/MyApp/Controller/Root.pm> class file and insert the following method:
+Edit the existing C<lib/MyApp/Controller/Root.pm> class file and insert
+the following method:
 
     =head2 auto
     
@@ -540,9 +537,8 @@ Edit the existing C<lib/MyApp/Controller/Root.pm> class file and insert the foll
 
 B<Note:> Catalyst provides a number of different types of actions, such
 as C<Local>, C<Regex>, and C<Private>.  You should refer to
-L<Catalyst::Manual::Intro|Catalyst::Manual::Intro> for a more detailed
-explanation, but the following bullet points provide a quick
-introduction:
+L<Catalyst::Manual::Intro> for a more detailed explanation, but the
+following bullet points provide a quick introduction:
 
 =over 4
 
@@ -568,7 +564,6 @@ namespaces will be called.
 By placing the authentication enforcement code inside the C<auto> method
 of C<lib/MyApp/Controller/Root.pm> (or C<lib/MyApp.pm>), it will be
 called for I<every> request that is received by the entire application.
-
 
 =head2 Displaying Content Only to Authenticated Users
 
@@ -625,12 +620,13 @@ C<myapp_server.pl> script.)
 Now trying going to L<http://localhost:3000/books/list> and you should
 be redirected to the login page, hitting Shift+Reload if necessary (the
 "You are already logged in" message should I<not> appear -- if it does,
-click the C<logout> button and try again).  Make note of the
-C<***Root::auto User not found...> debug message in the development
-server output.  Enter username C<test01> and password C<mypass>, and you
-should be taken to the Book List page.
+click the C<logout> button and try again). Note the C<***Root::auto User
+not found...> debug message in the development server output.  Enter
+username C<test01> and password C<mypass>, and you should be taken to
+the Book List page.
 
-Open C< root/src/books/list.tt2> and add the following lines to the bottom:
+Open C<root/src/books/list.tt2> and add the following lines to the
+bottom:
 
     <p>
       <a href="[% Catalyst.uri_for('/login') %]">Login</a>
@@ -648,7 +644,6 @@ You should stay at the login page, but the message should change to "You
 need to log in to use this application."
 
 
-
 =head1 USING PASSWORD HASHES
 
 In this section we increase the security of our system by converting
@@ -660,9 +655,9 @@ tutorial will function normally.
 Note that even with the techniques shown in this section, the browser
 still transmits the passwords in cleartext to your application.  We are
 just avoiding the I<storage> of cleartext passwords in the database by
-using a SHA-1 hash.  If you are concerned about cleartext passwords
-between the browser and your application, consider using SSL/TLS.
-
+using a SHA-1 hash. If you are concerned about cleartext passwords
+between the browser and your application, consider using SSL/TLS, made
+easy with the Catalyst plugin L<Catalyst::Plugin:RequireSSL>.
 
 =head2 Get a SHA-1 Hash for the Password
 
@@ -675,7 +670,6 @@ dirty" way to do this:
     $ perl -MDigest::SHA -e 'print Digest::SHA::sha1_hex("mypass"), "\n"'
     e727d1464ae12436e899a726da5b2f11d8381b26
     $
-
 
 =head2 Switch to SHA-1 Password Hashes in the Database
 
@@ -696,7 +690,6 @@ Then use the following command to update the SQLite database:
 
 B<Note:> We are using SHA-1 hashes here, but many other hashing
 algorithms are supported.  See C<Digest> for more information.
-
 
 =head2 Enable SHA-1 Hash Passwords in
 C<Catalyst::Plugin::Authentication::Store::DBIC>

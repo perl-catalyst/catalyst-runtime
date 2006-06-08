@@ -45,7 +45,7 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
 
@@ -67,13 +67,11 @@ following command:
     IMPORTANT: Does not work yet.  Will be completed for final version.
 
 
-
 =head1 BASIC AUTHORIZATION
 
 In this section you learn how to manually configure authorization.
 
-
-=head2 Update Plugins to Include Support Authorization
+=head2 Update Plugins to Include Support for Authorization
 
 Edit C<lib/MyApp.pm> and add C<Authorization::Roles> to the list:
 
@@ -99,7 +97,8 @@ Edit C<lib/MyApp.pm> and add C<Authorization::Roles> to the list:
 
 =head2 Add Config Information for Authorization
 
-Edit C<myapp.yml> and update it to match (everything from the "authorization:" line down is new):
+Edit C<myapp.yml> and update it to match (everything from the
+"authorization:" line down is new):
 
     ---
     name: MyApp
@@ -166,8 +165,8 @@ lines to the bottom of the file:
     [% END %]
     </p>
 
-This code displays a different combination of links depending on the roles assigned to the user..
-
+This code displays a different combination of links depending on the
+roles assigned to the user.
 
 =head2 Limit C<Books::add> to C<admin> Users
 
@@ -175,7 +174,7 @@ C<IF> statements in TT templates simply control the output that is sent
 to the user's browser; it provides no real enforcement (if users know or
 guess the appropriate URLs, they are still perfectly free to hit any
 action within your application).  We need to enhance the controller
-logic to wrap restricted actions with role validation logic.
+logic to wrap restricted actions with role-validation logic.
 
 For example, we might want to restrict the "formless create" action to
 admin-level users by editing C<lib/MyApp/Controller/Books.pm> and
@@ -183,7 +182,7 @@ updating C<url_create> to match the following code:
 
     =head2 url_create
 
-    Create a book with the supplied title, and rating 
+    Create a book with the supplied title and rating,
     with manual authorization
     
     =cut
@@ -229,7 +228,7 @@ updating C<url_create> to match the following code:
     }
 
 
-To add authorization, we simply write the main code of this method in an
+To add authorization, we simply wrap the main code of this method in an
 C<if> statement that calls C<check_user_roles>.  If the user does not
 have the appropriate permissions, they receive an "Unauthorized!"
 message.  Note that we intentionally chose to display the message this
@@ -244,10 +243,10 @@ create a new copy and comment out the original by making it look like a
 Pod comment.  For example, put something like C<=begin> before C<sub add
 : Local {> and C<=end> after the closing C<}>.
 
-
 =head2 Try Out Authentication And Authorization
 
-Press C<Ctrl-C> to kill the previous server instance (if it's still running) and restart it:
+Press C<Ctrl-C> to kill the previous server instance (if it's still
+running) and restart it:
 
     $ script/myapp_server.pl
 
@@ -268,15 +267,12 @@ while logged in as each user.  Use one of the 'Logout' links (or go to
 L<http://localhost:3000/logout> in you browser directly) when you are
 done.
 
-
-
 =head1 ENABLE ACL-BASED AUTHORIZATION
 
 This section takes a brief look at how the
-L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
-can automate much of the work required to perform role-based
-authorization in a Catalyst application.
-
+L<Catalyst::Plugin::Authorization::ACL> plugin can automate much of the
+work required to perform role-based authorization in a Catalyst
+application.
 
 =head2 Add the C<Catalyst::Plugin::Authorization::ACL> Plugin
 
@@ -287,7 +283,6 @@ C<use Catalyst> statement:
 
 Note that the remaining C<use Catalyst> plugins from earlier sections
 are not shown here, but they should still be included.
-
 
 =head2 Add ACL Rules to the Application Class
 
@@ -362,11 +357,10 @@ C<lib\MyApp.pm> B<after> the C<__PACKAGE__-E<gt>setup;> line.
 
 =back
 
-
 =head2 Add a Method to Handle Access Violations
 
 By default,
-L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
+L<Catalyst::Plugin::Authorization::ACL>
 throws an exception when authorization fails.  This will take the user
 to the Catalyst debug screen, or a "Please come back later" message if
 you are not using the C<-Debug> flag. This step uses the
@@ -409,14 +403,14 @@ When you are done, use one of the 'Logout' links (or go to the
 L<http://localhost:3000/logout> URL directly) when you are done.
 
 
-
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark, under Creative Commons License (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
 Version: .94
 

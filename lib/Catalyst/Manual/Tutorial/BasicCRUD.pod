@@ -56,7 +56,7 @@ L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
 This part of the tutorial builds on the fairly primitive application
 created in Part 2 to add basic support for Create, Read, Update, and
 Delete (CRUD) of C<Book> objects.  Note that the 'list' function in Part
-2 already implements the Read portion of Crud (although Read normally
+2 already implements the Read portion of CRUD (although Read normally
 refers to reading a single object; you could implement full read
 functionality using the techniques introduced below).  This section will
 focus on the Create and Delete aspects of CRUD.  More advanced
@@ -69,7 +69,6 @@ following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
     IMPORTANT: Does not work yet.  Will be completed for final version.
-
 
 
 =head1 FORMLESS SUBMISSION
@@ -85,14 +84,16 @@ Edit C<lib/MyApp/Controller/Books.pm> and enter the following method:
 
     =head2 url_create
     
-    Create a book with the supplied title, rating and author
+    Create a book with the supplied title, rating, and author
     
     =cut
     
     sub url_create : Local {
-        # In addition to self & context, get the title, rating & author_id args
-        # from the URL.  Note that Catalyst automatically puts extra information
-        # after the "/<controller_name>/<action_name/" into @_
+        # In addition to self & context, get the title, rating, & 
+        # author_id args from the URL.  Note that Catalyst automatically 
+        # puts extra information after the "/<controller_name>/<action_name/" 
+        # into @_
+
         my ($self, $c, $title, $rating, $author_id) = @_;
     
         # Call create() on the book model object. Pass the table 
@@ -153,28 +154,26 @@ Edit C<root/src/books/create_done.tt2> and then enter:
     [% # 'uri_for()' builds a full URI; e.g., 'http://localhost:3000/books/list' -%]
     <p><a href="[% Catalyst.uri_for('/books/list') %]">Return to list</a></p>
     
-    [% # Try out the TT Dumper -%]
+    [% # Try out the TT Dumper (for development only!) -%]
     <pre>
     Dump of the 'book' variable:
     [% Dumper.dump(book) %]
     </pre>
 
-The TT C<USE> directive allows access to a variety of plugin modules (we
-are talking TT plugins here, not Catalyst plugins) to add extra
-functionality to the base TT capabilities.  Here, the plugin allows
-L<Data::Dumper|Data::Dumper> "pretty printing" of objects and variables.
-Other than that, the rest of the code should be familiar from the
-examples in Part 2.
+The TT C<USE> directive allows access to a variety of plugin modules (TT
+plugins, that is, not Catalyst plugins) to add extra functionality to
+the base TT capabilities.  Here, the plugin allows L<Data::Dumper>
+"pretty printing" of objects and variables.  Other than that, the rest
+of the code should be familiar from the examples in Part 2.
 
 B<IMPORTANT NOTE> As mentioned earlier, the C<MyApp::View::TT.pm> view
 class created by TTSite redefines the name used to access the Catalyst
 context object in TT templates from the usual C<c> to C<Catalyst>.
 
-
 =head2 Try the C<url_create> Feature
 
 If the application is still running from before, use C<Ctrl-C> to kill
-it.  Then restart the server:
+it. Then restart the server:
 
     $ script/myapp_server.pl
 
@@ -184,7 +183,7 @@ output.
 B<TIP>: You can use C<script/myapp_server.pl -r> to have the development
 server auto-detect changed files and reload itself (if your browser acts
 odd, you should also try throwing in a C<-k>).  If you make changes to
-just the TT templates, you do not need to reload the development server
+the TT templates only, you do not need to reload the development server
 (only changes to "compiled code" such as Controller and Model C<.pm>
 files require a reload).
 
@@ -203,7 +202,6 @@ in the development server log messages:
 If you then click the "Return to list" link, you should find that there
 are now six books shown (if necessary, Shift-Reload your browser at the
 C</books/list> page).
-
 
 
 =head1 MANUALLY BUILDING A CREATE FORM
@@ -231,8 +229,7 @@ Edit C<lib/MyApp/Controller/Books.pm> and add the following method:
         $c->stash->{template} = 'books/form_create.tt2';
     }
 
-This action merely invokes a view containing a book creation form.
-
+This action simply invokes a view containing a book creation form.
 
 =head2 Add a Template for the Form
 
@@ -251,7 +248,6 @@ Open C<root/src/books/form_create.tt2> in your editor and enter:
 
 Note that we have specified the target of the form data as
 C<form_create_do>, the method created in the section that follows.
-
 
 =head2 Add Method to Process Form Values and Update Database
 
@@ -283,7 +279,7 @@ save the form information to the databse:
         # Store new model object in stash
         $c->stash->{book} = $book;
     
-        # Avoid Data::Dumper issue mention earlier
+        # Avoid Data::Dumper issue mentioned earlier
         # You can probably omit this    
         $Data::Dumper::Useperl = 1;
     
@@ -294,7 +290,8 @@ save the form information to the databse:
 
 =head2 Test Out The Form
 
-If the application is still running from before, use C<Ctrl-C> to kill it.  Then restart the server:
+If the application is still running from before, use C<Ctrl-C> to kill
+it.  Then restart the server:
 
     $ script/myapp_server.pl
 
@@ -305,10 +302,8 @@ C<create_done.tt2> template seen in earlier examples.  Finally, click
 "Return to list" to view the full list of books.
 
 B<Note:> Having the user enter the primary key ID for the author is
-obviously a bit crude; we will address this concern with a drop-down
-list in Part 8.
-
-
+obviously crude; we will address this concern with a drop-down list in
+Part 8.
 
 =head1 A SIMPLE DELETE FEATURE
 
@@ -361,7 +356,6 @@ and 2) the four lines for the Delete link near the bottom).
 The additional code is obviously designed to add a new column to the
 right side of the table with a C<Delete> "button" (for simplicity, links
 will be used instead of full HTML buttons).
-
 
 =head2 Add a Delete Action to the Controller
 
@@ -425,7 +419,6 @@ Then point your browser to L<http://localhost:3000/books/list> and click
 the "Delete" link next to "TCPIP_Illustrated_Vol-2".  A green "Book
 deleted" status message should display at the top of the page, along
 with a list of the six remaining books.
-
 
 =head1 AUTHOR
 
