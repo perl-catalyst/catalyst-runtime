@@ -1,7 +1,7 @@
 package Catalyst::AttrContainer;
 
 use strict;
-use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
+use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 
 use Catalyst::Exception;
 use NEXT;
