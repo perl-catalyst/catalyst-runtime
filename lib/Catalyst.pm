@@ -1817,7 +1817,7 @@ sub setup_components {
     );
     
     for my $component ( sort { length $a <=> length $b } $locator->plugins ) {
-        require( join( '/', split( '::', $component ) ) . '.pm' );
+        Catalyst::Utils::ensure_class_loaded( $component );
 
         my $module  = $class->setup_component( $component );
         my %modules = (
