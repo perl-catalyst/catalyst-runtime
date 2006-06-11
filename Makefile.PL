@@ -20,7 +20,7 @@ requires 'HTTP::Request';
 requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
-requires 'Module::Pluggable' => '3.0';
+requires 'Module::Pluggable' => '3.01';
 requires 'NEXT';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';

@@ -1817,7 +1817,7 @@ sub setup_components {
     );
     
     for my $component ( sort { length $a <=> length $b } $locator->plugins ) {
-        require Class::Inspector->filename($component);
+        require( join( '/', split( '::', $component ) ) . '.pm' );
 
         my $module  = $class->setup_component( $component );
         my %modules = (
