@@ -20,7 +20,7 @@ requires 'HTTP::Request';
 requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
-requires 'Module::Pluggable::Fast' => 0.16;
+requires 'Module::Pluggable' => '3.0';
 requires 'NEXT';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
@@ -43,7 +43,7 @@ WriteAll;
 print( '*' x 80, "\n" );
 my $banner =
   (qw/andyg chansen draven fordmason mst naughton sri jester
-      nothingmuch LTJake/)[ int( rand(10) ) ]
+      nothingmuch LTjake/)[ int( rand(10) ) ]
   . " is the greatest and gabb is "
   . ( (localtime)[2] > 12 ? "drunk" : "hung over" )
   . " again!";

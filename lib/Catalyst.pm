@@ -10,7 +10,9 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 use Catalyst::Controller;
+use Devel::InnerPackage ();
 use File::stat;
+use Module::Pluggable::Object;
 use NEXT;
 use Text::SimpleTable;
 use Path::Class::Dir;
@@ -47,8 +49,6 @@ our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = "catalyst_detach\n";
-
-require Module::Pluggable::Fast;
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
@@ -1808,57 +1808,60 @@ Sets up components.
 sub setup_components {
     my $class = shift;
 
-    my $callback = sub {
-        my ( $component, $context ) = @_;
+    my $locator = Module::Pluggable::Object->new(
+        search_path => [
+            "${class}::Controller", "${class}::C",
+            "${class}::Model",      "${class}::M",
+            "${class}::View",       "${class}::V"
+        ],
+    );
+    
+    for my $component ( sort { length $a <=> length $b } $locator->plugins ) {
+        require Class::Inspector->filename($component);
 
-        unless ( $component->can('COMPONENT') ) {
-            return $component;
-        }
-
-        my $suffix = Catalyst::Utils::class2classsuffix($component);
-        my $config = $class->config->{$suffix} || {};
-
-        my $instance;
-
-        eval { $instance = $component->COMPONENT( $context, $config ); };
-
-        if ( my $error = $@ ) {
-
-            chomp $error;
-
-            Catalyst::Exception->throw( message =>
-                  qq/Couldn't instantiate component "$component", "$error"/ );
-        }
-
-        Catalyst::Exception->throw( message =>
-qq/Couldn't instantiate component "$component", "COMPONENT() didn't return a object"/
-          )
-          unless ref $instance;
-        return $instance;
-    };
-
-    eval "package $class;\n" . q!Module::Pluggable::Fast->import(
-            name   => '_catalyst_components',
-            search => [
-                "$class\::Controller", "$class\::C",
-                "$class\::Model",      "$class\::M",
-                "$class\::View",       "$class\::V"
-            ],
-            callback => $callback
+        my $module  = $class->setup_component( $component );
+        my %modules = (
+            $component => $module,
+            map {
+                $_ => $class->setup_component( $_ )
+            } Devel::InnerPackage::list_packages( $component )
         );
-    !;
+        
+        for my $key ( keys %modules ) {
+            $class->components->{ $key } = $modules{ $key };
+        }
+    }
+}
+
+=head2 $c->setup_component
+
+=cut
+
+sub setup_component {
+    my( $class, $component ) = @_;
+
+    unless ( $component->can( 'COMPONENT' ) ) {
+        return $component;
+    }
+
+    my $suffix = Catalyst::Utils::class2classsuffix( $component );
+    my $config = $class->config->{ $suffix } || {};
+
+    my $instance = eval { $component->COMPONENT( $class, $config ); };
 
     if ( my $error = $@ ) {
-
         chomp $error;
-
         Catalyst::Exception->throw(
-            message => qq/Couldn't load components "$error"/ );
+            message => qq/Couldn't instantiate component "$component", "$error"/
+        );
     }
 
-    for my $component ( $class->_catalyst_components($class) ) {
-        $class->components->{ ref $component || $component } = $component;
-    }
+    Catalyst::Exception->throw(
+        message =>
+        qq/Couldn't instantiate component "$component", "COMPONENT() didn't return an object-like value"/
+    ) unless eval { $instance->can( 'can' ) };
+
+    return $instance;
 }
 
 =head2 $c->setup_dispatcher
