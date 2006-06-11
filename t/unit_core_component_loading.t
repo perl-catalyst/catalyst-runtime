@@ -148,14 +148,7 @@ $complist = $appclass->components;
 
 is(scalar keys %$complist, 24+1, "Correct number of components loaded");
 
-my $seen_foo_controller = 0;
-my $seen_extra = 0;
-foreach (keys %$complist) {
-    $seen_foo_controller++ if $_ eq "${appclass}::Controller::Foo";
-    $seen_extra++ if $_ eq "${appclass}::Extra::Foo";
-}
-
-is( $seen_foo_controller, 0, 'Controller::Foo was skipped' );
-is( $seen_extra, 1, 'Extra::Foo was loaded' );
+ok( !exists $complist->{ "${appclass}::Controller::Foo" }, 'Controller::Foo was skipped' );
+ok( exists $complist->{ "${appclass}::Extra::Foo" }, 'Extra::Foo was loaded' );
 
 rmtree($libdir);
