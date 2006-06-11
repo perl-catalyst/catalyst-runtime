@@ -1801,19 +1801,25 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 
 =head2 $c->setup_components
 
-Sets up components.
+Sets up components. Specify a C<setup_components> config option to pass additional options
+directly to L<Module::Pluggable>. To add additional search paths, specify a key named
+C<search_extra> as an array reference. Items in the array beginning with C<::> will have the
+application class name prepended to them.
 
 =cut
 
 sub setup_components {
     my $class = shift;
 
+    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
+    my $config  = $class->config->{ setup_components };
+    my $extra   = delete $config->{ search_extra } || [];
+    
+    push @paths, @$extra;
+        
     my $locator = Module::Pluggable::Object->new(
-        search_path => [
-            "${class}::Controller", "${class}::C",
-            "${class}::Model",      "${class}::M",
-            "${class}::View",       "${class}::V"
-        ],
+        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
+        %$config
     );
     
     for my $component ( sort { length $a <=> length $b } $locator->plugins ) {

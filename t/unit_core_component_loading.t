@@ -1,6 +1,7 @@
 # 2 initial tests, and 6 per component in the loop below
 # (do not forget to update the number of components in test 3 as well)
-use Test::More tests => 2 + 6 * 24;
+# 4 extra tests for the loading options
+use Test::More tests => 2 + 6 * 24 + 4;
 
 use strict;
 use warnings;
@@ -117,5 +118,44 @@ foreach (keys %$complist) {
             . " have been unreachable";
     }
 }
+
+rmtree($libdir);
+
+# test extra component loading options
+
+$appclass = 'ExtraOptions';
+push @components, { type => 'View', prefix => 'Extra', name => 'Foo' };
+
+foreach my $component (@components) {
+    make_component_file($component->{type},
+                        $component->{prefix},
+                        $component->{name});
+}
+
+eval qq(
+package $appclass;
+use Catalyst;
+__PACKAGE__->config->{ setup_components } = {
+    search_extra => [ '::Extra' ],
+    except       => [ "${appclass}::Controller::Foo" ]
+};
+__PACKAGE__->setup;
+);
+
+can_ok( $appclass, 'components');
+
+$complist = $appclass->components;
+
+is(scalar keys %$complist, 24+1, "Correct number of components loaded");
+
+my $seen_foo_controller = 0;
+my $seen_extra = 0;
+foreach (keys %$complist) {
+    $seen_foo_controller++ if $_ eq "${appclass}::Controller::Foo";
+    $seen_extra++ if $_ eq "${appclass}::Extra::Foo";
+}
+
+is( $seen_foo_controller, 0, 'Controller::Foo was skipped' );
+is( $seen_extra, 1, 'Extra::Foo was loaded' );
 
 rmtree($libdir);
