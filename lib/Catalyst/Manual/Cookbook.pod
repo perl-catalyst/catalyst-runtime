@@ -46,7 +46,7 @@ The recommended way is to use Catalyst::Helper::Controller::Scaffold.
 
 Just install this module, and to scaffold a Class::DBI Model class, do the following:
 
-./script/myapp_create controller <name> Scaffold <CDBI::Class>Scaffolding
+./script/myapp_create.pl controller <name> Scaffold <CDBI::Class>Scaffolding
 
 
 
@@ -423,7 +423,7 @@ static content to the view, perhaps like this:
     sub end : Private {
         my ( $self, $c ) = @_;
 
-        $c->forward( 'MyApp::V::TT' ) 
+        $c->forward( 'MyApp::View::TT' ) 
           unless ( $c->res->body || !$c->stash->{template} );
     }
 
@@ -433,7 +433,7 @@ C<$c-E<gt>res-E<gt>body>.
 
 Next, create a controller to handle requests for the /static path. Use
 the Helper to save time. This command will create a stub controller as
-C<lib/MyApp/C/Static.pm>.
+C<lib/MyApp/Controller/Static.pm>.
 
     $ script/myapp_create.pl controller Static
 
@@ -573,7 +573,7 @@ This is equivalent to:
   __PACKAGE__->config( name => MyApp );
   # configure authentication
   __PACKAGE__->config->{authentication} = {
-    user_class => 'MyApp::M::MyDB::Customer',
+    user_class => 'MyApp::Model::MyDB::Customer',
     ...
   };
   # configure sessions
@@ -687,7 +687,7 @@ in your Catalyst application, then make the following changes:
     return 1;
   }
 
-=head3 lib/MyApp/C/User.pm
+=head3 lib/MyApp/Controller/User.pm
 
   sub login : Path('/user/login') {
     my ($self, $c) = @_;
@@ -1816,7 +1816,7 @@ Catalyst::View::TT provides two different helpers for use to use: TT and TTSite.
 
 Create a basic Template Toolkit View using the provided helper script:
 
-    script/myapp_create.pl view MyView TT
+    script/myapp_create.pl view TT TT
 
 This will create lib/MyApp/View/MyView.pm, which is going to be pretty empty to start. However, it sets everything up that you need to get started. You can now define which template you want and forward to your view. For instance:
 
@@ -1825,7 +1825,7 @@ This will create lib/MyApp/View/MyView.pm, which is going to be pretty empty to 
 
         $c->stash->{template} = 'hello.tt';
 
-        $c->forward( $c->view('MyView') );
+        $c->forward( $c->view('TT') );
     }
 
 In most cases, you will put the $c->forward into end(), and then you would only have to define which template you want to use. The S<DefaultEnd> plugin discussed on Day 8 is also commonly used.
@@ -1836,7 +1836,7 @@ Although the TT helper does create a functional, working view, you may find your
 
 Once again, you can use the helper script:
 
-    script/myapp_create.pl view myView TTSite
+    script/myapp_create.pl view TT TTSite
 
 This time, the helper sets several options for us in the generated View.
 
@@ -1886,7 +1886,7 @@ In our controllers, we can add data to the stash, and then access it from the te
 
         $c->stash->{template} = 'hello.tt';
 
-        $c->forward( $c->view('MyView') );
+        $c->forward( $c->view('TT') );
     }
 
 Then, in hello.tt:
@@ -1906,7 +1906,7 @@ In your controller:
 
         $c->stash->{template} = 'hello.tt';
 
-        $c->forward( $c->view('MyView') );
+        $c->forward( $c->view('TT') );
     }
 
 In hello.tt:
