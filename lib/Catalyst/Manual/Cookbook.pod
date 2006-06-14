@@ -1543,6 +1543,33 @@ the name of a role to check, and it returns true if the user is a member.
      # do something restricted here
   }
 
+=head3 Using authentication in a testing environment
+
+Ideally, to write tests for authentication/authorization code one would first
+set up a test database with known data, then use
+L<Test::WWW::Mechanize::Catalyst> to simulate a user logging in. Unfortunately
+the former can be rather awkward, which is why it's a good thing that the
+authentication framework is so flexible.
+
+Instead of using a test database, one can simply change the authentication
+store to something a bit easier to deal with in a testing
+environment. Additionally, this has the advantage of not modifying one's
+database, which can be problematic if one forgets to use the testing instead of
+production database.
+
+e.g.,
+
+  use Catalyst::Plugin::Authentication::Store::Minimal::Backend;
+
+  # Sets up the user `test_user' with password `test_pass'
+  MyApp->default_auth_store(
+    Catalyst::Plugin::Authentication::Store::Minimal::Backend->new({
+      test_user => { password => 'test_pass' },
+    })
+  );
+
+Now, your test code can call C<$c->login('test_user', 'test_pass')> and
+successfully login, without messing with the database at all.
 
 =head3 More information
 
