@@ -11,8 +11,8 @@ Yummy code like your mum used to bake!
 
 =head2 Force debug screen
 
-You can force Catalyst to display the debug screen at the end of the request by
-placing a C<die()> call in the C<end> action.
+You can force Catalyst to display the debug screen at the end of the
+request by placing a C<die()> call in the C<end> action.
 
      sub end : Private {
          my ( $self, $c ) = @_;
@@ -27,8 +27,10 @@ condition in the C<end> action. For example:
         die "forced debug" if $c->req->params->{dump_info};  
     }  
 
-Then just add to your query string C<"&dump_info=1">, or the like, to
-force debug output.
+Then just add to your query string C<&dump_info=1> (or if there's no
+query string for the request, add C<?dump_info=1> to the end of the URL)
+to force debug output. This feature is included in
+L<Catlyst::Plugin::DefaultEnd>.
 
 
 =head2 Disable statistics
@@ -38,18 +40,13 @@ statistics in your debug messages.
 
     sub Catalyst::Log::info { }
 
-=head2 Scaffolding
+=head2 Enable debug status in the environment
 
-Scaffolding is very simple with Catalyst.
-
-The recommended way is to use Catalyst::Helper::Controller::Scaffold.
-
-Just install this module, and to scaffold a Class::DBI Model class, do the following:
-
-./script/myapp_create.pl controller <name> Scaffold <CDBI::Class>Scaffolding
-
-
-
+Normally you enable the debugging info by adding the C<-Debug> flag to
+your C<use Catalyst> statement. However, you can also enable it using
+environment variable, so you can (for example) get debug info without
+modifying your application scripts. Just set C<CATALYST_DEBUG> or
+C<E<LT>MYAPPE<GT>_DEBUG> to a true value.
 
 =head2 File uploads
 
@@ -136,166 +133,11 @@ displaying this message.
 For more information about uploads and usable methods look at
 L<Catalyst::Request::Upload> and L<Catalyst::Request>.
 
-=head2 Authentication with Catalyst::Plugin::Authentication
+=head2 Authentication (logging in)
 
-In this example, we'll use the
-L<Catalyst::Plugin::Authentication::Store::DBIC> store and the
-L<Catalyst::Plugin::Authentication::Credential::Password> credentials.
-
-In the lib/MyApp.pm package, we'll need to change the C<use Catalyst;>
-line to include the following modules:
-
-    use Catalyst qw/
-        ConfigLoader 
-        Authentication
-        Authentication::Store::DBIC
-        Authentication::Credential::Password
-        Session
-        Session::Store::FastMmap
-        Session::State::Cookie
-        HTML::Widget
-        Static::Simple
-        /;
-
-The Session, Session::Store::* and Session::State::* modules listed above
-ensure that we stay logged-in across multiple page-views.
-
-In our MyApp.yml configuration file, we'll need to add:
-
-    authentication:
-      dbic:
-        user_class: MyApp::Model::DBIC::User
-        user_field: username
-        password_field: password
-        password_type: hashed
-        password_hash_type: SHA-1
-
-'user_class' is a DBIx::Class package for your users table.
-'user_field' tells which field (column) is used for username lookup.
-'password_field' is the password field in your table.
-The above settings for 'password_type' and 'password_hash_type' ensure that
-the password won't be stored in the database in clear text.
-
-In SQLite, the users table might be something like:
-
-    CREATE TABLE user (
-        id       INTEGER PRIMARY KEY,
-        username VARCHAR(100),
-        password VARCHAR(100)
-    );
-
-Now we need to create a DBIC::SchemaLoader component for this database
-(changing "myapp.db" to wherever your SQLite database is).
-
-    script/myapp_create.pl model DBIC DBIC::SchemaLoader 'dbi:SQLite:myapp.db'
-
-Now we can start creating our page controllers and templates.
-For our homepage, we create the file "root/index.tt" containing:
-
-    <html>
-    <body>
-    [% IF c.user %]
-        <p>hello [% c.user.username %]</p>
-        <p><a href="[% c.uri_for( '/logout' ) %]">logout</a></p>
-    [% ELSE %]
-        <p><a href="[% c.uri_for( '/login' ) %]">login</a></p>
-    [% END %]
-    </body>
-    </html>
-
-If the user is logged in, they will be shown their name, and a logout link.
-Otherwise, they will be shown a login link.
-
-To display the homepage, we can uncomment the C<default> and C<end>
-subroutines in lib/MyApp/Controller/Root.pm and populate them as so:
-
-    sub default : Private {
-        my ( $self, $c ) = @_;
-    
-        $c->stash->{template} = 'index.tt';
-    }
-
-    sub end : Private {
-        my ( $self, $c ) = @_;
-    
-        $c->forward( $c->view('TT') )
-            unless $c->response->body || $c->response->redirect;
-    }
-
-The login template is very simple, as L<HTML::Widget> will handle the
-HTML form creation for use. This is saved as "root/login.tt".
-
-    <html>
-    <head>
-    <link href="[% c.uri_for('/static/simple.css') %]" rel="stylesheet" type="text/css">
-    </head>
-    <body>
-    [% result %]
-    </body>
-    </html>
-
-For the HTML form to look correct, we also copy the C<simple.css> file
-from the L<HTML::Widget> distribution into our "root/static" folder.
-This file is automatically server by the L<Catalyst::Plugin::Static::Simple>
-module which we loaded in our lib/MyApp.pm package.
-
-To handle login requests, we first create a controller, like so:
-
-    script/myapp_create.pl controller Login
-
-In the lib/MyApp/Controller/Login.pm package, we can then uncomment the
-C<default> subroutine, and populate it, as below.
-
-First the widget is created, it needs the 'action' set, and 'username' and
-'password' fields and a submit button added.
-
-Then, if we've received a username and password in the request, we attempt
-to login. If successful, we redirect to the homepage; if not the login form
-will be displayed again.
-
-    sub default : Private {
-        my ( $self, $c ) = @_;
-    
-        $c->widget->method('POST')->action( $c->uri_for('/login') );
-        $c->widget->element( 'Textfield', 'username' )->label( 'Username' );
-        $c->widget->element( 'Password', 'password' )->label( 'Password' );
-        $c->widget->element( 'Submit' )->value( 'Login' );
-        
-        my $result = $c->widget->process( $c->req );
-        
-        if ( my $user = $result->param('username')
-            and my $pass = $result->param('password') )
-        {    
-            if ( $c->login( $user, $pass ) ) {
-                $c->response->redirect( $c->uri_for( "/" ) );
-                return;
-            }
-        }
-        
-        $c->stash->{template} = 'login.tt';
-        $c->stash->{result}   = $result;
-    }
-
-To handle logout's, we create a new controller:
-
-    script/myapp_create.pl controller Logout
-
-Then in the lib/MyApp/Controller/Logout.pm package, we change the
-C<default> subroutine, to logout and then redirect back to the
-homepage.
-
-    sub default : Private {
-        my ( $self, $c ) = @_;
-    
-        $c->logout;
-        
-        $c->response->redirect( $c->uri_for( "/" ) );
-    }
-
-Remember that to test this, we would first need to add a user to the
-database, ensuring that the password field is saved as the SHA1 hash
-of our desired password.
-
+This is extensively covered in other documentation; see in particular
+L<Catalyst::Plugin::Authentication> and the Authentication chapter
+of the Tutorial at L<Catalyst::Manual::Tutorial::Authorization>.
 
 =head2 Pass-through login (and other actions)
 
@@ -314,75 +156,32 @@ like so:
       }
     }
 
-=head2 How to use Catalyst without mod_perl
-
-Catalyst applications give optimum performance when run under mod_perl.
-However sometimes mod_perl is not an option, and running under CGI is 
-just too slow.  There's also an alternative to mod_perl that gives
-reasonable performance named FastCGI.
-
-=head3 Using FastCGI
-
-To quote from L<http://www.fastcgi.com/>: "FastCGI is a language 
-independent, scalable, extension to CGI that provides high performance 
-without the limitations of specific server APIs."  Web server support 
-is provided for Apache in the form of C<mod_fastcgi> and there is Perl
-support in the C<FCGI> module.  To convert a CGI Catalyst application 
-to FastCGI one needs to initialize an C<FCGI::Request> object and loop 
-while the C<Accept> method returns zero.  The following code shows how 
-it is done - and it also works as a normal, single-shot CGI script.
-
-    #!/usr/bin/perl
-    use strict;
-    use FCGI;
-    use MyApp;
-
-    my $request = FCGI::Request();
-    while ($request->Accept() >= 0) {
-        MyApp->run;
-    }
-
-Any initialization code should be included outside the request-accept 
-loop.
-
-There is one little complication, which is that C<MyApp-E<gt>run> outputs a
-complete HTTP response including the status line (e.g.: 
-"C<HTTP/1.1 200>").
-FastCGI just wants a set of headers, so the sample code captures the 
-output and  drops the first line if it is an HTTP status line (note: 
-this may change).
-
-The Apache C<mod_fastcgi> module is provided by a number of Linux 
-distro's and is straightforward to compile for most Unix-like systems.  
-The module provides a FastCGI Process Manager, which manages FastCGI 
-scripts.  You configure your script as a FastCGI script with the 
-following Apache configuration directives:
-
-    <Location /fcgi-bin>
-       AddHandler fastcgi-script fcgi
-    </Location>
-
-or:
-
-    <Location /fcgi-bin>
-       SetHandler fastcgi-script
-       Action fastcgi-script /path/to/fcgi-bin/fcgi-script
-    </Location>
-
-C<mod_fastcgi> provides a number of options for controlling the FastCGI
-scripts spawned; it also allows scripts to be run to handle the
-authentication, authorization, and access check phases.
-
-For more information see the FastCGI documentation, the C<FCGI> module 
-and L<http://www.fastcgi.com/>.
 
 =head2 Serving static content
 
-Serving static content in Catalyst can be somewhat tricky; this recipe
-shows one possible solution. Using this recipe will serve all static
-content through Catalyst when developing with the built-in HTTP::Daemon
-server, and will make it easy to use Apache to serve the content when
-your app goes into production.
+Serving static content in Catalyst used to be somewhat tricky; the use
+of L<Catalyst::Plugin::Static::Simple> makes everything much easier.
+This plugin will automatically serve your static content during development,
+but allows you to easily switch to Apache (or other server) in a
+production environment.
+
+=head3 Introduction to Static::Simple
+
+Static::Simple is a plugin that will help to serve static content for your
+application. By default, it will serve most types of files, excluding some
+standard Template Toolkit extensions, out of your B<root> file directory. All
+files are served by path, so if B<images/me.jpg> is requested, then
+B<root/images/me.jpg> is found and served.
+
+=head3 Usage
+
+Using the plugin is as simple as setting your use line in MyApp.pm to include:
+
+ use Catalyst qw/Static::Simple/;
+
+and already files will be served.
+
+=head3 Configuring
 
 Static content is best served from a single directory within your root
 directory. Having many different directories such as C<root/css> and
@@ -390,7 +189,7 @@ C<root/images> requires more code to manage, because you must separately
 identify each static directory--if you decide to add a C<root/js>
 directory, you'll need to change your code to account for it. In
 contrast, keeping all static directories as subdirectories of a main
-C<root/static> directory makes things much easier to manager. Here's an
+C<root/static> directory makes things much easier to manage. Here's an
 example of a typical root directory structure:
 
     root/
@@ -403,15 +202,63 @@ example of a typical root directory structure:
     root/static/js/code.js
 
 
-All static content lives under C<root/static> with everything else being
-Template Toolkit files. Now you can identify the static content by
-matching C<static> from within Catalyst.
+All static content lives under C<root/static>, with everything else being
+Template Toolkit files.
 
-=head3 Serving with HTTP::Daemon (myapp_server.pl)
+=over 4
 
-To serve these files under the standalone server, we first must load the
-Static plugin. Install L<Catalyst::Plugin::Static> if it's not already
-installed.
+=item Include Path
+
+You may of course want to change the default locations, and make
+Static::Simple look somewhere else, this is as easy as:
+
+ MyApp->config->{static}->{include_path} = [
+  MyApp->config->{root},
+  '/path/to/my/files' 
+ ];
+
+When you override include_path, it will not automatically append the
+normal root path, so you need to add it yourself if you still want
+it. These will be searched in order given, and the first matching file
+served.
+
+=item Static directories
+
+If you want to force some directories to be only static, you can set
+them using paths relative to the root dir, or regular expressions:
+
+ MyApp->config->{static}->{dirs} = [
+   'static',
+   qr/^(images|css)/,
+ ];
+
+=item File extensions
+
+By default, the following extensions are not served (that is, they will
+be processed by Catalyst): B<tmpl, tt, tt2, html, xhtml>. This list can
+be replaced easily:
+
+ MyApp->config->{static}->{ignore_extensions} = [
+    qw/tmpl tt tt2 html xhtml/ 
+ ];
+
+=item Ignoring directories
+
+Entire directories can be ignored. If used with include_path,
+directories relative to the include_path dirs will also be ignored:
+
+ MyApp->config->{static}->{ignore_dirs} = [ qw/tmpl css/ ];
+
+=back
+
+=head3 More information
+
+L<http://search.cpan.org/dist/Catalyst-Plugin-Static-Simple/>
+
+=head3 Serving manually with the Static plugin with HTTP::Daemon (myapp_server.pl)
+
+In some situations you might want to control things more directly,
+using L<Catalyst::Plugin::Static>.
 
 In your main application class (MyApp.pm), load the plugin:
 
@@ -461,7 +308,7 @@ favicon.ico by using this in your HTML header:
 
     <link rel="icon" href="/static/myapp.ico" type="image/x-icon" />
 
-=head3 Common problems
+=head3 Common problems with the Static plugin
 
 The Static plugin makes use of the C<shared-mime-info> package to
 automatically determine MIME types. This package is notoriously
@@ -481,13 +328,14 @@ code in your Static controller:
         $c->serve_static;
     }
 
-=head3 Serving with Apache
+=head3 Serving Static Files with Apache
 
-When using Apache, you can completely bypass Catalyst and the Static
-controller by intercepting requests for the C<root/static> path at the
-server level. All that is required is to define a DocumentRoot and add a
-separate Location block for your static content. Here is a complete
-config for this application under mod_perl 1.x:
+When using Apache, you can bypass Catalyst and any Static
+plugins/controllers controller by intercepting requests for the
+C<root/static> path at the server level. All that is required is to
+define a DocumentRoot and add a separate Location block for your static
+content. Here is a complete config for this application under mod_perl
+1.x:
 
     <Perl>
         use lib qw(/var/www/MyApp/lib);
@@ -642,104 +490,6 @@ You can manually set errors in your code to trigger this page by calling
 
     $c->error( 'You broke me!' );
 
-=head2 Require user logins
-
-It's often useful to restrict access to your application to a set of
-registered users, forcing everyone else to the login page until they're
-signed in.
-
-To implement this in your application make sure you have a customer
-table with username and password fields and a corresponding Model class
-in your Catalyst application, then make the following changes:
-
-=head3 lib/MyApp.pm
-
-  use Catalyst qw/
-      Authentication
-      Authentication::Store::DBIC
-      Authentication::Credential::Password
-  /;
-
-  __PACKAGE__->config->{authentication}->{dbic} = {
-    'user_class'        => 'My::Model::DBIC::User',
-    'user_field'        => 'username',
-    'password_field'    => 'password'
-    'password_type'     => 'hashed',
-    'password_hash_type'=> 'SHA-1'
-  };
-
-  sub auto : Private {
-    my ($self, $c) = @_;
-    my $login_path = 'user/login';
-
-    # allow people to actually reach the login page!
-    if ($c->request->path eq $login_path) {
-      return 1;
-    }
-
-    # if a user doesn't exist, force login
-    if ( !$c->user_exists ) {
-      # force the login screen to be shown
-      $c->response->redirect($c->request->base . $login_path);
-    }
-
-    # otherwise, we have a user - continue with the processing chain
-    return 1;
-  }
-
-=head3 lib/MyApp/Controller/User.pm
-
-  sub login : Path('/user/login') {
-    my ($self, $c) = @_;
-
-    # default template
-    $c->stash->{'template'} = "user/login.tt";
-    # default form message
-    $c->stash->{'message'} = 'Please enter your username and password';
-
-    if ( $c->request->param('username') ) {
-      # try to log the user in
-      # login() is provided by ::Authentication::Credential::Password
-      if( $c->login(
-        $c->request->param('username'),
-        $c->request->param('password'),
-        ) {
-
-        # if login() returns 1, user is now logged in
-        $c->response->redirect('/some/page');
-      }
-
-      # otherwise we failed to login, try again!
-      $c->stash->{'message'} = 
-         'Unable to authenticate the login details supplied';
-    }
-  }
-
-  sub logout : Path('/user/logout') {
-    my ($self, $c) = @_;
-    # log the user out
-    $c->logout;
-
-    # do the 'default' action
-    $c->response->redirect($c->request->base);
-  }
-
-
-=head3 root/base/user/login.tt
-
- [% INCLUDE header.tt %]
- <form action="/user/login" method="POST" name="login_form">
-    [% message %]<br />
-    <label for="username">username:</label><br />
-    <input type="text" id="username" name="username" /><br />
-
-    <label for="password">password:</label><br />
-    <input type="password" id="password" name="password" /><br />
-
-    <input type="submit" value="log in" name="form_submit" />
-  </form>
-  [% INCLUDE footer.tt %]
-
 =head2 Role-based Authorization
 
 For more advanced access control, you may want to consider using role-based
@@ -800,19 +550,19 @@ the current user does not have one of the required roles:
     $c->assert_user_roles( qw/ user admin / );
   }
   
-=head2 Building PAR Packages
+=head2 Quick deployment: Building PAR Packages
 
-You know the problem, you got a application perfectly running on your
-development box, but then *shudder* you have to quickly move it to
-another one for demonstration/deployment/testing...
+You have an application running on your development box, but then you
+have to quickly move it to another one for
+demonstration/deployment/testing...
 
-PAR packages can save you from a lot of trouble here.
-They are usual Zip files that contain a blib tree, you can even
-include all prereqs and a perl interpreter by setting a few flags!
+PAR packages can save you from a lot of trouble here. They are usual Zip
+files that contain a blib tree; you can even include all prereqs and a
+perl interpreter by setting a few flags!
 
 =head3 Follow these few points to try it out!
 
-1. Install Catalyst 5.61 (or later) and PAR 0.89
+1. Install Catalyst and PAR 0.89 (or later)
 
     % perl -MCPAN -e 'install Catalyst'
     ...
@@ -834,7 +584,8 @@ include all prereqs and a perl interpreter by setting a few flags!
     catalyst_par();        # Generate a PAR as soon as the blib
                            # directory is ready
 
-4. Prepare the Makefile, test your app, create a PAR (the two Makefile.PL calls are no typo)
+4. Prepare the Makefile, test your app, create a PAR (the two
+Makefile.PL calls are no typo)
 
     % perl Makefile.PL
     ...
@@ -843,7 +594,8 @@ include all prereqs and a perl interpreter by setting a few flags!
     % perl Makefile.PL
     ...
 
-Future versions of Catalyst (5.62 and newer) will use a similar but more elegant calling convention.
+Recent versions of Catalyst include L<Module::Install::Catalyst>, which
+simplifies the process greatly.
 
     % perl Makefile.PL
     ...
@@ -853,7 +605,7 @@ Future versions of Catalyst (5.62 and newer) will use a similar but more elegant
 Congratulations! Your package "myapp.par" is ready, the following
 steps are just optional.
 
-5. Test your PAR package with "parl" (no typo) :)
+5. Test your PAR package with "parl" (no typo)
 
     % parl myapp.par
     Usage:
@@ -877,8 +629,7 @@ Yes, this nifty little starter application gets automatically included.
 You can also use "catalyst_par_script('myapp_server.pl')" to set a
 default script to execute.
 
-6. Want to create a binary that includes the Perl interpreter? No
-problem!
+6. Want to create a binary that includes the Perl interpreter?
 
     % pp -o myapp myapp.par
     % ./myapp myapp_server.pl
@@ -1013,159 +764,81 @@ This will let all files within root/static be handled directly by Apache.  In
 a two-tiered setup, the frontend server should handle static files.
 The configuration to do this on the frontend will vary.
 
-=head2 Don't Repeat Yourself
+=head2 Extending DefaultEnd
 
-DRY is a central principle in Catalyst, yet there is one piece of code
-that is identical in 90% of all Catalyst applications.
+Most people use L<Catalyst::Plugin::DefaultEnd> as their
+end action; it does what you usually need. However there are
+times when you need to add a bit to it, but don't want to
+write your own C<end> action.
 
-  sub end : Private {
-      my ($self,$c) = @_;
-      return 1 if $c->res->body;
-      return 1 if $c->response->status =~ /^3\d\d$/;
-      $c->forward( 'MyApp::View::TT' );
-  }
+Simply extend it like this:
 
-Basically, we want to render a template unless we already have a response,
-or are redirecting. 
+  use Catalyst qw/DefaultEnd/;
 
-=head3 Catalyst::Plugin::DefaultEnd to the rescue!
-
-So, rather than doing this again and again, I've made a plugin for you to use.
-sure, it's not much code, but at least it's one function less to worry about.
-
-Here's how to use it:
-
-1. Open up MyApp.pm.
-
-2. Add the DefaultEnd plugin like this:
-
-  use Catalyst qw/-Debug DefaultEnd Static::Simple/;
-  
-3.  There is no step 3 :)
-
-As an added bonus, you can now set dump_info=1 as a url parameter to force 
-the end action to die, and display the debug info. Note that this is only
-provided in Debug mode.
-
-By default, DefaultEnd will forward to the first view it can find. If you have
-more than one view, you might want to specifiy the active one, by setting 
-$c->config->{view}.
-
-If you need to add more things to your end action, you can extend it like this.
+  # (time passes)
 
   sub end : Private {
       my ( $self, $c ) = @_;
 
-      ... #code before view
+      ... # code before view
 
       $c->NEXT::end( $c );
   
-      ... #code after view
+      ... # code after view
   }
   
-=head2 YAML, YAML, YAML!
-
-When you start a new Catalyst app you configure it directly
-with __PACKAGE__->config, thats ok for development but admins
-will hate you when they have to deploy this.
-
-    __PACKAGE__->config( name => 'MyApp', 'View::TT' => { EVAL_PERL => 1 } );
-
-You didn't know you could configure your view from the application class, eh? :)
-Thats possible for every component that inherits from Catalyst::Component
-or it's subclasses (Catalyst::Base, Catalyst::Controller, Catalyst::View,
-Catalyst::Model).
-
-    __PACKAGE__->config(
-        name => 'MyApp',
-        'View::TT' => {
-            EVAL_PERL => 1
-        },
-        'Controller::Foo' => {
-            fool => 'sri'
-        }
-    );
-    
-    
-    package MyApp::Controller::Foo;
-    use base 'Catalyst::Controller';
-    
-    __PACKAGE__->config( lalala => " can't sing!" );
-    
-    sub default : Private {
-        my ( $self, $c ) = @_;
-        $c->res->body( $self->{fool} . $self->{lalala} );
-    }
-
-But back to the topic, lets make our admins happy with this little idiom.
-
-    use YAML ();
-    
-    __PACKAGE__->config( YAML::LoadFile( __PACKAGE__->path_to('myapp.yml') ) );
-
-The C<path_to()> method is a nice little helper that returns paths relative to the
-current application home.
-
-Thats it, now just create a file C<myapp.yml>.
-
-    ---
-    name: MyApp
-    View::TT:
-      EVAL_PERL: 1
-    Controller::Foo:
-      fool: sri
-
 =head2 Catalyst on shared hosting
 
 So, you want to put your Catalyst app out there for the whole world to
-see, but you don't want to break the bank. There is an answer - if you can
-get shared hosting with FastCGI and a shell, you can install your Catalyst
-app. First, run
+see, but you don't want to break the bank. There is an answer - if you
+can get shared hosting with FastCGI and a shell, you can install your
+Catalyst app in a local directory on your shared host. First, run
 
-  perl -MCPAN -e shell
+    perl -MCPAN -e shell
 
 and go through the standard CPAN configuration process. Then exit out
 without installing anything. Next, open your .bashrc and add
 
-  export PATH=$HOME/local/bin:$HOME/local/script:$PATH
-  perlversion=`perl -v | grep 'built for' | awk '{print $4}' | sed -e 's/v//;'`
-  export PERL5LIB=$HOME/local/share/perl/$perlversion:$HOME/local/lib/perl/$perlversion:$HOME/local/lib:$PERL5LIB
+    export PATH=$HOME/local/bin:$HOME/local/script:$PATH
+    perlversion=`perl -v | grep 'built for' | awk '{print $4}' | sed -e 's/v//;'`
+    export PERL5LIB=$HOME/local/share/perl/$perlversion:$HOME/local/lib/perl/$perlversion:$HOME/local/lib:$PERL5LIB
 
-and log out, then back in again (or run ". .bashrc" if you prefer). Finally,
-edit .cpan/CPAN/MyConfig.pm and add
+and log out, then back in again (or run C<". .bashrc"> if you
+prefer). Finally, edit C<.cpan/CPAN/MyConfig.pm> and add
 
-  'make_install_arg' => qq[SITEPREFIX=$ENV{HOME}/local],
-  'makepl_arg' => qq[INSTALLDIRS=site install_base=$ENV{HOME}/local],
+    'make_install_arg' => qq[SITEPREFIX=$ENV{HOME}/local],
+    'makepl_arg' => qq[INSTALLDIRS=site install_base=$ENV{HOME}/local],
 
-Now you can install the modules you need with CPAN as normal, and perl will
-pick them up. Finally, change directory into the root of your virtual host
-and symlink your application's script directory in -
+Now you can install the modules you need using CPAN as normal; they
+will be installed into your local directory, and perl will pick them
+up. Finally, change directory into the root of your virtual host and
+symlink your application's script directory in:
 
-  cd path/to/mydomain.com
-  ln -s ~/lib/MyApp/script script
+    cd path/to/mydomain.com
+    ln -s ~/lib/MyApp/script script
 
-And add the following lines to your .htaccess file (assuming the server is
-setup to handle .pl as fcgi - you may need to rename the script to
-myapp_fastcgi.fcgi and/or use a SetHandler directive) -
+And add the following lines to your .htaccess file (assuming the server
+is setup to handle .pl as fcgi - you may need to rename the script to
+myapp_fastcgi.fcgi and/or use a SetHandler directive):
 
   RewriteEngine On
   RewriteCond %{REQUEST_URI} !^/?script/myapp_fastcgi.pl
   RewriteRule ^(.*)$ script/myapp_fastcgi.pl/$1 [PT,L]
 
-http://mydomain.com/ should now Just Work. Congratulations, now you can
-tell your friends about your new website (or in our case, tell the client
-it's time to pay the invoice :)
+Now C<http://mydomain.com/> should now Just Work. Congratulations, now
+you can tell your friends about your new website (or in our case, tell
+the client it's time to pay the invoice :) )
 
 =head2 Caching
 
-Catalyst makes it easy to employ several different types of caching to speed
-up your applications.
+Catalyst makes it easy to employ several different types of caching to
+speed up your applications.
 
 =head3 Cache Plugins
 
 There are three wrapper plugins around common CPAN cache modules:
-Cache::FastMmap, Cache::FileCache, and Cache::Memcached.  These can be used
-to cache the result of slow operations. 
+Cache::FastMmap, Cache::FileCache, and Cache::Memcached.  These can be
+used to cache the result of slow operations.
 
 This very page you're viewing makes use of the FileCache plugin to cache the
 rendered XHTML version of the source POD document.  This is an ideal
@@ -1274,158 +947,19 @@ still be automatically detected.
 See the documentation for each cache plugin for more details and other
 available configuration options.
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Cache-FastMmap/lib/Catalyst/Plugin/Cache/FastMmap.pm>
-L<http://search.cpan.org/dist/Catalyst-Plugin-Cache-FileCache/lib/Catalyst/Plugin/Cache/FileCache.pm>
-L<http://search.cpan.org/dist/Catalyst-Plugin-Cache-Memcached/lib/Catalyst/Plugin/Cache/Memcached.pm>
-L<http://search.cpan.org/dist/Catalyst-Plugin-PageCache/lib/Catalyst/Plugin/PageCache.pm>
+L<Catalyst::Plugin::Cache::FastMmap>
+L<Catalyst::Plugin::Cache::FileCache>
+L<Catalyst::Plugin::Cache::Memcached>
+L<Catalyst::Plugin::PageCache>
 L<http://search.cpan.org/dist/Template-Toolkit/lib/Template/Manual/Config.pod#Caching_and_Compiling_Options>
 
-=head2 L<Catalyst::Plugin::Subrequest>
+=head2 Component-based Subrequests
 
-=head3 Component based sub-requests.
+See L<Catalyst::Plugin::SubRequest>.
 
-This is actually one of the features we brought over from L<Maypole>. There it 
-was called L<Maypole::Plugin::Component>. Basically, the idea is to set up 
-new request/response objects, and do an internal request, then return the 
-output. It's quite handy for various situations, Simon's example was a 
-shopping portal. I'm frequently using it to render parts of my site that I'm 
-also rendering with ajax, to avoid duplication of code.
+=head2 DBIx::Class as a Catalyst Model
 
-It's quite simple in use. You just call $c->subreq('</public/url>'); (or 
-with TT, [% c.subreq('/public/url') %] .) This will localize enough 
-of your request/response object so that it shouldn't affect your current
-request, set up a new path/uri, and call the Dispatcher to force a full
-request chain, including begin/end/auto/default and whatever else applies.
-if you don't like 'subreq', theres an alias as well: 'sub_request'.
-
-You can also set up the stash before the request, as well as pass parameters
-to the request like a normal form POST by passing optional hashrefs to the 
-subreq method. for example:
-
-	my $text=$c->subreq('/foo',{ bar=>$c->stash->{bar} }, {id=>23});
-
-This will dispatch to whatever handles '/foo', with bar in the stash, and
-$c->req->param('id') returning 23.  After the request, $text will contain
-whatever's in $c->res->output.
-
-Note, by the way, that the uri path is relative to the application root, 
-and not necessesarily the webserver root.
-
-=head2 DBIx::Class as Catalyst Model
-
-=head3 Our Database
-
-This text will show you how to start using DBIx::Class as your model within
-Catalyst. Let's assume, we have a relational set of tables:
-
-  shell> sqlite3 myapp.db
-  SQLite version 3.2.1
-  Enter ".help" for instructions
-  sqlite> CREATE TABLE person (
-     ...>     id       INTEGER PRIMARY KEY AUTOINCREMENT,
-     ...>     name     VARCHAR(100)
-     ...> );
-  sqlite> CREATE TABLE address (
-     ...>     id       INTEGER PRIMARY KEY AUTOINCREMENT,
-     ...>     person   INTEGER REFERENCES person
-     ...>     address  TEXT,
-     ...> );
-  sqlite> .q
-
-which we want to access from our C<MyApp> Catalyst application.
-
-=head3 Setting up the models
-
-We will cover the more convenient way to start with, and let our models be
-set up automatically. If you want to define your models and their relations
-manually, have a look at C<Catalyst::Model::DBIC::Plain>. We'll concentrate
-on C<Catalyst::Model::DBIC>.
-
-We let a helper do most of the work for us:
-
-  shell> script/myapp_create.pl model DBIC DBIC \
-         dbi:SQLite:/path/to/myapp.db
-   exists "/path/MyApp/script/../lib/MyApp/Model"
-   exists "/path/MyApp/script/../t"
-  created "/path/MyApp/Model/DBIC.pm"
-  created "/path/MyApp/Model/DBIC"
-  created "/path/MyApp/Model/DBIC/Address.pm"
-  created "/path/MyApp/Model/DBIC/Person.pm"
-  created "/path/MyApp/Model/DBIC/SqliteSequence.pm"
-   exists "/path/MyApp/script/../t"
-  created "/path/MyApp/script/../t/model_DBIC-Address.t"
-   exists "/path/MyApp/script/../t"
-  created "/path/MyApp/script/../t/model_DBIC-Person.t"
-   exists "/path/MyApp/script/../t"
-  created "/path/MyApp/script/../t/model_DBIC-SqliteSequence.t"
-
-The base class C<DBIC.pm> that does the setting-up part of the job is set up
-as well as stub files of our modules to extend and the testing environment.
-
-=head3 Table and Relationship Autodetection
-
-If you start your Cat Application up, you can see the loaded tables and
-model components in your debug output:
-
-  shell> script/myapp_server.pl
-  ...
-  [Tue Dec 13 01:20:59 2005] [catalyst] [debug] Loaded 
-  tables "address person sqlite_sequence"
-  ...
-  .------------------------------------+----------.
-  | Class                              | Type     |
-  +------------------------------------+----------+
-  | MyApp::Model::DBIC                 | instance |
-  | MyApp::Model::DBIC::Address        | class    |
-  | MyApp::Model::DBIC::Person         | class    |
-  | MyApp::Model::DBIC::SqliteSequence | class    |
-  | MyApp::Model::DBIC::_db            | class    |
-  '------------------------------------+----------'
-  ...
-
-And your models are ready to use! If you change the database schema,
-your models will also change at startup. However, Catalyst will not touch 
-your stub model files. 
-
-=head3 Using the Models
-
-You can create new objects:
-
-  my $person = $c->model( 'DBIC::Person' )->create({
-      name => 'Jon Doe',
-  });
-
-Or add related objects:
-
-  my $adress = $person->add_to_addresses({
-      address => 'We wish we knew.',
-  });
-
-Search and retrieve from the database:
-
-  my $person = $c->model( 'DBIC::Person' )->find(1);
-  my $address_iterator = $c->model( 'DBIC::Address' )
-    ->search( { address => { like => '%Tokyo%' } } );
-
-=head3 More Information
-
-You can find the documentation of C<Catalyst::Model::DBIC> and its helper
-at
-
-L<http://search.cpan.org/dist/Catalyst-Model-DBIC/>
-
-For information concerning DBIx::Class please visit the documentation and
-Intro on CPAN:
-
-L<http://search.cpan.org/dist/DBIx-Class/>
-L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual/Intro.pod>
-
-or its own Wiki
-
-L<http://dbix-class.shadowcatsystems.co.uk/>
-
-and of course, you can find support on irc.perl.org#catalyst and 
-irc.perl.org#dbix-class.
+See L<Catalyst::Model::DBIC::Schema>.
 
 =head2 Authentication/Authorization
 
@@ -2475,73 +2009,6 @@ L<http://search.cpan.org/author/SRI/Catalyst-5.61/lib/Catalyst/Manual/Intro.pod>
 
 L<http://dev.catalyst.perl.org/wiki/FlowChart>
 
-=head2 Static::Simple
-
-=head3 Introduction
-
-Static::Simple is a plugin that will help to serve static content for your
-application. By default, it will serve most types of files, excluding some
-standard Template Toolkit extensions, out of your B<root> file directory. All
-files are served by path, so if B<images/me.jpg> is requested, then
-B<root/images/me.jpg> is found and served.
-
-=head3 Usage
-
-Using the plugin is as simple as setting your use line in MyApp.pm to:
-
- use Catalyst qw/Static::Simple/;
-
-and already files will be served.
-
-=head3 Configuring
-
-=over 4
-
-=item Include Path
-
-You may of course want to change the default locations, and make
-Static::Simple look somewhere else, this is as easy as:
-
- MyApp->config->{static}->{include_path} = [
-  MyApp->config->{root},
-  '/path/to/my/files' 
- ];
-
-When you override include_path, it will not automatically append the normal
-root path, so you need to add it yourself if you still want it. These will be
-searched in order given, and the first matching file served.
-
-=item Static directories
-
-If you want to force some directories to be only static, you can set them
-using paths relative to the root dir, or regular expressions:
-
- MyApp->config->{static}->{dirs} = [
-   'static',
-   qr/^(images|css)/,
- ];
-
-=item File extensions
-
-By default, the following extensions are not served: B<tmpl, tt, tt2, html,
-xhtml>. This list can be replaced easily:
-
- MyApp->config->{static}->{ignore_extensions} = [
-    qw/tmpl tt tt2 html xhtml/ 
- ];
-
-=item Ignoring directories
-
-Entire directories can be ignored. If used with include_path, directories
-relative to the include_path dirs will also be ignored:
-
- MyApp->config->{static}->{ignore_dirs} = [ qw/tmpl css/ ];
-
-=back
-
-=head3 More information
-
-L<http://search.cpan.org/dist/Catalyst-Plugin-Static-Simple/>
 
 =head2 Authorization
 
