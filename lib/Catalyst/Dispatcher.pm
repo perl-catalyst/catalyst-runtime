@@ -392,7 +392,7 @@ sub register {
 
     my $priv = 0;
     foreach my $key ( keys %{ $action->attributes } ) {
-        $priv++ if $key eq 'Private';
+        next if $key eq 'Private';
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
             eval "require $class";
@@ -402,12 +402,9 @@ sub register {
     }
 
     # Pass the action to our dispatch types so they can register it if reqd.
-    my $reg = 0;
     foreach my $type ( @{ $self->dispatch_types } ) {
-        $reg++ if $type->register( $c, $action );
+        $type->register( $c, $action );
     }
-
-    return unless $reg + $priv;
 
     my $namespace = $action->namespace;
     my $name      = $action->name;

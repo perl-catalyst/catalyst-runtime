@@ -1,5 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - removed retarded registration requirement in dispatcher
         - removed Module::Pluggable::Fast hack in favor of
           Module::Pluggable::Object
         - extended uri_for, added dispatcher->uri_for_action
