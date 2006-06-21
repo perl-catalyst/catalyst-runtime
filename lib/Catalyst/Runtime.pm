@@ -14,7 +14,7 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-Catalyst Runtime class.
+This is the primary class for the Catalyst-Runtime distribution, version 5.70.
 
 =head1 AUTHOR
 
