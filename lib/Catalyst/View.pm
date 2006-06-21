@@ -32,6 +32,42 @@ action's private name. (See L<Catalyst::Action>.)
 Implements the same methods as other Catalyst components, see
 L<Catalyst::Component>
 
+=head2 process
+
+gives an error message about direct use.
+
+=cut
+
+sub process {
+
+    Catalyst::Exception->throw( message => ( ref $_[0] || $_[0] ).
+            " directly inherits from Catalyst::View. You need to\n".
+            " inherit from a subclass like Catalyst::View::TT instead.\n" );
+
+}
+
+=head2 $c->merge_hash_config( $hashref, $hashref )
+
+Merges two hashes together recursively, giving right-hand precedence.
+
+=cut
+
+sub merge_config_hashes {
+    my ( $self, $lefthash, $righthash ) = @_;
+
+    my %merged = %$lefthash;
+    for my $key ( keys %$righthash ) {
+        my $right_ref = ( ref $righthash->{ $key } || '' ) eq 'HASH';
+        my $left_ref  = ( ( exists $lefthash->{ $key } && ref $lefthash->{ $key } ) || '' ) eq 'HASH';
+        if( $right_ref and $left_ref ) {
+            $merged{ $key } = $self->merge_config_hashes(
+                $lefthash->{ $key }, $righthash->{ $key }
+            );
+        }
+    }
+}
+
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
