@@ -189,10 +189,10 @@ sub register {
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 
-    my $part = '';
+    my $part = $action->name;
 
-    if (@path_part == 1) {
-        $part = (defined $path_part[0] ? $path_part[0] : $action->name);
+    if (@path_part == 1 && defined $path_part[0]) {
+        $part = $path_part[0];
     } elsif (@path_part > 1) {
         Catalyst::Exception->throw(
           "Multiple PathPart attributes not supported registering ${action}"

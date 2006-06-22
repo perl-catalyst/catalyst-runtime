@@ -23,7 +23,7 @@ sub endpoint2 :PathPart('end2') :ChildOf('/action/childof/foo2') :Args(2) { }
 #   Relative specification of parent action
 #
 sub bar :PathPart('childof/bar') :ChildOf('/') :Captures(0) { }
-sub finale :ChildOf('bar') :Args { }
+sub finale :PathPart('') :ChildOf('bar') :Args { }
 
 #
 #   three chain with concurrent endpoints
@@ -49,7 +49,7 @@ sub higher_root :PathPart('bar') :ChildOf('/action/childof/foo/higher_root') :Ar
 #   Controller -> subcontroller -> controller
 #
 sub pcp1 :PathPart('childof/pcp1')  :ChildOf('/')                        :Captures(1) { }
-sub pcp3 :PathPart                  :ChildOf('/action/childof/foo/pcp2') :Args(1)     { }
+sub pcp3 :ChildOf('/action/childof/foo/pcp2') :Args(1)     { }
 
 #
 #   Dispatch on capture number
