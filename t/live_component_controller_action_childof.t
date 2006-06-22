@@ -29,7 +29,7 @@ sub run_tests {
           TestApp::Controller::Action::ChildOf->begin
           TestApp::Controller::Action::ChildOf->foo
           TestApp::Controller::Action::ChildOf->endpoint
-	  TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::ChildOf->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -44,7 +44,7 @@ sub run_tests {
           TestApp::Controller::Action::ChildOf->begin
           TestApp::Controller::Action::ChildOf->foo
           TestApp::Controller::Action::ChildOf::Foo->spoon
-	  TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::ChildOf->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -59,7 +59,7 @@ sub run_tests {
           TestApp::Controller::Action::ChildOf->begin
           TestApp::Controller::Action::ChildOf->bar
           TestApp::Controller::Action::ChildOf->finale
-	  TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::ChildOf->end
         ];
     
         my $expected = join( ", ", @expected );
