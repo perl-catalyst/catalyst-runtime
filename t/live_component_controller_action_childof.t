@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 57*$iters;
+use Test::More tests => 60*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -404,5 +404,25 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2; 3', 'Content OK' );
+    }
+
+    #
+    #   The :Args attribute is optional, we check the action not specifying
+    #   it with these tests.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::ChildOf->begin
+          TestApp::Controller::Action::ChildOf->opt_args
+          TestApp::Controller::Action::ChildOf->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/childof/opt_args/1/2/3'),
+            'Optional :Args attribute working' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '; 1, 2, 3', 'Content OK' );
     }
 }

@@ -73,6 +73,11 @@ sub priority_b1 :PathPart('childof/priority_b') :ChildOf('/') :Args(3) { }
 sub priority_b2 :PathPart('childof/priority_b') :ChildOf('/') :Captures(1) { }
 sub priority_b2_end :PathPart('end') :ChildOf('priority_b2') :Args(1) { }
 
+#
+#   Optional specification of :Args in endpoint
+#
+sub opt_args :PathPart('childof/opt_args') :ChildOf('/') { }
+
 sub end :Private {
   my ($self, $c) = @_;
   my $out = join('; ', map { join(', ', @$_) }
