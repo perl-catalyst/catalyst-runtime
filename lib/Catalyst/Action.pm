@@ -79,7 +79,9 @@ Check Args attribute, and makes sure number of args matches the setting.
 sub match {
     my ( $self, $c ) = @_;
     return 1 unless exists $self->attributes->{Args};
-    return scalar( @{ $c->req->args } ) == $self->attributes->{Args}[0];
+    my $args = $self->attributes->{Args}[0];
+    return 1 unless defined($args) && length($args);
+    return scalar( @{ $c->req->args } ) == $args;
 }
 
 =head2 namespace

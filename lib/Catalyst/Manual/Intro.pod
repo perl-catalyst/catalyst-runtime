@@ -480,6 +480,10 @@ would match any URL starting /foo/bar/. To restrict this you can do
 
 to only match /foo/bar/*/
 
+=item * B<PathPart>, B<Captures> and B<ChildOf>
+
+Matt is an idiot and hasn't documented this yet.
+
 =back
 
 B<Note:> After seeing these examples, you probably wonder what the point
