@@ -486,7 +486,7 @@ sub run_tests {
     }
 
     #
-    #   Test if :Chained is the same as :Chained('/')
+    #   Test if :Chained('.') is working
     #
     {
         my @expected = qw[
