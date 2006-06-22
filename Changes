@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - fixed a Catalyst::Base bug causing duplicate action registrations
+        - modified DispatchTypes to support multiple registrations
+        - added Catalyst::Runtime module as dist marker
+        - added Catalyst::ActionChain and Chained DispatchType
         - removed retarded registration requirement in dispatcher
         - removed Module::Pluggable::Fast hack in favor of
           Module::Pluggable::Object
