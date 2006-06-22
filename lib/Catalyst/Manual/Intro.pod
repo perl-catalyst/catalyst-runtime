@@ -625,7 +625,7 @@ parts of the path (separated by C</>) this action wants to captures as
 it's arguments. If it doesn't expect any, just specify C<:Captures(0)>.
 The captures get passed to the action's C<@_> right after the context,
 but you can also find them as array reference in 
-C<$c-E<gt>request-E<gt>snippets-E<gt>[$level]>. The C<$level> is the
+C<$c-E<gt>request-E<gt>captures-E<gt>[$level]>. The C<$level> is the
 level of the action in the chain that captured the parts of the path.
 
 An action that is part of a chain (read: that has a C<:Chained> attribute)
