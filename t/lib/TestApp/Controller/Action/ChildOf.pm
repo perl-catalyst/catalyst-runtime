@@ -22,7 +22,7 @@ sub endpoint2 :PathPart('end2') :ChildOf('/action/childof/foo2') :Args(2) { }
 #
 #   Relative specification of parent action
 #
-sub bar :PathPart('childof/bar') :ChildOf('/') { }
+sub bar :PathPart('childof/bar') :ChildOf('/') :Captures(0) { }
 sub finale :ChildOf('bar') :Args { }
 
 #

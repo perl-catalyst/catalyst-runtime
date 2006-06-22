@@ -127,21 +127,13 @@ sub recurse_match {
         }
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
-            if (my $args_attr = $action->attributes->{Args}) {
-                # XXX alternative non-Args way to identify an endpoint?
-                {
-                    local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
-                    next TRY_ACTION unless $action->match($c);
-                }
-                push(@{$c->req->args}, @parts);
-                return [ $action ], [ ];
-            } else {
+            if (my $capture_attr = $action->attributes->{Captures}) {
                 my @captures;
                 my @parts = @parts; # localise
-                if (my $capture_attr = $action->attributes->{Captures}) {
-                    # strip Captures into list
-                    push(@captures, splice(@parts, 0, $capture_attr->[0]));
-                }
+
+                # strip Captures into list
+                push(@captures, splice(@parts, 0, $capture_attr->[0]));
+
                 # try the remaining parts against children of this action
                 my ($actions, $captures) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
@@ -149,6 +141,13 @@ sub recurse_match {
                 if ($actions) {
                     return [ $action, @$actions ], [ @captures, @$captures ];
                 }
+            } else {
+                {
+                    local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
+                    next TRY_ACTION unless $action->match($c);
+                }
+                push(@{$c->req->args}, @parts);
+                return [ $action ], [ ];
             }
         }
     }
@@ -206,7 +205,7 @@ sub register {
 
     ($self->{actions} ||= {})->{'/'.$action->reverse} = $action;
 
-    if ($action->attributes->{Args}) {
+    unless ($action->attributes->{Captures}) {
         unshift(@{ $self->{endpoints} ||= [] }, $action);
     }
 
