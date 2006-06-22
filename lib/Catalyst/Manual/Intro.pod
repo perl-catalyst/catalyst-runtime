@@ -430,15 +430,17 @@ ChildOf is a powerful way to handle canonical URIs of the form
 
 Taking the above URI as an example in Controller::Root you can do the following :-
 
-	sub section_handler :PathPart('section') :ChildOf('/') :Captures(1) {
-		my ( $self, $c ) = @_;
-		$c->stash->{'section'} = $c->Model('Sections')->find($c->req->captures->[0]);
-	}
-	
-	sub item_handler :PathPart('item') :ChildOf('/section_handler') :Args(1) {
-		my ( $self, $c ) = @_;
-		$c->stash->{'item'} = $c->stash->{'section'}->find_related('item',$c->args->[0]);
-	}
+  sub section_handler :PathPart('section') :ChildOf('/') :Captures(1) {
+      my ( $self, $c ) = @_;
+      $c->stash->{'section'} =
+        $c->Model('Sections')->find($c->req->captures->[0]);
+  }
+
+  sub item_handler :PathPart('item') :ChildOf('/section_handler') :Args(1) {
+      my ( $self, $c ) = @_;
+      $c->stash->{'item'} =
+        $c->stash->{'section'}->find_related('item',$c->args->[0]);
+  }
 
 The subroutine section_handler matched the path segment 'section' as a child of '/'. It 
 then took the next path segment, as referenced by :Captures(1) and stashed it in the 
@@ -447,20 +449,46 @@ The same rules apply here - This time however it has the 'Args' attribute which 
 this particular routine will run if there is exactly 1 argument. See Args below for more 
 options.
 
+It is not important in which controller or on which namespace level a parent action is.
+Also, there can be more than one action using another one as parent by specifying C<ChildOf>.
+
 =item ChildOf('xyz')
 
 The action of the parent - for instance, if you have method item_handler in controller
 SuperMarket::Aisle, the action would be /supermarket/aisle/item_handler. For a root handler
-this would be '/'.
+this would be '/'. For an action in the same controller namespace you can use a relative
+name like C<:ChildOf('foo')>.
 
 =item PathPart('xyz')
 
-The name of this path section in the ChildOf tree mapping to the URI.
+The name of this path section in the ChildOf tree mapping to the URI. If you specify 
+C<:PathPart> without arguments, it takes the name of the action specifying the argument.
+For example, these two declarations have the same effect:
+
+  sub foo :PathPart('foo') :ChildOf('bar') :Args(1) {
+      ...
+  }
+
+and
+
+  sub foo :PathPart :ChildOf('bar') :Args(1) {
+      ...
+  }
+
+The value can also contain a slash, for example:
+
+  sub baz :PathPart('bar/baz') :ChildOf('/') :Captures(1) {
+      ...
+  }
+
+would be involved in matches on C</bar/baz/*/...> paths.
 
 =item Captures(int)
 
 Will 'collapse' the next x path segments in the request URI and push them into 
-the arrayref $c->req->captures
+the arrayref $c->req->captures. An action specifying C<Captures> is thought to
+be used as target for C<ChildOf> specifications. Also see the C<Args> attribute
+below, which is used for endpoints.
 
 =item Args(int)
 
@@ -468,6 +496,9 @@ The number of path segments to capture at the end of a request URI. This *must* 
 included in your leaf nodes. You can use Args(0) for an equivalent of the index
 action.
 Args with no parameters will capture every postfixed segment into $c->req->args.
+
+A specification of C<Args> is seen as endpoint in regard to an additional
+C<ChildOf> specification.
 
 =item * B<Top-level> (B<Global>)
 
@@ -527,10 +558,6 @@ would match any URL starting /foo/bar/. To restrict this you can do
   sub bar :Local :Args(1)
 
 to only match /foo/bar/*/
-
-=item * B<PathPart>, B<Captures> and B<ChildOf>
-
-Matt is an idiot and hasn't documented this yet.
 
 =back
 
