@@ -71,12 +71,21 @@ sub priority_a1 :PathPart('chained/priority_a') :Chained('/') :Args { }
 sub priority_a2 :PathPart('chained/priority_a') :Chained('/') :CaptureArgs(1) { }
 sub priority_a2_end :PathPart('end') :Chained('priority_a2') :Args(1) { }
 
+
 #
 #   Priority: Fixed args vs. chained actions
 #
 sub priority_b1 :PathPart('chained/priority_b') :Chained('/') :Args(3) { }
 sub priority_b2 :PathPart('chained/priority_b') :Chained('/') :CaptureArgs(1) { }
 sub priority_b2_end :PathPart('end') :Chained('priority_b2') :Args(1) { }
+
+#
+#   Priority: With no Args()
+#
+sub priority_c1 :PathPart('chained/priority_c') :Chained('/') :CaptureArgs(1) { }
+sub priority_c2 :PathPart('') :Chained('priority_c1') { }
+sub priority_c2_xyz :PathPart('xyz') :Chained('priority_c1')  { }
+
 
 #
 #   Optional specification of :Args in endpoint
