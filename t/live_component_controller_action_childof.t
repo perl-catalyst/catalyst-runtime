@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 60*$iters;
+use Test::More tests => 66*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -424,5 +424,45 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '; 1, 2, 3', 'Content OK' );
+    }
+
+    #
+    #   Tests for optional PathPart attribute.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::ChildOf->begin
+          TestApp::Controller::Action::ChildOf->opt_pp_start
+          TestApp::Controller::Action::ChildOf->opt_pathpart
+          TestApp::Controller::Action::ChildOf->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/childof/optpp/1/opt_pathpart/2'),
+            'Optional :PathName attribute working' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Tests for optional PathPart *and* Args attributes.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::ChildOf->begin
+          TestApp::Controller::Action::ChildOf->opt_all_start
+          TestApp::Controller::Action::ChildOf->oa
+          TestApp::Controller::Action::ChildOf->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/childof/optall/1/oa/2/3'),
+            'Optional :PathName *and* :Args attributes working' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2, 3', 'Content OK' );
     }
 }

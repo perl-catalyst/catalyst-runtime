@@ -8,6 +8,13 @@ use base qw/Catalyst::Controller/;
 sub begin :Private { }
 
 #
+#   TODO
+#   :ChildOf('') defaulting to controller namespace
+#   :ChildOf('..') defaulting to action in controller above
+#   :ChildOf == ChildOf('/')
+#
+
+#
 #   Simple parent/child action test
 #
 sub foo  :PathPart('childof/foo')  :Captures(1) :ChildOf('/') { }
@@ -77,6 +84,18 @@ sub priority_b2_end :PathPart('end') :ChildOf('priority_b2') :Args(1) { }
 #   Optional specification of :Args in endpoint
 #
 sub opt_args :PathPart('childof/opt_args') :ChildOf('/') { }
+
+#
+#   Optional PathPart test -> /childof/optpp/*/opt_pathpart/*
+#
+sub opt_pp_start :ChildOf('/') :PathPart('childof/optpp') :Captures(1) { }
+sub opt_pathpart :ChildOf('opt_pp_start') :Args(1) { }
+
+#
+#   Optional Args *and* PathPart -> /childof/optall/*/oa/...
+#
+sub opt_all_start :ChildOf('/') :PathPart('childof/optall') :Captures(1) { }
+sub oa :ChildOf('opt_all_start') { }
 
 sub end :Private {
   my ($self, $c) = @_;
