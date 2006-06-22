@@ -202,6 +202,12 @@ sub register {
         );
     }
 
+    if ($part =~ m(^/)) {
+        Catalyst::Exception->throw(
+          "Absolute parameters to PathPart not allowed registering ${action}"
+        );
+    }
+
     $action->attributes->{PartPath} = [ $part ];
 
     unshift(@{ $children->{$part} ||= [] }, $action);

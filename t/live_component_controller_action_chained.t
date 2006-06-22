@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 99*$iters;
+use Test::More tests => 101*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -19,11 +19,12 @@ if ( $ENV{CAT_BENCHMARK} ) {
 }
 else {
     for ( 1 .. $iters ) {
-        run_tests();
+        run_tests($_);
     }
 }
 
 sub run_tests {
+    my ($run_number) = @_;
 
     #
     #   This is a simple test where the parent and child actions are
@@ -687,5 +688,27 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test interception of recursive chains. This test was added because at
+    #   one point during the :Chained development, Catalyst used to hang on
+    #   recursive chains.
+    #
+    {
+        eval { require 'TestAppChainedRecursive.pm' };
+        pass( "Interception of recursive chains" );
+    }
+
+    #
+    #   Test failure of absolute path part arguments.
+    #
+    {
+        eval { require 'TestAppChainedAbsolutePathPart.pm' };
+        if ($run_number == 1) {
+            like( $@, qr(foo/foo),
+                "Usage of absolute path part argument emits error" );
+        }
+        else { pass( "Error on absolute path part arguments already tested" ) }
     }
 }
