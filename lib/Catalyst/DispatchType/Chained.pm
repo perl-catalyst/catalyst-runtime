@@ -1,4 +1,4 @@
-package Catalyst::DispatchType::ChildOf;
+package Catalyst::DispatchType::Chained;
 
 use strict;
 use base qw/Catalyst::DispatchType/;
@@ -10,7 +10,7 @@ use URI;
 
 =head1 NAME
 
-Catalyst::DispatchType::ChildOf - Path Part DispatchType
+Catalyst::DispatchType::Chained - Path Part DispatchType
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ sub list {
                 unshift(@parts, $pp->[0])
                     if (defined $pp->[0] && length $pp->[0]);
             }
-            $parent = $curr->attributes->{ChildOf}->[0];
+            $parent = $curr->attributes->{Chained}->[0];
             $curr = $self->{actions}{$parent};
             unshift(@parents, $curr) if $curr;
         }
@@ -163,13 +163,13 @@ Matt is an idiot and hasn't documented this yet.
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my @child_of_attr = @{ $action->attributes->{ChildOf} || [] };
+    my @child_of_attr = @{ $action->attributes->{Chained} || [] };
 
     return 0 unless @child_of_attr;
 
     if (@child_of_attr > 2) {
         Catalyst::Exception->throw(
-          "Multiple ChildOf attributes not supported registering ${action}"
+          "Multiple Chained attributes not supported registering ${action}"
         );
     }
 
@@ -183,7 +183,7 @@ sub register {
         $parent = '/'.$action->namespace;
     }
 
-    $action->attributes->{ChildOf} = [ $parent ];
+    $action->attributes->{Chained} = [ $parent ];
 
     my $children = ($self->{children_of}{$parent} ||= {});
 
@@ -221,7 +221,7 @@ Matt is an idiot and hasn't documented this yet.
 sub uri_for_action {
     my ( $self, $action, $captures ) = @_;
 
-    return undef unless ($action->attributes->{ChildOf}
+    return undef unless ($action->attributes->{Chained}
                            && $action->attributes->{Args});
 
     my @parts = ();
@@ -237,7 +237,7 @@ sub uri_for_action {
             unshift(@parts, $pp->[0])
                 if (defined $pp->[0] && length $pp->[0]);
         }
-        $parent = $curr->attributes->{ChildOf}->[0];
+        $parent = $curr->attributes->{Chained}->[0];
         $curr = $self->{actions}{$parent};
     }
 

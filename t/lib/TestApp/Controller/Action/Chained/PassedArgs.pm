@@ -1,4 +1,4 @@
-package TestApp::Controller::Action::ChildOf::PassedArgs;
+package TestApp::Controller::Action::Chained::PassedArgs;
 use warnings;
 use strict;
 
@@ -11,17 +11,17 @@ use base qw( Catalyst::Controller );
 #   as it should.
 #
 
-sub first  : PathPart('childof/passedargs/a') ChildOf('/') Captures(1) {
+sub first  : PathPart('chained/passedargs/a') Chained('/') Captures(1) {
     my ( $self, $c, $arg ) = @_;
     $c->stash->{ passed_args } = [ $arg ];
 }
 
-sub second : PathPart('b') ChildOf('first') Captures(1) {
+sub second : PathPart('b') Chained('first') Captures(1) {
     my ( $self, $c, $arg ) = @_;
     push @{ $c->stash->{ passed_args } }, $arg;
 }
 
-sub third  : PathPart('c') ChildOf('second') Args(1) {
+sub third  : PathPart('c') Chained('second') Args(1) {
     my ( $self, $c, $arg ) = @_;
     push @{ $c->stash->{ passed_args } }, $arg;
 }

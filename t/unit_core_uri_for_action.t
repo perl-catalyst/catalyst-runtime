@@ -56,19 +56,19 @@ is($dispatcher->uri_for_action($index_action),
    "/action/index",
    "index action returns correct path");
 
-my $childof_action = $dispatcher->get_action_by_path(
-                       '/action/childof/endpoint',
+my $chained_action = $dispatcher->get_action_by_path(
+                       '/action/chained/endpoint',
                      );
 
-ok(!defined($dispatcher->uri_for_action($childof_action)),
-   "ChildOf action without captures returns undef");
+ok(!defined($dispatcher->uri_for_action($chained_action)),
+   "Chained action without captures returns undef");
 
-ok(!defined($dispatcher->uri_for_action($childof_action, [ 1, 2 ])),
-   "ChildOf action with too many captures returns undef");
+ok(!defined($dispatcher->uri_for_action($chained_action, [ 1, 2 ])),
+   "Chained action with too many captures returns undef");
 
-is($dispatcher->uri_for_action($childof_action, [ 1 ]),
-   "/childof/foo/1/end",
-   "ChildOf action with correct captures returns correct path");
+is($dispatcher->uri_for_action($chained_action, [ 1 ]),
+   "/chained/foo/1/end",
+   "Chained action with correct captures returns correct path");
 
 my $request = Catalyst::Request->new( {
                 base => URI->new('http://127.0.0.1/foo')
@@ -94,6 +94,6 @@ is($context->uri_for($regex_action, [ 'foo', 123 ], qw/bar baz/, { q => 1 }),
    "http://127.0.0.1/foo/action/regexp/foo/123/bar/baz?q=1",
    "uri_for correct for regex with captures, args and query");
 
-is($context->uri_for($childof_action, [ 1 ], 2, { q => 1 }),
-   "http://127.0.0.1/foo/childof/foo/1/end/2?q=1",
-   "uri_for correct for childof with captures, args and query");
+is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
+   "http://127.0.0.1/foo/chained/foo/1/end/2?q=1",
+   "uri_for correct for chained with captures, args and query");

@@ -31,15 +31,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->foo
-          TestApp::Controller::Action::ChildOf->endpoint
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->foo
+          TestApp::Controller::Action::Chained->endpoint
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/foo/1/end/2'), 'childof + local endpoint' );
+        ok( my $response = request('http://localhost/chained/foo/1/end/2'), 'chained + local endpoint' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2', 'Content OK' );
@@ -52,8 +52,8 @@ sub run_tests {
     {
         my $expected = undef;
 
-        ok( my $response = request('http://localhost/childof/foo/1/end'), 
-            'childof + local endpoint; missing last argument' );
+        ok( my $response = request('http://localhost/chained/foo/1/end'), 
+            'chained + local endpoint; missing last argument' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->header('Status'), 500, 'Status OK' );
@@ -64,35 +64,35 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->foo
-          TestApp::Controller::Action::ChildOf::Foo->spoon
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->foo
+          TestApp::Controller::Action::Chained::Foo->spoon
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/foo/1/spoon'), 'childof + subcontroller endpoint' );
+        ok( my $response = request('http://localhost/chained/foo/1/spoon'), 'chained + subcontroller endpoint' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; ', 'Content OK' );
     }
 
     #
-    #   Tests if the relative specification (e.g.: ChildOf('bar') ) works
+    #   Tests if the relative specification (e.g.: Chained('bar') ) works
     #   as expected.
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->bar
-          TestApp::Controller::Action::ChildOf->finale
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->bar
+          TestApp::Controller::Action::Chained->finale
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/bar/1/spoon'), 'childof + relative endpoint' );
+        ok( my $response = request('http://localhost/chained/bar/1/spoon'), 'chained + relative endpoint' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '; 1, spoon', 'Content OK' );
@@ -103,16 +103,16 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->foo2
-          TestApp::Controller::Action::ChildOf->endpoint2
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->foo2
+          TestApp::Controller::Action::Chained->endpoint2
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/foo2/10/20/end2/15/25'), 
-            'childof + local (2 args each)' );
+        ok( my $response = request('http://localhost/chained/foo2/10/20/end2/15/25'), 
+            'chained + local (2 args each)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '10, 20; 15, 25', 'Content OK' );
@@ -125,14 +125,14 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->one_end
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->one_end
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/one/23'),
+        ok( my $response = request('http://localhost/chained/one/23'),
             'three-chain (only first)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -146,15 +146,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->one
-          TestApp::Controller::Action::ChildOf->two_end
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->one
+          TestApp::Controller::Action::Chained->two_end
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/one/23/two/23/46'),
+        ok( my $response = request('http://localhost/chained/one/23/two/23/46'),
             'three-chain (up to second)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -168,16 +168,16 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->one
-          TestApp::Controller::Action::ChildOf->two
-          TestApp::Controller::Action::ChildOf->three_end
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->one
+          TestApp::Controller::Action::Chained->two
+          TestApp::Controller::Action::Chained->three_end
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/one/23/two/23/46/three/1/2/3'),
+        ok( my $response = request('http://localhost/chained/one/23/two/23/46/three/1/2/3'),
             'three-chain (all three)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -190,14 +190,14 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->multi1
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->multi1
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/multi/23'),
+        ok( my $response = request('http://localhost/chained/multi/23'),
             'multi-action (one arg)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -209,14 +209,14 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->multi2
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->multi2
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/multi/23/46'),
+        ok( my $response = request('http://localhost/chained/multi/23/46'),
             'multi-action (two args)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -230,7 +230,7 @@ sub run_tests {
     {
         my $expected = undef;
 
-        ok( my $response = request('http://localhost/childof/multi/23/46/67'),
+        ok( my $response = request('http://localhost/chained/multi/23/46/67'),
             'multi-action (three args, should lead to error)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -243,15 +243,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf::Foo->higher_root
-          TestApp::Controller::Action::ChildOf->higher_root
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Foo->higher_root
+          TestApp::Controller::Action::Chained->higher_root
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/higher_root/23/bar/11'),
+        ok( my $response = request('http://localhost/chained/higher_root/23/bar/11'),
             'root higher than child' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -264,16 +264,16 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->pcp1
-          TestApp::Controller::Action::ChildOf::Foo->pcp2
-          TestApp::Controller::Action::ChildOf->pcp3
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->pcp1
+          TestApp::Controller::Action::Chained::Foo->pcp2
+          TestApp::Controller::Action::Chained->pcp3
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/pcp1/1/pcp2/2/pcp3/3'),
+        ok( my $response = request('http://localhost/chained/pcp1/1/pcp2/2/pcp3/3'),
             'parent -> child -> parent' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -285,15 +285,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->multi_cap1
-          TestApp::Controller::Action::ChildOf->multi_cap_end1
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->multi_cap1
+          TestApp::Controller::Action::Chained->multi_cap_end1
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/multi_cap/1/baz'),
+        ok( my $response = request('http://localhost/chained/multi_cap/1/baz'),
             'dispatch on capture num 1' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -306,15 +306,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->multi_cap2
-          TestApp::Controller::Action::ChildOf->multi_cap_end2
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->multi_cap2
+          TestApp::Controller::Action::Chained->multi_cap_end2
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/multi_cap/1/2/baz'),
+        ok( my $response = request('http://localhost/chained/multi_cap/1/2/baz'),
             'dispatch on capture num 2' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -327,15 +327,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->priority_a2
-          TestApp::Controller::Action::ChildOf->priority_a2_end
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->priority_a2
+          TestApp::Controller::Action::Chained->priority_a2_end
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/priority_a/1/end/2'),
+        ok( my $response = request('http://localhost/chained/priority_a/1/end/2'),
             'priority - slurpy args vs. parent/child' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -348,15 +348,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->priority_b2
-          TestApp::Controller::Action::ChildOf->priority_b2_end
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->priority_b2
+          TestApp::Controller::Action::Chained->priority_b2_end
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/priority_b/1/end/2'),
+        ok( my $response = request('http://localhost/chained/priority_b/1/end/2'),
             'priority - fixed args vs. parent/child' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -369,15 +369,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf::Bar->cross1
-          TestApp::Controller::Action::ChildOf::Foo->cross2
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Bar->cross1
+          TestApp::Controller::Action::Chained::Foo->cross2
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/cross/1/end/2'),
+        ok( my $response = request('http://localhost/chained/cross/1/end/2'),
             'cross controller w/o par/child relation' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -390,16 +390,16 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf::PassedArgs->first
-          TestApp::Controller::Action::ChildOf::PassedArgs->second
-          TestApp::Controller::Action::ChildOf::PassedArgs->third
-          TestApp::Controller::Action::ChildOf::PassedArgs->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::PassedArgs->first
+          TestApp::Controller::Action::Chained::PassedArgs->second
+          TestApp::Controller::Action::Chained::PassedArgs->third
+          TestApp::Controller::Action::Chained::PassedArgs->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/passedargs/a/1/b/2/c/3'),
+        ok( my $response = request('http://localhost/chained/passedargs/a/1/b/2/c/3'),
             'Correct arguments passed to actions' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -412,14 +412,14 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->opt_args
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->opt_args
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/opt_args/1/2/3'),
+        ok( my $response = request('http://localhost/chained/opt_args/1/2/3'),
             'Optional :Args attribute working' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -431,15 +431,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->opt_pp_start
-          TestApp::Controller::Action::ChildOf->opt_pathpart
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->opt_pp_start
+          TestApp::Controller::Action::Chained->opt_pathpart
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/optpp/1/opt_pathpart/2'),
+        ok( my $response = request('http://localhost/chained/optpp/1/opt_pathpart/2'),
             'Optional :PathName attribute working' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -451,15 +451,15 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::ChildOf->begin
-          TestApp::Controller::Action::ChildOf->opt_all_start
-          TestApp::Controller::Action::ChildOf->oa
-          TestApp::Controller::Action::ChildOf->end
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->opt_all_start
+          TestApp::Controller::Action::Chained->oa
+          TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/childof/optall/1/oa/2/3'),
+        ok( my $response = request('http://localhost/chained/optall/1/oa/2/3'),
             'Optional :PathName *and* :Args attributes working' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
