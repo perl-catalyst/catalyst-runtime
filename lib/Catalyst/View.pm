@@ -52,22 +52,6 @@ Merges two hashes together recursively, giving right-hand precedence.
 
 =cut
 
-sub merge_config_hashes {
-    my ( $self, $lefthash, $righthash ) = @_;
-
-    my %merged = %$lefthash;
-    for my $key ( keys %$righthash ) {
-        my $right_ref = ( ref $righthash->{ $key } || '' ) eq 'HASH';
-        my $left_ref  = ( ( exists $lefthash->{ $key } && ref $lefthash->{ $key } ) || '' ) eq 'HASH';
-        if( $right_ref and $left_ref ) {
-            $merged{ $key } = $self->merge_config_hashes(
-                $lefthash->{ $key }, $righthash->{ $key }
-            );
-        }
-    }
-}
-
-
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
