@@ -41,6 +41,7 @@ sub list {
                   ) {
         my $args = $endpoint->attributes->{Args}->[0];
         my @parts = (defined($args) ? (("*") x $args) : '...');
+        my @parents = ();
         my $parent = "DUMMY";
         my $curr = $endpoint;
         while ($curr) {
@@ -53,9 +54,23 @@ sub list {
             }
             $parent = $curr->attributes->{ChildOf}->[0];
             $curr = $self->{actions}{$parent};
+            unshift(@parents, $curr) if $curr;
         }
         next ENDPOINT unless $parent eq '/'; # skip dangling action
-        $paths->row(join('/', '', @parts), "/$endpoint");
+        my @rows;
+        foreach my $p (@parents) {
+            my $name = "/${p}";
+            if (my $cap = $p->attributes->{Captures}) {
+                $name .= ' ('.$cap->[0].')';
+            }
+            unless ($p eq $parents[0]) {
+                $name = "-> ${name}";
+            }
+            push(@rows, [ '', $name ]);
+        }
+        push(@rows, [ '', (@rows ? "=> " : '')."/${endpoint}" ]);
+        $rows[0][0] = join('/', '', @parts);
+        $paths->row(@$_) for @rows;
     }
 
     $c->log->debug( "Loaded Path Part actions:\n" . $paths->draw );
