@@ -1,8 +1,11 @@
 package Catalyst::Runtime;
 
 use strict;
+use warnings;
 
-our $VERSION='5.70';
+BEGIN { require 5.008001; }
+
+our $VERSION='5.70_01';
 
 =head1 NAME
 
