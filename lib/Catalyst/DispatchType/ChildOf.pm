@@ -6,9 +6,11 @@ use Text::SimpleTable;
 use Catalyst::ActionChain;
 use URI;
 
+# please don't perltidy this. hairy code within.
+
 =head1 NAME
 
-Catalyst::DispatchType::Path - Path DispatchType
+Catalyst::DispatchType::ChildOf - Path Part DispatchType
 
 =head1 SYNOPSIS
 
@@ -22,22 +24,42 @@ See L<Catalyst>.
 
 Debug output for Path Part dispatch points
 
-Matt is an idiot and hasn't implemented this yet.
-
 =cut
 
-#sub list {
-#    my ( $self, $c ) = @_;
-#    my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
-#    foreach my $path ( sort keys %{ $self->{paths} } ) {
-#        foreach my $action ( @{ $self->{paths}->{$path} } ) {
-#            $path = "/$path" unless $path eq '/';
-#            $paths->row( "$path", "/$action" );
-#        }
-#    }
-#    $c->log->debug( "Loaded Path actions:\n" . $paths->draw )
-#      if ( keys %{ $self->{paths} } );
-#}
+sub list {
+    my ( $self, $c ) = @_;
+
+    return unless $self->{endpoints};
+
+    my $paths = Text::SimpleTable->new(
+                    [ 35, 'Path Spec' ], [ 36, 'Private' ]
+                );
+
+    ENDPOINT: foreach my $endpoint (
+                  sort { $a->reverse cmp $b->reverse }
+                           @{ $self->{endpoints} }
+                  ) {
+        my $args = $endpoint->attributes->{Args}->[0];
+        my @parts = (defined($args) ? (("*") x $args) : '...');
+        my $parent = "DUMMY";
+        my $curr = $endpoint;
+        while ($curr) {
+            if (my $cap = $curr->attributes->{Captures}) {
+                unshift(@parts, (("*") x $cap->[0]));
+            }
+            if (my $pp = $curr->attributes->{PartPath}) {
+                unshift(@parts, $pp->[0])
+                    if (defined $pp->[0] && length $pp->[0]);
+            }
+            $parent = $curr->attributes->{ChildOf}->[0];
+            $curr = $self->{actions}{$parent};
+        }
+        next ENDPOINT unless $parent eq '/'; # skip dangling action
+        $paths->row(join('/', '', @parts), "/$endpoint");
+    }
+
+    $c->log->debug( "Loaded Path Part actions:\n" . $paths->draw );
+}
 
 =head2 $self->match( $c, $path )
 
@@ -84,8 +106,8 @@ sub recurse_match {
             next TRY unless
               ($try_part eq join('/', # assemble equal number of parts
                               splice( # and strip them off @parts as well
-                                @parts, 0, scalar(split('/', $try_part))
-                              )));
+                                @parts, 0, scalar(@{[split('/', $try_part)]})
+                              ))); # @{[]} to avoid split to @_
         }
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
@@ -146,6 +168,8 @@ sub register {
         $parent = '/'.$action->namespace;
     }
 
+    $action->attributes->{ChildOf} = [ $parent ];
+
     my $children = ($self->{children_of}{$parent} ||= {});
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
@@ -160,8 +184,17 @@ sub register {
         );
     }
 
+    $action->attributes->{PartPath} = [ $part ];
+
     unshift(@{ $children->{$part} ||= [] }, $action);
 
+    ($self->{actions} ||= {})->{'/'.$action->reverse} = $action;
+
+    if ($action->attributes->{Args}) {
+        unshift(@{ $self->{endpoints} ||= [] }, $action);
+    }
+
+    return 1;
 }
 
 =head2 $self->uri_for_action($action, $captures)
@@ -173,23 +206,37 @@ Matt is an idiot and hasn't documented this yet.
 sub uri_for_action {
     my ( $self, $action, $captures ) = @_;
 
-    return undef if @$captures;
+    return undef unless ($action->attributes->{ChildOf}
+                           && $action->attributes->{Args});
 
-    if (my $paths = $action->attributes->{Path}) {
-        my $path = $paths->[0];
-        $path = '/' unless length($path);
-        $path = "/${path}" unless ($path =~ m/^\//);
-        $path = URI->new($path)->canonical;
-        return $path;
-    } else {
-        return undef;
+    my @parts = ();
+    my @captures = @$captures;
+    my $parent = "DUMMY";
+    my $curr = $action;
+    while ($curr) {
+        if (my $cap = $curr->attributes->{Captures}) {
+            return undef unless @captures >= $cap->[0]; # not enough captures
+            unshift(@parts, splice(@captures, -$cap->[0]));
+        }
+        if (my $pp = $curr->attributes->{PartPath}) {
+            unshift(@parts, $pp->[0])
+                if (defined $pp->[0] && length $pp->[0]);
+        }
+        $parent = $curr->attributes->{ChildOf}->[0];
+        $curr = $self->{actions}{$parent};
     }
+
+    return undef unless $parent eq '/'; # fail for dangling action
+
+    return undef if @captures; # fail for too many captures
+
+    return join('/', '', @parts);
+   
 }
 
 =head1 AUTHOR
 
-Matt S Trout
-Sebastian Riedel, C<sri@cpan.org>
+Matt S Trout <mst@shadowcatsystems.co.uk>
 
 =head1 COPYRIGHT
 

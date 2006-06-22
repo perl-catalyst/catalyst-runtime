@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 
-plan tests => 12;
+plan tests => 17;
 
 use_ok('TestApp');
 
@@ -38,6 +38,9 @@ my $regex_action = $dispatcher->get_action_by_path(
 ok(!defined($dispatcher->uri_for_action($regex_action)),
    "Regex action without captures returns undef");
 
+ok(!defined($dispatcher->uri_for_action($regex_action, [ 1, 2, 3 ])),
+   "Regex action with too many captures returns undef");
+
 is($dispatcher->uri_for_action($regex_action, [ 'foo', 123 ]),
    "/action/regexp/foo/123",
    "Regex action interpolates captures correctly");
@@ -52,6 +55,20 @@ ok(!defined($dispatcher->uri_for_action($index_action, [ 'foo' ])),
 is($dispatcher->uri_for_action($index_action),
    "/action/index",
    "index action returns correct path");
+
+my $childof_action = $dispatcher->get_action_by_path(
+                       '/action/childof/endpoint',
+                     );
+
+ok(!defined($dispatcher->uri_for_action($childof_action)),
+   "ChildOf action without captures returns undef");
+
+ok(!defined($dispatcher->uri_for_action($childof_action, [ 1, 2 ])),
+   "ChildOf action with too many captures returns undef");
+
+is($dispatcher->uri_for_action($childof_action, [ 1 ]),
+   "/childof/foo/1/end",
+   "ChildOf action with correct captures returns correct path");
 
 my $request = Catalyst::Request->new( {
                 base => URI->new('http://127.0.0.1/foo')
@@ -76,3 +93,7 @@ ok(!defined($context->uri_for($path_action, [ 'blah' ])),
 is($context->uri_for($regex_action, [ 'foo', 123 ], qw/bar baz/, { q => 1 }),
    "http://127.0.0.1/foo/action/regexp/foo/123/bar/baz?q=1",
    "uri_for correct for regex with captures, args and query");
+
+is($context->uri_for($childof_action, [ 1 ], 2, { q => 1 }),
+   "http://127.0.0.1/foo/childof/foo/1/end/2?q=1",
+   "uri_for correct for childof with captures, args and query");
