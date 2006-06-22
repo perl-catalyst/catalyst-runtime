@@ -162,7 +162,7 @@ sub register_actions {
 
     foreach my $cache (@action_cache) {
         my $code   = $cache->[0];
-        my $method = $methods{$code};
+        my $method = delete $methods{$code}; # avoid dupe registers
         next unless $method;
         my $attrs = $self->_parse_attrs( $c, $method, @{ $cache->[1] } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {

@@ -27,9 +27,9 @@ sub list {
     my ( $self, $c ) = @_;
     my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
     foreach my $path ( sort keys %{ $self->{paths} } ) {
+        my $display_path = $path eq '/' ? $path : "/$path";
         foreach my $action ( @{ $self->{paths}->{$path} } ) {
-            $path = "/$path" unless $path eq '/';
-            $paths->row( "$path", "/$action" );
+            $paths->row( $display_path, "/$action" );
         }
     }
     $c->log->debug( "Loaded Path actions:\n" . $paths->draw )
