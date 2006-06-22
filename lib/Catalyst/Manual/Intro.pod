@@ -431,7 +431,7 @@ in Controller::Root you can do the following:
         $c->Model('Sections')->find($c->req->captures->[0]);
   }
 
-  sub item_handler :PathPart('item') :ChildOf('/section') :Args(1) {
+  sub item_handler :PathPart('item') :ChildOf('/section_handler') :Args(1) {
       my ( $self, $c ) = @_;
       $c->stash->{'item'} =
         $c->stash->{'section'}->find_related('item',$c->args->[0]);
