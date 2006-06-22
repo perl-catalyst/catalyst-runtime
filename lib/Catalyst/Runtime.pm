@@ -23,6 +23,7 @@ This is the primary class for the Catalyst-Runtime distribution, version 5.70.
 
 =head1 AUTHOR
 
+The Catalyst Core Team - see http://catalyst.perl.org/
 
 =head1 COPYRIGHT
 
