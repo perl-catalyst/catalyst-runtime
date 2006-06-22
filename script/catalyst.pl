@@ -4,7 +4,19 @@ use strict;
 use Getopt::Long;
 use Pod::Usage;
 eval 'use Catalyst::Helper "1.0";';
-die "Please install Catalyst::Helper!\n" if $@;
+
+if ($@) {
+  die <<END;
+To use the Catalyst development tools including catalyst.pl and the
+generated script/myapp_create.pl you need Catalyst::Helper, which is
+part of the Catalyst-Devel distribution. Please install this via a
+vendor package or by running one of -
+
+  perl -MCPAN -e 'install Catalyst::Devel'
+  perl -MCPANPLUS -e 'install Catalyst::Devel'
+END
+
+}
 
 my $force    = 0;
 my $help     = 0;
