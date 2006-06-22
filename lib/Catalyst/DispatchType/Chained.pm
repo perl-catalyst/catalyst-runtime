@@ -115,8 +115,9 @@ sub recurse_match {
     my $children = $self->{children_of}{$parent};
     return () unless $children;
     my @captures;
-    TRY: foreach my $try_part (sort { length($a) <=> length($b) }
+    TRY: foreach my $try_part (sort { length($b) <=> length($a) }
                                    keys %$children) {
+                               # $b then $a to try longest part first
         my @parts = @$path_parts;
         if (length $try_part) { # test and strip PathPart
             next TRY unless
