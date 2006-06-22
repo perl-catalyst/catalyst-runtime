@@ -163,24 +163,26 @@ Matt is an idiot and hasn't documented this yet.
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my @child_of_attr = @{ $action->attributes->{Chained} || [] };
+    my @chained_attr = @{ $action->attributes->{Chained} || [] };
 
-    return 0 unless @child_of_attr;
+    return 0 unless @chained_attr;
 
-    if (@child_of_attr > 2) {
+    if (@chained_attr > 2) {
         Catalyst::Exception->throw(
           "Multiple Chained attributes not supported registering ${action}"
         );
     }
 
-    my $parent = $child_of_attr[0];
+    my $parent = $chained_attr[0];
 
     if (defined($parent) && length($parent)) {
-        unless ($parent =~ m/^\//) {
+        if ($parent eq '.') {
+            $parent = '/'.$action->namespace;
+        } elsif ($parent !~ m/^\//) {
             $parent = '/'.join('/', $action->namespace, $parent);
         }
     } else {
-        $parent = '/'.$action->namespace;
+        $parent = '/'
     }
 
     $action->attributes->{Chained} = [ $parent ];

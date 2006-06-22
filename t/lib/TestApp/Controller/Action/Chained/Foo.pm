@@ -8,7 +8,7 @@ use base qw/Catalyst::Controller/;
 #
 #   Child of current namespace
 #
-sub spoon :Chained('') :Args(0) { }
+sub spoon :Chained('.') :Args(0) { }
 
 #
 #   Root for a action in a "parent" controller
