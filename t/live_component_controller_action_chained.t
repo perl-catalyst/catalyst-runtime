@@ -697,7 +697,10 @@ sub run_tests {
     #
     {
         eval { require 'TestAppChainedRecursive.pm' };
-        pass( "Interception of recursive chains" );
+        if ($run_number == 1) {
+            ok( ! $@, "Interception of recursive chains" );
+        }
+        else { pass( "Interception of recursive chains already tested" ) }
     }
 
     #
