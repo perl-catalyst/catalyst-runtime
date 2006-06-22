@@ -10,7 +10,6 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 use Catalyst::Controller;
-use Catalyst::Runtime;
 use Devel::InnerPackage ();
 use File::stat;
 use Module::Pluggable::Object;
@@ -60,7 +59,9 @@ __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 
-our $VERSION = $Catalyst::Runtime::VERSION;
+# Remember to update this in Catalyst::Runtime as well!
+
+our $VERSION = '5.70_01';
 
 sub import {
     my ( $class, @arguments ) = @_;

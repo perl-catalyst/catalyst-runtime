@@ -5,6 +5,8 @@ use warnings;
 
 BEGIN { require 5.008001; }
 
+# Remember to update this in Catalyst as well!
+
 our $VERSION='5.70_01';
 
 =head1 NAME
