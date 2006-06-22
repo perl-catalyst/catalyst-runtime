@@ -9,9 +9,7 @@ sub begin :Private { }
 
 #
 #   TODO
-#   :Chained('') defaulting to controller namespace
-#   :Chained('..') defaulting to action in controller above
-#   :Chained == Chained('/')
+#   :Chained('') means what?
 #
 
 #
@@ -96,6 +94,17 @@ sub opt_pathpart :Chained('opt_pp_start') :Args(1) { }
 #
 sub opt_all_start :Chained('/') :PathPart('chained/optall') :Captures(1) { }
 sub oa :Chained('opt_all_start') { }
+
+#
+#   :Chained is the same as :Chained('/')
+#
+sub rootdef :Chained :PathPart('chained/rootdef') :Args(1) { }
+
+#
+#   the ParentChain controller chains to this action by
+#   specifying :Chained('.')
+#
+sub parentchain :Chained('/') :PathPart('chained/parentchain') :Captures(1) { }
 
 sub end :Private {
   my ($self, $c) = @_;

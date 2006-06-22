@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 66*$iters;
+use Test::More tests => 72*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -464,5 +464,44 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2, 3', 'Content OK' );
+    }
+
+    #
+    #   Test if :Chained is the same as :Chained('/')
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->rootdef
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/rootdef/23'),
+            ":Chained is the same as :Chained('/')" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '; 23', 'Content OK' );
+    }
+
+    #
+    #   Test if :Chained is the same as :Chained('/')
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->parentchain
+          TestApp::Controller::Action::Chained::ParentChain->child
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/parentchain/1/child/2'),
+            ":Chained('.') chains to parent controller action" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
     }
 }
