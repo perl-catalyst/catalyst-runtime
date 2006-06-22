@@ -651,6 +651,15 @@ C<$c-E<gt>request-E<gt>arguments>.
 
 =back
 
+Note that the list of C<auto> actions called depends on the private path
+of the endpoint of the chain, not on the chained actions way. The C<auto>
+actions will be run before the chain dispatching begins. In every other
+aspect, C<auto> actions behave as documented.
+
+The C<forward>ing to other actions does just what you would expect. But if
+you C<detach> out of a chain, the rest of the chain will not get called
+after the C<detach> returned.
+
 =item * B<Top-level> (B<Global>)
 
     package MyApp::Controller::Foo;
