@@ -9,6 +9,6 @@ use base qw/Catalyst::Controller/;
 #   Redispatching between controllers that are not in a parent/child
 #   relation. This is the root.
 #
-sub cross1 :PathPart('chained/cross') :Captures(1) :Chained('/') { }
+sub cross1 :PathPart('chained/cross') :CaptureArgs(1) :Chained('/') { }
 
 1;

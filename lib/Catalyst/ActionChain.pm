@@ -53,7 +53,7 @@ sub dispatch {
     my $last = pop(@chain);
     foreach my $action ( @chain ) {
         my @args;
-        if (my $cap = $action->attributes->{Captures}) {
+        if (my $cap = $action->attributes->{CaptureArgs}) {
           @args = splice(@captures, 0, $cap->[0]);
         }
         local $c->request->{arguments} = \@args;

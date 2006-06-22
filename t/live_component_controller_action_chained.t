@@ -120,7 +120,7 @@ sub run_tests {
 
     #
     #   The first three-chain test tries to call the action with :Args(1)
-    #   specification. There's also a one action with a :Captures(1)
+    #   specification. There's also a one action with a :CaptureArgs(1)
     #   attribute, that should not be dispatched to.
     #
     {
@@ -142,7 +142,7 @@ sub run_tests {
     #
     #   This is the second three-chain test, it goes for the action that
     #   handles "/one/$cap/two/$arg1/$arg2" paths. Should be the two action
-    #   having :Args(2), not the one having :Captures(2).
+    #   having :Args(2), not the one having :CaptureArgs(2).
     #
     {
         my @expected = qw[
@@ -162,9 +162,9 @@ sub run_tests {
     }
 
     #
-    #   Last of the three-chain tests. Has no concurrent action with :Captures
+    #   Last of the three-chain tests. Has no concurrent action with :CaptureArgs
     #   and is more thought to simply test the chain as a whole and the 'two'
-    #   action specifying :Captures.
+    #   action specifying :CaptureArgs.
     #
     {
         my @expected = qw[

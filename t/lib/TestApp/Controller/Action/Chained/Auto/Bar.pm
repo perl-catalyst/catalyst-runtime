@@ -11,6 +11,6 @@ sub auto        : Private { 0 }
 
 sub barend      : Chained('.') Args(1) { }
 
-sub crossloose  : Chained PathPart('chained/auto_cross') Captures(1) { }
+sub crossloose  : Chained PathPart('chained/auto_cross') CaptureArgs(1) { }
 
 1;

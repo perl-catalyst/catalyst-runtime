@@ -45,7 +45,7 @@ sub list {
         my $parent = "DUMMY";
         my $curr = $endpoint;
         while ($curr) {
-            if (my $cap = $curr->attributes->{Captures}) {
+            if (my $cap = $curr->attributes->{CaptureArgs}) {
                 unshift(@parts, (("*") x $cap->[0]));
             }
             if (my $pp = $curr->attributes->{PartPath}) {
@@ -60,7 +60,7 @@ sub list {
         my @rows;
         foreach my $p (@parents) {
             my $name = "/${p}";
-            if (my $cap = $p->attributes->{Captures}) {
+            if (my $cap = $p->attributes->{CaptureArgs}) {
                 $name .= ' ('.$cap->[0].')';
             }
             unless ($p eq $parents[0]) {
@@ -127,11 +127,11 @@ sub recurse_match {
         }
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
-            if (my $capture_attr = $action->attributes->{Captures}) {
+            if (my $capture_attr = $action->attributes->{CaptureArgs}) {
                 my @captures;
                 my @parts = @parts; # localise
 
-                # strip Captures into list
+                # strip CaptureArgs into list
                 push(@captures, splice(@parts, 0, $capture_attr->[0]));
 
                 # try the remaining parts against children of this action
@@ -207,7 +207,7 @@ sub register {
 
     ($self->{actions} ||= {})->{'/'.$action->reverse} = $action;
 
-    unless ($action->attributes->{Captures}) {
+    unless ($action->attributes->{CaptureArgs}) {
         unshift(@{ $self->{endpoints} ||= [] }, $action);
     }
 
@@ -231,7 +231,7 @@ sub uri_for_action {
     my $parent = "DUMMY";
     my $curr = $action;
     while ($curr) {
-        if (my $cap = $curr->attributes->{Captures}) {
+        if (my $cap = $curr->attributes->{CaptureArgs}) {
             return undef unless @captures >= $cap->[0]; # not enough captures
             unshift(@parts, splice(@captures, -$cap->[0]));
         }

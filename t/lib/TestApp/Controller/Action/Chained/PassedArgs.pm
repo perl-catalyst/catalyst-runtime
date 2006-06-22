@@ -11,12 +11,12 @@ use base qw( Catalyst::Controller );
 #   as it should.
 #
 
-sub first  : PathPart('chained/passedargs/a') Chained('/') Captures(1) {
+sub first  : PathPart('chained/passedargs/a') Chained('/') CaptureArgs(1) {
     my ( $self, $c, $arg ) = @_;
     $c->stash->{ passed_args } = [ $arg ];
 }
 
-sub second : PathPart('b') Chained('first') Captures(1) {
+sub second : PathPart('b') Chained('first') CaptureArgs(1) {
     my ( $self, $c, $arg ) = @_;
     push @{ $c->stash->{ passed_args } }, $arg;
 }
