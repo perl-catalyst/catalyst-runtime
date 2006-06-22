@@ -421,6 +421,54 @@ C<$c-E<gt>req-E<gt>captures-E<gt>[0]> would be "23". If you want to pass
 arguments at the end of your URL, you must use regex action keys. See
 L</URL Path Handling> below.
 
+=item * B<ChildOf>
+
+    sub section :PathPart('section') :ChildOf('/') :Captures(1) { }
+
+ChildOf is a powerful way to handle canonical URIs of the form 
+/section/1/item/2 
+
+Taking the above URI as an example in Controller::Root you can do the following :-
+
+	sub section_handler :PathPart('section') :ChildOf('/') :Captures(1) {
+		my ( $self, $c ) = @_;
+		$c->stash->{'section'} = $c->Model('Sections')->find($c->req->captures->[0]);
+	}
+	
+	sub item_handler :PathPart('item') :ChildOf('/section_handler') :Args(1) {
+		my ( $self, $c ) = @_;
+		$c->stash->{'item'} = $c->stash->{'section'}->find_related('item',$c->args->[0]);
+	}
+
+The subroutine section_handler matched the path segment 'section' as a child of '/'. It 
+then took the next path segment, as referenced by :Captures(1) and stashed it in the 
+arrayref $c->req->captures. Since there was also a child of this handler - it also gets run.
+The same rules apply here - This time however it has the 'Args' attribute which means
+this particular routine will run if there is exactly 1 argument. See Args below for more 
+options.
+
+=item ChildOf('xyz')
+
+The action of the parent - for instance, if you have method item_handler in controller
+SuperMarket::Aisle, the action would be /supermarket/aisle/item_handler. For a root handler
+this would be '/'.
+
+=item PathPart('xyz')
+
+The name of this path section in the ChildOf tree mapping to the URI.
+
+=item Captures(int)
+
+Will 'collapse' the next x path segments in the request URI and push them into 
+the arrayref $c->req->captures
+
+=item Args(int)
+
+The number of path segments to capture at the end of a request URI. This *must* be
+included in your leaf nodes. You can use Args(0) for an equivalent of the index
+action.
+Args with no parameters will capture every postfixed segment into $c->req->args.
+
 =item * B<Top-level> (B<Global>)
 
     package MyApp::Controller::Foo;
