@@ -48,7 +48,13 @@ actions in order.
 
 sub dispatch {
     my ( $self, $c ) = @_;
+    my @captures = @{$c->req->captures||[]};
     foreach my $action ( @{ $self->chain } ) {
+        my @args;
+        if (my $cap = $action->attributes->{Captures}) {
+          @args = splice(@captures, 0, $cap->[0]);
+        }
+        local $c->request->{arguments} = \@args;
         $action->dispatch( $c );
     }
 }
