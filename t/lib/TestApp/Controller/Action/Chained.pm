@@ -106,6 +106,32 @@ sub rootdef :Chained :PathPart('chained/rootdef') :Args(1) { }
 #
 sub parentchain :Chained('/') :PathPart('chained/parentchain') :Captures(1) { }
 
+#
+#   This is just for a test that a loose end is not callable
+#
+sub loose :Chained :PathPart('chained/loose') Captures(1) { }
+
+#
+#   Forwarding out of the middle of a chain.
+#
+sub chain_fw_a :Chained :PathPart('chained/chain_fw') :Captures(1) {
+    $_[1]->forward( '/action/chained/fw_dt_target' );
+}
+sub chain_fw_b :Chained('chain_fw_a') :PathPart('end') :Args(1) { }
+
+#
+#   Detaching out of the middle of a chain.
+#
+sub chain_dt_a :Chained :PathPart('chained/chain_dt') :Captures(1) {
+    $_[1]->detach( '/action/chained/fw_dt_target' );
+}
+sub chain_dt_b :Chained('chain_dt_a') :PathPart('end') :Args(1) { }
+
+#
+#   Target for former forward and chain tests.
+#
+sub fw_dt_target :Private { }
+
 sub end :Private {
   my ($self, $c) = @_;
   my $out = join('; ', map { join(', ', @$_) }

@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 72*$iters;
+use Test::More tests => 96*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -500,6 +500,169 @@ sub run_tests {
 
         ok( my $response = request('http://localhost/chained/parentchain/1/child/2'),
             ":Chained('.') chains to parent controller action" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test behaviour of auto actions returning '1' for the chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Auto->auto
+          TestApp::Controller::Action::Chained::Auto::Foo->auto
+          TestApp::Controller::Action::Chained::Auto->foo
+          TestApp::Controller::Action::Chained::Auto::Foo->fooend
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/autochain1/1/fooend/2'),
+            "Behaviour when auto returns 1 correct" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test behaviour of auto actions returning '0' for the chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Auto->auto
+          TestApp::Controller::Action::Chained::Auto::Bar->auto
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/autochain2/1/barend/2'),
+            "Behaviour when auto returns 0 correct" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test what auto actions are run when namespaces are changed
+    #   horizontally.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Auto->auto
+          TestApp::Controller::Action::Chained::Auto::Foo->auto
+          TestApp::Controller::Action::Chained::Auto::Bar->crossloose
+          TestApp::Controller::Action::Chained::Auto::Foo->crossend
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/auto_cross/1/crossend/2'),
+            "Correct auto actions are run on cross controller dispatch" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test forwarding from auto action in chain dispatch.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Auto->auto
+          TestApp::Controller::Action::Chained::Auto::Forward->auto
+          TestApp::Controller::Action::Chained::Auto->fw3
+          TestApp::Controller::Action::Chained::Auto->fw1
+          TestApp::Controller::Action::Chained::Auto::Forward->forwardend
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/auto_forward/1/forwardend/2'),
+            "Forwarding out of auto in chain" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Detaching out of the auto action of a chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Auto->auto
+          TestApp::Controller::Action::Chained::Auto::Detach->auto
+          TestApp::Controller::Action::Chained::Auto->fw3
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/auto_detach/1/detachend/2'),
+            "Detaching out of auto in chain" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test forwarding from auto action in chain dispatch.
+    #
+    {
+        my $expected = undef;
+
+        ok( my $response = request('http://localhost/chained/loose/23'),
+            "Loose end is not callable" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->header('Status'), 500, 'Status OK' );
+    }
+
+    #
+    #   Test forwarding out of a chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->chain_fw_a
+          TestApp::Controller::Action::Chained->fw_dt_target
+          TestApp::Controller::Action::Chained->chain_fw_b
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/chain_fw/1/end/2'),
+            "Forwarding out a chain" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test detaching out of a chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->chain_dt_a
+          TestApp::Controller::Action::Chained->fw_dt_target
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/chain_dt/1/end/2'),
+            "Forwarding out a chain" );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2', 'Content OK' );
