@@ -107,9 +107,7 @@ Create the DBIC ``Result Source'' Files
 
 Use Catalyst::Model::DBIC::Schema to Load the Model Class
 
-=back
-
-=item *
+    =item *
 
 CREATE A CATALYST CONTROLLER
 

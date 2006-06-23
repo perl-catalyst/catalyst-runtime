@@ -7,6 +7,8 @@ Catalyst::Manual - User guide and reference for Catalyst
 This is the (table of contents page of the) comprehensive user guide and
 reference for Catalyst.
 
+=over 4
+
 =item *
 
 L<Catalyst::Manual::About>
@@ -60,6 +62,8 @@ L<Catalyst::Manual::Internals>
 Here be dragons! A very brief explanation of the Catalyst request cycle,
 the major components of Catalyst, and how you can use this knowledge
 when writing applications under Catalyst.
+
+=back
 
 =head1 SUPPORT
 

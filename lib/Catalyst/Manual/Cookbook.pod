@@ -46,7 +46,7 @@ Normally you enable the debugging info by adding the C<-Debug> flag to
 your C<use Catalyst> statement. However, you can also enable it using
 environment variable, so you can (for example) get debug info without
 modifying your application scripts. Just set C<CATALYST_DEBUG> or
-C<E<LT>MYAPPE<GT>_DEBUG> to a true value.
+C<E<lt>MYAPPE<gt>_DEBUG> to a true value.
 
 =head2 File uploads
 
