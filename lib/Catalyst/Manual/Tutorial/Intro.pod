@@ -71,7 +71,7 @@ A simple application that lists and adds books.
 
 =item *
 
-The use of L<DBIx::Class> (DBIC) for the model.
+The use of L<DBIx::Class|DBIx::Class> (DBIC) for the model.
 
 =item * 
 
@@ -89,14 +89,17 @@ Role-based authorization ("authz").
 =item * 
 
 Attempts to provide an example showing current (5.70) Catalyst
-practices. For example, the use of L<Catalyst::Plugin::DefaultEnd>,
-DBIC, L<Catalyst::Plugin::ConfigLoader> with C<myapp.yml>, the use of
-C<lib/MyApp/Controller/Root.pm> vs. C<lib/MyApp.pm>, etc.
+practices. For example, the use of 
+L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>,
+DBIC, L<Catalyst::Plugin::ConfigLoader|Catalyst::Plugin::ConfigLoader> 
+with C<myapp.yml>, the use of C<lib/MyApp/Controller/Root.pm> 
+vs. C<lib/MyApp.pm>, etc.
 
 =item * 
 
 The use of Template Toolkit (TT) and the
-L<Catalyst::Helper::View::TTSite> view helper.
+L<Catalyst::Helper::View::TTSite|Catalyst::Helper::View::TTSite> 
+view helper.
 
 =item * 
 
@@ -150,11 +153,11 @@ OS = CentOS 4 Linux (RHEL 4)
 
 =item * 
 
-Catalyst v5.67
+Catalyst v5.6902
 
 =item * 
 
-DBIx::Class v0.06002
+DBIx::Class v0.06003
 
 =item * 
 
@@ -213,11 +216,11 @@ Catalyst::Plugin::Session::State::Cookie -- 0.02
 
 =item *
 
-Catalyst::Plugin::Session::Store::FastMmap -- 0.0
+Catalyst::Plugin::Session::Store::FastMmap -- 0.02
 
 =item *
 
-Catalyst::Plugin::StackTrace -- 0.0
+Catalyst::Plugin::StackTrace -- 0.04
 
 =item *
 
@@ -288,12 +291,12 @@ complement of Catalyst plugins.
 =back
 
 For additional information and recommendations on Catalyst installation,
-please refer to L<Catalyst::Manual::Installation>.
+please refer to 
+L<Catalyst::Manual::Installation|Catalyst::Manual::Installation>.
 
-B<IMPORTANT:> Step-by-step instructions to replicate the environment on
+B<NOTE:> Step-by-step instructions to replicate the environment on
 which this tutorial was developed can be found at
-L<Catalyst::Manual::Installation::CentOS4>.
-
+L<Catalyst::Manual::Installation::CentOS4|Catalyst::Manual::Installation::CentOS4>. 
 Using these instructions, you should be able to build a complete CentOS
 4.X server with Catalyst and all the plugins required to run this
 tutorial.
@@ -316,7 +319,7 @@ Each part of the tutorial has complete code available in the main
 Catalyst Subversion repository (see the note at the beginning of each
 part for the appropriate svn command to use).  Additionally, the final
 code is available as a ready-to-run tarball at
-TO_BE_ADDED_TO_FINAL_VERSION.
+I<TO_BE_ADDED_TO_FINAL_VERSION>.
 
 =head1 AUTHOR
 
@@ -327,5 +330,4 @@ Please report any errors, issues or suggestions to the author.
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
 
-Version: .94
 

@@ -253,7 +253,9 @@ this plugin when you place your application into production.
 As you may have noticed, C<-Debug> is not a plugin, but a I<flag>.
 Although most of the items specified on the C<use Catalyst> line of your
 application class will be plugins, Catalyst supports a limited number of
-flag options (of these, C<-Debug> is the most common).
+flag options (of these, C<-Debug> is the most common).  See the
+documentation for C<Catalyst.pm> to get details on other flags 
+(currently C<-Engine>, C<-Home>, and C<-Log>).
 
 If you prefer, you can use the C<$c-E<gt>debug> method to enable debug
 messages.
@@ -272,7 +274,7 @@ authorization sections (Part 4 and Part 5).
 
 =item *
 
-L<Catalyst::Plugin::Static::Simple>
+L<Catalyst::Plugin::Static::Simple|Catalyst::Plugin::Static::Simple>
 
 C<Static::Simple> provides an easy method of serving static content such
 as images and CSS files under the development server.
@@ -296,7 +298,7 @@ Replace it with:
             DefaultEnd
             /;
 
-This tells Catalyst to start using three new plugins:
+This tells Catalyst to start using two new plugins:
 
 =over 4
 
@@ -339,17 +341,18 @@ on one (or more) lines as with the default configuration.
 =head1 DATABASE ACCESS WITH C<DBIx::Class>
 
 Catalyst can be used with virtually any form of persistent datastore
-available via Perl.  For example, L<Catalyst::Model::DBI> can be used to
-easily access databases through the traditional Perl L<DBI> interface.
+available via Perl.  For example, 
+L<Catalyst::Model::DBI|Catalyst::Model::DBI> can be used to
+easily access databases through the traditional Perl C<DBI> interface.
 However, most Catalyst applications use some form of ORM technology to
 automatically create and save model objects as they are used.  Although
-Tony Bowden's L<Class::DBI> has been the traditional Perl ORM engine,
-Matt Trout's L<DBIx::Class> (abbreviated as "DBIC") has rapidly emerged
-as the Perl-based ORM technology of choice.  Most new Catalyst
-applications rely on DBIC, as will this tutorial.
+Tony Bowden's L<Class::DBI|Class::DBI> has been the traditional 
+Perl ORM engine, Matt Trout's L<DBIx::Class|DBIx::Class> (abbreviated 
+as "DBIC") has rapidly emerged as the Perl-based ORM technology of choice.  
+Most new Catalyst applications rely on DBIC, as will this tutorial.
 
-Note: See L<Catalyst:: Model::CDBI > for more information on using
-Catalyst with L<Class::DBI>.
+Note: See L<Catalyst:: Model::CDBI> for more information on using
+Catalyst with L<Class::DBI|Class::DBI>.
 
 =head2 Create a DBIC Schema File
 
@@ -388,7 +391,7 @@ Open C<lib/MyAppDB.pm> in your editor and insert:
 
 B<Note:> C<__PACKAGE__> is just a shorthand way of referencing the name
 of the package where it is used.  Therefore, in C<MyAppDB.pm>,
-C<__PACKAGE__> is equivalent to C<MyAppDB>
+C<__PACKAGE__> is equivalent to C<MyAppDB>.
 
 
 =head2 Create the DBIC "Result Source" Files
@@ -577,22 +580,24 @@ restrictions on the naming conventions you wish to use.
 
 =head2 Use C<Catalyst::Model::DBIC::Schema> To Load The Model Class
 
-When L<Catalyst::Model::DBIC::Schema> is
+When L<Catalyst::Model::DBIC::Schema|Catalyst::Model::DBIC::Schema> is
 in use, Catalyst essentially reads an existing copy of your database
 model and creates a new set of objects under C<MyApp::Model> for use
 inside of Catalyst.
 
-B<Note:> With L<Catalyst::Model::DBIC::Schema> you essentially end up
-with two sets of model classes (only one of which you write... the other
-set is created automatically in memory when your Catalyst application
-initializes).  For this tutorial application, the important points to
-remember are: you write the I<result source> files in C<MyAppDB>, but
-I<within Catalyst> you use the I<automatically created model classes> in
-C<MyApp::Model>.
+B<Note:> With 
+L<Catalyst::Model::DBIC::Schema|Catalyst::Model::DBIC::Schema> you 
+essentially end up with two sets of model classes (only one of which 
+you write... the other set is created automatically in memory when 
+your Catalyst application initializes).  For this tutorial application, 
+the important points to remember are: you write the I<result source> 
+files in C<MyAppDB>, but I<within Catalyst> you use the I<automatically 
+created model classes> in C<MyApp::Model>.
 
-Use the L<Catalyst::Helper::Model::DBIC::Schema > helper script to
-create the model class that loads up the model we created in the
-previous step:
+Use the 
+L<Catalyst::Helper::Model::DBIC::Schema|Catalyst::Helper::Model::DBIC::Schema> 
+helper script to create the model class that loads up the model we 
+created in the previous step:
 
     $ script/myapp_create.pl model MyAppDB DBIC::Schema MyAppDB dbi:SQLite:myapp.db '' '' '{ AutoCommit => 1 }'
 
@@ -653,20 +658,21 @@ written as C<$c-E<gt>model('MyAppDB')-E<gt>resultset('Book)>.  The two
 are equivalent.
 
 B<Note:> Catalyst actions are regular Perl methods, but they make use of
-Nicholas Clark's C<attributes> module to provide additional information
-to the Catalyst dispatcher logic.
+Nicholas Clark's C<attributes> module (that's the C<: Local> next to the
+C<sub list> in the code above) to provide additional information to the 
+Catalyst dispatcher logic.
 
 =head1 CATALYST VIEWS
 
 Views are where you render output, typically for display in the user's
-web browser, but also possibly using other display our output-generation
+web browser, but also possibly using other display output-generation
 systems.  As with virtually every aspect of Catalyst, options abound
 when it comes to the specific view technology you adopt inside your
 application.  However, most Catalyst applications use the Template
 Toolkit, known as TT (for more information on TT, see
 L<http://www.template-toolkit.org>). Other popular View technologies
 include Mason (L<http://www.masonhq.com> and
-L<http://www.masonbook.com>) and L<HTML::Template>
+L<http://www.masonbook.com>) and L<HTML::Template|HTML::Template>
 (L<http://html-template.sourceforge.net>).
 
 =head2 Create a Catalyst View Using C<TTSITE>
@@ -677,11 +683,11 @@ When using TT for the Catalyst view, there are two main helper scripts:
 
 =item *
 
-L<Catalyst::Helper::View::TT>
+L<Catalyst::Helper::View::TT|Catalyst::Helper::View::TT>
 
 =item *
 
-L<Catalyst::Helper::View::TTSite>
+L<Catalyst::Helper::View::TTSite|Catalyst::Helper::View::TTSite>
 
 =back
 
@@ -745,8 +751,8 @@ C<root/src/ttsite.css> and can be customized to suit your needs.
 
 B<Note:> The Catalyst stash only lasts for a single HTTP request.  If
 you need to retain information across requests you can use
-L<Catalyst::Plugin::Session> (we will use
-Catalyst sessions in the Authentication part).
+L<Catalyst::Plugin::Session|Catalyst::Plugin::Session> (we will use
+Catalyst sessions in the Authentication part of the tutorial).
 
 
 =head2 Create a TT Template Page
@@ -778,16 +784,16 @@ Then open C<root/src/books/list.tt2> in your editor and enter:
         <td>[% book.title %]</td>
         <td>[% book.rating %]</td>
         <td>
-          [% # Print author count in parens. 'book.authors' uses the 'many_to_many' -%]
-          [% # relationship to retrieve all of the authors of a book. 'size' is a   -%]
-          [% # TT VMethod to get the number of elements in a list.                  -%]
-          ([% book.authors.size %])
-          [% # Use an alternate form of a FOREACH loop to display authors.          -%]
-          [% # _ below is the TT string concatenation operator.                     -%]
-          [% author.last_name _' ' FOREACH author = book.authors %]
-          [% # Note: if many_to_many relationship not used in Authors.pm, you could -%]
-          [% # have used the following to 'walk' through the 'join table objects'   -%]
-          [% # bk_author.author.last_name _' ' FOREACH bk_author = book.book_authors %]
+          [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
+          [% # loop in 'side effect notation' to load just the last names of the     -%]
+          [% # authors into the list.  Note that we are making a bogus assignment to -%]
+          [% # the 'xx' vbl to avoid printing the size of the list after each push.  -%]      
+          [% tt_authors = [ ];
+             xx = tt_authors.push(author.last_name) FOREACH author = book.authors %]
+          [% # Now use a TT 'virtual method' to display the author count in parens   -%]
+          ([% tt_authors.size %])
+          [% # Use another vmethod to join & print the names with comma separators   -%]
+          [% tt_authors.join(', ') %]
         </td>
       </tr>
     [% END -%]
@@ -797,9 +803,8 @@ As indicated by the inline comments above, the C<META title> line uses
 TT's META feature to provide a title to C<root/lib/site/header>.
 Meanwhile, the outer C<FOREACH> loop iterates through each C<book> model
 object and prints the C<title> and C<rating> fields.  An inner
-C<FOREACH> loop prints the last name of each author in a single table
-cell (a simple space is used between the names; in reality you would
-probably want to modify the code to use a comma as a separator).
+C<FOREACH> loop prints the last name of each author in a comma-separated
+list within a single table cell.
 
 If you are new to TT, the C<[%> and C<%]> tags are used to delimit TT
 code.  TT supports a wide variety of directives for "calling" other
@@ -845,7 +850,7 @@ You should get something like this:
     [Tue May 16 12:51:33 2006] [catalyst] [debug] Debug messages enabled
     [Tue May 16 12:51:33 2006] [catalyst] [debug] Loaded plugins:
     .------------------------------------------------------------------------------.
-    | Catalyst::Plugin::ConfigLoader 0.07                                          |
+    | Catalyst::Plugin::ConfigLoader 0.09                                          |
     | Catalyst::Plugin::Static::Simple 0.14                                        |
     | Catalyst::Plugin::StackTrace 0.04                                            |
     | Catalyst::Plugin::DefaultEnd 0.06                                            |
@@ -940,6 +945,4 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
-
-Version: .94
 
