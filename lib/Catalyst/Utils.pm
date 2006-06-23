@@ -237,6 +237,34 @@ sub ensure_class_loaded {
     return 1;
 }
 
+=head2 merge_hashes($hashref, $hashref)
+
+Base code to recursively merge two hashes together with right-hand precedence.
+
+=cut
+
+sub merge_hashes {
+    my ( $lefthash, $righthash ) = @_;
+
+    return $lefthash unless defined $righthash;
+    
+    my %merged = %$lefthash;
+    for my $key ( keys %$righthash ) {
+        my $right_ref = ( ref $righthash->{ $key } || '' ) eq 'HASH';
+        my $left_ref  = ( ( exists $lefthash->{ $key } && ref $lefthash->{ $key } ) || '' ) eq 'HASH';
+        if( $right_ref and $left_ref ) {
+            $merged{ $key } = merge_hashes(
+                $lefthash->{ $key }, $righthash->{ $key }
+            );
+        }
+        else {
+            $merged{ $key } = $righthash->{ $key };
+        }
+    }
+    
+    return \%merged;
+}
+
 
 =head1 AUTHOR
 

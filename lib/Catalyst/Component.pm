@@ -3,6 +3,7 @@ package Catalyst::Component;
 use strict;
 use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use NEXT;
+use Catalyst::Utils;
 
 __PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
@@ -134,7 +135,7 @@ sub process {
           . " did not override Catalyst::Component::process" );
 }
 
-=head2 $c->merge_hash_config( $hashref, $hashref )
+=head2 $c->merge_config_hashes( $hashref, $hashref )
 
 Merges two hashes together recursively, giving right-hand precedence.
 
@@ -143,21 +144,7 @@ Merges two hashes together recursively, giving right-hand precedence.
 sub merge_config_hashes {
     my ( $self, $lefthash, $righthash ) = @_;
 
-    my %merged = %$lefthash;
-    for my $key ( keys %$righthash ) {
-        my $right_ref = ( ref $righthash->{ $key } || '' ) eq 'HASH';
-        my $left_ref  = ( ( exists $lefthash->{ $key } && ref $lefthash->{ $key } ) || '' ) eq 'HASH';
-        if( $right_ref and $left_ref ) {
-            $merged{ $key } = $self->merge_config_hashes(
-                $lefthash->{ $key }, $righthash->{ $key }
-            );
-        }
-        else {
-            $merged{ $key } = $righthash->{ $key };
-        }
-    }
-    
-    return \%merged;
+    return Catalyst::Utils::merge_hashes( $lefthash, $righthash );
 }
 
 =head1 OPTIONAL METHODS
