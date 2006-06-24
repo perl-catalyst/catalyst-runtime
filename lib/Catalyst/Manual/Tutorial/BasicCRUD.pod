@@ -93,14 +93,13 @@ Edit C<lib/MyApp/Controller/Books.pm> and enter the following method:
         # author_id args from the URL.  Note that Catalyst automatically 
         # puts extra information after the "/<controller_name>/<action_name/" 
         # into @_
-
         my ($self, $c, $title, $rating, $author_id) = @_;
     
         # Call create() on the book model object. Pass the table 
         # columns/field values we want to set as hash values
         my $book = $c->model('MyAppDB::Book')->create({
-                title   => $title,
-                rating  => $rating
+                title  => $title,
+                rating => $rating
             });
         
         # Add a record to the join table for this book, mapping to 
@@ -142,7 +141,10 @@ Edit C<root/src/books/create_done.tt2> and then enter:
     [% # optional, but prevents "massive indenting" of deeply nested objects -%]
     [% USE Dumper(Indent=1) -%]
     
-    [% # Set the page title -%]
+    [% # Set the page title.  META can 'go back' and set values in templates -%]
+    [% # that have been processed 'before' this template (here it's for      -%]
+    [% # root/lib/site/html and root/lib/site/header).  Note that META on    -%]
+    [% # simple strings (e.g., no variable interpolation).                   -%]
     [% META title = 'Book Created' %]
     
     [% # Output information about the record that was added.  Note use  -%]
@@ -235,7 +237,7 @@ This action simply invokes a view containing a book creation form.
 
 Open C<root/src/books/form_create.tt2> in your editor and enter:
 
-    [% META title = 'Book Create' -%]
+    [% META title = 'Manual Form Book Create' -%]
     
     <form method="post" action="[% Catalyst.uri_for('form_create_do') %]">
     <table>
@@ -334,16 +336,16 @@ and 2) the four lines for the Delete link near the bottom).
         <td>[% book.title %]</td>
         <td>[% book.rating %]</td>
         <td>
-          [% # Print author count in parens. 'book.authors' uses the 'many_to_many' -%]
-          [% # relationship to retrieve all of the authors of a book. 'size' is a   -%]
-          [% # TT VMethod to get the number of elements in a list.                  -%]
-          ([% book.authors.size %])
-          [% # Use an alternate form of a FOREACH loop to display authors.          -%]
-          [% # _ below is the TT string concatenation operator.                     -%]
-          [% author.last_name _' ' FOREACH author = book.authors %]
-          [% # Note: if many_to_many relationship not used in Authors.pm, you could -%]
-          [% # have used the following to 'walk' through the 'join table objects'   -%]
-          [% # bk_author.author.last_name _' ' FOREACH bk_author = book.book_authors %]
+          [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
+          [% # loop in 'side effect notation' to load just the last names of the     -%]
+          [% # authors into the list.  Note that we are making a bogus assignment to -%]
+          [% # the 'xx' vbl to avoid printing the size of the list after each push.  -%]
+          [% tt_authors = [ ];
+             xx = tt_authors.push(author.last_name) FOREACH author = book.authors %]
+          [% # Now use a TT 'virtual method' to display the author count             -%]
+          ([% tt_authors.size %])
+          [% # Use another TT virtual method to join the names with comma separators -%]
+          [% tt_authors.join(', ') %]
         </td>
         <td>
           [% # Add a link to delete a book %]
@@ -428,6 +430,4 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
-
-Version: .94
 

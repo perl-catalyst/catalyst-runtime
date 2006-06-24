@@ -715,7 +715,8 @@ context object in templates from its usual C<c> to C<Catalyst>. When
 looking at other Catalyst examples, remember that they almost always use
 C<c>.  Note that Catalyst and TT I<do not complain> when you use the
 wrong name to access the context object...TT simply outputs blanks for
-that bogus logic.  Finally, be aware that this change in name I<only>
+that bogus logic (see next tip to change this behavior with TT C<DEBUG>
+options).  Finally, be aware that this change in name I<only>
 applies to how the context object is accessed inside your TT templates;
 your controllers will continue to use C<$c> (or whatever name you use
 when fetching the reference from C<@_> inside your methods). (You can
@@ -724,6 +725,25 @@ line from C<lib/MyApp/View/TT.pm>, but you will also have to edit
 C<root/lib/config/main> and C<root/lib/config/url>.  If you do this, be
 careful not to have a collision between your own C<c> variable and the
 Catalyst C<c> variable.)
+
+B<TIP>: When troubleshooting TT it can be helpful to enable variable
+C<DEBUG> options.  You can do this in a Catalyst environment by adding
+a C<DEBUG> line to the C<__PACKAGE__->config> declaration in 
+C<MyApp/View/TT.pm>:
+
+    __PACKAGE__->config({
+        CATALYST_VAR => 'Catalyst',
+        ...
+        DEBUG        => 'undef',
+        ...
+    });
+   
+There are a variety of options you can use, such as 'undef', 'all', 
+'service', 'context', 'parser', 'provider', and 'service'.  See
+L<Template::Constants> for more information (remove the C<DEBUG_>
+portion of the name shown in the TT docs and convert to lower case
+for use inside Catalyst).
+
 
 =head2 Globally Customize Every View
 
