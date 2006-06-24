@@ -148,30 +148,41 @@ Returns home directory for given class.
 =cut
 
 sub home {
-    my $name = shift;
-    $name =~ s/\:\:/\//g;
-    my $home = 0;
-    if ( my $path = $INC{"$name.pm"} ) {
-        $home = file($path)->absolute->dir;
-        $name =~ /(\w+)$/;
-        my $append = $1;
-        my $subdir = dir($home)->subdir($append);
-        for ( split '/', $name ) { $home = dir($home)->parent }
-        if ( $home =~ /blib$/ ) { $home = dir($home)->parent }
-        elsif (!-f file( $home, 'Makefile.PL' )
-            && !-f file( $home, 'Build.PL' ) )
+    my $class = shift;
+
+    # make an $INC{ $key } style string from the class name
+    (my $file = "$class.pm") =~ s{::}{/}g;
+
+    if ( my $inc_entry = $INC{$file} ) {
         {
-            $home = $subdir;
+            # look for an uninstalled Catalyst app
+
+            # find the @INC entry in which $file was found
+            (my $path = $inc_entry) =~ s/$file$//;
+            my $home = dir($path)->absolute->cleanup;
+
+            # pop off /lib and /blib if they're there
+            $home = $home->parent while $home =~ /b?lib$/;
+
+            # only return the dir if it has a Makefile.PL or Build.PL
+            return $home->stringify
+                if $home->file("Makefile.PL") or -f $home->file("Build.PL");
         }
 
-        # clean up relative path:
-        # MyApp/script/.. -> MyApp
-        my ($lastdir) = $home->dir_list( -1, 1 );
-        if ( $lastdir eq '..' ) {
-            $home = dir($home)->parent->parent;
+        {
+            # look for an installed Catalyst app
+
+            # trim the .pm off the thing ( Foo/Bar.pm -> Foo/Bar/ )
+            ( my $path = $inc_entry) =~ s/\.pm$//;
+            my $home = dir($path)->absolute->cleanup;
+
+            # return if if it's a valid directory
+            return $home->stringify if -d $home;
         }
     }
-    return $home;
+
+    # we found nothing
+    return 0;
 }
 
 =head2 prefix($class, $name);
