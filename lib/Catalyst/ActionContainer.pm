@@ -35,6 +35,12 @@ to represent the various dispatch points in your application.
 
 =head1 METHODS
 
+=head2 new(\%data | $part)
+
+Can be called with { part => $part, actions => \%actions } for full
+construction or with just a part, which will result in an empty actions
+hashref to be populated via add_action later
+
 =head2 get_action($name)
 
 Returns an action from this container based on the action name, or undef

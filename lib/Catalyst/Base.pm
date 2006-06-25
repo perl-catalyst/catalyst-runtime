@@ -85,6 +85,11 @@ dispatch of actions for controllers.
 
 =head1 METHODS
 
+=head2 $class->new($app, @args)
+
+Proxies through to NEXT::new and stashes the application instance as
+$self->{application}.
+
 =head2 $self->action_for('name')
 
 Returns the Catalyst::Action object (if any) for a given method name in
@@ -138,7 +143,9 @@ sub path_prefix {
 
 =head2 $self->register_actions($c)
 
-register all actions for this component based on a given context.
+Finds all applicable actions for this component, creates Catalyst::Action
+objects (using $self->create_action) for them and registers them with
+$c->dispatcher.
 
 =cut
 
@@ -185,6 +192,15 @@ sub register_actions {
         $c->dispatcher->register( $c, $action );
     }
 }
+
+=head2 $self->create_action(%args)
+
+Called with a hash of data to be use for construction of a new Catalyst::Action
+(or appropriate sub/alternative class) object.
+
+Primarily designed for the use of register_actions.
+
+=cut
 
 sub create_action {
     my $self = shift;
