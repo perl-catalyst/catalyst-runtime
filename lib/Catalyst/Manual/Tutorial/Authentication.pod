@@ -72,6 +72,7 @@ following command:
 This section explores how to add authentication logic to a Catalyst
 application.
 
+
 =head2 Add Users and Roles to the Database
 
 First, we add both user and role information to the database (we will
@@ -354,22 +355,25 @@ Edit C<lib/MyApp.pm> and update it as follows (everything below C<DefaultEnd> is
 The three C<Authentication> plugins work together to support
 Authentication while the C<Session> plugins are required to maintain
 state across multiple HTTP requests.  Note that there are several
-options for L<Session::Store|Catalyst::Plugin::Session::Store> (although
-L<Session::Store::FastMmap|Catalyst::Plugin::Session::Store::FastMmap>
+options for L<Session::Store|Catalyst::Plugin::Session::Store> 
+(L<Session::Store::FastMmap|Catalyst::Plugin::Session::Store::FastMmap>
 is generally a good choice if you are on Unix; try
 L<Cache::FileCache|Catalyst::Plugin::Cache::FileCache> if you are on
 Win32) -- consult L<Session::Store|Catalyst::Plugin::Session::Store> and
 its subclasses for additional information.
+
 
 =head2 Configure Authentication
 
 Although C<__PACKAGE__-E<gt>config(name =E<gt> 'value');> is still
 supported, newer Catalyst applications tend to place all configuration
 information in C<myapp.yml> and automatically load this information into
-C<MyApp-E<gt>config> using the
-L<ConfigLoader|Catalyst::Plugin::ConfigLoader> plugin.
-
-Edit the C<myapp.yml> YAML and update it to match:
+C<MyApp-E<gt>config> using the 
+L<ConfigLoader|Catalyst::Plugin::ConfigLoader> plugin.  Here, we need
+to load several parameters that tell 
+L<Catalyst::Plugin::Authentication|Catalyst::Plugin::Authentication>
+where to locate information in your database.  To do this, edit the 
+C<myapp.yml> YAML and update it to match:
 
     ---
     name: MyApp
@@ -382,7 +386,7 @@ Edit the C<myapp.yml> YAML and update it to match:
             # This is the model object created by Catalyst::Model::DBIC from your
             # schema (you created 'MyAppDB::User' but as the Catalyst startup
             # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
-            # NOTE: Omit 'MyAppDB::Model' to avoid a component lookup issue in Catalyst 5.66
+            # NOTE: Omit 'MyApp::Model' to avoid a component lookup issue in Catalyst 5.66
             user_class: MyAppDB::User
             # This is the name of the field in your 'users' table that contains the user's name
             user_field: username
@@ -397,6 +401,7 @@ does require the use of a consistent level of indenting.  Be sure you
 line up everything on a given 'level' with the same number of indents.
 Also, be sure not to use C<tab> characters (YAML does not support them
 because they are handled inconsistently across editors).
+
 
 =head2 Add Login and Logout Controllers
 
@@ -554,15 +559,16 @@ C<default>, C<index>, and C<auto>.
 
 =item *
 
-Unlike the other private C<Private> actions where only a single method
-is called for each request, I<every> auto action along the chain of
-namespaces will be called.
+Unlike the other actions where only a single method is called for each 
+request, I<every> auto action along the chain of namespaces will be 
+called.
 
 =back
 
 By placing the authentication enforcement code inside the C<auto> method
 of C<lib/MyApp/Controller/Root.pm> (or C<lib/MyApp.pm>), it will be
 called for I<every> request that is received by the entire application.
+
 
 =head2 Displaying Content Only to Authenticated Users
 
@@ -632,11 +638,11 @@ bottom:
       <a href="[% Catalyst.uri_for('form_create') %]">Create</a>
     </p>
 
-Reload your browser and you should now see a "Login" link at the bottom
-of the page (as mentioned earlier, you can update template files without
-reloading the development server).  Click this link to return to the
-login page.  This time you I<should> see the "You are already logged in"
-message.
+Reload your browser and you should now see a "Login" and "Create" links
+at the bottom of the page (as mentioned earlier, you can update 
+template files without reloading the development server).  Click this 
+link to return to the login page.  This time you I<should> see the 
+"You are already logged in" message.
 
 Finally, click the C<You can logout here> link on the C</login> page.
 You should stay at the login page, but the message should change to "You
@@ -656,7 +662,9 @@ still transmits the passwords in cleartext to your application.  We are
 just avoiding the I<storage> of cleartext passwords in the database by
 using a SHA-1 hash. If you are concerned about cleartext passwords
 between the browser and your application, consider using SSL/TLS, made
-easy with the Catalyst plugin L<Catalyst::Plugin:RequireSSL>.
+easy with the Catalyst plugin 
+L<Catalyst::Plugin:RequireSSL|Catalyst::Plugin:RequireSSL>.
+
 
 =head2 Get a SHA-1 Hash for the Password
 
@@ -669,6 +677,7 @@ dirty" way to do this:
     $ perl -MDigest::SHA -e 'print Digest::SHA::sha1_hex("mypass"), "\n"'
     e727d1464ae12436e899a726da5b2f11d8381b26
     $
+
 
 =head2 Switch to SHA-1 Password Hashes in the Database
 
@@ -690,6 +699,7 @@ Then use the following command to update the SQLite database:
 B<Note:> We are using SHA-1 hashes here, but many other hashing
 algorithms are supported.  See C<Digest> for more information.
 
+
 =head2 Enable SHA-1 Hash Passwords in
 C<Catalyst::Plugin::Authentication::Store::DBIC>
 
@@ -707,7 +717,7 @@ C<password_hash_type> are new, everything else is the same):
             # This is the model object created by Catalyst::Model::DBIC from your
             # schema (you created 'MyAppDB::User' but as the Catalyst startup
             # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
-            # NOTE: Omit 'MyAppDB::Model' to avoid a component lookup issue in Catalyst 5.66
+            # NOTE: Omit 'MyApp::Model' to avoid a component lookup issue in Catalyst 5.66
             user_class: MyAppDB::User
             # This is the name of the field in your 'users' table that contains the user's name
             user_field: username
@@ -731,16 +741,12 @@ You should now be able to go to L<http://localhost:3000/books/list> and
 login as before.  When done, click the "Logout" link on the login page
 (or point your browser at L<http://localhost:3000/logout>).
 
+
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-Version: .94
-
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
