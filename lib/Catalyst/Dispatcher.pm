@@ -409,7 +409,7 @@ sub register {
     my $namespace = $action->namespace;
     my $name      = $action->name;
 
-    my $container = $self->find_or_create_action_container($namespace);
+    my $container = $self->_find_or_create_action_container($namespace);
 
     # Set the method value
     $container->add_action($action);
@@ -418,7 +418,7 @@ sub register {
     $self->container_hash->{$namespace} = $container;
 }
 
-sub find_or_create_action_container {
+sub _find_or_create_action_container {
     my ( $self, $namespace ) = @_;
 
     my $tree ||= $self->tree;
@@ -460,14 +460,14 @@ sub setup_actions {
     $self->action_container_class('Catalyst::ActionContainer');
 
     my @classes =
-      $self->do_load_dispatch_types( @{ $self->preload_dispatch_types } );
+      $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
     @{ $self->registered_dispatch_types }{@classes} = (1) x @classes;
 
     foreach my $comp ( values %{ $c->components } ) {
         $comp->register_actions($c) if $comp->can('register_actions');
     }
 
-    $self->do_load_dispatch_types( @{ $self->postload_dispatch_types } );
+    $self->_load_dispatch_types( @{ $self->postload_dispatch_types } );
 
     return unless $c->debug;
 
@@ -504,7 +504,7 @@ sub setup_actions {
     $_->list($c) for @{ $self->dispatch_types };
 }
 
-sub do_load_dispatch_types {
+sub _load_dispatch_types {
     my ( $self, @types ) = @_;
 
     my @loaded;
