@@ -806,10 +806,10 @@ Then open C<root/src/books/list.tt2> in your editor and enter:
         <td>
           [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
           [% # loop in 'side effect notation' to load just the last names of the     -%]
-          [% # authors into the list.  Note that we are making a bogus assignment to -%]
-          [% # the 'xx' vbl to avoid printing the size of the list after each push.  -%]      
+          [% # authors into the list.  Note that we make a bogus assignment to the   -%]
+          [% # 'unused' vbl to avoid printing the size of the list after each push.  -%]      
           [% tt_authors = [ ];
-             xx = tt_authors.push(author.last_name) FOREACH author = book.authors %]
+             unused = tt_authors.push(author.last_name) FOREACH author = book.authors %]
           [% # Now use a TT 'virtual method' to display the author count in parens   -%]
           ([% tt_authors.size %])
           [% # Use another vmethod to join & print the names with comma separators   -%]

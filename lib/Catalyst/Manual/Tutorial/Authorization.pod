@@ -110,7 +110,7 @@ Edit C<myapp.yml> and update it to match (everything from the
             # This is the model object created by Catalyst::Model::DBIC from your
             # schema (you created 'MyAppDB::User' but as the Catalyst startup
             # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
-            # NOTE: Omit 'MyAppDB::Model' to avoid a component lookup issue in Catalyst 5.66
+            # NOTE: Omit 'MyApp::Model' to avoid a component lookup issue in Catalyst 5.66
             user_class: MyAppDB::User
             # This is the name of the field in your 'users' table that contains the user's name
             user_field: username
@@ -126,7 +126,7 @@ Edit C<myapp.yml> and update it to match (everything from the
             # This is the model object created by Catalyst::Model::DBIC from your
             # schema (you created 'MyAppDB::Role' but as the Catalyst startup
             # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::Role').
-            # NOTE: Omit 'MyAppDB::Model' to avoid a component lookup issue in Catalyst 5.66
+            # NOTE: Omit 'MyApp::Model' to avoid a component lookup issue in Catalyst 5.66
             role_class: MyAppDB::Role
             # The name of the field in the 'roles' table that contains the role name
             role_field: role
@@ -251,9 +251,10 @@ running) and restart it:
 
 Now trying going to L<http://localhost:3000/books/list> and you should
 be taken to the login page (you might have to C<Shift+Reload> your
-browser).  Try logging in with both C<test01> and C<test02> (both use a
-password of C<mypass>) and notice how the roles information updates at
-the bottom of the "Book List" page. Also try the C<Logout> link on the
+browser and/or click the "Logout" link on the book list page).  Try 
+logging in with both C<test01> and C<test02> (both use a password 
+of C<mypass>) and notice how the roles information updates at the 
+bottom of the "Book List" page. Also try the C<Logout> link on the
 book list page.
 
 Now the "url_create" URL will work if you are already logged in as user
@@ -266,12 +267,13 @@ while logged in as each user.  Use one of the 'Logout' links (or go to
 L<http://localhost:3000/logout> in you browser directly) when you are
 done.
 
+
 =head1 ENABLE ACL-BASED AUTHORIZATION
 
 This section takes a brief look at how the
-L<Catalyst::Plugin::Authorization::ACL> plugin can automate much of the
-work required to perform role-based authorization in a Catalyst
-application.
+L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
+plugin can automate much of the work required to perform role-based 
+authorization in a Catalyst application.
 
 =head2 Add the C<Catalyst::Plugin::Authorization::ACL> Plugin
 
@@ -305,7 +307,7 @@ C<__PACKAGE__-E<gt>setup;> statement:
 Each of the three statements above comprises an ACL plugin "rule".  The
 first two rules only allow admin-level users to create new books using
 the form (both the form itself and the data submission logic are
-protected).  The third statement allows both users and admin to delete
+protected).  The third statement allows both users and admins to delete
 books.  The C</books/url_create> action will continue to be protected by
 the "manually configured" authorization created earlier in this part of
 the tutorial.
@@ -359,7 +361,7 @@ C<lib\MyApp.pm> B<after> the C<__PACKAGE__-E<gt>setup;> line.
 =head2 Add a Method to Handle Access Violations
 
 By default,
-L<Catalyst::Plugin::Authorization::ACL>
+L<Catalyst::Plugin::Authorization::ACL|Catalyst::Plugin::Authorization::ACL>
 throws an exception when authorization fails.  This will take the user
 to the Catalyst debug screen, or a "Please come back later" message if
 you are not using the C<-Debug> flag. This step uses the
@@ -380,11 +382,10 @@ following method:
     
         # Set the error message
         $c->stash->{error_msg} = 'Unauthorized!';
-
+    
         # Display the list
         $c->forward('list');
     }
-
 
 Then run the Catalyst development server script:    
 
@@ -410,6 +411,4 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
-
-Version: .94
 

@@ -417,13 +417,13 @@ such matters up to you, the designer and programmer.
 
 Then open C<lib/MyApp/Controller/Login.pm> and add:
 
-    =head2 default
+    =head2 base
     
     Login logic
     
     =cut
     
-    sub default : Private {
+    sub base :Path :Args(0) {
         my ($self, $c) = @_;
     
         # Get the username and password from form
@@ -454,15 +454,29 @@ at the login page but receive an error message.  If the C<username> and
 C<password> values are not present in the form, the user will be taken
 to the empty login form.
 
+We are using C<sub base :Path :Args(0) {...}> here to specifically match 
+the URL C</login>.  C<Path> actions (aka, "literal actions") create URI 
+matches relative to the namespace of the controller where they are defined.  
+Although C<Path> supports arguments that allow relative and absolute paths 
+to be defined, here we use an empty C<Path> definition to match on just the 
+name of the controller itself.  The method name, C<base>, is arbitrary.  
+We make the match even more specific with the C<:Args(0)> action modifier 
+-- this forces the match on I<only> C</login>, not C</login/somethingelse>.
+
+Note that we could have used something like C<sub default :Private>; 
+however, the use of C<default> actions is discouraged because it does
+not receive path args as with other actions.  The recommended practice 
+is to only use C<default> in C<MyApp::Controller::Root>.
+
 Next, create a corresponding method in C<lib/MyApp/Controller/Logout.pm>:
 
-    =head2 default
+    =head2 base
     
     Logout logic
     
     =cut
     
-    sub default : Private {
+    sub base :Path :Args(0) {
         my ($self, $c) = @_;
     
         # Clear the user's state
@@ -471,6 +485,9 @@ Next, create a corresponding method in C<lib/MyApp/Controller/Logout.pm>:
         # Send the user to the starting point
         $c->response->redirect($c->uri_for('/'));
     }
+
+Note that we are using the same C<sub base :Path :Args(0) {...}> style
+of action as with the login logic.
 
 
 =head2 Add a Login Form TT Template Page
