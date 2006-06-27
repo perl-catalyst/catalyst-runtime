@@ -30,7 +30,8 @@ condition in the C<end> action. For example:
 Then just add to your query string C<&dump_info=1> (or if there's no
 query string for the request, add C<?dump_info=1> to the end of the URL)
 to force debug output. This feature is included in
-L<Catlyst::Plugin::DefaultEnd>.
+L<Catalyst::Action::RenderView> (formerly
+L<Catalyst::Plugin::DefaultEnd>).
 
 
 =head2 Disable statistics
@@ -764,28 +765,35 @@ This will let all files within root/static be handled directly by Apache.  In
 a two-tiered setup, the frontend server should handle static files.
 The configuration to do this on the frontend will vary.
 
-=head2 Extending DefaultEnd
+=head2 Extending RenderView (formerly DefaultEnd)
 
-Most people use L<Catalyst::Plugin::DefaultEnd> as their
-end action; it does what you usually need. However there are
-times when you need to add a bit to it, but don't want to
-write your own C<end> action.
+The recommended approach for an C<end> action is to use
+L<Catalyst::Action::RenderView> (taking the place of
+L<Catalyst::Plugin::DefaultEnd>), which does what you usually need.
+However there are times when you need to add a bit to it, but don't want
+to write your own C<end> action.
 
-Simply extend it like this:
+You can extend it like this:
 
-  use Catalyst qw/DefaultEnd/;
+To add something to an C<end> action that is called before rendering
+(this is likely to be what you want), simply place it in the C<end>
+method:
 
-  # (time passes)
-
-  sub end : Private {
+    sub end : ActionClass('RenderView') {
       my ( $self, $c ) = @_;
+      # do stuff here; the RenderView action is called afterwards
+    }
 
-      ... # code before view
+To add things to an C<end> action that are called I<after> rendering,
+you can set it up like this:
 
-      $c->NEXT::end( $c );
-  
-      ... # code after view
-  }
+    sub render : ActionClass('RenderView') { }
+
+    sub end : Private { 
+      my ( $self, $c ) = @_;
+      $c->forward('render');
+      # do stuff here
+    }
   
 =head2 Catalyst on shared hosting
 

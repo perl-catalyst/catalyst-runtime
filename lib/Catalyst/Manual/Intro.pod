@@ -831,7 +831,8 @@ C<$c-E<gt>forward(qw/MyApp::View::TT process/)>.
     }
 
 You normally render templates at the end of a request, so it's a perfect
-use for the global C<end> action.
+use for the global C<end> action. (In practice, however, you would use a
+default C<end> action as supplied by L<Catalyst::Action::DefaultEnd>.)
 
 Also, be sure to put the template under the directory specified in
 C<$c-E<gt>config-E<gt>{root}>, or you'll be forced to look at our

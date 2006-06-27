@@ -10,10 +10,11 @@ are not distributed with Catalyst but should be available from CPAN.
 They typically require additional modules from CPAN.
 
 This list may well be outdated by the time you read this and some
-plugins may be deprecated or now part of core L<Catalyst>. Be sure 
-to check the Catalyst::Plugin namespace for additional plugins and consult 
-the mailing list ( L<http://dev.catalyst.perl.org/wiki/Support> ) for advice 
-on the current status or preferred use of your chosen plugin/framework.
+plugins may be deprecated or now part of core L<Catalyst>. Be sure to
+check the Catalyst::Plugin namespace for additional plugins and consult
+the mailing list ( L<http://dev.catalyst.perl.org/wiki/Support> ) for
+advice on the current status or preferred use of your chosen
+plugin/framework.
 
 =head1 PLUGINS
 
@@ -23,8 +24,8 @@ Provides Account Auto-Discovery for Catalyst.
 
 =head2 L<Catalyst::Plugin::Acme::Scramble>
 
-Implements a potent meme about how easily we can read scrambled text if the
-first and last letters remain constant. Operates on text/plain and
+Implements a potent meme about how easily we can read scrambled text if
+the first and last letters remain constant. Operates on text/plain and
 text/html served by your Catalyst application.
 
 =head2 L<Catalyst::Plugin::Alarm>
@@ -75,6 +76,12 @@ Part of the Authentication Framework L<Catalyst::Plugin::Authentication>.
 
 Integrates L<Authen::TypeKey> with L<Catalyst::Plugin::Authentication>.
 
+=head2 L<Catalyst::Plugin::Authentication::OpenID>
+
+L<Catalyst::Plugin::Authentication::OpenID> is a plugin that implements 
+support for OpenID authentication. For more information on OpenID, take 
+a look at L<http://www.openid.net/>.
+
 =head2 L<Catalyst::Plugin::Authentication::Store>
 
 The core authentication store documentation.
@@ -120,9 +127,9 @@ for Catalyst based on L<Catalyst::Plugin::Authentication>.
 
 =head2 L<Catalyst::Plugin::Browser>
 
-Extends L<Catalyst::Request> by adding the capability of browser detection.
-It returns an instance of L<HTTP::BrowserDetect>, which lets you get information 
-from the client's user agent.
+Extends L<Catalyst::Request> by adding the capability of browser
+detection.  It returns an instance of L<HTTP::BrowserDetect>, which lets
+you get information from the client's user agent.
 
 =head2 Catalyst::Plugin::Cache::FastMmap, FileCache, BerkeleyDB, and Memcached
 
@@ -381,16 +388,17 @@ and primary keys.
 
 =head2 L<Catalyst::Model::CDBI::Plain>
 
-A neutral interface to the C<Class::DBI> module which does not attempt to
-automate table setup. It allows the user to manually set up C<Class::DBI>
-classes, either by doing so within the Catalyst model classes themselves,
-or by inheriting from existing C<Class::DBI> classes.
+A neutral interface to the C<Class::DBI> module which does not attempt
+to automate table setup. It allows the user to manually set up
+C<Class::DBI> classes, either by doing so within the Catalyst model
+classes themselves, or by inheriting from existing C<Class::DBI>
+classes.
 
 =head2 L<Catalyst::Model::DBIC::Schema>
 
 A L<DBIx::Class> model class that can use either an explicit
-L<DBIx::Class::Schema> or one automatically loaded from your database via
-L<DBIx::Class::Schema::Loader>.
+L<DBIx::Class::Schema> or one automatically loaded from your database
+via L<DBIx::Class::Schema::Loader>.
 
 =head2 L<Catalyst::Model::EVDB>
 
@@ -485,12 +493,6 @@ Replaced by L<Catalyst::Plugin::Authentication::Credential::HTTP>.
 
 Replaced by L<Catalyst::Plugin::Authentication::Store::LDAP>.
 
-=head2 L<Catalyst::Plugin::Authentication::OpenID>
-
-L<Catalyst::Plugin::Authentication::OpenID> is a plugin that implements 
-support for OpenID authentication. For more information on OpenID, take 
-a look at L<http://www.openid.net/>.
-
 =head2 L<Catalyst::Plugin::Authentication::Simple>
 
 Replaced by L<Catalyst::Plugin::Authentication>.
@@ -501,9 +503,13 @@ Replaced by L<Catalyst::Plugin::Authentication>.
 
 =head2 Catalyst::Plugin::Config::*
 
-The L<Catalyst::Plugin::Config::JSON> and L<Catalyst::Plugin::Config::YAML>
-modules have been replaced by their corresponding L<Catalyst::Plugin::ConfigLoader>
-modules.
+The L<Catalyst::Plugin::Config::JSON> and
+L<Catalyst::Plugin::Config::YAML> modules have been replaced by their
+corresponding L<Catalyst::Plugin::ConfigLoader> modules.
+
+=head2 L<Catalyst::Plugin::DefaultEnd>
+
+Replaced by L<Catalyst::Action::RenderView>
 
 =head2 L<Catalyst::Plugin::SanitizeUrl>
 

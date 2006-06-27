@@ -4,33 +4,34 @@ Catalyst::Manual::Actions - Catalyst Reusable Actions
 
 =head1 DESCRIPTION
 
-This section of the manual describes the reusable action system in catalyst,
-how they work, descriptions of some existing ones, and how to write your own.
-Reusable actions are attributes on Catalyst methods that allow you to decorate
-your method with functions running before or after the method call.
-This can be used to implement commonly used action patterns, while still
-leaving you full freedom to customize them.
+This section of the manual describes the reusable action system in
+Catalyst, how they work, descriptions of some existing ones, and how to
+write your own.  Reusable actions are attributes on Catalyst methods
+that allow you to decorate your method with functions running before or
+after the method call.  This can be used to implement commonly used
+action patterns, while still leaving you full freedom to customize them.
 
 =head1 USING ACTIONS
 
-This is pretty simple. It works just like the normal dispatch attributes you
-are used to, like Local or Private:
+This is pretty simple. It works just like the normal dispatch attributes
+you are used to, like Local or Private:
 
   sub Hello :Local :ActionClass('SayBefore') { 
 	$c->res->output( 'Hello '.$c->stash->{what} );
   }
 
-In this example, we expect the SayBefore action to magically populate stash with
-something relevant before Hello is run.  In the next section we'll show you
-how to implement it. If you want it in another namespace than Catalyst::Action
-you can prefix the action name with a '+', for instance '+Foo::SayBefore',
-or if you just want it under your application namespace instead, use MyAction,
-like MyAction('SayBefore').
+In this example, we expect the SayBefore action to magically populate
+stash with something relevant before C<Hello> is run.  In the next
+section we'll show you how to implement it. If you want it in another
+namespace than Catalyst::Action you can prefix the action name with a
+'+', for instance '+Foo::SayBefore', or if you just want it under your
+application namespace instead, use MyAction, like MyAction('SayBefore').
 
 =head1 WRITING YOUR OWN ACTIONS
 
-Implementing the action is self is almost as easy. Just use L<Catalyst::Action>
-as a base class and decorate the 'execute' call in the Action class:
+Implementing the action is self is almost as easy. Just use
+L<Catalyst::Action> as a base class and decorate the C<execute> call in
+the Action class:
 
   package Catalyst::Action::SayBefore;
 
@@ -45,8 +46,8 @@ as a base class and decorate the 'execute' call in the Action class:
 
   1;
 
-If you want to do something after the action, just put it after the execute 
-call. Pretty simple, huh?
+If you want to do something after the action, just put it after the
+C<execute> call. Pretty simple, huh?
 
 =head1 ACTIONS
 
@@ -56,4 +57,11 @@ This is meant to decorate end actions. It's similar in operation to
 L<Catalyst::Plugin::DefaultEnd>, but allows you to decide on an action
 level rather than on an application level where it should be run.
 
-=cut
+=head1 AUTHOR
+
+The Catalyst Core Team - see http://catalyst.perl.org/
+
+=head1 COPYRIGHT
+
+This program is free software. You can redistribute it and/or modify it
+under the same terms as Perl itself.
