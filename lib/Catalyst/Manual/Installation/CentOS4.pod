@@ -167,7 +167,7 @@ Type the following:
     
     cpan shell -- CPAN exploration and modules installation (v1.7601)
     ReadLine support available (try 'install Bundle::CPAN')
-    
+        
     cpan> force install Module::Build
     
     ...
@@ -185,7 +185,9 @@ Type C<vi cat-install> to open the installer script, then insert the
 following lines at the bottom of the file (after the
 C<install('Catalyst');> line):
 
+    install('ExtUtils::ParseXS');
     install('Digest::SHA1');
+    install('Digest::SHA');
     install('Class::DBI');
     install('DBIx::Class');
     install('DBIx::Class::HTMLWidget');
@@ -199,9 +201,12 @@ C<install('Catalyst');> line):
     install('Catalyst::Plugin::DefaultEnd');
     install('Catalyst::Plugin::StackTrace');
     install('Catalyst::Plugin::Dumper');
+    install('Catalyst::Plugin::HTML::Widget');
     install('Catalyst::Model::DBIC::Schema');
     install('Catalyst::View::TT');
     install('Test::WWW::Mechanize::Catalyst');
+    install('Test::Pod');
+    install('Test::Pod::Coverage');
 
 =item * 
 
@@ -221,6 +226,3 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
-
-Version: .01
-
