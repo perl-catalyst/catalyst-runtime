@@ -1,7 +1,14 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.70_03  2006-06-28 16:42:00
         - fixup to registered plugins debug at app startup
         - refactored Catalyst::Utils::home
+
+5.70_02  2006-06-27 11:51:00
+	- Updated tutorial.
+
+5.70_01  2006-06-26 10:49:00
+
         - fixed a Catalyst::Base bug causing duplicate action registrations
         - modified DispatchTypes to support multiple registrations
         - added Catalyst::Runtime module as dist marker
