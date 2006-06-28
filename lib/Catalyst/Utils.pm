@@ -165,8 +165,18 @@ sub home {
             $home = $home->parent while $home =~ /b?lib$/;
 
             # only return the dir if it has a Makefile.PL or Build.PL
-            return $home->stringify
-                if $home->file("Makefile.PL") or -f $home->file("Build.PL");
+            if (-f $home->file("Makefile.PL") or -f $home->file("Build.PL")) {
+
+                # clean up relative path:
+                # MyApp/script/.. -> MyApp
+
+                my ($lastdir) = $home->dir_list( -1, 1 );
+                if ( $lastdir eq '..' ) {
+                    $home = dir($home)->parent->parent;
+                }
+
+                return $home->stringify;
+            }
         }
 
         {
