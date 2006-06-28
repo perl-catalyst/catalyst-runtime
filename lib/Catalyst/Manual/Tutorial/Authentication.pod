@@ -695,6 +695,13 @@ dirty" way to do this:
     e727d1464ae12436e899a726da5b2f11d8381b26
     $
 
+B<Note:> You should probably modify this code for production use to
+not read the password from the command line.  By having the script
+prompt for the cleartext password, it avoids having the password linger
+in forms such as your C<.bash_history> files (assuming you are using
+BASH as your shell).  An example of such a script can be found in
+Appendix 3.
+
 
 =head2 Switch to SHA-1 Password Hashes in the Database
 

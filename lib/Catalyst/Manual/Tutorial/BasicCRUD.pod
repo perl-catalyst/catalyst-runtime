@@ -148,8 +148,12 @@ Edit C<root/src/books/create_done.tt2> and then enter:
     [% META title = 'Book Created' %]
     
     [% # Output information about the record that was added.  Note use  -%]
-    [% # of 'first' to only list the first author (if > 1 author).      -%] 
-    <p>Added book '[% book.title %]' by '[% book.authors.first.last_name %]'
+    [% # of 'first' to only list the first author (if > 1 author).  TT  -%] 
+    [% # v2.15 has an issue that requires                               -%]
+    [% # 'book.authors.list.first.value.last_name' vs. the shorter      -%]
+    [% # 'book.authors.first.last_name' in prior versions.              -%]
+    <p>Added book '[% book.title %]' 
+    by '[% book.authors.list.first.value.last_name %]'
     with a rating of [% book.rating %].</p>
     
     [% # Provide a link back to the list page                                    -%]
@@ -364,7 +368,7 @@ will be used instead of full HTML buttons).
 Open C<lib/MyApp/Controller/Books.pm> in your editor and add the
 following method:
 
-    =head2 Delete 
+    =head2 delete 
     
     Delete a book
         

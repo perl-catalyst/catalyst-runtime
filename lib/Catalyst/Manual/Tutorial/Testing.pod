@@ -68,7 +68,7 @@ following command:
 =head1 RUNNING THE "CANNED" CATALYST TESTS
 
 There are a variety of ways to run Catalyst and Perl tests (for example,
-C<perl Makefile.PL> and C<make test>, but one of the easiest is with the
+C<perl Makefile.PL> and C<make test>), but one of the easiest is with the
 C<prove> command.  For example, to run all of the tests in the C<t>
 directory, enter:
 
@@ -135,9 +135,10 @@ For example:
 Although the Catalyst helper scripts provide a basic level of checks
 "for free," testing can become significantly more helpful when you write
 your own script to exercise the various parts of your application.  The
-L<Test::WWW::Mechanize::Catalyst> module is very popular for writing
-these sorts of test cases.  This module extends L<Test::WWW::Mechanize>
-(and therefore L<WWW::Mechanize>) to allow you to automate the action of
+L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> module 
+is very popular for writing these sorts of test cases.  This module 
+extends L<Test::WWW::Mechanize|Test::WWW::Mechanize> (and therefore 
+L<WWW::Mechanize|WWW::Mechanize>) to allow you to automate the action of
 a user "clicking around" inside your application.  It gives you all the
 benefits of testing on a live system without the messiness of having to
 use an actual web server, and a real person to do the clicking.
@@ -241,12 +242,14 @@ editor and enter the following:
 
 The C<live_app.t> test cases uses copious comments to explain each step
 of the process.  In addition to the techniques shown here, there are a
-variety of other methods available in L<Test::WWW::Mechanize::Catalyst>
-(for example, regex-based matching). Consult the documentation for more
+variety of other methods available in 
+L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> (for 
+example, regex-based matching). Consult the documentation for more
 detail.
 
 B<TIP>: For I<unit tests> vs. the "full application tests" approach used
-by L<Test::WWW::Mechanize::Catalyst>, see L<Catalyst::Test>.
+by L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst>, see 
+L<Catalyst::Test|Catalyst::Test>.
 
 B<Note:> The test script does not test the C<form_create> and
 C<form_create_do> actions.  That is left as an exercise for the reader
@@ -309,6 +312,7 @@ launch your normal application without the C<MYAPP_DSN> environment
 variable defined, it will default to the same C<dbi:SQLite:myapp.db> as
 before.
 
+
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
@@ -317,6 +321,4 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
-
-Version: .94
 

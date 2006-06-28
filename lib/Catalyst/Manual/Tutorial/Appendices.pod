@@ -78,6 +78,13 @@ C<0>, to the last line, C<$>).
 
 =item * 
 
+"%$s/^    "
+
+A shortcut for the previous item (C<%> specifies the entire file; so
+this removes four leading spaces from every line).
+
+=item * 
+
 ":.,$s/^    "
 
 Removes the first four spaces from the line the cursor is on at the time
@@ -121,3 +128,70 @@ B<TODO>
 
 B<TODO>
 
+
+=head1 APPENDIX 3: IMPROVED HASHING SCRIPT
+
+Here is an improved SHA-1 hashing script from Gavin Henry that does
+not expose the passwords to "capture" on the command line.
+
+    #!/usr/bin/perl -w
+    #===============================================================================
+    #
+    #         FILE:  enc_pass.pl
+    #
+    #        USAGE:  ./enc_pass.pl
+    #
+    #  DESCRIPTION:  Encrypt a Password using SHA-1
+    #
+    #      OPTIONS:  ---
+    # REQUIREMENTS:  ---
+    #         BUGS:  ---
+    #        NOTES:  ---
+    #       AUTHOR:  Gavin Henry (GH), <ghenry@suretecsystems.com>
+    #      COMPANY:  Suretec Systems Ltd.
+    #      VERSION:  1.0
+    #      CREATED:  26/06/2006
+    #     REVISION:  ---
+    #    COPYRIGHT:  http://search.cpan.org/dist/perl/pod/perlgpl.pod
+    #===============================================================================
+    
+    use strict;
+    use warnings;
+    use Digest::SHA1;
+    use Term::ReadKey;
+    
+    sub get_pass {
+        ReadMode 'noecho';
+        chomp( my $pw = ReadLine 0 );
+        ReadMode 'normal';
+        return $pw;
+    }
+    
+    print "Enter the password to be encrypted: ";
+    my $pass = get_pass();
+    
+    print "\nConfirm the password: ";
+    my $verify = get_pass();
+    
+    if ( $pass eq $verify ) {
+        my $sha1_enc = Digest::SHA1->new;
+        $sha1_enc->add($pass);
+    
+        print "\nYour encrypted password is: "
+          . $sha1_enc->hexdigest . "\n"
+          . "Paste this into your SQL INSERT/COPY Data.\n";
+    }
+    else {
+        print "\nPasswords do not match!\n";
+    }
+
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Please report any errors, issues or suggestions to the author.
+
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).

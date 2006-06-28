@@ -131,7 +131,7 @@ following method:
     }
 
 This method provides a central location (so it can be called by multiple
-actions, such as C<create> and C<edit>) that builds an HTML::Wiget-based
+actions, such as C<create> and C<edit>) that builds an HTML::Widget-based
 form with the appropriate fields. The "Get Authors" code uses DBIC to
 retrieve a list of model objects and then uses C<map> to create a hash
 where the hash keys are the database primary keys from the authors table
@@ -468,7 +468,7 @@ model classes:
 
 =item *
 
-fill_wiget()
+fill_widget()
 
 Takes data from the database and transfers it to your form widget.
 
@@ -554,16 +554,12 @@ have to call C<$book-E<gt>add_to_book_authors> once per author because
 C<populate_from_widget> does not currently handle the relationships
 between tables.
 
+
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.
 
-Copyright 2006, Kennedy Clark. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-Version: .94
-
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).

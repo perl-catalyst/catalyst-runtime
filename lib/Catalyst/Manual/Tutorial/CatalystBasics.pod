@@ -854,6 +854,10 @@ DBIx::Class to dump the SQL statements it's using to access the database
 
     $ export DBIX_CLASS_STORAGE_DBI_DEBUG=1
 
+This assumes you are using BASH as your shell -- adjust accordingly if
+you are using a different shell (for example, under tcsh, use
+C<setenv DBIX_CLASS_STORAGE_DBI_DEBUG 1>).
+
 B<NOTE>: You can also set this in your code using
 C<$class-E<gt>storage-E<gt>debug(1);>.  See
 L<DBIx::Class::Manual::Troubleshooting> for details (including options

@@ -87,9 +87,9 @@ view use:
 
     [% Catalyst.log.debug("This is a test log message") %]
 
-You can also use L<Data::Dumper> in both Catalyst code (C<use
-Data::Dumper; $c-E<gt>log-E<gt>debug("$var is: ".Dumper($var));)>) and
-TT templates (C<[% Dumper.dump(book) %]>.
+You can also use L<Data::Dumper|Data::Dumper> in both Catalyst code 
+(C<use Data::Dumper; $c-E<gt>log-E<gt>debug("$var is: ".Dumper($var));)>) 
+and TT templates (C<[% Dumper.dump(book) %]>.
 
 =head1 RUNNING CATALYST UNDER THE PERL DEBUGGER
 
@@ -229,6 +229,67 @@ For more information on using the Perl debugger, please see C<perldebug>
 and C<perldebtut>.  You can also type C<h> or C<h h> at the debugger
 prompt to view the built-in help screens.
 
+
+=head1 DEBUGGING MODULES FROM CPAN
+
+Although the techniques discussed above work well for code you are 
+writing, what if you want to use print/log/warn messages or set
+breakpoints in code that you have installed from CPAN (or in module
+that ship with Perl)?  One helpful approach is to place a copy of 
+the module inside the C<lib> directory of your Catalyst project.  
+When Catalyst loads, it will load from inside your C<lib> directory
+first, only turning to the global modules if a local copy cannot be
+found.  You can then make modifications such as adding a 
+C<$DB::single=1> to the local copy of the module without risking 
+the copy in the original location.
+
+Matt Trout has suggested the following shortcut to create a local
+copy of an installed module:
+
+    mkdir -p lib/Module; cp `perldoc -l Module::Name` lib/Module/
+
+For example, you could make a copy of 
+L<Catalyst::Plugin::Authentication|Catalyst::Plugin::Authentication>
+with the following command:
+
+    mkdir -p lib/Catalyst/Plugin; cp \
+        `perldoc -l Catalyst::Plugin::Authentication` lib/Catalyst/Plugin
+
+B<Note:> Matt has also suggested the following tips for Perl 
+debugging:
+
+=over 4
+
+=item * 
+
+Check the version of an installed module:
+
+    perl -MModule::Name -e 'print $Module::Name::VERSION;'
+
+For example:
+
+    $ perl -MCatalyst::Plugin::Authentication -e \
+        'print $Catalyst::Plugin::Authentication::VERSION;'
+    0.07
+
+=item * 
+
+Check if a modules contains a given method:
+
+    perl -MModule::Name -e 'print Module::Name->can("method");'
+
+For example:
+
+    $ perl -MCatalyst::Plugin::Authentication -e \
+        'print Catalyst::Plugin::Authentication->can("prepare");'
+    CODE(0x9c8db2c)
+
+If the method exists, the Perl C<can> method returns a coderef.
+Otherwise, it returns undef and nothing will be printed.
+
+=back
+
+
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
@@ -237,6 +298,3 @@ Please report any errors, issues or suggestions to the author.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
-
-Version: .94
-
