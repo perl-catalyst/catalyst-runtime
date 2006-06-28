@@ -1,6 +1,6 @@
-=head1 Catalyst Development Process
+=head1 NAME
 
-Below you will find information related to the Catalyst Development Process
+Catalyst::Manual::DevelopmentProcess - Administrative structure of the Catalyst Development Process
 
 =head1 Aims of the Catalyst Core Team
 
@@ -9,18 +9,18 @@ be stability, performance, and a more paced addition of features, with a
 focus on extensibility. Extensive improvements to the documentation are
 also expected in the short term.
 
-The Catalyst Roadmap at http://dev.catalyst.perl.org/roadmap will remain
-as is, and continues to reflect the specific priorities and schedule for
-future releases.
+The Catalyst Roadmap at L<http://dev.catalyst.perl.org/roadmap> will
+remain as is, and continues to reflect the specific priorities and
+schedule for future releases.
 
 =head1 Charter for the Catalyst Core Team
 
 =head2 Intention
 
-The intention of the Catalyst Core Team is to maintain and support the 
+The intention of the Catalyst Core Team is to maintain and support the
 Catalyst framework, in order for it to be a viable and stable framework
 for developing web-based MVC applications. This includes both technical
-decisions about the Catalyst core distribution, and public relations 
+decisions about the Catalyst core distribution, and public relations
 relating to the Catalyst framework as a whole.
 
 The main priority for development is stability for the users of the
