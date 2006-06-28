@@ -1203,13 +1203,14 @@ L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-DBI>
 
 =head2 Adding RSS feeds 
 
-Adding RSS feeds to your stuff in Catalyst is really simple. I'll show two
-different aproaches here, but the basic premise is that you forward to the
-normal view action first to get the objects, then handle the output differently
+Adding RSS feeds to your Catalyst applications is simple. We'll see two
+different aproaches here, but the basic premise is that you forward to
+the normal view action first to get the objects, then handle the output
+differently.
 
 =head3 Using TT templates
 
-This is the aproach we chose in Agave (L<http://dev.rawmode.org/>).
+This is the aproach used in Agave (L<http://dev.rawmode.org/>).
 
     sub rss : Local {
         my ($self,$c) = @_;
@@ -1218,16 +1219,34 @@ This is the aproach we chose in Agave (L<http://dev.rawmode.org/>).
     }
 
 Then you need a template. Here's the one from Agave: 
-L<http://svn.rawmode.org/repos/Agave/trunk/root/base/blog/rss.tt>
 
-As you can see, it's pretty simple. 
+    <?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <channel>
+	<title>[ [% blog.name || c.config.name || "Agave" %] ] RSS Feed</title>
+        <link>[% base %]</link>
+        <description>Recent posts</description>
+        <language>en-us</language>
+        <ttl>40</ttl>
+     [% WHILE (post = posts.next) %]
+      <item>
+        <title>[% post.title %]</title>
+        <description>[% post.formatted_teaser|html%]</description>    
+        <pubDate>[% post.pub_date %]</pubDate>
+        <guid>[% post.full_uri %]</guid>
+        <link>[% post.full_uri %]</link>
+        <dc:creator>[% post.author.screenname %]</dc:creator>
+      </item>
+    [% END %]
+      </channel>
+    </rss> 
 
 =head3 Using XML::Feed
 
-However, a more robust solution is to use XML::Feed, as we've done in this 
-Advent Calendar. Assuming we have a 'view' action that populates 'entries' 
-with some DBIx::Class/Class::DBI iterator, the code would look something like 
-this:
+A more robust solution is to use XML::Feed, as was done in the Catalyst
+Advent Calendar. Assuming we have a C<view> action that populates
+'entries' with some DBIx::Class iterator, the code would look something
+like this:
 
     sub rss : Local {
         my ($self,$c) = @_;
@@ -1239,35 +1258,36 @@ this:
         $feed->description('Catalyst advent calendar'); Some description
 
         # Process the entries
-        while( my $entry=$c->stash->{entries}->next ) {
+        while( my $entry = $c->stash->{entries}->next ) {
             my $feed_entry = XML::Feed::Entry->new('RSS');
             $feed_entry->title($entry->title);
             $feed_entry->link( $c->uri_for($entry->link) );
-            $feed_entry->issued( DateTime->from_epoch(epoch   => $entry->created) );
+            $feed_entry->issued( DateTime->from_epoch(epoch => $entry->created) );
             $feed->add_entry($feed_entry);
         }
         $c->res->body( $feed->as_xml );
    }
 
+A little more code in the controller, but with this approach you're
+pretty sure to get something that validates. 
 
-A little more code in the controller, but with this approach you're pretty sure
-to get something that validates. One little note regarding that tho, for both
-of the above aproaches, you'll need to set the content type like this:
+Note that for both of the above aproaches, you'll need to set the
+content type like this:
 
     $c->res->content_type('application/rss+xml');
 
-=head2 Final words
+=head3 Final words
 
-Note that you could generalize the second variant easily by replacing 'RSS' 
-with a variable, so you can generate Atom feeds with the same code.
+You could generalize the second variant easily by replacing 'RSS' with a
+variable, so you can generate Atom feeds with the same code.
 
-Now, go ahead and make RSS feeds for all your stuff. The world *needs* updates
-on your goldfish!
+Now, go ahead and make RSS feeds for all your stuff. The world *needs*
+updates on your goldfish!
 
 =head2 FastCGI Deployment
 
-As a companion to Day 7's mod_perl article, today's article is about
-production FastCGI deployment.
+FastCGI is a high-performance extension to CGI. It is suitable
+for production environments.
 
 =head3 Pros
 
@@ -1314,8 +1334,8 @@ than when using mod_perl.
 =head4 1. Install Apache with mod_fastcgi
 
 mod_fastcgi for Apache is a third party module, and can be found at
-L<http://www.fastcgi.com/>.  It is also packaged in many distributions, for
-example, libapache2-mod-fastcgi in Debian.
+L<http://www.fastcgi.com/>.  It is also packaged in many distributions,
+for example, libapache2-mod-fastcgi in Debian.
 
 =head4 2. Configure your application
 
@@ -1365,21 +1385,28 @@ Now, we simply configure Apache to connect to the running server.
     
 =head3 More Info
 
-Lots more information is available in the new and expanded FastCGI docs that
-will be part of Catalyst 5.62.  For now you may read them here:
-L<http://dev.catalyst.perl.org/file/trunk/Catalyst/lib/Catalyst/Engine/FastCGI.pm>
+L<Catalyst::Engine::FastCGI>.
 
 =head2 Catalyst::View::TT
 
-One of the first things you probably want to do when starting a new Catalyst application is set up your View. Catalyst doesn't care how you display your data; you can choose to generate HTML, PDF files, or plain text if you wanted.
+One of the first things you probably want to do when starting a new
+Catalyst application is set up your View. Catalyst doesn't care how you
+display your data; you can choose to generate HTML, PDF files, or plain
+text if you wanted.
 
-Most Catalyst applications use a template system to generate their HTML, and though there are several template systems available, Template Toolkit is probably the most popular.
+Most Catalyst applications use a template system to generate their HTML,
+and though there are several template systems available, Template
+Toolkit is probably the most popular.
 
-Once again, the Catalyst developers have done all the hard work, and made things easy for the rest of us. Catalyst::View::TT provides the interface to Template Toolkit, and provides Helpers which let us set it up that much more easily.
+Once again, the Catalyst developers have done all the hard work, and
+made things easy for the rest of us. Catalyst::View::TT provides the
+interface to Template Toolkit, and provides Helpers which let us set it
+up that much more easily.
 
 =head3 Creating your View
 
-Catalyst::View::TT provides two different helpers for use to use: TT and TTSite.
+Catalyst::View::TT provides two different helpers for us to use: TT and
+TTSite.
 
 =head4 TT
 
@@ -1387,7 +1414,10 @@ Create a basic Template Toolkit View using the provided helper script:
 
     script/myapp_create.pl view TT TT
 
-This will create lib/MyApp/View/MyView.pm, which is going to be pretty empty to start. However, it sets everything up that you need to get started. You can now define which template you want and forward to your view. For instance:
+This will create lib/MyApp/View/MyView.pm, which is going to be pretty
+empty to start. However, it sets everything up that you need to get
+started. You can now define which template you want and forward to your
+view. For instance:
 
     sub hello : Local {
         my ( $self, $c ) = @_;
@@ -1397,11 +1427,16 @@ This will create lib/MyApp/View/MyView.pm, which is going to be pretty empty to 
         $c->forward( $c->view('TT') );
     }
 
-In most cases, you will put the $c->forward into end(), and then you would only have to define which template you want to use. The S<DefaultEnd> plugin discussed on Day 8 is also commonly used.
+In practice you wouldn't do the forwarding manually, but would
+use L<Catalyst::Action::RenderView>.
 
 =head4 TTSite
 
-Although the TT helper does create a functional, working view, you may find yourself having to create the same template files and changing the same options every time you create a new application. The TTSite helper saves us even more time by creating the basic templates and setting some common options for us.
+Although the TT helper does create a functional, working view, you may
+find yourself having to create the same template files and changing the
+same options every time you create a new application. The TTSite helper
+saves us even more time by creating the basic templates and setting some
+common options for us.
 
 Once again, you can use the helper script:
 
@@ -1423,30 +1458,49 @@ This time, the helper sets several options for us in the generated View.
 
 =over
 
-=item
-INCLUDE_PATH defines the directories that Template Toolkit should search for the template files.
+=item 
+
+INCLUDE_PATH defines the directories that Template Toolkit should search
+for the template files.
 
 =item
-PRE_PROCESS is used to process configuration options which are common to every template file.
+
+PRE_PROCESS is used to process configuration options which are common to
+every template file.
 
 =item
-WRAPPER is a file which is processed with each template, usually used to easily provide a common header and footer for every page.
+
+WRAPPER is a file which is processed with each template, usually used to
+easily provide a common header and footer for every page.
 
 =back
 
-In addition to setting these options, the TTSite helper also created the template and config files for us! In the 'root' directory, you'll notice two new directories: src and lib. 
+In addition to setting these options, the TTSite helper also created the
+template and config files for us! In the 'root' directory, you'll notice
+two new directories: src and lib.
 
 Several configuration files in root/lib/config are called by PRE_PROCESS.
 
-The files in root/lib/site are the site-wide templates, called by WRAPPER, and display the html framework, control the layout, and provide the templates for the header and footer of your page. Using the template organization provided makes it much easier to standardize pages and make changes when they are (inevitably) needed.
+The files in root/lib/site are the site-wide templates, called by
+WRAPPER, and display the html framework, control the layout, and provide
+the templates for the header and footer of your page. Using the template
+organization provided makes it much easier to standardize pages and make
+changes when they are (inevitably) needed.
 
-The template files that you will create for your application will go into root/src, and you don't need to worry about putting the the <html> or <head> sections; just put in the content. The WRAPPER will the rest of the page around your template for you.
+The template files that you will create for your application will go
+into root/src, and you don't need to worry about putting the the <html>
+or <head> sections; just put in the content. The WRAPPER will the rest
+of the page around your template for you.
 
 =head2 $c->stash
 
-Of course, having the template system include the header and footer for you isn't all that we want our templates to do. We need to be able to put data into our templates, and have it appear where and how we want it, right? That's where the stash comes in.
+Of course, having the template system include the header and footer for
+you isn't all that we want our templates to do. We need to be able to
+put data into our templates, and have it appear where and how we want
+it, right? That's where the stash comes in.
 
-In our controllers, we can add data to the stash, and then access it from the template. For instance:
+In our controllers, we can add data to the stash, and then access it
+from the template. For instance:
 
     sub hello : Local {
         my ( $self, $c ) = @_;
@@ -1464,7 +1518,9 @@ Then, in hello.tt:
 
 When you view this page, it will display "Hello, Adam!"
 
-All of the information in your stash is available, by its name/key, in your templates. And your data doesn't have to be plain, old, boring scalars. You can pass array references and hash references, too.
+All of the information in your stash is available, by its name/key, in
+your templates. And your data don't have to be plain, old, boring
+scalars. You can pass array references and hash references, too.
 
 In your controller:
 
@@ -1484,15 +1540,27 @@ In hello.tt:
         <strong>Hello, [% name %]!</strong><br />
     [% END %]
 
-This allowed us to loop through each item in the arrayref, and display a line for each name that we have.
+This allowed us to loop through each item in the arrayref, and display a
+line for each name that we have.
 
-This is the most basic usage, but Template Toolkit is quite powerful, and allows you to truly keep your presentation logic separate from the rest of your application.
+This is the most basic usage, but Template Toolkit is quite powerful,
+and allows you to truly keep your presentation logic separate from the
+rest of your application.
 
 =head3 $c->uri_for()
 
-One of my favorite things about Catalyst is the ability to move an application around without having to worry that everything is going to break. One of the areas that used to be a problem was with the http links in your template files. For example, suppose you have an application installed at http://www.domain.com/Calendar. The links point to "/Calendar", "/Calendar/2005", "/Calendar/2005/10", etc.  If you move the application to be at http://www.mydomain.com/Tools/Calendar, then all of those links will suddenly break.
+One of my favorite things about Catalyst is the ability to move an
+application around without having to worry that everything is going to
+break. One of the areas that used to be a problem was with the http
+links in your template files. For example, suppose you have an
+application installed at http://www.domain.com/Calendar. The links point
+to "/Calendar", "/Calendar/2005", "/Calendar/2005/10", etc.  If you move
+the application to be at http://www.mydomain.com/Tools/Calendar, then
+all of those links will suddenly break.
 
-That's where $c->uri_for() comes in. This function will merge its parameters with either the base location for the app, or its current namespace. Let's take a look at a couple of examples.
+That's where $c->uri_for() comes in. This function will merge its
+parameters with either the base location for the app, or its current
+namespace. Let's take a look at a couple of examples.
 
 In your template, you can use the following:
 
@@ -1703,9 +1771,8 @@ L<http://search.cpan.org/dist/Test-Harness/bin/prove>
 
 =head2 XMLRPC
 
-Today we'll discover the wonderful world of web services.
-XMLRPC is unlike SOAP a very simple (and imo elegant) protocol,
-exchanging small XML messages like these.
+Unlike SOAP, XMLRPC is a very simple (and imo elegant) web-services
+protocol, exchanging small XML messages like these:
 
 Request:
 
@@ -1735,7 +1802,7 @@ Response:
     Content-Length: 133
     Content-Type: text/xml
     Status: 200
-    X-Catalyst: 5.62
+    X-Catalyst: 5.70
 
     <?xml version="1.0" encoding="us-ascii"?>
     <methodResponse>
@@ -1744,18 +1811,12 @@ Response:
         </params>
     </methodResponse>
 
-Sweet little protocol, isn't it? :)
+Now follow these few steps to implement the application:
 
-Now follow these few steps to implement the application.
+1. Install Catalyst (5.61 or later), Catalyst::Plugin::XMLRPC (0.06 or
+later) and SOAP::Lite (for XMLRPCsh.pl).
 
-1. Install Catalyst (5.61 or later), Catalyst::Plugin::XMLRPC (0.06 or later) and SOAP::Lite (for XMLRPCsh.pl)
-
-    % perl -MCPAN -e'install Catalyst'
-    ...
-    % perl -MCPAN -e'install Catalyst::Plugin::XMLRPC'
-    ...
-
-2. Create a myapp
+2. Create an application framework:
 
     % catalyst.pl MyApp
     ...
@@ -1765,12 +1826,12 @@ Now follow these few steps to implement the application.
 
     use Catalyst qw/-Debug Static::Simple XMLRPC/;
 
-4. Add a api controller
+4. Add an API controller
 
     % ./script/myapp_create.pl controller API
 
-5. Add a XMLRPC redispatch method and a add method with Remote attribute
-to lib/MyApp/Controller/API.pm
+5. Add a XMLRPC redispatch method and an add method with Remote
+attribute to lib/MyApp/Controller/API.pm
 
     sub default : Private {
         my ( $self, $c ) = @_;
@@ -1782,14 +1843,15 @@ to lib/MyApp/Controller/API.pm
         return $a + $b;
     }
 
-The default action is the entry point for each XMLRPC request, it will
-redispatch every request to methods with Remote attribute in the same class.
+The default action is the entry point for each XMLRPC request. It will
+redispatch every request to methods with Remote attribute in the same
+class.
 
-The add method is no traditional action, it has no private or public path.
-Only the XMLRPC dispatcher knows it exists.
+The C<add> method is not a traditional action; it has no private or
+public path. Only the XMLRPC dispatcher knows it exists.
 
-6. Thats it! You have built your first web service, lets test it with
-XMLRPCsh.pl (part of SOAP::Lite)
+6. That's it! You have built your first web service. Let's test it with
+XMLRPCsh.pl (part of SOAP::Lite):
 
     % ./script/myapp_server.pl
     ...
@@ -1799,7 +1861,7 @@ XMLRPCsh.pl (part of SOAP::Lite)
     --- XMLRPC RESULT ---
     '3'
 
-=head3 Tip Of The Day
+=head3 Tip
 
 Your return data type is usually auto-detected, but you can easily
 enforce a specific one.
@@ -1830,15 +1892,16 @@ Assume our Controller module starts with the following package declaration:
 
  package MyApp::Controller::Buckets;
 
-and we are running our application on localhost, port 3000 (the test server default).
+and we are running our application on localhost, port 3000 (the test
+server default).
 
 =over 4
 
 =item Path
 
-A Path attribute also takes an argument, this can be either a relative or an
-absolute path. A relative path will be relative to the controller namespace,
-an absolute path will represent an exact matching URL.
+A Path attribute also takes an argument, this can be either a relative
+or an absolute path. A relative path will be relative to the controller
+namespace, an absolute path will represent an exact matching URL.
 
  sub my_handles : Path('handles') { .. }
 
