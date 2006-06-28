@@ -792,15 +792,7 @@ EOF
     }
     
     if ( $class->debug ) {
-
-        my @plugins = ();
-
-        {
-            no strict 'refs';
-            @plugins =
-              map { $_ . ' ' . ( $_->VERSION || '' ) }
-              grep { /^Catalyst::Plugin/ } @{"$class\::ISA"};
-        }
+        my @plugins = map { "$_  " . ( $_->VERSION || '' ) } $class->registered_plugins;
 
         if (@plugins) {
             my $t = Text::SimpleTable->new(74);
