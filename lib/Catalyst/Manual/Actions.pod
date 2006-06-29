@@ -29,7 +29,7 @@ application namespace instead, use MyAction, like MyAction('SayBefore').
 
 =head1 WRITING YOUR OWN ACTIONS
 
-Implementing the action is self is almost as easy. Just use
+Implementing the action itself is almost as easy. Just use
 L<Catalyst::Action> as a base class and decorate the C<execute> call in
 the Action class:
 
