@@ -33,8 +33,7 @@ The Catalyst Core Team consists of the developers that have full commit
 privileges to the entire Catalyst source tree. 
 
 In addition, the core team may accept members that have non-technical
-roles such as marketing, legal, or ecconomic responsibilities.
-
+roles such as marketing, legal, or economic responsibilities.
 
 At the time of conception, the Core Team consists of the following people:
 
