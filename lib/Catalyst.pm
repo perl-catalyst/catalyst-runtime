@@ -1128,16 +1128,15 @@ sub execute {
         return $c->state;
     }
 
-    my $stats_info = $c->_stats_start_execute( $code );
+    my $stats_info = $c->_stats_start_execute( $code ) if $c->debug;
 
     push( @{ $c->stack }, $code );
     
     eval { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) };
 
-    $c->_stats_finish_execute( $stats_info );
+    $c->_stats_finish_execute( $stats_info ) if $c->debug and $stats_info;
     
-    my $last = ${ $c->stack }[-1];
-    pop( @{ $c->stack } );
+    my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
         if ( $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
@@ -1158,12 +1157,13 @@ sub execute {
 sub _stats_start_execute {
     my ( $c, $code ) = @_;
 
-    return unless $c->debug;
+    return if ( ( $code->name =~ /^_.*/ )
+        && ( !$c->config->{show_internal_actions} ) );
+
+    $c->counter->{"$code"}++;
 
     my $action = "$code";
-
-    $action = "/$action" unless $action =~ /\-\>/;
-    $c->counter->{"$code"}++;
+    $action = "/$action" unless $action =~ /->/;
 
     # determine if the call was the result of a forward
     # this is done by walking up the call stack and looking for a calling
@@ -1190,73 +1190,44 @@ sub _stats_start_execute {
     );
     $node->setUID( "$code" . $c->counter->{"$code"} );
 
-    unless ( ( $code->name =~ /^_.*/ )
-        && ( !$c->config->{show_internal_actions} ) )
-    {
-        # is this a root-level call or a forwarded call?
-        if ( $callsub =~ /forward$/ ) {
+    # is this a root-level call or a forwarded call?
+    if ( $callsub =~ /forward$/ ) {
 
-            # forward, locate the caller
-            if ( my $parent = $c->stack->[-1] ) {
-                my $visitor = Tree::Simple::Visitor::FindByUID->new;
-                $visitor->searchForUID(
-                    "$parent" . $c->counter->{"$parent"} );
-                $c->stats->accept($visitor);
-                if ( my $result = $visitor->getResult ) {
-                    $result->addChild($node);
-                }
-            }
-            else {
-
-                # forward with no caller may come from a plugin
-                $c->stats->addChild($node);
+        # forward, locate the caller
+        if ( my $parent = $c->stack->[-1] ) {
+            my $visitor = Tree::Simple::Visitor::FindByUID->new;
+            $visitor->searchForUID(
+                "$parent" . $c->counter->{"$parent"} );
+            $c->stats->accept($visitor);
+            if ( my $result = $visitor->getResult ) {
+                $result->addChild($node);
             }
         }
         else {
 
-            # root-level call
+            # forward with no caller may come from a plugin
             $c->stats->addChild($node);
         }
     }
+    else {
 
-    my $start = [gettimeofday];
-    my $elapsed = tv_interval($start);
+        # root-level call
+        $c->stats->addChild($node);
+    }
 
     return {
-        code    => $code,
-        elapsed => $elapsed,
-        start   => $start,
+        start   => [gettimeofday],
         node    => $node,
-      }
+    };
 }
 
 sub _stats_finish_execute {
     my ( $c, $info ) = @_;
+    my ( $start, $node ) = @{ $info }{qw/start node/};
 
-    return unless $c->debug;
-
-    my ( $code, $start, $elapsed ) = @{ $info }{qw/code start elapsed/};
-
-    unless ( ( $code->name =~ /^_.*/ )
-        && ( !$c->config->{show_internal_actions} ) )
-    {
-
-        # FindByUID uses an internal die, so we save the existing error
-        my $error = $@;
-
-        # locate the node in the tree and update the elapsed time
-        my $visitor = Tree::Simple::Visitor::FindByUID->new;
-        $visitor->searchForUID( "$code" . $c->counter->{"$code"} );
-        $c->stats->accept($visitor);
-        if ( my $result = $visitor->getResult ) {
-            my $value = $result->getNodeValue;
-            $value->{elapsed} = sprintf( '%fs', $elapsed );
-            $result->setNodeValue($value);
-        }
-
-        # restore error
-        $@ = $error || undef;
-    }
+    my $elapsed = tv_interval $start;
+    my $value = $node->getNodeValue;
+    $value->{elapsed} = sprintf( '%fs', $elapsed );
 }
 
 =head2 $c->_localize_fields( sub { }, \%keys );
