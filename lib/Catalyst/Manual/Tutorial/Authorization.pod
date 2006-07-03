@@ -130,8 +130,8 @@ Edit C<myapp.yml> and update it to match (everything from the
             role_class: MyAppDB::Role
             # The name of the field in the 'roles' table that contains the role name
             role_field: role
-            # The name of the accessor used to map a user to a role
-            # See the has_many() in MyAppDB/User.pm
+            # The name of the accessor used to map a role to the users who have this role
+            # See the has_many() in MyAppDB/Role.pm
             role_rel: map_user_role
             # The name of the field in the user_role table that references the user
             user_role_user_field: user_id
