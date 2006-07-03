@@ -1223,10 +1223,8 @@ sub _stats_start_execute {
 
 sub _stats_finish_execute {
     my ( $c, $info ) = @_;
-    my ( $start, $node ) = @{ $info }{qw/start node/};
-
-    my $elapsed = tv_interval $start;
-    my $value = $node->getNodeValue;
+    my $elapsed = tv_interval $info->{start};
+    my $value = $info->{node}->getNodeValue;
     $value->{elapsed} = sprintf( '%fs', $elapsed );
 }
 
@@ -1409,25 +1407,20 @@ sub handle_request {
     # Always expect worst case!
     my $status = -1;
     eval {
-        my $stats = ( $class->debug ) ? Tree::Simple->new: q{};
-
-        my $handler = sub {
-            my $c = $class->prepare(@arguments);
-            $c->stats($stats);
-            $c->dispatch;
-            return $c->finalize;
-        };
-
-        if ( $class->debug ) {
+        if ($class->debug) {
             my $start = [gettimeofday];
-            $status = &$handler;
+            my $c = $class->prepare(@arguments);
+            $c->stats(Tree::Simple->new);          
+            $c->dispatch;
+            $status = $c->finalize;            
+
             my $elapsed = tv_interval $start;
             $elapsed = sprintf '%f', $elapsed;
             my $av = sprintf '%.3f',
               ( $elapsed == 0 ? '??' : ( 1 / $elapsed ) );
             my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
 
-            $stats->traverse(
+            $c->stats->traverse(
                 sub {
                     my $action = shift;
                     my $stat   = $action->getNodeValue;
@@ -1439,8 +1432,11 @@ sub handle_request {
             $class->log->info(
                 "Request took ${elapsed}s ($av/s)\n" . $t->draw );
         }
-        else { $status = &$handler }
-
+        else {
+            my $c = $class->prepare(@arguments);
+            $c->dispatch;
+            $status = $c->finalize;            
+        }
     };
 
     if ( my $error = $@ ) {
