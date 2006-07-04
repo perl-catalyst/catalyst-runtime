@@ -8,21 +8,34 @@ How to install Catalyst.
 
 =head1 INSTALLATION
 
-On one hand, Catalyst gains immediate power and flexibility
-through its use of CPAN (the Comprehensive Perl Archive
-Network, an enormous global repository containing over 10,000
-free modules).  On the other hand, Catalyst's reliance on CPAN
-can complicate initial installations, especially in
-shared-hosting environments where you, the user, do not have
-easy control over what versions other modules are installed.
+One of the frequent problems reported by new users of Catalyst is that
+it can be extremely time-consuming and difficult to install.
 
-It is worth stressing that the difficulties found in installing
-Catalyst are caused not by anything intrinsic to Catalyst
-itself, but rather by the interrelated dependencies of a large
-number of required modules.
+One of the great strengths of Perl as a programming language is its use
+of CPAN, the Comprehensive Perl Archive Network, an enormous global
+repository containing over 10,000 free modules.  For almost any basic
+task--and a very large number of non-basic ones--there is a module on
+CPAN that will help you. Catalyst has taken advantage of this, and uses
+a very large number of CPAN modules, rather than reinventing the wheel
+over and over again.  On the one hand, Catalyst gains power and
+flexibility through this re-use of existing code. On the other hand,
+Catalyst's reliance on CPAN can complicate initial installations,
+especially in shared-hosting environments where you, the user, do not
+have easy control over what versions of other modules are installed.
 
-Fortunately, there are a growing number of methods that can
-dramatically ease this undertaking:
+It is worth stressing that the difficulties found in installing Catalyst
+are caused not by anything intrinsic to Catalyst itself, but rather by
+the interrelated dependencies of a large number of required modules.
+
+Fortunately, there are a growing number of methods that can dramatically
+ease this undertaking. Note that for many of these, you will probably
+need to install additional Catalyst-related modules (especially plugins)
+to do the things you want. As of version 5.70, Catalyst has split into
+two packages, L<Catalyst::Runtime>, which includes the core elements
+necessary to deploy a Catalyst application, and L<Catalyst::Devel>,
+which includes the Helpers and other things necessary or useful for
+developing Catalyst applications.  In a purely deployment environment
+you can omit L<Catalyst::Devel>.
 
 =over 4
 
@@ -35,7 +48,11 @@ C<cat-install> can be a quick and painless way to get Catalyst up and
 running on your system.  Just download the script from the link above
 and type C<perl cat-install>. This script automates the process of
 installing Catalyst itself and its dependencies, with bits of overriding
-so that the process does not require user interaction.
+so that the process does not require user interaction. C<cat-install>
+installs Catalyst and its dependencies using the L<CPAN> module, so that
+modules are installed the same way you would probably install them
+normally--it just makes it easier. This is a recommended solution for
+installation.
 
 =item * 
 
@@ -78,7 +95,7 @@ variety of other installation techniques:
 
 CPAN
 
-The traditional way to install Catalyst is directly from CPAN using
+The traditional way to install Catalyst is directly from CPAN using the
 C<Task::Catalyst> bundle:
 
 	$ perl -MCPAN -e 'install Task::Catalyst'
@@ -121,15 +138,13 @@ Catalyst uses Subversion for version control. To checkout the latest:
 
 =back
 
-B<NOTE:> Although all of the above methods can be used to
-install a base Catalyst system, only the VMWare image is
-likely to have all of the plugins and modules you need to use
-Catalyst properly, and to complete the tutorial.  When you
-start the C<script/myapp_server.pl> development server, it
-will tell you about any modules that are missing.  To add
-them, type something along the lines of the following
-(C<Catalyst::Model::DBIC::Schema> is used here as a
-representative example):
+B<NOTE:> Although all of the above methods can be used to install a base
+Catalyst system, only the VMWare image is likely to have all of the
+plugins and modules you need to use Catalyst properly.  When you start
+the C<script/myapp_server.pl> development server, it will tell you about
+any modules that are missing.  To add them, type something along the
+lines of the following (C<Catalyst::Model::DBIC::Schema> is used here as
+a representative example):
 
     # perl -MCPAN -e 'install Catalyst::Model::DBIC::Schema'
     ...
