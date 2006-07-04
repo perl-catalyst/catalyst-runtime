@@ -88,7 +88,7 @@ Role-based authorization ("authz").
 
 =item * 
 
-Attempts to provide an example showing current (5.70) Catalyst
+Attempts to provide an example showing current (5.7000) Catalyst
 practices. For example, the use of 
 L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>,
 DBIC, L<Catalyst::Plugin::ConfigLoader|Catalyst::Plugin::ConfigLoader> 
@@ -327,7 +327,9 @@ I<TO_BE_ADDED_TO_FINAL_VERSION>.
 
 Kennedy Clark, C<hkclark@gmail.com>
 
-Please report any errors, issues or suggestions to the author.
+Please report any errors, issues or suggestions to the author.  The
+most recent version of the Catlayst Tutorial can be found at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
