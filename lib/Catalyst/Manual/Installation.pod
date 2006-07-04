@@ -134,7 +134,7 @@ Subversion Repository
 
 Catalyst uses Subversion for version control. To checkout the latest:
 
-    $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst/
+    $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/
 
 =back
 
