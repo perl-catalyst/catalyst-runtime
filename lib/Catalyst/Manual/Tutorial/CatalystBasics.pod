@@ -187,7 +187,7 @@ in your editor and enter:
     INSERT INTO book_authors VALUES (5, 8);
 
 B<TIP>: See Appendix 1 for tips on removing the leading spaces when
-cutting and pasting example code from POD documents.
+cutting and pasting example code from POD-based documents.
 
 Then use the following command to build a C<myapp.db> SQLite database:
 
@@ -295,10 +295,9 @@ Replace it with:
             Static::Simple
             
             StackTrace
-            DefaultEnd
             /;
 
-This tells Catalyst to start using two new plugins:
+This tells Catalyst to start using one new plugin:
 
 =over 4
 
@@ -313,30 +312,26 @@ Note: L<StackTrace|Catalyst::Plugin::StackTrace> output appears in your
 browser, not in the console window from which you're running your
 application, which is where logging output usually goes.
 
-=item * 
-
-L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>
-
-Automatically provides a Catalyst "end action" that invokes your view at
-the end of each request.  Also allows you to add "dump_info=1" (precede
-with "?" or "&" depending on where it is in the URL) to I<force> the
-debug screen at the end of the Catalyst request processing cycle.
-
-B<TIP>: Many Catalyst-related documents predate
-L<DefaultEnd|Catalyst::Plugin::DefaultEnd> and suggest that you add an
-C<end> action to your application class (C<MyApp.pm>) or Root.pm
-(C<MyApp/Controller/Root.pm>).  In most of these cases, you can convert
-to L<DefaultEnd|Catalyst::Plugin::DefaultEnd> by deleting the C<end>
-action and using the plugin instead. There are certainly cases when
-you'd want to write your own custom C<end> action, but for most
-circumstances, DefaultEnd will be exactly what you want.
-
 =back
 
 Note that when specifying plugins on the C<use Catalyst> line, you can
 omit C<Catalyst::Plugin::> from the name.  Additionally, you can spread
 the plugin names across multiple lines as shown here, or place them all
 on one (or more) lines as with the default configuration.
+
+B<TIP:> You may see examples that include the
+L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>
+plugins.  As of Catalyst 5.7000, C<DefaultEnd> has been
+deprecated in favor of 
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>
+(as the name of the package suggests, C<RenderView> is not
+a plugin, but an action). The purpose of both is essentially the same: 
+forward processing to the view to be rendered.  For more information
+on C<RenderView> and the various options for forwarding to your view 
+logic, please refer to the "Enable RenderView for the Default View" 
+section under "CATALYST VIEWS" below.
+
+
 
 =head1 DATABASE ACCESS WITH C<DBIx::Class>
 
@@ -745,6 +740,69 @@ portion of the name shown in the TT docs and convert to lower case
 for use inside Catalyst).
 
 
+=head2 Enable C<RenderView> for the Default View
+
+In keeping with Catalyst's goal of providing an extremely flexible 
+development platform, a single Catalyst application can simultaneously 
+use multiple view rendering technologies.  While it's nice to know that 
+you are using a deveopment framework with this sort of adaptability, it 
+also makes sense that we want to define a default view mechanism for our 
+application. Depending on the age of the code, you will likely run into 
+one of three different solutions to this issue:
+
+=over 4
+
+=item *
+
+Private C<end> Action in Application Class
+
+Older Catalyst-related documents often suggest that you add a "private 
+end action" to your application class (C<MyApp.pm>) or Root.pm 
+(C<MyApp/Controller/Root.pm>).  These examples should be easily 
+converted to L<Catalyst|Catalyst::Action::RenderView> using the example 
+code shown below.
+
+=item *
+
+L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>
+
+C<DefaultEnd> automatically provides a Catalyst "end action" that 
+invokes your view at the end of each request.  Also allows you to add 
+"dump_info=1" (precede with "?" or "&" depending on where it is in the 
+URL) to I<force> the debug screen at the end of the Catalyst request 
+processing cycle.  Although it was easier to implement than the earlier 
+C<end> action approach, it was also less extensible than the newer 
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>.
+
+=item *
+
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>
+
+The current recommended approach to handling your view logic relies on 
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>.  Although 
+similar to the "private end action" approach, it utilizes Catalyst's 
+"ActionClass" mechanism to provide easy extensibility.  As with 
+C<DefaultEnd>, it allows you to add "dump_info=1" (precede with "?" or 
+"&" depending on where it is in the URL) to I<force> the debug screen at 
+the end of the Catalyst request processing cycle.
+
+=back
+
+To enable C<RenderView>, edit C<lib/MyApp/Controller/Root.pm> and insert
+the following method:
+
+    =head 2 end
+    
+    Forward to a default view.
+    
+    =cut
+    
+    sub end :ActionClass('RenderView') {
+        my ($self, $c) = @_;
+        $c->forward('MyApp::View::TT') unless $c->res->body;
+    }
+
+
 =head2 Globally Customize Every View
 
 When using TTSite, files in the subdirectories of C<root/lib> can be
@@ -965,7 +1023,9 @@ time to actually display the list).
 
 Kennedy Clark, C<hkclark@gmail.com>
 
-Please report any errors, issues or suggestions to the author.
+Please report any errors, issues or suggestions to the author.  The
+most recent version of the Catlayst Tutorial can be found at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
