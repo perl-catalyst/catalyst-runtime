@@ -12,13 +12,13 @@ use Catalyst::Utils;
 use Catalyst::Controller;
 use Devel::InnerPackage ();
 use File::stat;
-use Module::Pluggable::Object;
+use Module::Pluggable::Object ();
 use NEXT;
-use Text::SimpleTable;
-use Path::Class::Dir;
-use Path::Class::File;
+use Text::SimpleTable ();
+use Path::Class::Dir ();
+use Path::Class::File ();
 use Time::HiRes qw/gettimeofday tv_interval/;
-use URI;
+use URI ();
 use Scalar::Util qw/weaken blessed/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
@@ -860,8 +860,8 @@ EOF
 
 =head2 $c->uri_for( $path, @args?, \%query_values? )
 
-Merges path with C<$c-E<gt>request-E<gt>base> for absolute URIs and with
-C<$c-E<gt>namespace> for relative URIs, then returns a normalized L<URI>
+Merges path with C<< $c->request->base >> for absolute URIs and with
+C<< $c->namespace >> for relative URIs, then returns a normalized L<URI>
 object. If any args are passed, they are added at the end of the path.
 If the last argument to C<uri_for> is a hash reference, it is assumed to
 contain GET parameter key/value pairs, which will be appended to the URI
@@ -869,7 +869,7 @@ in standard fashion.
 
 Instead of C<$path>, you can also optionally pass a C<$action> object
 which will be resolved to a path using
-C<$c-E<gt>dispatcher-E<gt>uri_for_action>; if the first element of
+C<< $c->dispatcher->uri_for_action .>; if the first element of
 C<@args> is an arrayref it is treated as a list of captures to be passed
 to C<uri_for_action>.
 
