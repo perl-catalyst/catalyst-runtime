@@ -576,37 +576,16 @@ perl interpreter by setting a few flags!
     ...
     % cd MyApp
 
-3. Add these lines to Makefile.PL (below "catalyst_files();")
-
-    catalyst_par_core();   # Include modules that are also included
-                           # in the standard Perl distribution,
-                           # this is optional but highly suggested
-
-    catalyst_par();        # Generate a PAR as soon as the blib
-                           # directory is ready
-
-4. Prepare the Makefile, test your app, create a PAR (the two
-Makefile.PL calls are no typo)
+Recent versions of Catalyst (5.62 and up) include
+L<Module::Install::Catalyst>, which simplifies the process greatly.  From the shell in your application directory:
 
     % perl Makefile.PL
-    ...
-    % make test
-    ...
-    % perl Makefile.PL
-    ...
-
-Recent versions of Catalyst include L<Module::Install::Catalyst>, which
-simplifies the process greatly.
-
-    % perl Makefile.PL
-    ...
     % make catalyst_par
-    ...
 
 Congratulations! Your package "myapp.par" is ready, the following
 steps are just optional.
 
-5. Test your PAR package with "parl" (no typo)
+3. Test your PAR package with "parl" (no typo)
 
     % parl myapp.par
     Usage:
@@ -637,9 +616,6 @@ default script to execute.
     You can connect to your server at http://localhost:3000
 
 =head2 mod_perl Deployment
-
-In today's entry, I'll be talking about deploying an application in
-production using Apache and mod_perl.
 
 =head3 Pros & Cons
 
