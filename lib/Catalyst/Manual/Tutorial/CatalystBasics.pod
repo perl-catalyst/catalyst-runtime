@@ -838,7 +838,7 @@ the controller does not define a controller-specific C<end> method, the
 
 Because the definition includes an C<ActionClass> attribute, the
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView> logic
-will be called before any code inside the definition of C<sub end>
+will be executed B<after> any code inside the definition of C<sub end>
 is run.  See L<Catalyst::Manual::Actions|Catalyst::Manual::Actions>
 for more information on C<ActionClass>.
 
