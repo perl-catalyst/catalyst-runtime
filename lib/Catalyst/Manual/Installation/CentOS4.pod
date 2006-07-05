@@ -185,6 +185,7 @@ Type C<vi cat-install> to open the installer script, then insert the
 following lines at the bottom of the file (after the
 C<install('Catalyst');> line):
 
+    install('Catalyst::Devel');
     install('ExtUtils::ParseXS');
     install('Digest::SHA1');
     install('Digest::SHA');
