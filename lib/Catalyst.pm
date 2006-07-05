@@ -1129,7 +1129,7 @@ sub execute {
 
     if ( $c->depth >= $RECURSION ) {
         my $action = "$code";
-        $action = "/$action" unless $action =~ /\-\>/;
+        $action = "/$action" unless $action =~ /->/;
         my $error = qq/Deep recursion detected calling "$action"/;
         $c->log->error($error);
         $c->error($error);
@@ -1151,6 +1151,7 @@ sub execute {
         if ( $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
         else {
             unless ( ref $error ) {
+                no warnings 'uninitialized';
                 chomp $error;
                 my $class = $last->class;
                 my $name  = $last->name;
