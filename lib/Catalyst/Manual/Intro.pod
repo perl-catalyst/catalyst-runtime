@@ -34,8 +34,8 @@ modify code that handles one concern without affecting code that handles
 the others. Catalyst promotes the re-use of existing Perl modules that
 already handle common web application concerns well.
 
-Here's how the M, V, and C map to those concerns, with examples of
-well-known Perl modules you may want to use for each.
+Here's how the Model, View, and Controller map to those concerns, with
+examples of well-known Perl modules you may want to use for each.
 
 =over 4
 
@@ -64,9 +64,8 @@ is becoming a popular design method for web applications.
 
 =head3 Flexibility
 
-Catalyst is much more flexible than many other frameworks. We'll talk
-more about this later, but rest assured you can use your favorite Perl
-modules with Catalyst.
+Catalyst is much more flexible than many other frameworks. Rest assured
+you can use your favorite Perl modules with Catalyst.
 
 =over 4
 
@@ -104,9 +103,10 @@ example:
 
 Now http://localhost:3000/hello prints "Hello World!".
 
-=item * B<Support for CGI, mod_perl, Apache::Request>
+=item * B<Support for CGI, mod_perl, Apache::Request, FastCGI>
 
-Use L<Catalyst::Engine::Apache> or L<Catalyst::Engine::CGI>.
+Use L<Catalyst::Engine::Apache> or L<Catalyst::Engine::CGI>. Other
+engines are also available.
 
 =back
 
@@ -144,7 +144,8 @@ framework, making it easy to test applications from the command line.
 =item * B<Helper Scripts>
 
 Catalyst provides helper scripts to quickly generate running starter
-code for components and unit tests. See L<Catalyst::Helper>.
+code for components and unit tests. Install L<Catalyst::Devel> and see
+L<Catalyst::Helper>.
 
 =back
 
@@ -155,7 +156,14 @@ running, using the helper scripts described above.
 
 =head3 Install
 
-    $ perl -MCPAN -e 'install Task::Catalyst'
+Installation of Catalyst can be a time-consuming and frustrating
+effort, due to its large number of dependencies. The easiest way
+to get up and running is to use Matt Trout's C<cat-install>
+script, from L<http://www.shadowcatsystems.co.uk/static/cat-install>,
+and then install L<Catalyst::Devel>.
+
+    # perl cat-install
+    # perl -MCPAN -e 'install Catalyst::Devel'
 
 =head3 Setup
 
@@ -199,7 +207,8 @@ configure your application, load plugins, and extend Catalyst.
     package MyApp;
 
     use strict;
-    use Catalyst qw/-Debug/;
+    use Catalyst qw/-Debug/; # Add other plugins here, e.g.
+                             # for session support
 
     MyApp->config(
         name => 'My Application',
@@ -295,7 +304,7 @@ information.
     $c->stash
     $c->stash->{foo} = 'bar';
     $c->stash->{baz} = {baz => 'qox'};
-    $c->stash->{fred} = [qw/ wilma pebbles/];
+    $c->stash->{fred} = [qw/wilma pebbles/];
 
 and so on.
 
@@ -450,17 +459,17 @@ names.
 Catalyst also provides a method to build and dispatch chains of actions,
 like
 
-    sub foo : Chained : CaptureArgs(1) {
+    sub catalog : Chained : CaptureArgs(1) {
         my ( $self, $c, $arg ) = @_;
         ...
     }
 
-    sub bar : Chained('foo') : Args(1) {
+    sub item : Chained('catalog') : Args(1) {
         my ( $self, $c, $arg ) = @_;
         ...
     }
 
-to handle a C</foo/*/bar/*> path. For extensive information about this
+to handle a C</catalog/*/item/*> path. For extensive information about this
 dispatch type, please see L<Catalyst::DispatchType::Chained>.
 
 =item * B<Private>
@@ -482,9 +491,9 @@ C<$c-E<gt>forward('/catalog/order/process/bar')>.
 
 =item * B<Args>
 
-Args is not an action type per se, but an action modifier - it adds a match
-restriction to any action it's provided to, requiring only as many path parts
-as are specified for the action to be valid - for example in
+Args is not an action type per se, but an action modifier - it adds a
+match restriction to any action it's provided to, requiring only as many
+path parts as are specified for the action to be valid - for example in
 MyApp::Controller::Foo,
 
   sub bar :Local
@@ -557,6 +566,8 @@ run in place of C<MyApp::begin> if you're in the C<catalog> namespace,
 and C<MyApp::Controller::Catalog::Order::begin> would override this in
 turn.
 
+=item * B<auto : Private>
+
 In addition to the normal built-in actions, you have a special action
 for making chains, C<auto>. Such C<auto> actions will be run after any
 C<begin>, but before your action is processed. Unlike the other
@@ -612,7 +623,7 @@ authentication fails, returning 0 would skip any remaining methods
 for that URL.
 
 B<Note:> Looking at it another way, C<auto> actions have to return a
-true value to continue processing! You can also C<die> in the autochain
+true value to continue processing! You can also C<die> in the auto
 action; in that case, the request will go straight to the finalize
 stage, without processing further actions.
 
@@ -834,8 +845,10 @@ C<$c-E<gt>forward(qw/MyApp::View::TT process/)>.
     }
 
 You normally render templates at the end of a request, so it's a perfect
-use for the global C<end> action. (In practice, however, you would use a
-default C<end> action as supplied by L<Catalyst::Action::RenderView>.)
+use for the global C<end> action.
+
+In practice, however, you would use a default C<end> action as supplied
+by L<Catalyst::Action::RenderView>.
 
 Also, be sure to put the template under the directory specified in
 C<$c-E<gt>config-E<gt>{root}>, or you'll end up looking at the debug
@@ -986,26 +999,29 @@ controller above
 
 =head3 Models
 
-Models are providers of data. This data could come from anywhere - a search
-engine index, a database table, etc. Typically the data source does not have
-much to do with web applications or Catalyst - it could be used to write an
-offline report generator or a command line tool just the same.
+Models are providers of data. This data could come from anywhere - a
+search engine index, a database table, etc. Typically the data source
+does not have much to do with web applications or Catalyst - it could be
+used to write an offline report generator or a command line tool just
+the same.
 
-The common approach to writing a Catalyst-style model for your application is
-wrapping a generic model (e.g. L<DBIx::Class::Schema>, a bunch of XMLs, or
-anything really) with an object that contains configuration data, convenience
-methods, and so forth.
+The common approach to writing a Catalyst-style model for your
+application is wrapping a generic model (e.g. L<DBIx::Class::Schema>, a
+bunch of XMLs, or anything really) with an object that contains
+configuration data, convenience methods, and so forth.
 
 #### editor: move this part to =head3 Components somehow, right after this
 #### section - this will require deeply rephrasing this paragraph.
 
-Technically, within Catalyst a model is a B<component> - an instance of the
-model's class belonging to the application. It is important to stress that the
-lifetime of these objects is per application, not per request.
+Technically, within Catalyst a model is a B<component> - an instance of
+the model's class belonging to the application. It is important to
+stress that the lifetime of these objects is per application, not per
+request.
 
-While the model base class (L<Catalyst::Model>) provides things like C<config>
-and stuff to better integrate the model into the application, sometimes this is
-not enough, and the model requires access to C<$c> itself.
+While the model base class (L<Catalyst::Model>) provides things like
+C<config> and stuff to better integrate the model into the application,
+sometimes this is not enough, and the model requires access to C<$c>
+itself.
 
 Situations where this need might arise include:
 
@@ -1051,10 +1067,10 @@ C<$c> and delegates to the per-application model object.
 
 A typical C<ACCEPT_CONTEXT> method could look like this:
 
-	sub ACCEPT_CONTEXT {
-		my ( $self, $c, @extra_arguments ) = @_;
-		bless { %$self, c => $c }, ref($self);
-	}
+    sub ACCEPT_CONTEXT {
+      my ( $self, $c, @extra_arguments ) = @_;
+      bless { %$self, c => $c }, ref($self);
+    }
 
 effectively treating $self as a B<prototype object> that gets a new parameter.
 C<@extra_arguments> comes from any trailing arguments to
