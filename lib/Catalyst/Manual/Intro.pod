@@ -1067,18 +1067,18 @@ per request you can use the following technique:
 Add a field to C<$c>, like C<my_model_instance>. Then write your
 C<ACCEPT_CONTEXT> method to look like this:
 
-	sub ACCEPT_CONTEXT {
-		my ( $self, $c ) = @_;
+    sub ACCEPT_CONTEXT {
+      my ( $self, $c ) = @_;
 
-		if ( my $per_request = $c->my_model_instance ) {
-			return $per_request;
-		} else {
-			my $new_instance = bless { %$self, c => $c }, ref($self);
-			Scalar::Util::weaken($new_instance->{c}); # or we have a circular reference
-			$c->my_model_instance( $new_instance );
-			return $new_instance;
-		}
-	}
+      if ( my $per_request = $c->my_model_instance ) {
+        return $per_request;
+      } else {
+        my $new_instance = bless { %$self, c => $c }, ref($self);
+        Scalar::Util::weaken($new_instance->{c}); # or we have a circular reference
+        $c->my_model_instance( $new_instance );
+        return $new_instance;
+      }
+    }
 
 
 =head3 Testing
