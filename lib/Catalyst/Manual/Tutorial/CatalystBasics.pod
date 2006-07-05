@@ -49,6 +49,7 @@ L<Appendices|Catalyst::Manual::Tutorial::Appendicies>
 
 =back
 
+
 =head1 DESCRIPTION
 
 In this part of the tutorial, we will create a very basic Catalyst web
@@ -120,6 +121,12 @@ In the case of this tutorial, use the Catalyst C<catalyst.pl> script to
 initialize the framework for an application called C<MyApp>:
 
     $ catalyst.pl MyApp
+    created "MyApp"
+    created "MyApp/script"
+    created "MyApp/lib"
+    created "MyApp/root"
+    ...
+    created "MyApp/script/myapp_create.pl"
     $ cd MyApp
 
 The C<catalyst.pl> helper script will display the names of the
@@ -129,12 +136,53 @@ Though it's too early for any significant celebration, we already have a
 functioning application. Run the following command to run this
 application with the built-in development web server:
 
-	$ script/myapp_server.pl
+    $ script/myapp_server.pl
+    [debug] Debug messages enabled
+    [debug] Loaded plugins:
+    .----------------------------------------------------------------------------.
+    | Catalyst::Plugin::ConfigLoader  0.06                                       |
+    | Catalyst::Plugin::Static::Simple  0.14                                     |
+    '----------------------------------------------------------------------------'
+    
+    [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [debug] Found home "/root/dev/MyApp"
+    [debug] Loaded components:
+    .-----------------------------------------------------------------+----------.
+    | Class                                                           | Type     |
+    +-----------------------------------------------------------------+----------+
+    | MyApp::Controller::Root                                         | instance |
+    '-----------------------------------------------------------------+----------'
+    
+    [debug] Loaded Private actions:
+    .----------------------+--------------------------------------+--------------.
+    | Private              | Class                                | Method       |
+    +----------------------+--------------------------------------+--------------+
+    | /default             | MyApp::Controller::Root              | default      |
+    | /end                 | MyApp::Controller::Root              | end          |
+    '----------------------+--------------------------------------+--------------'
+    
+    [info] MyApp powered by Catalyst 5.70_03
+    You can connect to your server at http://localhost.localdomain:3000
 
-Point your web browser to L<http://localhost:3000> (substituting a
-different hostname or IP address as appropriate) and you should be
-greeted by the Catalyst welcome screen.  Press Ctrl-C to break out of
-the development server.
+Point your web browser to L<http://localhost:3000> (substituting a 
+different hostname or IP address as appropriate) and you should be 
+greeted by the Catalyst welcome screen.  Information similar to the 
+following should be appended to the logging output of the development 
+server:
+
+    [info] *** Request 1 (0.008/s) [2822] [Mon Jul  3 12:42:43 2006] ***
+    [debug] "GET" request for "/" from "127.0.0.1"
+    [info] Request took 0.154781s (6.461/s)
+    .----------------------------------------------------------------+-----------.
+    | Action                                                         | Time      |
+    +----------------------------------------------------------------+-----------+
+    | /default                                                       | 0.000006s |
+    | /end                                                           | 0.000007s |
+    '----------------------------------------------------------------+-----------'
+
+Press Ctrl-C to break out of the development server.
+
 
 =head1 CREATE A SQLITE DATABASE
 
@@ -326,11 +374,12 @@ deprecated in favor of
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>
 (as the name of the package suggests, C<RenderView> is not
 a plugin, but an action). The purpose of both is essentially the same: 
-forward processing to the view to be rendered.  For more information
-on C<RenderView> and the various options for forwarding to your view 
-logic, please refer to the "Enable RenderView for the Default View" 
-section under "CATALYST VIEWS" below.
-
+forward processing to the view to be rendered.  Applications generated
+under 5.7000 should automatically use C<RenderView> and "just work"
+for most applications.  For more information on C<RenderView> and 
+the various options for forwarding to your view logic, please refer 
+to the "Using RenderView for the Default View" section under 
+"CATALYST VIEWS" below.
 
 
 =head1 DATABASE ACCESS WITH C<DBIx::Class>
@@ -476,7 +525,7 @@ Next, open C<lib/MyAppDB/Author.pm> in your editor and enter:
     __PACKAGE__->add_columns(qw/id first_name last_name/);
     # Set the primary key for the table
     __PACKAGE__->set_primary_key(qw/id/);
-
+    
     #
     # Set relationships:
     #
@@ -539,7 +588,7 @@ Finally, open C<lib/MyAppDB/BookAuthor.pm> in your editor and enter:
     #     2) Name of the model class referenced by this relationship
     #     3) Column name in *this* table
     __PACKAGE__->belongs_to(book => 'MyAppDB::Book', 'book_id');
-
+    
     # belongs_to():
     #   args:
     #     1) Name of relationship, DBIC will create accessor with this name
@@ -557,7 +606,7 @@ Finally, open C<lib/MyAppDB/BookAuthor.pm> in your editor and enter:
     
     This is an object that represents a row in the 'book_authors' table of your 
     application database.  It uses DBIx::Class (aka, DBIC) to do ORM.
-
+    
     You probably won't need to use this class directly -- it will be automatically
     used by DBIC where joins are needed.
     
@@ -595,6 +644,11 @@ helper script to create the model class that loads up the model we
 created in the previous step:
 
     $ script/myapp_create.pl model MyAppDB DBIC::Schema MyAppDB dbi:SQLite:myapp.db '' '' '{ AutoCommit => 1 }'
+     exists "/root/dev/MyApp/script/../lib/MyApp/Model"
+     exists "/root/dev/MyApp/script/../t"
+    created "/root/dev/MyApp/script/../lib/MyApp/Model/MyAppDB.pm"
+    created "/root/dev/MyApp/script/../t/model_MyAppDB.t"
+
 
 Where the first C<MyAppDB> is the name of the class to be created by the
 helper in C<lib/MyApp/Model> and the second C<MyAppDB> is the name of
@@ -615,6 +669,10 @@ Use the Catalyst C<create> script to add a controller for book-related
 actions:
 
     $ script/myapp_create.pl controller Books
+     exists "/root/dev/MyApp/script/../lib/MyApp/Controller"
+     exists "/root/dev/MyApp/script/../t"
+    created "/root/dev/MyApp/script/../lib/MyApp/Controller/Books.pm"
+    created "/root/dev/MyApp/script/../t/controller_Books.t"
 
 Then edit C<lib/MyApp/Controller/Books.pm> and add the following method
 to the controller:
@@ -657,6 +715,7 @@ Nicholas Clark's C<attributes> module (that's the C<: Local> next to the
 C<sub list> in the code above) to provide additional information to the 
 Catalyst dispatcher logic.
 
+
 =head1 CATALYST VIEWS
 
 Views are where you render output, typically for display in the user's
@@ -665,7 +724,7 @@ systems.  As with virtually every aspect of Catalyst, options abound
 when it comes to the specific view technology you adopt inside your
 application.  However, most Catalyst applications use the Template
 Toolkit, known as TT (for more information on TT, see
-L<http://www.template-toolkit.org>). Other popular View technologies
+L<http://www.template-toolkit.org>). Other popular view technologies
 include Mason (L<http://www.masonhq.com> and
 L<http://www.masonbook.com>) and L<HTML::Template|HTML::Template>
 (L<http://html-template.sourceforge.net>).
@@ -698,6 +757,12 @@ Enter the following command to enable the C<TTSite> style of view
 rendering for this tutorial:
 
     $ script/myapp_create.pl view TT TTSite
+     exists "/root/dev/MyApp/script/../lib/MyApp/View"
+     exists "/root/dev/MyApp/script/../t"
+    created "/root/dev/MyApp/script/../lib/MyApp/View/TT.pm"
+    created "/root/dev/MyApp/script/../root/lib"
+    ...
+    created "/root/dev/MyApp/script/../root/src/ttsite.css"
 
 This puts a number of files in the C<root/lib> and C<root/src>
 directories that can be used to customize the look and feel of your
@@ -705,7 +770,7 @@ application.  Also take a look at C<lib/MyApp/View/TT.pm> for config
 values set by the C<TTSite> helper.
 
 B<TIP>: Note that TTSite does one thing that could confuse people who
-are used to the normal C<TT> Catalyst View: it redefines the Catalyst
+are used to the normal C<TT> Catalyst view: it redefines the Catalyst
 context object in templates from its usual C<c> to C<Catalyst>. When
 looking at other Catalyst examples, remember that they almost always use
 C<c>.  Note that Catalyst and TT I<do not complain> when you use the
@@ -732,7 +797,7 @@ C<MyApp/View/TT.pm>:
         DEBUG        => 'undef',
         ...
     });
-   
+
 There are a variety of options you can use, such as 'undef', 'all', 
 'service', 'context', 'parser', 'provider', and 'service'.  See
 L<Template::Constants> for more information (remove the C<DEBUG_>
@@ -740,15 +805,63 @@ portion of the name shown in the TT docs and convert to lower case
 for use inside Catalyst).
 
 
-=head2 Enable C<RenderView> for the Default View
+=head2 Using C<RenderView> for the Default View
 
-In keeping with Catalyst's goal of providing an extremely flexible 
-development platform, a single Catalyst application can simultaneously 
-use multiple view rendering technologies.  While it's nice to know that 
-you are using a deveopment framework with this sort of adaptability, it 
-also makes sense that we want to define a default view mechanism for our 
-application. Depending on the age of the code, you will likely run into 
-one of three different solutions to this issue:
+Once your controller logic has processed the request from a user, it 
+forwards processing to your view in order to generate the appropriate 
+response output.  Catalyst v5.7000 ships with a new mechanism, 
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>, that 
+automatically performs this operation.  If you look in 
+C<lib/MyApp/Controller/Root.pm>, you should see the this empty 
+definition for the C<sub end> method:
+
+    sub end : ActionClass('RenderView') {}
+
+The following bullet points provide a quick overview of the 
+C<RenderView> process:
+
+=over 4
+
+=item *
+
+C<Root.pm> is designed to hold application-wide logic.
+
+=item *
+
+At the end of a given user request, Catalyst will call the most specific 
+C<end> method that's appropriate.  For example, if the controller for a 
+request has an C<end> method defined, it will be called.  However, if 
+the controller does not define a controller-specific C<end> method, the 
+"global" C<end> method in C<Root.pm> will be called.
+
+=item *
+
+Because the definition includes an C<ActionClass> attribute, the
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView> logic
+will be called before any code inside the definition of C<sub end>
+is run.  See L<Catalyst::Manual::Actions|Catalyst::Manual::Actions>
+for more information on C<ActionClass>.
+
+=item *
+
+Because C<sub end> is empty, this effectively just runs the default 
+logic in C<RenderView>.  However, you can easily extend the 
+C<RenderView> logic by adding your own code inside the empty method body 
+(C<{}>) created by the Catalyst Helpers when we first ran the 
+C<catalyst.pl> to initialize our application.  See 
+L<Catalyst::Action::RenderView|Catalyst::Action::RenderView> for more 
+detailed information on how to extended C<RenderView> in C<sub end>.
+
+=back
+
+
+=head3 The History Leading Up To C<RenderView>
+
+Although C<RenderView> strikes a nice balance between default
+behavior and easy extensibility, it is a new feature that won't 
+appear in most existing Catalyst examples.  This section provides
+some brief background on the evolution of default view rendering
+logic with an eye to how they can be migrated to C<RenderView>:
 
 =over 4
 
@@ -759,48 +872,42 @@ Private C<end> Action in Application Class
 Older Catalyst-related documents often suggest that you add a "private 
 end action" to your application class (C<MyApp.pm>) or Root.pm 
 (C<MyApp/Controller/Root.pm>).  These examples should be easily 
-converted to L<Catalyst|Catalyst::Action::RenderView> using the example 
-code shown below.
+converted to L<RenderView|Catalyst::Action::RenderView> by simply adding 
+C<ActionClass('RenderView')> to the C<sub end> definition. If end sub is 
+defined in your application class (C<MyApp.pm>), you should also migrate 
+it to C<MyApp/Controller/Root.pm>.
 
 =item *
 
 L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>
 
-C<DefaultEnd> automatically provides a Catalyst "end action" that 
-invokes your view at the end of each request.  Also allows you to add 
-"dump_info=1" (precede with "?" or "&" depending on where it is in the 
-URL) to I<force> the debug screen at the end of the Catalyst request 
-processing cycle.  Although it was easier to implement than the earlier 
-C<end> action approach, it was also less extensible than the newer 
-L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>.
+C<DefaultEnd> represented the "next step" in passing processing from 
+your controller to your view.  It has the advantage of only requiring 
+that C<DefaultEnd> be added to the list of plugins in C<lib/MyApp.pm>. 
+It also allowed you to add "dump_info=1" (precede with "?" or "&" 
+depending on where it is in the URL) to I<force> the debug screen at the 
+end of the Catalyst request processing cycle.  However, it was more 
+difficult to extend the C<RenderView> mechanism, and is now deprecated.
 
 =item *
 
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>
 
-The current recommended approach to handling your view logic relies on 
+As discussed above, the current recommended approach to handling your 
+view logic relies on 
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>.  Although 
-similar to the "private end action" approach, it utilizes Catalyst's 
-"ActionClass" mechanism to provide easy extensibility.  As with 
-C<DefaultEnd>, it allows you to add "dump_info=1" (precede with "?" or 
-"&" depending on where it is in the URL) to I<force> the debug screen at 
-the end of the Catalyst request processing cycle.
+similar in first appearance to the "private end action" approach, it 
+utilizes Catalyst's "ActionClass" mechanism to provide both automatic 
+default behavior (you don't have to include a plugin as with 
+C<DefaultEnd>) and easy extensibility.  As with C<DefaultEnd>, it allows 
+you to add "dump_info=1" (precede with "?" or "&" depending on where it 
+is in the URL) to I<force> the debug screen at the end of the Catalyst 
+request processing cycle.
 
 =back
 
-To enable C<RenderView>, edit C<lib/MyApp/Controller/Root.pm> and insert
-the following method:
-
-    =head 2 end
-    
-    Forward to a default view.
-    
-    =cut
-    
-    sub end :ActionClass('RenderView') {
-        my ($self, $c) = @_;
-        $c->forward('MyApp::View::TT') unless $c->res->body;
-    }
+It is recommended that all Catalyst applications use or migrate to
+the C<RenderView> approach.
 
 
 =head2 Globally Customize Every View
@@ -926,52 +1033,52 @@ Then run the Catalyst "demo server" script:
 
     $ script/myapp_server.pl
 
-You should get something like this:
+Your development server log output should display something like:
 
     $ script/myapp_server.pl
-    [Tue May 16 12:51:33 2006] [catalyst] [debug] Debug messages enabled
-    [Tue May 16 12:51:33 2006] [catalyst] [debug] Loaded plugins:
-    .------------------------------------------------------------------------------.
-    | Catalyst::Plugin::ConfigLoader 0.09                                          |
-    | Catalyst::Plugin::Static::Simple 0.14                                        |
-    | Catalyst::Plugin::StackTrace 0.04                                            |
-    | Catalyst::Plugin::DefaultEnd 0.06                                            |
-    '------------------------------------------------------------------------------'
+    [debug] Debug messages enabled
+    [debug] Loaded plugins:
+    .----------------------------------------------------------------------------.
+    | Catalyst::Plugin::ConfigLoader  0.06                                       |
+    | Catalyst::Plugin::StackTrace  0.04                                         |
+    | Catalyst::Plugin::Static::Simple  0.14                                     |
+    '----------------------------------------------------------------------------'
     
-    [Tue May 16 12:51:33 2006] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
-    [Tue May 16 12:51:33 2006] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [Tue May 16 12:51:33 2006] [catalyst] [debug] Found home "/home/me/MyApp"
-    [Tue May 16 12:51:37 2006] [catalyst] [debug] Loaded components:
-    .-------------------------------------------------------------------+----------.
-    | Class                                                             | Type     |
-    +-------------------------------------------------------------------+----------+
-    | MyApp::Controller::Books                                          | instance |
-    | MyApp::Controller::Root                                           | instance |
-    | MyApp::Model::MyAppDB                                             | instance |
-    | MyApp::Model::MyAppDB::Author                                     | class    |
-    | MyApp::Model::MyAppDB::Book                                       | class    |
-    | MyApp::Model::MyAppDB::BookAuthor                                 | class    |
-    | MyApp::View::TT                                                   | instance |
-    '-------------------------------------------------------------------+----------'
+    [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [debug] Found home "/home/me/MyApp"
+    [debug] Loaded components:
+    .-----------------------------------------------------------------+----------.
+    | Class                                                           | Type     |
+    +-----------------------------------------------------------------+----------+
+    | MyApp::Controller::Books                                        | instance |
+    | MyApp::Controller::Root                                         | instance |
+    | MyApp::Model::MyAppDB                                           | instance |
+    | MyApp::Model::MyAppDB::Author                                   | class    |
+    | MyApp::Model::MyAppDB::Book                                     | class    |
+    | MyApp::Model::MyAppDB::BookAuthor                               | class    |
+    | MyApp::View::TT                                                 | instance |
+    '-----------------------------------------------------------------+----------'
     
-    [Tue May 16 12:51:37 2006] [catalyst] [debug] Loaded Private actions:
-    .----------------------+----------------------------------------+--------------.
-    | Private              | Class                                  | Method       |
-    +----------------------+----------------------------------------+--------------+
-    | /default             | MyApp::Controller::Root                | default      |
-    | /end                 | MyApp                                  | end          |
-    | /books/list          | MyApp::Controller::Books               | list         |
-    '----------------------+----------------------------------------+--------------'
+    [debug] Loaded Private actions:
+    .----------------------+--------------------------------------+--------------.
+    | Private              | Class                                | Method       |
+    +----------------------+--------------------------------------+--------------+
+    | /default             | MyApp::Controller::Root              | default      |
+    | /end                 | MyApp::Controller::Root              | end          |
+    | /books/index         | MyApp::Controller::Books             | index        |
+    | /books/list          | MyApp::Controller::Books             | list         |
+    '----------------------+--------------------------------------+--------------'
     
-    [Tue May 16 12:51:37 2006] [catalyst] [debug] Loaded Path actions:
-    .--------------------------------------+---------------------------------------.
-    | Path                                 | Private                               |
-    +--------------------------------------+---------------------------------------+
-    | /books/list                          | /books/list                           |
-    '--------------------------------------+---------------------------------------'
+    [debug] Loaded Path actions:
+    .-------------------------------------+--------------------------------------.
+    | Path                                | Private                              |
+    +-------------------------------------+--------------------------------------+
+    | /books/list                         | /books/list                          |
+    '-------------------------------------+--------------------------------------'
     
-    [Tue May 16 12:51:37 2006] [catalyst] [info] MyApp powered by Catalyst 5.6902
-    You can connect to your server at http://localhost:3000
+    [info] MyApp powered by Catalyst 5.7000
+    You can connect to your server at http://localhost.localdomain:3000
 
 Some things you should note in the output above:
 
@@ -1014,9 +1121,8 @@ legibility):
         JOIN authors author ON ( author.id = me.author_id ) 
         WHERE ( me.book_id = ? ): `1'
 
-You should see 10 such lines of debug output, two for each of the five
-author_id values (it pulls the data once for the count logic and another
-time to actually display the list).
+You should see 5 such lines of debug output as DBIC fetches the author 
+information for each book.
 
 
 =head1 AUTHOR
