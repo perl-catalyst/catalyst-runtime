@@ -60,23 +60,24 @@ forms and model objects.
 In keeping with the Catalyst (and Perl) spirit of flexibility, there are
 many different ways approach advanced CRUD operations in a Catalyst
 environment.  One alternative is to use
-L<Catalyst::Helper::Controller::Scaffold> to instantly construct a set
-of Controller methods and templates for basic CRUD operations.  Although
-a popular subject in Quicktime movies that serve as promotional material
-for various frameworks, more real-world applications require more
-control.  Other options include L<Data::FormValidator> and
-L<HTML::FillInForm>.
+L<Catalyst::Helper::Controller::Scaffold|Catalyst::Helper::Controller::Scaffold> 
+to instantly construct a set of Controller methods and templates for 
+basic CRUD operations.  Although a popular subject in Quicktime 
+movies that serve as promotional material for various frameworks, 
+real-world applications generally require more control.  Other 
+options include L<Data::FormValidator|Data::FormValidator> and
+L<HTML::FillInForm|HTML::FillInForm>.
 
-Here, we will make use of the L<HTML::Widget> to not only ease form
-creation, but to also provide validation of the submitted data.  The
-approached used by the part of the tutorial is to slowly incorporate
-additional L<HTML::Widget> functionality in a step-wise fashion (we
-start with fairly simple form creation and then move on to more complex
-and "magical" features such as validation and
+Here, we will make use of the L<HTML::Widget|HTML::Widget> to not only 
+ease form creation, but to also provide validation of the submitted 
+data.  The approached used by the part of the tutorial is to slowly 
+incorporate additional L<HTML::Widget|HTML::Widget> functionality in a 
+step-wise fashion (we start with fairly simple form creation and then 
+move on to more complex and "magical" features such as validation and 
 auto-population/auto-saving).
 
 B<Note:> Part 8 of the tutorial is optional.  Users who do not wish to
-use L<HTML::Widget|HTML::Widget> may skip this section.
+use L<HTML::Widget|HTML::Widget> may skip this part.
 
 B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
@@ -87,7 +88,7 @@ following command:
 
 =head1 C<HTML::WIDGET> FORM CREATION
 
-This section looks at how L<HTML::Widget> can be used to
+This section looks at how L<HTML::Widget|HTML::Widget> can be used to
 add additional functionality to the manually created form from Part 3.
 
 =head2 Add the C<HTML::Widget> Plugin
@@ -110,7 +111,7 @@ following method:
     
     sub make_book_widget {
         my ($self, $c) = @_;
-
+    
         # Create an HTML::Widget to build the form
         my $w = $c->widget('book_form')->method('post');
     
@@ -125,7 +126,7 @@ following method:
         $w->element('Select',    'authors')->label('Authors')
             ->options(@authors);
         $w->element('Submit',    'submit' )->value('submit');
-
+    
         # Return the widget    
         return $w;
     }
@@ -237,7 +238,8 @@ in the CSS from a single location.
 
 =head2 Create a Template Page To Display The Form
 
-C<root/src/books/hw_form.tt2>
+Open C<root/src/books/hw_form.tt2> in your editor and enter the following:
+
     [% META title = 'Create/Update Book' %]
     
     [% widget_result.as_xml %]
@@ -302,7 +304,7 @@ been marked with a C<*** NEW:> comment):
 
     sub make_book_widget {
         my ($self, $c) = @_;
-
+    
         # Create an HTML::Widget to build the form
         my $w = $c->widget('book_form')->method('post');
             
@@ -310,7 +312,7 @@ been marked with a C<*** NEW:> comment):
         my @authorObjs = $c->model("MyAppDB::Author")->all();
         my @authors = map {$_->id => $_->last_name }
                            sort {$a->last_name cmp $b->last_name} @authorObjs;
-   
+    
         # Create the form feilds
         $w->element('Textfield', 'title'  )->label('Title')->size(60);
         $w->element('Textfield', 'rating' )->label('Rating')->size(1);
@@ -559,7 +561,9 @@ between tables.
 
 Kennedy Clark, C<hkclark@gmail.com>
 
-Please report any errors, issues or suggestions to the author.
+Please report any errors, issues or suggestions to the author.  The
+most recent version of the Catlayst Tutorial can be found at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).

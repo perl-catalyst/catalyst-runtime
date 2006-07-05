@@ -155,13 +155,13 @@ editor and enter the following:
     # all tests. Better to replace "'no_plan'" with "tests => 30" so it
     # knows exactly how many tests need to be run (and will tell you if
     # not), but 'no_plan' is nice for quick & dirty tests
-
+    
     use Test::More 'no_plan';
     
     # Need to specify the name of your app as arg on next line
     # Can also do:
     #   use Test::WWW::Mechanize::Catalyst "MyApp";
-
+    
     use ok "Test::WWW::Mechanize::Catalyst" => "MyApp";
         
     # Create two 'user agents' to simulate two different users ('test01' & 'test02')
@@ -218,7 +218,8 @@ editor and enter the following:
     $ua1->get_ok("http://localhost/books/url_create/TestTitle/2/4",
         "'test01' formless create");
     $ua1->title_is("Book Created", "Book created title");
-    $ua1->content_contains("Added book 'TestTitle' by 'Stevens'", "Check added OK");
+    $ua1->content_contains("Added book 'TestTitle'", "Check title added OK");
+    $ua1->content_contains("by 'Stevens'", "Check author added OK");
     $ua1->content_contains("a rating of 2.", "Check rating added");
     
     # Make sure the new book shows in the list
