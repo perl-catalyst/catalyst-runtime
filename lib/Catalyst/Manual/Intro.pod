@@ -211,8 +211,8 @@ configure your application, load plugins, and extend Catalyst.
 
 In older versions of Catalyst, the application class was where you put
 global actions. However, as of version 5.66, the recommended practice is
-to place such actions in a special Root controller (see #####, below),
-to avoid namespace collisions.
+to place such actions in a special Root controller (see L</Actions>,
+below), to avoid namespace collisions.
 
 =over 4
 
@@ -227,8 +227,6 @@ data.  If omitted, Catalyst will try to auto-detect the directory's
 location. You can define as many parameters as you want for plugins or
 whatever you need. You can access them anywhere in your application via
 C<$context-E<gt>config-E<gt>{$param_name}>.
-
-###### We need a short section on configuration here.
 
 =head3 Context
 
@@ -266,6 +264,7 @@ query parameters, cookies, uploads, headers, and more.
     $c->req->cookies->{sessionid};
     $c->req->headers->content_type;
     $c->req->base;
+    $c->req->uri_with( { page = $pager->next_page } );
 
 =item * L<Catalyst::Response>
 
@@ -318,7 +317,9 @@ application components. For an example, we return to our 'hello' action:
 
 Note that the stash should be used only for passing data in an
 individual request cycle; it gets cleared at a new request. If you need
-to maintain more persistent data, use a session.
+to maintain persistent data, use a session. See
+L<Catalyst::Plugin::Session> for a comprehensive set of
+Catalyst-friendly session-handling tools.
 
 =head3 Actions
 
@@ -459,8 +460,8 @@ like
         ...
     }
 
-to handle a C</foo/*/bar/*> path. For more information about this dispatch
-type, please read L<Catalyst::DispatchType::Chained>.
+to handle a C</foo/*/bar/*> path. For extensive information about this
+dispatch type, please see L<Catalyst::DispatchType::Chained>.
 
 =item * B<Private>
 
@@ -515,10 +516,12 @@ displaying a generic frontpage for the main app, or an error page for
 individual controllers.
 
 If C<default> isn't acting how you would expect, look at using a
-L</Literal> C<Path> action (with an empty path string). The difference is
-that C<Path> takes arguments relative from the namespace and C<default>
-I<always> takes arguments relative from the root, regardless of what
-controller it's in.
+L</Literal> C<Path> action (with an empty path string). The difference
+is that C<Path> takes arguments relative from the namespace and
+C<default> I<always> takes arguments relative from the root, regardless
+of what controller it's in. Indeed, this is now the recommended way of
+handling default situations; the C<default> private controller should
+be considered deprecated.
 
 =item * B<index : Private>
 
@@ -832,11 +835,11 @@ C<$c-E<gt>forward(qw/MyApp::View::TT process/)>.
 
 You normally render templates at the end of a request, so it's a perfect
 use for the global C<end> action. (In practice, however, you would use a
-default C<end> action as supplied by L<Catalyst::Action::DefaultEnd>.)
+default C<end> action as supplied by L<Catalyst::Action::RenderView>.)
 
 Also, be sure to put the template under the directory specified in
-C<$c-E<gt>config-E<gt>{root}>, or you'll be forced to look at our
-eyecandy debug screen. ;)
+C<$c-E<gt>config-E<gt>{root}>, or you'll end up looking at the debug
+screen.
 
 =head4 Models
 
@@ -900,9 +903,9 @@ can always call an outside module that serves as your Model:
       
       $c->stash->{template} = 'list.tt';
       
-      use Some::Outside::DBIC::Module;
-      my @records = Some::Outside::DBIC::Module->search({
-        artist => 'sri',
+      use Some::Outside::Database::Module;
+      my @records = Some::Outside::Database::Module->search({
+        artist => 'Led Zeppelin',
         });
       
       $c->stash->{records} = \@records;
