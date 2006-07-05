@@ -81,7 +81,6 @@ Edit C<lib/MyApp.pm> and add C<Authorization::Roles> to the list:
             Static::Simple
             
             StackTrace
-            DefaultEnd
             
             Authentication
             Authentication::Store::DBIC

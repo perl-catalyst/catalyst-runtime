@@ -333,7 +333,7 @@ Again, notice that your "result source" classes have been "re-loaded" by Catalys
 
 =head2 Include Authentication and Session Plugins
 
-Edit C<lib/MyApp.pm> and update it as follows (everything below C<DefaultEnd> is new):
+Edit C<lib/MyApp.pm> and update it as follows (everything below C<StackTrace> is new):
 
     use Catalyst qw/
             -Debug
@@ -341,7 +341,6 @@ Edit C<lib/MyApp.pm> and update it as follows (everything below C<DefaultEnd> is
             Static::Simple
             
             StackTrace
-            DefaultEnd
             
             Authentication
             Authentication::Store::DBIC
