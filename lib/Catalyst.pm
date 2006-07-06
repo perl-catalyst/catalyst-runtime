@@ -869,7 +869,7 @@ in standard fashion.
 
 Instead of C<$path>, you can also optionally pass a C<$action> object
 which will be resolved to a path using
-C<< $c->dispatcher->uri_for_action .>; if the first element of
+C<< $c->dispatcher->uri_for_action >>; if the first element of
 C<@args> is an arrayref it is treated as a list of captures to be passed
 to C<uri_for_action>.
 
