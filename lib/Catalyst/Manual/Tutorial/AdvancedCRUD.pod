@@ -131,12 +131,12 @@ following method:
         return $w;
     }
 
-This method provides a central location (so it can be called by multiple
-actions, such as C<create> and C<edit>) that builds an HTML::Widget-based
-form with the appropriate fields. The "Get Authors" code uses DBIC to
-retrieve a list of model objects and then uses C<map> to create a hash
-where the hash keys are the database primary keys from the authors table
-and the associated values are the last names of the authors.
+This method provides a central location that builds an HTML::Widget-
+based form with the appropriate fields.  The "Get Authors" code uses 
+DBIC to retrieve a list of model objects and then uses C<map> to create 
+a hash where the hash keys are the database primary keys from the 
+authors table and the associated values are the last names of the 
+authors.
 
 =head2 Add Actions to Display and Save the Form
 
@@ -194,7 +194,6 @@ following methods:
     
         # Use 'hw_create' to redisplay the form
         $c->detach('hw_create');
-    
     }
 
 Note how we use C<make_book_widget> to build the core parts of the form
@@ -430,6 +429,8 @@ now has a C<$c-E<gt>stash-E<gt>{template}> line).  Note that if we
 process the form in C<hw_create_do> I<and> forward/detach back to
 <hw_create>, we would end up with C<make_book_widget> being called
 twice, resulting in a duplicate set of elements being added to the form.
+(There are other ways to address the "duplicate form rendering" issue --
+just be aware that it exists.)
 
 =item *
 
