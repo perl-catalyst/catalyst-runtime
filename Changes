@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.7000   2006-07-06 19:42:00
+	- Further doc work.
+	- Minor code cleanups 
+	- Changed catalyst.pl to depend on Catalyst::Devel
+
 5.70_03  2006-06-28 16:42:00
         - fixup to registered plugins debug at app startup
         - refactored Catalyst::Utils::home
@@ -34,7 +39,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Updated docs for Catalyst::Component
         - Separated execute and dispatch on Catalyst::Action
         - cleaned up logging and debug output
-        - minor doc fixes
+	- significant documentation revisions
         - Added warning for setup being called twice
         - Fix pod to use DBIC::Schema instead of DBIC model
         - Fix ->config failing to copy _config for subclassing

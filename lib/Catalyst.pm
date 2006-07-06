@@ -61,7 +61,7 @@ __PACKAGE__->response_class('Catalyst::Response');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.70_03';
+our $VERSION = '5.7000';
 
 sub import {
     my ( $class, @arguments ) = @_;
