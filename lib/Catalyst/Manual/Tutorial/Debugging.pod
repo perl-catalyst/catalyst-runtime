@@ -233,15 +233,17 @@ prompt to view the built-in help screens.
 =head1 DEBUGGING MODULES FROM CPAN
 
 Although the techniques discussed above work well for code you are 
-writing, what if you want to use print/log/warn messages or set
-breakpoints in code that you have installed from CPAN (or in module
-that ship with Perl)?  One helpful approach is to place a copy of 
-the module inside the C<lib> directory of your Catalyst project.  
-When Catalyst loads, it will load from inside your C<lib> directory
-first, only turning to the global modules if a local copy cannot be
-found.  You can then make modifications such as adding a 
-C<$DB::single=1> to the local copy of the module without risking 
-the copy in the original location.
+writing, what if you want to use print/log/warn messages or set 
+breakpoints in code that you have installed from CPAN (or in module that 
+ship with Perl)?  One helpful approach is to place a copy of the module 
+inside the C<lib> directory of your Catalyst project.  When Catalyst 
+loads, it will load from inside your C<lib> directory first, only 
+turning to the global modules if a local copy cannot be found.  You can 
+then make modifications such as adding a C<$DB::single=1> to the local 
+copy of the module without risking the copy in the original location. 
+This can also be a great way to "locally override" bugs in modules while 
+you wait for a fix on CPAN.
+
 
 Matt Trout has suggested the following shortcut to create a local
 copy of an installed module:
