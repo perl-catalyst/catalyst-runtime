@@ -63,6 +63,8 @@ print <<"EOF";
 
  Important:
 
+    This library is for running Catalyst applications.
+
     For development and use of catalyst.pl and myapp_create.pl, make sure
     you also install the development tools package Catalyst::Devel.
 
