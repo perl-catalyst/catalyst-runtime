@@ -13,6 +13,11 @@ If you already have a functioning install of CentOS, RHEL, or a
 comparable Linux OS, you should be able to skip this first section and
 go straight to the C<INSTALL CATALYST> section.
 
+B<NOTE:> You might want to consult the latest version of this document.  It
+is available at:
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Installation/CentOS4.pod>
+
+
 
 =head1 INSTALL CENTOS
 
@@ -223,7 +228,9 @@ and plugins required to run the Catalyst tutorial.
 
 Kennedy Clark, C<hkclark@gmail.com>
 
-Please report any errors, issues or suggestions to the author.
+Please report any errors, issues or suggestions to the author.  The
+most recent version of the Catlayst Tutorial can be found at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
 (L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).

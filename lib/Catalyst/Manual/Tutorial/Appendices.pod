@@ -49,10 +49,12 @@ B<Appendices>
 
 =back
 
+
 =head1 DESCRIPTION
 
 This part of the tutorial provides supporting information relevant to
 the Catalyst tutorial.
+
 
 =head1 APPENDIX 1: CUT AND PASTE FOR POD-BASED EXAMPLES
 
@@ -101,7 +103,25 @@ Removes four leading space from the current line through line 44
 
 =head2 "Un-indenting" with Emacs
 
-B<TODO>
+Although there author has not used emacs for many years (appologies to 
+the emacs fans out there), here is a quick hint to get you started.  To
+replace the leading spaces of every line in a file, use:
+
+    M-x replace-regexp<RET>
+    Replace regexp: ^    <RET>
+    with: <RET>
+
+All of that will occur on the single line at the bottom of your screen.
+Note that "<RET>" represents the return key/enter.  Also, there are 
+four spaces after the "^" on the "Replace regexp:" line and no spaces
+entered on the last line.
+
+You can limit the replacement operation by selecting text first (depending
+on your version of emacs, you can either use the mouse or experiment with 
+commands such as C<C-SPC> to set the mark at the cursor location and 
+C<C-E<lt>> and C<C-E<gt>> to set the mark at the beginning and end of the
+file respectively.
+
 
 =head1 APPENDIX 2: USING MYSQL AND POSTGRESQL
 
@@ -380,7 +400,8 @@ Load the user/roles data:
 
 =head2 PostgreSQL
 
-B<TODO>
+B<TODO> -- Please see the latest version of this document for possible updates:
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/Appendices.pod>
 
 
 =head1 APPENDIX 3: IMPROVED HASHING SCRIPT
@@ -438,7 +459,6 @@ not expose the passwords to "capture" on the command line.
     else {
         print "\nPasswords do not match!\n";
     }
-
 
 
 =head1 AUTHOR
