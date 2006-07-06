@@ -58,7 +58,7 @@ validation of user-entered data, and automated transfer of data between
 forms and model objects.
 
 In keeping with the Catalyst (and Perl) spirit of flexibility, there are
-many different ways approach advanced CRUD operations in a Catalyst
+many different ways to approach advanced CRUD operations in a Catalyst
 environment.  One alternative is to use
 L<Catalyst::Helper::Controller::Scaffold|Catalyst::Helper::Controller::Scaffold> 
 to instantly construct a set of Controller methods and templates for 
