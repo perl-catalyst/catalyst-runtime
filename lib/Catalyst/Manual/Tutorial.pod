@@ -543,13 +543,13 @@ key Catalyst modules.
 
 =item *
 
-Everyone on #catalyst and #catalyst-dev.
-
-=item *
-
 Other Catalyst documentation folks like Kieren Diment, Gavin Henry,
 and Jess Robinson (including their work on the original Catalyst
 tutorial).
+
+=item *
+
+Everyone on #catalyst and #catalyst-dev.
 
 =item *
 
