@@ -162,7 +162,7 @@ application with the built-in development web server:
     | /end                 | MyApp::Controller::Root              | end          |
     '----------------------+--------------------------------------+--------------'
     
-    [info] MyApp powered by Catalyst 5.70
+    [info] MyApp powered by Catalyst 5.7000
     You can connect to your server at http://localhost.localdomain:3000
 
 Point your web browser to L<http://localhost:3000> (substituting a 
@@ -369,13 +369,13 @@ on one (or more) lines as with the default configuration.
 
 B<TIP:> You may see examples that include the
 L<Catalyst::Plugin::DefaultEnd|Catalyst::Plugin::DefaultEnd>
-plugins.  As of Catalyst 5.70, C<DefaultEnd> has been
+plugins.  As of Catalyst 5.7000, C<DefaultEnd> has been
 deprecated in favor of 
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>
 (as the name of the package suggests, C<RenderView> is not
 a plugin, but an action). The purpose of both is essentially the same: 
 forward processing to the view to be rendered.  Applications generated
-under 5.70 should automatically use C<RenderView> and "just work"
+under 5.7000 should automatically use C<RenderView> and "just work"
 for most applications.  For more information on C<RenderView> and 
 the various options for forwarding to your view logic, please refer 
 to the "Using RenderView for the Default View" section under 
@@ -809,7 +809,7 @@ for use inside Catalyst).
 
 Once your controller logic has processed the request from a user, it 
 forwards processing to your view in order to generate the appropriate 
-response output.  Catalyst v5.70 ships with a new mechanism, 
+response output.  Catalyst v5.7000 ships with a new mechanism, 
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>, that 
 automatically performs this operation.  If you look in 
 C<lib/MyApp/Controller/Root.pm>, you should see the this empty 
@@ -1077,7 +1077,7 @@ Your development server log output should display something like:
     | /books/list                         | /books/list                          |
     '-------------------------------------+--------------------------------------'
     
-    [info] MyApp powered by Catalyst 5.70
+    [info] MyApp powered by Catalyst 5.7000
     You can connect to your server at http://localhost.localdomain:3000
 
 Some things you should note in the output above:
