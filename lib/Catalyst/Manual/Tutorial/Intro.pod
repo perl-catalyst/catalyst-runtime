@@ -316,7 +316,7 @@ Each part of the tutorial has complete code available in the main
 Catalyst Subversion repository (see the note at the beginning of each
 part for the appropriate svn command to use).  Additionally, the final
 code is available as a ready-to-run tarball at
-I<TO_BE_ADDED_TO_FINAL_VERSION>.
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz>.
 
 
 =head1 AUTHOR

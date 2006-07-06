@@ -68,7 +68,6 @@ pulled from the Catalyst Subversion repository in one step with the
 following command:
 
     svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@4611 .
-    IMPORTANT: Does not work yet.  Will be completed for final version.
 
 
 =head1 FORMLESS SUBMISSION
