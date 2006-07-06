@@ -83,7 +83,7 @@ B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
 following command:
 
-    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@4627 .
+    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial -r 4627 .
 
 =head1 C<HTML::WIDGET> FORM CREATION
 
