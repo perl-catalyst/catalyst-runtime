@@ -83,7 +83,7 @@ B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
 following command:
 
-    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@###
+    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial@4627 .
     IMPORTANT: Does not work yet.  Will be completed for final version.
 
 =head1 C<HTML::WIDGET> FORM CREATION
@@ -450,7 +450,8 @@ similar to the prior version of the C<hw_create_do> method.
 
 =head2 Try Out the Form
 
-Press C<Ctrl-C> to kill the previous server instance (if it's still running) and restart it:
+Press C<Ctrl-C> to kill the previous server instance (if it's still 
+running) and restart it:
 
     $ script/myapp_server.pl
 
@@ -459,6 +460,7 @@ non-numeric rating, a rating of 0 or 6, etc.  Also try selecting one,
 two, and zero authors.  When you click Submit, the HTML::Widget
 C<constraint> items will validate the logic and insert feedback as
 appropriate.
+
 
 =head1 Enable C<DBIx::Class::HTMLWidget> Support
 
@@ -556,6 +558,179 @@ single call to C<$book-E<gt>populate_from_widget>.  Note that we still
 have to call C<$book-E<gt>add_to_book_authors> once per author because
 C<populate_from_widget> does not currently handle the relationships
 between tables.
+
+
+=head2 Try Out the Form
+
+Press C<Ctrl-C> to kill the previous server instance (if it's still 
+running) and restart it:
+
+    $ script/myapp_server.pl
+
+Try adding a book that validate.  Return to the book list and the book 
+you added should be visible.
+
+
+
+=head1 Rendering C<HTMLWidget> Forms in a Table
+
+Some developers my wish to use the "old-fashioned" table style of 
+rendering a form in lieu of the default C<HTML::Widget> rendering that 
+assumes you will use CSS for formatting.
+
+
+=head2 Add a New "Element Container"
+
+Open C<lib/FormElementContainer.pm> in your editor and enter:
+
+    package FormElementContainer;
+    
+    use base 'HTML::Widget::Container';
+    
+    sub _build_element {
+        my ($self, $element) = @_;
+    
+        return () unless $element;
+        if (ref $element eq 'ARRAY') {
+            return map { $self->_build_element($_) } @{$element};
+        }
+        my $e = $element->clone;
+        my $class = $e->attr('class') || '';
+        $e = new HTML::Element('span', class => 'fields_with_errors')->push_content($e)
+            if $self->error && $e->tag eq 'input';
+    
+        return $e ? ($e) : ();
+    }
+    
+    1;
+
+This simply dumps the HTML code for a given form element, followed by a 
+C<span> that can contain validation error message.
+
+
+=head2 Enable the New Element Container When Building the Form
+
+Open C<lib/MyApp/Controller/Books.pm> in your editor.  First add a
+C<use> for your element container class:
+
+    use FormElementContainer;
+
+Then tell C<HTML::Widget> to use that class during rendering by updating
+C<make_book_widget> to match the following:
+
+    sub make_book_widget {
+        my ($self, $c) = @_;
+    
+        # Create an HTML::Widget to build the form
+        my $w = $c->widget('book_form')->method('post');
+    
+        # ***New: Use custom class to render each element in the form    
+        $w->element_container_class('FormElementContainer');
+        
+        # Get authors
+        my @authorObjs = $c->model("MyAppDB::Author")->all();
+        my @authors = map {$_->id => $_->last_name }
+                           sort {$a->last_name cmp $b->last_name} @authorObjs;
+    
+        # Create the form feilds
+        $w->element('Textfield', 'title'  )->label('Title')->size(60);
+        $w->element('Textfield', 'rating' )->label('Rating')->size(1);
+        # Convert to multi-select list
+        $w->element('Select',    'authors')->label('Authors')
+            ->options(@authors)->multiple(1)->size(3);
+        $w->element('Submit',    'submit' )->value('submit');
+    
+        # Set constraints
+        $w->constraint(All     => qw/title rating authors/)
+            ->message('Required. ');
+        $w->constraint(Integer => qw/rating/)
+            ->message('Must be an integer. ');
+        $w->constraint(Range   => qw/rating/)->min(1)->max(5)
+            ->message('Must be a number between 1 and 5. ');
+        $w->constraint(Length  => qw/title/)->min(5)->max(50)
+            ->message('Must be between 5 and 50 characters. ');
+    
+        # Set filters
+        for my $column (qw/title rating authors/) {
+            $w->filter( HTMLEscape => $column );
+            $w->filter( TrimEdges  => $column );
+        }
+    
+        # Return the widget    
+        return $w;
+    }
+
+The two new lines are marked with C<***New:>.
+
+
+=head2 Update the TT Template
+
+Open C<root/src/books/hw_form.tt2> and edit it to match:
+
+    [% META title = 'Create/Update Book' %]
+    
+    [%# Comment out the auto-rendered form %]
+    [%# widget_result.as_xml %]
+    
+    
+    [%# Iterate over the form elements and display each -%]
+    <form name="book_form" action="[% widget_result.action %]" method="post">
+    <table border="0">
+    [% FOREACH element = widget_result.elements %]
+      <tr>
+        <td class="form-label">
+          [% element.label.as_text %]
+        </td>
+        <td class="form-element">
+          [% element.element_xml %]
+          <span class="form-error">
+            [% element.error_xml %]
+          </span>
+        </td>
+      </tr>
+    [% END %]
+    </table>
+    </form>
+    
+    
+    <p><a href="[% Catalyst.uri_for('list') %]">Return to book list</a></p>
+    
+    
+    [%# A little JavaScript to move the cursor to the first field %]
+    <script LANGUAGE="JavaScript">
+    document.book_form.book_form_title.focus();
+    </script>
+
+This represents three changes:
+
+=over 4
+
+=item *
+
+The existing C<widget_result.as_xml> has been commented out.
+
+=item *
+
+It loops through each form element, displaying the field name in the 
+first table cell along with the form element and validation errors in 
+the second field.
+
+=item *
+
+JavaScript to position the user's curson in the first field of the form.
+
+=back
+
+
+=head2 Try Out the Form
+
+Press C<Ctrl-C> to kill the previous server instance (if it's still 
+running) and restart it:
+
+    $ script/myapp_server.pl
+
+Try adding a book that validate.  Return to the book list and the book 
+you added should be visible.
 
 
 =head1 AUTHOR
