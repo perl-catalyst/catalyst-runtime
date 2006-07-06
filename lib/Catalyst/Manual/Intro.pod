@@ -191,12 +191,348 @@ Both of these URLs should take you to the welcome page.)
 
 =back
 
-Easy!
-
 =head2 How It Works
 
 Let's see how Catalyst works, by taking a closer look at the components
 and other parts of a Catalyst application.
+
+=head3 Components
+
+Catalyst has an uncommonly flexible component system. You can define as
+many L</Models>, L</Views>, and L</Controllers> as you like. As discussed
+previously, the general idea is that the View is responsible for the
+output of data to the user (typically via a web browser, but a View can
+also generate PDFs or e-mails, for example); the Model is responsible 
+for providing data (typically from a relational database); and the
+Controller is responsible for interacting with the user and deciding
+how user input determines what actions the application takes.
+
+In the world of MVC, there are frequent discussions and disagreements
+about the nature of each element - whether certain types of logic
+belong in the Model or the Controller, etc. Catalyst's flexibility
+means that this decision is entirely up to you, the programmer; 
+Catalyst doesn't enforce anything. See L<Catalyst::Manual::About> for
+a general discussion of these concerns.
+
+All components must inherit from L<Catalyst::Base>, which provides a
+simple class structure and some common class methods like C<config> and
+C<new> (constructor).
+
+    package MyApp::Controller::Catalog;
+
+    use strict;
+    use base 'Catalyst::Base';
+
+    __PACKAGE__->config( foo => 'bar' );
+
+    1;
+
+You don't have to C<use> or otherwise register Models, Views, and
+Controllers.  Catalyst automatically discovers and instantiates them
+when you call C<setup> in the main application. All you need to do is
+put them in directories named for each Component type. You can use a
+short alias for each one.
+
+=over 4
+
+=item * B<MyApp/Model/> 
+
+=item * B<MyApp/M/>
+
+=item * B<MyApp/View/>
+
+=item * B<MyApp/V/>
+
+=item * B<MyApp/Controller/>
+
+=item * B<MyApp/C/>
+
+=back
+
+In older versions of Catalyst, the recommended practice (and the one
+automatically created by helper scripts) was to name the directories
+C<M/>, C<V/>, and C<C/>. Though these still work, we now recommend
+the use of the full names.
+
+=head4 Views
+
+To show how to define views, we'll use an already-existing base class for the
+L<Template Toolkit|Template>, L<Catalyst::View::TT>. All we need to do is
+inherit from this class:
+
+    package MyApp::View::TT;
+
+    use strict;
+    use base 'Catalyst::View::TT';
+
+    1;
+
+(You can also generate this automatically by using the helper script:
+
+    script/myapp_create.pl view TT TT
+
+where the first C<TT> tells the script that the name of the view should
+be C<TT>, and the second that it should be a Template Toolkit view.)
+
+This gives us a process() method and we can now just do
+$c->forward('MyApp::View::TT') to render our templates. The base class
+makes process() implicit, so we don't have to say
+C<$c-E<gt>forward(qw/MyApp::View::TT process/)>.
+
+    sub hello : Global {
+        my ( $self, $c ) = @_;
+        $c->stash->{template} = 'hello.tt';
+    }
+
+    sub end : Private {
+        my ( $self, $c ) = @_;
+        $c->forward( $c->view('TT') );
+    }
+
+You normally render templates at the end of a request, so it's a perfect
+use for the global C<end> action.
+
+In practice, however, you would use a default C<end> action as supplied
+by L<Catalyst::Action::RenderView>.
+
+Also, be sure to put the template under the directory specified in
+C<$c-E<gt>config-E<gt>{root}>, or you'll end up looking at the debug
+screen.
+
+=head4 Models
+
+Models are providers of data. This data could come from anywhere - a
+search engine index, a spreadsheet - but typically a Model represents a
+database table. The data source does not intrinsically have much to do
+with web applications or Catalyst - it could just as easily be used to
+write an offline report generator or a command-line tool.
+
+To show how to define models, again we'll use an already-existing base
+class, this time for L<DBIx::Class>: L<Catalyst::Model::DBIC::Schema>.
+We'll also need L<DBIx::Class::Schema::Loader>.
+
+But first, we need a database.
+
+    -- myapp.sql
+    CREATE TABLE foo (
+        id INTEGER PRIMARY KEY,
+        data TEXT
+    );
+
+    CREATE TABLE bar (
+        id INTEGER PRIMARY KEY,
+        foo INTEGER REFERENCES foo,
+        data TEXT
+    );
+
+    INSERT INTO foo (data) VALUES ('TEST!');
+
+    % sqlite /tmp/myapp.db < myapp.sql
+
+Now we can create a DBIC::SchemaLoader component for this database.
+
+    script/myapp_create.pl model DBIC DBIC::SchemaLoader 'dbi:SQLite:/tmp/myapp.db'
+
+L<DBIx::Class::Schema::Loader> automatically loads table layouts and
+relationships. Use the stash to pass data to your templates.
+
+We add the following to MyApp/Controller/Root.pm
+
+    sub view : Global {
+        my ( $self, $c, $id ) = @_;
+        
+        $c->stash->{item} = $c->model('DBIC::Foo')->find($id);
+    }
+
+    1;
+    
+    sub end : Private {
+        my ( $self, $c ) = @_;
+        
+        $c->stash->{template} ||= 'index.tt';
+        $c->forward( $c->view('TT') );
+    }
+
+We then create a new template file "root/index.tt" containing:
+
+    The Id's data is [% item.data %]
+
+Models do not have to be part of your Catalyst application; you
+can always call an outside module that serves as your Model:
+
+    # in a Controller
+    sub list : Local {
+      my ( $self, $c ) = @_;
+      
+      $c->stash->{template} = 'list.tt';
+      
+      use Some::Outside::Database::Module;
+      my @records = Some::Outside::Database::Module->search({
+        artist => 'Led Zeppelin',
+        });
+      
+      $c->stash->{records} = \@records;
+    }
+
+But by using a Model that is part of your Catalyst application, you gain
+several things: you don't have to C<use> each component, Catalyst will
+find and load it automatically at compile-time; you can C<forward> to
+the module, which can only be done to Catalyst components; and only
+Catalyst components can be fetched with
+C<$c-E<gt>model('SomeModel')>.
+
+Happily, since many people have existing Model classes that they
+would like to use with Catalyst (or, conversely, they want to
+write Catalyst models that can be used outside of Catalyst, e.g.
+in a cron job), it's trivial to write a simple component in
+Catalyst that slurps in an outside Model:
+
+    package MyApp::Model::DB;
+    use base qw/Catalyst::Model::DBIC::Schema/;
+    __PACKAGE__->config(
+        schema_class => 'Some::DBIC::Schema',
+        connect_info => ['dbi:SQLite:foo.db', '', '', {AutoCommit=>1}]
+    );
+    1;
+
+and that's it! Now C<Some::DBIC::Schema> is part of your
+Cat app as C<MyApp::Model::DB>.
+
+Within Catalyst, the common approach to writing a model for your
+application is wrapping a generic model (e.g. L<DBIx::Class::Schema>, a
+bunch of XMLs, or anything really) with an object that contains
+configuration data, convenience methods, and so forth. Thus you
+will in effect have two models - a wrapper model that knows something
+about Catalyst and your web application, and a generic model that is
+totally independent of these needs.
+
+Technically, within Catalyst a model is a B<component> - an instance of
+the model's class belonging to the application. It is important to
+stress that the lifetime of these objects is per application, not per
+request.
+
+While the model base class (L<Catalyst::Model>) provides things like
+C<config> to better integrate the model into the application, sometimes
+this is not enough, and the model requires access to C<$c> itself.
+
+Situations where this need might arise include:
+
+=over 4
+
+=item *
+
+Interacting with another model
+
+=item *
+
+Using per-request data to control behavior
+
+=item *
+
+Using plugins from a Model (for example L<Catalyst::Plugin::Cache>).
+
+=back
+
+From a style perspective it's usually considered bad form to make your
+model "too smart" about things - it should worry about business logic
+and leave the integration details to the controllers. If, however, you
+find that it does not make sense at all to use an auxillary controller
+around the model, and the model's need to access C<$c> cannot be
+sidestepped, there exists a power tool called L</ACCEPT_CONTEXT>.
+
+=head4 Controllers
+
+Multiple controllers are a good way to separate logical domains of your
+application.
+
+    package MyApp::Controller::Login;
+
+    use base qw/Catalyst::Controller/;
+
+    sub login : Path("login") { }
+    sub new_password : Path("new-password") { }
+    sub logout : Path("logout") { }
+
+    package MyApp::Controller::Catalog;
+
+    use base qw/Catalyst::Controller/;
+
+    sub view : Local { }
+    sub list : Local { }
+
+    package MyApp::Controller::Cart;
+
+    use base qw/Catalyst::Controller/;
+
+    sub add : Local { }
+    sub update : Local { }
+    sub order : Local { }
+
+Note that you can also supply attributes via the Controller's config so
+long as you have at least one attribute on a subref to be exported
+(:Action is commonly used for this) - for example the following is
+equivalent to the same controller above:
+
+    package MyApp::Controller::Login;
+
+    use base qw/Catalyst::Controller/;
+
+    __PACKAGE__->config(
+      actions => {
+        'sign_in' => { Path => 'sign-in' },
+        'new_password' => { Path => 'new-password' },
+        'sign_out' => { Path => 'sign-out' },
+      },
+    );
+
+    sub sign_in : Action { }
+    sub new_password : Action { }
+    sub sign_out : Action { }
+
+=head3 ACCEPT_CONTEXT
+
+Whenever you call $c->component("Foo") you get back an object - the
+instance of the model. If the component supports the C<ACCEPT_CONTEXT>
+method instead of returning the model itself, the return value of C<<
+$model->ACCEPT_CONTEXT( $c ) >> will be used.
+
+This means that whenever your model/view/controller needs to talk to C<$c> it
+gets a chance to do this when it's needed.
+
+A typical C<ACCEPT_CONTEXT> method will either clone the model and return one
+with the context object set, or it will return a thin wrapper that contains
+C<$c> and delegates to the per-application model object.
+
+A typical C<ACCEPT_CONTEXT> method could look like this:
+
+    sub ACCEPT_CONTEXT {
+      my ( $self, $c, @extra_arguments ) = @_;
+      bless { %$self, c => $c }, ref($self);
+    }
+
+effectively treating $self as a B<prototype object> that gets a new parameter.
+C<@extra_arguments> comes from any trailing arguments to
+C<< $c->component( $bah, @extra_arguments ) >> (or C<< $c->model(...) >>,
+C<< $c->view(...) >> etc).
+
+The life time of this value is B<per usage>, and not per request. To make this
+per request you can use the following technique:
+
+Add a field to C<$c>, like C<my_model_instance>. Then write your
+C<ACCEPT_CONTEXT> method to look like this:
+
+    sub ACCEPT_CONTEXT {
+      my ( $self, $c ) = @_;
+
+      if ( my $per_request = $c->my_model_instance ) {
+        return $per_request;
+      } else {
+        my $new_instance = bless { %$self, c => $c }, ref($self);
+        Scalar::Util::weaken($new_instance->{c}); # or we have a circular reference
+        $c->my_model_instance( $new_instance );
+        return $new_instance;
+      }
+    }
 
 =head3 Application Class
 
@@ -764,344 +1100,12 @@ the C<detach>ed action and not return to the calling sub. In both cases,
 Catalyst will automatically try to call process() if you omit the
 method.
 
-=head3 Components
-
-Catalyst has an uncommonly flexible component system. You can define as
-many L</Models>, L</Views>, and L</Controllers> as you like.
-
-All components must inherit from L<Catalyst::Base>, which provides a
-simple class structure and some common class methods like C<config> and
-C<new> (constructor).
-
-    package MyApp::Controller::Catalog;
-
-    use strict;
-    use base 'Catalyst::Base';
-
-    __PACKAGE__->config( foo => 'bar' );
-
-    1;
-
-You don't have to C<use> or otherwise register Models, Views, and
-Controllers.  Catalyst automatically discovers and instantiates them
-when you call C<setup> in the main application. All you need to do is
-put them in directories named for each Component type. Notice that you
-can use a terse alias for each one.
-
-=over 4
-
-=item * B<MyApp/Model/> 
-
-=item * B<MyApp/M/>
-
-=item * B<MyApp/View/>
-
-=item * B<MyApp/V/>
-
-=item * B<MyApp/Controller/>
-
-=item * B<MyApp/C/>
-
-=back
-
-In older versions of Catalyst, the recommended practice (and the one
-automatically created by helper scripts) was to name the directories
-C<M/>, C<V/>, and C<C/>. Though these still work, we now recommend
-the use of the full names.
-
-=head4 Views
-
-To show how to define views, we'll use an already-existing base class for the
-L<Template Toolkit|Template>, L<Catalyst::View::TT>. All we need to do is
-inherit from this class:
-
-    package MyApp::View::TT;
-
-    use strict;
-    use base 'Catalyst::View::TT';
-
-    1;
-
-(You can also generate this automatically by using the helper script:
-
-    script/myapp_create.pl view TT TT
-
-where the first C<TT> tells the script that the name of the view should
-be C<TT>, and the second that it should be a Template Toolkit view.)
-
-This gives us a process() method and we can now just do
-$c->forward('MyApp::View::TT') to render our templates. The base class
-makes process() implicit, so we don't have to say
-C<$c-E<gt>forward(qw/MyApp::View::TT process/)>.
-
-    sub hello : Global {
-        my ( $self, $c ) = @_;
-        $c->stash->{template} = 'hello.tt';
-    }
-
-    sub end : Private {
-        my ( $self, $c ) = @_;
-        $c->forward('MyApp::View::TT');
-    }
-
-You normally render templates at the end of a request, so it's a perfect
-use for the global C<end> action.
-
-In practice, however, you would use a default C<end> action as supplied
-by L<Catalyst::Action::RenderView>.
-
-Also, be sure to put the template under the directory specified in
-C<$c-E<gt>config-E<gt>{root}>, or you'll end up looking at the debug
-screen.
-
-=head4 Models
-
-To show how to define models, again we'll use an already-existing base
-class, this time for L<DBIx::Class>: L<Catalyst::Model::DBIC::Schema>.
-We'll also need L<DBIx::Class::Schema::Loader>.
-
-But first, we need a database.
-
-    -- myapp.sql
-    CREATE TABLE foo (
-        id INTEGER PRIMARY KEY,
-        data TEXT
-    );
-
-    CREATE TABLE bar (
-        id INTEGER PRIMARY KEY,
-        foo INTEGER REFERENCES foo,
-        data TEXT
-    );
-
-    INSERT INTO foo (data) VALUES ('TEST!');
-
-
-    % sqlite /tmp/myapp.db < myapp.sql
-
-Now we can create a DBIC::SchemaLoader component for this database.
-
-    script/myapp_create.pl model DBIC DBIC::SchemaLoader 'dbi:SQLite:/tmp/myapp.db'
-
-L<DBIx::Class::Schema::Loader> automatically loads table layouts and
-relationships. Use the stash to pass data to your templates.
-
-We add the following to MyApp/Controller/Root.pm
-
-    sub view : Global {
-        my ( $self, $c, $id ) = @_;
-        
-        $c->stash->{item} = $c->model('DBIC::Foo')->find($id);
-    }
-
-    1;
-    
-    sub end : Private {
-        my ( $self, $c ) = @_;
-        
-        $c->stash->{template} ||= 'index.tt';
-        $c->forward( $c->view('TT') );
-    }
-
-We then create a new template file "root/index.tt" containing:
-
-    The Id's data is [% item.data %]
-
-Models do not have to be part of your Catalyst application; you
-can always call an outside module that serves as your Model:
-
-    # in a Controller
-    sub list : Local {
-      my ( $self, $c ) = @_;
-      
-      $c->stash->{template} = 'list.tt';
-      
-      use Some::Outside::Database::Module;
-      my @records = Some::Outside::Database::Module->search({
-        artist => 'Led Zeppelin',
-        });
-      
-      $c->stash->{records} = \@records;
-    }
-
-But by using a Model that is part of your Catalyst application, you gain
-several things: you don't have to C<use> each component, Catalyst will
-find and load it automatically at compile-time; you can C<forward> to
-the module, which can only be done to Catalyst components; and only
-Catalyst components can be fetched with
-C<$c-E<gt>model('SomeModel')>.
-
-Happily, since many people have existing Model classes that they
-would like to use with Catalyst (or, conversely, they want to
-write Catalyst models that can be used outside of Catalyst, e.g.
-in a cron job), it's trivial to write a simple component in
-Catalyst that slurps in an outside Model:
-
-    package MyApp::Model::DB;
-    use base qw/Catalyst::Model::DBIC::Schema/;
-    __PACKAGE__->config(
-        schema_class => 'Some::DBIC::Schema',
-        connect_info => ['dbi:SQLite:foo.db', '', '', {AutoCommit=>1}]
-    );
-    1;
-
-and that's it! Now C<Some::DBIC::Schema> is part of your
-Cat app as C<MyApp::Model::DB>.
-
-=head4 Controllers
-
-Multiple controllers are a good way to separate logical domains of your
-application.
-
-    package MyApp::Controller::Login;
-
-    use base qw/Catalyst::Controller/;
-
-    sub sign_in : Path("sign-in") { }
-    sub new_password : Path("new-password") { }
-    sub sign_out : Path("sign-out") { }
-
-    package MyApp::Controller::Catalog;
-
-    use base qw/Catalyst::Controller/;
-
-    sub view : Local { }
-    sub list : Local { }
-
-    package MyApp::Controller::Cart;
-
-    use base qw/Catalyst::Controller/;
-
-    sub add : Local { }
-    sub update : Local { }
-    sub order : Local { }
-
-Note that you can also supply attributes via the Controller's config so long
-as you have at least one attribute on a subref to be exported (:Action is
-commonly used for this) - for example the following is equivalent to the same
-controller above
-
-    package MyApp::Controller::Login;
-
-    use base qw/Catalyst::Controller/;
-
-    __PACKAGE__->config(
-      actions => {
-        'sign_in' => { Path => 'sign-in' },
-        'new_password' => { Path => 'new-password' },
-        'sign_out' => { Path => 'sign-out' },
-      },
-    );
-
-    sub sign_in : Action { }
-    sub new_password : Action { }
-    sub sign_out : Action { }
-
-=head3 Models
-
-Models are providers of data. This data could come from anywhere - a
-search engine index, a database table, etc. Typically the data source
-does not have much to do with web applications or Catalyst - it could be
-used to write an offline report generator or a command line tool just
-the same.
-
-The common approach to writing a Catalyst-style model for your
-application is wrapping a generic model (e.g. L<DBIx::Class::Schema>, a
-bunch of XMLs, or anything really) with an object that contains
-configuration data, convenience methods, and so forth.
-
-#### editor: move this part to =head3 Components somehow, right after this
-#### section - this will require deeply rephrasing this paragraph.
-
-Technically, within Catalyst a model is a B<component> - an instance of
-the model's class belonging to the application. It is important to
-stress that the lifetime of these objects is per application, not per
-request.
-
-While the model base class (L<Catalyst::Model>) provides things like
-C<config> and stuff to better integrate the model into the application,
-sometimes this is not enough, and the model requires access to C<$c>
-itself.
-
-Situations where this need might arise include:
-
-=over 4
-
-=item *
-
-Interacting with another model
-
-=item *
-
-Using per-request data to control behavior
-
-=item *
-
-Using plugins in (for example L<Catalyst::Plugin::Cache>).
-
-=back
-
-From a style perspective usually it's bad to make your model "too smart"
-about things - it should worry about business logic and leave the
-integration details to the controllers. If, however, you find that it
-does not make sense at all to use an auxillary controller around the
-model, and the model's need to access C<$c> cannot be sidestepped, there
-exists a power tool called C<ACCEPT_CONTEXT>.
-
-#### editor note: this part is "generic" - it also applies to views and
-#### controllers.
-
-=head3 ACCEPT_CONTEXT
-
-Whenever you call $c->component("Foo") you get back an object - the
-instance of the model. If the component supports the C<ACCEPT_CONTEXT>
-method instead of returning the model itself, the return value of C<<
-$model->ACCEPT_CONTEXT( $c ) >> will be used.
-
-This means that whenever your model/view/controller needs to talk to C<$c> it
-gets a chance to do this when it's needed.
-
-A typical C<ACCEPT_CONTEXT> method will either clone the model and return one
-with the context object set, or it will return a thin wrapper that contains
-C<$c> and delegates to the per-application model object.
-
-A typical C<ACCEPT_CONTEXT> method could look like this:
-
-    sub ACCEPT_CONTEXT {
-      my ( $self, $c, @extra_arguments ) = @_;
-      bless { %$self, c => $c }, ref($self);
-    }
-
-effectively treating $self as a B<prototype object> that gets a new parameter.
-C<@extra_arguments> comes from any trailing arguments to
-C<< $c->component( $bah, @extra_arguments ) >> (or C<< $c->model(...) >>,
-C<< $c->view(...) >> etc).
-
-The life time of this value is B<per usage>, and not per request. To make this
-per request you can use the following technique:
-
-Add a field to C<$c>, like C<my_model_instance>. Then write your
-C<ACCEPT_CONTEXT> method to look like this:
-
-    sub ACCEPT_CONTEXT {
-      my ( $self, $c ) = @_;
-
-      if ( my $per_request = $c->my_model_instance ) {
-        return $per_request;
-      } else {
-        my $new_instance = bless { %$self, c => $c }, ref($self);
-        Scalar::Util::weaken($new_instance->{c}); # or we have a circular reference
-        $c->my_model_instance( $new_instance );
-        return $new_instance;
-      }
-    }
-
 
 =head3 Testing
 
-Catalyst has a built-in http server for testing. (Later, you can easily
-use a more powerful server, e.g. Apache/mod_perl or FastCGI, in a
-production environment.)
+Catalyst has a built-in http server for testing or local
+deployment. (Later, you can easily use a more powerful server, for
+example Apache/mod_perl or FastCGI, in a production environment.)
 
 Start your application on the command line...
 
@@ -1113,15 +1117,32 @@ You can also do it all from the command line:
 
     script/myapp_test.pl http://localhost/
 
+Catalyst has a number of tools for actual regression testing of
+applications. The helper scripts will automatically generate basic tests
+that can be extended as you develop your project. To write your own
+comprehensive test scripts, L<Test::WWW::Mechanize::Catalyst> is an
+invaluable tool.
+
+For more testing ideas, see L<Catalyst::Manual::Tutorial::Testing>.
+
 Have fun!
+
+=head1 SEE ALSO
+
+=item * L<Catalyst::Manual::About>
+
+=item * L<Catalyst::Manual::Tutorial>
+
+=item * L<Catalyst>
 
 =head1 SUPPORT
 
 IRC:
 
     Join #catalyst on irc.perl.org.
+    Join #catalyst-dev on irc.perl.org to help with development.
 
-Mailing-lists:
+Mailing lists:
 
     http://lists.rawmode.org/mailman/listinfo/catalyst
     http://lists.rawmode.org/mailman/listinfo/catalyst-dev
@@ -1138,5 +1159,5 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it
+This program is free software. You can redistribute it and/or modify it
 under the same terms as Perl itself.
