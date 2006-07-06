@@ -530,15 +530,15 @@ Sebastian Riedel for founding the Catalyst project.
 
 =item *
 
-The members of the Catalyst Core Team for their tireless efforts to 
-advance the Catalyst project.  Although all of the Core Team members 
-have played a key role in this tutorial, it would have never been 
-possible without the critical contributions of: Matt Trout, for his 
-unfathomable knowledge of all things Perl and Catalyst (& his 
-willingness to answer lots of my questions); Jesse Sheidlower, for his 
-incrediable skill with the written word and dedication to improving the 
-Catalyst documentation ; and Yuval Kogman, for his work on the Catalyst 
-"Auth & Authz" plugins (the original focus of the tutorial) and other 
+The members of the Catalyst Core Team for their tireless efforts to
+advance the Catalyst project.  Although all of the Core Team members
+have played a key role in this tutorial, it would have never been
+possible without the critical contributions of: Matt Trout, for his
+unfathomable knowledge of all things Perl and Catalyst (and his
+willingness to answer lots of my questions); Jesse Sheidlower, for his
+incredible skill with the written word and dedication to improving the
+Catalyst documentation; and Yuval Kogman, for his work on the Catalyst
+"Auth & Authz" plugins (the original focus of the tutorial) and other
 key Catalyst modules.
 
 =item *
