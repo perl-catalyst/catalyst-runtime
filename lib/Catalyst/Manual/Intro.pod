@@ -13,17 +13,18 @@ with Catalyst, see L<Catalyst::Manual::Tutorial>.
 
 =head2 What is Catalyst?
 
-Catalyst is an elegant web application framework, extremely flexible yet
-extremely simple. It's similar to Ruby on Rails, Spring (Java), and
-L<Maypole>, upon which it was originally based. Its most important
-design philosphy is to provide easy access to all the tools you need to
-develop web applications, with few restrictions on how you need to use
-these tools. Under Catalyst, it is always possible to do things in a
-different way. However, this does mean that it is always possible to do
-things in a different way. Other web frameworks are simpler to use and
-easy to get up and running, but achieve this by locking the programmer
-into a single set of tools. Catalyst's emphasis on flexibility means
-that you have to think more to use it. We view this as a feature.
+Catalyst is an elegant web application framework, extremely flexible
+yet extremely simple. It's similar to Ruby on Rails, Spring (Java),
+and L<Maypole>, upon which it was originally based. Its most important
+design philosphy is to provide easy access to all the tools you need
+to develop web applications, with few restrictions on how you need to
+use these tools. However, this does mean that it is always possible to
+do things in a different way. Other web frameworks are B<initially>
+simpler to use, but achieve this by locking the programmer into a
+single set of tools. Catalyst's emphasis on flexibility means that you
+have to think more to use it. We view this as a feature.  For example,
+this leads to Catalyst being more suited to system integration tasks
+than other web frameworks.
 
 =head3 MVC
 
@@ -60,7 +61,7 @@ If you're unfamiliar with MVC and design patterns, you may want to
 check out the original book on the subject, I<Design Patterns>, by
 Gamma, Helm, Johnson, and Vlissides, also known as the Gang of Four
 (GoF).  Many, many web application frameworks are based on MVC, which
-is becoming a popular design method for web applications.
+is becoming a popular design paradigm for the world wide web.
 
 =head3 Flexibility
 
@@ -139,7 +140,8 @@ L<Catalyst::View::TT> for L<Template Toolkit|Template>.
 =item * B<Built-in Test Framework>
 
 Catalyst comes with a built-in, lightweight http server and test
-framework, making it easy to test applications from the command line.
+framework, making it easy to test applications from the web browser,
+and the command line.
 
 =item * B<Helper Scripts>
 
@@ -212,7 +214,7 @@ about the nature of each element - whether certain types of logic
 belong in the Model or the Controller, etc. Catalyst's flexibility
 means that this decision is entirely up to you, the programmer; 
 Catalyst doesn't enforce anything. See L<Catalyst::Manual::About> for
-a general discussion of these concerns.
+a general discussion of these issues.
 
 All components must inherit from L<Catalyst::Base>, which provides a
 simple class structure and some common class methods like C<config> and
@@ -302,10 +304,11 @@ screen.
 =head4 Models
 
 Models are providers of data. This data could come from anywhere - a
-search engine index, a spreadsheet - but typically a Model represents a
-database table. The data source does not intrinsically have much to do
-with web applications or Catalyst - it could just as easily be used to
-write an offline report generator or a command-line tool.
+search engine index, a spreadsheet, the file system - but typically a
+Model represents a database table. The data source does not
+intrinsically have much to do with web applications or Catalyst - it
+could just as easily be used to write an offline report generator or a
+command-line tool.
 
 To show how to define models, again we'll use an already-existing base
 class, this time for L<DBIx::Class>: L<Catalyst::Model::DBIC::Schema>.
@@ -374,11 +377,11 @@ can always call an outside module that serves as your Model:
       $c->stash->{records} = \@records;
     }
 
-But by using a Model that is part of your Catalyst application, you gain
-several things: you don't have to C<use> each component, Catalyst will
-find and load it automatically at compile-time; you can C<forward> to
-the module, which can only be done to Catalyst components; and only
-Catalyst components can be fetched with
+But by using a Model that is part of your Catalyst application, you
+gain several things: you don't have to C<use> each component, Catalyst
+will find and load it automatically at compile-time; you can
+C<forward> to the module, which can only be done to Catalyst
+components.  Only Catalyst components can be fetched with
 C<$c-E<gt>model('SomeModel')>.
 
 Happily, since many people have existing Model classes that they
@@ -805,7 +808,7 @@ like
         ...
     }
 
-to handle a C</catalog/*/item/*> path. For extensive information about this
+to handle a C</catalog/*/item/*> path. For further information about this
 dispatch type, please see L<Catalyst::DispatchType::Chained>.
 
 =item * B<Private>
