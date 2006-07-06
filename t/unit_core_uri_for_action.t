@@ -150,15 +150,15 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4/5',
         'uri_for returns uri with more args than specified on action' );
 
-    is( $context->uri_for($action_needs_two, [1,undef], (3,4)),
+    is( $context->uri_for($action_needs_two, [1,''], (3,4)),
         'http://127.0.0.1/foo/chained/foo2/1//end2/3/4',
         'uri_for returns uri with empty capture on undef capture' );
 
-    is( $context->uri_for($action_needs_two, [1,2], (undef,3)),
+    is( $context->uri_for($action_needs_two, [1,2], ('',3)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2//3',
         'uri_for returns uri with empty arg on undef argument' );
 
-    is( $context->uri_for($action_needs_two, [1,2], (3,undef)),
+    is( $context->uri_for($action_needs_two, [1,2], (3,'')),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/',
         'uri_for returns uri with empty arg on undef last argument' );
 
