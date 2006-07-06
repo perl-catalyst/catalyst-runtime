@@ -905,6 +905,8 @@ run in place of C<MyApp::begin> if you're in the C<catalog> namespace,
 and C<MyApp::Controller::Catalog::Order::begin> would override this in
 turn.
 
+=over 4
+
 =item * B<auto : Private>
 
 In addition to the normal built-in actions, you have a special action
@@ -914,6 +916,8 @@ built-ins, C<auto> actions I<do not> override each other; they will be
 called in turn, starting with the application class and going through to
 the I<most> specific class. I<This is the reverse of the order in which
 the normal built-ins override each other>.
+
+=back
 
 Here are some examples of the order in which the various built-ins
 would be called:
@@ -1132,11 +1136,15 @@ Have fun!
 
 =head1 SEE ALSO
 
+=over 4
+
 =item * L<Catalyst::Manual::About>
 
 =item * L<Catalyst::Manual::Tutorial>
 
 =item * L<Catalyst>
+
+=back
 
 =head1 SUPPORT
 
