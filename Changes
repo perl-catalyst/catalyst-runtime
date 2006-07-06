@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.7000   2006-07-06 19:42:00
+        - fixes to uri_for_action for DispatchType::Chained
 	- Further doc work.
 	- Minor code cleanups 
 	- Changed catalyst.pl to depend on Catalyst::Devel

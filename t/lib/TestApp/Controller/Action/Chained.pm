@@ -141,6 +141,16 @@ sub chain_dt_b :Chained('chain_dt_a') :PathPart('end') :Args(1) { }
 #
 sub fw_dt_target :Private { }
 
+#
+#   Test multiple chained actions with no captures
+#
+sub empty_chain_a : Chained('/')             PathPart('chained/empty') CaptureArgs(0) { }
+sub empty_chain_b : Chained('empty_chain_a') PathPart('')              CaptureArgs(0) { }
+sub empty_chain_c : Chained('empty_chain_b') PathPart('')              CaptureArgs(0) { }
+sub empty_chain_d : Chained('empty_chain_c') PathPart('')              CaptureArgs(1) { }
+sub empty_chain_e : Chained('empty_chain_d') PathPart('')              CaptureArgs(0) { }
+sub empty_chain_f : Chained('empty_chain_e') PathPart('')              Args(1)        { }
+
 sub end :Private {
   my ($self, $c) = @_;
   my $out = join('; ', map { join(', ', @$_) }

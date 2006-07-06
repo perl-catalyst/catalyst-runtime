@@ -244,7 +244,7 @@ sub uri_for_action {
     my ( $self, $action, $captures ) = @_;
 
     return undef unless ($action->attributes->{Chained}
-                           && $action->attributes->{Args});
+                           && !$action->attributes->{CaptureArgs});
 
     my @parts = ();
     my @captures = @$captures;
@@ -253,11 +253,13 @@ sub uri_for_action {
     while ($curr) {
         if (my $cap = $curr->attributes->{CaptureArgs}) {
             return undef unless @captures >= $cap->[0]; # not enough captures
-            unshift(@parts, splice(@captures, -$cap->[0]));
+            if ($cap->[0]) {
+                unshift(@parts, splice(@captures, -$cap->[0]));
+            }
         }
         if (my $pp = $curr->attributes->{PartPath}) {
             unshift(@parts, $pp->[0])
-                if (defined $pp->[0] && length $pp->[0]);
+                if (defined($pp->[0]) && length($pp->[0]));
         }
         $parent = $curr->attributes->{Chained}->[0];
         $curr = $self->{actions}{$parent};

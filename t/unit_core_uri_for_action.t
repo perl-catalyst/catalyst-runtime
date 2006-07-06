@@ -8,12 +8,15 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 
-plan tests => 17;
+plan tests => 28;
 
 use_ok('TestApp');
 
 my $dispatcher = TestApp->dispatcher;
 
+#
+#   Private Action
+#
 my $private_action = $dispatcher->get_action_by_path(
                        '/class_forward_test_method'
                      );
@@ -21,6 +24,9 @@ my $private_action = $dispatcher->get_action_by_path(
 ok(!defined($dispatcher->uri_for_action($private_action)),
    "Private action returns undef for URI");
 
+#
+#   Path Action
+#
 my $path_action = $dispatcher->get_action_by_path(
                     '/action/testrelative/relative'
                   );
@@ -31,6 +37,9 @@ is($dispatcher->uri_for_action($path_action), "/action/relative/relative",
 ok(!defined($dispatcher->uri_for_action($path_action, [ 'foo' ])),
    "no URI returned for Path action when snippets are given");
 
+#
+#   Regex Action
+#
 my $regex_action = $dispatcher->get_action_by_path(
                      '/action/regexp/one'
                    );
@@ -45,6 +54,9 @@ is($dispatcher->uri_for_action($regex_action, [ 'foo', 123 ]),
    "/action/regexp/foo/123",
    "Regex action interpolates captures correctly");
 
+#
+#   Index Action
+#
 my $index_action = $dispatcher->get_action_by_path(
                      '/action/index/index'
                    );
@@ -56,6 +68,9 @@ is($dispatcher->uri_for_action($index_action),
    "/action/index",
    "index action returns correct path");
 
+#
+#   Chained Action
+#
 my $chained_action = $dispatcher->get_action_by_path(
                        '/action/chained/endpoint',
                      );
@@ -70,6 +85,9 @@ is($dispatcher->uri_for_action($chained_action, [ 1 ]),
    "/chained/foo/1/end",
    "Chained action with correct captures returns correct path");
 
+#
+#   Tests with Context
+#
 my $request = Catalyst::Request->new( {
                 base => URI->new('http://127.0.0.1/foo')
               } );
@@ -97,3 +115,57 @@ is($context->uri_for($regex_action, [ 'foo', 123 ], qw/bar baz/, { q => 1 }),
 is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
    "http://127.0.0.1/foo/chained/foo/1/end/2?q=1",
    "uri_for correct for chained with captures, args and query");
+
+#
+#   More Chained with Context Tests
+#
+{
+    sub __action { $dispatcher->get_action_by_path( @_ ) }
+
+    is( $context->uri_for( __action( '/action/chained/endpoint2' ), [1,2], (3,4), { x => 5 } ),
+        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4?x=5',
+        'uri_for correct for chained with multiple captures and args' );
+
+    is( $context->uri_for( __action( '/action/chained/three_end' ), [1,2,3], (4,5,6) ),
+        'http://127.0.0.1/foo/chained/one/1/two/2/3/three/4/5/6',
+        'uri_for correct for chained with multiple capturing actions' );
+
+    my $action_needs_two = __action( '/action/chained/endpoint2' );
+    
+    ok( ! defined( $context->uri_for($action_needs_two, [1],     (2,3)) ),
+        'uri_for returns undef for not enough captures' );
+        
+    is( $context->uri_for($action_needs_two,            [1,2],   (2,3)),
+        'http://127.0.0.1/foo/chained/foo2/1/2/end2/2/3',
+        'uri_for returns correct uri for correct captures' );
+        
+    ok( ! defined( $context->uri_for($action_needs_two, [1,2,3], (2,3)) ),
+        'uri_for returns undef for too many captures' );
+    
+    is( $context->uri_for($action_needs_two, [1,2],   (3)),
+        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3',
+        'uri_for returns uri with lesser args than specified on action' );
+
+    is( $context->uri_for($action_needs_two, [1,2],   (3,4,5)),
+        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4/5',
+        'uri_for returns uri with more args than specified on action' );
+
+    is( $context->uri_for($action_needs_two, [1,undef], (3,4)),
+        'http://127.0.0.1/foo/chained/foo2/1//end2/3/4',
+        'uri_for returns uri with empty capture on undef capture' );
+
+    is( $context->uri_for($action_needs_two, [1,2], (undef,3)),
+        'http://127.0.0.1/foo/chained/foo2/1/2/end2//3',
+        'uri_for returns uri with empty arg on undef argument' );
+
+    is( $context->uri_for($action_needs_two, [1,2], (3,undef)),
+        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/',
+        'uri_for returns uri with empty arg on undef last argument' );
+
+    my $complex_chained = __action( '/action/chained/empty_chain_f' );
+    is( $context->uri_for( $complex_chained, [23], (13), {q => 3} ),
+        'http://127.0.0.1/foo/chained/empty/23/13?q=3',
+        'uri_for returns correct uri for chain with many empty path parts' );
+}
+
+
