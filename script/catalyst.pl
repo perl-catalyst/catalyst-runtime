@@ -18,6 +18,8 @@ END
 
 }
 
+use Catalyst::Helper;
+
 my $force    = 0;
 my $help     = 0;
 my $makefile = 0;
