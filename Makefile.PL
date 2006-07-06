@@ -62,14 +62,15 @@ print qq/ Install "PAR" for PAR packaging support.\n/ if $@;
 print <<"EOF";
 
  Important:
-    Install Task::Catalyst to get everything you need to start writing
-    serious applications with Catalyst.
 
     For development and use of catalyst.pl and myapp_create.pl, make sure
     you also install the development tools package Catalyst::Devel.
 
-        perl -MCPANPLUS -e 'install Task::Catalyst'
-        perl -MCPAN -e 'install Task::Catalyst'
+        perl -MCPANPLUS -e 'install Catalyst::Devel' # or
+        perl -MCPAN -e 'install Catalyst::Devel'
+
+    To get some commonly used plugins, as well as the TT view and DBIC 
+    model, install Task::Catalyst in the same way.
 
  Have fun!
 EOF
