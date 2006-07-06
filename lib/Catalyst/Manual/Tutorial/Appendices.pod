@@ -122,7 +122,261 @@ field types/constraints.
 
 =head2 MySQL
 
-B<TODO>
+Use the following steps to adapt the tutorial to MySQL.  Thanks to Jim 
+Howard for the help.
+
+=over 4
+
+=item *
+
+Part 2: Catalyst Basics
+
+=over 4
+
+=item *
+
+Install the required software:
+
+=over 4
+
+=item *
+
+The MySQL database server and client utility.
+
+=item *
+
+The Perl C<DBD::MySQL> module
+
+=back
+
+For CentOS users (see 
+L<Catalyst::Manual::Installation::CentOS4|Catalyst::Manual::Installation::CentOS4>),
+you can use the following commands to install the software and start the MySQL
+daemon:
+
+    yum -y install mysql mysql-server
+    service mysqld start
+
+=item *
+
+Create the database and set the permissions:
+
+    $ mysql
+    Welcome to the MySQL monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 2 to server version: 4.1.20
+    
+    Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
+    
+    mysql> create database myapp;
+    Query OK, 1 row affected (0.01 sec)
+    
+    mysql> grant all on myapp.* to tutorial@'localhost';
+    Query OK, 0 rows affected (0.00 sec)
+    
+    mysql> flush privileges;
+    Query OK, 0 rows affected (0.00 sec)
+    
+    mysql> quit
+    Bye
+
+=item *
+
+Create the C<.sql> file and load the data:
+
+=over 4
+
+=item *
+
+Open the C<myapp01_mysql.sql> in your editor and enter:
+
+    --
+    -- Create a very simple database to hold book and author information
+    --
+    DROP TABLE IF EXISTS books;
+    DROP TABLE IF EXISTS book_authors;
+    DROP TABLE IF EXISTS authors;
+    CREATE TABLE books (
+           id          INT(11) PRIMARY KEY,
+           title       TEXT ,
+           rating      INT(11)
+    );
+    -- 'book_authors' is a many-to-many join table between books & authors
+    CREATE TABLE book_authors (
+           book_id     INT(11),
+           author_id   INT(11),
+           PRIMARY KEY (book_id, author_id)
+    );
+    CREATE TABLE authors (
+           id          INT(11) PRIMARY KEY,
+           first_name  TEXT,
+           last_name   TEXT
+    );
+    ---
+    --- Load some sample data
+    ---
+    INSERT INTO books VALUES (1, 'CCSP SNRS Exam Certification Guide', 5);
+    INSERT INTO books VALUES (2, 'TCP/IP Illustrated, Volume 1', 5);
+    INSERT INTO books VALUES (3, 'Internetworking with TCP/IP Vol.1', 4);
+    INSERT INTO books VALUES (4, 'Perl Cookbook', 5);
+    INSERT INTO books VALUES (5, 'Designing with Web Standards', 5);
+    INSERT INTO authors VALUES (1, 'Greg', 'Bastien');
+    INSERT INTO authors VALUES (2, 'Sara', 'Nasseh');
+    INSERT INTO authors VALUES (3, 'Christian', 'Degu');
+    INSERT INTO authors VALUES (4, 'Richard', 'Stevens');
+    INSERT INTO authors VALUES (5, 'Douglas', 'Comer');
+    INSERT INTO authors VALUES (6, 'Tom', 'Christiansen');
+    INSERT INTO authors VALUES (7, ' Nathan', 'Torkington');
+    INSERT INTO authors VALUES (8, 'Jeffrey', 'Zeldman');
+    INSERT INTO book_authors VALUES (1, 1);
+    INSERT INTO book_authors VALUES (1, 2);
+    INSERT INTO book_authors VALUES (1, 3);
+    INSERT INTO book_authors VALUES (2, 4);
+    INSERT INTO book_authors VALUES (3, 5);
+    INSERT INTO book_authors VALUES (4, 6);
+    INSERT INTO book_authors VALUES (4, 7);
+    INSERT INTO book_authors VALUES (5, 8);
+
+=item *
+
+Load the data:
+
+    mysql -ututorial myapp < myapp01_mysql.sql
+
+=item *
+
+Make sure the data loaded correctly:
+
+    $ mysql -ututorial myapp
+    Reading table information for completion of table and column names
+    You can turn off this feature to get a quicker startup with -A
+    
+    Welcome to the MySQL monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 4 to server version: 4.1.20
+    
+    Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
+    
+    mysql> show tables;
+    +-----------------+
+    | Tables_in_myapp |
+    +-----------------+
+    | authors         |
+    | book_authors    |
+    | books           |
+    +-----------------+
+    3 rows in set (0.00 sec)
+    
+    mysql> select * from books;
+    +----+------------------------------------+--------+
+    | id | title                              | rating |
+    +----+------------------------------------+--------+
+    |  1 | CCSP SNRS Exam Certification Guide |      5 |
+    |  2 | TCP/IP Illustrated, Volume 1       |      5 |
+    |  3 | Internetworking with TCP/IP Vol.1  |      4 |
+    |  4 | Perl Cookbook                      |      5 |
+    |  5 | Designing with Web Standards       |      5 |
+    +----+------------------------------------+--------+
+    5 rows in set (0.00 sec)
+    
+    mysql>
+
+=back
+
+=item *
+
+Update the model:
+
+=over 4
+
+=item *
+
+Delete the existing model:
+
+    rm lib/MyApp/Model/MyAppDB.pm
+
+=item *
+
+Regenerate the model using the Catalyst "_create.pl" script:
+
+    script/myapp_create.pl model MyAppDB DBIC::Schema MyAppDB dbi:mysql:myapp 'tutorial' '' '{ AutoCommit => 1 }'
+
+=back
+
+=back
+
+=item *
+
+Part 4: Authentication
+
+=over 4
+
+=item *
+
+Create the C<.sql> file for the user/roles data:
+
+Open C<myapp02_mysql.sql> in your editor and enter:
+
+    --
+    -- Add users and roles tables, along with a many-to-many join table
+    --
+    CREATE TABLE users (
+            id            INT(11) PRIMARY KEY,
+            username      TEXT,
+            password      TEXT,
+            email_address TEXT,
+            first_name    TEXT,
+            last_name     TEXT,
+            active        INT(11)
+    );
+    CREATE TABLE roles (
+            id   INTEGER PRIMARY KEY,
+            role TEXT
+    );
+    CREATE TABLE user_roles (
+            user_id INT(11),
+            role_id INT(11),
+            PRIMARY KEY (user_id, role_id)
+    );
+    --
+    -- Load up some initial test data
+    --
+    INSERT INTO users VALUES (1, 'test01', 'mypass', 't01@na.com', 'Joe',  'Blow', 1);
+    INSERT INTO users VALUES (2, 'test02', 'mypass', 't02@na.com', 'Jane', 'Doe',  1);
+    INSERT INTO users VALUES (3, 'test03', 'mypass', 't03@na.com', 'No',   'Go',   0);
+    INSERT INTO roles VALUES (1, 'user');
+    INSERT INTO roles VALUES (2, 'admin');
+    INSERT INTO user_roles VALUES (1, 1);
+    INSERT INTO user_roles VALUES (1, 2);
+    INSERT INTO user_roles VALUES (2, 1);
+    INSERT INTO user_roles VALUES (3, 1);
+
+=item *
+
+Load the user/roles data:
+
+    mysql -ututorial myapp < myapp02_mysql.sql
+
+=item *
+
+Create the C<.sql> file for the hashed password data:
+
+Open C<myapp03_mysql.sql> in your editor and enter:
+
+    --
+    -- Convert passwords to SHA-1 hashes
+    --
+    UPDATE users SET password = 'e727d1464ae12436e899a726da5b2f11d8381b26' WHERE id = 1;
+    UPDATE users SET password = 'e727d1464ae12436e899a726da5b2f11d8381b26' WHERE id = 2;
+    UPDATE users SET password = 'e727d1464ae12436e899a726da5b2f11d8381b26' WHERE id = 3;
+
+=item *
+
+Load the user/roles data:
+
+    mysql -ututorial myapp < myapp03_mysql.sql
+
+=back
+
+=back
 
 =head2 PostgreSQL
 

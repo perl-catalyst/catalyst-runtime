@@ -95,6 +95,9 @@ EDIT THE LIST OF CATALYST PLUGINS
 
 DATABASE ACCESS WITH DBIx::Class
 
+
+=over 4
+
 =item *
 
 Create a DBIC Schema File
@@ -107,7 +110,10 @@ Create the DBIC ``Result Source'' Files
 
 Use Catalyst::Model::DBIC::Schema to Load the Model Class
 
-    =item *
+=back
+
+
+=item *
 
 CREATE A CATALYST CONTROLLER
 
@@ -115,11 +121,16 @@ CREATE A CATALYST CONTROLLER
 
 CATALYST VIEWS
 
+
 =over 4
 
 =item *
 
 Create a Catalyst View Using TTSite
+
+=item *
+
+Using RenderView for the Default View
 
 =item *
 
@@ -130,6 +141,7 @@ Globally Customize Every View
 Create a TT Template Page
 
 =back
+
 
 =item *
 
@@ -355,6 +367,10 @@ LOG STATEMENTS
 
 RUNNING CATALYST UNDER THE PERL DEBUGGER
 
+=item *
+
+DEBUGGING MODULES FROM CPAN
+
 =back
 
 =head2 Part 7: Testing
@@ -493,5 +509,66 @@ PostgreSQL
 
 =back
 
+=item *
+
+APPENDIX 3: IMPROVED HASHING SCRIPT
+
 =back
 
+
+=head1 THANKS
+
+This tutorial would not have been possible without the input of many 
+different people in the Catalyst community.  In particular, the 
+primary author would like to thank:
+
+=over 4
+
+=item *
+
+Sebastian Riedel for founding the Catalyst project.
+
+=item *
+
+The members of the Catalyst Core Team for their tireless efforts to 
+advance the Catalyst project.  Although all of the Core Team members 
+have played a key role in this tutorial, it would have never been 
+possible without the critical contributions of: Matt Trout, for his 
+unfathomable knowledge of all things Perl and Catalyst (& his 
+willingness to answer lots of my questions); Jesse Sheidlower, for his 
+incrediable skill with the written word and dedication to improving the 
+Catalyst documentation ; and Yuval Kogman, for his work on the Catalyst 
+"Auth & Authz" plugins (the original focus of the tutorial) and other 
+key Catalyst modules.
+
+=item *
+
+Everyone on #catalyst and #catalyst-dev.
+
+=item *
+
+Other Catalyst documentation folks like Kieren Diment, Gavin Henry,
+and Jess Robinson (including their work on the original Catalyst
+tutorial).
+
+=item *
+
+People who have emailed me with corrections and suggestions on the 
+tutorial.  As of the most recent release, this include: Florian Ragwitz, 
+Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno, and 
+Bryan Roach.  
+
+=back
+
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Please report any errors, issues or suggestions to the author.  The
+most recent version of the Catlayst Tutorial can be found at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
+
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).
