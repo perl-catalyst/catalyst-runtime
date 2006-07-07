@@ -45,7 +45,7 @@ Options may also be specified;
 sub run {
     my ( $self, $class, $listen, $options ) = @_;
 
-    my $sock;
+    my $sock = 0;
     if ($listen) {
         my $old_umask = umask;
         unless ( $options->{leave_umask} ) {

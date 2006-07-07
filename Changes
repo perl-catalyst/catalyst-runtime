@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.7000   2006-07-07 08:08:08
+        - fix FCGI.pm warning message with FastCGI engine
         - bumped inc::Module::Install to 0.63 in Makefile.PL
         - fixes to uri_for_action for DispatchType::Chained
 	- Further doc work.
