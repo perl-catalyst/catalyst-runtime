@@ -11,9 +11,9 @@ use Test::More;
 plan skip_all => 'set TEST_HTTP to enable this test' unless $ENV{TEST_HTTP};
 eval "use Catalyst::Devel 1.0";
 plan skip_all => 'Catalyst::Devel required' if $@;
+eval "use File::Copy::Recursive";
+plan skip_all => 'File::Copy::Recursive required' if $@;
 plan tests => 1;
-
-use File::Copy::Recursive;
 
 # clean up
 rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
