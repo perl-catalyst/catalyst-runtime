@@ -332,19 +332,22 @@ But first, we need a database.
 
     % sqlite /tmp/myapp.db < myapp.sql
 
-Now we can create a DBIC::SchemaLoader component for this database.
+Now we can create a DBIC::Schema model for this database.
 
-    script/myapp_create.pl model DBIC DBIC::SchemaLoader 'dbi:SQLite:/tmp/myapp.db'
+    script/myapp_create.pl model MyModel DBIC::Schema MySchema create=static 'dbi:SQLite:/tmp/myapp.db'
 
 L<DBIx::Class::Schema::Loader> automatically loads table layouts and
-relationships. Use the stash to pass data to your templates.
+relationships, and converts them into a static schema definition C<MySchema>,
+which you can edit later.
+
+Use the stash to pass data to your templates.
 
 We add the following to MyApp/Controller/Root.pm
 
     sub view : Global {
         my ( $self, $c, $id ) = @_;
         
-        $c->stash->{item} = $c->model('DBIC::Foo')->find($id);
+        $c->stash->{item} = $c->model('MyModel::Foo')->find($id);
     }
 
     1;
