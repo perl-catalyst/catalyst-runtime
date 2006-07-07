@@ -10,6 +10,7 @@ use Test::More;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 use Config;
+use HTTP::Response;
 
 plan skip_all => 'set TEST_THREADS to enable this test'
     unless $ENV{TEST_THREADS};
@@ -30,7 +31,7 @@ else {
 no warnings 'redefine';
 sub request {
     my $thr = threads->new( 
-        sub { TestApp->run(@_) },
+        sub { Catalyst::Test::local_request('TestApp',@_) },
         @_ 
     );
     $thr->join;
