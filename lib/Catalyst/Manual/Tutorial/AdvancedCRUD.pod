@@ -83,7 +83,7 @@ B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
 following command:
 
-    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial -r 4627 .
+    svn co http://dev.catalyst.perl.org/repos/Catalyst/tags/examples/Tutorial/MyApp/5.7/AdvancedCRUD MyApp
 
 =head1 C<HTML::WIDGET> FORM CREATION
 
@@ -130,11 +130,11 @@ following method:
         return $w;
     }
 
-This method provides a central location that builds an HTML::Widget-
-based form with the appropriate fields.  The "Get Authors" code uses 
-DBIC to retrieve a list of model objects and then uses C<map> to create 
-a hash where the hash keys are the database primary keys from the 
-authors table and the associated values are the last names of the 
+This method provides a central location that builds an 
+HTML::Widget-based form with the appropriate fields.  The "Get authors" 
+code uses DBIC to retrieve a list of model objects and then uses C<map> 
+to create a hash where the hash keys are the database primary keys from 
+the authors table and the associated values are the last names of the 
 authors.
 
 =head2 Add Actions to Display and Save the Form
@@ -544,6 +544,9 @@ match the following code:
     
             # Set a status message for the user
             $c->stash->{status_msg} = 'Book created';
+            
+            # Redisplay an empty form for another
+            $c->stash->{widget_result} = $w->result;
         }
     
         # Set the template
@@ -556,7 +559,12 @@ C<$c-E<gt>model('MyAppDB::Book')-E<gt>create> and replaced it with a
 single call to C<$book-E<gt>populate_from_widget>.  Note that we still
 have to call C<$book-E<gt>add_to_book_authors> once per author because
 C<populate_from_widget> does not currently handle the relationships
-between tables.
+between tables.  Also, we reset the form to an empty fields by adding
+another call to C<$w-E<gt>result> and storing the output in the stash 
+(if we don't override the output from C<$w-E<gt>process($c-E<gt>req)>,
+the form values already entered will be retained on redisplay --
+although this could be desirable for some applications, we avoid it
+here to help avoid the creation of duplicate records).
 
 
 =head2 Try Out the Form
@@ -575,7 +583,9 @@ you added should be visible.
 
 Some developers my wish to use the "old-fashioned" table style of 
 rendering a form in lieu of the default C<HTML::Widget> rendering that 
-assumes you will use CSS for formatting.
+assumes you will use CSS for formatting.  This section demonstrates
+some techniques that can override the default rendering with a 
+custom class.
 
 
 =head2 Add a New "Element Container"
@@ -720,7 +730,7 @@ the second field.
 
 =item *
 
-JavaScript to position the user's curson in the first field of the form.
+JavaScript to position the user's cursor in the first field of the form.
 
 =back
 
@@ -741,7 +751,7 @@ you added should be visible.
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.  The
-most recent version of the Catlayst Tutorial can be found at
+most recent version of the Catalyst Tutorial can be found at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License

@@ -45,7 +45,7 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendicies|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
 
@@ -67,7 +67,7 @@ B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
 following command:
 
-    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial -r 4611 .
+    svn co http://dev.catalyst.perl.org/repos/Catalyst/tags/examples/Tutorial/5.7X/BasicCRUD MyApp
 
 
 =head1 FORMLESS SUBMISSION
@@ -146,13 +146,19 @@ Edit C<root/src/books/create_done.tt2> and then enter:
     [% # simple strings (e.g., no variable interpolation).                   -%]
     [% META title = 'Book Created' %]
     
-    [% # Output information about the record that was added.  Note use  -%]
-    [% # of 'first' to only list the first author (if > 1 author).  TT  -%] 
-    [% # v2.15 has an issue that requires                               -%]
-    [% # 'book.authors.list.first.value.last_name' vs. the shorter      -%]
-    [% # 'book.authors.first.last_name' in prior versions.              -%]
-    <p>Added book '[% book.title %]' 
-    by '[% book.authors.list.first.value.last_name %]'
+    [% # Output information about the record that was added.  First title.       -%]
+    <p>Added book '[% book.title %]'
+    
+    [% # Output the last name of the first author.  This is complicated by an    -%]
+    [% # issue in TT 2.15 where blessed hash objects are not handled right.      -%]
+    [% # First, fetch 'book.authors' from the DB once.                           -%]
+    [% authors = book.authors %]
+    [% # Now use IF statements to test if 'authors.first' is "working". If so,   -%]
+    [% # we use it.  Otherwise we use a hack that seems to keep TT 2.15 happy.   -%]
+    by '[% authors.first.last_name IF authors.first; 
+           authors.list.first.value.last_name IF ! authors.first %]'
+    
+    [% # Output the rating for the book that was added -%]
     with a rating of [% book.rating %].</p>
     
     [% # Provide a link back to the list page                                    -%]
@@ -257,7 +263,7 @@ C<form_create_do>, the method created in the section that follows.
 =head2 Add Method to Process Form Values and Update Database
 
 Edit C<lib/MyApp/Controller/Books.pm> and add the following method to
-save the form information to the databse:
+save the form information to the database:
 
     =head2 form_create_do
     
@@ -431,7 +437,7 @@ with a list of the six remaining books.
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.  The
-most recent version of the Catlayst Tutorial can be found at
+most recent version of the Catalyst Tutorial can be found at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License

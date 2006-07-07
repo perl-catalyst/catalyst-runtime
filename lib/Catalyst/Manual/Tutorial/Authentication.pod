@@ -45,7 +45,7 @@ L<AdvancedCRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendices|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
 
@@ -63,7 +63,7 @@ B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
 following command:
 
-    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial -r 4612 .
+    svn co http://dev.catalyst.perl.org/repos/Catalyst/tags/examples/Tutorial/MyApp/5.7/Authentication MyApp
 
 
 =head1 BASIC AUTHENTICATION
@@ -421,7 +421,7 @@ created the Login controller above), and delete this line:
 
 Then update it to match:
 
-    =head2 base
+    =head2 index
     
     Login logic
     
@@ -476,9 +476,10 @@ We make the match even more specific with the C<:Args(0)> action
 modifier -- this forces the match on I<only> C</login>, not 
 C</login/somethingelse>.
 
-Next, create a corresponding method in C<lib/MyApp/Controller/Logout.pm>:
+Next, update the corresponding method in C<lib/MyApp/Controller/Logout.pm>
+to match:
 
-    =head2 base
+    =head2 index
     
     Logout logic
     
@@ -789,7 +790,7 @@ of this module on your system:
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.  The
-most recent version of the Catlayst Tutorial can be found at
+most recent version of the Catalyst Tutorial can be found at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License

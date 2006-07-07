@@ -103,7 +103,7 @@ Removes four leading space from the current line through line 44
 
 =head2 "Un-indenting" with Emacs
 
-Although there author has not used emacs for many years (appologies to 
+Although there author has not used emacs for many years (apologies to 
 the emacs fans out there), here is a quick hint to get you started.  To
 replace the leading spaces of every line in a file, use:
 
@@ -466,7 +466,7 @@ not expose the passwords to "capture" on the command line.
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.  The
-most recent version of the Catlayst Tutorial can be found at
+most recent version of the Catalyst Tutorial can be found at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License

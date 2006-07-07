@@ -45,7 +45,7 @@ L<Advanced CRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =item 9
 
-L<Appendices|Catalyst::Manual::Tutorial::Appendicies>
+L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =back
 
@@ -107,7 +107,7 @@ B<TIP>: Note that all of the code for this part of the tutorial can be
 pulled from the Catalyst Subversion repository in one step with the
 following command:
 
-    svn checkout http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial -r 4609 .
+    svn co http://dev.catalyst.perl.org/repos/Catalyst/tags/examples/Tutorial/MyApp/5.7/CatalystBasics MyApp
 
 
 =head1 CREATE A CATALYST PROJECT
@@ -170,14 +170,14 @@ greeted by the Catalyst welcome screen.  Information similar to the
 following should be appended to the logging output of the development 
 server:
 
-    [info] *** Request 1 (0.008/s) [2822] [Mon Jul  3 12:42:43 2006] ***
+    [info] *** Request 1 (0.043/s) [6003] [Fri Jul  7 13:32:53 2006] ***
     [debug] "GET" request for "/" from "127.0.0.1"
-    [info] Request took 0.154781s (6.461/s)
+    [info] Request took 0.067675s (14.777/s)
     .----------------------------------------------------------------+-----------.
     | Action                                                         | Time      |
     +----------------------------------------------------------------+-----------+
-    | /default                                                       | 0.069475s |
-    | /end                                                           | 0.085305s |
+    | /default                                                       | 0.002844s |
+    | /end                                                           | 0.000207s |
     '----------------------------------------------------------------+-----------'
 
 Press Ctrl-C to break out of the development server.
@@ -1129,7 +1129,7 @@ information for each book.
 Kennedy Clark, C<hkclark@gmail.com>
 
 Please report any errors, issues or suggestions to the author.  The
-most recent version of the Catlayst Tutorial can be found at
+most recent version of the Catalyst Tutorial can be found at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
 
 Copyright 2006, Kennedy Clark, under Creative Commons License
