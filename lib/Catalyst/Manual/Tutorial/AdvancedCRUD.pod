@@ -614,6 +614,10 @@ C<use> for your element container class:
 
     use FormElementContainer;
 
+B<Note:> If you forget to C<use> your container class in your 
+controller, then your form will not be displayed and no error messages 
+will be generated. Don't forget this important step!
+
 Then tell C<HTML::Widget> to use that class during rendering by updating
 C<make_book_widget> to match the following:
 
