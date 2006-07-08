@@ -194,26 +194,32 @@ script by entering the following command at the C<cpanE<gt>> prompt:
 
 It will then take you through the configuration dialog.  
 
-However, it's often easiest to manually edit the C<urllist> setting in 
-the CPAN configuration file (global configuration settings are located 
-in C</usr/lib/perl5/5.8.5/CPAN/Config.pm> with per-user override 
-settings optionally specified in C<~/.cpan/CPAN/MyConfig.pm>).  For 
-example, open C</usr/lib/perl5/5.8.5/CPAN/Config.pm> in your editor and 
-update the C<urllist> entry (do not change or delete the other 
-settings):
+However, it's often easiesr to avoid the full configuration dialog and
+manually add a URL.  To prepend a new URL to the B<front> of the list,
+use the C<unshift> option to C<o conf>:
 
-    $CPAN::Config = {
-      ...
-      'urllist' => [q[http://www.perl.com/CPAN/]],
-      ...
-    };
-    1;
-    __END__
+    cpan> o conf urllist unshift http://www.perl.com/CPAN/
 
 Where C<http://www.perl.com/CPAN/> is replaced by a nearby, HTTP-based 
 mirror.  You can get a list of all mirrors (including where they are 
 located, their bandwidth, and their update frequency) at 
 L<http://www.perl.com/CPAN/MIRRORED.BY>.
+
+Then, be sure to save your changes (or they will be lost the next
+time you restart the CPAN shell):
+
+    cpan> o conf commit
+
+You can view the current settings with C<o conf urllist> (or just
+C<o conf> to view all settings):
+
+    cpan> o conf urllist
+        urllist           
+            http://www.perl.com/CPAN/
+    Type 'o conf' to view configuration edit options
+ 
+Note that multiple values can be entered for the C<urllist> option (the
+first entry will be used as long as it responds).
 
 =item * 
 
