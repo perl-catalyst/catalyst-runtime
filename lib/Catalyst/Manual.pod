@@ -17,9 +17,11 @@ Explanation (without code) of what Catalyst is and why to use it.
 
 =item *
 
-L<Catalyst::Manual::Intro> - Introduction to Catalyst. This is a
-detailed, if unsystematic, look at the basic concepts of Catalyst and
-what the best practices are for writing applications with it.
+L<Catalyst::Manual::Intro>
+
+Introduction to Catalyst. This is a detailed, if unsystematic, look at 
+the basic concepts of Catalyst and what the best practices are for 
+writing applications with it.
 
 =item *
 
