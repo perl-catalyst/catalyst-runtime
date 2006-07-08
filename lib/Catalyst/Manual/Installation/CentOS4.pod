@@ -162,7 +162,7 @@ packages used by Catalyst.
 
 Type the following:
 
-    perl -MCPAN -e shell
+    $ perl -MCPAN -e shell
     
     ...
     
@@ -178,6 +178,42 @@ Type the following:
     ...
     
     cpan> quit
+
+=item *
+
+B<Optional:> The remaining steps of the installation could run 
+significantly faster if you configure a fast mirror that uses HTTP vs. 
+FTP (both transfer data at the same rate once the transfer is in 
+progress, but HTTP connects much more quickly... and a Catalyst 
+installation involves many connections).  One way to do this is to 
+answer C<yes> to the C<Are you ready for manual configuration?> prompt 
+when you ran C<perl -MCPAN -e shell> above.  Or, you can rerun the 
+script by entering the following command at the C<cpanE<gt>> prompt:
+
+    cpan> o conf init
+
+It will then take you through the configuration dialog.  
+
+However, it's often easiest to manually edit the C<urllist> setting in 
+the CPAN configuration file (global configuration settings are located 
+in C</usr/lib/perl5/5.8.5/CPAN/Config.pm> with per-user override 
+settings optionally specified in C<~/.cpan/CPAN/MyConfig.pm>).  For 
+example, open C</usr/lib/perl5/5.8.5/CPAN/Config.pm> in your editor and 
+update the C<urllist> entry (do not change or delete the other 
+settings):
+
+    $CPAN::Config = {
+      ...
+      'urllist' => [q[http://www.perl.com/CPAN/]],
+      ...
+    };
+    1;
+    __END__
+
+Where C<http://www.perl.com/CPAN/> is replaced by a nearby, HTTP-based 
+mirror.  You can get a list of all mirrors (including where they are 
+located, their bandwidth, and their update frequency) at 
+L<http://www.perl.com/CPAN/MIRRORED.BY>.
 
 =item * 
 
@@ -197,6 +233,8 @@ C<install('Catalyst');> line):
     install('Class::DBI');
     install('DBIx::Class');
     install('DBIx::Class::HTMLWidget');
+    install('Module::Install');
+    install('Catalyst::Plugin::ConfigLoader');
     install('Catalyst::Plugin::Session');
     install('Catalyst::Plugin::Session::State::Cookie');
     install('Catalyst::Plugin::Session::Store::FastMmap');
@@ -210,6 +248,7 @@ C<install('Catalyst');> line):
     install('Catalyst::Plugin::HTML::Widget');
     install('Catalyst::Model::DBIC::Schema');
     install('Catalyst::View::TT');
+    install('Test::WWW::Mechanize');
     install('Test::WWW::Mechanize::Catalyst');
     install('Test::Pod');
     install('Test::Pod::Coverage');
@@ -222,6 +261,49 @@ Type C<perl cat-install>.  It will take a while to complete.
 
 You should now have a functioning Catalyst installation with the modules
 and plugins required to run the Catalyst tutorial.
+
+
+=head1 TESTING THE INSTALLATION
+
+=over 4
+
+=item *
+
+Download the tarball of the final tutorial application:
+
+    $ wget http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz
+
+=item *
+
+Untar it:
+
+    $ tar zxvf MyApp.tgz
+    $ cd MyApp
+
+=item *
+
+Run the tests:
+
+    $ CATALYST_DEBUG=0 prove --lib lib  t
+    t/02pod...............skipped
+            all skipped: set TEST_POD to enable this test
+    t/03podcoverage.......skipped
+            all skipped: set TEST_POD to enable this test
+    t/01app...............ok                                                     
+    t/controller_Login....ok                                                     
+    t/live_app01..........ok 1/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok 2/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok 15/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok 16/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok                                                     
+    t/model_MyAppDB.......ok                                                     
+    All tests successful, 2 tests skipped.
+    Files=6, Tests=55, 11 wallclock secs ( 4.68 cusr +  4.84 csys =  9.52 CPU)
+
+You should see C<All tests successful>.
+
+=back
+
 
 
 =head1 AUTHOR
