@@ -886,7 +886,8 @@ that C<DefaultEnd> be added to the list of plugins in C<lib/MyApp.pm>.
 It also allowed you to add "dump_info=1" (precede with "?" or "&" 
 depending on where it is in the URL) to I<force> the debug screen at the 
 end of the Catalyst request processing cycle.  However, it was more 
-difficult to extend the C<RenderView> mechanism, and is now deprecated.
+difficult to extend than the C<RenderView> mechanism, and is now 
+deprecated.
 
 =item *
 
@@ -970,13 +971,16 @@ Then open C<root/src/books/list.tt2> in your editor and enter:
         <td>
           [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
           [% # loop in 'side effect notation' to load just the last names of the     -%]
-          [% # authors into the list.  Note that we make a bogus assignment to the   -%]
-          [% # 'unused' vbl to avoid printing the size of the list after each push.  -%]      
+          [% # authors into the list.  Note that the 'push' TT vmethod does not      -%]
+          [% # a value, so nothing will be printed here.  But, if you have something -%]
+          [% # in TT that does return a method and you don't want it printed, you    -%]
+          [% # can: 1) assign it to a bogus value, or 2) use the CALL keyword to     -%]
+          [% # call it and discard the return value.                                 -%]
           [% tt_authors = [ ];
-             unused = tt_authors.push(author.last_name) FOREACH author = book.authors %]
+             tt_authors.push(author.last_name) FOREACH author = book.authors %]
           [% # Now use a TT 'virtual method' to display the author count in parens   -%]
           ([% tt_authors.size %])
-          [% # Use another vmethod to join & print the names with comma separators   -%]
+          [% # Use another TT vmethod to join & print the names & comma separators   -%]
           [% tt_authors.join(', ') %]
         </td>
       </tr>

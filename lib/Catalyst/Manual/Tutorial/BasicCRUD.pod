@@ -347,13 +347,16 @@ and 2) the four lines for the Delete link near the bottom).
         <td>
           [% # First initialize a TT variable to hold a list.  Then use a TT FOREACH -%]
           [% # loop in 'side effect notation' to load just the last names of the     -%]
-          [% # authors into the list.  Note that we are making a bogus assignment to -%]
-          [% # the 'xx' vbl to avoid printing the size of the list after each push.  -%]
+          [% # authors into the list.  Note that the 'push' TT vmethod does not      -%]
+          [% # a value, so nothing will be printed here.  But, if you have something -%]
+          [% # in TT that does return a method and you don't want it printed, you    -%]
+          [% # can: 1) assign it to a bogus value, or 2) use the CALL keyword to     -%]
+          [% # call it and discard the return value.                                 -%]
           [% tt_authors = [ ];
-             xx = tt_authors.push(author.last_name) FOREACH author = book.authors %]
+             tt_authors.push(author.last_name) FOREACH author = book.authors %]
           [% # Now use a TT 'virtual method' to display the author count             -%]
           ([% tt_authors.size %])
-          [% # Use another TT virtual method to join the names with comma separators -%]
+          [% # Use another TT vmethod to join & print the names & comma separators   -%]
           [% tt_authors.join(', ') %]
         </td>
         <td>

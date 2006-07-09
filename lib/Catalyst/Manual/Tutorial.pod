@@ -555,8 +555,8 @@ Everyone on #catalyst and #catalyst-dev.
 
 People who have emailed me with corrections and suggestions on the 
 tutorial.  As of the most recent release, this include: Florian Ragwitz, 
-Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno, and 
-Bryan Roach.  
+Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno,  
+Bryan Roach, Ashley Berlin, and David Kamholz.  
 
 =back
 
