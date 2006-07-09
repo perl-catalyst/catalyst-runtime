@@ -573,12 +573,6 @@ C<default>, etc will also be restricted.
 will create rules that permit access to C<end>, C<begin>, and C<auto> in the
 root of your app (but not in any other controller).
 
-=head1 COPYRIGHT
-
-This program is free software, you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-
 =head1 Models
 
 Models are where application data belongs.  Catalyst is exteremely
@@ -1357,13 +1351,11 @@ including web server engines and tips to improve application efficiency.
 
 =head2 mod_perl Deployment
 
-=head3 Pros & Cons
-
-mod_perl is the best solution for many applications, but I'll list some pros
+mod_perl is the best solution for many applications, but we'll list some pros
 and cons so you can decide for yourself.  The other production deployment
-option is FastCGI, which I'll talk about in a future calendar article.
+option is FastCGI, for which see below.
 
-=head4 Pros
+=head3 Pros
 
 =head4 Speed
 
@@ -1375,7 +1367,7 @@ within each Apache process.
 If you need to run several Catalyst apps on the same server, mod_perl will
 share the memory for common modules.
 
-=head4 Cons
+=head3 Cons
 
 =head4 Memory usage
 
@@ -2217,13 +2209,28 @@ L<http://search.cpan.org/perldoc?Catalyst::Plugin::Authorization::ACL>
 
 =head1 AUTHORS
 
-Sebastian Riedel, C<sri@oook.de>
-Danijel Milicevic, C<me@danijel.de>
-Viljo Marrandi, C<vilts@yahoo.com>  
-Marcus Ramberg, C<mramberg@cpan.org>
-Jesse Sheidlower, C<jester@panix.com>
-Andy Grundman, C<andy@hybridized.org> 
-Chisel Wright, C<pause@herlpacker.co.uk>
-Will Hawes, C<info@whawes.co.uk>
-Gavin Henry, C<ghenry@perl.me.uk>
+Sebastian Riedel C<sri@oook.de>
+
+Danijel Milicevic C<me@danijel.de>
+
+Viljo Marrandi C<vilts@yahoo.com>  
+
+Marcus Ramberg C<mramberg@cpan.org>
+
+Jesse Sheidlower C<jester@panix.com>
+
+Andy Grundman C<andy@hybridized.org> 
+
+Chisel Wright C<pause@herlpacker.co.uk>
+
+Will Hawes C<info@whawes.co.uk>
+
+Gavin Henry C<ghenry@perl.me.uk>
+
 Kieren Diment C<kd@totaldatasolution.com>
+
+=head1 COPYRIGHT
+
+This document is free, you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
