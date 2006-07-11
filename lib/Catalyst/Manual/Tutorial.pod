@@ -48,7 +48,8 @@ L<Appendices|Catalyst::Manual::Tutorial::Appendices>
 =back
 
 A tarball of the final application is available at
-C<to_be_compled_in_final_version>.
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz>.
+
 
 =head1 Detailed Table Of Contents
 
@@ -556,7 +557,7 @@ Everyone on #catalyst and #catalyst-dev.
 People who have emailed me with corrections and suggestions on the 
 tutorial.  As of the most recent release, this include: Florian Ragwitz, 
 Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno,  
-Bryan Roach, Ashley Berlin, and David Kamholz.  
+Bryan Roach, Ashley Berlin, David Kamholz, and Kevin Old.  
 
 =back
 
