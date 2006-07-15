@@ -1795,7 +1795,7 @@ sub setup_components {
     );
     
     for my $component ( sort { length $a <=> length $b } $locator->plugins ) {
-        Catalyst::Utils::ensure_class_loaded( $component );
+        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
 
         my $module  = $class->setup_component( $component );
         my %modules = (

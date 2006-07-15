@@ -240,8 +240,10 @@ Loads the class unless it already has been loaded.
 
 sub ensure_class_loaded {
     my $class = shift;
+    my $opts  = shift;
 
-    return if Class::Inspector->loaded( $class ); # if a symbol entry exists we don't load again
+    return if !$opts->{ ignore_loaded }
+        && Class::Inspector->loaded( $class ); # if a symbol entry exists we don't load again
 
     # this hack is so we don't overwrite $@ if the load did not generate an error
     my $error;
