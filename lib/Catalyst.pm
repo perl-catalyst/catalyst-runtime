@@ -902,11 +902,10 @@ sub uri_for {
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     for my $value ( values %$params ) {
-        my $isa_ref = ref $value;
-        if( $isa_ref and $isa_ref ne 'ARRAY' ) {
-            croak( "Non-array reference ($isa_ref) passed to uri_for()" );
+        for ( ref $value eq 'ARRAY' ? @$value : $value ) {
+            $_ = "$_";
+            utf8::encode( $_ );
         }
-        utf8::encode( $_ ) for grep { defined } $isa_ref ? @$value : $value;
     };
     
     # join args with '/', or a blank string

@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 38;
+use Test::More tests => 41;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -82,6 +82,13 @@ my $creq;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
     is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
+}
+
+# test that uri_with replaces params (and preserves)
+{
+    ok( my $response = request('http://localhost/engine/request/uri/uri_with_object'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-Param-a' ), 'http://localhost/', 'param "a" ok' );
 }
 
 # test that uri_with is utf8 safe

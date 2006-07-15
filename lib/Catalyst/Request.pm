@@ -510,14 +510,14 @@ sub uri_with {
     my( $self, $args ) = @_;
     
     carp( 'No arguments passed to uri_with()' ) unless $args;
-    
+
     for my $value ( values %$args ) {
-        my $isa_ref = ref $value;
-        if( $isa_ref and $isa_ref ne 'ARRAY' ) {
-            croak( "Non-array reference ($isa_ref) passed to uri_with()" );
+        for ( ref $value eq 'ARRAY' ? @$value : $value ) {
+            $_ = "$_";
+            utf8::encode( $_ );
         }
-        utf8::encode( $_ ) for grep{ defined } $isa_ref ? @$value : $value;
     };
+    
     my $uri = $self->uri->clone;
     
     $uri->query_form( {

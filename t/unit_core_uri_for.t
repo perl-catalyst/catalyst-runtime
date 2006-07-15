@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use URI;
 
 use_ok('Catalyst');
@@ -48,6 +48,13 @@ is(
     Catalyst::uri_for( $context, 'quux', { param1 => "\x{2620}" } )->as_string,
     'http://127.0.0.1/foo/yada/quux?param1=%E2%98%A0',
     'URI for undef action with query params in unicode'
+);
+
+# test with object
+is(
+    Catalyst::uri_for( $context, 'quux', { param1 => $request->base } )->as_string,
+    'http://127.0.0.1/foo/yada/quux?param1=http%3A%2F%2F127.0.0.1%2Ffoo',
+    'URI for undef action with query param as object'
 );
 
 $request->base( URI->new('http://localhost:3000/') );

@@ -41,6 +41,17 @@ sub uri_with : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub uri_with_object : Local {
+    my ( $self, $c ) = @_;
+
+    my $uri   = $c->req->uri_with( { a => $c->req->base } );
+    my %query = $uri->query_form;
+    
+    $c->res->header( 'X-Catalyst-Param-a' => $query{ a } );
+    
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 sub uri_with_utf8 : Local {
     my ( $self, $c ) = @_;
 
