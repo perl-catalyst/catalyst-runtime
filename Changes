@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.7001   2006-07-15 18:07:54
+        - fix for component loading
+        - uri_for and uri_with now behave as they used to with non-
+          array references
+
 5.7000   2006-07-07 08:08:08
         - fix FCGI.pm warning message with FastCGI engine
         - bumped inc::Module::Install to 0.63 in Makefile.PL
