@@ -1,0 +1,69 @@
+=head1 ROADMAP
+
+This is a living document, that represents the core team's current plans
+for the Catalyst framework. It's liable to change at any time. This document
+lives in the the catalyst trunk, currently at 
+
+  http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst/lib/Catalyst/ROADMAP.pod
+
+Make sure you get it from there to ensure you have the latest version.
+
+=head2 5.7x series
+
+Stable relases, no major features planned. Bugfixes for current release
+and documentation improvements.
+
+Will be working on developing more ActionClasses, and Reusable chained 
+controllers, as well as opinonated highlevel frameworks on top of the 
+Catalyst Core.
+
+=head3 5.7.1
+
+=over 4
+
+=item Add support for configuration profiles to be selected at startup time
+through switches / ENV
+
+=item add call method to do a forward with eval case.
+
+=item add go method to do a call while setting action.
+
+=item move all inline pod to bottom of file.
+
+=item update pod coverage tests to detect stubbed pod, ensure real coverage
+
+=back
+
+=head2 5.80000 4. Quarter 2006
+
+Next major planned release.
+
+=over 4
+
+=item  Application / Context Split 
+
+Catalyst needs to be split so that $c refers to the current context, and is a separate thing from the Application class.
+
+=item Extend pluggability of the Catalyst core.
+
+good support for reusable components good support for reusable plugins good 
+separation of plugins (some reusable components want different plugins) 
+near total engine independence
+
+=item Moose roles instead of NEXT.  
+
+Change the Catalyst core to use Moose for the plugin system as well as
+accessors/constructors.
+
+=item Reduce core class data usage.
+
+Refactor everything that doesn't have to be class data into object data
+
+=item Add support for Isotope Engines
+
+=back
+ 
+=head2 5.90000 2007
+
+Blue Sky. Will start planning this once we land 5.8 :)
+
