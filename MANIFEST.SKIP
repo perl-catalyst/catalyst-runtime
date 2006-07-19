@@ -36,3 +36,6 @@ t/var
 
 # No tarballs!
 \.gz$
+
+# Skip the roadmap
+lib/Catalyst/ROADMAP.pod

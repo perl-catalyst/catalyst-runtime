@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7001   2006-07-15 18:07:54
+5.7001   2006-07-19 23:46:54
         - fix for component loading
         - uri_for and uri_with now behave as they used to with non-
           array references
