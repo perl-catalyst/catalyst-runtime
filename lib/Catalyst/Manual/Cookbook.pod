@@ -991,6 +991,45 @@ variable, so you can generate Atom feeds with the same code.
 Now, go ahead and make RSS feeds for all your stuff. The world *needs*
 updates on your goldfish!
 
+=head2 Forcing the browser to download content
+ 
+Sometimes you need your application to send content for download. For
+example, you can generate a comma-separated values (CSV) file for your
+users to download and import into their spreadsheet program.
+ 
+Let's say you have an C<Orders> controller which generates a CSV file
+in the C<export> action (i.e., C<http://localhost:3000/orders/export>):
+
+    sub export : Local Args(0) {
+        my ( $self, $c ) = @_;
+
+        # In a real application, you'd generate this from the database
+        my $csv = "1,5.99\n2,29.99\n3,3.99\n";
+
+        $c->res->content_type('text/comma-separated-values');
+        $c->res->body($csv);
+    }
+
+Normally the browser uses the last part of the URI to generate a
+filename for data it cannot display. In this case your browser would
+likely ask you to save a file named C<export>.
+
+Luckily you can have the browser download the content with a specific
+filename by setting the C<Content-Disposition> header:
+
+    my $filename = 'Important Orders.csv';
+    $c->res->header('Content-Disposition', qq[attachment; filename="$filename"]);
+
+Note the use of quotes around the filename; this ensures that any
+spaces in the filename are handled by the browser.
+
+Put this right before calling C<< $c->res->body >> and your browser
+will download a file named C<Important Orders.csv> instead of
+C<export>.
+
+You can also use this to have the browser download content which it
+normally displays, such as JPEG images or even HTML. Just be sure to
+set the appropriate content type and disposition.
 
 
 =head1 Controllers
