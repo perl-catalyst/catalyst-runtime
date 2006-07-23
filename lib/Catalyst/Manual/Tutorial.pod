@@ -11,6 +11,9 @@ commonly used features while focusing on real-world best practices.
 
 The tutorial is divided into the following sections:
 
+B<NOTE:> CLICK THESE LINKS TO JUMP TO CHAPTERS (the index links above
+only navigate inside this page).
+
 =over 4
 
 =item *
@@ -35,6 +38,10 @@ L<Authorization|Catalyst::Manual::Tutorial::Authorization>
 
 =item * 
 
+L<Debugging|Catalyst::Manual::Tutorial::Debugging>
+
+=item *
+
 L<Testing|Catalyst::Manual::Tutorial::Testing>
 
 =item * 
@@ -53,7 +60,7 @@ L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarb
 
 =head1 Detailed Table Of Contents
 
-=head2 Part 1: Introduction
+=head2 L<Part 1: Introduction|Catalyst::Manual::Tutorial::Intro>
 
 =over 4
 
@@ -76,7 +83,7 @@ WHERE TO GET WORKING CODE
 =back
 
 
-=head2 Part 2: Catalyst Application Development Basics
+=head2 L<Part 2: Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =over 4
 
@@ -150,7 +157,7 @@ RUN THE APPLICATION
 
 =back
 
-=head2 Part 3: Basic CRUD
+=head2 L<Part 3: Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD>
 
 =over 4
 
@@ -220,7 +227,7 @@ Try the Delete Feature
 
 =back
 
-=head2 Part 4: Authentication
+=head2 L<Part 4: Authentication|Catalyst::Manual::Tutorial::Authentication>
 
 =over 4
 
@@ -302,7 +309,7 @@ Try Out the Hashed Passwords
 
 =back
 
-=head2 Part 5: Authorization
+=head2 L<Part 5: Authorization|Catalyst::Manual::Tutorial::Authorization>
 
 =over 4
 
@@ -356,7 +363,7 @@ Add a Method to Handle Access Violations
 
 =back
 
-=head2 Part 6: Debugging
+=head2 L<Part 6: Debugging|Catalyst::Manual::Tutorial::Debugging>
 
 =over 4
 
@@ -374,7 +381,7 @@ DEBUGGING MODULES FROM CPAN
 
 =back
 
-=head2 Part 7: Testing
+=head2 L<Part 7: Testing|Catalyst::Manual::Tutorial::Testing>
 
 =over 4
 
@@ -396,7 +403,7 @@ SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
 =back
 
-=head2 Part 8: Advanced CRUD
+=head2 L<Part 8: Advanced CRUD|Catalyst::Manual::Tutorial::AdvancedCRUD>
 
 =over 4
 
@@ -474,7 +481,7 @@ Use populate_from_widget in hw_create_do
 
 =back
 
-=head2 Part 9: Appendices
+=head2 L<Part 9: Appendices|Catalyst::Manual::Tutorial::Appendices>
 
 =over 4
 
