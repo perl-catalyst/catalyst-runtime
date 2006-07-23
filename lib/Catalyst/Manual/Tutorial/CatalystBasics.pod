@@ -114,7 +114,10 @@ following command:
 
 Catalyst provides a number of helper scripts that can be used to quickly
 flesh out the basic structure of your application. All Catalyst projects
-begin with the C<catalyst.pl> helper.
+begin with the C<catalyst.pl> helper (see L<Catalyst::Helper|Catalyst::Helper>
+for more information on helpers).  Also note that as of Catalyst 5.7000,
+you will not have the helper scripts unless you install both 
+L<Catalyst::Runtime|Catalyst::Runtime> and L<Catalyst::Devel|Catalyst::Devel>.
 
 In the case of this tutorial, use the Catalyst C<catalyst.pl> script to
 initialize the framework for an application called C<MyApp>:
@@ -693,7 +696,8 @@ to the controller:
         $c->stash->{books} = [$c->model('MyAppDB::Book')->all];
         
         # Set the TT template to use.  You will almost always want to do this
-        # in your action methods.
+        # in your action methods (actions methods respond to user input in
+        # your controllers).
         $c->stash->{template} = 'books/list.tt2';
     }
 
@@ -788,7 +792,7 @@ Catalyst C<c> variable.)
 B<TIP>: When troubleshooting TT it can be helpful to enable variable
 C<DEBUG> options.  You can do this in a Catalyst environment by adding
 a C<DEBUG> line to the C<__PACKAGE__->config> declaration in 
-C<MyApp/View/TT.pm>:
+C<lib/MyApp/View/TT.pm>:
 
     __PACKAGE__->config({
         CATALYST_VAR => 'Catalyst',
@@ -872,9 +876,10 @@ Older Catalyst-related documents often suggest that you add a "private
 end action" to your application class (C<MyApp.pm>) or Root.pm 
 (C<MyApp/Controller/Root.pm>).  These examples should be easily 
 converted to L<RenderView|Catalyst::Action::RenderView> by simply adding 
-C<ActionClass('RenderView')> to the C<sub end> definition. If end sub is 
-defined in your application class (C<MyApp.pm>), you should also migrate 
-it to C<MyApp/Controller/Root.pm>.
+the attribute C<:ActionClass('RenderView')> to the C<sub end> 
+definition. If end sub is defined in your application class 
+(C<MyApp.pm>), you should also migrate it to 
+C<MyApp/Controller/Root.pm>.
 
 =item *
 

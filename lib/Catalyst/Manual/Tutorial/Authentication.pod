@@ -463,7 +463,7 @@ however, the use of C<default> actions is discouraged because it does
 not receive path args as with other actions.  The recommended practice 
 is to only use C<default> in C<MyApp::Controller::Root>.
 
-Another options would be to use something like 
+Another option would be to use something like 
 C<sub base :Path :Args(0) {...}> (where the C<...> refers to the login 
 code shown in C<sub index : Private> above). We are using C<sub base 
 :Path :Args(0) {...}> here to specifically match the URL C</login>. 

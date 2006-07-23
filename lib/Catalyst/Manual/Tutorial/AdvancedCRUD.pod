@@ -70,7 +70,7 @@ L<HTML::FillInForm|HTML::FillInForm>.
 
 Here, we will make use of the L<HTML::Widget|HTML::Widget> to not only 
 ease form creation, but to also provide validation of the submitted 
-data.  The approached used by the part of the tutorial is to slowly 
+data.  The approached used by this part of the tutorial is to slowly 
 incorporate additional L<HTML::Widget|HTML::Widget> functionality in a 
 step-wise fashion (we start with fairly simple form creation and then 
 move on to more complex and "magical" features such as validation and 
@@ -191,7 +191,8 @@ following methods:
         # Set a status message for the user
         $c->stash->{status_msg} = 'Book created';
     
-        # Use 'hw_create' to redisplay the form
+        # Use 'hw_create' to redisplay the form.  As discussed in 
+        # Part 3, 'detach' is like 'forward', but it does not return
         $c->detach('hw_create');
     }
 

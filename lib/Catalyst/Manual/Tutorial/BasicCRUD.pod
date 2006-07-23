@@ -318,7 +318,7 @@ Part 8.
 
 =head1 A SIMPLE DELETE FEATURE
 
-Turning out attention to the delete portion of CRUD, this section
+Turning our attention to the delete portion of CRUD, this section
 illustrates some basic techniques that can be used to remove information
 from the database.
 

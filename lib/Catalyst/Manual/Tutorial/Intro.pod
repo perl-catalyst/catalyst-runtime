@@ -119,7 +119,7 @@ and validation.
 =back
 
 This tutorial makes the learning process its main priority.  For
-example, the level of comments in the code found here would like be
+example, the level of comments in the code found here would likely be
 considered excessive in a "normal project".  Because of their contextual
 value, this tutorial will generally favor inline comments over a
 separate discussion in the text.  It also deliberately tries to
