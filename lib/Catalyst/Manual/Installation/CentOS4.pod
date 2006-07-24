@@ -166,7 +166,8 @@ Type the following:
     
     ...
     
-    Are you ready for manual configuration? [yes] n
+    Are you ready for manual configuration? [yes] yes
+    The following questions are intended to help you with the
     
     ...
     
@@ -181,22 +182,20 @@ Type the following:
 
 =item *
 
+B<Note:> You need to have CPAN manually configured prior to running
+cat-install.  As shown above, you should automatically receive
+a prompt for this when you first run C<perl -MCPAN -e shell>.  You
+can re-run the configuration script by typing C<o conf init> at the
+C<cpanE<gt>> prompt.
+
 B<Optional:> The remaining steps of the installation could run 
 significantly faster if you configure a fast mirror that uses HTTP vs. 
 FTP (both transfer data at the same rate once the transfer is in 
 progress, but HTTP connects much more quickly... and a Catalyst 
-installation involves many connections).  One way to do this is to 
-answer C<yes> to the C<Are you ready for manual configuration?> prompt 
-when you ran C<perl -MCPAN -e shell> above.  Or, you can rerun the 
-script by entering the following command at the C<cpanE<gt>> prompt:
-
-    cpan> o conf init
-
-It will then take you through the configuration dialog.  
-
-However, it's often easiesr to avoid the full configuration dialog and
-manually add a URL.  To prepend a new URL to the B<front> of the list,
-use the C<unshift> option to C<o conf>:
+installation involves many connections).  If you want to change the 
+selection(s) you made during the "manual configuration" process above, 
+you can manually add a single URL.  To prepend a new URL to the B<front> 
+of the list, use the C<unshift> option to C<o conf>:
 
     cpan> o conf urllist unshift http://www.perl.com/CPAN/
 
@@ -220,6 +219,39 @@ C<o conf> to view all settings):
  
 Note that multiple values can be entered for the C<urllist> option (the
 first entry will be used as long as it responds).
+
+=item * 
+
+Review the C<cat-install> documentation from the 
+L<http://www.shadowcatsystems.co.uk> web site:
+    
+    If you want to get started quickly with Catalyst, Shadowcat provides an 
+    installer script that will automate most of the process of installing it 
+    for you. Please bear in mind that this script is currently considered 
+    beta quality; we don't think it will eat your system but we make no 
+    guarantee of that.
+    
+    First, you'll need -
+    
+        * Perl, 5.8.1+ (if you're on windows, get it from Active State)
+        * make of some sort. On unix/linux you should already have one. On 
+            windows get nmake from Microsoft.
+        * A compiler. On unix/linux you should already have one. On windows, 
+            get the latest Dev-C++ beta.
+        * All three of the above in your PATH for whatever shell you're using
+        * A configured CPAN.pm. perl -MCPAN -e shell should get CPAN to walk 
+            you through the configuration process
+        * Module::Build. Active State kindly include this for you.
+    
+    Ok, now that your environment is set up, download the installer from 
+    this link, open a command prompt in the directory you downloaded it to 
+    and run perl cat-install. By the time it exits, you should have a full 
+    Catalyst install.
+    
+    If anything goes wrong, please send the full build log and the output of 
+    perl -V to cat-install (at) shadowcatsystems.co.uk so we can try and 
+    resolve your issue.
+
 
 =item * 
 
