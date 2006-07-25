@@ -1147,7 +1147,7 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-        if ( $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
+        if ( !ref($error) and $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
         else {
             unless ( ref $error ) {
                 no warnings 'uninitialized';
