@@ -732,7 +732,7 @@ include Mason (L<http://www.masonhq.com> and
 L<http://www.masonbook.com>) and L<HTML::Template|HTML::Template>
 (L<http://html-template.sourceforge.net>).
 
-=head2 Create a Catalyst View Using C<TTSITE>
+=head2 Create a Catalyst View Using C<TTSite>
 
 When using TT for the Catalyst view, there are two main helper scripts:
 
@@ -806,6 +806,12 @@ There are a variety of options you can use, such as 'undef', 'all',
 L<Template::Constants> for more information (remove the C<DEBUG_>
 portion of the name shown in the TT docs and convert to lower case
 for use inside Catalyst).
+
+B<NOTE:> Please be sure to disable TT debug options before 
+continuing the tutorial (especially the 'undef' option -- leaving
+this enabled will conflict with several of the conventions used
+by this tutorial and TTSite to leave some variables undefined
+on purpose).
 
 
 =head2 Using C<RenderView> for the Default View
