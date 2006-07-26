@@ -58,7 +58,7 @@ A tarball of the final application is available at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz>.
 
 
-=head1 Detailed Table Of Contents
+=head1 Detailed Table of Contents
 
 =head2 L<Part 1: Introduction|Catalyst::Manual::Tutorial::Intro>
 
