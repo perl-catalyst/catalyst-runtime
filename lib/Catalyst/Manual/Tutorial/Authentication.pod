@@ -547,8 +547,13 @@ the following method:
     sub auto : Private {
         my ($self, $c) = @_;
     
-        # Allow unauthenticated users to reach the login page
-        if ($c->request->path =~ /login/) {
+        # Allow unauthenticated users to reach the login page.  This
+        # allows anauthenticated users to reach any action in the Login
+        # controller.  To lock it down to a single action, we could use:
+        #   if ($c->action eq $c->controller('Login')->action_for('index'))
+        # to only allow unauthenticated access to the C<index> action we
+        # added above.
+        if ($c->controller eq $c->controller('Login')) {
             return 1;
         }
     
@@ -751,7 +756,8 @@ C<password_hash_type> are new, everything else is the same):
             # This is the model object created by Catalyst::Model::DBIC from your
             # schema (you created 'MyAppDB::User' but as the Catalyst startup
             # debug messages show, it was loaded as 'MyApp::Model::MyAppDB::User').
-            # NOTE: Omit 'MyApp::Model' to avoid a component lookup issue in Catalyst 5.66
+            # NOTE: Omit 'MyApp::Model' here just as you would when using 
+            # '$c->model("MyAppDB::User)'
             user_class: MyAppDB::User
             # This is the name of the field in your 'users' table that contains the user's name
             user_field: username
