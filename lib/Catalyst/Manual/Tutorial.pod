@@ -565,7 +565,7 @@ People who have emailed me with corrections and suggestions on the
 tutorial.  As of the most recent release, this include: Florian Ragwitz, 
 Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno,  
 Bryan Roach, Ashley Berlin, David Kamholz, Kevin Old, Henning Sprang,
-and Jeremy Jones.  
+Jeremy Jones, and David Kurtz.
 
 =back
 

@@ -544,6 +544,7 @@ the following method:
     
     # Note that 'auto' runs after 'begin' but before your actions and that
     # 'auto' "chain" (all from application path to most specific class are run)
+    # See the 'Actions' section of 'Catalyst::Manual::Intro' for more info.
     sub auto : Private {
         my ($self, $c) = @_;
     
@@ -591,9 +592,18 @@ C<default>, C<index>, and C<auto>.
 
 =item *
 
+With C<begin>, C<end>, C<default>, C<index> private actions, only the
+most specific action of each type will be called.  For example, if you
+define a C<begin> action in your controller it will I<override> a 
+C<begin> action in your application/root controller -- I<only> the
+action in your controller will be called.
+
+=item *
+
 Unlike the other actions where only a single method is called for each 
 request, I<every> auto action along the chain of namespaces will be 
-called.
+called.  Each C<auto> action will be called I<from the application/root
+controller down through the most specific class>.
 
 =back
 
