@@ -155,6 +155,10 @@ Create a TT Template Page
 
 RUN THE APPLICATION
 
+=item *
+
+USING THE DEFAULT TEMPLATE NAME
+
 =back
 
 =head2 L<Part 3: Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD>

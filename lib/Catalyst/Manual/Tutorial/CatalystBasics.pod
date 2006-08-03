@@ -1139,6 +1139,66 @@ You should see 5 such lines of debug output as DBIC fetches the author
 information for each book.
 
 
+=head1 USING THE DEFAULT TEMPLATE NAME
+
+By default, C<Catalyst::View::TT> will look for a template that uses the 
+same name as your controller action, allowing you to save the step of 
+manually specifying the template name in each action.  For example, this 
+would allow us to remove (or comment out) the 
+C<$c-E<gt>stash-E<gt>{template} = 'books/list.tt2';> line of our 
+C<list> action in the Books controller.  Open 
+C<lib/MyApp/Controller/Books.pm> in your editor and update it to 
+match the following:
+
+    =head2 list
+    
+    Fetch all book objects and pass to books/list.tt2 in stash to be displayed
+    
+    =cut
+    
+    sub list : Local {
+        # Retrieve the usual perl OO '$self' for this object. $c is the Catalyst
+        # 'Context' that's used to 'glue together' the various components
+        # that make up the application
+        my ($self, $c) = @_;
+    
+        # Retrieve all of the book records as book model objects and store in the
+        # stash where they can be accessed by the TT template
+        $c->stash->{books} = [$c->model('MyAppDB::Book')->all];
+    
+        # Automatically look for a template of 'books/list.tt2' template
+        # (if TEMPLATE_EXTENSION is set to '.tt2')
+    }
+
+C<Catalyst::View::TT> defaults to looking for a template with no 
+extension.  In our case, we need to override this to look for an 
+extension of C<.tt2>.  Open C<lib/MyApp/View/TT.pm> and add the 
+C<TEMPLATE_EXTENSION> definition as follows:
+
+    __PACKAGE__->config({
+        CATALYST_VAR => 'Catalyst',
+        INCLUDE_PATH => [
+            MyApp->path_to( 'root', 'src' ),
+            MyApp->path_to( 'root', 'lib' )
+        ],
+        PRE_PROCESS  => 'config/main',
+        WRAPPER      => 'site/wrapper',
+        ERROR        => 'error.tt2',
+        TIMER        => 0,
+        TEMPLATE_EXTENSION => '.tt2',
+    });
+
+You should now be able to restart the development server as per the 
+previous section and access the L<http://localhost:3000/books/list>
+as before.
+
+Although this can be a valuable technique to establish a default 
+template for each of your actions, the remainder of the tutorial
+will manually assign the template name to 
+C<$c-E<gt>stash-E<gt>{template}> in each action in order to make 
+the logic as conspicuous as possible.
+
+
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>
