@@ -167,6 +167,11 @@ application with the built-in development web server:
     [info] MyApp powered by Catalyst 5.7000
     You can connect to your server at http://localhost.localdomain:3000
 
+B<NOTE>: Be sure you run the C<script/myapp_server.pl> command from the
+'base' directory of your application, not inside the C<script> directory 
+itself.  It doesn't make a difference at this point, but it will as soon
+as we get the database going in the next section.
+
 Point your web browser to L<http://localhost:3000> (substituting a 
 different hostname or IP address as appropriate) and you should be 
 greeted by the Catalyst welcome screen.  Information similar to the 
