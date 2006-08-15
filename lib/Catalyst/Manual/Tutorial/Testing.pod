@@ -174,7 +174,7 @@ editor and enter the following:
     $_->get_ok("http://localhost/", "Check redirect of base URL") for $ua1, $ua2;
     # Use title_is() to check the contents of the <title>...</title> tags
     $_->title_is("Login", "Check for login title") for $ua1, $ua2;
-    # Use content_contains() to match on test in the html body
+    # Use content_contains() to match on text in the html body
     $_->content_contains("You need to log in to use this application",
         "Check we are NOT logged in") for $ua1, $ua2;
     
