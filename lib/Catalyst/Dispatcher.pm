@@ -372,7 +372,8 @@ sub uri_for_action {
     $captures ||= [];
     foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
         my $uri = $dispatch_type->uri_for_action( $action, $captures );
-        return $uri if defined($uri);
+        return( $uri eq '' ? '/' : $uri )
+            if defined($uri);
     }
     return undef;
 }

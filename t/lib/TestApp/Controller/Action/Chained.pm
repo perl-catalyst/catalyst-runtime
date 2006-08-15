@@ -153,6 +153,7 @@ sub empty_chain_f : Chained('empty_chain_e') PathPart('')              Args(1)  
 
 sub end :Private {
   my ($self, $c) = @_;
+  return if $c->stash->{no_end};
   my $out = join('; ', map { join(', ', @$_) }
                          ($c->req->captures, $c->req->args));
   $c->res->body($out);

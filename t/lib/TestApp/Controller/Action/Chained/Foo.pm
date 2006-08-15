@@ -25,4 +25,15 @@ sub pcp2 :Chained('/action/chained/pcp1') :CaptureArgs(1) { }
 #
 sub cross2 :PathPart('end') :Chained('/action/chained/bar/cross1') :Args(1) { }
 
+#
+#   Create a uri to the root index
+#
+sub to_root : Chained('/') PathPart('action/chained/to_root') {
+    my ( $self, $c ) = @_;
+    my $uri = $c->uri_for(
+        $c->controller('Root')->action_for('chain_root_index') );
+    $c->res->body( "URI:$uri" );
+    $c->stash->{no_end}++;
+}
+
 1;

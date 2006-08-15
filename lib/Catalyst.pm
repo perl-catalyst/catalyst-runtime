@@ -889,6 +889,7 @@ sub uri_for {
                          : [] );
         $path = $c->dispatcher->uri_for_action($path, $captures);
         return undef unless defined($path);
+        $path = '/' if $path eq '';
     }
 
     # massage namespace, empty if absolute path

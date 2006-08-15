@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 101*$iters;
+use Test::More tests => 103*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -688,6 +688,19 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Tests that an uri_for to a chained root index action
+    #   returns the right value.
+    #
+    {
+        ok( my $response = request(
+            'http://localhost/action/chained/to_root' ),
+            'uri_for with chained root action as arg' );
+        is( $response->content,
+            'URI:http://localhost/',
+            'Correct URI generated' );
     }
 
     #
