@@ -72,15 +72,19 @@ The keys of the hash reference on the right correspond to the L<CGI::Cookie>
 parameters of the same name, except they are used without a leading dash.
 Possible parameters are:
 
-=head2 value
+=over 
 
-=head2 expires
+=item value
 
-=head2 domain
+=item expires
 
-=head2 path
+=item domain
 
-=head2 secure
+=item path
+
+=item secure
+
+=back
 
 =head2 $res->header
 
