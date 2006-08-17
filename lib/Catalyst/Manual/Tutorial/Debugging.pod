@@ -167,9 +167,8 @@ C<single-step> into methods/subroutines):
       DB<1>
 
 This takes you to the next line of code where the template name is set.
-Notice that because we enabled C<DBIX_CLASS_STORAGE_DBI_DEBUG=1>
-earlier, SQL debug output also shows up in the development server debug
-output.
+Notice that because we enabled C<DBIC_TRACE=1> earlier, SQL debug 
+output also shows up in the development server debug information.
 
 Next, list the methods available on our C<Book> model:
 

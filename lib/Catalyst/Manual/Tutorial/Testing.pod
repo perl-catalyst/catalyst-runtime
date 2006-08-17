@@ -264,9 +264,9 @@ To run the new test script, use a command such as:
 
 or
 
-    $ DBIX_CLASS_STORAGE_DBI_DEBUG=0 CATALYST_DEBUG=0 prove --lib lib -v t/live_app01.t
+    $ DBIC_TRACE=0 CATALYST_DEBUG=0 prove --lib lib -v t/live_app01.t
 
-Experiment with the C<DBIX_CLASS_STORAGE_DBI_DEBUG>, C<CATALYST_DEBUG>
+Experiment with the C<DBIC_TRACE>, C<CATALYST_DEBUG>
 and C<-v> settings.  If you find that there are errors, use the
 techniques discussed in the "Catalyst Debugging" section (Part 6) to
 isolate and fix any problems.
@@ -274,7 +274,7 @@ isolate and fix any problems.
 If you want to run the test case under the Perl interactive debugger,
 try a command such as:
 
-    $ DBIX_CLASS_STORAGE_DBI_DEBUG=0 CATALYST_DEBUG=0 perl -d -Ilib t/live_app01.t
+    $ DBIC_TRACE=0 CATALYST_DEBUG=0 perl -d -Ilib t/live_app01.t
 
 Note that although this tutorial uses a single custom test case for
 simplicity, you may wish to break your tests into different files for

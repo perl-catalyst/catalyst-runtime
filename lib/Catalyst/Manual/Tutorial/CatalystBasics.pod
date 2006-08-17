@@ -1036,7 +1036,11 @@ First, let's enable an environment variable option that causes
 DBIx::Class to dump the SQL statements it's using to access the database
 (this option can provide extremely helpful troubleshooting information):
 
-    $ export DBIX_CLASS_STORAGE_DBI_DEBUG=1
+    $ export DBIC_TRACE=1
+
+B<NOTE>: You can also use the older 
+C<export DBIX_CLASS_STORAGE_DBI_DEBUG=1>, that that's a lot more to
+type.
 
 This assumes you are using BASH as your shell -- adjust accordingly if
 you are using a different shell (for example, under tcsh, use
