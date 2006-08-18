@@ -605,7 +605,6 @@ Open C<lib/FormElementContainer.pm> in your editor and enter:
             return map { $self->_build_element($_) } @{$element};
         }
         my $e = $element->clone;
-        my $class = $e->attr('class') || '';
         $e = new HTML::Element('span', class => 'fields_with_errors')->push_content($e)
             if $self->error && $e->tag eq 'input';
     
