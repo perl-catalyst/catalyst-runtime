@@ -216,7 +216,7 @@ Open the C<myapp01_mysql.sql> in your editor and enter:
     DROP TABLE IF EXISTS book_authors;
     DROP TABLE IF EXISTS authors;
     CREATE TABLE books (
-           id          INT(11) PRIMARY KEY,
+           id          INT(11) PRIMARY KEY AUTO_INCREMENT,
            title       TEXT ,
            rating      INT(11)
     );
@@ -227,7 +227,7 @@ Open the C<myapp01_mysql.sql> in your editor and enter:
            PRIMARY KEY (book_id, author_id)
     );
     CREATE TABLE authors (
-           id          INT(11) PRIMARY KEY,
+           id          INT(11) PRIMARY KEY AUTO_INCREMENT,
            first_name  TEXT,
            last_name   TEXT
     );
