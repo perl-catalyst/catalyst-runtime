@@ -79,11 +79,7 @@ auto-population/auto-saving).
 B<Note:> Part 8 of the tutorial is optional.  Users who do not wish to
 use L<HTML::Widget|HTML::Widget> may skip this part.
 
-B<TIP>: Note that all of the code for this part of the tutorial can be
-pulled from the Catalyst Subversion repository in one step with the
-following command:
-
-    svn co http://dev.catalyst.perl.org/repos/Catalyst/tags/examples/Tutorial/MyApp/5.7/AdvancedCRUD MyApp
+You can checkout the source code for this example from the catalyst subversion repository as per the instructions in L<Catalyst::Manual::Tutorial::Intro>
 
 =head1 C<HTML::WIDGET> FORM CREATION
 
