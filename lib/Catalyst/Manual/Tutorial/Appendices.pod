@@ -80,7 +80,7 @@ C<0>, to the last line, C<$>).
 
 =item * 
 
-"%$s/^    "
+"%s/^    "
 
 A shortcut for the previous item (C<%> specifies the entire file; so
 this removes four leading spaces from every line).
