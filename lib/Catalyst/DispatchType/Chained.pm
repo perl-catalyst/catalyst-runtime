@@ -192,7 +192,11 @@ sub register {
         if ($parent eq '.') {
             $parent = '/'.$action->namespace;
         } elsif ($parent !~ m/^\//) {
-            $parent = '/'.join('/', $action->namespace, $parent);
+            if ($action->namespace) {
+                $parent = '/'.join('/', $action->namespace, $parent);
+            } else {
+                $parent = '/'.$parent; # special case namespace '' (root)
+            }
         }
     } else {
         $parent = '/'

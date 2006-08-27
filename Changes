@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
+5.7002
+        - unescape captures to match args
+        - fix for relative Chained under namespace '' (root)
+
 5.7001   2006-07-19 23:46:54
         - fix for component loading
         - uri_for and uri_with now behave as they used to with non-
