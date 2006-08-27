@@ -30,7 +30,7 @@ BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2;
 		 );
 }
 
-use Test::More tests => 4*@paths * $iters;
+use Test::More tests => 6*@paths * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -74,5 +74,17 @@ sub run_test_for {
     ok( $response = request("http://localhost/args/params/$path"), "Requested params for path $path");
 
     is( $response->content, $test, 'as params' );
+
+    undef $response;
+
+    if( $test =~ m{/} ) {
+        $test =~ s{/}{}g;
+        $path = uri_escape( $test ); 
+    }
+
+    ok( $response = request("http://localhost/chained/multi_cap/$path/baz"), "Requested capture for path $path");
+
+    is( $response->content, join( ', ', split( //, $test ) ) ."; ", 'as capture' );
+
 }
 
