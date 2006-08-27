@@ -282,6 +282,8 @@ sub prepare_action {
         unshift @args, $arg;
     }
 
+    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for @{$c->req->captures||[]};
+
     $c->log->debug( 'Path is "' . $c->req->match . '"' )
       if ( $c->debug && $c->req->match );
 
