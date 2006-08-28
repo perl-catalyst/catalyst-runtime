@@ -251,7 +251,7 @@ sub _parse_attrs {
 
         my $raw = $raw_attributes{$key};
 
-        foreach my $value (ref($raw) ? @$raw : $raw) {
+        foreach my $value (ref($raw) eq 'ARRAY' ? @$raw : $raw) {
 
             my $meth = "_parse_${key}_attr";
             if ( $self->can($meth) ) {
