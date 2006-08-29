@@ -21,7 +21,7 @@ L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics>
 
 =item 3
 
-L<Basic CRUD|Catalyst::Manual::Tutorial_BasicCRUD>
+L<Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD>
 
 =item 4
 
@@ -701,8 +701,7 @@ still transmits the passwords in cleartext to your application.  We are
 just avoiding the I<storage> of cleartext passwords in the database by
 using a SHA-1 hash. If you are concerned about cleartext passwords
 between the browser and your application, consider using SSL/TLS, made
-easy with the Catalyst plugin 
-L<Catalyst::Plugin:RequireSSL|Catalyst::Plugin:RequireSSL>.
+easy with the Catalyst plugin Catalyst::Plugin:RequireSSL.
 
 
 =head2 Get a SHA-1 Hash for the Password
