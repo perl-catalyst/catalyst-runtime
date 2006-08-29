@@ -632,8 +632,8 @@ information.
 =item * L<Catalyst::Config>
 
     $c->config
-    $c->config->root;
-    $c->config->name;
+    $c->config->{root};
+    $c->config->{name};
 
 =item * L<Catalyst::Log>
 
