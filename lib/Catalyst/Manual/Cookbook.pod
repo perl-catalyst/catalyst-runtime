@@ -1,4 +1,4 @@
-=head1 NAME
+S=head1 NAME
 
 Catalyst::Manual::Cookbook - Cooking with Catalyst
 
@@ -204,6 +204,28 @@ This is equivalent to:
   __PACKAGE__->config->{email} = [qw/SMTP localhost/];
 
 See also L<YAML>.
+
+=head1 Skipping your VCS's directories
+
+Catalyst uses Module::Pluggable to load Models, Views and Controllers.
+Module::Pluggable will scan through all directories and load modules
+it finds.  Sometimes you might want to skip some of these directories,
+for example when your version control system makes a subdirectory with
+meta-information in every version-controlled directory.  While
+Catalyst skips subversion and CVS directories already, there are other
+source control systems.  Here is the configuration you need to add
+their directories to the list to skip.
+
+You can make catalyst skip these directories using the Catalyst config:
+
+  # Configure the application
+  __PACKAGE__->config(
+      name => 'MyApp',
+      setup_components => { except => qr/SCCS/ },
+  );
+
+See the Module::Pluggable manual page for more information on B<except>
+and other options.
 
 =head1 Users and Access Control
 
