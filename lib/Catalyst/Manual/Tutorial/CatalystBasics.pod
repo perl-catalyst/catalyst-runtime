@@ -399,7 +399,7 @@ Perl ORM engine, Matt Trout's L<DBIx::Class|DBIx::Class> (abbreviated
 as "DBIC") has rapidly emerged as the Perl-based ORM technology of choice.  
 Most new Catalyst applications rely on DBIC, as will this tutorial.
 
-Note: See L<Catalyst:: Model::CDBI> for more information on using
+Note: See L<Catalyst::Model::CDBI> for more information on using
 Catalyst with L<Class::DBI|Class::DBI>.
 
 =head2 Create a DBIC Schema File
