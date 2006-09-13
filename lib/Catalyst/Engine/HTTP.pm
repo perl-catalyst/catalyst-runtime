@@ -199,6 +199,13 @@ sub run {
     if ($restart) {
         $SIG{CHLD} = 'DEFAULT';
         wait;
+
+        ### if the standalone server was invoked with perl -I .. we will loose
+        ### those include dirs upon re-exec. So add them to PERL5LIB, so they
+        ### are available again for the exec'ed process --kane
+        use Config;
+        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC; 
+        
         exec $^X . ' "' . $0 . '" ' . join( ' ', @{ $options->{argv} } );
     }
 
