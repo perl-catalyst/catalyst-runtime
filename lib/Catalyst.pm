@@ -293,8 +293,12 @@ sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
 
 =head2 $c->detach( $class, $method, [, \@arguments ] )
 
+=head2 $c->detach()
+
 The same as C<forward>, but doesn't return to the previous action when 
 processing is finished. 
+
+When called with no arguments it escapes the processing chain entirely.
 
 =cut
 
