@@ -141,6 +141,10 @@ sub recurse_match {
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
             if (my $capture_attr = $action->attributes->{CaptureArgs}) {
+
+                # Short-circuit if not enough remaining parts
+                next TRY_ACTION unless @parts >= $capture_attr->[0];
+
                 my @captures;
                 my @parts = @parts; # localise
 

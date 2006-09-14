@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Catalyst.
         - unescape captures to match args
         - fix for relative Chained under namespace '' (root)
         - fix for hashrefs in action attributes from config
+        - fix for Chained to require correct number of CaptureArgs
 
 5.7001   2006-07-19 23:46:54
         - fix for component loading

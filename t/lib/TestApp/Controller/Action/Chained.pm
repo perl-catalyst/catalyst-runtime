@@ -151,6 +151,13 @@ sub empty_chain_d : Chained('empty_chain_c') PathPart('')              CaptureAr
 sub empty_chain_e : Chained('empty_chain_d') PathPart('')              CaptureArgs(0) { }
 sub empty_chain_f : Chained('empty_chain_e') PathPart('')              Args(1)        { }
 
+sub mult_nopp_base  : Chained('/') PathPart('chained/mult_nopp') CaptureArgs(0) { }
+sub mult_nopp_all   : Chained('mult_nopp_base') PathPart('') Args(0) { }
+sub mult_nopp_new   : Chained('mult_nopp_base') PathPart('new') Args(0) { }
+sub mult_nopp_id    : Chained('mult_nopp_base') PathPart('') CaptureArgs(1) { }
+sub mult_nopp_idall : Chained('mult_nopp_id') PathPart('') Args(0) { }
+sub mult_nopp_idnew : Chained('mult_nopp_id') PathPart('new') Args(0) { }
+
 sub end :Private {
   my ($self, $c) = @_;
   return if $c->stash->{no_end};

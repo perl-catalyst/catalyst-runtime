@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 103*$iters;
+use Test::More tests => 106*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -727,4 +727,25 @@ sub run_tests {
         }
         else { pass( "Error on absolute path part arguments already tested" ) }
     }
+
+    #
+    #   Complex path with multiple empty pathparts
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->mult_nopp_base
+          TestApp::Controller::Action::Chained->mult_nopp_all
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/mult_nopp'),
+            "Complex path with multiple empty pathparts" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '; ', 'Content OK' );
+    }
+
 }
