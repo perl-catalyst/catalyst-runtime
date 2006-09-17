@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7002
+5.7002   2006-09-17 19:35:32
         - unescape captures to match args
         - fix for relative Chained under namespace '' (root)
         - fix for hashrefs in action attributes from config
