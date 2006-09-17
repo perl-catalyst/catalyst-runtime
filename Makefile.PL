@@ -1,4 +1,4 @@
-use inc::Module::Install 0.63;
+use inc::Module::Install 0.64;
 
 perl_version '5.8.1';
 
