@@ -139,13 +139,14 @@ application with the built-in development web server:
     [debug] Debug messages enabled
     [debug] Loaded plugins:
     .----------------------------------------------------------------------------.
-    | Catalyst::Plugin::ConfigLoader  0.06                                       |
+    | Catalyst::Plugin::ConfigLoader  0.13                                       |
     | Catalyst::Plugin::Static::Simple  0.14                                     |
     '----------------------------------------------------------------------------'
     
     [debug] Loaded dispatcher "Catalyst::Dispatcher"
     [debug] Loaded engine "Catalyst::Engine::HTTP"
-    [debug] Found home "/root/dev/MyApp"
+    [debug] Found home "/home/me/MyApp"
+    [debug] Loaded Config "/home/me/myapp.yml"
     [debug] Loaded components:
     .-----------------------------------------------------------------+----------.
     | Class                                                           | Type     |
@@ -161,7 +162,7 @@ application with the built-in development web server:
     | /end                 | MyApp::Controller::Root              | end          |
     '----------------------+--------------------------------------+--------------'
     
-    [info] MyApp powered by Catalyst 5.7000
+    [info] MyApp powered by Catalyst 5.7002
     You can connect to your server at http://localhost.localdomain:3000
 
 B<NOTE>: Be sure you run the C<script/myapp_server.pl> command from the
@@ -1059,14 +1060,15 @@ Your development server log output should display something like:
     [debug] Debug messages enabled
     [debug] Loaded plugins:
     .----------------------------------------------------------------------------.
-    | Catalyst::Plugin::ConfigLoader  0.06                                       |
-    | Catalyst::Plugin::StackTrace  0.04                                         |
+    | Catalyst::Plugin::ConfigLoader  0.13                                       |
+    | Catalyst::Plugin::StackTrace  0.06                                         |
     | Catalyst::Plugin::Static::Simple  0.14                                     |
     '----------------------------------------------------------------------------'
     
     [debug] Loaded dispatcher "Catalyst::Dispatcher"
     [debug] Loaded engine "Catalyst::Engine::HTTP"
     [debug] Found home "/home/me/MyApp"
+    [debug] Loaded Config "/home/me/myapp.yml"
     [debug] Loaded components:
     .-----------------------------------------------------------------+----------.
     | Class                                                           | Type     |
@@ -1097,7 +1099,7 @@ Your development server log output should display something like:
     | /books/list                         | /books/list                          |
     '-------------------------------------+--------------------------------------'
     
-    [info] MyApp powered by Catalyst 5.7000
+    [info] MyApp powered by Catalyst 5.7002
     You can connect to your server at http://localhost.localdomain:3000
 
 Some things you should note in the output above:
