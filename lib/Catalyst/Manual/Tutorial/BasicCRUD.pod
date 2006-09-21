@@ -415,7 +415,8 @@ This method first deletes the book with the specified primary key ID.
 However, it also removes the corresponding entry from the
 C<book_authors> table.  Note that C<delete_all> was used instead of
 C<delete>: whereas C<delete_all> also removes the join table entries in
-C<book_authors>, C<delete> does not.
+C<book_authors>, C<delete> does not (only use C<delete_all> if you
+really need the cascading deletes... otherwise you are wasting resources).
 
 Then, rather than forwarding to a "delete done" page as we did with the
 earlier create example, it simply sets the C<status_msg> to display a
