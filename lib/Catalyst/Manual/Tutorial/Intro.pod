@@ -176,25 +176,21 @@ Catalyst Plugins
 The plugins used in this tutorial all have sufficiently stable APIs that
 you shouldn't need to worry about versions. However, there could be
 cases where the tutorial is affected by what version of plugins you
-use. The plugins used for this tutorial are:
+use. This tutorial has been tested against the following set of plugins:
 
 =over 4
 
 =item * 
 
-Catalyst::Plugin::Authentication -- 0.07
+Catalyst::Plugin::Authentication -- 0.09
 
 =item *
 
-Catalyst::Plugin::Authentication::Credential::Password -- 0.07
+Catalyst::Plugin::Authentication::Store::DBIC -- 0.07
 
 =item *
 
-Catalyst::Plugin::Authentication::Store::DBIC -- 0.06
-
-=item *
-
-Catalyst::Plugin::Authorization::ACL -- 0.06
+Catalyst::Plugin::Authorization::ACL -- 0.08
 
 =item *
 
@@ -202,7 +198,7 @@ Catalyst::Plugin::Authorization::Roles -- 0.04
 
 =item *
 
-Catalyst::Plugin::ConfigLoader -- 0.07
+Catalyst::Plugin::ConfigLoader -- 0.13
 
 =item *
 
@@ -210,15 +206,11 @@ Catalyst::Plugin::HTML::Widget -- 1.1
 
 =item *
 
-Catalyst::Plugin::Session -- 0.05
+Catalyst::Plugin::Session -- 0.12
 
 =item *
 
-Catalyst::Plugin::Session::FastMmap -- 0.12
-
-=item *
-
-Catalyst::Plugin::Session::State::Cookie -- 0.02
+Catalyst::Plugin::Session::State::Cookie -- 0.05
 
 =item *
 
@@ -226,7 +218,7 @@ Catalyst::Plugin::Session::Store::FastMmap -- 0.02
 
 =item *
 
-Catalyst::Plugin::StackTrace -- 0.04
+Catalyst::Plugin::StackTrace -- 0.06
 
 =item *
 
