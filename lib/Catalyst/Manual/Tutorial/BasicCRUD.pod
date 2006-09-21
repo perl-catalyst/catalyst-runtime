@@ -461,8 +461,8 @@ new request.  As a result, the URL in the browser is updated to match
 the destination of the redirection URL.
 
 To convert the forward used in the previous section to a redirect,
-open C<lib/MyApp/Controller/Books.pm> and the existing C<sub delete>
-method to match:
+open C<lib/MyApp/Controller/Books.pm> and edit the existing 
+C<sub delete> method to match:
 
     =head2 delete 
     
@@ -491,7 +491,8 @@ Restart the development server and point your browser to
 L<http://localhost:3000/books/list>.  Delete the first copy of 
 "TCPIP_Illustrated_Vol-2", but notice that I<no green "Book deleted" 
 status message is displayed>.  Because the stash is reset on every
-request, the C<status_msg> is cleared before it can be displayed.
+request (and a redirect involves a second request), the 
+C<status_msg> is cleared before it can be displayed.
 
 
 =head2 Using C<uri_for> to Pass Query Parameters
@@ -499,7 +500,7 @@ request, the C<status_msg> is cleared before it can be displayed.
 There are several ways to pass information across a redirect. 
 In general, the best option is to use the C<flash> technique that we
 will see in Part 4 of the tutorial; however, here we will pass the
-information via the redirect itself.  Open 
+information via query parameters on the redirect itself.  Open 
 C<lib/MyApp/Controller/Books.pm> and update the existing 
 C<sub delete> method to match the following:
 
@@ -540,17 +541,18 @@ query parameter:
 =head2 Try the Delete and Redirect With Query Param Logic
 
 Restart the development server and point your browser to 
-L<http://localhost:3000/books/list> and delete the remaining copy of 
-"TCPIP_Illustrated_Vol-2".  The green "Book deleted" status message
+L<http://localhost:3000/books/list>.  Then delete the remaining copy 
+of "TCPIP_Illustrated_Vol-2".  The green "Book deleted" status message
 should return.
 
 B<NOTE:> Although this did present an opportunity to show a handy
 capability of C<uri_for>, it would be much better to use Catalyst's
-C<flash> feature in this situation.  Although less dangerous than 
-leaving the delete URL in the client's browser, we have still exposed 
-the status message to the user.  With C<flash>, this message returns 
-to its rightful place as a service-side mechanism (we will migrate
-this code to C<flash> in the next part of the tutorial).
+C<flash> feature in this situation.  Although the technique here is 
+less dangerous than  leaving the delete URL in the client's browser, 
+we have still exposed the status message to the user.  With C<flash>, 
+this message returns to its rightful place as a service-side 
+mechanism (we will migrate this code to C<flash> in the next part 
+of the tutorial).
 
 
 =head1 AUTHOR

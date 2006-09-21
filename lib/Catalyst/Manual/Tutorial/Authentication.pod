@@ -806,7 +806,8 @@ is cleared (unless reset).  Although C<flash> has nothing to do with
 authentication, it does leverage the same session plugins.  Now that
 those plugins are enabled, let's go back and improve the "delete
 and redirect with query parameters" code seen at the end of the
-C<BasicCRUD> part of the tutorial.
+L<Basic CRUD|Catalyst::Manual::Tutorial::BasicCRUD> part of the 
+tutorial.
 
 First, open C<lib/MyApp/Controller/Books.pm> and modify C<sub delete>
 to match the following:
@@ -831,8 +832,8 @@ to match the following:
         $c->response->redirect($c->uri_for('/books/list'));
     }
 
-Next, open C<root/lib/site/layout> update the TT code to pull from flash
-vs. the C<status_msg> query parameter:
+Next, open C<root/lib/site/layout> and update the TT code to pull from 
+flash vs. the C<status_msg> query parameter:
 
     <div id="header">[% PROCESS site/header %]</div>
     
@@ -849,12 +850,12 @@ vs. the C<status_msg> query parameter:
 
 Restart the development server and point your browser to 
 L<http://localhost:3000/books/url_create/Test/1/4> to create an extra
-book.  Click the "Return to list" link and delete this "Test" book.  
-The C<flash> mechanism should retain our "Book deleted" status message
-across the redirect.
+book.  Click the "Return to list" link and delete this "Test" book you
+just added.  The C<flash> mechanism should retain our "Book deleted" 
+status message across the redirect.
 
 B<NOTE:> While C<flash> will save information across multiple requests,
-it does get cleared the first time it is read.  In general, this is
+I<it does get cleared the first time it is read>.  In general, this is
 exactly what you want -- the C<flash> message will get displayed on
 the next screen where it's appropriate, but it won't "keep showing up"
 after that first time (unless you reset it).  Please refer to
