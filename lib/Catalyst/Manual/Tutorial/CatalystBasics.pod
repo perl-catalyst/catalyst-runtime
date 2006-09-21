@@ -703,7 +703,7 @@ to the controller:
         $c->stash->{books} = [$c->model('MyAppDB::Book')->all];
         
         # Set the TT template to use.  You will almost always want to do this
-        # in your action methods (actions methods respond to user input in
+        # in your action methods (action methods respond to user input in
         # your controllers).
         $c->stash->{template} = 'books/list.tt2';
     }
@@ -1213,7 +1213,7 @@ the C<$c-E<gt>detach> mechanisms (these are discussed in Part 2 and
 Part 8 of the Tutorial).
 
 
-=head1 RETURN TO A MANUALLY SPECIFIED TEMPLATE
+=head1 RETURN TO A MANUALLY-SPECIFIED TEMPLATE
 
 In order to be able to use C<$c-E<gt>forward> and C<$c-E<gt>detach>
 later in the tutorial, you should remove the comment from the

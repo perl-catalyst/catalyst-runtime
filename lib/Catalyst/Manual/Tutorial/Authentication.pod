@@ -825,7 +825,7 @@ to match the following:
         # Search for the book and then delete it
         $c->model('MyAppDB::Book')->search({id => $id})->delete_all;
     
-        # Use 'flash' to save information across requests util it's read
+        # Use 'flash' to save information across requests until it's read
         $c->flash->{status_msg} = "Book deleted";
             
         # Redirect the user back to the list page with status msg as an arg
@@ -850,7 +850,7 @@ flash vs. the C<status_msg> query parameter:
 
 Restart the development server and point your browser to 
 L<http://localhost:3000/books/url_create/Test/1/4> to create an extra
-book.  Click the "Return to list" link and delete this "Test" book you
+book.  Click the "Return to list" link and delete the "Test" book you
 just added.  The C<flash> mechanism should retain our "Book deleted" 
 status message across the redirect.
 

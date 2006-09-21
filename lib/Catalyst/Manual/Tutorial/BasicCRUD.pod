@@ -444,7 +444,7 @@ along with a list of the eight remaining books.
 
 =head2 Fixing a Dangerous URL
 
-Note the URL in your browser once you have performed the deleted in the 
+Note the URL in your browser once you have performed the deletetion in the 
 prior step -- it is still referencing the delete action:
 
     http://localhost:3000/books/delete/6
@@ -548,7 +548,7 @@ should return.
 B<NOTE:> Although this did present an opportunity to show a handy
 capability of C<uri_for>, it would be much better to use Catalyst's
 C<flash> feature in this situation.  Although the technique here is 
-less dangerous than  leaving the delete URL in the client's browser, 
+less dangerous than leaving the delete URL in the client's browser, 
 we have still exposed the status message to the user.  With C<flash>, 
 this message returns to its rightful place as a service-side 
 mechanism (we will migrate this code to C<flash> in the next part 

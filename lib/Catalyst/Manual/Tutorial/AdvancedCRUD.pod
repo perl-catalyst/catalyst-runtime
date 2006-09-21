@@ -204,7 +204,7 @@ B<NOTE:> If you receive an error about Catalyst not being able to find
 the template C<hw_create_do.tt2>, please verify that you followed the
 instructions in the final section of
 L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics> where
-you returned to a manually specified template.  You can either use 
+you returned to a manually-specified template.  You can either use 
 C<forward>/C<detach> B<OR> default template names, but the two cannot
 be used together.
 
