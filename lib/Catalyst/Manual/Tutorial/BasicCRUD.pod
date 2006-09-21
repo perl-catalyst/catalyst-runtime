@@ -206,10 +206,27 @@ in the development server log messages:
 
     INSERT INTO books (rating, title) VALUES (?, ?): `5', `TCPIP_Illustrated_Vol-2'
     INSERT INTO book_authors (author_id, book_id) VALUES (?, ?): `4', `6'
+    SELECT author.id, author.first_name, author.last_name 
+        FROM book_authors me  JOIN authors author 
+        ON ( author.id = me.author_id ) WHERE ( me.book_id = ? ): '6'
+
+The C<INSERT> statements are obviously adding the book and linking it to
+the existing record for Richard Stevens.  The C<SELECT> statement results
+from DBIC automatically fetching the book for the C<Dumper.dump(book)>.
 
 If you then click the "Return to list" link, you should find that there
 are now six books shown (if necessary, Shift-Reload your browser at the
 C</books/list> page).
+
+Then I<add 2 more copies of the same book> so that we have some extras for
+our delete logic that will be coming up soon.  Enter the same URL above
+two more times (or refresh your browser twice if it still contains this
+URL):
+
+    http://localhost:3000/books/url_create/TCPIP_Illustrated_Vol-2/5/4
+
+You should be able to click "Return to list" and now see 3 copies of 
+"TCP_Illustrated_Vol-2".
 
 
 =head1 MANUALLY BUILDING A CREATE FORM
@@ -257,7 +274,7 @@ Open C<root/src/books/form_create.tt2> in your editor and enter:
 Note that we have specified the target of the form data as
 C<form_create_do>, the method created in the section that follows.
 
-=head2 Add Method to Process Form Values and Update Database
+=head2 Add a Method to Process Form Values and Update Database
 
 Edit C<lib/MyApp/Controller/Books.pm> and add the following method to
 save the form information to the database:
@@ -313,6 +330,7 @@ B<Note:> Having the user enter the primary key ID for the author is
 obviously crude; we will address this concern with a drop-down list in
 Part 8.
 
+
 =head1 A SIMPLE DELETE FEATURE
 
 Turning our attention to the delete portion of CRUD, this section
@@ -351,7 +369,7 @@ and 2) the four lines for the Delete link near the bottom).
           [% # call it and discard the return value.                                 -%]
           [% tt_authors = [ ];
              tt_authors.push(author.last_name) FOREACH author = book.authors %]
-          [% # Now use a TT 'virtual method' to display the author count             -%]
+          [% # Now use a TT 'virtual method' to display the author count in parens   -%]
           ([% tt_authors.size %])
           [% # Use another TT vmethod to join & print the names & comma separators   -%]
           [% tt_authors.join(', ') %]
@@ -409,15 +427,6 @@ Whereas C<forward> I<returns> to the original action once it is
 completed, C<detach> does I<not> return.  Other than that, the two are
 equivalent.
 
-Another alternative to C<forward> would be to use
-C<$c-E<gt>response-E<gt>redirect($c-E<gt>uri_for('/books/list'))>.  The
-C<forward> and C<redirect> operations differ in several important
-respects that stem from the fact that redirects cause the client browser
-to issue an entirely new HTTP request.  In doing so, this results in a
-new URL showing in the browser window.  And, because the stash
-information is reset for every request, the "Book deleted" message would
-not be displayed.
-
 
 =head2 Try the Delete Feature
 
@@ -427,9 +436,120 @@ it.  Then restart the server:
     $ script/myapp_server.pl
 
 Then point your browser to L<http://localhost:3000/books/list> and click
-the "Delete" link next to "TCPIP_Illustrated_Vol-2".  A green "Book
-deleted" status message should display at the top of the page, along
-with a list of the six remaining books.
+the "Delete" link next to the first "TCPIP_Illustrated_Vol-2".  A green 
+"Book deleted" status message should display at the top of the page, 
+along with a list of the eight remaining books.
+
+
+=head2 Fixing a Dangerous URL
+
+Note the URL in your browser once you have performed the deleted in the 
+prior step -- it is still referencing the delete action:
+
+    http://localhost:3000/books/delete/6
+
+What if the user were to press reload with this URL still active?  In
+this case the redundant delete is harmless, but in other cases this
+could clearly be extremely dangerous.
+
+We can improve the logic by converting to a redirect.  Unlike
+C<$c-E<gt>forward('list'))> or C<$c-E<gt>detach('list'))> that perform
+a server-side alteration in the flow of processing, a redirect is a
+client-side mechanism that causes the brower to issue an entirely
+new request.  As a result, the URL in the browser is updated to match
+the destination of the redirection URL.
+
+To convert the forward used in the previous section to a redirect,
+open C<lib/MyApp/Controller/Books.pm> and the existing C<sub delete>
+method to match:
+
+    =head2 delete 
+    
+    Delete a book
+        
+    =cut
+    
+    sub delete : Local {
+        # $id = primary key of book to delete
+        my ($self, $c, $id) = @_;
+    
+        # Search for the book and then delete it
+        $c->model('MyAppDB::Book')->search({id => $id})->delete_all;
+    
+        # Set a status message to be displayed at the top of the view
+        $c->stash->{status_msg} = "Book deleted.";
+    
+        # Redirect the user back to the list page
+        $c->response->redirect($c->uri_for('/books/list'));
+    }
+
+
+=head2 Try the Delete and Redirect Logic
+
+Restart the development server and point your browser to 
+L<http://localhost:3000/books/list>.  Delete the first copy of 
+"TCPIP_Illustrated_Vol-2", but notice that I<no green "Book deleted" 
+status message is displayed>.  Because the stash is reset on every
+request, the C<status_msg> is cleared before it can be displayed.
+
+
+=head2 Using C<uri_for> to Pass Query Parameters
+
+There are several ways to pass information across a redirect. 
+In general, the best option is to use the C<flash> technique that we
+will see in Part 4 of the tutorial; however, here we will pass the
+information via the redirect itself.  Open 
+C<lib/MyApp/Controller/Books.pm> and update the existing 
+C<sub delete> method to match the following:
+
+    =head2 delete 
+    
+    Delete a book
+        
+    =cut
+    
+    sub delete : Local {
+        # $id = primary key of book to delete
+        my ($self, $c, $id) = @_;
+    
+        # Search for the book and then delete it
+        $c->model('MyAppDB::Book')->search({id => $id})->delete_all;
+    
+        # Redirect the user back to the list page with status msg as an arg
+        $c->response->redirect($c->uri_for('/books/list', 
+            {status_msg => "Book deleted."}));
+    }
+
+This modification simply leverages the ability of C<uri_for> to include
+an arbitrary number of name/value pairs in a hash reference.  Next, we 
+need to update C<root/lib/site/layout> to handle C<status_msg> as a 
+query parameter:
+
+    <div id="header">[% PROCESS site/header %]</div>
+    
+    <div id="content">
+    <span class="message">[% status_msg || Catalyst.request.params.status_msg %]</span>
+    <span class="error">[% error_msg %]</span>
+    [% content %]
+    </div>
+    
+    <div id="footer">[% PROCESS site/footer %]</div>
+
+
+=head2 Try the Delete and Redirect With Query Param Logic
+
+Restart the development server and point your browser to 
+L<http://localhost:3000/books/list> and delete the remaining copy of 
+"TCPIP_Illustrated_Vol-2".  The green "Book deleted" status message
+should return.
+
+B<NOTE:> Although this did present an opportunity to show a handy
+capability of C<uri_for>, it would be much better to use Catalyst's
+C<flash> feature in this situation.  Although less dangerous than 
+leaving the delete URL in the client's browser, we have still exposed 
+the status message to the user.  With C<flash>, this message returns 
+to its rightful place as a service-side mechanism (we will migrate
+this code to C<flash> in the next part of the tutorial).
 
 
 =head1 AUTHOR

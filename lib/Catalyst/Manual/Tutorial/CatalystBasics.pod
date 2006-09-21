@@ -163,7 +163,7 @@ application with the built-in development web server:
     '----------------------+--------------------------------------+--------------'
     
     [info] MyApp powered by Catalyst 5.7002
-    You can connect to your server at http://localhost.localdomain:3000
+    You can connect to your server at http://localhost:3000
 
 B<NOTE>: Be sure you run the C<script/myapp_server.pl> command from the
 'base' directory of your application, not inside the C<script> directory 
@@ -228,7 +228,7 @@ in your editor and enter:
     INSERT INTO authors VALUES (4, 'Richard', 'Stevens');
     INSERT INTO authors VALUES (5, 'Douglas', 'Comer');
     INSERT INTO authors VALUES (6, 'Tom', 'Christiansen');
-    INSERT INTO authors VALUES (7, ' Nathan', 'Torkington');
+    INSERT INTO authors VALUES (7, 'Nathan', 'Torkington');
     INSERT INTO authors VALUES (8, 'Jeffrey', 'Zeldman');
     INSERT INTO book_authors VALUES (1, 1);
     INSERT INTO book_authors VALUES (1, 2);
@@ -441,6 +441,10 @@ Open C<lib/MyAppDB.pm> in your editor and insert:
 B<Note:> C<__PACKAGE__> is just a shorthand way of referencing the name
 of the package where it is used.  Therefore, in C<MyAppDB.pm>,
 C<__PACKAGE__> is equivalent to C<MyAppDB>.
+
+B<Note:> As with any Perl package, we need to end the last line with
+a statement that evaluates to C<true>.  This is customarily done with
+C<1> on a line by itself as shown above.
 
 
 =head2 Create the DBIC "Result Source" Files
@@ -1100,7 +1104,7 @@ Your development server log output should display something like:
     '-------------------------------------+--------------------------------------'
     
     [info] MyApp powered by Catalyst 5.7002
-    You can connect to your server at http://localhost.localdomain:3000
+    You can connect to your server at http://localhost:3000
 
 Some things you should note in the output above:
 
@@ -1152,11 +1156,12 @@ information for each book.
 By default, C<Catalyst::View::TT> will look for a template that uses the 
 same name as your controller action, allowing you to save the step of 
 manually specifying the template name in each action.  For example, this 
-would allow us to remove (or comment out) the 
+would allow us to remove the 
 C<$c-E<gt>stash-E<gt>{template} = 'books/list.tt2';> line of our 
 C<list> action in the Books controller.  Open 
-C<lib/MyApp/Controller/Books.pm> in your editor and update it to 
-match the following:
+C<lib/MyApp/Controller/Books.pm> in your editor and comment out this line
+to match the following (only the C<$c-E<gt>stash-E<gt>{template}> line
+has changed):
 
     =head2 list
     
@@ -1174,8 +1179,10 @@ match the following:
         # stash where they can be accessed by the TT template
         $c->stash->{books} = [$c->model('MyAppDB::Book')->all];
     
-        # Automatically look for a template of 'books/list.tt2' template
-        # (if TEMPLATE_EXTENSION is set to '.tt2')
+        # Set the TT template to use.  You will almost always want to do this
+        # in your action methods (actions methods respond to user input in
+        # your controllers).
+        #$c->stash->{template} = 'books/list.tt2';
     }
 
 C<Catalyst::View::TT> defaults to looking for a template with no 
@@ -1200,11 +1207,26 @@ You should now be able to restart the development server as per the
 previous section and access the L<http://localhost:3000/books/list>
 as before.
 
-Although this can be a valuable technique to establish a default 
-template for each of your actions, the remainder of the tutorial
-will manually assign the template name to 
-C<$c-E<gt>stash-E<gt>{template}> in each action in order to make 
-the logic as conspicuous as possible.
+B<NOTE:> Please note that if you use the default template technique,
+you will B<not> be able to use either the C<$c-E<gt>forward> or
+the C<$c-E<gt>detach> mechanisms (these are discussed in Part 2 and 
+Part 8 of the Tutorial).
+
+
+=head1 RETURN TO A MANUALLY SPECIFIED TEMPLATE
+
+In order to be able to use C<$c-E<gt>forward> and C<$c-E<gt>detach>
+later in the tutorial, you should remove the comment from the
+statement in C<sub list>:
+
+    $c->stash->{template} = 'books/list.tt2';
+
+Then delete the C<TEMPLATE_EXTENSION> line in  
+C<lib/MyApp/View/TT.pm>.
+
+You should then be able to restart the development server and 
+access L<http://localhost:3000/books/list> in the same manner as
+with earlier sections.
 
 
 =head1 AUTHOR

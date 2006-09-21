@@ -2,6 +2,7 @@
 
 Catalyst::Manual::Tutorial::AdvancedCRUD - Catalyst Tutorial - Part 8: Advanced CRUD
 
+
 =head1 OVERVIEW
 
 This is B<Part 8 of 9> for the Catalyst tutorial.
@@ -199,6 +200,15 @@ so allows us to have the same form submit the data to different actions
 (e.g., C<hw_create_do> for a create operation but C<hw_update_do> to
 update an existing book object).
 
+B<NOTE:> If you receive an error about Catalyst not being able to find
+the template C<hw_create_do.tt2>, please verify that you followed the
+instructions in the final section of
+L<Catalyst Basics|Catalyst::Manual::Tutorial::CatalystBasics> where
+you returned to a manually specified template.  You can either use 
+C<forward>/C<detach> B<OR> default template names, but the two cannot
+be used together.
+
+
 =head2 Update the CSS
 
 Edit C<root/src/ttsite.css> and add the following lines to the bottom of
@@ -249,8 +259,8 @@ the bottom of the existing file:
     <p>
       HTML::Widget:
       <a href="[% Catalyst.uri_for('hw_create') %]">Create</a>
-      <a href="[% Catalyst.uri_for('hw_update') %]">Update</a>
     </p>
+
 
 =head2 Test The <HTML::Widget> Create Form
 
@@ -540,7 +550,7 @@ match the following code:
             }
     
             # Set a status message for the user
-            $c->stash->{status_msg} = 'Book created';
+            $c->flash->{status_msg} = 'Book created';
             
             # Redisplay an empty form for another
             $c->stash->{widget_result} = $w->result;
@@ -571,7 +581,7 @@ running) and restart it:
 
     $ script/myapp_server.pl
 
-Try adding a book that validate.  Return to the book list and the book 
+Try adding a book that validates.  Return to the book list and the book 
 you added should be visible.
 
 
@@ -738,7 +748,7 @@ running) and restart it:
 
     $ script/myapp_server.pl
 
-Try adding a book that validate.  Return to the book list and the book 
+Try adding a book that validates.  Return to the book list and the book 
 you added should be visible.
 
 

@@ -797,6 +797,71 @@ of this module on your system:
     perl -MCatalyst::Plugin::Authorization::ACL -e 'print $Catalyst::Plugin::Authorization::ACL::VERSION, "\n";'
 
 
+=head1 USING THE SESSION FOR FLASH
+
+As discussed in Part 3 of the tutorial, C<flash> allows you to set
+variables in a way that is very similar to C<stash>, but it will 
+remain set across multiple requests.  Once the value is read, it
+is cleared (unless reset).  Although C<flash> has nothing to do with
+authentication, it does leverage the same session plugins.  Now that
+those plugins are enabled, let's go back and improve the "delete
+and redirect with query parameters" code seen at the end of the
+C<BasicCRUD> part of the tutorial.
+
+First, open C<lib/MyApp/Controller/Books.pm> and modify C<sub delete>
+to match the following:
+
+    =head2 delete 
+    
+    Delete a book
+        
+    =cut
+    
+    sub delete : Local {
+        # $id = primary key of book to delete
+        my ($self, $c, $id) = @_;
+    
+        # Search for the book and then delete it
+        $c->model('MyAppDB::Book')->search({id => $id})->delete_all;
+    
+        # Use 'flash' to save information across requests util it's read
+        $c->flash->{status_msg} = "Book deleted";
+            
+        # Redirect the user back to the list page with status msg as an arg
+        $c->response->redirect($c->uri_for('/books/list'));
+    }
+
+Next, open C<root/lib/site/layout> update the TT code to pull from flash
+vs. the C<status_msg> query parameter:
+
+    <div id="header">[% PROCESS site/header %]</div>
+    
+    <div id="content">
+    <span class="message">[% status_msg || Catalyst.flash.status_msg %]</span>
+    <span class="error">[% error_msg %]</span>
+    [% content %]
+    </div>
+    
+    <div id="footer">[% PROCESS site/footer %]</div>
+
+
+=head2 Try Out Flash
+
+Restart the development server and point your browser to 
+L<http://localhost:3000/books/url_create/Test/1/4> to create an extra
+book.  Click the "Return to list" link and delete this "Test" book.  
+The C<flash> mechanism should retain our "Book deleted" status message
+across the redirect.
+
+B<NOTE:> While C<flash> will save information across multiple requests,
+it does get cleared the first time it is read.  In general, this is
+exactly what you want -- the C<flash> message will get displayed on
+the next screen where it's appropriate, but it won't "keep showing up"
+after that first time (unless you reset it).  Please refer to
+L<Catalyst::Plugin::Session|Catalyst::Plugin::Session> for additional
+information.
+
+
 =head1 AUTHOR
 
 Kennedy Clark, C<hkclark@gmail.com>

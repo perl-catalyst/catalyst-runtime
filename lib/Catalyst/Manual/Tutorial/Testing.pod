@@ -2,6 +2,7 @@
 
 Catalyst::Manual::Tutorial::Testing - Catalyst Tutorial - Part 7: Testing
 
+
 =head1 OVERVIEW
 
 This is B<Part 7 of 9> for the Catalyst tutorial.
@@ -176,8 +177,14 @@ editor and enter the following:
         "Check we are NOT logged in") for $ua1, $ua2;
     
     # Log in as each user
+    # Specify username and password on the URL
     $ua1->get_ok("http://localhost/login?username=test01&password=mypass", "Login 'test01'");
-    $ua2->get_ok("http://localhost/login?username=test02&password=mypass", "Login 'test02'");
+    # Use the form for user 'test02'; note there is no description here
+    $ua2->submit_form(
+        fields => {
+            username => 'test02',
+            password => 'mypass',
+        });
     
     # Go back to the login page and it should show that we are already logged in
     $_->get_ok("http://localhost/login", "Return to '/login'") for $ua1, $ua2;
@@ -185,7 +192,7 @@ editor and enter the following:
     $_->content_contains("Please Note: You are already logged in as ",
         "Check we ARE logged in" ) for $ua1, $ua2;
     
-    # 'Click' the 'Logout' link
+    # 'Click' the 'Logout' link (see also 'text_regex' and 'url_regex' options)
     $_->follow_link_ok({n => 1}, "Logout via first link on page") for $ua1, $ua2;
     $_->title_is("Login", "Check for login title") for $ua1, $ua2;
     $_->content_contains("You need to log in to use this application",
@@ -233,7 +240,7 @@ editor and enter the following:
     $ua1->get_ok($delLinks[$#delLinks]->url, 'Delete last book');
     # Check that delete worked
     $ua1->content_contains("Book List", "Book List page test");
-    $ua1->content_contains("Book deleted.", "Book was deleted");
+    $ua1->content_contains("Book deleted", "Book was deleted");
     
     # User 'test02' should not be able to add a book
     $ua2->get_ok("http://localhost/books/url_create/TestTitle2/2/5", "'test02' add");
@@ -277,12 +284,31 @@ Note that although this tutorial uses a single custom test case for
 simplicity, you may wish to break your tests into different files for
 better organization.
 
+B<TIP:> If you have a test case that fails, you will receive an error
+similar to the following:
+
+    #   Failed test 'Check we are NOT logged in'
+    #   in t/live_app01.t at line 31.
+    #     searched: "\x{0a}<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Tran"...
+    #   can't find: "You need to log in to use this application."
+
+Unfortunately, this only shows us the first 50 characters of the HTML
+returned by the request -- not enough to determine where the problem
+lies.  A simple technique that can be used in such situations is to 
+temporarily insert a line similar to the following right after the 
+failed test:
+
+    warn $ua1->content;
+
+This will cause the full HTML returned by the request to be displayed.
+
+
 =head1 SUPPORTING BOTH PRODUCTION AND TEST DATABASES
 
 You may wish to leverage the techniques discussed in this tutorial to
 maintain both a "production database" for your live application and a
 "testing database" for your test cases.  One advantage to
-L<Test::WWW::Mechanize::Catalyst> is that
+L<Test::WWW::Mechanize::Catalyst|Test::WWW::Mechanize::Catalyst> is that
 it runs your full application; however, this can complicate things when
 you want to support multiple databases.  One solution is to allow the
 database specification to be overridden with an environment variable.
