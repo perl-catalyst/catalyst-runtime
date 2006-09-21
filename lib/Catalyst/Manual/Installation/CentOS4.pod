@@ -21,7 +21,7 @@ L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalys
 
 =head1 INSTALL CENTOS
 
-These directions are written for CentOS 4.3 on an i386 machine; however,
+These directions are written for CentOS 4.4 on an i386 machine; however,
 you can substitute other versions as they become available.
 
 
@@ -34,7 +34,7 @@ nearest mirror.
 
 =item * 
 
-Download C<CentOS-4.3-i386-bin1of4.iso> (you only need the first disk).
+Download C<CentOS-4.4-i386-bin1of4.iso> (you only need the first disk).
 
 =item * 
 
@@ -264,14 +264,18 @@ Type C<vi cat-install> to open the installer script, then insert the
 following lines at the bottom of the file (after the
 C<install('Catalyst');> line):
 
-    install('Catalyst::Devel');
     install('ExtUtils::ParseXS');
     install('Digest::SHA1');
     install('Digest::SHA');
     install('Class::DBI');
     install('DBIx::Class');
     install('DBIx::Class::HTMLWidget');
+    install('Module::ScanDeps');
+    install('Module::CoreList');
+    install('PAR::Dist');
+    install('Archive::Tar');
     install('Module::Install');
+    install('Catalyst::Devel');
     install('Catalyst::Plugin::ConfigLoader');
     install('Catalyst::Plugin::Session');
     install('Catalyst::Plugin::Session::State::Cookie');
@@ -294,6 +298,24 @@ C<install('Catalyst');> line):
 =item * 
 
 Type C<perl cat-install>.  It will take a while to complete.
+
+Tip: You may want to enable logging of the output that C<cat-install>
+generates as it runs -- it can be useful if you need to troubleshoot
+a failure.  The log will generate almost 1 MB of output.
+
+Note: Once the C<perl cat-install> is complete, you may want to rerun the 
+command to check the status of the packages listed in <cat-install>. Ideally, 
+everything should return a I<name> C<is up to date> message.  If any packages 
+try to re-install, the you could need to manually install the package with the 
+C<force> option.  Also, look for new optional dependences that C<cat-install> 
+was not able to automatically handle. You can address these by manually 
+installing the dependency and then re-running C<perl cat-install>.  
+
+In some cases you may wish to install an earlier version of a module.  For
+example, say that the latest version of Module::Install is 0.64 and you
+want to install 0.63.  The following command under C<perl -MCPAN -e shell>:
+
+    cpan> install A/AD/ADAMK/Module-Install-0.63.tar.gz
 
 =back
 
