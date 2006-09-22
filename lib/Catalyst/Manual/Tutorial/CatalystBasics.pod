@@ -411,7 +411,7 @@ sources"; see L<DBIx::Class::ResultSource>).  In this case, we want to
 load the model object for the C<books>, C<book_authors>, and C<authors>
 tables created in the previous step.
 
-Open C<lib/MyAppDB.pm> in your editor and insert:
+Create C<lib/MyAppDB.pm> in your editor and insert:
 
     package MyAppDB;
     
@@ -457,7 +457,7 @@ First, create a directory to hold the class:
 
     $ mkdir lib/MyAppDB
 
-Then open C<lib/MyAppDB/Book.pm> in your editor and enter:
+Then create C<lib/MyAppDB/Book.pm> in your editor and enter:
 
     package MyAppDB::Book;
     
@@ -520,7 +520,7 @@ us to use the shorter C<$book-E<gt>authors-E<gt>first-E<gt>last_name>.
 Note that you cannot define a C<many_to_many> relationship without also
 having the C<has_many> relationship in place.
 
-Next, open C<lib/MyAppDB/Author.pm> in your editor and enter:
+Next, create C<lib/MyAppDB/Author.pm> in your editor and enter:
 
     package MyAppDB::Author;
     
@@ -572,7 +572,7 @@ Next, open C<lib/MyAppDB/Author.pm> in your editor and enter:
     
     1;
 
-Finally, open C<lib/MyAppDB/BookAuthor.pm> in your editor and enter:
+Finally, create C<lib/MyAppDB/BookAuthor.pm> in your editor and enter:
 
     package MyAppDB::BookAuthor;
     
@@ -969,7 +969,7 @@ First create a directory for book-related TT templates:
 
     $ mkdir root/src/books
 
-Then open C<root/src/books/list.tt2> in your editor and enter:
+Then create C<root/src/books/list.tt2> in your editor and enter:
 
     [% # This is a TT comment.  The '-' at the end "chomps" the newline.  You won't -%]
     [% # see this "chomping" in your browser because HTML ignores blank lines, but  -%]
