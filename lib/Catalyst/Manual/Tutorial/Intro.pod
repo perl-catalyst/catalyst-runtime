@@ -319,6 +319,14 @@ part for the appropriate svn command to use).  Additionally, the final
 code is available as a ready-to-run tarball at
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz>.
 
+B<NOTE:> You can run the test cases for the final code with the following 
+commands:
+
+    wget http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz
+    tar zxvf MyApp.tgz
+    cd MyApp
+    CATALYST_DEBUG=0 prove --lib lib  t
+
 
 =head1 AUTHOR
 
