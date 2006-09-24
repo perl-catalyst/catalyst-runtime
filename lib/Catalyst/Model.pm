@@ -15,6 +15,11 @@ See L<Catalyst>.
 
 Catalyst Model base class.
 
+=head1 METHODS
+
+Implements the same methods as other Catalyst components, see
+L<Catalyst::Component>
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@oook.de>
