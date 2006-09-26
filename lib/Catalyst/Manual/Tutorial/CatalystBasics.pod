@@ -828,7 +828,7 @@ forwards processing to your view in order to generate the appropriate
 response output.  Catalyst v5.7000 ships with a new mechanism, 
 L<Catalyst::Action::RenderView|Catalyst::Action::RenderView>, that 
 automatically performs this operation.  If you look in 
-C<lib/MyApp/Controller/Root.pm>, you should see the this empty 
+C<lib/MyApp/Controller/Root.pm>, you should see the empty 
 definition for the C<sub end> method:
 
     sub end : ActionClass('RenderView') {}
