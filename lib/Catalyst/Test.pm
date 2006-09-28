@@ -72,9 +72,10 @@ sub import {
     if ( $ENV{CATALYST_SERVER} ) {
         $request = sub { remote_request(@_) };
         $get     = sub { remote_request(@_)->content };
-    }
-
-    else {
+    } elsif (! $class) {
+        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
+        $get     = $request;
+    } else {
         unless( Class::Inspector->loaded( $class ) ) {
             require Class::Inspector->filename( $class );
         }

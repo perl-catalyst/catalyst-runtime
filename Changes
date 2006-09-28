@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
+?        ?
+       - Allow use Catalyst::Test without app name (Ton Voon, Altinity)
+
 5.7003   2006-09-21 16:29:45
         - Additions and updates to tutorial
 
