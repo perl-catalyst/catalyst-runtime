@@ -80,8 +80,10 @@ See L<Catalyst>
 
 Catalyst Base Class
 
-This is the base class for all Catalyst components. It also handles 
-dispatch of actions for controllers.
+This is the base class for all Catalyst components.  It is a subclass
+of L<Catalyst::Component> which is the universal base class for
+catalyst components.  This module includes handling of dispatching for
+controller actions.
 
 =head1 METHODS
 
