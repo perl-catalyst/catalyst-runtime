@@ -61,6 +61,10 @@ Refactor everything that doesn't have to be class data into object data
 
 =item Add support for Isotope Engines
 
+This depends on the progress of Isotope
+
+=item Work towards a declarative syntax mode
+
 =back
  
 =head2 5.90000 2007
