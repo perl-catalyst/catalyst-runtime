@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 23;
 use strict;
 use warnings;
 
@@ -50,3 +50,29 @@ is_deeply( [ sort MyApp->controllers ],
 is_deeply( [ sort MyApp->models ],
            [ qw/Dummy::Model M Model Test::Object/ ],
            'models ok');
+
+is (MyApp->view , 'MyApp::V::View', 'view() with no defaults ok');
+
+is ( bless ({stash=>{current_view=>'V'}}, 'MyApp')->view , 'MyApp::View::V', 'current_view ok');
+
+my $view = bless {} , 'MyApp::View::V'; 
+is ( bless ({stash=>{current_view_instance=> $view }}, 'MyApp')->view , $view, 'current_view_instance ok');
+
+is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyApp::V::View' }}, 'MyApp')->view , $view, 
+  'current_view_instance precedes current_view ok');
+
+is (MyApp->model , 'MyApp::M::Model', 'model() with no defaults ok');
+
+is ( bless ({stash=>{current_model=>'M'}}, 'MyApp')->model , 'MyApp::Model::M', 'current_model ok');
+
+my $model = bless {} , 'MyApp::Model::M'; 
+is ( bless ({stash=>{current_model_instance=> $model }}, 'MyApp')->model , $model, 'current_model_instance ok');
+
+is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyApp::M::Model' }}, 'MyApp')->model , $model, 
+  'current_model_instance precedes current_model ok');
+
+MyApp->config->{default_view} = 'V';
+is ( bless ({stash=>{}}, 'MyApp')->view , 'MyApp::View::V', 'default_view ok');
+
+MyApp->config->{default_model} = 'M';
+is ( bless ({stash=>{}}, 'MyApp')->model , 'MyApp::Model::M', 'default_model ok');
