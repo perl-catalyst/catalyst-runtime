@@ -13,6 +13,11 @@ __PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class/;
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
 __PACKAGE__->_action_class('Catalyst::Action');
 
+__PACKAGE__->mk_accessors( qw/_application/ );
+
+### _app as alias
+*_app = *_application;
+
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
 
@@ -61,11 +66,11 @@ sub _END : Private {
 }
 
 sub new {
-  my $self = shift;
-  my $app = $_[0];
-  my $new = $self->NEXT::new(@_);
-  $new->{application} = $app;
-  return $new;
+    my $self = shift;
+    my $app = $_[0];
+    my $new = $self->NEXT::new(@_);
+    $new->_application( $app );
+    return $new;
 }
 
 =head1 NAME
@@ -90,7 +95,7 @@ controller actions.
 =head2 $class->new($app, @args)
 
 Proxies through to NEXT::new and stashes the application instance as
-$self->{application}.
+$self->_application.
 
 =head2 $self->action_for('name')
 
@@ -101,7 +106,7 @@ this component.
 
 sub action_for {
     my ( $self, $name ) = @_;
-    my $app = ($self->isa('Catalyst') ? $self : $self->{application});
+    my $app = ($self->isa('Catalyst') ? $self : $self->_application);
     return $app->dispatcher->get_action($name, $self->action_namespace);
 }
 
@@ -116,7 +121,7 @@ from the controller name (for e.g. MyApp::Controller::Foo::Bar becomes
 sub action_namespace {
     my ( $self, $c ) = @_;
     unless ( $c ) {
-        $c = ($self->isa('Catalyst') ? $self : $self->{application});
+        $c = ($self->isa('Catalyst') ? $self : $self->_application);
     }
     my $hash = (ref $self ? $self : $self->config); # hate app-is-class
     return $hash->{namespace} if exists $hash->{namespace};
@@ -136,7 +141,7 @@ overriden from the "path" config key.
 sub path_prefix {
     my ( $self, $c ) = @_;
     unless ( $c ) {
-        $c = ($self->isa('Catalyst') ? $self : $self->{application});
+        $c = ($self->isa('Catalyst') ? $self : $self->_application);
     }
     my $hash = (ref $self ? $self : $self->config); # hate app-is-class
     return $hash->{path} if exists $hash->{path};
@@ -316,6 +321,12 @@ sub _parse_ActionClass_attr {
     }
     return ( 'ActionClass', $value );
 }
+
+=head2 $self->_application  
+
+=head2 $self->_app
+
+Returns the application instance stored by C<new()>
 
 =head1 SEE ALSO
 
