@@ -1,3 +1,8 @@
+<IfDefine !APACHE1>
+    # Needed to pass some %2F tests
+    AllowEncodedSlashes on
+</IfDefine>
+
 # CGI
 <IfModule @CGI_MODULE@>
     ScriptAlias /cgi/ @ServerRoot@/tmp/TestApp/script/testapp_cgi.pl/
