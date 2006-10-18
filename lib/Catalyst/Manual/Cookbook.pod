@@ -1,4 +1,4 @@
-S=head1 NAME
+=head1 NAME
 
 Catalyst::Manual::Cookbook - Cooking with Catalyst
 
@@ -1681,15 +1681,15 @@ L<Catalyst::Engine::FastCGI>.
 
 =head2 Development server deployment
 
-The developemnt server is a mini web server written in perl.  If you
+The development server is a mini web server written in perl.  If you
 expect a low number of hits or you don't need mod_perl/FastCGI speed,
 you could use the development server as the application server with a
 lightweight proxy web server at the front.  However, be aware that
 there are known issues, especially with Internet Explorer.  Many of
 these issues can be dealt with by running the server with the -k
 (keepalive) option but be aware for more complex applications this may
-not be suitable.  Consider using Catalyst::Engine::HTTP::POE.  This recipe
-is easily adapted for POE as well.
+not be suitable.  Consider using Catalyst::Engine::HTTP::POE.  This
+recipe is easily adapted for POE as well.
 
 =head3 Pros
 
@@ -1699,7 +1699,8 @@ It is also:
 
 =head4 Simple
 
-The development server is what you create your code on, so if it works here, it should work in production!
+The development server is what you create your code on, so if it works
+here, it should work in production!
 
 =head3 Cons
 
