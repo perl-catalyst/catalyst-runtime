@@ -57,7 +57,7 @@ sub run_tests {
             'chained + local endpoint; missing last argument' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->header('Status'), 500, 'Status OK' );
+        is( $response->code, 500, 'Status OK' );
     }
 
     #
@@ -235,7 +235,7 @@ sub run_tests {
             'multi-action (three args, should lead to error)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->header('Status'), 500, 'Status OK' );
+        is( $response->code, 500, 'Status OK' );
     }
 
     #
@@ -646,7 +646,7 @@ sub run_tests {
             "Loose end is not callable" );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->header('Status'), 500, 'Status OK' );
+        is( $response->code, 500, 'Status OK' );
     }
 
     #
@@ -698,8 +698,8 @@ sub run_tests {
         ok( my $response = request(
             'http://localhost/action/chained/to_root' ),
             'uri_for with chained root action as arg' );
-        is( $response->content,
-            'URI:http://localhost/',
+        like( $response->content,
+            qr(URI:http://[^/]+/),
             'Correct URI generated' );
     }
 
