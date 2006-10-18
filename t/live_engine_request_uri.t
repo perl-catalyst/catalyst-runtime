@@ -88,7 +88,7 @@ my $creq;
 {
     ok( my $response = request('http://localhost/engine/request/uri/uri_with_object'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->header( 'X-Catalyst-Param-a' ), 'http://localhost/', 'param "a" ok' );
+    like( $response->header( 'X-Catalyst-Param-a' ), qr(http://localhost[^/]*/), 'param "a" ok' );
 }
 
 # test that uri_with is utf8 safe
