@@ -116,6 +116,12 @@ sub run {
 
     $options ||= {};
 
+    if ($options->{background}) {
+        my $child = fork;
+        die "Can't fork: $!" unless defined($child);
+        exit if $child;
+    }
+
     my $restart = 0;
     local $SIG{CHLD} = 'IGNORE';
 
@@ -147,9 +153,27 @@ sub run {
 
     print "You can connect to your server at $url\n";
 
+    if ($options->{background}) {
+        open STDIN,  "+</dev/null" or die $!;
+        open STDOUT, ">&STDIN"     or die $!;
+        open STDERR, ">&STDIN"     or die $!;
+        if ( $^O !~ /MSWin32/ ) {
+             require POSIX;
+             POSIX::setsid()
+                 or die "Can't start a new session: $!";
+        }
+    }
+
+    if (my $pidfile = $options->{pidfile}) {
+        if (! open PIDFILE, "> $pidfile") {
+            warn("Cannot open: $pidfile: $!");
+        }
+        print PIDFILE "$$\n";
+        close PIDFILE;
+    }
+
     $self->_keep_alive( $options->{keepalive} || 0 );
 
-    my $parent = $$;
     my $pid    = undef;
     while ( accept( Remote, $daemon ) )
     {    # TODO: get while ( my $remote = $daemon->accept ) to work

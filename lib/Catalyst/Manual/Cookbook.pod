@@ -1014,11 +1014,11 @@ Now, go ahead and make RSS feeds for all your stuff. The world *needs*
 updates on your goldfish!
 
 =head2 Forcing the browser to download content
- 
+
 Sometimes you need your application to send content for download. For
 example, you can generate a comma-separated values (CSV) file for your
 users to download and import into their spreadsheet program.
- 
+
 Let's say you have an C<Orders> controller which generates a CSV file
 in the C<export> action (i.e., C<http://localhost:3000/orders/export>):
 
@@ -1678,6 +1678,64 @@ Now, we simply configure Apache to connect to the running server.
 =head3 More Info
 
 L<Catalyst::Engine::FastCGI>.
+
+=head2 Development server deployment
+
+The developemnt server is a mini web server written in perl.  If you
+expect a low number of hits or you don't need mod_perl/FastCGI speed,
+you could use the development server as the application server with a
+lightweight proxy web server at the front.  However, be aware that
+there are known issues, especially with Internet Explorer.  Many of
+these issues can be dealt with by running the server with the -k
+(keepalive) option but be aware for more complex applications this may
+not be suitable.  Consider using Catalyst::Engine::POE.  This recipe
+is easily adapted for POE as well.
+
+=head3 Pros
+
+As this is an application server setup, the pros are the same as
+FastCGI (with the exception of speed).
+It is also:
+
+=head4 Simple
+
+The development server is what you create your code on, so if it works here, it should work in production!
+
+=head3 Cons
+
+=head4 Speed
+
+Not as fast as mod_perl or FastCGI. Needs to fork for each request
+that comes in - make sure static files are served by the web server to
+save forking.
+
+=head3 Setup
+
+=head4 Start up the development server
+
+   script/myapp_server.pl -p 8080 -k  -f -pidfile=/tmp/myapp.pid -daemon
+
+You will probably want to write an init script to handle stop/starting
+the app using the pid file.
+
+=head4 Configuring Apache
+
+Make sure mod_proxy is enabled and add:
+
+    # Serve static content directly
+    DocumentRoot /var/www/MyApp/root
+    Alias /static /var/www/MyApp/root/static
+
+    ProxyRequests Off
+    <Proxy *>
+        Order deny,allow
+        Allow from all
+    </Proxy>
+    ProxyPass / http://localhost:8080/
+    ProxyPassReverse / http://localhost:8080/
+
+You can wrap the above within a VirtualHost container if you want
+different apps served on the same host.
 
 =head2 Quick deployment: Building PAR Packages
 
