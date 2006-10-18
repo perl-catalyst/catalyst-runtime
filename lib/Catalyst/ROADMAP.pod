@@ -21,6 +21,18 @@ Catalyst Core.
 
 =over 4
 
+=item make deployment of Catalyst easier
+
+=over 4
+
+=item Add htaccess files to distro
+
+=item Trim runtime dependencies
+
+=item test dependency graph, make sure everything installs cleanly on different platforms.
+
+=back
+
 =item Add support for configuration profiles to be selected at startup time
 through switches / ENV
 
