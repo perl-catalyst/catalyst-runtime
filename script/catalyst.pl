@@ -3,6 +3,7 @@
 use strict;
 use Getopt::Long;
 use Pod::Usage;
+BEGIN {
 eval " use Catalyst::Devel 1.0; ";
 
 if ($@) {
@@ -17,6 +18,7 @@ vendor package or by running one of -
 END
 
 }
+};
 
 use Catalyst::Helper;
 
