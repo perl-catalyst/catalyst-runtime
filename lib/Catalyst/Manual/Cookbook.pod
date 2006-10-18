@@ -1688,7 +1688,7 @@ lightweight proxy web server at the front.  However, be aware that
 there are known issues, especially with Internet Explorer.  Many of
 these issues can be dealt with by running the server with the -k
 (keepalive) option but be aware for more complex applications this may
-not be suitable.  Consider using Catalyst::Engine::POE.  This recipe
+not be suitable.  Consider using Catalyst::Engine::HTTP::POE.  This recipe
 is easily adapted for POE as well.
 
 =head3 Pros
