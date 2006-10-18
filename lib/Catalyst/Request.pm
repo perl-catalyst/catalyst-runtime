@@ -81,7 +81,11 @@ thus hiding the details of the particular engine implementation.
 
 =head2 $req->action
 
-Returns the requested action as a L<Catalyst::Action> object.
+[DEPRECATED] Returns the name of the requested action.
+
+
+Use C<< $c->action >> instead (which returns a
+L<Catalyst::Action|Catalyst::Action> object).
 
 =head2 $req->address
 
