@@ -28,22 +28,22 @@ See L<Catalyst>.
 
 sub appprefix {
     my $class = shift;
-    $class =~ s/\:\:/_/g;
+    $class =~ s/::/_/g;
     $class = lc($class);
     return $class;
 }
 
 =head2 class2appclass($class);
 
-    MyApp::C::Foo::Bar becomes MyApp
-    My::App::C::Foo::Bar becomes My::App
+    MyApp::Controller::Foo::Bar becomes MyApp
+    My::App::Controller::Foo::Bar becomes My::App
 
 =cut
 
 sub class2appclass {
     my $class = shift || '';
     my $appname = '';
-    if ( $class =~ /^(.*)::([MVC]|Model|View|Controller)?::.*$/ ) {
+    if ( $class =~ /^(.+?)::([MVC]|Model|View|Controller)::.+$/ ) {
         $appname = $1;
     }
     return $appname;
@@ -51,15 +51,15 @@ sub class2appclass {
 
 =head2 class2classprefix($class);
 
-    MyApp::C::Foo::Bar becomes MyApp::C
-    My::App::C::Foo::Bar becomes My::App::C
+    MyApp::Controller::Foo::Bar becomes MyApp::Controller
+    My::App::Controller::Foo::Bar becomes My::App::Controller
 
 =cut
 
 sub class2classprefix {
     my $class = shift || '';
     my $prefix;
-    if ( $class =~ /^(.*::[MVC]|Model|View|Controller)?::.*$/ ) {
+    if ( $class =~ /^(.+?::([MVC]|Model|View|Controller))::.+$/ ) {
         $prefix = $1;
     }
     return $prefix;
@@ -67,14 +67,14 @@ sub class2classprefix {
 
 =head2 class2classsuffix($class);
 
-    MyApp::C::Foo::Bar becomes C::Foo::Bar
+    MyApp::Controller::Foo::Bar becomes Controller::Foo::Bar
 
 =cut
 
 sub class2classsuffix {
     my $class = shift || '';
     my $prefix = class2appclass($class) || '';
-    $class =~ s/$prefix\:\://;
+    $class =~ s/$prefix\:://;
     return $class;
 }
 
@@ -89,7 +89,7 @@ Returns the environment name for class.
 
 sub class2env {
     my $class = shift || '';
-    $class =~ s/\:\:/_/g;
+    $class =~ s/::/_/g;
     return uc($class);
 }
 
@@ -97,7 +97,7 @@ sub class2env {
 
 Returns the uri prefix for a class. If case is false the prefix is converted to lowercase.
 
-    My::App::C::Foo::Bar becomes foo/bar
+    My::App::Controller::Foo::Bar becomes foo/bar
 
 =cut
 
@@ -105,9 +105,9 @@ sub class2prefix {
     my $class = shift || '';
     my $case  = shift || 0;
     my $prefix;
-    if ( $class =~ /^.*::([MVC]|Model|View|Controller)?::(.*)$/ ) {
+    if ( $class =~ /^.+?::([MVC]|Model|View|Controller)::(.+)$/ ) {
         $prefix = $case ? $2 : lc $2;
-        $prefix =~ s/\:\:/\//g;
+        $prefix =~ s{::}{/}g;
     }
     return $prefix;
 }
@@ -199,7 +199,7 @@ sub home {
 
 Returns a prefixed action.
 
-    MyApp::C::Foo::Bar, yada becomes foo/bar/yada
+    MyApp::Controller::Foo::Bar, yada becomes foo/bar/yada
 
 =cut
 
