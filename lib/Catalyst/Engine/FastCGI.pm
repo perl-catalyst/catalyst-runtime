@@ -101,7 +101,16 @@ sub run {
 
     while ( $request->Accept >= 0 ) {
         $proc_manager && $proc_manager->pm_pre_dispatch();
+        
+        # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
+        # http://lists.rawmode.org/pipermail/catalyst/2006-June/008361.html
+        # Thanks to Mark Blythe for this fix
+        if ( $env{SERVER_SOFTWARE} && $env{SERVER_SOFTWARE} =~ /lighttpd/ ) {
+            $env{PATH_INFO} = delete $env{SCRIPT_NAME};
+        }
+        
         $class->handle_request( env => \%env );
+        
         $proc_manager && $proc_manager->pm_post_dispatch();
     }
 }
