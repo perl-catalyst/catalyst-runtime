@@ -106,7 +106,7 @@ sub run {
         # http://lists.rawmode.org/pipermail/catalyst/2006-June/008361.html
         # Thanks to Mark Blythe for this fix
         if ( $env{SERVER_SOFTWARE} && $env{SERVER_SOFTWARE} =~ /lighttpd/ ) {
-            $env{PATH_INFO} = delete $env{SCRIPT_NAME};
+            $env{PATH_INFO} ||= delete $env{SCRIPT_NAME};
         }
         
         $class->handle_request( env => \%env );
