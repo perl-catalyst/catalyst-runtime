@@ -54,7 +54,6 @@ server.document-root = "$docroot"
 server.errorlog    = "$docroot/error.log"
 accesslog.filename = "$docroot/access.log"
 
-server.bind = "127.0.0.1"
 server.port = $port
 
 # catalyst app specific fcgi setup
@@ -82,6 +81,8 @@ print "Waiting for server to start...\n";
 while ( check_port( 'localhost', $port ) != 1 ) {
     sleep 1;
 }
+
+exit;
 
 # run the testsuite against the server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
