@@ -335,16 +335,23 @@ sub _parse_request_line {
 sub _socket_data {
     my ( $self, $handle ) = @_;
 
-    my $remote_sockaddr = getpeername($handle);
-    my ( undef, $iaddr ) = sockaddr_in($remote_sockaddr);
-    my $local_sockaddr = getsockname($handle);
+    my $iaddr;
+    
+    my $remote_sockaddr       = getpeername($handle);
+    ( undef, $iaddr )         = sockaddr_in($remote_sockaddr);
+    my $local_sockaddr        = getsockname($handle);
     my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
 
+    # This mess is necessary to keep IE from crashing the server
     my $data = {
-        peername => gethostbyaddr( $iaddr, AF_INET ) || "localhost",
-        peeraddr => inet_ntoa($iaddr) || "127.0.0.1",
-        localname => gethostbyaddr( $localiaddr, AF_INET ) || "localhost",
-        localaddr => inet_ntoa($localiaddr) || "127.0.0.1",
+        peername  => $iaddr 
+            ? ( gethostbyaddr( $iaddr, AF_INET ) || 'localhost' )
+            : 'localhost',
+        peeraddr  => $iaddr 
+            ? ( inet_ntoa($iaddr) || '127.0.0.1' )
+            : '127.0.0.1',
+        localname => gethostbyaddr( $localiaddr, AF_INET ) || 'localhost',
+        localaddr => inet_ntoa($localiaddr) || '127.0.0.1',
     };
 
     return $data;
