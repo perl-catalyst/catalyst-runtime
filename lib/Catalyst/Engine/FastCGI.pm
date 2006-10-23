@@ -39,6 +39,7 @@ Options may also be specified;
   pidfile         Specify a filename for the pid file
   manager         Specify a FCGI::ProcManager sub-class
   detach          Detach from console
+  keep_stderr     Send STDERR to STDOUT instead of the webserver
 
 =cut
 
@@ -65,9 +66,12 @@ sub run {
     $options ||= {};
 
     my %env;
-
+    my $error = \*STDERR; # send STDERR to the web server
+       $error = \*STDOUT  # send STDERR to stdout (a logfile)
+	 if $options->{keep_stderr}; # (if asked to)
+    
     my $request =
-      FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%env, $sock,
+      FCGI::Request( \*STDIN, \*STDOUT, $error, \%env, $sock,
         ( $options->{nointr} ? 0 : &FCGI::FAIL_ACCEPT_ON_INTR ),
       );
 
