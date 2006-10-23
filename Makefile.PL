@@ -37,10 +37,13 @@ feature 'Apache/mod_perl Support',
 
 feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
 
+feature 'PAR support', -default => 0, 'PAR' => 0;
+
 install_script glob('script/*.pl');
+#auto_install;
 WriteAll;
 
-print( '*' x 80, "\n" );
+print( '*' x 74, "\n" );
 my $banner =
   (qw/andyg chansen draven fordmason mst naughton sri jester
       nothingmuch LTjake/)[ int( rand(10) ) ]
@@ -48,7 +51,7 @@ my $banner =
   . ( (localtime)[2] > 12 ? "drunk" : "hung over" )
   . " again!";
 print " $banner \n";
-print( '*' x 80, "\n" );
+print( '*' x 74, "\n" );
 
 eval "use FCGI";
 print qq/ Install "FCGI" for FastCGI support.\n/ if $@;
