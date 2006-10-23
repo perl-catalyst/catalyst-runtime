@@ -22,24 +22,53 @@ This class overloads some methods from C<Catalyst::Engine::CGI>.
 Starts the FastCGI server.  If C<$listen> is set, then it specifies a
 location to listen for FastCGI requests;
 
-  Form            Meaning
-  /path           listen via Unix sockets on /path
-  :port           listen via TCP on port on all interfaces
-  hostname:port   listen via TCP on port bound to hostname
+=over 4
+
+=item /path
+
+listen via Unix sockets on /path
+
+=item :port
+
+listen via TCP on port on all interfaces
+
+=item hostname:port
+
+listen via TCP on port bound to hostname
+
+=back
 
 Options may also be specified;
 
-  Option          Meaning
-  leave_umask     Set to 1 to disable setting umask to 0
-                  for socket open
-  nointr          Do not allow the listener to be
-                  interrupted by Ctrl+C
-  nproc           Specify a number of processes for
-                  FCGI::ProcManager
-  pidfile         Specify a filename for the pid file
-  manager         Specify a FCGI::ProcManager sub-class
-  detach          Detach from console
-  keep_stderr     Send STDERR to STDOUT instead of the webserver
+=over 4
+
+=item leave_umask
+
+Set to 1 to disable setting umask to 0 for socket open =item nointr
+
+Do not allow the listener to be interrupted by Ctrl+C
+
+=item nproc
+
+Specify a number of processes for FCGI::ProcManager
+
+=item pidfile
+
+Specify a filename for the pid file
+
+=item manager
+
+Specify a FCGI::ProcManager sub-class
+
+=item detach          
+
+Detach from console
+
+=item keep_stderr
+
+Send STDERR to STDOUT instead of the webserver
+
+=back
 
 =cut
 
