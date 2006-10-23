@@ -40,7 +40,7 @@ feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
 feature 'PAR support', -default => 0, 'PAR' => 0;
 
 install_script glob('script/*.pl');
-#auto_install;
+auto_install;
 WriteAll;
 
 print( '*' x 74, "\n" );
