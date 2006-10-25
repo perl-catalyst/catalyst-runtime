@@ -42,11 +42,9 @@ sub finalize_headers {
     my ( $self, $c ) = @_;
 
     $c->response->header( Status => $c->response->status );
-    
-    return unless *STDOUT->opened();
 
-    print $c->response->headers->as_string("\015\012");
-    print "\015\012";
+    print $c->response->headers->as_string("\015\012") if *STDOUT->opened();
+    print "\015\012" if *STDOUT->opened();
 }
 
 =head2 $self->prepare_connection($c)
