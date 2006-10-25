@@ -335,10 +335,11 @@ sub _parse_request_line {
 sub _socket_data {
     my ( $self, $handle ) = @_;
 
-    my $iaddr;
-    
     my $remote_sockaddr       = getpeername($handle);
-    ( undef, $iaddr )         = sockaddr_in($remote_sockaddr);
+    my ( undef, $iaddr )      = $remote_sockaddr 
+        ? sockaddr_in($remote_sockaddr) 
+        : (undef, undef);
+        
     my $local_sockaddr        = getsockname($handle);
     my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
 

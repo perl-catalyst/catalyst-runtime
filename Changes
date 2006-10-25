@@ -1,7 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
 ?5.7004? 2006-10-25 ??:??:??
-        - Fix Engine::HTTP crash when using IE. (Jesper Krogh)
+        - Fix Engine::HTTP crash when using IE. (Jesper Krogh, Peter Edwards)
         - clean up Catalyst::Utils to handle some edge cases
         - Properly work around lighttpd PATH_INFO vs. SCRIPT_NAME bug.
           (Mark Blythe)
