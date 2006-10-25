@@ -42,6 +42,8 @@ sub finalize_headers {
     my ( $self, $c ) = @_;
 
     $c->response->header( Status => $c->response->status );
+    
+    return unless *STDOUT->opened();
 
     print $c->response->headers->as_string("\015\012");
     print "\015\012";
