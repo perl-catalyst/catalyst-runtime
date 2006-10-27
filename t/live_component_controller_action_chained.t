@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
 
-use Test::More tests => 106*$iters;
+use Test::More tests => 109*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -726,6 +726,25 @@ sub run_tests {
                 "Usage of absolute path part argument emits error" );
         }
         else { pass( "Error on absolute path part arguments already tested" ) }
+    }
+
+    #
+    #   Test chained actions in the root controller
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Root->rootsub
+          TestApp::Controller::Action::Chained::Root->endpointsub
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/rootsub/1/endpointsub/2'), 'chained in root namespace' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 2', 'Content OK' );
     }
 
     #
