@@ -733,10 +733,9 @@ sub run_tests {
     #
     {
         my @expected = qw[
-          TestApp::Controller::Action::Chained->begin
           TestApp::Controller::Action::Chained::Root->rootsub
           TestApp::Controller::Action::Chained::Root->endpointsub
-          TestApp::Controller::Action::Chained->end
+          TestApp->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -744,7 +743,7 @@ sub run_tests {
         ok( my $response = request('http://localhost/rootsub/1/endpointsub/2'), 'chained in root namespace' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, '1; 2', 'Content OK' );
+        is( $response->content, '', 'Content OK' );
     }
 
     #
