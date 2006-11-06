@@ -5,9 +5,9 @@ This file documents the revision history for Perl extension Catalyst.
         - clean up Catalyst::Utils to handle some edge cases
         - Properly work around lighttpd PATH_INFO vs. SCRIPT_NAME bug
           (Mark Blythe)
-        - add _application accessor
+        - add _application accessor to Catalyst::Base
         - Support current_view
-        - Allow use Catalyst::Test without app name (Ton Voon, Altinity)
+        - Allow use of Catalyst::Test without app name (Ton Voon, Altinity)
         - Catalyst::Manual moved to its own package
         - Add option to FastCGI engine to send errors to stdout, not the web server
         - Use Module::Install's auto_install to install prerequisite modules 
