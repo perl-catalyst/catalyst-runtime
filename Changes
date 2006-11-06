@@ -1,16 +1,17 @@
 This file documents the revision history for Perl extension Catalyst.
 
-?5.7004? 2006-10-25 ??:??:??
+5.7004   2006-11-????
         - Fix Engine::HTTP crash when using IE. (Jesper Krogh, Peter Edwards)
         - clean up Catalyst::Utils to handle some edge cases
-        - Properly work around lighttpd PATH_INFO vs. SCRIPT_NAME bug.
+        - Properly work around lighttpd PATH_INFO vs. SCRIPT_NAME bug
           (Mark Blythe)
         - add _application accessor
         - Support current_view
         - Allow use Catalyst::Test without app name (Ton Voon, Altinity)
         - Catalyst::Manual moved to its own package
         - Add option to FastCGI engine to send errors to stdout, not the web server
-	- Use Module::Install's auto_install to install prerequisite modules 
+        - Use Module::Install's auto_install to install prerequisite modules 
+        - various documentation fixes and improvements
 	
 5.7003   2006-09-21 16:29:45
         - Additions and updates to tutorial
