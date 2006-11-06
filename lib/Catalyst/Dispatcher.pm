@@ -500,8 +500,8 @@ sub setup_actions {
     };
 
     $walker->( $walker, $self->tree, '' );
-    $c->log->debug( "Loaded Private actions:\n" . $privates->draw )
-      if ($has_private);
+    $c->log->debug( "Loaded Private actions:\n" . $privates->draw . "\n" )
+      if $has_private;
 
     # List all public actions
     $_->list($c) for @{ $self->dispatch_types };

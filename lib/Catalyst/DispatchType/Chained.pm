@@ -85,7 +85,7 @@ sub list {
         $paths->row(@$_) for @rows;
     }
 
-    $c->log->debug( "Loaded Path Part actions:\n" . $paths->draw );
+    $c->log->debug( "Loaded Chained actions:\n" . $paths->draw . "\n" );
 }
 
 =head2 $self->match( $c, $path )

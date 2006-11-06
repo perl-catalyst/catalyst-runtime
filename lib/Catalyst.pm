@@ -817,6 +817,7 @@ You are running an old script!
 
   or (this will not overwrite existing files):
     catalyst.pl -scripts $class
+
 EOF
     }
     
@@ -826,7 +827,7 @@ EOF
         if (@plugins) {
             my $t = Text::SimpleTable->new(74);
             $t->row($_) for @plugins;
-            $class->log->debug( "Loaded plugins:\n" . $t->draw );
+            $class->log->debug( "Loaded plugins:\n" . $t->draw . "\n" );
         }
 
         my $dispatcher = $class->dispatcher;
@@ -861,7 +862,7 @@ EOF
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
             $t->row( $comp, $type );
         }
-        $class->log->debug( "Loaded components:\n" . $t->draw )
+        $class->log->debug( "Loaded components:\n" . $t->draw . "\n" )
           if ( keys %{ $class->components } );
     }
 
@@ -1327,7 +1328,7 @@ sub finalize {
         );
 
         $c->log->info(
-            "Request took ${elapsed}s ($av/s)\n" . $t->draw );        
+            "Request took ${elapsed}s ($av/s)\n" . $t->draw . "\n" );        
     }
 
     return $c->response->status;

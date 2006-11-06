@@ -69,7 +69,8 @@ sub _log {
     my $self    = shift;
     my $level   = shift;
     my $message = join( "\n", @_ );
-    $self->{body} .= sprintf( "[%s] %s\n", $level, $message );
+    $message .= "\n" unless $message =~ /\n$/;
+    $self->{body} .= sprintf( "[%s] %s", $level, $message );
 }
 
 sub _flush {

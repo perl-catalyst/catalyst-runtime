@@ -30,7 +30,7 @@ sub list {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
     }
-    $c->log->debug( "Loaded Regex actions:\n" . $re->draw )
+    $c->log->debug( "Loaded Regex actions:\n" . $re->draw . "\n" )
       if ( @{ $self->{compiled} } );
 }
 
