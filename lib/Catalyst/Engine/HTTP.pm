@@ -50,7 +50,12 @@ sub finalize_headers {
     $c->response->headers->date(time);
     $c->response->headers->header(
         Connection => $self->_keep_alive ? 'keep-alive' : 'close' );
-    $self->NEXT::finalize_headers($c);
+        
+    $c->response->header( Status => $c->response->status );
+        
+    # Avoid 'print() on closed filehandle Remote' warnings when using IE
+    print $c->response->headers->as_string("\015\012") if *STDOUT->opened();
+    print "\015\012" if *STDOUT->opened();
 }
 
 =head2 $self->finalize_read($c)
@@ -104,6 +109,19 @@ sub read_chunk {
             return;
         }
     }
+}
+
+=head2 $self->write($c, $buffer)
+
+Writes the buffer to the client. Can only be called once for a request.
+
+=cut
+
+sub write {
+	# Avoid 'print() on closed filehandle Remote' warnings when using IE
+	return unless *STDOUT->opened();
+	
+	shift->NEXT::write( @_ );
 }
 
 =head2 run

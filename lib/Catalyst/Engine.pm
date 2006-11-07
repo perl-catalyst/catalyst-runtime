@@ -579,8 +579,6 @@ sub write {
         $self->prepare_write($c);
         $self->{_prepared_write} = 1;
     }
-    
-    return unless *STDOUT->opened();
 
     print STDOUT $buffer;
 }

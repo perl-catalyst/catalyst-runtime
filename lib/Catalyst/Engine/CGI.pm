@@ -43,8 +43,8 @@ sub finalize_headers {
 
     $c->response->header( Status => $c->response->status );
 
-    print $c->response->headers->as_string("\015\012") if *STDOUT->opened();
-    print "\015\012" if *STDOUT->opened();
+    print $c->response->headers->as_string("\015\012");
+    print "\015\012";
 }
 
 =head2 $self->prepare_connection($c)
