@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7004   2006-11-????
+5.7005   2006-11-??
+        - Fixed lighttpd tests to be properly skipped.
+        - Moved IE workarounds to exist only in the HTTP engine.
+
+5.7004   2006-11-06 20:48:35
         - Fix Engine::HTTP crash when using IE. (Jesper Krogh, Peter Edwards)
         - clean up Catalyst::Utils to handle some edge cases
         - Properly work around lighttpd PATH_INFO vs. SCRIPT_NAME bug
