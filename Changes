@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7005   2006-11-??
+5.7005   2006-11-07 19:37:35
         - Fixed lighttpd tests to be properly skipped.
         - Moved IE workarounds to exist only in the HTTP engine.
         - Added installation instructions (from Catalyst-Manual dist)
@@ -36,9 +36,9 @@ This file documents the revision history for Perl extension Catalyst.
         - fix FCGI.pm warning message with FastCGI engine
         - bumped inc::Module::Install to 0.63 in Makefile.PL
         - fixes to uri_for_action for DispatchType::Chained
-	- Further doc work.
-	- Minor code cleanups 
-	- Changed catalyst.pl to depend on Catalyst::Devel
+        - Further doc work.
+        - Minor code cleanups 
+        - Changed catalyst.pl to depend on Catalyst::Devel
 
 5.70_03  2006-06-28 16:42:00
         - fixup to registered plugins debug at app startup
