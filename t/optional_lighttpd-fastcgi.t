@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use File::Path;
-use File::Slurp qw(write_file);
 use FindBin;
 use IO::Socket;
 use Test::More;
@@ -15,11 +14,13 @@ plan skip_all => 'Catalyst::Devel required' if $@;
 eval "use File::Copy::Recursive";
 plan skip_all => 'File::Copy::Recursive required' if $@;
 
-my $lighttpd_bin = $ENV{LIGHTTPD_BIN} || 'lighttpd';
-plan skip_all => 'Cannot find lighttpd, please set LIGHTTPD_BIN'
-    unless -x $lighttpd_bin;
+my $lighttpd_bin = $ENV{LIGHTTPD_BIN};
+plan skip_all => 'Please set LIGHTTPD_BIN to run this test'
+    unless $lighttpd_bin && -x $lighttpd_bin;
 
 plan tests => 1;
+
+require File::Slurp;
 
 # clean up
 rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
@@ -72,7 +73,7 @@ fastcgi.server = (
 )
 };
 
-write_file "$docroot/lighttpd.conf", $conf;
+File::Slurp::write_file( "$docroot/lighttpd.conf", $conf );
 
 my $pid = open my $lighttpd, "$lighttpd_bin -D -f $docroot/lighttpd.conf 2>&1 |" 
     or die "Unable to spawn lighttpd: $!";
