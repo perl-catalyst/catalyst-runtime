@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 41;
+use Test::More tests => 44;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -96,4 +96,11 @@ my $creq;
     ok( my $response = request("http://localhost/engine/request/uri/uri_with_utf8"), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     like( $response->header( 'X-Catalyst-uri-with' ), qr/%E2%98%A0$/, 'uri_with ok' );
+}
+
+# test with undef -- no warnings should be thrown
+{
+    ok( my $response = request("http://localhost/engine/request/uri/uri_with_undef"), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-warnings' ), 0, 'no warnings emitted' );
 }

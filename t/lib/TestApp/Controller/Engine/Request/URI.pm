@@ -63,4 +63,18 @@ sub uri_with_utf8 : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub uri_with_undef : Local {
+    my ( $self, $c ) = @_;
+
+    my $warnings = 0;
+    local $SIG{__WARN__} = sub { $warnings++ };
+
+    # change the current uri
+    my $uri = $c->req->uri_with( { foo => undef } );
+    
+    $c->res->header( 'X-Catalyst-warnings' => $warnings );
+    
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;

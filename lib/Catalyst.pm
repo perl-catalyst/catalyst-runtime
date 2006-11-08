@@ -925,6 +925,7 @@ sub uri_for {
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     for my $value ( values %$params ) {
+        next unless defined $value;
         for ( ref $value eq 'ARRAY' ? @$value : $value ) {
             $_ = "$_";
             utf8::encode( $_ );

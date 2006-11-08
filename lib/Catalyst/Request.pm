@@ -516,6 +516,7 @@ sub uri_with {
     carp( 'No arguments passed to uri_with()' ) unless $args;
 
     for my $value ( values %$args ) {
+        next unless defined $value;
         for ( ref $value eq 'ARRAY' ? @$value : $value ) {
             $_ = "$_";
             utf8::encode( $_ );
