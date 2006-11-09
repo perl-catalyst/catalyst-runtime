@@ -8,6 +8,9 @@ use FindBin;
 use IO::Socket;
 use Test::More;
 
+plan skip_all => 'set TEST_LIGHTTPD to enable this test' 
+    unless $ENV{TEST_LIGHTTPD};
+
 eval "use Catalyst::Devel 1.0";
 plan skip_all => 'Catalyst::Devel required' if $@;
 
@@ -18,7 +21,7 @@ eval "use Test::Harness";
 plan skip_all => 'Test::Harness required' if $@;
 
 my $lighttpd_bin = $ENV{LIGHTTPD_BIN};
-plan skip_all => 'Please set LIGHTTPD_BIN to run this test'
+plan skip_all => 'Please set LIGHTTPD_BIN to the path to lighttpd'
     unless $lighttpd_bin && -x $lighttpd_bin;
 
 plan tests => 1;
