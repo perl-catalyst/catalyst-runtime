@@ -20,8 +20,6 @@ plan skip_all => 'Please set LIGHTTPD_BIN to run this test'
 
 plan tests => 1;
 
-require File::Slurp;
-
 # clean up
 rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
 
@@ -42,7 +40,7 @@ my $port    = 8529;
 # Clean up docroot path
 $docroot =~ s{/t/..}{};
 
-my $conf = qq{
+my $conf = <<"END";
 # basic lighttpd config file for testing fcgi+catalyst
 server.modules = (
     "mod_access",
@@ -71,9 +69,11 @@ fastcgi.server = (
         )
     )
 )
-};
+END
 
-File::Slurp::write_file( "$docroot/lighttpd.conf", $conf );
+open(my $lightconf, '>', "$docroot/lighttpd.conf") or die "Can't open $docroot/lighttpd.conf: $!";
+print {$lightconf} $conf or die "Write error: $!";
+close $lightconf;
 
 my $pid = open my $lighttpd, "$lighttpd_bin -D -f $docroot/lighttpd.conf 2>&1 |" 
     or die "Unable to spawn lighttpd: $!";
