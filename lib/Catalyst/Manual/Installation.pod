@@ -118,8 +118,8 @@ C<emerge catalystframework>.
 FreeBSD
 
 FreeBSD users can get up and running quickly by typing C<cd
-/usr/ports/www/p5-Catalyst && make install>, or C<portinstall
-p5-Catalyst> if C<portinstall> is installed on your system.
+/usr/ports/www/p5-Catalyst-Devel && make install>, or C<portinstall
+p5-Catalyst-Devel> if C<portinstall> is installed on your system.
 
 =item * 
 
@@ -127,7 +127,7 @@ Windows ActivePerl
 
 Windows users can take advantage of the PPM tool that comes with
 ActivePerl to jumpstart their Catalyst environment.  Directions are
-available at L<http://catalyst.infogami.com/katalytes/cat_on_windows>.
+available at L<http://catalyst.infogami.com/install/windows>.
 
 =item *
 
