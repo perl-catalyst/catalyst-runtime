@@ -20,7 +20,9 @@ plan skip_all => 'File::Copy::Recursive required' if $@;
 eval "use Test::Harness";
 plan skip_all => 'Test::Harness required' if $@;
 
-my $lighttpd_bin = $ENV{LIGHTTPD_BIN};
+my $lighttpd_bin = $ENV{LIGHTTPD_BIN} || `which lighttpd`;
+chomp $lighttpd_bin;
+
 plan skip_all => 'Please set LIGHTTPD_BIN to the path to lighttpd'
     unless $lighttpd_bin && -x $lighttpd_bin;
 
