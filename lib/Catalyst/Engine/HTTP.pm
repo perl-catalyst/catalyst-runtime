@@ -303,7 +303,7 @@ sub _handler {
                 $name = 'HTTP_' . $name
                   unless $name =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
                 if ( exists $ENV{$name} ) {
-                    $ENV{$name} .= "; $value";
+                    $ENV{$name} .= ", $value";
                 }
                 else {
                     $ENV{$name} = $value;

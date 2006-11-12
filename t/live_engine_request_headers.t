@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -20,6 +20,7 @@ use URI;
     my $request = GET( 'http://localhost/dump/request', 
         'User-Agent'       => 'MyAgen/1.0',
         'X-Whats-Cool'     => 'Catalyst',
+        'X-Multiple'       => [ 1 .. 5 ],
         'X-Forwarded-Host' => 'frontend.server.com',
         'X-Forwarded-For'  => '192.168.1.1, 1.2.3.4',
     );
@@ -32,6 +33,14 @@ use URI;
     isa_ok( $creq, 'Catalyst::Request' );
     isa_ok( $creq->headers, 'HTTP::Headers', 'Catalyst::Request->headers' );
     is( $creq->header('X-Whats-Cool'), $request->header('X-Whats-Cool'), 'Catalyst::Request->header X-Whats-Cool' );
+    
+    { # Test that multiple headers are joined as per RFC 2616 4.2 and RFC 3875 4.1.18
+
+        my $excpected = '1, 2, 3, 4, 5';
+        
+        is( $creq->header('X-Multiple'), $request->header('X-Multiple'), 'Multiple message-headers are joined as a comma-separated list' );
+    }
+
     is( $creq->header('User-Agent'), $request->header('User-Agent'), 'Catalyst::Request->header User-Agent' );
 
     my $host = sprintf( '%s:%d', $request->uri->host, $request->uri->port );
