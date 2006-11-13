@@ -5,6 +5,7 @@ use base 'Catalyst::Engine';
 use NEXT;
 use URI;
 
+my $uri_proto=URI->new();
 __PACKAGE__->mk_accessors('env');
 
 =head1 NAME
@@ -140,7 +141,7 @@ sub prepare_path {
     my $path = $base_path . ( $ENV{PATH_INFO} || '' );
     $path =~ s{^/+}{};
 
-    my $uri = URI->new;
+    my $uri = $uri_proto->clone;
     $uri->scheme($scheme);
     $uri->host($host);
     $uri->port($port);
