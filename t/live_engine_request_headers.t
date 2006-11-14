@@ -37,8 +37,9 @@ use URI;
     { # Test that multiple headers are joined as per RFC 2616 4.2 and RFC 3875 4.1.18
 
         my $excpected = '1, 2, 3, 4, 5';
-        
-        is( $creq->header('X-Multiple'), $request->header('X-Multiple'), 'Multiple message-headers are joined as a comma-separated list' );
+        my $got       = $creq->header('X-Multiple'); # HTTP::Headers is context sensitive, "force" scalar context
+
+        is( $got, $excpected, 'Multiple message-headers are joined as a comma-separated list' );
     }
 
     is( $creq->header('User-Agent'), $request->header('User-Agent'), 'Catalyst::Request->header User-Agent' );
