@@ -3,26 +3,10 @@
 use strict;
 use warnings;
 
-BEGIN {
-    use Test::More;
-
-    eval "use Catalyst::Devel 1.0";
-    plan skip_all => 'Catalyst::Devel required' if $@;
-
-    eval "use File::Copy::Recursive";
-    plan skip_all => 'File::Copy::Recursive required' if $@;
-
-    my $lighttpd_bin = $ENV{LIGHTTPD_BIN} || 'lighttpd';
-    plan skip_all => 'Cannot find lighttpd, please set LIGHTTPD_BIN'
-    unless -x $lighttpd_bin;
-
-    plan tests => 1;
-
-};
-
 use File::Path;
 use FindBin;
 use IO::Socket;
+use Test::More;
 
 plan skip_all => 'set TEST_LIGHTTPD to enable this test' 
     unless $ENV{TEST_LIGHTTPD};
