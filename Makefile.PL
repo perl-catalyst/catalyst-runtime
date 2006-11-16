@@ -31,14 +31,6 @@ requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 
-feature 'Apache/mod_perl Support',
-  -default                   => 0,
-  'Catalyst::Engine::Apache' => '1.05';
-
-feature 'FastCGI Support', -default => 0, 'FCGI' => 0, 'FCGI::ProcManager' => 0;
-
-feature 'PAR support', -default => 0, 'PAR' => 0;
-
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
@@ -52,15 +44,6 @@ my $banner =
   . " again!";
 print " $banner \n";
 print( '*' x 74, "\n" );
-
-eval "use FCGI";
-print qq/ Install "FCGI" for FastCGI support.\n/ if $@;
-eval "use FCGI::ProcManager";
-print
-  qq/ Install "FCGI::ProcManager" for multiprocess FastCGI external support.\n/
-  if ($@);
-eval "use PAR ()";
-print qq/ Install "PAR" for PAR packaging support.\n/ if $@;
 
 print <<"EOF";
 
