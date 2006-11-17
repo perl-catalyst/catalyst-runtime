@@ -1,8 +1,13 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7006	2006-11-03 14.18
-	- Updated manifest
-	- Fix Slurp dependency
+5.7007  ??
+        - Don't ignore file uploads if form contains a text field with the same name.
+          (Carl Franks)
+        - ...
+
+5.7006   2006-11-03 14.18
+        - Updated manifest
+        - Fix Slurp dependency
         - Updated HTTP::Body dependency to 0.6, 0.5 can break on large POST requests.
         - Skip utf8 fix for undef values in uri_with() and uri_for()
 
@@ -23,7 +28,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Add option to FastCGI engine to send errors to stdout, not the web server
         - Use Module::Install's auto_install to install prerequisite modules 
         - various documentation fixes and improvements
-	
+        
 5.7003   2006-09-21 16:29:45
         - Additions and updates to tutorial
 
@@ -51,7 +56,7 @@ This file documents the revision history for Perl extension Catalyst.
         - refactored Catalyst::Utils::home
 
 5.70_02  2006-06-27 11:51:00
-	- Updated tutorial.
+        - Updated tutorial.
 
 5.70_01  2006-06-26 10:49:00
 
@@ -80,7 +85,7 @@ This file documents the revision history for Perl extension Catalyst.
         - Updated docs for Catalyst::Component
         - Separated execute and dispatch on Catalyst::Action
         - cleaned up logging and debug output
-	- significant documentation revisions
+        - significant documentation revisions
         - Added warning for setup being called twice
         - Fix pod to use DBIC::Schema instead of DBIC model
         - Fix ->config failing to copy _config for subclassing
@@ -108,7 +113,7 @@ This file documents the revision history for Perl extension Catalyst.
 5.68    2006-04-26 12:23:00
         - ConfigLoader: Updated to version 0.06
         - fixed undef warnings in uri_for() and uri_with()
-	- Fixed Catalyst::Test to report errors on failed Class load
+        - Fixed Catalyst::Test to report errors on failed Class load
 
 5.678   2006-04-24 12:30:00
         - Re-release of 5.67 without OSX metadata files.
