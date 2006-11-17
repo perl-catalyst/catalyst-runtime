@@ -494,8 +494,20 @@ sub prepare_uploads {
 
         # support access to the filename as a normal param
         my @filenames = map { $_->{filename} } @uploads;
-        $c->request->parameters->{$name} =
-          @filenames > 1 ? \@filenames : $filenames[0];
+        # append, if there's already params with this name
+        if (exists $c->request->parameters->{$name}) {
+            if (ref $c->request->parameters->{$name} eq 'ARRAY') {
+                push @{ $c->request->parameters->{$name} }, @filenames;
+            }
+            else {
+                $c->request->parameters->{$name} = 
+                    [ $c->request->parameters->{$name}, @filenames ];
+            }
+        }
+        else {
+            $c->request->parameters->{$name} =
+                @filenames > 1 ? \@filenames : $filenames[0];
+        }
     }
 }
 
