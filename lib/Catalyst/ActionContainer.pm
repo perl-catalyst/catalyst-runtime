@@ -3,6 +3,21 @@ package Catalyst::ActionContainer;
 use strict;
 use base qw/Class::Accessor::Fast/;
 
+=head1 NAME
+
+Catalyst::ActionContainer - Catalyst Action Container
+
+=head1 SYNOPSIS
+
+See L<Catalyst>.
+
+=head1 DESCRIPTION
+
+This is a container for actions. The dispatcher sets up a tree of these
+to represent the various dispatch points in your application.
+
+=cut
+
 __PACKAGE__->mk_accessors(qw/part actions/);
 
 use overload (
@@ -20,18 +35,23 @@ sub new {
     $class->SUPER::new($fields);
 }
 
-=head1 NAME
 
-Catalyst::ActionContainer - Catalyst Action Container
 
-=head1 SYNOPSIS
+sub get_action {
+    my ( $self, $name ) = @_;
+    return $self->actions->{$name} if defined $self->actions->{$name};
+    return;
+}
 
-See L<Catalyst>.
+sub add_action {
+    my ( $self, $action, $name ) = @_;
+    $name ||= $action->name;
+    $self->actions->{$name} = $action;
+}
 
-=head1 DESCRIPTION
+1;
 
-This is a container for actions. The dispatcher sets up a tree of these
-to represent the various dispatch points in your application.
+__END__
 
 =head1 METHODS
 
@@ -45,25 +65,9 @@ hashref to be populated via add_action later
 
 Returns an action from this container based on the action name, or undef
 
-=cut
-
-sub get_action {
-    my ( $self, $name ) = @_;
-    return $self->actions->{$name} if defined $self->actions->{$name};
-    return;
-}
-
 =head2 add_action($action, [ $name ])
 
 Adds an action, optionally providing a name to override $action->name
-
-=cut
-
-sub add_action {
-    my ( $self, $action, $name ) = @_;
-    $name ||= $action->name;
-    $self->actions->{$name} = $action;
-}
 
 =head2 actions
 
@@ -76,7 +80,7 @@ stringifies to.
 
 =head1 AUTHOR
 
-Matt S. Trout
+Matt S. Trout 
 
 =head1 COPYRIGHT
 
