@@ -461,7 +461,7 @@ effect as using C<:PathPart>, it would default to the action name.
 Has to be specified for every child in the chain. Possible values are
 absolute and relative private action paths, with the relatives pointing
 to the current controller, or a single slash C</> to tell Catalyst that
-this is the root of a chain. The attribute C<:Chained> without aguments
+this is the root of a chain. The attribute C<:Chained> without arguments
 also defaults to the C</> behavior.
 
 Because you can specify an absolute path to the parent action, it
