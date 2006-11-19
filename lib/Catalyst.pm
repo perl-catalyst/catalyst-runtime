@@ -1038,7 +1038,7 @@ sub welcome_message {
                  <p>
                  <img src="$logo" alt="Catalyst Logo" />
                  </p>
-                 <p>Welcome to the wonderful world of Catalyst.
+                 <p>Welcome to the  world of Catalyst.
                     This <a href="http://en.wikipedia.org/wiki/MVC">MVC</a>
                     framework will make web development something you had
                     never expected it to be: Fun, rewarding, and quick.</p>
@@ -1046,9 +1046,13 @@ sub welcome_message {
                  <p>That really depends  on what <b>you</b> want to do.
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
-                    you might want to check out the documentation.</p>
-                 <pre><code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
-perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
+                    you might want want to start with a tutorial.</p>
+<pre>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
+</pre>
+<p>Afterwards you can go on to check out a more complete look at our features.</p>
+<pre>
+<code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
+				
 perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a></code></pre>
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
