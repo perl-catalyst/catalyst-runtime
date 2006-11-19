@@ -13,6 +13,8 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
+This is an abstract base class for Dispatch Types. 
+
 =head1 METHODS
 
 =head2 $self->list($c)
