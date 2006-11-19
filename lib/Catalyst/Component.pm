@@ -5,7 +5,6 @@ use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use NEXT;
 use Catalyst::Utils;
 
-__PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
 =head1 NAME
 
@@ -42,20 +41,17 @@ Catalyst::Component - Catalyst Component Base Class
 
 =head1 DESCRIPTION
 
-This is the universal base class for Catalyst components
+This is the universal base class for Catalyst components 
 (Model/View/Controller).
 
 It provides you with a generic new() for instantiation through Catalyst's
 component loader with config() support and a process() method placeholder.
 
-=head1 METHODS
-
-=head2 new($c, $arguments)
-
-Called by COMPONENT to instantiate the component; should return an object
-to be stored in the application's component hash.
-
 =cut
+
+__PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
+
+
 
 sub new {
     my ( $self, $c ) = @_;
@@ -63,20 +59,9 @@ sub new {
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( $self->merge_config_hashes( $self->config, $arguments ) );
+    return $self->NEXT::new( 
+		$self->merge_config_hashes( $self->config, $arguments ) );
 }
-
-=head2 COMPONENT($c, $arguments)
-
-If this method is present (as it is on all Catalyst::Component subclasses,
-it is called by Catalyst during setup_components with the application class
-as $c and any config entry on the application for this component (for example,
-in the case of MyApp::Controller::Foo this would be
-MyApp->config->{'Controller::Foo'}). The arguments are expected to be a hashref
-and are merged with the __PACKAGE__->config hashref before calling ->new to
-instantiate the component.
-
-=cut
 
 sub COMPONENT {
     my ( $self, $c ) = @_;
@@ -93,22 +78,12 @@ sub COMPONENT {
         }
         else {
             my $class = ref $self || $self;
-            my $new   = $self->merge_config_hashes( $self->config, $arguments );
+            my $new   = $self->merge_config_hashes( 
+				$self->config, $arguments );
             return bless $new, $class;
         }
     }
 }
-
-# remember to leave blank lines between the consecutive =head2's
-# otherwise the pod tools don't recognize the subsequent =head2s
-
-=head2 $c->config
-
-=head2 $c->config($hashref)
-
-=head2 $c->config($key, $value, ...)
-
-=cut
 
 sub config {
     my $self = shift;
@@ -125,9 +100,11 @@ sub config {
     return $config;
 }
 
-=head2 $c->process()
+sub merge_config_hashes {
+    my ( $self, $lefthash, $righthash ) = @_;
 
-=cut
+    return Catalyst::Utils::merge_hashes( $lefthash, $righthash );
+}
 
 sub process {
 
@@ -135,17 +112,48 @@ sub process {
           . " did not override Catalyst::Component::process" );
 }
 
+1;
+
+__END__
+
+=head1 METHODS
+
+=head2 new($c, $arguments)
+
+Called by COMPONENT to instantiate the component; should return an object
+to be stored in the application's component hash.
+
+=head2 COMPONENT($c, $arguments)
+
+If this method is present (as it is on all Catalyst::Component subclasses,
+it is called by Catalyst during setup_components with the application class
+as $c and any config entry on the application for this component (for example,
+in the case of MyApp::Controller::Foo this would be
+MyApp->config->{'Controller::Foo'}). The arguments are expected to be a 
+hashref and are merged with the __PACKAGE__->config hashref before calling 
+->new to instantiate the component.
+
+=head2 $c->config
+
+=head2 $c->config($hashref)
+
+=head2 $c->config($key, $value, ...)
+
+Accessor for this component's config hash. Config values can be set as 
+key value pair, or you can specify a hashref. In either case the keys
+will be merged with any existing config settings. Each component in 
+a Catalyst application has it's own config hash.
+
+=head2 $c->process()
+
+This is the default method called on a Catalyst component in the dispatcher.
+For instance, Views implement this action to render the response body 
+when you forward to them. The default is an abstract method.
+
 =head2 $c->merge_config_hashes( $hashref, $hashref )
 
 Merges two hashes together recursively, giving right-hand precedence.
-
-=cut
-
-sub merge_config_hashes {
-    my ( $self, $lefthash, $righthash ) = @_;
-
-    return Catalyst::Utils::merge_hashes( $lefthash, $righthash );
-}
+Alias for the method in L<Catalyst::Utils>.
 
 =head1 OPTIONAL METHODS
 
@@ -177,5 +185,3 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
-
-1;
