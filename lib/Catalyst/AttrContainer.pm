@@ -30,7 +30,7 @@ Catalyst::AttrContainer
 =head1 DESCRIPTION
 
 This class sets up the code attribute cache.  It's a base class for 
-L<Catalyst::Base>
+L<Catalyst::Controller>.
 
 =head1 METHODS
 
@@ -44,6 +44,7 @@ Attribute function. See attributes(3pm)
 
 =head1 SEE ALSO
 
+L<Catalyst::Dispatcher>
 L<Catalyst>.
 
 =head1 AUTHOR
