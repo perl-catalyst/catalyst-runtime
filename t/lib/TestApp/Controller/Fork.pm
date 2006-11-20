@@ -9,7 +9,7 @@ use warnings;
 use base 'Catalyst::Controller';
 use YAML;
 
-sub fork : Local {
+sub system : Local {
     my ($self, $c, $ls) = @_;
     my ($result, $code) = (undef, 1);
 
@@ -40,5 +40,22 @@ sub backticks : Local {
     
     $c->response->body(Dump({result => $result, code => $code}));
 }
-  
+
+sub fork : Local {
+    my ($self, $c) = @_;
+    my $pid;
+    my $x = 0;
+    
+    if($pid = fork()){
+	$x = "ok";
+    }
+    else {
+	exit(0);
+    }
+
+    waitpid $pid,0 or die;
+    
+    $c->response->body(Dump({pid => $pid, result => $x}));
+}
+
 1;

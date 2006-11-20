@@ -16,11 +16,11 @@ use lib "$FindBin::Bin/lib";
 use Catalyst::Test qw(TestApp);
 
 plan 'skip_all' if !-e '/bin/ls'; # see if /bin/ls exists
-plan tests => 8; # otherwise
+plan tests => 13; # otherwise
 
 {
-  fork:
-    ok(my $result = get('/fork/fork/%2Fbin%2Fls'), 'get /fork//bin/ls');
+  system:
+    ok(my $result = get('/fork/system/%2Fbin%2Fls'), 'system');
     my @result = split /$/m, $result;
     $result = join q{}, @result[-4..-1];
     
@@ -32,7 +32,7 @@ plan tests => 8; # otherwise
 
 { 
   backticks:
-    ok(my $result = get('/fork/backticks/%2Fbin%2Fls'), 'get /fork//bin/ls');
+    ok(my $result = get('/fork/backticks/%2Fbin%2Fls'), '`backticks`');
     my @result = split /$/m, $result;
     $result = join q{}, @result[-4..-1];
     
@@ -40,4 +40,16 @@ plan tests => 8; # otherwise
     ok($result_ref, 'is YAML');
     is($result_ref->{code}, 0, 'exited successfully');
     like($result_ref->{result}, qr{^/bin/ls[^:]}, 'contains ^/bin/ls$');
+}
+{ 
+  fork:
+    ok(my $result = get('/fork/fork'), 'fork');
+    my @result = split /$/m, $result;
+    $result = join q{}, @result[-4..-1];
+    
+    my $result_ref = eval { Load($result) };
+    ok($result_ref, 'is YAML');
+    isnt($result_ref->{pid}, 0, q{fork's "pid" wasn't 0});
+    isnt($result_ref->{pid}, $$, 'fork got a new pid');
+    is($result_ref->{result}, 'ok', 'fork was effective');
 }
