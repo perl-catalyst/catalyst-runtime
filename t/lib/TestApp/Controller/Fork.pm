@@ -9,7 +9,7 @@ use warnings;
 use base 'Catalyst::Controller';
 use YAML;
 
-sub fork : Global {
+sub fork : Local {
     my ($self, $c, $ls) = @_;
     my ($result, $code) = (undef, 1);
 
@@ -18,11 +18,27 @@ sub fork : Global {
 	$code = 0;
     }
     else {
-	$result = system($ls, $ls, $ls);
+	$result = system($ls, $ls, $ls) || $!;
 	$code = $?;
     }
     
     $c->response->body(Dump({result => $result, code => $code}));
 }
 
+sub backticks : Local {
+    my ($self, $c, $ls) = @_;
+    my ($result, $code) = (undef, 1);
+    
+    if(!-e $ls || !-x _){ 
+	$result = 'skip';
+	$code = 0;
+    }
+    else {
+	$result = `$ls $ls $ls` || $!;
+	$code = $?;
+    }
+    
+    $c->response->body(Dump({result => $result, code => $code}));
+}
+  
 1;
