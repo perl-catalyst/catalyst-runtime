@@ -1047,13 +1047,13 @@ sub welcome_message {
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
                     you might want want to start with a tutorial.</p>
-<pre>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
+<pre>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst-Manual/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
 </pre>
 <p>Afterwards you can go on to check out a more complete look at our features.</p>
 <pre>
-<code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
-				
-perldoc <a href="http://cpansearch.perl.org/dist/Catalyst/lib/Catalyst/Manual.pod">Catalyst::Manual</a></code></pre>
+<code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst-Manual/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
+<!-- Something else should go here, but the Catalyst::Manual link seems unhelpful -->
+</code></pre>
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
                     helper scripts to generate <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AController%3A%3A&amp;mode=all">controllers</a>,
