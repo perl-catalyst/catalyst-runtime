@@ -146,6 +146,7 @@ C<application/x-www-form-urlencoded> or C<multipart/form-data>.
 sub body {
     my ( $self, $body ) = @_;
     $self->{_context}->prepare_body;
+    $self->{_body}->body($body) if $body;
     return $self->{_body}->body;
 }
 
