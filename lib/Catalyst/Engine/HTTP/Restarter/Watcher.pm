@@ -47,8 +47,10 @@ sub watch {
 
     my @changes;
     my @changed_files;
+    
+    my $delay = ( defined $self->delay ) ? $self->delay : 1;
 
-    sleep $self->delay || 1;
+    sleep $delay if $delay > 0;
 
     eval { @changes = $self->modified->changed };
     if ($@) {
