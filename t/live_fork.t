@@ -26,8 +26,7 @@ plan tests => 13; # otherwise
     
     my $result_ref = eval { Load($result) };
     ok($result_ref, 'is YAML');
-    is($result_ref->{code}, 0, 'exited successfully');
-    like($result_ref->{result}, qr{^/bin/ls[^:]}, 'contains ^/bin/ls$');
+    is($result_ref->{result}, 0, 'exited OK');
 }
 
 { 
@@ -40,6 +39,7 @@ plan tests => 13; # otherwise
     ok($result_ref, 'is YAML');
     is($result_ref->{code}, 0, 'exited successfully');
     like($result_ref->{result}, qr{^/bin/ls[^:]}, 'contains ^/bin/ls$');
+    like($result_ref->{result}, qr{\n.*\n}m, 'contains two newlines');
 }
 { 
   fork:

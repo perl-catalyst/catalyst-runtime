@@ -15,14 +15,13 @@ sub system : Local {
 
     if(!-e $ls || !-x _){ 
 	$result = 'skip';
-	$code = 0;
     }
     else {
-	$result = system($ls, $ls, $ls) || $!;
-	$code = $?;
+	$result = system($ls, $ls, $ls);
+	$result = $! if $result != 0;
     }
     
-    $c->response->body(Dump({result => $result, code => $code}));
+    $c->response->body(Dump({result => $result}));
 }
 
 sub backticks : Local {
