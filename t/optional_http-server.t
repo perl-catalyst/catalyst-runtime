@@ -15,6 +15,9 @@ eval "use File::Copy::Recursive";
 plan skip_all => 'File::Copy::Recursive required' if $@;
 plan tests => 1;
 
+# Run a single test by providing it as the first arg
+my $single_test = shift;
+
 # clean up
 rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
 
@@ -42,7 +45,13 @@ while ( check_port( 'localhost', $port ) != 1 ) {
 
 # run the testsuite against the HTTP server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
-system( 'prove -r -Ilib/ t/live_*' );
+
+if ( $single_test ) {
+    system( "perl -Ilib/ $single_test" );
+}
+else {
+    system( 'prove -r -Ilib/ t/live_*' );
+}
 
 # shut it down
 kill 'INT', $pid;
