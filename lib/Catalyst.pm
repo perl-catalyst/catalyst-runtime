@@ -92,11 +92,12 @@ Catalyst - The Elegant MVC Web Application Framework
     catalyst.pl MyApp
 
     # add models, views, controllers
-    script/myapp_create.pl model Database DBIC::SchemaLoader dbi:SQLite:/path/to/db
-    script/myapp_create.pl view TT TT
+    script/myapp_create.pl model MyDatabase DBIC::Schema create=dynamic dbi:SQLite:/path/to/db
+    script/myapp_create.pl view MyTemplate TT
     script/myapp_create.pl controller Search
 
     # built in testserver -- use -r to restart automatically on changes
+    # --help to see all available options
     script/myapp_server.pl
 
     # command line testing interface
@@ -224,6 +225,12 @@ Forces Catalyst to use a specific home directory, e.g.:
 
     use Catalyst qw[-Home=/usr/mst];
 
+This can also be done in the shell environment by setting either the
+C<CATALYST_HOME> environment variable or C<MYAPP_HOME>; where C<MYAPP>
+is replaced with the uppercased name of your application, any "::" in
+the name will be replaced with underscores, e.g. MyApp::Web should use
+MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
+
 =head2 -Log
 
 Specifies log level.
@@ -262,8 +269,8 @@ cookies, HTTP headers, etc.). See L<Catalyst::Request>.
 Forwards processing to another action, by its private name. If you give a
 class name but no method, C<process()> is called. You may also optionally
 pass arguments in an arrayref. The action will receive the arguments in
-C<@_> and C<$c-E<gt>req-E<gt>args>. Upon returning from the function,
-C<$c-E<gt>req-E<gt>args> will be restored to the previous values.
+C<@_> and C<< $c->req->args >>. Upon returning from the function,
+C<< $c->req->args >> will be restored to the previous values.
 
 Any data C<return>ed from the action forwarded to, will be returned by the
 call to forward.
@@ -308,7 +315,7 @@ sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
 =head2 $c->res
 
-Returns the current L<Catalyst::Response> object, q.v.
+Returns the current L<Catalyst::Response> object, see there for details.
 
 =head2 $c->stash
 
@@ -325,7 +332,7 @@ Catalyst).
     $c->stash( bar => 1, gorch => 2 ); # equivalent to passing a hashref
     
     # stash is automatically passed to the view for use in a template
-    $c->forward( 'MyApp::V::TT' );
+    $c->forward( 'MyApp::View::TT' );
 
 =cut
 
@@ -595,9 +602,9 @@ sub views {
 
 =head2 $c->component($name)
 
-Gets a component object by name. This method is no longer recommended,
+Gets a component object by name. This method is not recommended,
 unless you want to get a specific component by full
-class. C<$c-E<gt>controller>, C<$c-E<gt>model>, and C<$c-E<gt>view>
+class. C<< $c->controller >>, C<< $c->model >>, and C<< $c->view >>
 should be used instead.
 
 =cut
@@ -637,8 +644,9 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config( { db => 'dsn:SQLite:foo.db' } );
 
-You can also use a L<YAML> config file like myapp.yml in your
-applications home directory.
+You can also use a C<YAML>, C<XML> or C<Config::General> config file
+like myapp.yml in your applications home directory. See
+L<Catalyst::Plugin::ConfigLoader>.
 
     ---
     db: dsn:SQLite:foo.db
@@ -699,8 +707,8 @@ L<Catalyst::Engine>.
 
 =head2 $c->path_to(@path)
 
-Merges C<@path> with C<$c-E<gt>config-E<gt>{home}> and returns a
-L<Path::Class> object.
+Merges C<@path> with C<< $c->config->{home} >> and returns a
+L<Path::Class::Dir> object.
 
 For example:
 
@@ -1762,7 +1770,7 @@ Reads a chunk of data from the request body. This method is designed to
 be used in a while loop, reading C<$maxlength> bytes on every call.
 C<$maxlength> defaults to the size of the request if not specified.
 
-You have to set C<MyApp-E<gt>config-E<gt>{parse_on_demand}> to use this
+You have to set C<< MyApp->config->{parse_on_demand} >> to use this
 directly.
 
 =cut
@@ -2037,6 +2045,7 @@ sub setup_home {
     }
 
     if ( $ENV{ uc($class) . '_HOME' } ) {
+        $class =~ s/::/_/g;
         $home = $ENV{ uc($class) . '_HOME' };
     }
 
