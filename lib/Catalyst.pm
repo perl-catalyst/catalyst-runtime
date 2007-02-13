@@ -87,6 +87,9 @@ Catalyst - The Elegant MVC Web Application Framework
 
 =head1 SYNOPSIS
 
+See the L<Catalyst::Manual> distribution for comprehensive
+documentation and tutorials.
+
     # Install Catalyst::Devel for helpers and other development tools
     # use the helper to create a new application
     catalyst.pl MyApp
@@ -356,7 +359,7 @@ sub stash {
 
 Returns an arrayref containing error messages.  If Catalyst encounters an
 error while processing a request, it stores the error in $c->error.  This
-method should not be used to store non-fatal error messages.
+method should only be used to store fatal error messages.
 
     my @error = @{ $c->error };
 
