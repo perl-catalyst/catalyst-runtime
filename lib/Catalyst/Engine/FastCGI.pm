@@ -237,18 +237,22 @@ static, and dynamic.
 
 =head3 Standalone server mode
 
-    FastCgiExternalServer /tmp/myapp -socket /tmp/myapp.socket
-    Alias /myapp/ /tmp/myapp/
+    FastCgiExternalServer /tmp/myapp.fcgi -socket /tmp/myapp.socket
+    Alias /myapp/ /tmp/myapp/myapp.fcgi/
     
     # Or, run at the root
-    Alias / /tmp/myapp/
+    Alias / /tmp/myapp.fcgi/
     
     # Optionally, rewrite the path when accessed without a trailing slash
     RewriteRule ^/myapp$ myapp/ [R]
     
-The FastCgiExternalServer directive tells Apache that when serving /tmp/myapp
-to use the FastCGI application listenting on the socket /tmp/mapp.socket. 
-Note that /tmp/myapp does not need to exist -- it's a virtual file name.
+
+The FastCgiExternalServer directive tells Apache that when serving
+/tmp/myapp to use the FastCGI application listenting on the socket
+/tmp/mapp.socket.  Note that /tmp/myapp.fcgi does not need to exist --
+it's a virtual file name.  With some versions of C<mod_fastcgi> or
+C<mod_fcgid>, you can use any name you like, but most require that the
+virtual filename end in C<.fcgi>.
 
 It's likely that Apache is not configured to serve files in /tmp, so the 
 Alias directive maps the url path /myapp/ to the (virtual) file that runs the
