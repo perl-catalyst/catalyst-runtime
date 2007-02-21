@@ -283,7 +283,14 @@ sub _parse_ActionClass_attr {
     return ( 'ActionClass', $value );
 }
 
+sub _parse_MyAction_attr {
+    my ( $self, $c, $name, $value ) = @_;
 
+    my $appclass = Catalyst::Utils::class2appclass($self);
+    $value = "${appclass}::Action::${value}";
+
+    return ( 'ActionClass', $value );
+}
 
 1;
 

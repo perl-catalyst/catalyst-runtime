@@ -20,4 +20,9 @@ sub action_action_three : Global : ActionClass('+TestApp::Action::TestBefore') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub action_action_four : Global : MyAction('TestMyAction') {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;
