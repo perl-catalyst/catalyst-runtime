@@ -3,6 +3,7 @@ package Catalyst::Engine::HTTP;
 use strict;
 use base 'Catalyst::Engine::CGI';
 use Errno 'EWOULDBLOCK';
+use HTTP::Date ();
 use HTTP::Status;
 use NEXT;
 use Socket;
@@ -46,12 +47,14 @@ sub finalize_headers {
     my $protocol = $c->request->protocol;
     my $status   = $c->response->status;
     my $message  = status_message($status);
+    
     print "$protocol $status $message\015\012";
-    $c->response->headers->date(time);
+    
+    $c->response->headers->header( Date => HTTP::Date::time2str(time) );
     $c->response->headers->header(
         Connection => $self->_keep_alive ? 'keep-alive' : 'close' );
         
-    $c->response->header( Status => $c->response->status );
+    $c->response->headers->header( Status => $status );
         
     # Avoid 'print() on closed filehandle Remote' warnings when using IE
     print $c->response->headers->as_string("\015\012") if *STDOUT->opened();
