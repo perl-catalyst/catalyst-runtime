@@ -144,12 +144,11 @@ C<application/x-www-form-urlencoded> or C<multipart/form-data>.
 =cut
 
 sub body {
-    my ( $self, $body ) = @_;
+    my $self = shift;
     $self->{_context}->prepare_body;
     
     return unless $self->{_body};
     
-    $self->{_body}->body($body) if $body;
     return $self->{_body}->body;
 }
 
