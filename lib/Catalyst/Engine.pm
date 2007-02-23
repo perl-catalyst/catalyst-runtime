@@ -312,28 +312,34 @@ sets up the L<Catalyst::Request> object body using L<HTTP::Body>
 
 sub prepare_body {
     my ( $self, $c ) = @_;
+    
+    my $length = $c->request->header('Content-Length') || 0;
 
-    $self->read_length( $c->request->header('Content-Length') || 0 );
-    my $type = $c->request->header('Content-Type');
+    $self->read_length( $length );
 
-    unless ( $c->request->{_body} ) {
-        $c->request->{_body} = HTTP::Body->new( $type, $self->read_length );
-        $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp}
-          if exists $c->config->{uploadtmp};
-    }
-
-    if ( $self->read_length > 0 ) {
+    if ( $length > 0 ) {
+        unless ( $c->request->{_body} ) {
+            my $type = $c->request->header('Content-Type');
+            $c->request->{_body} = HTTP::Body->new( $type, $length );
+            $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp}
+              if exists $c->config->{uploadtmp};
+        }
+        
         while ( my $buffer = $self->read($c) ) {
             $c->prepare_body_chunk($buffer);
         }
 
         # paranoia against wrong Content-Length header
-        my $remaining = $self->read_length - $self->read_position;
+        my $remaining = $length - $self->read_position;
         if ( $remaining > 0 ) {
             $self->finalize_read($c);
             Catalyst::Exception->throw(
-                "Wrong Content-Length value: " . $self->read_length );
+                "Wrong Content-Length value: $length" );
         }
+    }
+    else {
+        # Defined but will cause all body code to be skipped
+        $c->request->{_body} = 0;
     }
 }
 
@@ -357,6 +363,9 @@ Sets up parameters from body.
 
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
+    
+    return unless $c->request->{_body};
+    
     $c->request->body_parameters( $c->request->{_body}->param );
 }
 
@@ -476,6 +485,9 @@ sub prepare_request { }
 
 sub prepare_uploads {
     my ( $self, $c ) = @_;
+    
+    return unless $c->request->{_body};
+    
     my $uploads = $c->request->{_body}->upload;
     for my $name ( keys %$uploads ) {
         my $files = $uploads->{$name};

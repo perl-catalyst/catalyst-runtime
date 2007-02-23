@@ -5,7 +5,8 @@ This file documents the revision history for Perl extension Catalyst.
         - Don't ignore file uploads if form contains a text field with the same name.
           (Carl Franks)
         - Support restart_delay of 0 (for use in the POE engine).
-        - ...
+        - Skip body processing if we don't have a Content-Length header.
+          Results in about a 9% performance increase when handling GET/HEAD requests.
 
 5.7006   2006-11-03 14.18
         - Updated manifest
