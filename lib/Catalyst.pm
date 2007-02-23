@@ -1391,6 +1391,13 @@ sub finalize_headers {
     if ( my $location = $c->response->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $c->response->header( Location => $location );
+        
+        if ( !$c->response->body ) {
+            # Add a default body if none is already present
+            $c->response->body(
+                "<p>This item has moved <a href=\"$location\">here</a>.</p>"
+            );
+        }
     }
 
     # Content-Length
