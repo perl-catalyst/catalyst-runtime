@@ -511,6 +511,8 @@ Gets a L<Catalyst::Model> instance by name.
 
     $c->model('Foo')->do_stuff;
 
+Any extra arguments are directly passed to ACCEPT_CONTEXT.
+
 If the name is omitted, it will look for 
  - a model object in $c->stash{current_model_instance}, then
  - a model name in $c->stash->{current_model}, then
@@ -529,10 +531,10 @@ sub model {
           if $c->stash->{current_model_instance};
         return $c->model( $c->stash->{current_model} )
           if $c->stash->{current_model};
-        return $c->model( $c->config->{default_model} )
-          if $c->config->{default_model};
     }
-    return $c->_filter_component( $c->_comp_singular(qw/Model M/), @args );
+    return $c->model( $c->config->{default_model} )
+      if $c->config->{default_model};
+    return $c->_filter_component( $c->_comp_singular(qw/Model M/) );
 
 }
 
@@ -554,6 +556,8 @@ Gets a L<Catalyst::View> instance by name.
 
     $c->view('Foo')->do_stuff;
 
+Any extra arguments are directly passed to ACCEPT_CONTEXT.
+
 If the name is omitted, it will look for 
  - a view object in $c->stash{current_view_instance}, then
  - a view name in $c->stash->{current_view}, then
@@ -572,9 +576,9 @@ sub view {
           if $c->stash->{current_view_instance};
         return $c->view( $c->stash->{current_view} )
           if $c->stash->{current_view};
-        return $c->view( $c->config->{default_view} )
-          if $c->config->{default_view};
     }
+    return $c->view( $c->config->{default_view} )
+      if $c->config->{default_view};
     return $c->_filter_component( $c->_comp_singular(qw/View V/) );
 }
 

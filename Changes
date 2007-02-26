@@ -7,6 +7,8 @@ This file documents the revision history for Perl extension Catalyst.
         - Skip body processing if we don't have a Content-Length header.
           Results in about a 9% performance increase when handling GET/HEAD requests.
         - Add a default body to redirect responses.
+        - MyApp->model/view now looks at MyApp->config->{default_view/model}
+          (Bogdan Lucaciu)
 
 5.7006   2006-11-03 14.18
         - Updated manifest

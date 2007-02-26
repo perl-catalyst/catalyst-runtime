@@ -1,4 +1,4 @@
-use Test::More tests => 23;
+use Test::More tests => 27;
 use strict;
 use warnings;
 
@@ -73,6 +73,20 @@ is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyApp::M::
 
 MyApp->config->{default_view} = 'V';
 is ( bless ({stash=>{}}, 'MyApp')->view , 'MyApp::View::V', 'default_view ok');
+is ( MyApp->view , 'MyApp::View::V', 'default_view in class method ok');
 
 MyApp->config->{default_model} = 'M';
 is ( bless ({stash=>{}}, 'MyApp')->model , 'MyApp::Model::M', 'default_model ok');
+is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
+
+#checking @args passed to ACCEPT_CONTEXT
+my $args;
+{
+	no warnings; 
+	*MyApp::Model::M::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+	*MyApp::View::V::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+} 
+MyApp->model('M', qw/foo bar/);
+is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
+MyApp->view('V', qw/baz moo/);
+is_deeply($args, [qw/baz moo/], '$c->view args passed to ACCEPT_CONTEXT ok');
