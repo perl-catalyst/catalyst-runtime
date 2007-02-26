@@ -1399,7 +1399,7 @@ sub finalize_headers {
         if ( !$c->response->body ) {
             # Add a default body if none is already present
             $c->response->body(
-                "<p>This item has moved <a href=\"$location\">here</a>.</p>"
+                qq{<html><body><p>This item has moved <a href="$location">here</a>.</p></body></html>}
             );
         }
     }
