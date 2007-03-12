@@ -5,7 +5,6 @@ use base 'Catalyst::Engine::CGI';
 use Data::Dump qw(dump);
 use Errno 'EWOULDBLOCK';
 use HTTP::Date ();
-use HTTP::Headers;
 use HTTP::Status;
 use NEXT;
 use Socket;
@@ -54,30 +53,17 @@ sub finalize_headers {
     my $status   = $c->response->status;
     my $message  = status_message($status);
     
-    my @headers;
-    push @headers, "$protocol $status $message";
+    print "$protocol $status $message\015\012";
     
     $c->response->headers->header( Date => HTTP::Date::time2str(time) );
+    $c->response->headers->header(
+        Connection => $self->_keep_alive ? 'keep-alive' : 'close' );
+        
     $c->response->headers->header( Status => $status );
-    
-    # Should we keep the connection open?
-    my $connection = $c->request->header('Connection');
-    if (   $self->{options}->{keepalive} 
-        && $connection 
-        && $connection =~ /^keep-alive$/i
-    ) {
-        $c->response->headers->header( Connection => 'keep-alive' );
-        $self->{_keepalive} = 1;
-    }
-    else {
-        $c->response->headers->header( Connection => 'close' );
-    }
-    
-    push @headers, $c->response->headers->as_string("\x0D\x0A");
-    
-    # Buffer the headers so they are sent with the first write() call
-    # This reduces the number of TCP packets we are sending
-    $self->{_header_buf} = join("\x0D\x0A", @headers, '');
+        
+    # Avoid 'print() on closed filehandle Remote' warnings when using IE
+    print $c->response->headers->as_string("\015\012") if *STDOUT->opened();
+    print "\015\012" if *STDOUT->opened();
 }
 
 =head2 $self->finalize_read($c)
