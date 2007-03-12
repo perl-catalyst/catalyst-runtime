@@ -137,6 +137,10 @@ sub prepare_path {
         $port = $c->request->secure ? 443 : 80;
     }
 
+    # set the base URI
+    # base must end in a slash
+    $base_path .= '/' unless ( $base_path =~ /\/$/ );
+
     my $path = $base_path . ( $ENV{PATH_INFO} || '' );
     $path =~ s{^/+}{};
 
@@ -150,10 +154,6 @@ sub prepare_path {
     # sanitize the URI
     $uri = $uri->canonical;
     $c->request->uri($uri);
-
-    # set the base URI
-    # base must end in a slash
-    $base_path .= '/' unless ( $base_path =~ /\/$/ );
     my $base = $uri->clone;
     $base->path_query($base_path);
     $c->request->base($base);
