@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.7007  ??
+        - Performance and stability improvements to the built-in HTTP server.
+        - Built-in server no longer supports -k (keep-alive).
         - Don't ignore file uploads if form contains a text field with the same name.
           (Carl Franks)
         - Support restart_delay of 0 (for use in the POE engine).

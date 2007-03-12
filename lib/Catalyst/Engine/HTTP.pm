@@ -5,6 +5,7 @@ use base 'Catalyst::Engine::CGI';
 use Data::Dump qw(dump);
 use Errno 'EWOULDBLOCK';
 use HTTP::Date ();
+use HTTP::Headers;
 use HTTP::Status;
 use NEXT;
 use Socket;
@@ -53,17 +54,18 @@ sub finalize_headers {
     my $status   = $c->response->status;
     my $message  = status_message($status);
     
-    print "$protocol $status $message\015\012";
+    my @headers;
+    push @headers, "$protocol $status $message";
     
     $c->response->headers->header( Date => HTTP::Date::time2str(time) );
-    $c->response->headers->header(
-        Connection => $self->_keep_alive ? 'keep-alive' : 'close' );
-        
+    $c->response->headers->header( Connection => 'close' );
     $c->response->headers->header( Status => $status );
-        
-    # Avoid 'print() on closed filehandle Remote' warnings when using IE
-    print $c->response->headers->as_string("\015\012") if *STDOUT->opened();
-    print "\015\012" if *STDOUT->opened();
+    
+    push @headers, $c->response->headers->as_string("\x0D\x0A");
+    
+    # Buffer the headers so they are sent with the first write() call
+    # This reduces the number of TCP packets we are sending
+    $self->{_header_buf} = join("\x0D\x0A", @headers, '');
 }
 
 =head2 $self->finalize_read($c)
@@ -240,12 +242,20 @@ sub run {
 
             Remote->blocking(1);
         
-            # Read until we see all headers
+            # Read until we see a newline
             $self->{inputbuf} = '';
+        
+            while (1) {
+                my $read = sysread Remote, my $buf, CHUNKSIZE;
             
-            if ( !$self->_read_headers ) {
-                # Error reading, give up
-                next LISTEN;
+                if ( !$read ) {
+                    DEBUG && warn "EOF or error: $!\n";
+                    next LISTEN;
+                }
+            
+                DEBUG && warn "Read $read bytes\n";
+                $self->{inputbuf} .= $buf;
+                last if $self->{inputbuf} =~ /(\x0D\x0A?|\x0A\x0D?)/s;
             }
 
             my ( $method, $uri, $protocol ) = $self->_parse_request_line;
@@ -327,82 +337,36 @@ sub _handler {
     $sel->add( \*STDIN );
     
     REQUEST:
-    while (1) {
-        my ( $path, $query_string ) = split /\?/, $uri, 2;
+    my ( $path, $query_string ) = split /\?/, $uri, 2;
 
-        # Initialize CGI environment
-        local %ENV = (
-            PATH_INFO       => $path         || '',
-            QUERY_STRING    => $query_string || '',
-            REMOTE_ADDR     => $sockdata->{peeraddr},
-            REMOTE_HOST     => $sockdata->{peername},
-            REQUEST_METHOD  => $method || '',
-            SERVER_NAME     => $sockdata->{localname},
-            SERVER_PORT     => $port,
-            SERVER_PROTOCOL => "HTTP/$protocol",
-            %copy_of_env,
-        );
+    # Initialize CGI environment
+    local %ENV = (
+        PATH_INFO       => $path         || '',
+        QUERY_STRING    => $query_string || '',
+        REMOTE_ADDR     => $sockdata->{peeraddr},
+        REMOTE_HOST     => $sockdata->{peername},
+        REQUEST_METHOD  => $method || '',
+        SERVER_NAME     => $sockdata->{localname},
+        SERVER_PORT     => $port,
+        SERVER_PROTOCOL => "HTTP/$protocol",
+        %copy_of_env,
+    );
 
-        # Parse headers
-        if ( $protocol >= 1 ) {
-            $self->_parse_headers;
-        }
-
-        # Pass flow control to Catalyst
-        $class->handle_request;
-    
-        DEBUG && warn "Request done\n";
-    
-        # Allow keepalive requests, this is a hack but we'll support it until
-        # the next major release.
-        if ( delete $self->{_keepalive} ) {
-            
-            DEBUG && warn "Reusing previous connection for keep-alive request\n";
-            
-            if ( $sel->can_read(1) ) {            
-                if ( !$self->_read_headers ) {
-                    # Error reading, give up
-                    last REQUEST;
-                }
-
-                ( $method, $uri, $protocol ) = $self->_parse_request_line;
-                
-                DEBUG && warn "Parsed request: $method $uri $protocol\n";
-                
-                # Force HTTP/1.0
-                $protocol = '1.0';
-                
-                next REQUEST;
-            }
-            
-            DEBUG && warn "No keep-alive request within 1 second\n";
-        }
-        
-        last REQUEST;
+    # Parse headers
+    if ( $protocol >= 1 ) {
+        $self->_parse_headers;
     }
+
+    # Pass flow control to Catalyst
+    $class->handle_request;
     
-    DEBUG && warn "Closing connection\n";
+    DEBUG && warn "Request done\n";
+    
+    # XXX: We used to have a hack for keep-alive here but keep-alive
+    # has no place in a single-tasking server like this.  Use HTTP::POE
+    # if you want keep-alive.
 
     close Remote;
-}
-
-sub _read_headers {
-    my $self = shift;
-    
-    while (1) {
-        my $read = sysread Remote, my $buf, CHUNKSIZE;
-    
-        if ( !$read ) {
-            DEBUG && warn "EOF or error: $!\n";
-            return;
-        }
-    
-        DEBUG && warn "Read $read bytes\n";
-        $self->{inputbuf} .= $buf;
-        last if $self->{inputbuf} =~ /(\x0D\x0A?\x0D\x0A?|\x0A\x0D?\x0A\x0D?)/s;
-    }
-    
-    return 1;
 }
 
 sub _parse_request_line {
