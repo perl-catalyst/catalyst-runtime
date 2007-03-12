@@ -55,6 +55,17 @@ Returns the content.
 
     my $content = get('foo/bar?test=1');
 
+Note that this method doesn't follow redirects, so to test for a
+correctly redirecting page you'll need to use a combination of this
+method and the L<request> method below:
+
+    my $res = request('/'); # redirects to /y
+    warn $res->header('location');
+    use URI;
+    my $uri = URI->new($res->header('location'));
+    is ( $uri->path , '/y');
+    my $content = get($uri->path);
+
 =head2 request
 
 Returns a C<HTTP::Response> object.
