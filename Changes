@@ -1,12 +1,13 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7007  ??
+5.7007  2006-03-13 14:18:00
         - Performance and stability improvements to the built-in HTTP server.
-        - Don't ignore file uploads if form contains a text field with the same name.
-          (Carl Franks)
+        - Don't ignore file uploads if form contains a text field with the
+          same name.  (Carl Franks)
         - Support restart_delay of 0 (for use in the POE engine).
         - Skip body processing if we don't have a Content-Length header.
-          Results in about a 9% performance increase when handling GET/HEAD requests.
+          Results in about a 9% performance increase when handling GET/HEAD
+          requests.
         - Add a default body to redirect responses.
         - MyApp->model/view now looks at MyApp->config->{default_view/model}
           (Bogdan Lucaciu)
@@ -14,7 +15,8 @@ This file documents the revision history for Perl extension Catalyst.
 5.7006   2006-11-03 14.18
         - Updated manifest
         - Fix Slurp dependency
-        - Updated HTTP::Body dependency to 0.6, 0.5 can break on large POST requests.
+        - Updated HTTP::Body dependency to 0.6, 0.5 can break on large POST 
+          requests.
         - Skip utf8 fix for undef values in uri_with() and uri_for()
 
 5.7005   2006-11-07 19:37:35
