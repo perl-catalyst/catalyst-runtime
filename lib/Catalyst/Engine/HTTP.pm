@@ -16,9 +16,8 @@ use IO::Select       ();
 require Catalyst::Engine::HTTP::Restarter;
 require Catalyst::Engine::HTTP::Restarter::Watcher;
 
-sub CHUNKSIZE () { 64 * 1024 }
-
-sub DEBUG () { $ENV{CATALYST_HTTP_DEBUG} || 0 }
+use constant CHUNKSIZE => 64 * 1024;
+use constant DEBUG     => $ENV{CATALYST_HTTP_DEBUG} || 0;
 
 =head1 NAME
 
@@ -510,16 +509,6 @@ sub _socket_data {
 }
 
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
-
-=head1 CONSTANTS
-
-=head2 CHUNKSIZE
-
-How much data to read at once.  This value is set to 64K.
-
-=head2 DEBUG
-
-Enables debugging via the environment variable CATALYST_HTTP_DEBUG.
 
 =head1 SEE ALSO
 
