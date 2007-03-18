@@ -24,7 +24,7 @@ use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
 use utf8;
-use Carp qw/croak/;
+use Carp qw/croak carp/;
 
 BEGIN { require 5.008001; }
 
@@ -949,7 +949,13 @@ sub uri_for {
     };
     
     # join args with '/', or a blank string
-    my $args = ( scalar @args ? '/' . join( '/', map {s/\?/%3F/g; $_} @args ) : '' );
+    my $args = ( scalar @args ? '/' . join( '/', map {
+            unless (defined) {
+               carp "uri_for called with undefined argument";
+               $_='';
+            }
+            s/\?/%3F/g; $_
+        } @args ) : '' );
     $args =~ s/^\/// unless $path;
     my $res =
       URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ), $base )

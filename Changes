@@ -1,5 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - Add warning in uri_for
+
 5.7007  2006-03-13 14:18:00
         - Performance and stability improvements to the built-in HTTP server.
         - Don't ignore file uploads if form contains a text field with the
