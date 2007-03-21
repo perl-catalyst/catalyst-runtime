@@ -932,7 +932,7 @@ sub uri_for {
     # massage namespace, empty if absolute path
     $namespace =~ s/^\/// if $namespace;
     $namespace .= '/' if $namespace;
-    $path ||= '';
+    $path = '' if !defined $path;
     $namespace = '' if $path =~ /^\//;
     $path =~ s/^\///;
     $path =~ s/\?/%3F/g;
@@ -956,7 +956,7 @@ sub uri_for {
             }
             s/\?/%3F/g; $_
         } @args ) : '' );
-    $args =~ s/^\/// unless $path;
+    $args =~ s/^\/// unless length $path;
     my $res =
       URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ), $base )
       ->canonical;

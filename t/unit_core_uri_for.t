@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 use URI;
 
 use_ok('Catalyst');
@@ -81,6 +81,12 @@ is(
 
     is( Catalyst::uri_for( $context, '/bar/baz' )->as_string,
         'http://127.0.0.1/bar/baz', 'URI with no base or match' );
+
+    # test "0" as the path
+    is( Catalyst::uri_for( $context, qw/0 foo/ )->as_string,
+        'http://127.0.0.1/0/foo', '0 as path is ok'
+    );
+
 }
 
 # test with undef -- no warnings should be thrown
