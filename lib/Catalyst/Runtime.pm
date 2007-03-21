@@ -7,7 +7,7 @@ BEGIN { require 5.008001; }
 
 # Remember to update this in Catalyst as well!
 
-our $VERSION='5.7007';
+our $VERSION='5.7008';
 
 =head1 NAME
 
