@@ -914,11 +914,6 @@ to C<uri_for_action>.
 
 sub uri_for {
     my ( $c, $path, @args ) = @_;
-    my $base     = $c->request->base->clone;
-    my $basepath = $base->path;
-    $basepath =~ s/\/$//;
-    $basepath .= '/';
-    my $namespace = $c->namespace || '';
 
     if ( Scalar::Util::blessed($path) ) { # action object
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
@@ -929,38 +924,52 @@ sub uri_for {
         $path = '/' if $path eq '';
     }
 
-    # massage namespace, empty if absolute path
-    $namespace =~ s/^\/// if $namespace;
-    $namespace .= '/' if $namespace;
-    $path = '' if !defined $path;
-    $namespace = '' if $path =~ /^\//;
-    $path =~ s/^\///;
-    $path =~ s/\?/%3F/g;
+    undef($path) if (defined $path && $path eq '');
 
     my $params =
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
-    for my $value ( values %$params ) {
-        next unless defined $value;
-        for ( ref $value eq 'ARRAY' ? @$value : $value ) {
-            $_ = "$_";
-            utf8::encode( $_ );
+    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
+
+    unshift(@args, $path);
+
+    unless (defined $path && $path =~ s!^/!!) { # in-place strip
+        my $namespace = $c->namespace;
+        if (defined $path) { # cheesy hack to handle path '../foo'
+           $namespace =~ s{(?:^|/)[^/]+$}{} while $args[0] =~ s{^\.\./}{};
         }
-    };
+        unshift(@args, $namespace || '');
+    }
     
     # join args with '/', or a blank string
-    my $args = ( scalar @args ? '/' . join( '/', map {
-            unless (defined) {
-               carp "uri_for called with undefined argument";
-               $_='';
-            }
-            s/\?/%3F/g; $_
-        } @args ) : '' );
-    $args =~ s/^\/// unless length $path;
-    my $res =
-      URI->new_abs( URI->new_abs( "$path$args", "$basepath$namespace" ), $base )
-      ->canonical;
-    $res->query_form(%$params);
+    my $args = join('/', grep { defined($_) } @args);
+    $args =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
+    $args =~ s!^/!!;
+    my $base = $c->req->base;
+    my $class = ref($base);
+    $base =~ s{(?<!/)$}{/};
+
+    my $query = '';
+
+    if (my @keys = keys %$params) {
+      # somewhat lifted from URI::_query's query_form
+      $query = '?'.join('&', map {
+          s/([;\/?:@&=+,\$\[\]%])/$URI::Escape::escapes{$1}/go;
+          s/ /+/g;
+          my $key = $_;
+          my $val = $params->{$_};
+          $val = '' unless defined $val;
+          (map {
+              $_ = "$_";
+              utf8::encode( $_ );
+              # using the URI::Escape pattern here so utf8 chars survive
+              s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+              s/ /+/g;
+              "${key}=$_"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
+      } @keys);
+    }
+
+    my $res = bless(\"${base}${args}${query}", $class);
     $res;
 }
 
