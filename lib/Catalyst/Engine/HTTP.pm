@@ -244,6 +244,12 @@ sub run {
     # Ignore broken pipes as an HTTP server should
     local $SIG{PIPE} = 'IGNORE';
     
+    # Restart on HUP
+    local $SIG{HUP} = sub { 
+        $restart = 1;
+        warn "Restarting server on SIGHUP...\n";
+    };
+    
     LISTEN:
     while ( !$restart ) {
         while ( accept( Remote, $daemon ) ) {        
