@@ -1,8 +1,10 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.7008  XXXX-XX-XX
-        - Allow "0" for a path in uri_for
-        - Performance improvements to uri_for by inlining encoding
+        - Allow "0" for a path in uri_for.
+        - Performance improvements to uri_for by inlining encoding.
+        - Updated HTTP::Body dependency to 0.8 to handle the case where IE sometimes
+          sends an extra CRLF after a POST body.
 
 5.7007  2006-03-13 14:18:00
         - Performance and stability improvements to the built-in HTTP server.
