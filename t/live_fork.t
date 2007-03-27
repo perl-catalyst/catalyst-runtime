@@ -15,7 +15,12 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Catalyst::Test qw(TestApp);
 
-plan 'skip_all' if !-e '/bin/ls'; # see if /bin/ls exists
+plan skip_all => 'Using remote server'
+    if $ENV{CATALYST_SERVER};
+    
+plan skip_all => 'Skipping fork tests: no /bin/ls'
+    if !-e '/bin/ls'; # see if /bin/ls exists
+    
 plan tests => 13; # otherwise
 
 {
