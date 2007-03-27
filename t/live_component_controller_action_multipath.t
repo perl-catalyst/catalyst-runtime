@@ -13,7 +13,7 @@ baz
 
 our $iters;
 
-BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 2; }
+BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
 use Test::More tests => 16*$iters;
 use Catalyst::Test 'TestApp';
