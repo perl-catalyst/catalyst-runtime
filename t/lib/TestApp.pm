@@ -55,6 +55,17 @@ sub execute {
     return $c->SUPER::execute(@_);
 }
 
+# Replace the very large HTML error page with
+# useful info if something crashes during a test
+sub finalize_error {
+    my $c = shift;
+    
+    $c->NEXT::finalize_error(@_);
+    
+    $c->res->status(500);
+    $c->res->body( 'FATAL ERROR: ' . join( ', ', @{ $c->error } ) );
+}
+
 sub class_forward_test_method :Private {
     my ( $self, $c ) = @_;
     $c->response->headers->header( 'X-Class-Forward-Test-Method' => 1 );
