@@ -14,7 +14,7 @@ requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
 requires 'File::Modified';
 requires 'HTML::Entities';
-requires 'HTTP::Body'    => '0.8';
+requires 'HTTP::Body'    => '0.9';
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request';
 requires 'HTTP::Response';
