@@ -19,7 +19,7 @@ This file documents the revision history for Perl extension Catalyst.
         - MyApp->model/view now looks at MyApp->config->{default_view/model}
           (Bogdan Lucaciu)
 
-5.7006   2006-11-03 14.18
+5.7006   2006-11-15 14.18
         - Updated manifest
         - Fix Slurp dependency
         - Updated HTTP::Body dependency to 0.6, 0.5 can break on large POST 
