@@ -99,7 +99,7 @@ while ( check_port( 'localhost', $port ) != 1 ) {
 # run the testsuite against the server
 $ENV{CATALYST_SERVER} = "http://localhost:$port/deep/path";
 
-my @tests = glob('t/live_*');
+my @tests = (shift) || glob('t/live_*');
 eval {
     runtests(@tests);
 };
