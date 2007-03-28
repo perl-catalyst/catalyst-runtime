@@ -65,8 +65,9 @@ sub run_test_for {
     
     SKIP:
     {   
-        # Skip %2F and . tests on real webservers, they are often ignored by default
-        if ( $ENV{CATALYST_SERVER} && $path =~ /(?:%2F|\.)/ ) {
+        # Skip %2F, ., [, (, and ) tests on real webservers
+        # Both Apache and lighttpd don't seem to like these
+        if ( $ENV{CATALYST_SERVER} && $path =~ /(?:%2F|\.|%5B|\(|\))/ ) {
             skip "Skipping $path tests on remote server", 6;
         }
 
