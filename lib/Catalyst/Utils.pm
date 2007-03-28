@@ -220,10 +220,10 @@ sub request {
     my $request = shift;
     unless ( ref $request ) {
         if ( $request =~ m/^http/i ) {
-            $request = URI->new($request)->canonical;
+            $request = URI->new($request);
         }
         else {
-            $request = URI->new( 'http://localhost' . $request )->canonical;
+            $request = URI->new( 'http://localhost' . $request );
         }
     }
     unless ( ref $request eq 'HTTP::Request' ) {

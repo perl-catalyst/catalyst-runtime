@@ -136,12 +136,16 @@ sub remote_request {
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         $server->path("$1");    # need to be quoted
-        }
+    }
 
     # the request path needs to be sanitised if $server is using a
     # non-root path due to potential overlap between request path and
     # response path.
     if ($server->path) {
+        # If request path is '/', we have to add a trailing slash to the
+        # final request URI
+        my $add_trailing = $request->uri->path eq '/';
+        
         my @sp = split '/', $server->path;
         my @rp = split '/', $request->uri->path;
         shift @sp;shift @rp; # leading /
@@ -151,6 +155,10 @@ sub remote_request {
             }
         }
         $request->uri->path(join '/', @rp);
+        
+        if ( $add_trailing ) {
+            $request->uri->path( $request->uri->path . '/' );
+        }
     }
 
     $request->uri->scheme( $server->scheme );
