@@ -650,6 +650,7 @@ sub unescape_uri {
     my $self = shift;
     
     if ( HAS_APR ) {
+        # This function is ~12x faster than URI::Escape
         return APR::Request::decode(@_);
     }
     
