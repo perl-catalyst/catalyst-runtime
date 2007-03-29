@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Catalyst.
           * $c->uri_for (approx. 8x faster)
           * $c->engine->prepare_path (approx. 27x faster)
           * $c->engine->prepare_query_parameters (approx. 5x faster)
+        - If libapreq2 is installed, URIs are decoded using a faster C function.
         - Updated HTTP::Body dependency to 0.9 which fixes the following issues:
           * Handle when IE sometimes sends an extra CRLF after the POST body.
           * Empty fields in multipart/form-data POSTs are no longer ignored.
