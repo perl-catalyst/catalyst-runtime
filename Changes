@@ -1,13 +1,18 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.7008  XXXX-XX-XX
-        - Sending SIGHUP to the dev server will now cause it to restart.
-        - Allow "0" for a path in uri_for.
-        - Performance improvements to uri_for by inlining encoding.
+        - Many performance improvements by not using URI.pm:
+          * $c->uri_for (approx. 8x faster)
+          * $c->engine->prepare_path (approx. 27x faster)
+          * $c->engine->prepare_query_parameters (approx. 5x faster)
         - Updated HTTP::Body dependency to 0.9 which fixes the following issues:
           * Handle when IE sometimes sends an extra CRLF after the POST body.
           * Empty fields in multipart/form-data POSTs are no longer ignored.
           * Uploaded files with the name "0" are no longer ignored.
+        - Added $c->request->keywords for getting the keywords (a query string with
+          no parameters).
+        - Sending SIGHUP to the dev server will now cause it to restart.
+        - Allow "0" for a path in uri_for.
 
 5.7007  2007-03-13 14:18:00
         - Performance and stability improvements to the built-in HTTP server.

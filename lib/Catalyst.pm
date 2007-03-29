@@ -19,6 +19,8 @@ use Path::Class::Dir ();
 use Path::Class::File ();
 use Time::HiRes qw/gettimeofday tv_interval/;
 use URI ();
+use URI::http;
+use URI::https;
 use Scalar::Util qw/weaken blessed/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;

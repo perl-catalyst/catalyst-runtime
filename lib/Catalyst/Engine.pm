@@ -7,6 +7,7 @@ use Data::Dump qw/dump/;
 use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
+use URI::Escape ();
 use URI::QueryParam;
 use Scalar::Util ();
 
@@ -446,16 +447,42 @@ process the query string and extract query parameters.
 
 sub prepare_query_parameters {
     my ( $self, $c, $query_string ) = @_;
+    
+    # Check for keywords (no = signs)
+    if ( index( $query_string, '=' ) < 0 ) {
+        $c->request->keywords( $self->unescape_uri($query_string) );
+        return;
+    }
+
+    my %query;
 
     # replace semi-colons
     $query_string =~ s/;/&/g;
+    
+    my @params = split /&/, $query_string;
 
-    my $u = URI->new( '', 'http' );
-    $u->query($query_string);
-    for my $key ( $u->query_param ) {
-        my @vals = $u->query_param($key);
-        $c->request->query_parameters->{$key} = @vals > 1 ? [@vals] : $vals[0];
+    for my $item ( @params ) {
+        
+        my ($param, $value) 
+            = map { $self->unescape_uri($_) }
+              split( /=/, $item );
+          
+        $param = $self->unescape_uri($item) unless defined $param;
+        
+        if ( exists $query{$param} ) {
+            if ( ref $query{$param} ) {
+                push @{ $query{$param} }, $value;
+            }
+            else {
+                $query{$param} = [ $query{$param}, $value ];
+            }
+        }
+        else {
+            $query{$param} = $value;
+        }
     }
+
+    $c->request->query_parameters( \%query );
 }
 
 =head2 $self->prepare_read($c)
@@ -607,6 +634,21 @@ sub write {
     print STDOUT $buffer;
 }
 
+=head2 $self->unescape_uri($uri)
+
+Unescapes a given URI using the most efficient method available.  Engines such
+as Apache may implement this using Apache's C-based modules, for example.
+
+=cut
+
+sub unescape_uri {
+    my $self = shift;
+    
+    my $e = URI::Escape::uri_unescape(@_);
+    $e =~ s/\+/ /g;
+    
+    return $e;
+}
 
 =head2 $self->finalize_output
 
