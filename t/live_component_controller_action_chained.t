@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 109*$iters;
+use Test::More tests => 112*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -766,4 +766,22 @@ sub run_tests {
         is( $response->content, '; ', 'Content OK' );
     }
 
+    #
+    #   PathPrefix
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::PathPrefix->instance
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/action/chained/pathprefix/1'),
+            "PathPrefix (as an endpoint)" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '; 1', 'Content OK' );
+    }
 }
