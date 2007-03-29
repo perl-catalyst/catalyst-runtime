@@ -56,6 +56,7 @@ my $conf = <<"END";
 server.modules = (
     "mod_access",
     "mod_fastcgi",
+    "mod_rewrite",
     "mod_accesslog"
 )
 
@@ -66,6 +67,10 @@ accesslog.filename = "$docroot/access.log"
 
 server.bind = "127.0.0.1"
 server.port = $port
+
+# Work around inability to hit http://localhost/deep/path
+# without a trailing slash 
+url.rewrite = ( "deep/path\$" => "deep/path/" )
 
 # catalyst app specific fcgi setup
 fastcgi.server = (
