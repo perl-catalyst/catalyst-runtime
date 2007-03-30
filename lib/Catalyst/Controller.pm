@@ -292,11 +292,6 @@ sub _parse_MyAction_attr {
     return ( 'ActionClass', $value );
 }
 
-sub _parse_PathPrefix_attr {
-    my ( $self, $c, $name, $value ) = @_;
-    return PathPart => $self->path_prefix;
-}
-
 1;
 
 __END__

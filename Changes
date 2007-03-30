@@ -14,7 +14,6 @@ This file documents the revision history for Perl extension Catalyst.
         - Added $c->request->keywords for getting the keywords (a query string with
           no parameters).
         - Sending SIGHUP to the dev server will now cause it to restart.
-        - Added PathPrefix attribute
         - Allow "0" for a path in uri_for.
 
 5.7007  2007-03-13 14:18:00
