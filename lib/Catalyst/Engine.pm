@@ -20,11 +20,6 @@ use overload '""' => sub { return ref shift }, fallback => 1;
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 
-# See if we can use libapreq2 for URI unescaping
-use constant HAS_APR => eval {
-    require APR::Request;
-};
-
 =head1 NAME
 
 Catalyst::Engine - The Catalyst Engine
@@ -641,18 +636,13 @@ sub write {
 
 =head2 $self->unescape_uri($uri)
 
-Unescapes a given URI using the most efficient method available.  Engines
-can subclass to provide faster implementations.
+Unescapes a given URI using the most efficient method available.  Engines such
+as Apache may implement this using Apache's C-based modules, for example.
 
 =cut
 
 sub unescape_uri {
     my $self = shift;
-    
-    if ( HAS_APR ) {
-        # This function is ~12x faster than URI::Escape
-        return APR::Request::decode(@_);
-    }
     
     my $e = URI::Escape::uri_unescape(@_);
     $e =~ s/\+/ /g;
