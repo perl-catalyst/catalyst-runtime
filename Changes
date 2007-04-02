@@ -9,8 +9,6 @@ This file documents the revision history for Perl extension Catalyst.
           * Handle when IE sometimes sends an extra CRLF after the POST body.
           * Empty fields in multipart/form-data POSTs are no longer ignored.
           * Uploaded files with the name "0" are no longer ignored.
-        - Added $c->request->keywords for getting the keywords (a query string with
-          no parameters).
         - Sending SIGHUP to the dev server will now cause it to restart.
         - Allow "0" for a path in uri_for.
 

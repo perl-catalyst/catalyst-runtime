@@ -9,7 +9,7 @@ use utf8;
 use URI::QueryParam;
 
 __PACKAGE__->mk_accessors(
-    qw/action address arguments cookies headers keywords match method
+    qw/action address arguments cookies headers match method
       protocol query_parameters secure captures uri user/
 );
 
@@ -51,7 +51,6 @@ Catalyst::Request - provides information about the current client request
     $req->headers;
     $req->hostname;
     $req->input;
-    $req->keywords;
     $req->match;
     $req->method;
     $req->param;
@@ -259,15 +258,6 @@ sub hostname {
 =head2 $req->input
 
 Alias for $req->body.
-
-=head2 $req->keywords
-
-Contains the keywords portion of a query string, when no '=' signs are
-present.
-
-    http://localhost/path?some+keywords
-    
-    $c->request->keywords will contain 'some keywords'
 
 =head2 $req->match
 

@@ -448,9 +448,8 @@ process the query string and extract query parameters.
 sub prepare_query_parameters {
     my ( $self, $c, $query_string ) = @_;
     
-    # Check for keywords (no = signs)
+    # Make sure query has params
     if ( index( $query_string, '=' ) < 0 ) {
-        $c->request->keywords( $self->unescape_uri($query_string) );
         return;
     }
 
