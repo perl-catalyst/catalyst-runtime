@@ -7,7 +7,6 @@ use Data::Dump qw/dump/;
 use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
-use URI::Escape ();
 use URI::QueryParam;
 use Scalar::Util ();
 
@@ -641,12 +640,12 @@ as Apache may implement this using Apache's C-based modules, for example.
 =cut
 
 sub unescape_uri {
-    my $self = shift;
+    my ( $self, $str ) = @_;
     
-    my $e = URI::Escape::uri_unescape(@_);
-    $e =~ s/\+/ /g;
+    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+    $str =~ s/\+/ /g;
     
-    return $e;
+    return $str;
 }
 
 =head2 $self->finalize_output
