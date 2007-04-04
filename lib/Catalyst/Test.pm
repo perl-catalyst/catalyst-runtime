@@ -147,7 +147,7 @@ sub remote_request {
         shift @sp;shift @rp; # leading /
         if (@rp) {
             foreach my $sp (@sp) {
-                shift @rp if $sp eq $rp[0];
+                $sp eq $rp[0] ? shift @rp : last
             }
         }
         $request->uri->path(join '/', @rp);
