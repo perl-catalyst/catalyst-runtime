@@ -346,19 +346,9 @@ sub _handler {
     $sel->add( \*STDIN );
     
     REQUEST:
-        # Initialize CGI environment
-        local %ENV = (
-            PATH_INFO       => $path         || '',
-            QUERY_STRING    => $query_string || '',
-            REMOTE_ADDR     => $sockdata->{peeraddr},
-            REMOTE_HOST     => $sockdata->{peername},
-            REQUEST_METHOD  => $method || '',
-            SERVER_NAME     => $sockdata->{localname},
-            SERVER_PORT     => $port,
-            SERVER_PROTOCOL => "HTTP/$protocol",
-            %copy_of_env,
-        );
-
+    while (1) {
+        my ( $path, $query_string ) = split /\?/, $uri, 2;
+        
         # Initialize CGI environment
         local %ENV = (
             PATH_INFO       => $path         || '',
