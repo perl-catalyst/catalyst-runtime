@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7008  XXXX-XX-XX
+5.7007  2007-03-13 14:18:00
         - Many performance improvements by not using URI.pm:
           * $c->uri_for (approx. 8x faster)
           * $c->engine->prepare_path (approx. 27x faster)
@@ -11,8 +11,6 @@ This file documents the revision history for Perl extension Catalyst.
           * Uploaded files with the name "0" are no longer ignored.
         - Sending SIGHUP to the dev server will now cause it to restart.
         - Allow "0" for a path in uri_for.
-
-5.7007  2007-03-13 14:18:00
         - Performance and stability improvements to the built-in HTTP server.
         - Don't ignore file uploads if form contains a text field with the same name.
           (Carl Franks)

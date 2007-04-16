@@ -34,15 +34,19 @@ Catalyst::Response - stores output responding to the current client request
 =head1 DESCRIPTION
 
 This is the Catalyst Response class, which provides methods for responding to
-the current client request.
+the current client request. The appropriate L<Catalyst::Engine> for your environment
+will turn the Catalyst::Response into a HTTP Response and return it to the client.
 
 =head1 METHODS
 
-=head2 $res->body($text)
+=head2 $res->body(<$text|$fh|$iofh_object)
 
     $c->response->body('Catalyst rocks!');
 
-Sets or returns the output (text or binary data).
+Sets or returns the output (text or binary data). If you are returning a large body,
+you might want to use a L<IO::FileHandle> type of object (Something that implements the read method
+in the same fashion), or a filehandle GLOB. Catalyst
+will write it piece by piece into the response.
 
 =head2 $res->content_encoding
 
