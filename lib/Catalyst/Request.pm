@@ -365,22 +365,24 @@ Alias for path, added for compability with L<CGI>.
 =cut
 
 sub path {
-    my ( $self, $params ) = @_;
+    my ( $self, @params ) = @_;
 
-    if ($params) {
-        $self->uri->path($params);
+    if (@params) {
+        $self->uri->path(@params);
+        undef $self->{path};
+    }
+    elsif ( defined( my $path = $self->{path} ) ) {
+        return $path;
     }
     else {
-        return $self->{path} if $self->{path};
+        my $path     = $self->uri->path;
+        my $location = $self->base->path;
+        $path =~ s/^(\Q$location\E)?//;
+        $path =~ s/^\///;
+        $self->{path} = $path;
+
+        return $path;
     }
-
-    my $path     = $self->uri->path;
-    my $location = $self->base->path;
-    $path =~ s/^(\Q$location\E)?//;
-    $path =~ s/^\///;
-    $self->{path} = $path;
-
-    return $path;
 }
 
 =head2 $req->protocol
