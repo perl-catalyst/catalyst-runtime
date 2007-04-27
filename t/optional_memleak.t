@@ -9,16 +9,16 @@ use lib "$FindBin::Bin/lib";
 use Test::More;
 use Catalyst::Test 'TestApp';
 use YAML;
-eval "use GTop";
+eval "use Proc::ProcessTable";
 
 plan skip_all => 'set TEST_MEMLEAK to enable this test'
     unless $ENV{TEST_MEMLEAK};
-plan skip_all => 'GTop required for this test' if $@;
+plan skip_all => 'Proc::ProcessTable required for this test' if $@;
 
 eval "use HTTP::Body 0.03";
 plan skip_all => 'HTTP::Body >= 0.03 required for this test' if $@;
 
-our $gtop = GTop->new;
+our $t = Proc::ProcessTable->new( cache_ttys => 1 );
 our ( $initial, $final ) = ( 0, 0 ); 
 our $tests = YAML::LoadFile("$FindBin::Bin/optional_stress.yml");
 
@@ -52,20 +52,32 @@ sub run_test {
         request( $uri );
     }
     
-    $initial = $gtop->proc_mem($$)->size;
-    print "Initial Size: " . GTop::size_string($initial) . "\n";
+    $initial = size_of($$);
+    print "Initial Size: $initial\n";
     
     for ( 1 .. 500 ) {
         request( $uri );
     }
     
-    $final = $gtop->proc_mem($$)->size;
-    print "Final Size:   " . GTop::size_string($final) . "\n";
+    $final = size_of($$);
+    print "Final Size:   $final\n";
     
     if ( $final > $initial ) {
-        print "Leaked Bytes: " . GTop::size_string($final - $initial) . "\n";
+        print "Leaked:       " . ($final - $initial) . "\n";
     }
     
     is( $final, $initial, "'$uri' memory is not leaking" );
+}
+
+sub size_of {
+    my $pid = shift;
+    
+    foreach my $p ( @{ $t->table } ) {
+        if ( $p->pid == $pid ) {
+            return $p->size;
+        }
+    }
+    
+    die "Pid $pid not found?";
 }
 
