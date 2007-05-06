@@ -1427,7 +1427,8 @@ sub finalize_headers {
         # get the length from a filehandle
         if ( blessed( $c->response->body ) && $c->response->body->can('read') )
         {
-            if ( my $stat = stat $c->response->body ) {
+            my $stat = stat $c->response->body;
+            if ( $stat && $stat->size > 0 ) {
                 $c->response->content_length( $stat->size );
             }
             else {

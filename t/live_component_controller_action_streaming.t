@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 8*$iters;
+use Test::More tests => 10*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -29,6 +29,8 @@ sub run_tests {
         ok( my $response = request('http://localhost/streaming'), 'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        # XXX: Length should be undef here, but HTTP::Request::AsCGI sets it
+        is( $response->content_length, 12, 'Response Content-Length' );
         is( $response->content,, <<'EOF', 'Content is a stream' );
 foo
 bar
@@ -40,7 +42,7 @@ EOF
   SKIP:
     {
         if ( $ENV{CATALYST_SERVER} ) {
-            skip "Using remote server", 4;
+            skip "Using remote server", 5;
         }
 
         my $file = "$FindBin::Bin/01use.t";
@@ -55,6 +57,7 @@ EOF
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->content_length, -s $file, 'Response Content-Length' );
         is( $response->content, $buffer, 'Content is read from filehandle' );
     }
 }
