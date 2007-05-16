@@ -276,17 +276,30 @@ sub run {
             unless ( uc($method) eq 'RESTART' ) {
 
                 # Fork
-                if ( $options->{fork} ) { next if $pid = fork }
+                if ( $options->{fork} ) { 
+                    if ( $pid = fork ) {
+                        DEBUG && warn "Forked child $pid\n";
+                        next;
+                    }
+                }
 
                 $self->_handler( $class, $port, $method, $uri, $protocol );
             
                 if ( my $error = delete $self->{_write_error} ) {
                     DEBUG && warn "Write error: $error\n";
                     close Remote;
-                    next LISTEN;
+                    
+                    if ( !defined $pid ) {
+                        next LISTEN;
+                    }
                 }
 
-                $daemon->close if defined $pid;
+                if ( defined $pid ) {
+                    # Child process, close connection and exit
+                    DEBUG && warn "Child process exiting\n";
+                    $daemon->close;
+                    exit;
+                }
             }
             else {
                 my $sockdata = $self->_socket_data( \*Remote );
@@ -302,8 +315,6 @@ sub run {
                     last;
                 }
             }
-
-            exit if defined $pid;
         }
         continue {
             close Remote;
