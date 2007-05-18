@@ -3,7 +3,7 @@ package Catalyst::Engine::FastCGI;
 use strict;
 use base 'Catalyst::Engine::CGI';
 eval "use FCGI";
-die "Please install FCGI\n" if $@;
+die "Unable to load the FCGI module, you may need to install it:\n$@\n" if $@;
 
 =head1 NAME
 
