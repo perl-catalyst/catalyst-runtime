@@ -1,5 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
+        - Fix bug where a nested component would be setup twice
+
 5.7008
         - Fixed a bug where Content-Length could be set to 0 if a filehandle
           object in $c->response->body did not report a size.

@@ -1856,8 +1856,11 @@ sub setup_components {
         search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
         %$config
     );
+
+    my @comps = sort { length $a <=> length $b } $locator->plugins;
+    my %comps = map { $_ => 1 } @comps;
     
-    for my $component ( sort { length $a <=> length $b } $locator->plugins ) {
+    for my $component ( @comps ) {
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
 
         my $module  = $class->setup_component( $component );
@@ -1865,6 +1868,8 @@ sub setup_components {
             $component => $module,
             map {
                 $_ => $class->setup_component( $_ )
+            } grep { 
+              not exists $comps{$_}
             } Devel::InnerPackage::list_packages( $component )
         );
         

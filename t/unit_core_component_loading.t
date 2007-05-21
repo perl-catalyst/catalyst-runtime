@@ -1,7 +1,7 @@
 # 2 initial tests, and 6 per component in the loop below
 # (do not forget to update the number of components in test 3 as well)
-# 4 extra tests for the loading options
-use Test::More tests => 2 + 6 * 24 + 4;
+# 5 extra tests for the loading options
+use Test::More tests => 2 + 6 * 24 + 5;
 
 use strict;
 use warnings;
@@ -40,6 +40,18 @@ my @components = (
     { type => 'View', prefix => 'View', name => 'Foo' },
 );
 
+sub write_component_file { 
+  my ($dir_list, $module_name, $content) = @_;
+
+  my $dir  = File::Spec->catdir(@$dir_list);
+  my $file = File::Spec->catfile($dir, $module_name . '.pm');
+
+  mkpath(join(q{/}, @$dir_list) );
+  open(my $fh, '>', $file) or die "Could not open file $file for writing: $!";
+  print $fh $content;
+  close $fh;
+}
+
 sub make_component_file {
     my ($type, $prefix, $name) = @_;
 
@@ -48,13 +60,8 @@ sub make_component_file {
     my @namedirs = split(/::/, $name);
     my $name_final = pop(@namedirs);
     my @dir_list = ($libdir, $appclass, $prefix, @namedirs);
-    my $dir_ux   = join(q{/}, @dir_list);
-    my $dir      = File::Spec->catdir(@dir_list);
-    my $file     = File::Spec->catfile($dir, $name_final . '.pm');
 
-    mkpath($dir_ux); # mkpath wants unix '/' seperators :p
-    open(my $fh, '>', $file) or die "Could not open file $file for writing: $!";
-    print $fh <<EOF;
+    write_component_file(\@dir_list, $name_final, <<EOF);
 package $fullname;
 use base '$compbase';
 sub COMPONENT {
@@ -66,8 +73,6 @@ sub COMPONENT {
 1;
 
 EOF
-
-    close($fh);
 }
 
 foreach my $component (@components) {
@@ -150,5 +155,42 @@ is(scalar keys %$complist, 24+1, "Correct number of components loaded");
 
 ok( !exists $complist->{ "${appclass}::Controller::Foo" }, 'Controller::Foo was skipped' );
 ok( exists $complist->{ "${appclass}::Extra::Foo" }, 'Extra::Foo was loaded' );
+
+rmtree($libdir);
+
+$appclass = "ComponentOnce";
+
+write_component_file([$libdir, $appclass, 'Model'], 'TopLevel', <<EOF);
+package ${appclass}::Model::TopLevel;
+use base 'Catalyst::Model';
+sub COMPONENT {
+ 
+    my \$self = shift->NEXT::COMPONENT(\@_);
+    no strict 'refs';
+    *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
+    \$self;
+}
+
+package ${appclass}::Model::TopLevel::Nested;
+
+sub COMPONENT { die "COMPONENT called in the wrong order!"; }
+
+1;
+
+EOF
+
+write_component_file([$libdir, $appclass, 'Model', 'TopLevel'], 'Nested', <<EOF);
+package ${appclass}::Model::TopLevel::Nested;
+use base 'Catalyst::Model';
+
+no warnings 'redefine';
+sub COMPONENT { return shift->NEXT::COMPONENT(\@_); }
+1;
+
+EOF
+
+eval "package $appclass; use Catalyst; __PACKAGE__->setup";
+
+is($@, '', "Didn't load component twice");
 
 rmtree($libdir);
