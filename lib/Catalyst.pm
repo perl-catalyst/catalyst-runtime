@@ -2158,9 +2158,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        unless (Class::Inspector->loaded($plugin)) {
-            require Class::Inspector->filename($plugin);
-        }
+        Catalyst::Utils::ensure_class_loaded( $plugin, { ignore_loaded => 1 } );
 
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
