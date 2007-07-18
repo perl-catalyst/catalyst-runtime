@@ -7,6 +7,7 @@ use HTTP::Request;
 use Path::Class;
 use URI;
 use Class::Inspector;
+use Carp qw/croak/;
 
 =head1 NAME
 
@@ -241,6 +242,9 @@ Loads the class unless it already has been loaded.
 sub ensure_class_loaded {
     my $class = shift;
     my $opts  = shift;
+
+    croak "Malformed class Name $class"
+        if $class =~ m/(?:\b\:\b|\:{3,})/;
 
     return if !$opts->{ ignore_loaded }
         && Class::Inspector->loaded( $class ); # if a symbol entry exists we don't load again

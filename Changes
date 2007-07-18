@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Catalyst.
 
         - Fix bug where a nested component would be setup twice
+        - Make ensure_class_loaded behave better with malformed class name
 
 5.7008
         - Fixed a bug where Content-Length could be set to 0 if a filehandle
