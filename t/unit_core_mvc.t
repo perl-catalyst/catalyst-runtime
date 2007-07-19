@@ -82,9 +82,9 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
 #checking @args passed to ACCEPT_CONTEXT
 my $args;
 {
-	no warnings; 
-	*MyApp::Model::M::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
-	*MyApp::View::V::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+    no warnings; 
+    *MyApp::Model::M::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+    *MyApp::View::V::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
 } 
 MyApp->model('M', qw/foo bar/);
 is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');

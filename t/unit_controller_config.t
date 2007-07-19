@@ -18,11 +18,11 @@ use_ok('Catalyst');
 ## ----------------------------------------------------------------------------
 
 {
-	package base_controller;
-	
-	use base 'Catalyst::Controller';
-	
-	__PACKAGE__->config( base_key	=> 'base_value' );
+    package base_controller;
+
+    use base 'Catalyst::Controller';
+
+    __PACKAGE__->config( base_key   => 'base_value' );
 }
 
 ## ----------------------------------------------------------------------------
@@ -31,20 +31,20 @@ use_ok('Catalyst');
 ## ----------------------------------------------------------------------------
 
 {
-	package controller_a;
+    package controller_a;
 
-	use base 'base_controller';
-	
-	__PACKAGE__->config( key_a => 'value_a' );
+    use base 'base_controller';
+    
+    __PACKAGE__->config( key_a => 'value_a' );
 }
-	
-	
+        
+        
 {
-	package controller_b;
+    package controller_b;
 
-	use base 'base_controller';
+    use base 'base_controller';
 
-	__PACKAGE__->config( key_b => 'value_b' );
+    __PACKAGE__->config( key_b => 'value_b' );
 }
 
 ## Okay, we expect that the base controller has a config with one key

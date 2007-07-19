@@ -35,7 +35,7 @@ sub run_tests {
           TestApp::Controller::Action::Auto->begin
           TestApp::Controller::Action::Auto->auto
           TestApp::Controller::Action::Auto->one
-	  TestApp->end
+          TestApp->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -52,7 +52,7 @@ sub run_tests {
           TestApp::Controller::Action::Auto->begin
           TestApp::Controller::Action::Auto->auto
           TestApp::Controller::Action::Auto->default
-	  TestApp->end
+          TestApp->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -70,7 +70,7 @@ sub run_tests {
           TestApp::Controller::Action::Auto->auto
           TestApp::Controller::Action::Auto::Deep->auto
           TestApp::Controller::Action::Auto::Deep->one
-	  TestApp->end
+          TestApp->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -88,7 +88,7 @@ sub run_tests {
           TestApp::Controller::Action::Auto->auto
           TestApp::Controller::Action::Auto::Deep->auto
           TestApp::Controller::Action::Auto::Deep->default
-	  TestApp->end
+          TestApp->end
         ];
     
         my $expected = join( ", ", @expected );

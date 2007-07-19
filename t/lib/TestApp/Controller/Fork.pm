@@ -14,11 +14,11 @@ sub system : Local {
     my ($result, $code) = (undef, 1);
 
     if(!-e $ls || !-x _){ 
-	$result = 'skip';
+        $result = 'skip';
     }
     else {
-	$result = system($ls, $ls, $ls);
-	$result = $! if $result != 0;
+        $result = system($ls, $ls, $ls);
+        $result = $! if $result != 0;
     }
     
     $c->response->body(Dump({result => $result}));
@@ -29,12 +29,12 @@ sub backticks : Local {
     my ($result, $code) = (undef, 1);
     
     if(!-e $ls || !-x _){ 
-	$result = 'skip';
-	$code = 0;
+        $result = 'skip';
+        $code = 0;
     }
     else {
-	$result = `$ls $ls $ls` || $!;
-	$code = $?;
+        $result = `$ls $ls $ls` || $!;
+        $code = $?;
     }
     
     $c->response->body(Dump({result => $result, code => $code}));
@@ -46,10 +46,10 @@ sub fork : Local {
     my $x = 0;
     
     if($pid = fork()){
-	$x = "ok";
+        $x = "ok";
     }
     else {
-	exit(0);
+        exit(0);
     }
 
     waitpid $pid,0 or die;

@@ -13,21 +13,21 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1;
 
-	# add special paths to test here
-	@paths = (
-	            # all reserved in uri's
-		    qw~ : / ? [ ] @ ! $ & ' ( ) * + ; = ~, ',' , '#',
+    # add special paths to test here
+    @paths = (
+        # all reserved in uri's
+        qw~ : / ? [ ] @ ! $ & ' ( ) * + ; = ~, ',' , '#',
 
-		    # unreserved
-		    'a'..'z','A'..'Z',0..9,qw( - . _ ~ ),
-		    " ",
+        # unreserved
+        'a'..'z','A'..'Z',0..9,qw( - . _ ~ ),
+        " ",
 
-		    # just to test %2F/%
-		    [ qw~ / / ~ ],
+        # just to test %2F/%
+        [ qw~ / / ~ ],
 
-		    # testing %25/%25
-		    [ qw~ % % ~ ],
-		 );
+        # testing %25/%25
+        [ qw~ % % ~ ],
+    );
 }
 
 use Test::More tests => 6*@paths * $iters;

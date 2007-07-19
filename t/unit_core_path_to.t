@@ -17,10 +17,10 @@ my %non_unix = (
 my $os = $non_unix{$^O} ? $^O : 'Unix';
 
 if(  $os ne 'Unix' ) {
-	plan skip_all => 'tests require Unix';
+    plan skip_all => 'tests require Unix';
 }
 else {
-	plan tests => 3;
+    plan tests => 3;
 }
 
 use_ok('Catalyst');
