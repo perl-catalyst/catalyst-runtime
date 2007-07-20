@@ -931,6 +931,7 @@ sub uri_for {
     my $params =
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
+    carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
     s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
 
     unshift(@args, $path);

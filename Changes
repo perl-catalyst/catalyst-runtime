@@ -1,13 +1,12 @@
 This file documents the revision history for Perl extension Catalyst.
 
-X.XXXX
+5.7008
+	- add undef warning for uri_for
         - Fix bug where a nested component would be setup twice
         - Make ensure_class_loaded behave better with malformed class name
-        - Make _register_plugin use ensure_class_loaded
+	- Make _register_plugin use ensure_class_loaded
         - Remove 'Argument "??" isn't numeric in sprintf' warning
           (Emanuele Zeppieri)
-
-5.7008
         - Fixed a bug where Content-Length could be set to 0 if a filehandle
           object in $c->response->body did not report a size.
         - Fixed issue where development server running in fork mode did not
