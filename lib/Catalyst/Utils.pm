@@ -292,6 +292,28 @@ sub merge_hashes {
     return \%merged;
 }
 
+=head2 env_value($class, $key)
+
+Checks for and returns an environment value. For instance, if $key is
+'home', then this method will check for and return the first value it finds,
+looking at $ENV{MYAPP_HOME} and $ENV{CATALYST_HOME}.
+
+=cut
+
+sub env_value {
+    my ( $class, $key ) = @_;
+
+    $key = uc($key);
+    my @prefixes = ( class2env($class), 'CATALYST' );
+
+    for my $prefix (@prefixes) {
+        if ( defined( my $value = $ENV{"${prefix}_${key}"} ) ) {
+            return $value;
+        }
+    }
+
+    return;
+}
 
 =head1 AUTHOR
 

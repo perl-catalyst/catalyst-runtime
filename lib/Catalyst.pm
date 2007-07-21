@@ -1924,13 +1924,8 @@ sub setup_dispatcher {
         $dispatcher = 'Catalyst::Dispatcher::' . $dispatcher;
     }
 
-    if ( $ENV{CATALYST_DISPATCHER} ) {
-        $dispatcher = 'Catalyst::Dispatcher::' . $ENV{CATALYST_DISPATCHER};
-    }
-
-    if ( $ENV{ uc($class) . '_DISPATCHER' } ) {
-        $dispatcher =
-          'Catalyst::Dispatcher::' . $ENV{ uc($class) . '_DISPATCHER' };
+    if ( my $env = Catalyst::Utils::env_value( $class, 'DISPATCHER' ) ) {
+        $dispatcher = 'Catalyst::Dispatcher::' . $env;
     }
 
     unless ($dispatcher) {
@@ -1958,12 +1953,8 @@ sub setup_engine {
         $engine = 'Catalyst::Engine::' . $engine;
     }
 
-    if ( $ENV{CATALYST_ENGINE} ) {
-        $engine = 'Catalyst::Engine::' . $ENV{CATALYST_ENGINE};
-    }
-
-    if ( $ENV{ uc($class) . '_ENGINE' } ) {
-        $engine = 'Catalyst::Engine::' . $ENV{ uc($class) . '_ENGINE' };
+    if ( my $env = Catalyst::Utils::env_value( $class, 'ENGINE' ) ) {
+        $engine = 'Catalyst::Engine::' . $env;
     }
 
     if ( $ENV{MOD_PERL} ) {
@@ -2078,13 +2069,8 @@ Sets up the home directory.
 sub setup_home {
     my ( $class, $home ) = @_;
 
-    if ( $ENV{CATALYST_HOME} ) {
-        $home = $ENV{CATALYST_HOME};
-    }
-
-    if ( $ENV{ uc($class) . '_HOME' } ) {
-        $class =~ s/::/_/g;
-        $home = $ENV{ uc($class) . '_HOME' };
+    if ( my $env = Catalyst::Utils::env_value( $class, 'HOME' ) ) {
+        $home = $env;
     }
 
     unless ($home) {
@@ -2110,14 +2096,8 @@ sub setup_log {
         $class->log( Catalyst::Log->new );
     }
 
-    my $app_flag = Catalyst::Utils::class2env($class) . '_DEBUG';
-
-    if (
-          ( defined( $ENV{CATALYST_DEBUG} ) || defined( $ENV{$app_flag} ) )
-        ? ( $ENV{CATALYST_DEBUG} || $ENV{$app_flag} )
-        : $debug
-      )
-    {
+    my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
+    if ( defined($env_debug) ? $env_debug : $debug ) {
         no strict 'refs';
         *{"$class\::debug"} = sub { 1 };
         $class->log->debug('Debug messages enabled');
