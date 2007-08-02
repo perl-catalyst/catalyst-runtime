@@ -13,4 +13,9 @@ sub two : Action LocalRegexp('^(\d+)/(\w+)$') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub three : Action LocalRegex('^(mandatory)(/optional)?$'){
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;
