@@ -10,8 +10,8 @@ Catalyst::Action - Catalyst Action
 
 =head1 SYNOPSIS
 
-	<form action="[%c.uri_for(c.action.reverse)%]">
-	
+    <form action="[%c.uri_for(c.action.reverse)%]">
+
 =head1 DESCRIPTION
 
 This class represents a Catalyst Action. You can access the object for the 

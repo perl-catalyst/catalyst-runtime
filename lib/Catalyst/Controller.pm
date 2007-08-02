@@ -18,8 +18,8 @@ Catalyst::Controller - Catalyst Controller base class
   use base qw/Catalyst::Controller;
 
   sub foo : Local { 
-	my ($self,$c,@args) = @_;
-	... 
+    my ($self,$c,@args) = @_;
+    ... 
   } # Dispatches to /search/foo
 
 =head1 DESCRIPTION

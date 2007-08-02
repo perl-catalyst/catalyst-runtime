@@ -97,7 +97,7 @@ sub run {
     my %env;
     my $error = \*STDERR; # send STDERR to the web server
        $error = \*STDOUT  # send STDERR to stdout (a logfile)
-	 if $options->{keep_stderr}; # (if asked to)
+         if $options->{keep_stderr}; # (if asked to)
     
     my $request =
       FCGI::Request( \*STDIN, \*STDOUT, $error, \%env, $sock,

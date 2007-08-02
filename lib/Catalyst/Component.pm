@@ -60,7 +60,7 @@ sub new {
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
     return $self->NEXT::new( 
-		$self->merge_config_hashes( $self->config, $arguments ) );
+        $self->merge_config_hashes( $self->config, $arguments ) );
 }
 
 sub COMPONENT {
@@ -79,7 +79,7 @@ sub COMPONENT {
         else {
             my $class = ref $self || $self;
             my $new   = $self->merge_config_hashes( 
-				$self->config, $arguments );
+                $self->config, $arguments );
             return bless $new, $class;
         }
     }

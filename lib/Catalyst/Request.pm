@@ -99,11 +99,11 @@ Returns a reference to an array containing the arguments.
 
 For example, if your action was
 
-	package MyApp::C::Foo;
-	
-	sub moose : Local {
-		...
-	}
+    package MyApp::C::Foo;
+
+    sub moose : Local {
+        ...
+    }
 
 and the URI for the request was C<http://.../foo/moose/bah>, the string C<bah>
 would be the first and only argument.
@@ -281,7 +281,7 @@ is an alternative method for accessing parameters in $c->req->parameters.
 Like L<CGI>, and B<unlike> earlier versions of Catalyst, passing multiple
 arguments to this method, like this:
 
-	$c->request->param( 'foo', 'bar', 'gorch', 'quxx' );
+    $c->request->param( 'foo', 'bar', 'gorch', 'quxx' );
 
 will set the parameter C<foo> to the multiple values C<bar>, C<gorch> and
 C<quxx>. Previously this would have added C<bar> as another value to C<foo>

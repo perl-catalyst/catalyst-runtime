@@ -23,7 +23,7 @@ See L<Catalyst>.
 
 =head2 appprefix($class)
 
-	MyApp::Foo becomes myapp_foo
+    MyApp::Foo becomes myapp_foo
 
 =cut
 

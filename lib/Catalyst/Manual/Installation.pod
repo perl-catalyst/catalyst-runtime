@@ -98,8 +98,8 @@ CPAN
 The traditional way to install Catalyst is directly from CPAN using the
 C<Task::Catalyst> bundle and C<Catalyst::Devel>:
 
-	$ perl -MCPAN -e 'install Task::Catalyst'
-	$ perl -MCPAN -e 'install Catalyst::Devel'
+    $ perl -MCPAN -e 'install Task::Catalyst'
+    $ perl -MCPAN -e 'install Catalyst::Devel'
 
 Unless you have a particularly complete set of Perl modules already
 installed, be prepared for a large number of nested dependencies.

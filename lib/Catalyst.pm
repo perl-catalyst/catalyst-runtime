@@ -111,7 +111,7 @@ documentation and tutorials.
     ### in lib/MyApp.pm
     use Catalyst qw/-Debug/; # include plugins here as well
     
-	### In lib/MyApp/Controller/Root.pm (autocreated)
+    ### In lib/MyApp/Controller/Root.pm (autocreated)
     sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
         my ( $self, $c, @args ) = @_; # args are qw/1 2/ for /foo/1/2
         $c->stash->{template} = 'foo.tt'; # set the template
@@ -345,7 +345,7 @@ sub stash {
     my $c = shift;
     if (@_) {
         my $stash = @_ > 1 ? {@_} : $_[0];
-	croak('stash takes a hash or hashref') unless ref $stash;
+        croak('stash takes a hash or hashref') unless ref $stash;
         foreach my $key ( keys %$stash ) {
             $c->{stash}->{$key} = $stash->{$key};
         }
@@ -993,8 +993,8 @@ sub welcome_message {
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-	<meta http-equiv="Content-Language" content="en" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>$name on Catalyst $VERSION</title>
         <style type="text/css">
             body {

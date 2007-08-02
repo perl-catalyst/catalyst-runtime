@@ -149,15 +149,15 @@ Writes the buffer to the client. Can only be called once for a request.
 sub write {
     my ( $self, $c, $buffer ) = @_;
     
-	# Avoid 'print() on closed filehandle Remote' warnings when using IE
-	return unless *STDOUT->opened();
-	
-	my $ret;
-	
-	# Prepend the headers if they have not yet been sent
-	if ( my $headers = delete $self->{_header_buf} ) {
-	    DEBUG && warn "write: Wrote headers and first chunk (" . length($headers . $buffer) . " bytes)\n";
-	    $ret = $self->NEXT::write( $c, $headers . $buffer );
+    # Avoid 'print() on closed filehandle Remote' warnings when using IE
+    return unless *STDOUT->opened();
+
+    my $ret;
+
+    # Prepend the headers if they have not yet been sent
+    if ( my $headers = delete $self->{_header_buf} ) {
+        DEBUG && warn "write: Wrote headers and first chunk (" . length($headers . $buffer) . " bytes)\n";
+        $ret = $self->NEXT::write( $c, $headers . $buffer );
     }
     else {
         DEBUG && warn "write: Wrote chunk (" . length($buffer) . " bytes)\n";
