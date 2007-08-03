@@ -142,7 +142,7 @@ sub read_chunk {
 
 =head2 $self->write($c, $buffer)
 
-Writes the buffer to the client. Can only be called once for a request.
+Writes the buffer to the client.
 
 =cut
 
@@ -152,19 +152,16 @@ sub write {
     # Avoid 'print() on closed filehandle Remote' warnings when using IE
     return unless *STDOUT->opened();
 
-    my $ret;
-
     # Prepend the headers if they have not yet been sent
     if ( my $headers = delete $self->{_header_buf} ) {
-        DEBUG && warn "write: Wrote headers and first chunk (" . length($headers . $buffer) . " bytes)\n";
-        $ret = $self->NEXT::write( $c, $headers . $buffer );
-    }
-    else {
-        DEBUG && warn "write: Wrote chunk (" . length($buffer) . " bytes)\n";
-        $ret = $self->NEXT::write( $c, $buffer );
+        $buffer = $headers . $buffer;
     }
     
-    if ( !$ret ) {
+    my $ret = $self->NEXT::write( $c, $buffer );
+    
+    DEBUG && warn "write: Wrote response ($ret bytes)\n";
+    
+    if ( !defined $ret ) {
         $self->{_write_error} = $!;
     }
     

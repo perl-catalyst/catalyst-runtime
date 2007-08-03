@@ -4,6 +4,7 @@ use strict;
 use base 'Class::Accessor::Fast';
 use CGI::Simple::Cookie;
 use Data::Dump qw/dump/;
+use Errno 'EWOULDBLOCK';
 use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
@@ -609,7 +610,7 @@ sub run { }
 
 =head2 $self->write($c, $buffer)
 
-Writes the buffer to the client. Can only be called once for a request.
+Writes the buffer to the client.
 
 =cut
 
@@ -620,8 +621,27 @@ sub write {
         $self->prepare_write($c);
         $self->{_prepared_write} = 1;
     }
-
-    print STDOUT $buffer;
+    
+    my $len   = length($buffer);
+    my $wrote = syswrite STDOUT, $buffer;
+    
+    if ( defined $wrote && $wrote < $len ) {
+        # We didn't write the whole buffer
+        while (1) {
+            my $ret = syswrite STDOUT, $buffer, $CHUNKSIZE, $wrote;
+            if ( defined $ret ) {
+                $wrote += $ret;
+            }
+            else {
+                next if $! == EWOULDBLOCK;
+                return;
+            }
+            
+            last if $wrote >= $len;
+        }
+    }
+    
+    return $wrote;
 }
 
 =head2 $self->unescape_uri($uri)

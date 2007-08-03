@@ -42,7 +42,8 @@ sub finalize_headers {
 
     $c->response->header( Status => $c->response->status );
 
-    print $c->response->headers->as_string("\015\012") . "\015\012";
+    $self->{_header_buf} 
+        = $c->response->headers->as_string("\015\012") . "\015\012";
 }
 
 =head2 $self->prepare_connection($c)
@@ -205,6 +206,23 @@ sub prepare_write {
     *STDOUT->autoflush(1);
 
     $self->NEXT::prepare_write($c);
+}
+
+=head2 $self->write($c, $buffer)
+
+Writes the buffer to the client.
+
+=cut
+
+sub write {
+    my ( $self, $c, $buffer ) = @_;
+
+    # Prepend the headers if they have not yet been sent
+    if ( my $headers = delete $self->{_header_buf} ) {
+        $buffer = $headers . $buffer;
+    }
+    
+    return $self->NEXT::write( $c, $buffer );
 }
 
 =head2 $self->read_chunk($c, $buffer, $length)

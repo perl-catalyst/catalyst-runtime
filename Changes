@@ -16,6 +16,8 @@ This file documents the revision history for Perl extension Catalyst.
           (http://rt.cpan.org/Ticket/Display.html?id=27135)
         - Remove warning for captures that are undef.
         - Fixed $c->read and parse_on_demand mode.
+        - Fixed a bug with the HTTP engine where very large response bodies
+          would not be sent properly.
 
 5.7007  2007-03-13 14:18:00
         - Many performance improvements by not using URI.pm:
