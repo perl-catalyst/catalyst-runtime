@@ -136,21 +136,6 @@ sub remote_request {
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         $server->path("$1");    # need to be quoted
-        }
-
-    # the request path needs to be sanitised if $server is using a
-    # non-root path due to potential overlap between request path and
-    # response path.
-    if ($server->path) {
-        my @sp = split '/', $server->path;
-        my @rp = split '/', $request->uri->path;
-        shift @sp;shift @rp; # leading /
-        if (@rp) {
-            foreach my $sp (@sp) {
-                shift @rp if $sp eq $rp[0];
-            }
-        }
-        $request->uri->path(join '/', @rp);
     }
 
     # the request path needs to be sanitised if $server is using a
