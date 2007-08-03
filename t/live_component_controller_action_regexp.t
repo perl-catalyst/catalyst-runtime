@@ -13,6 +13,8 @@ BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 use Test::More tests => 28*$iters;
 use Catalyst::Test 'TestApp';
 
+use Catalyst::Request;
+
 if ( $ENV{CAT_BENCHMARK} ) {
     require Benchmark;
     Benchmark::timethis( $iters, \&run_tests );

@@ -29,8 +29,17 @@ sub run_tests {
         ok( my $response = request('http://localhost/streaming'), 'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
-        # XXX: Length should be undef here, but HTTP::Request::AsCGI sets it
-        is( $response->content_length, 12, 'Response Content-Length' );
+        
+        SKIP:
+        {
+            if ( $ENV{CATALYST_SERVER} ) {
+                skip "Using remote server", 1;
+            }
+            
+            # XXX: Length should be undef here, but HTTP::Request::AsCGI sets it
+            is( $response->content_length, 12, 'Response Content-Length' );
+        }
+        
         is( $response->content,, <<'EOF', 'Content is a stream' );
 foo
 bar
