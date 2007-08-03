@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -103,14 +103,15 @@ use URI;
     };
 
     my $request = POST(
-        'http://localhost/dump/request/a/b?query_string',
+        'http://localhost/dump/request/a/b?query+string',
         'Content'      => $parameters,
         'Content-Type' => 'application/x-www-form-urlencoded'
     );
     
     ok( my $response = request($request), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is( $creq->{uri}->query, 'query_string', 'Catalyst::Request POST query_string' );
+    is( $creq->{uri}->query, 'query+string', 'Catalyst::Request POST query_string' );
+    is( $creq->query_keywords, 'query string', 'Catalyst::Request query_keywords' );
     is_deeply( $creq->{parameters}, $parameters, 'Catalyst::Request parameters' );
     
     ok( $response = request('http://localhost/dump/request/a/b?x=1&y=1&z=1'), 'Request' );

@@ -1,18 +1,20 @@
 This file documents the revision history for Perl extension Catalyst.
 
 5.7008
-        - Add undef warning for uri_for
-        - Fix bug where a nested component would be setup twice
-        - Make ensure_class_loaded behave better with malformed class name
-        - Make _register_plugin use ensure_class_loaded
-        - Remove 'Argument "??" isn't numeric in sprintf' warning
+        - Added $c->request->query_keywords for getting the keywords
+          (a query string with no parameters).
+        - Add undef warning for uri_for.
+        - Fix bug where a nested component would be setup twice.
+        - Make ensure_class_loaded behave better with malformed class name.
+        - Make _register_plugin use ensure_class_loaded.
+        - Remove 'Argument "??" isn't numeric in sprintf' warning.
           (Emanuele Zeppieri)
         - Fixed a bug where Content-Length could be set to 0 if a filehandle
           object in $c->response->body did not report a size.
         - Fixed issue where development server running in fork mode did not
           properly exit after a write error.
           (http://rt.cpan.org/Ticket/Display.html?id=27135)
-        - Remove warning for captures that are undef
+        - Remove warning for captures that are undef.
 
 5.7007  2007-03-13 14:18:00
         - Many performance improvements by not using URI.pm:
