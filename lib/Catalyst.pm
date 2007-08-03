@@ -1590,8 +1590,14 @@ sub prepare {
         $c->prepare_cookies;
         $c->prepare_path;
 
-        # On-demand parsing
-        $c->prepare_body unless $c->config->{parse_on_demand};
+        # Prepare the body for reading, either by prepare_body
+        # or the user, if they are using $c->read
+        $c->prepare_read;
+        
+        # Parse the body unless the user wants it on-demand
+        unless ( $c->config->{parse_on_demand} ) {
+            $c->prepare_body;
+        }
     }
 
     my $method  = $c->req->method  || '';
@@ -1805,6 +1811,10 @@ C<$maxlength> defaults to the size of the request if not specified.
 
 You have to set C<< MyApp->config->{parse_on_demand} >> to use this
 directly.
+
+Warning: If you use read(), Catalyst will not process the body,
+so you will not be able to access POST parameters or file uploads via
+$c->request.  You must handle all body parsing yourself.
 
 =cut
 
@@ -2217,8 +2227,8 @@ This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
 =head1 ON-DEMAND PARSER
 
 The request body is usually parsed at the beginning of a request,
-but if you want to handle input yourself or speed things up a bit,
-you can enable on-demand parsing with a config parameter.
+but if you want to handle input yourself, you can enable on-demand
+parsing with a config parameter.
 
     MyApp->config->{parse_on_demand} = 1;
     

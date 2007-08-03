@@ -279,11 +279,7 @@ sub finalize_headers { }
 
 =cut
 
-sub finalize_read {
-    my ( $self, $c ) = @_;
-
-    undef $self->{_prepared_read};
-}
+sub finalize_read { }
 
 =head2 $self->finalize_uploads($c)
 
@@ -312,12 +308,8 @@ sets up the L<Catalyst::Request> object body using L<HTTP::Body>
 
 sub prepare_body {
     my ( $self, $c ) = @_;
-    
-    my $length = $c->request->header('Content-Length') || 0;
 
-    $self->read_length( $length );
-
-    if ( $length > 0 ) {
+    if ( my $length = $self->read_length ) {
         unless ( $c->request->{_body} ) {
             my $type = $c->request->header('Content-Type');
             $c->request->{_body} = HTTP::Body->new( $type, $length );
@@ -494,8 +486,11 @@ prepare to read from the engine.
 sub prepare_read {
     my ( $self, $c ) = @_;
 
-    # Reset the read position
+    # Initialize the read position
     $self->read_position(0);
+    
+    # Initialize the amount of data we think we need to read
+    $self->read_length( $c->request->header('Content-Length') || 0 );
 }
 
 =head2 $self->prepare_request(@arguments)
@@ -564,11 +559,6 @@ sub prepare_write { }
 
 sub read {
     my ( $self, $c, $maxlength ) = @_;
-
-    unless ( $self->{_prepared_read} ) {
-        $self->prepare_read($c);
-        $self->{_prepared_read} = 1;
-    }
 
     my $remaining = $self->read_length - $self->read_position;
     $maxlength ||= $CHUNKSIZE;
