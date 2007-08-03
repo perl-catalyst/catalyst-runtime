@@ -9,8 +9,14 @@
 
     # REDIRECT_URL test
     <IfModule mod_rewrite.c>
+        # Fix trailing slash on /cgi
+        # one CGI test will fail if you don't have mod_rewrite enabled
+        RewriteEngine on
+        RewriteRule /cgi$ /cgi/ [PT]
+
         <Location /rewrite>
             RewriteEngine on
+            RewriteRule /rewrite$ /rewrite/ [PT]
             RewriteRule /rewrite/(.*) /cgi/$1
         </Location>
     </IfModule>
