@@ -5,7 +5,7 @@
 # Note, to get this to run properly, you may need to give it the path to your
 # httpd.conf:
 #
-# perl t/optional_apache-fastcgi-non-root.pl -httpd_conf /etc/apache/httpd.conf t/live_*
+# perl t/optional_apache-fastcgi-non-root.pl -httpd_conf /etc/apache/httpd.conf
 
 use strict;
 use warnings;

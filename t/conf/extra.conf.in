@@ -34,7 +34,7 @@
     ScriptAlias / @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl/
 
     <IfModule mod_rewrite.c>
-        # Fix trailing slas
+        # Fix trailing slash
         RewriteEngine on
         RewriteRule /fastcgi/deep/path$ /fastcgi/deep/path/ [PT]
     </IfModule>
