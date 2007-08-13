@@ -33,6 +33,12 @@ rmtree 't/tmp/TestApp/t';
 
 $ENV{CATALYST_SERVER} = 'http://localhost:8529/rewrite';
 
+if ( !-e 't/optional_apache-cgi-rewrite.pl' ) {
+    die "ERROR: Please run test from the Catalyst-Runtime directory\n";
+}
+
+push @ARGV, glob( 't/live_*' );
+
 Apache::TestRun->new->run(@ARGV);
 
 # clean up if the server has shut down
