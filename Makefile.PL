@@ -31,6 +31,10 @@ requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 
+if (-e 'inc/.author') {
+  build_requires 'Test::Perl::Critic';
+}
+
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
