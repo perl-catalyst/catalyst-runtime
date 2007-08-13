@@ -5,7 +5,7 @@
 # Note, to get this to run properly, you may need to give it the path to your
 # httpd.conf:
 #
-# perl t/optional_apache-fastcgi.pl -httpd_conf /etc/apache/httpd.conf t/live_*
+# perl t/optional_apache-fastcgi-non-root.pl -httpd_conf /etc/apache/httpd.conf t/live_*
 
 use strict;
 use warnings;
@@ -31,9 +31,9 @@ File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
 # remove TestApp's tests so Apache::Test doesn't try to run them
 rmtree 't/tmp/TestApp/t';
 
-$ENV{CATALYST_SERVER} = 'http://localhost:8529';
+$ENV{CATALYST_SERVER} = 'http://localhost:8529/fastcgi/deep/path';
 
-if ( !-e 't/optional_apache-fastcgi.pl2' ) {
+if ( !-e 't/optional_apache-fastcgi.pl' ) {
     die "ERROR: Please run test from the Catalyst-Runtime directory\n";
 }
 

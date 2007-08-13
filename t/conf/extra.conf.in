@@ -26,5 +26,16 @@
 <IfModule mod_fastcgi.c>
     FastCgiIpcDir @ServerRoot@/tmp/tmp
     FastCgiServer @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl -idle-timeout 300 -processes 1
-    ScriptAlias /fastcgi/ @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl/
+
+    # Test at a non-root location
+    ScriptAlias /fastcgi/deep/path/ @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl/
+
+    # Test at root
+    ScriptAlias / @ServerRoot@/tmp/TestApp/script/testapp_fastcgi.pl/
+
+    <IfModule mod_rewrite.c>
+        # Fix trailing slas
+        RewriteEngine on
+        RewriteRule /fastcgi/deep/path$ /fastcgi/deep/path/ [PT]
+    </IfModule>
 </IfModule>
