@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7008
+5.7009
+
+5.7008  2007-08-13 08:40:00
         - Added $c->request->query_keywords for getting the keywords
           (a query string with no parameters).
         - Add undef warning for uri_for.
