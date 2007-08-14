@@ -159,10 +159,11 @@ sub write {
     
     my $ret = $self->NEXT::write( $c, $buffer );
     
-    DEBUG && warn "write: Wrote response ($ret bytes)\n";
-    
     if ( !defined $ret ) {
         $self->{_write_error} = $!;
+    }
+    else {
+        DEBUG && warn "write: Wrote response ($ret bytes)\n";
     }
     
     return $ret;
