@@ -15,7 +15,7 @@ Catalyst::Controller - Catalyst Controller base class
 =head1 SYNOPSIS
 
   package MyApp::Controller::Search
-  use base qw/Catalyst::Controller;
+  use base qw/Catalyst::Controller/;
 
   sub foo : Local { 
     my ($self,$c,@args) = @_;
@@ -24,10 +24,10 @@ Catalyst::Controller - Catalyst Controller base class
 
 =head1 DESCRIPTION
 
-Controllers are where the actions in the Catalyst framework reside. each
-action is represented by a function with an attribute to identify what kind
-of action it is. See the L<Catalyst::Dispatcher> for more info about how 
-Catalyst dispatches to actions.
+Controllers are where the actions in the Catalyst framework
+reside. Each action is represented by a function with an attribute to
+identify what kind of action it is. See the L<Catalyst::Dispatcher>
+for more info about how Catalyst dispatches to actions.
 
 =cut
 
@@ -298,16 +298,17 @@ __END__
 
 =head1 CONFIGURATION
 
-As any other L<Catalyst::Component>, controllers have a config 
-hash, accessable through $self->config from the controller actions.
-Some settings are in use by the Catalyst framework:
+Like any other L<Catalyst::Component>, controllers have a config hash,
+accessible through $self->config from the controller actions.  Some
+settings are in use by the Catalyst framework:
 
 =head2 namespace
 
-This spesifies the internal namespace the controller should be bound to. By default
-the controller is bound to the uri version of the controller name. For instance
-controller 'MyApp::Controller::Foo::Bar' will be bound to 'foo/bar'. The default Root 
-controller is an example of setting namespace to ''. 
+This specifies the internal namespace the controller should be bound
+to. By default the controller is bound to the URI version of the
+controller name. For instance controller 'MyApp::Controller::Foo::Bar'
+will be bound to 'foo/bar'. The default Root controller is an example
+of setting namespace to '' (the null string).
 
 =head2 prefix 
 
@@ -322,36 +323,37 @@ $self->_application.
 
 =head2 $self->action_for('name')
 
-Returns the Catalyst::Action object (if any) for a given method name in
-this component.
+Returns the Catalyst::Action object (if any) for a given method name
+in this component.
 
 =head2 $self->register_actions($c)
 
-Finds all applicable actions for this component, creates Catalyst::Action
-objects (using $self->create_action) for them and registers them with
-$c->dispatcher.
+Finds all applicable actions for this component, creates
+Catalyst::Action objects (using $self->create_action) for them and
+registers them with $c->dispatcher.
 
 =head2 $self->action_namespace($c)
 
-Returns the private namespace for actions in this component. Defaults to a value
-from the controller name (for e.g. MyApp::Controller::Foo::Bar becomes
-"foo/bar") or can be overriden from the "namespace" config key.
+Returns the private namespace for actions in this component. Defaults
+to a value from the controller name (for
+e.g. MyApp::Controller::Foo::Bar becomes "foo/bar") or can be
+overridden from the "namespace" config key.
 
 
 =head2 $self->path_prefix($c)
 
-Returns the default path prefix for :Local, :LocalRegex and relative :Path
-actions in this component. Defaults to the action_namespace or can be
-overriden from the "path" config key.
+Returns the default path prefix for :Local, :LocalRegex and relative
+:Path actions in this component. Defaults to the action_namespace or
+can be overridden from the "path" config key.
 
 =head2 $self->create_action(%args)
 
-Called with a hash of data to be use for construction of a new Catalyst::Action
-(or appropriate sub/alternative class) object.
+Called with a hash of data to be use for construction of a new
+Catalyst::Action (or appropriate sub/alternative class) object.
 
 Primarily designed for the use of register_actions.
 
-=head2 $self->_application  
+=head2 $self->_application
 
 =head2 $self->_app
 
@@ -364,7 +366,7 @@ Marcus Ramberg C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
