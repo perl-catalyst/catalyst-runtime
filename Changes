@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
-5.7009
+5.7009  2007-08-17 10:00:00
+        - Moved Manual.pod to Manual.pm and clarified status of 
+          Catalyst-Manual dist
+        - Doc patches to Catalyst::Controller
 
 5.7008  2007-08-13 08:40:00
         - Added $c->request->query_keywords for getting the keywords
