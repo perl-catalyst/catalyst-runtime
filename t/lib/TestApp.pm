@@ -5,6 +5,7 @@ use Catalyst qw/
     Test::Errors 
     Test::Headers 
     Test::Plugin
+    Test::Inline
     +TestApp::Plugin::FullyQualified
 /;
 use Catalyst::Utils;
@@ -88,4 +89,13 @@ sub recursion_test : Local {
     no warnings 'redefine';
     sub Catalyst::Log::error { }
 }
+
+# Make sure we can load Inline plugins. 
+
+package Catalyst::Plugin::Test::Inline;
+
+use strict;
+
+use base qw/Catalyst::Base Class::Data::Inheritable/;
+
 1;
