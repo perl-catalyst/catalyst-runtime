@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Catalyst.
         - Moved Manual.pod to Manual.pm and clarified status of 
           Catalyst-Manual dist
         - Doc patches to Catalyst::Controller
+        - remove ignore_loaded from plugin load, commenting why
+        - document the ignore_loaded feature in Catalyst::Utils
 
 5.7008  2007-08-13 08:40:00
         - Added $c->request->query_keywords for getting the keywords

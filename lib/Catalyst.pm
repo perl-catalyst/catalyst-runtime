@@ -1872,6 +1872,11 @@ sub setup_components {
     my %comps = map { $_ => 1 } @comps;
     
     for my $component ( @comps ) {
+
+        # We pass ignore_loaded here so that overlay files for (e.g.)
+        # Model::DBI::Schema sub-classes are loaded - if it's in @comps
+        # we know M::P::O found a file on disk so this is safe
+
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
 
         my $module  = $class->setup_component( $component );
@@ -2149,7 +2154,10 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        Catalyst::Utils::ensure_class_loaded( $plugin, { ignore_loaded => 1 } );
+        # no ignore_loaded here, the plugin may already have been
+        # defined in memory and we don't want to error on "no file" if so
+
+        Catalyst::Utils::ensure_class_loaded( $plugin );
 
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {

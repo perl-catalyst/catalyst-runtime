@@ -233,9 +233,14 @@ sub request {
     return $request;
 }
 
-=head2 ensure_class_loaded($class_name)
+=head2 ensure_class_loaded($class_name, \%opts)
 
 Loads the class unless it already has been loaded.
+
+If $opts{ignore_loaded} is true always tries the require whether the package
+already exists or not. Only pass this if you're either (a) sure you know the
+file exists on disk or (b) have code to catch the file not found exception
+that will result if it doesn't.
 
 =cut
 
