@@ -267,7 +267,6 @@ C<install('Catalyst');> line):
     install('ExtUtils::ParseXS');
     install('Digest::SHA1');
     install('Digest::SHA');
-    install('Class::DBI');
     install('DBIx::Class');
     install('DBIx::Class::HTMLWidget');
     install('Module::ScanDeps');
