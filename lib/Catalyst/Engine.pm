@@ -625,6 +625,11 @@ sub write {
     my $len   = length($buffer);
     my $wrote = syswrite STDOUT, $buffer;
     
+    if ( !defined $wrote && $! == EWOULDBLOCK ) {
+        # Unable to write on the first try, will retry in the loop below
+        $wrote = 0;
+    }
+    
     if ( defined $wrote && $wrote < $len ) {
         # We didn't write the whole buffer
         while (1) {
