@@ -46,16 +46,6 @@ install_script glob('script/*.pl');
 auto_install;
 WriteAll;
 
-print( '*' x 74, "\n" );
-my $banner =
-  (qw/andyg chansen draven fordmason mst naughton sri jester
-      jrockway ningu nothingmuch LTjake/)[ int( rand(12) ) ]
-  . " is the greatest and gabb is "
-  . ( (localtime)[2] > 12 ? "drunk" : "hung over" )
-  . " again!";
-print " $banner \n";
-print( '*' x 74, "\n" );
-
 print <<"EOF";
 
  Important:
