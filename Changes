@@ -1,5 +1,8 @@
 e This file documents the revision history for Perl extension Catalyst.
 
+5.7010  2007-08-22 07:41:00
+        - Resource forks in 5.7009
+
 5.7009  2007-08-22 00:14:00
         - Moved Manual.pod to Manual.pm and clarified status of 
           Catalyst-Manual dist
