@@ -31,6 +31,12 @@ requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 
+if ($^O eq 'darwin') { 
+    makemaker_args(dist => { PREOP => 'if [ "$$COPY_EXTENDED_ATTRIBUTES_DISABLE" != "true" ]; then'.
+                                      ' echo "you must set the ENV variable COPY_EXTENDED_ATTRIBUTES_DISABLE to true,"; '.
+                                      ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
+}
+
 if (-e 'inc/.author') {
   build_requires 'Test::Perl::Critic';
 }
