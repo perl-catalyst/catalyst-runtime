@@ -1865,6 +1865,7 @@ sub setup_components {
         
     my $locator = Module::Pluggable::Object->new(
         search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
+        except => qr/\.#/,
         %$config
     );
 
