@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 109*$iters;
+use Test::More tests => 118*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -765,5 +765,67 @@ sub run_tests {
             $expected, 'Executed actions' );
         is( $response->content, '; ', 'Content OK' );
     }
+
+	#
+	#	Higher Args() hiding more specific CaptureArgs chains sections
+	#
+	{
+		my @expected = qw[
+		  	TestApp::Controller::Action::Chained->begin
+		  	TestApp::Controller::Action::Chained->cc_base
+		  	TestApp::Controller::Action::Chained->cc_link
+		  	TestApp::Controller::Action::Chained->cc_anchor
+		  	TestApp::Controller::Action::Chained->end
+			];
+
+		my $expected = join ', ', @expected;
+
+		ok( my $response = request('http://localhost/chained/choose_capture/anchor.html'),
+			'Choose between an early Args() and a later more ideal chain' );
+		is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
+		is( $response->content => '; ', 'Content OK' );
+	}
+
+	#
+	#	Less specific chain not being seen correctly due to earlier looser capture
+	#
+	{
+		my @expected = qw[
+		  	TestApp::Controller::Action::Chained->begin
+		  	TestApp::Controller::Action::Chained->cc_base
+		  	TestApp::Controller::Action::Chained->cc_b
+		  	TestApp::Controller::Action::Chained->cc_b_link
+		  	TestApp::Controller::Action::Chained->cc_b_anchor
+		  	TestApp::Controller::Action::Chained->end
+			];
+
+		my $expected = join ', ', @expected;
+
+		ok( my $response = request('http://localhost/chained/choose_capture/b/a/anchor.html'),
+			'Choose between a more specific chain and an earlier looser one' );
+		is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
+		is( $response->content => 'a; ', 'Content OK' );
+	}
+
+	#
+	#	Check we get the looser one when it's the correct match
+	#
+	{
+		my @expected = qw[
+		  	TestApp::Controller::Action::Chained->begin
+		  	TestApp::Controller::Action::Chained->cc_base
+		  	TestApp::Controller::Action::Chained->cc_a
+		  	TestApp::Controller::Action::Chained->cc_a_link
+		  	TestApp::Controller::Action::Chained->cc_a_anchor
+		  	TestApp::Controller::Action::Chained->end
+			];
+
+		my $expected = join ', ', @expected;
+
+		ok( my $response = request('http://localhost/chained/choose_capture/a/a/anchor.html'),
+			'Choose between a more specific chain and an earlier looser one' );
+		is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
+		is( $response->content => 'a; anchor.html', 'Content OK' );
+	}
 
 }

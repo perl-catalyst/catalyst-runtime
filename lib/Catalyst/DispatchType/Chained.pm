@@ -101,7 +101,8 @@ sub match {
 
     my @parts = split('/', $path);
 
-    my ($chain, $captures) = $self->recurse_match($c, '/', \@parts);
+    my ($chain, $captures, $parts) = $self->recurse_match($c, '/', \@parts);
+	push @{$c->req->args}, @$parts;
 
     return 0 unless $chain;
 
@@ -126,6 +127,7 @@ sub recurse_match {
     my ( $self, $c, $parent, $path_parts ) = @_;
     my $children = $self->{children_of}{$parent};
     return () unless $children;
+	my $best_action;
     my @captures;
     TRY: foreach my $try_part (sort { length($b) <=> length($a) }
                                    keys %$children) {
@@ -152,22 +154,33 @@ sub recurse_match {
                 push(@captures, splice(@parts, 0, $capture_attr->[0]));
 
                 # try the remaining parts against children of this action
-                my ($actions, $captures) = $self->recurse_match(
+                my ($actions, $captures, $action_parts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
                                            );
-                if ($actions) {
-                    return [ $action, @$actions ], [ @captures, @$captures ];
-                }
-            } else {
+				if ($actions && (!$best_action || $#$action_parts < $#{$best_action->{parts}})){
+					$best_action = {
+						actions	=> [ $action, @$actions ],
+						captures=> [ @captures, @$captures ],
+						parts	=> $action_parts
+						};
+				}
+           	}
+			else {
                 {
                     local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
                     next TRY_ACTION unless $action->match($c);
                 }
-                push(@{$c->req->args}, @parts);
-                return [ $action ], [ ];
+				if (!$best_action || $#parts < $#{$best_action->{parts}}){
+                	$best_action = {
+						actions	=> [ $action ],
+						captures=> [],
+						parts	=> \@parts
+						}
+					}
             }
         }
     }
+	return @$best_action{qw/actions captures parts /} if $best_action;
     return ();
 }
 
