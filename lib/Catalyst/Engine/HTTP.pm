@@ -184,7 +184,7 @@ sub run {
     if ($options->{background}) {
         my $child = fork;
         die "Can't fork: $!" unless defined($child);
-        exit if $child;
+        return $child if $child;
     }
 
     my $restart = 0;
