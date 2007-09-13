@@ -658,10 +658,9 @@ as Apache may implement this using Apache's C-based modules, for example.
 
 sub unescape_uri {
     my ( $self, $str ) = @_;
-    
-    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-    $str =~ s/\+/ /g;
-    
+
+    $str =~ s/(?:%([0-9A-Fa-f]{2})|\+)/defined $1 ? chr(hex($1)) : ' '/eg;
+
     return $str;
 }
 

@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 30;
+use Test::More tests => 35;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -35,6 +35,16 @@ use URI;
     is( $creq->method, 'GET', 'Catalyst::Request method' );
     is_deeply( $creq->{parameters}, $parameters,
         'Catalyst::Request parameters' );
+}
+
+{
+    my $creq;
+    ok( my $response = request("http://localhost/dump/request?q=foo%2bbar"),
+        'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    ok( eval '$creq = ' . $response->content );
+    is $creq->{parameters}->{q}, 'foo+bar', '%2b not double decoded';
 }
 
 {
