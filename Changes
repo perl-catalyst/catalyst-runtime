@@ -6,6 +6,8 @@
           (Emanuele Zeppieri)
         - Fixed bug in HTTP engine where writes could fail with
           'Resource temporarily unavailable'.
+        - Fixed bug where %2b in query parameter is doubly decoded to ' ', instead of '+'
+          (Gavin Henry, Tatsuhiko Miyagawa)
 
 5.7010  2007-08-22 07:41:00
         - Resource forks in 5.7009
