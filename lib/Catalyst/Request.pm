@@ -6,6 +6,8 @@ use base 'Class::Accessor::Fast';
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;
+use URI::http;
+use URI::https;
 use URI::QueryParam;
 
 __PACKAGE__->mk_accessors(

@@ -143,10 +143,10 @@ sub prepare_path {
     # Using URI directly is way too slow, so we construct the URLs manually
     my $uri_class = "URI::$scheme";
     
-    # HTTP_HOST will include the port even if it's 80
-    $host =~ s/:80$//;
+    # HTTP_HOST will include the port even if it's 80/443
+    $host =~ s/:(?:80|443)$//;
     
-    if ( $port != 80 && $host !~ /:/ ) {
+    if ( $port !~ /^(?:80|443)$/ && $host !~ /:/ ) {
         $host .= ":$port";
     }
     

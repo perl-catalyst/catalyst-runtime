@@ -12,7 +12,6 @@ use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 use HTTP::Headers;
 use HTTP::Request::Common;
-use URI;
 
 {
     my $creq;

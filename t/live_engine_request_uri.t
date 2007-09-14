@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 44;
+use Test::More tests => 49;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -35,6 +35,21 @@ my $creq;
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->base . $creq->path, $creq->uri, 'Base + Path ok' );
+}
+
+# test base is correct for HTTPS URLs
+SKIP:
+{
+    if ( $ENV{CATALYST_SERVER} ) {
+        skip 'Using remote server', 5;
+    }
+    
+    local $ENV{HTTPS} = 'on';
+    ok( my $response = request('https://localhost/engine/request/uri'), 'HTTPS Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
+    is( $creq->base, 'https://localhost/', 'HTTPS base ok' );
+    is( $creq->uri, 'https://localhost/engine/request/uri', 'HTTPS uri ok' );
 }
 
 # test that we can use semi-colons as separators
@@ -88,7 +103,7 @@ my $creq;
 {
     ok( my $response = request('http://localhost/engine/request/uri/uri_with_object'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    like( $response->header( 'X-Catalyst-Param-a' ), qr(http://localhost[^/]*/), 'param "a" ok' );
+    like( $response->header( 'X-Catalyst-Param-a' ), qr(https?://localhost[^/]*/), 'param "a" ok' );
 }
 
 # test that uri_with is utf8 safe

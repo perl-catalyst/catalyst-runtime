@@ -699,7 +699,7 @@ sub run_tests {
             'http://localhost/action/chained/to_root' ),
             'uri_for with chained root action as arg' );
         like( $response->content,
-            qr(URI:http://[^/]+/),
+            qr(URI:https?://[^/]+/),
             'Correct URI generated' );
     }
 
