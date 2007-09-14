@@ -5,7 +5,6 @@
           symlinks in the HTTP::Restarter engine (Sebastian Willert)
         - Fixed t/optional_http-server-restart.t so it actually tests
           if the server restarted or notified of an error (Sebastian Willert)
-        - Patch for emacs temp files with module::pluggable::object. (Dave Rolsky)
         - Return child PID from the HTTP engine when run with the 'background' option.
           (Emanuele Zeppieri)
         - Fixed bug in HTTP engine where writes could fail with
