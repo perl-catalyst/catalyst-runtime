@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.7011
+        - Allow multiple restart directories and added option to follow
+          symlinks in the HTTP::Restarter engine (Sebastian Willert)
+        - Fixed t/optional_http-server-restart.t so it actually tests
+          if the server restarted or notified of an error (Sebastian Willert)
         - Patch for emacs temp files with module::pluggable::object. (Dave Rolsky)
         - Return child PID from the HTTP engine when run with the 'background' option.
           (Emanuele Zeppieri)

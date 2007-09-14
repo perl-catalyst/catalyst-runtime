@@ -13,6 +13,7 @@ __PACKAGE__->mk_accessors(
       directory
       modified
       regex
+      follow_symlinks
       watch_list/
 );
 
@@ -102,7 +103,9 @@ sub watch {
 sub _index_directory {
     my $self = shift;
 
-    my $dir   = $self->directory || die "No directory specified";
+    my $dir   = $self->directory;
+    die "No directory specified" if !$dir or ref($dir) && !@{$dir};
+
     my $regex = $self->regex     || '\.pm$';
     my %list;
 
@@ -120,9 +123,10 @@ sub _index_directory {
                 $cur_dir =~ s{/script/..}{};
                 $list{$cur_dir} = 1;
             },
+            follow_fast => $self->follow_symlinks ? 1 : 0,
             no_chdir => 1
         },
-        $dir
+        ref $dir eq 'ARRAY' ? @{$dir} : $dir
     );
     return \%list;
 }

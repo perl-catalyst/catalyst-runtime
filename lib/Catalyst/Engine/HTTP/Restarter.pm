@@ -23,6 +23,7 @@ sub run {
                 $options->{restart_directory} || 
                 File::Spec->catdir( $FindBin::Bin, '..' )
             ),
+            follow_symlinks => $options->{follow_symlinks},
             regex     => $options->{restart_regex},
             delay     => $options->{restart_delay},
         );
