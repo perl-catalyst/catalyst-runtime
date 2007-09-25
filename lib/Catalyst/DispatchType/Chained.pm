@@ -170,17 +170,28 @@ sub recurse_match {
                     local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
                     next TRY_ACTION unless $action->match($c);
                 }
-                if (!$best_action || $#parts < $#{$best_action->{parts}}){
+                my $args_attr = $action->attributes->{Args}->[0];
+
+                #    No best action currently
+                # OR This one matches with fewer parts left than the current best action,
+                #    And therefore is a better match
+                # OR No parts and this expects 0 
+                #    The current best action might also be Args(0),
+                #    but we couldn't chose between then anyway so we'll take the last seen
+
+                if (!$best_action                       ||
+                    @parts < @{$best_action->{parts}}   ||
+                    (!@parts && $args_attr == 0)){
                     $best_action = {
                         actions => [ $action ],
                         captures=> [],
                         parts   => \@parts
-                        }
                     }
+                }
             }
         }
     }
-    return @$best_action{qw/actions captures parts /} if $best_action;
+    return @$best_action{qw/actions captures parts/} if $best_action;
     return ();
 }
 

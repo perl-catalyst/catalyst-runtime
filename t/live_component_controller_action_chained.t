@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 118*$iters;
+use Test::More tests => 124*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -766,66 +766,101 @@ sub run_tests {
         is( $response->content, '; ', 'Content OK' );
     }
 
-	#
-	#	Higher Args() hiding more specific CaptureArgs chains sections
-	#
-	{
-		my @expected = qw[
-		  	TestApp::Controller::Action::Chained->begin
-		  	TestApp::Controller::Action::Chained->cc_base
-		  	TestApp::Controller::Action::Chained->cc_link
-		  	TestApp::Controller::Action::Chained->cc_anchor
-		  	TestApp::Controller::Action::Chained->end
-			];
+    #
+    #   Higher Args() hiding more specific CaptureArgs chains sections
+    #
+    {
+        my @expected = qw[
+            TestApp::Controller::Action::Chained->begin
+            TestApp::Controller::Action::Chained->cc_base
+            TestApp::Controller::Action::Chained->cc_link
+            TestApp::Controller::Action::Chained->cc_anchor
+            TestApp::Controller::Action::Chained->end
+            ];
 
-		my $expected = join ', ', @expected;
+        my $expected = join ', ', @expected;
 
-		ok( my $response = request('http://localhost/chained/choose_capture/anchor.html'),
-			'Choose between an early Args() and a later more ideal chain' );
-		is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
-		is( $response->content => '; ', 'Content OK' );
-	}
+        ok( my $response = request('http://localhost/chained/choose_capture/anchor.html'),
+            'Choose between an early Args() and a later more ideal chain' );
+        is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
+        is( $response->content => '; ', 'Content OK' );
+    }
 
-	#
-	#	Less specific chain not being seen correctly due to earlier looser capture
-	#
-	{
-		my @expected = qw[
-		  	TestApp::Controller::Action::Chained->begin
-		  	TestApp::Controller::Action::Chained->cc_base
-		  	TestApp::Controller::Action::Chained->cc_b
-		  	TestApp::Controller::Action::Chained->cc_b_link
-		  	TestApp::Controller::Action::Chained->cc_b_anchor
-		  	TestApp::Controller::Action::Chained->end
-			];
+    #
+    #   Less specific chain not being seen correctly due to earlier looser capture
+    #
+    {
+        my @expected = qw[
+            TestApp::Controller::Action::Chained->begin
+            TestApp::Controller::Action::Chained->cc_base
+            TestApp::Controller::Action::Chained->cc_b
+            TestApp::Controller::Action::Chained->cc_b_link
+            TestApp::Controller::Action::Chained->cc_b_anchor
+            TestApp::Controller::Action::Chained->end
+            ];
 
-		my $expected = join ', ', @expected;
+        my $expected = join ', ', @expected;
 
-		ok( my $response = request('http://localhost/chained/choose_capture/b/a/anchor.html'),
-			'Choose between a more specific chain and an earlier looser one' );
-		is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
-		is( $response->content => 'a; ', 'Content OK' );
-	}
+        ok( my $response = request('http://localhost/chained/choose_capture/b/a/anchor.html'),
+            'Choose between a more specific chain and an earlier looser one' );
+        is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
+        is( $response->content => 'a; ', 'Content OK' );
+    }
 
-	#
-	#	Check we get the looser one when it's the correct match
-	#
-	{
-		my @expected = qw[
-		  	TestApp::Controller::Action::Chained->begin
-		  	TestApp::Controller::Action::Chained->cc_base
-		  	TestApp::Controller::Action::Chained->cc_a
-		  	TestApp::Controller::Action::Chained->cc_a_link
-		  	TestApp::Controller::Action::Chained->cc_a_anchor
-		  	TestApp::Controller::Action::Chained->end
-			];
+    #
+    #   Check we get the looser one when it's the correct match
+    #
+    {
+        my @expected = qw[
+            TestApp::Controller::Action::Chained->begin
+            TestApp::Controller::Action::Chained->cc_base
+            TestApp::Controller::Action::Chained->cc_a
+            TestApp::Controller::Action::Chained->cc_a_link
+            TestApp::Controller::Action::Chained->cc_a_anchor
+            TestApp::Controller::Action::Chained->end
+            ];
 
-		my $expected = join ', ', @expected;
+        my $expected = join ', ', @expected;
 
-		ok( my $response = request('http://localhost/chained/choose_capture/a/a/anchor.html'),
-			'Choose between a more specific chain and an earlier looser one' );
-		is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
-		is( $response->content => 'a; anchor.html', 'Content OK' );
-	}
+        ok( my $response = request('http://localhost/chained/choose_capture/a/a/anchor.html'),
+            'Choose between a more specific chain and an earlier looser one' );
+        is( $response->header('X-Catalyst-Executed') => $expected, 'Executed actions');
+        is( $response->content => 'a; anchor.html', 'Content OK' );
+    }
+
+    #
+    #   Args(0) should win over Args() if we actually have no arguments.
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::ArgsOrder->base
+          TestApp::Controller::Action::Chained::ArgsOrder->index
+          TestApp::Controller::Action::Chained::ArgsOrder->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+    # With no args, we should run "index"
+        ok( my $response = request('http://localhost/argsorder/'),
+            'Correct arg order ran' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'base; ; index; ', 'Content OK' );
+
+    # With args given, run "all"
+        ok( $response = request('http://localhost/argsorder/X'),
+            'Correct arg order ran' );
+        is( $response->header('X-Catalyst-Executed'), 
+        join(", ", 
+         qw[
+             TestApp::Controller::Action::Chained->begin
+             TestApp::Controller::Action::Chained::ArgsOrder->base
+             TestApp::Controller::Action::Chained::ArgsOrder->all
+             TestApp::Controller::Action::Chained::ArgsOrder->end
+          ])
+      );
+        is( $response->content, 'base; ; all; X', 'Content OK' );
+    
+    }
 
 }
