@@ -1,5 +1,6 @@
 use inc::Module::Install 0.64;
 
+use 5.008001; 
 perl_version '5.8.1';
 
 name 'Catalyst-Runtime';
