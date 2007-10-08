@@ -181,7 +181,7 @@ sub recurse_match {
 
                 if (!$best_action                       ||
                     @parts < @{$best_action->{parts}}   ||
-                    (!@parts && $args_attr == 0)){
+                    (!@parts && $args_attr eq 0)){
                     $best_action = {
                         actions => [ $action ],
                         captures=> [],
