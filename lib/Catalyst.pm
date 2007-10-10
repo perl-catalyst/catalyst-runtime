@@ -1353,7 +1353,7 @@ sub finalize {
     }
     
     if ($c->debug) {
-        my $elapsed = sprintf '%f', tv_interval($c->stats->getNodeValue);
+        my $elapsed = tv_interval($c->stats->getNodeValue);
         my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
         
         my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
