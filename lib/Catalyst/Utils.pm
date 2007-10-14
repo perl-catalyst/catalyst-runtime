@@ -251,6 +251,12 @@ sub ensure_class_loaded {
     croak "Malformed class Name $class"
         if $class =~ m/(?:\b\:\b|\:{3,})/;
 
+    croak "Malformed class Name $class"
+        if $class =~ m/[^\w:]/;
+
+    croak "ensure_class_loaded should be given a classname, not a filename ($class)"
+        if $class =~ m/\.pm$/;
+
     return if !$opts->{ ignore_loaded }
         && Class::Inspector->loaded( $class ); # if a symbol entry exists we don't load again
 
@@ -258,7 +264,7 @@ sub ensure_class_loaded {
     my $error;
     {
         local $@;
-        eval "require $class";
+        eval "require $class;";
         $error = $@;
     }
 

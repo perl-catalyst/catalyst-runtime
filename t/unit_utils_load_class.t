@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use lib "t/lib";
 
@@ -48,4 +48,12 @@ is( $@, "foo", '$@ is untouched' );
 undef $@;
 eval { Catalyst::Utils::ensure_class_loaded("This::Module::Is::Not::In::Inc::But::Does::Exist") };
 ok( !$@, "no error when loading non existent .pm that *does* have a symbol table entry" ); 
+
+undef $@;
+eval { Catalyst::Utils::ensure_class_loaded('Silly::File::.#Name') };
+like($@, qr/Malformed class Name/, 'errored when attempting to load a file beginning with a .');
+
+undef $@;
+eval { Catalyst::Utils::ensure_class_loaded('Silly::File::Name.pm') };
+like($@, qr/Malformed class Name/, 'errored sanely when given a classname ending in .pm');
 
