@@ -161,6 +161,7 @@ sub write {
     
     if ( !defined $ret ) {
         $self->{_write_error} = $!;
+        DEBUG && warn "write: Failed to write response ($!)\n";
     }
     else {
         DEBUG && warn "write: Wrote response ($ret bytes)\n";
@@ -284,7 +285,6 @@ sub run {
                 $self->_handler( $class, $port, $method, $uri, $protocol );
             
                 if ( my $error = delete $self->{_write_error} ) {
-                    DEBUG && warn "Write error: $error\n";
                     close Remote;
                     
                     if ( !defined $pid ) {

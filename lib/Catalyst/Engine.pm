@@ -4,10 +4,10 @@ use strict;
 use base 'Class::Accessor::Fast';
 use CGI::Simple::Cookie;
 use Data::Dump qw/dump/;
-use Errno 'EWOULDBLOCK';
 use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
+use IO::Select ();
 use URI::QueryParam;
 use Scalar::Util ();
 
@@ -622,29 +622,28 @@ sub write {
         $self->{_prepared_write} = 1;
     }
     
-    my $len   = length($buffer);
-    my $wrote = syswrite STDOUT, $buffer;
+    my $wrote;
+    my $len = length($buffer);
     
-    if ( !defined $wrote && $! == EWOULDBLOCK ) {
-        # Unable to write on the first try, will retry in the loop below
-        $wrote = 0;
-    }
+    my $sel = IO::Select->new();
+    $sel->add( \*STDOUT );
     
-    if ( defined $wrote && $wrote < $len ) {
-        # We didn't write the whole buffer
-        while (1) {
-            my $ret = syswrite STDOUT, $buffer, $CHUNKSIZE, $wrote;
-            if ( defined $ret ) {
-                $wrote += $ret;
-            }
-            else {
-                next if $! == EWOULDBLOCK;
-                return;
-            }
-            
-            last if $wrote >= $len;
+    while ( $sel->can_write() ) {
+        $wrote ||= 0;
+        
+        my $ret = syswrite STDOUT, $buffer, $CHUNKSIZE, $wrote;
+        if ( defined $ret ) {
+            $wrote += $ret;
         }
+        else {
+            # Write error
+            return;
+        }
+    
+        last if $wrote >= $len;
     }
+    
+    $sel->remove( \*STDOUT );
     
     return $wrote;
 }
