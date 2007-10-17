@@ -15,6 +15,8 @@
           in SSL mode.
         - Removed unnecessary sprintf in debug mode that caused warnings on locales where
           commas are used for decimal markers.
+        - Improved error message for case when server picks up editor save
+          files as module names. (James Mastros)
 
 5.7010  2007-08-22 07:41:00
         - Resource forks in 5.7009
