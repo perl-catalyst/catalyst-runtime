@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 54;
+use Test::More tests => 49;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -120,12 +120,3 @@ SKIP:
     is( $response->header( 'X-Catalyst-warnings' ), 0, 'no warnings emitted' );
 }
 
-
-# test that query params are unescaped properly with '+'
-{
-    ok( my $response = request('http://localhost/engine/request/uri?text=C%2B%2B+lang'), 'Request' );
-    ok( $response->is_success, 'Response Successful 2xx' );
-    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is( $creq->{uri}->query, 'text=C%2B%2B+lang', 'Query string ok' );
-    is( $creq->{parameters}->{text}, 'C++ lang', 'Unescaped param has pluses in it' );
-}
