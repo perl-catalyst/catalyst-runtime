@@ -12,9 +12,9 @@ sub new {
 
     my $root = Tree::Simple->new({t => [gettimeofday]});
     bless { 
-	enabled => 1,
-	stack => [ $root ],
-	tree => $root,
+    enabled => 1,
+    stack => [ $root ],
+    tree => $root,
     }, ref $class || $class;
 }
 
@@ -31,15 +31,15 @@ sub profile {
 
     my %params;
     if (@_ <= 1) {
-	$params{comment} = shift || "";
+    $params{comment} = shift || "";
     }
     elsif (@_ % 2 != 0) {
-	die "profile() requires a single comment parameter or a list of name-value pairs; found " 
-	    . (scalar @_) . " values: " . join(", ", @_);
+    die "profile() requires a single comment parameter or a list of name-value pairs; found " 
+        . (scalar @_) . " values: " . join(", ", @_);
     }
     else {
-	(%params) = @_;
-	$params{comment} ||= "";
+    (%params) = @_;
+    $params{comment} ||= "";
     }
 
     my $parent;
@@ -47,35 +47,35 @@ sub profile {
     my $t = [ gettimeofday ];
 
     if ($params{end}) {
-	# parent is on stack; search for matching block and splice out
-	for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
-	    if ($self->{stack}->[$i]->getNodeValue->{action} eq $params{end}) {
-		my $node = $self->{stack}->[$i];
-		splice(@{$self->{stack}}, $i, 1);
-		# Adjust elapsed on partner node
-		my $v = $node->getNodeValue;
-		$v->{elapsed} =  tv_interval($v->{t}, $t);
-		return $node->getUID;
-	    }
-	}
-	# if partner not found, fall through to treat as non-closing call
+    # parent is on stack; search for matching block and splice out
+    for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
+        if ($self->{stack}->[$i]->getNodeValue->{action} eq $params{end}) {
+        my $node = $self->{stack}->[$i];
+        splice(@{$self->{stack}}, $i, 1);
+        # Adjust elapsed on partner node
+        my $v = $node->getNodeValue;
+        $v->{elapsed} =  tv_interval($v->{t}, $t);
+        return $node->getUID;
+        }
+    }
+    # if partner not found, fall through to treat as non-closing call
     }
     if ($params{parent}) {
-	# parent is explicitly defined
-	$prev = $parent = $self->_get_uid($params{parent}) or return undef;
+    # parent is explicitly defined
+    $prev = $parent = $self->_get_uid($params{parent}) or return undef;
     }
     if (!$parent) {
-	# Find previous node, which is either previous sibling or parent, for ref time.
-	$prev = $parent = $self->{stack}->[-1] or return undef;
-	my $n = $parent->getChildCount;
-	$prev = $parent->getChild($n - 1) if $n > 0;
+    # Find previous node, which is either previous sibling or parent, for ref time.
+    $prev = $parent = $self->{stack}->[-1] or return undef;
+    my $n = $parent->getChildCount;
+    $prev = $parent->getChild($n - 1) if $n > 0;
     }
 
     my $node = Tree::Simple->new({
-	action  => $params{begin} || "",
-	t => $t, 
-	elapsed => tv_interval($prev->getNodeValue->{t}, $t),
-	comment => $params{comment},
+    action  => $params{begin} || "",
+    t => $t, 
+    elapsed => tv_interval($prev->getNodeValue->{t}, $t),
+    comment => $params{comment},
     });
     $node->setUID($params{uid}) if $params{uid};
 
@@ -94,26 +94,26 @@ sub report {
 
 # close any remaining open nodes
     for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
-	$self->profile(end => $self->{stack}->[$i]->getNodeValue->{action});
+    $self->profile(end => $self->{stack}->[$i]->getNodeValue->{action});
     }
 
     my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
     my @results;
     $self->{tree}->traverse(
-			    sub {
-				my $action = shift;
-				my $stat   = $action->getNodeValue;
-				my @r = ( $action->getDepth,
-					  ($stat->{action} || "") .
-					  ($stat->{action} && $stat->{comment} ? " " : "") . ($stat->{comment} ? '- ' . $stat->{comment} : ""),
-					  $stat->{elapsed},
-					  $stat->{action} ? 1 : 0,
-					  );
-				$t->row( ( q{ } x $r[0] ) . $r[1], 
-					 defined $r[2] ? sprintf("%fs", $r[2]) : '??');
-				push(@results, \@r);
-			    }
-			    );
+                sub {
+                my $action = shift;
+                my $stat   = $action->getNodeValue;
+                my @r = ( $action->getDepth,
+                      ($stat->{action} || "") .
+                      ($stat->{action} && $stat->{comment} ? " " : "") . ($stat->{comment} ? '- ' . $stat->{comment} : ""),
+                      $stat->{elapsed},
+                      $stat->{action} ? 1 : 0,
+                      );
+                $t->row( ( q{ } x $r[0] ) . $r[1], 
+                     defined $r[2] ? sprintf("%fs", $r[2]) : '??');
+                push(@results, \@r);
+                }
+            );
     return wantarray ? @results : $t->draw;
 }
 

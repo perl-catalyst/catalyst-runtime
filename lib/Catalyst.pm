@@ -1271,8 +1271,8 @@ sub _stats_start_execute {
 
         # forward, locate the caller
         if ( my $parent = $c->stack->[-1] ) {
-	    $c->stats->profile(begin => $action, 
-			       parent => "$parent" . $c->counter->{"$parent"});
+            $c->stats->profile(begin => $action, 
+                               parent => "$parent" . $c->counter->{"$parent"});
         }
         else {
 
@@ -1281,9 +1281,9 @@ sub _stats_start_execute {
         }
     }
     else {
-
+        
         # root-level call
-	$c->stats->profile(begin => $action);
+        $c->stats->profile(begin => $action);
     }
     return $action;
 
@@ -2122,9 +2122,9 @@ sub setup_stats {
 
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
     if ( defined($env) ? $env : ($stats || $class->debug ) ) {
-	no strict 'refs';
-	*{"$class\::use_stats"} = sub { 1 };
-	$class->log->debug('Statistics enabled');
+        no strict 'refs';
+        *{"$class\::use_stats"} = sub { 1 };
+        $class->log->debug('Statistics enabled');
     }
 }
 
