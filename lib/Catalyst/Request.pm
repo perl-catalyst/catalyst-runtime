@@ -403,6 +403,8 @@ Returns the protocol (HTTP/1.0 or HTTP/1.1) used for the current request.
 
 =head2 $req->query_parameters
 
+=head2 $req->query_params
+
 Returns a reference to a hash containing query string (GET) parameters. Values can
 be either a scalar or an arrayref containing scalars.
 
