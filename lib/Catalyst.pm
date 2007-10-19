@@ -54,12 +54,14 @@ our $DETACH    = "catalyst_detach\n";
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
-  engine_class context_class request_class response_class setup_finished/;
+  engine_class context_class request_class response_class stats_class 
+  setup_finished/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
+__PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
@@ -239,6 +241,17 @@ MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
 =head2 -Log
 
 Specifies log level.
+
+=head2 -Stats
+
+Enables statistics collection and reporting. You can also force this setting
+from the system environment with CATALYST_STATS or <MYAPP>_STATS. The
+environment settings override the application, with <MYAPP>_STATS having the
+highest priority.
+
+e.g. 
+
+   use Catalyst qw/-Stats=1/
 
 =head1 METHODS
 
@@ -813,6 +826,7 @@ sub setup {
     $class->setup_plugins( delete $flags->{plugins} );
     $class->setup_dispatcher( delete $flags->{dispatcher} );
     $class->setup_engine( delete $flags->{engine} );
+    $class->setup_stats( delete $flags->{stats} );
 
     for my $flag ( sort keys %{$flags} ) {
 
@@ -1198,13 +1212,13 @@ sub execute {
         return $c->state;
     }
 
-    my $stats_info = $c->_stats_start_execute( $code ) if $c->debug;
+    my $stats_info = $c->_stats_start_execute( $code ) if $c->use_stats;
 
     push( @{ $c->stack }, $code );
     
     eval { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) };
 
-    $c->_stats_finish_execute( $stats_info ) if $c->debug and $stats_info;
+    $c->_stats_finish_execute( $stats_info ) if $c->use_stats and $stats_info;
     
     my $last = pop( @{ $c->stack } );
 
@@ -1252,51 +1266,32 @@ sub _stats_start_execute {
         }
     }
 
-    my $node = Tree::Simple->new(
-        {
-            action  => $action,
-            elapsed => undef,     # to be filled in later
-            comment => "",
-        }
-    );
-    $node->setUID( "$code" . $c->counter->{"$code"} );
-
     # is this a root-level call or a forwarded call?
     if ( $callsub =~ /forward$/ ) {
 
         # forward, locate the caller
         if ( my $parent = $c->stack->[-1] ) {
-            my $visitor = Tree::Simple::Visitor::FindByUID->new;
-            $visitor->searchForUID(
-                "$parent" . $c->counter->{"$parent"} );
-            $c->stats->accept($visitor);
-            if ( my $result = $visitor->getResult ) {
-                $result->addChild($node);
-            }
+	    $c->stats->profile(begin => $action, 
+			       parent => "$parent" . $c->counter->{"$parent"});
         }
         else {
 
             # forward with no caller may come from a plugin
-            $c->stats->addChild($node);
+            $c->stats->profile(begin => $action);
         }
     }
     else {
 
         # root-level call
-        $c->stats->addChild($node);
+	$c->stats->profile(begin => $action);
     }
+    return $action;
 
-    return {
-        start   => [gettimeofday],
-        node    => $node,
-    };
 }
 
 sub _stats_finish_execute {
     my ( $c, $info ) = @_;
-    my $elapsed = tv_interval $info->{start};
-    my $value = $info->{node}->getNodeValue;
-    $value->{elapsed} = sprintf( '%fs', $elapsed );
+    $c->stats->profile(end => $info);
 }
 
 =head2 $c->_localize_fields( sub { }, \%keys );
@@ -1352,22 +1347,11 @@ sub finalize {
         $c->finalize_body;
     }
     
-    if ($c->debug) {
+    if ($c->use_stats) {
         my $elapsed = tv_interval($c->stats->getNodeValue);
         my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
-        
-        my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
-        $c->stats->traverse(
-            sub {
-                my $action = shift;
-                my $stat   = $action->getNodeValue;
-                $t->row( ( q{ } x $action->getDepth ) . $stat->{action} . $stat->{comment},
-                    $stat->{elapsed} || '??' );
-            }
-        );
-
         $c->log->info(
-            "Request took ${elapsed}s ($av/s)\n" . $t->draw . "\n" );        
+            "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );        
     }
 
     return $c->response->status;
@@ -1567,8 +1551,8 @@ sub prepare {
         }
     );
 
+    $c->stats($class->stats_class->new)->enable($c->use_stats);
     if ( $c->debug ) {
-        $c->stats(Tree::Simple->new([gettimeofday]));
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );            
     }
 
@@ -2125,6 +2109,26 @@ Sets up plugins.
 
 =cut
 
+=head2 $c->setup_stats
+
+Sets up timing statistics class.
+
+=cut
+
+sub setup_stats {
+    my ( $class, $stats ) = @_;
+
+    Catalyst::Utils::ensure_class_loaded($class->stats_class);
+
+    my $env = Catalyst::Utils::env_value( $class, 'STATS' );
+    if ( defined($env) ? $env : ($stats || $class->debug ) ) {
+	no strict 'refs';
+	*{"$class\::use_stats"} = sub { 1 };
+	$class->log->debug('Statistics enabled');
+    }
+}
+
+
 =head2 $c->registered_plugins 
 
 Returns a sorted list of the plugins which have either been stated in the
@@ -2187,6 +2191,24 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 
 Returns an arrayref of the internal execution stack (actions that are
 currently executing).
+
+=head2 $c->stats_class
+
+Returns or sets the stats (timing statistics) class.
+
+=head2 $c->use_stats
+
+Returns 1 when stats collection is enabled.  Stats collection is enabled
+when the -Stats options is set, debug is on or when the <MYAPP>_STATS
+environment variable is set.
+
+Note that this is a static method, not an accessor and should be overloaded
+by declaring "sub use_stats { 1 }" in your MyApp.pm, not by calling $c->use_stats(1).
+
+=cut
+
+sub use_stats { 0 }
+
 
 =head2 $c->write( $data )
 
