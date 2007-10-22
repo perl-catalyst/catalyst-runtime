@@ -62,7 +62,7 @@ sub profile {
     }
     if ($params{parent}) {
     # parent is explicitly defined
-    $prev = $parent = $self->_get_uid($params{parent}) or return undef;
+    $prev = $parent = $self->_get_uid($params{parent});
     }
     if (!$parent) {
     # Find previous node, which is either previous sibling or parent, for ref time.

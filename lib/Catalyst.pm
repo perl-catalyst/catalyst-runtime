@@ -1266,24 +1266,29 @@ sub _stats_start_execute {
         }
     }
 
+    my $uid = "$code" . $c->counter->{"$code"};
+
     # is this a root-level call or a forwarded call?
     if ( $callsub =~ /forward$/ ) {
 
         # forward, locate the caller
         if ( my $parent = $c->stack->[-1] ) {
             $c->stats->profile(begin => $action, 
-                               parent => "$parent" . $c->counter->{"$parent"});
+                               parent => "$parent" . $c->counter->{"$parent"},
+			       uid => $uid);
         }
         else {
 
             # forward with no caller may come from a plugin
-            $c->stats->profile(begin => $action);
+            $c->stats->profile(begin => $action,
+			       uid => $uid);
         }
     }
     else {
         
         # root-level call
-        $c->stats->profile(begin => $action);
+        $c->stats->profile(begin => $action,
+			   uid => $uid);
     }
     return $action;
 
