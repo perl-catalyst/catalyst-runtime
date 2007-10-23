@@ -35,6 +35,8 @@ requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 
 if (-e 'inc/.author') {
   build_requires 'Test::Perl::Critic';
+  build_requires 'Test::Pod' => 1.14;
+  build_requires 'Test::Pod::Coverage' => 1.04;
 
   if ($^O eq 'darwin') { 
       makemaker_args(dist => { PREOP => 'if [ "$$COPY_EXTENDED_ATTRIBUTES_DISABLE" != "true" ]; then'.
