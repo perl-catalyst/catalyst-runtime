@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.7011
+5.7012
+        - Fixed Engine::HTTP to use a proper SIGCHLD repear. Should fix issues with 
+          system() calls returning -1 instead of the correct value. (Jon Schutz)
+
+5.7011  2007-10-18 20:40:00
         - Allow multiple restart directories and added option to follow
           symlinks in the HTTP::Restarter engine (Sebastian Willert)
         - Fixed t/optional_http-server-restart.t so it actually tests
