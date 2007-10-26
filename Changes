@@ -1,8 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.7012
-        - Fixed Engine::HTTP to use a proper SIGCHLD repear. Should fix issues with 
-          system() calls returning -1 instead of the correct value. (Jon Schutz)
 	- Add Catalyst::Stats (Jon Schutz)
 
 5.7011  2007-10-18 20:40:00

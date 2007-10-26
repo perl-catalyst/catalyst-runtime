@@ -11,7 +11,6 @@ use NEXT;
 use Socket;
 use IO::Socket::INET ();
 use IO::Select       ();
-use POSIX ":sys_wait_h";
 
 # For PAR
 require Catalyst::Engine::HTTP::Restarter;
@@ -190,7 +189,7 @@ sub run {
     }
 
     my $restart = 0;
-    local $SIG{CHLD} = \&_REAPER;
+    local $SIG{CHLD} = 'IGNORE';
 
     my $allowed = $options->{allowed} || { '127.0.0.1' => '255.255.255.255' };
     my $addr = $host ? inet_aton($host) : INADDR_ANY;
@@ -525,12 +524,6 @@ sub _socket_data {
 }
 
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
-
-sub _REAPER {
-    my $child;
-    while ( ( $child = waitpid( -1,WNOHANG ) ) > 0 ) { }
-    $SIG{CHLD} = \&_REAPER;
-}
 
 =head1 SEE ALSO
 
