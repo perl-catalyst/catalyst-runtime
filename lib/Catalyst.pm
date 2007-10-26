@@ -1273,22 +1273,28 @@ sub _stats_start_execute {
 
         # forward, locate the caller
         if ( my $parent = $c->stack->[-1] ) {
-            $c->stats->profile(begin => $action, 
-                               parent => "$parent" . $c->counter->{"$parent"},
-			       uid => $uid);
+            $c->stats->profile(
+                begin  => $action, 
+                parent => "$parent" . $c->counter->{"$parent"},
+                uid    => $uid,
+            );
         }
         else {
 
             # forward with no caller may come from a plugin
-            $c->stats->profile(begin => $action,
-			       uid => $uid);
+            $c->stats->profile(
+                begin => $action,
+                uid   => $uid,
+            );
         }
     }
     else {
         
         # root-level call
-        $c->stats->profile(begin => $action,
-			   uid => $uid);
+        $c->stats->profile(
+            begin => $action,
+            uid   => $uid,
+        );
     }
     return $action;
 
@@ -1296,7 +1302,7 @@ sub _stats_start_execute {
 
 sub _stats_finish_execute {
     my ( $c, $info ) = @_;
-    $c->stats->profile(end => $info);
+    $c->stats->profile( end => $info );
 }
 
 =head2 $c->_localize_fields( sub { }, \%keys );
