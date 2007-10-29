@@ -135,7 +135,8 @@ sub remote_request {
     my $server  = URI->new( $ENV{CATALYST_SERVER} );
 
     if ( $server->path =~ m|^(.+)?/$| ) {
-        $server->path("$1");    # need to be quoted
+        my $path = $1;
+        $server->path("$path") if $path;    # need to be quoted
     }
 
     # the request path needs to be sanitised if $server is using a
