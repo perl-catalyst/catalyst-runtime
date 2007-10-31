@@ -6,8 +6,15 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 5;
+use Test::More;
 use Catalyst::Test 'TestAppStats';
+
+if ( $ENV{CATALYST_SERVER} ) {
+    plan skip_all => 'Using remote server';
+}
+else {
+    plan tests => 5;
+}
 
 {
     ok( my $response = request('http://localhost/'), 'Request' );
