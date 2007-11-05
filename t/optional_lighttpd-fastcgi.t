@@ -71,12 +71,15 @@ server.port = $port
 fastcgi.server = (
     "" => (
         "FastCgiTest" => (
-            "socket"       => "$docroot/test.socket",
-            "check-local"  => "disable",
-            "bin-path"     => "$docroot/TestApp/script/testapp_fastcgi.pl",
-            "min-procs"    => 1,
-            "max-procs"    => 1,
-            "idle-timeout" => 20
+            "socket"          => "$docroot/test.socket",
+            "check-local"     => "disable",
+            "bin-path"        => "$docroot/TestApp/script/testapp_fastcgi.pl",
+            "min-procs"       => 1,
+            "max-procs"       => 1,
+            "idle-timeout"    => 20,
+            "bin-environment" => (
+                "PERL5LIB" => "$docroot/../../lib"
+            )
         )
     )
 )
