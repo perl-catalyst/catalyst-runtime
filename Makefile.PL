@@ -39,8 +39,15 @@ if (-e 'inc/.author') {
   build_requires 'Test::Pod::Coverage' => 1.04;
 
   if ($^O eq 'darwin') { 
-      makemaker_args(dist => { PREOP => 'if [ "$$COPY_EXTENDED_ATTRIBUTES_DISABLE" != "true" ]; then'.
-                                        ' echo "you must set the ENV variable COPY_EXTENDED_ATTRIBUTES_DISABLE to true,"; '.
+      my $osx_ver = `/usr/bin/sw_vers -productVersion`;
+      chomp $osx_ver;
+
+      # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
+      # On 10.5 (Leopard) it wants COPYFILE_DISABLE
+      my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+
+      makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
+                                        qq{ echo "You must set the ENV variable $attr to true,"; }.
                                         ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
   }
 }
