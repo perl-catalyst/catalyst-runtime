@@ -2,6 +2,8 @@
 
 5.7012
 	- Add Catalyst::Stats (Jon Schutz)
+        - Fixed a bug where ?q=bar=baz is decoded as q=>'bar', not 'bar=baz'.
+          (Tatsuhiko Miyagawa, Masahiro Nagano)
 
 5.7011  2007-10-18 20:40:00
         - Allow multiple restart directories and added option to follow
