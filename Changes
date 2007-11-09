@@ -1,7 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.7012
-	- Add Catalyst::Stats (Jon Schutz)
+        - Add Catalyst::Stats (Jon Schutz)
         - Fixed a bug where ?q=bar=baz is decoded as q=>'bar', not 'bar=baz'.
           (Tatsuhiko Miyagawa, Masahiro Nagano)
 
