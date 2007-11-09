@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 35;
+use Test::More tests => 40;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -44,6 +44,16 @@ use HTTP::Request::Common;
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     ok( eval '$creq = ' . $response->content );
     is $creq->{parameters}->{q}, 'foo+bar', '%2b not double decoded';
+}
+
+{
+    my $creq;
+    ok( my $response = request("http://localhost/dump/request?q=foo=bar"),
+        'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    ok( eval '$creq = ' . $response->content );
+    is $creq->{parameters}->{q}, 'foo=bar', '= not ignored';
 }
 
 {

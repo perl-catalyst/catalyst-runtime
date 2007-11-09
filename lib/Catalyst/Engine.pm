@@ -458,7 +458,7 @@ sub prepare_query_parameters {
         
         my ($param, $value) 
             = map { $self->unescape_uri($_) }
-              split( /=/, $item );
+              split( /=/, $item, 2 );
           
         $param = $self->unescape_uri($item) unless defined $param;
         
