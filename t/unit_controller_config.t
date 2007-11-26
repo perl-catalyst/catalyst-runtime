@@ -44,7 +44,7 @@ use_ok('Catalyst');
 
     use base 'base_controller';
 
-    __PACKAGE__->config( key_b => 'value_b' );
+    __PACKAGE__->config->{key_b} = 'value_b';
 }
 
 ## Okay, we expect that the base controller has a config with one key
