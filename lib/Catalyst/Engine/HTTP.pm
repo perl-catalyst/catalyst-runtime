@@ -333,7 +333,7 @@ sub run {
         use Config;
         $ENV{PERL5LIB} .= join $Config{path_sep}, @INC; 
         
-        exec $^X . ' "' . $0 . '" ' . join( ' ', @{ $options->{argv} } );
+        exec $^X, $0, @{ $options->{argv} };
     }
 
     exit;
