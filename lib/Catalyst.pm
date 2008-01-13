@@ -1432,6 +1432,7 @@ sub finalize_headers {
             }
         }
         else {
+            # everything should be bytes at this point, but just in case
             $c->response->content_length( bytes::length( $c->response->body ) );
         }
     }
