@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.7013  
+        - convert perl characters to utf8 before output 
+          (Catalyst::Plugin::Unicode no longer needed for output)
+
 5.7012  2007-12-16 23:44:00
         - Fix __PACKAGE__->config->{foo} = 'bar' case with subclassing
         - Add Catalyst::Stats (Jon Schutz)

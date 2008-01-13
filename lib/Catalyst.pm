@@ -1335,6 +1335,11 @@ sub finalize {
         $c->log->error($error);
     }
 
+    # utf8-encode the body (convert perl chars to utf8 on the wire)
+    if ( $c->response->{body} && utf8::is_utf8($c->response->{body}) ){
+        utf8::encode( $c->response->{body} );
+    }
+    
     # Allow engine to handle finalize flow (for POE)
     if ( $c->engine->can('finalize') ) {
         $c->engine->finalize($c);
