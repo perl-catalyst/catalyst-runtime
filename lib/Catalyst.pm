@@ -978,7 +978,7 @@ sub uri_for {
           $val = '' unless defined $val;
           (map {
               $_ = "$_";
-              utf8::encode( $_ );
+              utf8::encode( $_ ) if utf8::is_utf8($_);
               # using the URI::Escape pattern here so utf8 chars survive
               s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               s/ /+/g;
