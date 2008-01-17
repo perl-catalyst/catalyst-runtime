@@ -539,7 +539,7 @@ sub uri_with {
         next unless defined $value;
         for ( ref $value eq 'ARRAY' ? @$value : $value ) {
             $_ = "$_";
-            utf8::encode( $_ );
+            utf8::encode( $_ ) if utf8::is_utf8($_);
         }
     };
     
