@@ -264,7 +264,9 @@ sub ensure_class_loaded {
     my $error;
     {
         local $@;
-        eval "require $class;";
+        my $file = $class . '.pm';
+        $file =~ s{::}{/}g;
+        eval { CORE::require($file) };
         $error = $@;
     }
 

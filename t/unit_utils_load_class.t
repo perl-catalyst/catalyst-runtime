@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 use lib "t/lib";
 
@@ -40,6 +40,11 @@ undef $@;
 eval { Catalyst::Utils::ensure_class_loaded("This::Module::Is::Probably::Not::There") };
 ok( $@, "doesn't defatalize" );
 like( $@, qr/There\.pm.*\@INC/, "error looks right" );
+
+undef $@;
+eval { Catalyst::Utils::ensure_class_loaded("__PACKAGE__") };
+ok( $@, "doesn't defatalize" );
+like( $@, qr/__PACKAGE__\.pm.*\@INC/, "errors sanely on __PACKAGE__.pm" );
 
 $@ = "foo";
 Catalyst::Utils::ensure_class_loaded("TestApp::View::Dump::Response");
