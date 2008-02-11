@@ -920,6 +920,9 @@ If the last argument to C<uri_for> is a hash reference, it is assumed to
 contain GET parameter key/value pairs, which will be appended to the URI
 in standard fashion.
 
+Note that uri_for is destructive to the passed hashref.  Subsequent calls
+with the same hashref may have unintended results.
+
 Instead of C<$path>, you can also optionally pass a C<$action> object
 which will be resolved to a path using
 C<< $c->dispatcher->uri_for_action >>; if the first element of
