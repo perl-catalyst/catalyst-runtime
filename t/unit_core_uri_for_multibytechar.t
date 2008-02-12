@@ -5,9 +5,10 @@ use FindBin;
 use File::Spec;
 use lib File::Spec->catfile($FindBin::Bin, 'lib');
 
-use Test::More;
+use utf8; # for literal below
+use Encode; # URI.pm is braindead wrt unicode-flagged characters
 
-plan tests => 5;
+use Test::More tests => 5;
 
 use_ok('TestApp');
 
@@ -26,9 +27,8 @@ my $context = TestApp->new({
 my $uri_with_multibyte = URI->new($base);
 $uri_with_multibyte->path('/');
 $uri_with_multibyte->query_form(
-    name => '村瀬大輔',
+    name => Encode::encode('utf8', '村瀬大輔'),
 );
-
 
 # multibyte with utf8 bytes
 is($context->uri_for('/', { name => '村瀬大輔' }), $uri_with_multibyte, 'uri_for with utf8 bytes query');
