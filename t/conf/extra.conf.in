@@ -13,6 +13,10 @@
         # one CGI test will fail if you don't have mod_rewrite enabled
         RewriteEngine on
         RewriteRule /cgi$ /cgi/ [PT]
+        
+        # Pass-through Authorization header for CGI/FastCGI
+        RewriteCond %{HTTP:Authorization} ^(.+)
+        RewriteRule ^(.*)$ $1 [E=HTTP_AUTHORIZATION:%1,PT]
 
         <Location /rewrite>
             RewriteEngine on

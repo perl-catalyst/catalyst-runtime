@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.7013
+        - Added test and updated docs for handling the Authorization header
+          under mod_fastcgi/mod_cgi.
+
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars
           (Daisuke Murase)
