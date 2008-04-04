@@ -263,14 +263,15 @@ sub run {
             
             if ( !$self->_read_headers ) {
                 # Error reading, give up
+                close Remote;
                 next LISTEN;
             }
 
             my ( $method, $uri, $protocol ) = $self->_parse_request_line;
+            
+            next unless $method;
         
             DEBUG && warn "Parsed request: $method $uri $protocol\n";
-        
-            next unless $method;
 
             unless ( uc($method) eq 'RESTART' ) {
 
@@ -419,9 +420,14 @@ sub _read_headers {
     
     while (1) {
         my $read = sysread Remote, my $buf, CHUNKSIZE;
-    
-        if ( !$read ) {
-            DEBUG && warn "EOF or error: $!\n";
+        
+        if ( !defined $read ) {
+            next if $! == EWOULDBLOCK;
+            DEBUG && warn "Error reading headers: $!\n";
+            return;
+        }
+        elsif ( $read == 0 ) {
+            DEBUG && warn "EOF\n";
             return;
         }
     
