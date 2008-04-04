@@ -3,8 +3,8 @@
 5.7013
         - Added test and updated docs for handling the Authorization header
           under mod_fastcgi/mod_cgi.
-        - Fixed bug in HTTP engine where the connection was not closed properly if the client disconnected
-          before sending any headers. (Ton Voon)
+        - Fixed bug in HTTP engine where the connection was not closed properly if the
+          client disconnected before sending any headers. (Ton Voon)
 
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars
