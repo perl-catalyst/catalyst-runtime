@@ -374,8 +374,9 @@ values are disabled.  The above example would start 5 processes.
 =head3 Non-root configuration
     
 You can also run your application at any non-root location with either of the
-above modes.
+above modes.  Note the required mod_rewrite rule.
 
+    url.rewrite = ( "myapp\$" => "myapp/" )
     fastcgi.server = (
         "/myapp" => (
             "MyApp" => (
