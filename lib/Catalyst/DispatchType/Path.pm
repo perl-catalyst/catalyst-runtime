@@ -47,7 +47,7 @@ first action that matches, if any; if not, returns 0.
 sub match {
     my ( $self, $c, $path ) = @_;
 
-    $path ||= '/';
+    $path = '/' if !defined $path;
 
     foreach my $action ( @{ $self->{paths}->{$path} || [] } ) {
         next unless $action->match($c);

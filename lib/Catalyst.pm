@@ -1600,7 +1600,8 @@ sub prepare {
     }
 
     my $method  = $c->req->method  || '';
-    my $path    = $c->req->path    || '/';
+    my $path    = $c->req->path;
+    $path       = '/' unless length $path;
     my $address = $c->req->address || '';
 
     $c->log->debug(qq/"$method" request for "$path" from "$address"/)

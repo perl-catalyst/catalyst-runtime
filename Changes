@@ -8,6 +8,7 @@
           client disconnected before sending any headers. (Ton Voon)
         - POD fix, IO::FileHandle => IO::Handle (RT #35690)
         - Fix grammar on welcome page (RT #33236)
+        - Fix for Path('0') handling (RT #29334)
 
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars

@@ -73,7 +73,7 @@ sub _ACTION : Private {
     my ( $self, $c ) = @_;
     if (   ref $c->action
         && $c->action->can('execute')
-        && $c->req->action )
+        && defined $c->req->action )
     {
         $c->action->dispatch( $c );
     }
@@ -248,7 +248,7 @@ sub _parse_Relative_attr { shift->_parse_Local_attr(@_); }
 
 sub _parse_Path_attr {
     my ( $self, $c, $name, $value ) = @_;
-    $value ||= '';
+    $value = '' if !defined $value;
     if ( $value =~ m!^/! ) {
         return ( 'Path', $value );
     }

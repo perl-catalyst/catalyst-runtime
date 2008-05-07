@@ -285,7 +285,7 @@ sub prepare_action {
     s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$c->req->captures||[]};
 
     $c->log->debug( 'Path is "' . $c->req->match . '"' )
-      if ( $c->debug && $c->req->match );
+      if ( $c->debug && length $c->req->match );
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
@@ -301,7 +301,7 @@ sub get_action {
     my ( $self, $name, $namespace ) = @_;
     return unless $name;
 
-    $namespace = join( "/", grep { length } split '/', $namespace || "" );
+    $namespace = join( "/", grep { length } split '/', ( defined $namespace ? $namespace : "" ) );
 
     return $self->action_hash->{"$namespace/$name"};
 }
