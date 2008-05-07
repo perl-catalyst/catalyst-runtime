@@ -10,17 +10,23 @@ use warnings;
 BEGIN { use_ok 'Catalyst::Utils' }
 use FindBin;
 
-$INC{'TestApp.pm'} = "$FindBin::Bin/something/script/foo/../../lib/TestApp.pm";
-my $home = Catalyst::Utils::home('TestApp');
-like($home, qr/t\/something/, "has path TestApp/t/something"); 
-unlike($home, qr/\/script\/foo/, "doesn't have path /script/foo");
+{
+    $INC{'TestApp.pm'} = "$FindBin::Bin/something/script/foo/../../lib/TestApp.pm";
+    my $home = Catalyst::Utils::home('TestApp');
+    like($home, qr{t[\/\\]something}, "has path TestApp/t/something"); 
+    unlike($home, qr{[\/\\]script[\/\\]foo}, "doesn't have path /script/foo");
+}
 
-$INC{'TestApp.pm'} = "$FindBin::Bin/something/script/foo/bar/../../../lib/TestApp.pm";
-$home = Catalyst::Utils::home('TestApp');
-like($home, qr/t\/something/, "has path TestApp/t/something"); 
-unlike($home, qr/\/script\/foo\/bar/, "doesn't have path /script/foo");
+{
+    $INC{'TestApp.pm'} = "$FindBin::Bin/something/script/foo/bar/../../../lib/TestApp.pm";
+    my $home = Catalyst::Utils::home('TestApp');
+    like($home, qr{t[\/\\]something}, "has path TestApp/t/something"); 
+    unlike($home, qr{[\/\\]script[\/\\]foo[\/\\]bar}, "doesn't have path /script/foo/bar");
+}
 
-$INC{'TestApp.pm'} = "$FindBin::Bin/something/script/../lib/TestApp.pm";
-$home = Catalyst::Utils::home('TestApp');
-like($home, qr/t\/something/, "has path TestApp/t/something"); 
-unlike($home, qr/\/script\/foo/, "doesn't have path /script/foo");
+{
+    $INC{'TestApp.pm'} = "$FindBin::Bin/something/script/../lib/TestApp.pm";
+    my $home = Catalyst::Utils::home('TestApp');
+    like($home, qr{t[\/\\]something}, "has path TestApp/t/something"); 
+    unlike($home, qr{[\/\\]script[\/\\]foo}, "doesn't have path /script/foo");
+}
