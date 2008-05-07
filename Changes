@@ -6,6 +6,7 @@
           under mod_fastcgi/mod_cgi.
         - Fixed bug in HTTP engine where the connection was not closed properly if the
           client disconnected before sending any headers. (Ton Voon)
+        - POD fix, IO::FileHandle => IO::Handle (RT #35690)
 
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars

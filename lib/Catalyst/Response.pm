@@ -39,12 +39,12 @@ will turn the Catalyst::Response into a HTTP Response and return it to the clien
 
 =head1 METHODS
 
-=head2 $res->body(<$text|$fh|$iofh_object)
+=head2 $res->body(<$text|$fh|$iohandle_object)
 
     $c->response->body('Catalyst rocks!');
 
 Sets or returns the output (text or binary data). If you are returning a large body,
-you might want to use a L<IO::FileHandle> type of object (Something that implements the read method
+you might want to use a L<IO::Handle> type of object (Something that implements the read method
 in the same fashion), or a filehandle GLOB. Catalyst
 will write it piece by piece into the response.
 
