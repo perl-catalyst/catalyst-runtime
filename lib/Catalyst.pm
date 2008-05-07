@@ -1096,7 +1096,7 @@ sub welcome_message {
                  <p>That really depends  on what <b>you</b> want to do.
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
-                    you might want want to start with a tutorial.</p>
+                    you might want to start with a tutorial.</p>
 <pre>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst-Manual/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
 </pre>
 <p>Afterwards you can go on to check out a more complete look at our features.</p>
