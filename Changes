@@ -32,7 +32,7 @@
         - Fixed bug in HTTP engine where writes could fail with
           'Resource temporarily unavailable'.
         - Fixed bug where %2b in query parameter is doubly decoded to ' ', instead of '+'
-          (Gavin Henry, Tatsuhiko Miyagawa, Oleg Pronin)
+          (RT #30087, Gavin Henry, Tatsuhiko Miyagawa, Oleg Pronin)
         - Fixed bug where req->base and req->uri would include a port number when running
           in SSL mode.
         - Removed unnecessary sprintf in debug mode that caused warnings on locales where
