@@ -974,10 +974,10 @@ sub uri_for {
     if (my @keys = keys %$params) {
       # somewhat lifted from URI::_query's query_form
       $query = '?'.join('&', map {
+          my $val = $params->{$_};
           s/([;\/?:@&=+,\$\[\]%])/$URI::Escape::escapes{$1}/go;
           s/ /+/g;
           my $key = $_;
-          my $val = $params->{$_};
           $val = '' unless defined $val;
           (map {
               $_ = "$_";

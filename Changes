@@ -10,6 +10,7 @@
         - Fix grammar on welcome page (RT #33236)
         - Fix for Path('0') handling (RT #29334)
         - Workaround for Win32 and c3_mro.t (RT #26452, tested by Kenichi Ishigaki)
+        - Fix for encoding query parameters (eden)
 
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars
