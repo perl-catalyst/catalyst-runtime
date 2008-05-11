@@ -208,7 +208,7 @@ sub register {
 
     return 0 unless @chained_attr;
 
-    if (@chained_attr > 2) {
+    if (@chained_attr > 1) {
         Catalyst::Exception->throw(
           "Multiple Chained attributes not supported registering ${action}"
         );
