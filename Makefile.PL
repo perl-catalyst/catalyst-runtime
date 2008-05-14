@@ -1,12 +1,10 @@
 use inc::Module::Install 0.64;
 
-use 5.008001; 
-perl_version '5.8.1';
+perl_version '5.008001';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
-requires 'perl'               => '5.8.1';
 requires 'Carp';
 requires 'Class::Accessor::Fast';
 requires 'Class::Data::Inheritable';
