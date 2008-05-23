@@ -34,8 +34,6 @@ __PACKAGE__->mk_accessors(
     qw/counter request response state action stack namespace stats/
 );
 
-attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
-
 sub depth { scalar @{ shift->stack || [] }; }
 
 # Laziness++
@@ -65,7 +63,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.7013';
+our $VERSION = '5.7014';
 
 sub import {
     my ( $class, @arguments ) = @_;

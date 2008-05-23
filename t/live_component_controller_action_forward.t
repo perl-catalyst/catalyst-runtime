@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 47 * $iters;
+use Test::More tests => 50 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -233,6 +233,17 @@ sub run_tests {
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->header('X-Class-Forward-Test-Method'), 1,
             'Test Method' );
+    }
+
+    # test uri_for re r7385
+    {
+        ok( my $response = request(
+            'http://localhost/action/forward/forward_to_uri_check'),
+            'forward_to_uri_check request');
+
+        ok( $response->is_success, 'forward_to_uri_check successful');
+        is( $response->content, 'http://localhost/action/forward/foo/bar',
+             'forward_to_uri_check correct namespace');
     }
 
 }
