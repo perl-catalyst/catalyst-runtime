@@ -1,11 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.7014  ---
-        - Fix regression for relative uri_for arguments after a forward()
-          introduced in 5.7013 (Peter Karman)
-        - Fix regression for "sub foo : Path {}" in the root controller which
-          was introduced when attempting to allow "0" as a Path.
-
+5.7014  2008-XX-XX XX:XX:XX
+         - Addition of .conf in restart regex in Catalyst::Engine::HTTP::Restarter::Watcher
 5.7013  2008-05-16 18:20:00
         - Provide backwards compatability methods in Catalyst::Stats
         - Fix subdirs for scripts that run in subdirs more than one level deep.

@@ -157,7 +157,7 @@ files
 
     my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
         directory => '/path/to/MyApp',
-        regex     => '\.yml$|\.yaml$|\.pm$',
+        regex     => '\.yml$|\.yaml$|\.conf|\.pm$',
         delay     => 1,
     );
     
