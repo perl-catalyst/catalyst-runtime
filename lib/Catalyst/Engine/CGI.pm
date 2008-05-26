@@ -54,24 +54,11 @@ sub prepare_connection {
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
 
-    $c->request->address( $ENV{REMOTE_ADDR} );
+    my $proxy = $self->_proxy_info($c);
 
-  PROXY_CHECK:
-    {
-        unless ( $c->config->{using_frontend_proxy} ) {
-            last PROXY_CHECK if $ENV{REMOTE_ADDR} ne '127.0.0.1';
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
-        }
-        last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_FOR};
-
-        # If we are running as a backend server, the user will always appear
-        # as 127.0.0.1. Select the most recent upstream IP (last in the list)
-        my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
-        $c->request->address($ip);
-    }
-
-    $c->request->hostname( $ENV{REMOTE_HOST} );
-    $c->request->protocol( $ENV{SERVER_PROTOCOL} );
+    $c->request->address( $proxy->{address} || $ENV{REMOTE_ADDR} );
+    $c->request->hostname( $proxy->{host} || $ENV{REMOTE_HOST} );
+    $c->request->protocol( $proxy->{scheme} || $ENV{SERVER_PROTOCOL} );
     $c->request->user( $ENV{REMOTE_USER} );
     $c->request->method( $ENV{REQUEST_METHOD} );
 
@@ -80,6 +67,10 @@ sub prepare_connection {
     }
 
     if ( $ENV{SERVER_PORT} == 443 ) {
+        $c->request->secure(1);
+    }
+
+    if ( $c->request->protocol eq 'https' ) {
         $c->request->secure(1);
     }
 }
@@ -108,9 +99,11 @@ sub prepare_path {
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
 
+    my $proxy = $self->_proxy_info($c);
+
     my $scheme = $c->request->secure ? 'https' : 'http';
-    my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
-    my $port      = $ENV{SERVER_PORT} || 80;
+    my $host      = $proxy->{host} || $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
+    my $port      = $proxy->{port} || $ENV{SERVER_PORT} || 80;
     my $base_path;
     if ( exists $ENV{REDIRECT_URL} ) {
         $base_path = $ENV{REDIRECT_URL};
@@ -120,26 +113,15 @@ sub prepare_path {
         $base_path = $ENV{SCRIPT_NAME} || '/';
     }
 
-    # If we are running as a backend proxy, get the true hostname
-  PROXY_CHECK:
-    {
-        unless ( $c->config->{using_frontend_proxy} ) {
-            last PROXY_CHECK if $host !~ /localhost|127.0.0.1/;
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
-        }
-        last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_HOST};
-
-        $host = $ENV{HTTP_X_FORWARDED_HOST};
-
-        # backend could be on any port, so
-        # assume frontend is on the default port
-        $port = $c->request->secure ? 443 : 80;
+    if ( $proxy->{path} ) {
+        $base_path = $proxy->{path} . $base_path;
+        $base_path =~ s{/$}{}g;
     }
 
     # set the request URI
     my $path = $base_path . ( $ENV{PATH_INFO} || '' );
     $path =~ s{^/+}{};
-    
+
     # Using URI directly is way too slow, so we construct the URLs manually
     my $uri_class = "URI::$scheme";
     

@@ -390,6 +390,104 @@ sub prepare_cookies {
 
 sub prepare_headers { }
 
+=head2 $self->_proxy_info($c)
+
+Checks for the presence of various headers from a frontend proxy, and
+returns a hash of information based on what it finds.
+
+This method is intended to be called by engines in their various
+C<prepare_XXX()> methods so that they can override values based on
+proxy headers.
+
+This method returns a hash which may have one or more of the following
+keys:
+
+=over 4
+
+=item * host
+
+=item * port
+
+=item * path
+
+=item * scheme
+
+The only value used for scheme is "https".
+
+=back
+
+If the config key "ignore_frontend_proxy" is true, no adjustments are
+made.
+
+If the config key "using_frontend_proxy" is I<not> true, then we do
+not make adjustments nuless the client's IP address is 127.0.0.1
+(localhost).
+
+=head3 Subclassing
+
+If you are creating a new Engine subclass, you may want to add a
+method named C<_ip_address_without_proxy()>. This method will be
+called when checking whether or not to respect proxy headers. It
+should return the "raw" IP address of the connection, without looking
+at the "X-Forwarded-For" header.
+
+This class provides an implementation of this method that simply
+returns C<$ENV{REMOTE_ADDR}>, but you may wish to override this
+implementation.
+
+=cut
+
+sub _proxy_info {
+    my ( $self, $c, $ip_address ) = @_;
+
+    return $c->{proxy_info}
+      if $c->{proxy_info};
+
+    unless ( $self->_check_for_proxy($c) ) {
+        return $c->{proxy_info} = {};
+    }
+
+    my %proxy;
+    if ( my $for = $c->request->header('X-Forwarded-For') ) {
+        ($proxy{address}) = $for =~ /([^,\s]+)$/
+    }
+
+    $proxy{host} = $c->request->header('X-Forwarded-Host');
+    $proxy{port} = $c->request->header('X-Forwarded-Port');
+
+    $proxy{path} = $c->request->header('X-Forwarded-Path');
+    $proxy{path} =~ s{/$}{}
+      if $proxy{path};
+
+    $proxy{scheme} = 'https'
+      if $c->request->header('X-Forwarded-Is-SSL');
+
+    $c->{proxy_info} = \%proxy;
+
+    return $c->{proxy_info};
+}
+
+sub _check_for_proxy {
+    my ( $self, $c, $ip_address ) = @_;
+
+    return 0 if $c->config->{ignore_frontend_proxy};
+
+    my $address = $self->_ip_address_without_proxy($c);
+
+    return 0 unless $c->config->{using_frontend_proxy}
+      || $address eq '127.0.0.1';
+
+    return 1;
+}
+
+# This method is provided mainly as a fallback for older versions of
+# engines that don't implement this method themselves. Given that most
+# web environments emulate the CGI environment to some extent,
+# checking $ENV{REMOTE_ADDR} has a decent chance of being correct.
+sub _ip_address_without_proxy {
+    return $ENV{REMOTE_ADDR};
+}
+
 =head2 $self->prepare_parameters($c)
 
 sets up parameters from query and post parameters.

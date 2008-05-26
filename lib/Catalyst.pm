@@ -1581,9 +1581,9 @@ sub prepare {
     }
     else {
         $c->prepare_request(@arguments);
+        $c->prepare_headers;
         $c->prepare_connection;
         $c->prepare_query_parameters;
-        $c->prepare_headers;
         $c->prepare_cookies;
         $c->prepare_path;
 
@@ -1717,6 +1717,14 @@ Prepares path and base.
 =cut
 
 sub prepare_path { my $c = shift; $c->engine->prepare_path( $c, @_ ) }
+
+=head2 $c->adjust_request_for_proxy
+
+Adjusts the request to account for a frontend proxy.
+
+=cut
+
+sub adjust_request_for_proxy { my $c = shift; $c->engine->adjust_request_for_proxy( $c, @_ ) }
 
 =head2 $c->prepare_query_parameters
 
@@ -2289,11 +2297,38 @@ Catalyst will automatically detect this situation when you are running
 the frontend and backend servers on the same machine. The following
 changes are made to the request.
 
-    $c->req->address is set to the user's real IP address, as read from 
-    the HTTP X-Forwarded-For header.
-    
-    The host value for $c->req->base and $c->req->uri is set to the real
-    host, as read from the HTTP X-Forwarded-Host header.
+=over 4
+
+=item * X-Forwarded-For
+
+The IP address in C<< $c->req->address >> is set to the user's real IP
+address, as read from the X-Forwarded-For header.
+
+=item * X-Forwarded-Host
+
+The host value for C<< $c->req->base >> and C<< $c->req->uri >> is set
+to the real host, as read from the X-Forwarded-Host header. The value
+of C<< $c->req->hostname >> is also adjusted accordingly.
+
+=item * X-Forwarded-Port
+
+The port value for C<< $c->req->base >> and C<< $c->req->uri >> is set
+to the real port, as read from the X-Forwarded-Port header.
+
+=item * X-Forwarded-Path
+
+If this is set, the value of the X-Forwarded-Path header is
+I<prepended> to the path value of C<< $c->req->base >> and C<<
+$c->req->uri >>.
+
+=item * X-Forwarded-Is-SSL
+
+If this is set, the scheme value of C<< $c->req->base >> and C<<
+$c->req->uri >> is set to "https". Additional, C<< $c->req->protocol
+>> is also set to "https", and C<< $c->req->secure >> is set to a true
+value.
+
+=back
 
 Obviously, your web server must support these headers for this to work.
 
