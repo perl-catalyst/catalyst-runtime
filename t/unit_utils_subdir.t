@@ -1,4 +1,4 @@
-use Test::More tests=>7;
+use Test::More tests => 8;
 
 use strict;
 use warnings;
@@ -29,4 +29,14 @@ use FindBin;
     my $home = Catalyst::Utils::home('TestApp');
     like($home, qr{t[\/\\]something}, "has path TestApp/t/something"); 
     unlike($home, qr{[\/\\]script[\/\\]foo}, "doesn't have path /script/foo");
+}
+
+{
+    $INC{'TestApp.pm'} = "TestApp.pm";
+    my $dir = "$FindBin::Bin/something";
+    chdir( $dir );
+  
+    my $home = Catalyst::Utils::home('TestApp');
+
+    is( $home, $dir, 'same dir loading' );
 }
