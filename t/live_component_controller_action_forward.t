@@ -242,9 +242,7 @@ sub run_tests {
             'forward_to_uri_check request');
 
         ok( $response->is_success, 'forward_to_uri_check successful');
-        # optional port, as it could be a live test
-        like( $response->content, qr{http://localhost(:\d+)?/action/forward/foo/bar},
+        is( $response->content, '/action/forward/foo/bar',
              'forward_to_uri_check correct namespace');
     }
-
 }
