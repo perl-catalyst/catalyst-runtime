@@ -525,7 +525,8 @@ Returns a URI object for the current request. Stringifies to the URI text.
 =head2 $req->uri_with( { key => 'value' } );
 
 Returns a rewritten URI object for the current request. Key/value pairs
-passed in will override existing parameters. Unmodified pairs will be
+passed in will override existing parameters. You can remove an existing
+parameter by passing in an undef value. Unmodified pairs will be
 preserved.
 
 =cut
@@ -535,7 +536,7 @@ sub uri_with {
     
     carp( 'No arguments passed to uri_with()' ) unless $args;
 
-    for my $value ( values %$args ) {
+    foreach my $value ( values %$args ) {
         next unless defined $value;
         for ( ref $value eq 'ARRAY' ? @$value : $value ) {
             $_ = "$_";
@@ -543,11 +544,12 @@ sub uri_with {
         }
     };
     
-    my $uri = $self->uri->clone;
-    
+    my $uri   = $self->uri->clone;
+    my %query = ( %{ $uri->query_form_hash }, %$args );
+
     $uri->query_form( {
-        %{ $uri->query_form_hash },
-        %$args
+        # remove undef values
+        map { defined $query{ $_ } ? ( $_ => $query{ $_ } ) : () } keys %query
     } );
     return $uri;
 }

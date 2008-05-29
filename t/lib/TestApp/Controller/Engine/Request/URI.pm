@@ -77,4 +77,26 @@ sub uri_with_undef : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub uri_with_undef_only : Local {
+    my ( $self, $c ) = @_;
+
+    my $uri = $c->req->uri_with( { a => undef } );
+    
+    $c->res->header( 'X-Catalyst-uri-with' => "$uri" );
+    $c->forward('TestApp::View::Dump::Request');
+}
+
+sub uri_with_undef_ignore : Local {
+    my ( $self, $c ) = @_;
+
+    my $uri = $c->req->uri_with( { a => 1, b => undef } );
+    
+    my %query = $uri->query_form;
+    $c->res->header( 'X-Catalyst-uri-with' => "$uri" );
+    $c->res->header( 'X-Catalyst-Param-a' => $query{ a } );
+    $c->res->header( 'X-Catalyst-Param-b' => $query{ b } );
+    $c->res->header( 'X-Catalyst-Param-c' => $query{ c } );
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;
