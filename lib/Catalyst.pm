@@ -441,8 +441,8 @@ sub _comp_search_prefixes {
 
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {
-        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-        $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution is unreliable and unsafe.' );
+        $c->log->warn( 'If you really want to search, pass in a regexp as the argument.' );
     }
 
     return @result;
@@ -481,6 +481,12 @@ Gets a L<Catalyst::Controller> instance by name.
 If the name is omitted, will return the controller for the dispatched
 action.
 
+If you want to search for controllers, pass in a regexp as the argument.
+
+    # find all controllers that start with Foo
+    my @foo_controllers = $c->controller(qr{^Foo});
+
+
 =cut
 
 sub controller {
@@ -508,6 +514,11 @@ If the name is omitted, it will look for
  - a model name in $c->stash->{current_model}, then
  - a config setting 'default_model', or
  - check if there is only one model, and return it if that's the case.
+
+If you want to search for models, pass in a regexp as the argument.
+
+    # find all models that start with Foo
+    my @foo_models = $c->model(qr{^Foo});
 
 =cut
 
@@ -556,6 +567,11 @@ If the name is omitted, it will look for
  - a view name in $c->stash->{current_view}, then
  - a config setting 'default_view', or
  - check if there is only one view, and return it if that's the case.
+
+If you want to search for views, pass in a regexp as the argument.
+
+    # find all views that start with Foo
+    my @foo_views = $c->view(qr{^Foo});
 
 =cut
 
@@ -632,6 +648,9 @@ Gets a component object by name. This method is not recommended,
 unless you want to get a specific component by full
 class. C<< $c->controller >>, C<< $c->model >>, and C<< $c->view >>
 should be used instead.
+
+If C<$name> is a regexp, a list of components matched against the full
+component name will be returned.
 
 =cut
 
