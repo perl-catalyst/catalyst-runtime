@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 11;
 use strict;
 use warnings;
 
@@ -12,6 +12,9 @@ my @complist = map { "MyApp::$_"; } qw/C::Controller M::Model V::View/;
   use base qw/Catalyst/;
 
   __PACKAGE__->components({ map { ($_, $_) } @complist });
+
+  # this is so $c->log->warn will work
+  __PACKAGE__->setup_log;
 }
 
 is(MyApp->comp('MyApp::V::View'), 'MyApp::V::View', 'Explicit return ok');
@@ -21,7 +24,14 @@ is(MyApp->comp('C::Controller'), 'MyApp::C::Controller', 'Two-part return ok');
 is(MyApp->comp('Model'), 'MyApp::M::Model', 'Single part return ok');
 
 # regexp fallback
-is(MyApp->comp('::M::'), 'MyApp::M::Model', 'Regex return ok');
+{
+    my $warnings = 0;
+    no warnings 'redefine';
+    local *Catalyst::Log::warn = sub { $warnings++ };
+
+    is(MyApp->comp('::M::'), 'MyApp::M::Model', 'Regex return ok');
+    ok( $warnings, 'regexp fallback for comp() warns' );
+}
 
 is_deeply([ MyApp->comp() ], \@complist, 'Empty return ok');
 
