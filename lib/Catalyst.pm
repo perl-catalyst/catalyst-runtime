@@ -414,87 +414,60 @@ sub clear_errors {
     $c->error(0);
 }
 
-
-# search via regex
-sub _comp_search {
-    my ( $c, @names ) = @_;
-
-    foreach my $name (@names) {
-        foreach my $component ( keys %{ $c->components } ) {
-            return $c->components->{$component} if $component =~ /$name/i;
-        }
-    }
-
-    return undef;
-}
-
-# try explicit component names
-sub _comp_explicit {
-    my ( $c, @names ) = @_;
-
-    foreach my $try (@names) {
-        return $c->components->{$try} if ( exists $c->components->{$try} );
-    }
-
-    return undef;
-}
-
-# like component, but try just these prefixes before regex searching,
-#  and do not try to return "sort keys %{ $c->components }"
-sub _comp_prefixes {
+# search components given a name and some prefixes
+sub _comp_search_prefixes {
     my ( $c, $name, @prefixes ) = @_;
-
     my $appclass = ref $c || $c;
+    my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
 
-    my @names = map { "${appclass}::${_}::${name}" } @prefixes;
+    # map the original component name to the sub part that we will search against
+    my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
+        grep { /$filter/ } keys %{ $c->components };
 
-    my $comp = $c->_comp_explicit(@names);
-    return $comp if defined($comp);
-    $comp = $c->_comp_search($name);
-    return $comp;
+    # undef for a name will return all
+    return keys %eligible if !defined $name;
+
+    my $query  = ref $name ? $name : qr/^$name$/i;
+    my @result = grep { $eligible{$_} =~ m{$query} } keys %eligible;
+
+    return map { $c->components->{ $_ } } @result if @result;
+
+    # if we were given a regexp to search against, we're done.
+    return if ref $name;
+
+    # regexp fallback
+    $query  = qr/$name/i;
+    @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
+
+    # don't warn if we didn't find any results, it just might not exist
+    if( @result ) {
+        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
+        $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+    }
+
+    return @result;
 }
 
 # Find possible names for a prefix 
-
 sub _comp_names {
     my ( $c, @prefixes ) = @_;
-
     my $appclass = ref $c || $c;
 
-    my @pre = map { "${appclass}::${_}::" } @prefixes;
+    my $filter = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
 
-    my @names;
-
-    COMPONENT: foreach my $comp ($c->component) {
-        foreach my $p (@pre) {
-            if ($comp =~ s/^$p//) {
-                push(@names, $comp);
-                next COMPONENT;
-            }
-        }
-    }
-
+    my @names = map { s{$filter}{}; $_; } $c->_comp_search_prefixes( undef, @prefixes );
     return @names;
-}
-
-# Return a component if only one matches.
-sub _comp_singular {
-    my ( $c, @prefixes ) = @_;
-
-    my $appclass = ref $c || $c;
-
-    my ( $comp, $rest ) =
-      map { $c->_comp_search("^${appclass}::${_}::") } @prefixes;
-    return $comp unless $rest;
 }
 
 # Filter a component before returning by calling ACCEPT_CONTEXT if available
 sub _filter_component {
     my ( $c, $comp, @args ) = @_;
+
     if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
         return $comp->ACCEPT_CONTEXT( $c, @args );
     }
-    else { return $comp }
+    
+    return $comp;
 }
 
 =head2 COMPONENT ACCESSORS
@@ -512,9 +485,13 @@ action.
 
 sub controller {
     my ( $c, $name, @args ) = @_;
-    return $c->_filter_component( $c->_comp_prefixes( $name, qw/Controller C/ ),
-        @args )
-      if ($name);
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
     return $c->component( $c->action->class );
 }
 
@@ -536,9 +513,13 @@ If the name is omitted, it will look for
 
 sub model {
     my ( $c, $name, @args ) = @_;
-    return $c->_filter_component( $c->_comp_prefixes( $name, qw/Model M/ ),
-        @args )
-      if $name;
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
     if (ref $c) {
         return $c->stash->{current_model_instance} 
           if $c->stash->{current_model_instance};
@@ -547,19 +528,17 @@ sub model {
     }
     return $c->model( $c->config->{default_model} )
       if $c->config->{default_model};
-    return $c->_filter_component( $c->_comp_singular(qw/Model M/) );
 
-}
+    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
-=head2 $c->controllers
+    if( $rest ) {
+        $c->log->warn( 'Calling $c->model() will return a random model unless you specify one of:' );
+        $c->log->warn( '* $c->config->{default_model} # the name of the default model to use' );
+        $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
+        $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
+    }
 
-Returns the available names which can be passed to $c->controller
-
-=cut
-
-sub controllers {
-    my ( $c ) = @_;
-    return $c->_comp_names(qw/Controller C/);
+    return $c->_filter_component( $comp );
 }
 
 
@@ -581,9 +560,13 @@ If the name is omitted, it will look for
 
 sub view {
     my ( $c, $name, @args ) = @_;
-    return $c->_filter_component( $c->_comp_prefixes( $name, qw/View V/ ),
-        @args )
-      if $name;
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
     if (ref $c) {
         return $c->stash->{current_view_instance} 
           if $c->stash->{current_view_instance};
@@ -592,7 +575,28 @@ sub view {
     }
     return $c->view( $c->config->{default_view} )
       if $c->config->{default_view};
-    return $c->_filter_component( $c->_comp_singular(qw/View V/) );
+
+    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
+
+    if( $rest ) {
+        $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
+        $c->log->warn( '* $c->config->{default_view} # the name of the default view to use' );
+        $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
+        $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
+    }
+
+    return $c->_filter_component( $comp );
+}
+
+=head2 $c->controllers
+
+Returns the available names which can be passed to $c->controller
+
+=cut
+
+sub controllers {
+    my ( $c ) = @_;
+    return $c->_comp_names(qw/Controller C/);
 }
 
 =head2 $c->models
@@ -630,31 +634,37 @@ should be used instead.
 =cut
 
 sub component {
-    my $c = shift;
+    my ( $c, $name, @args ) = @_;
 
-    if (@_) {
+    if( $name ) {
+        my $comps = $c->components;
 
-        my $name = shift;
+        if( !ref $name ) {
+            # is it the exact name?
+            return $comps->{ $name } if exists $comps->{ $name };
 
-        my $appclass = ref $c || $c;
+            # perhaps we just omitted "MyApp"?
+            my $composed = ( ref $c || $c ) . "::${name}";
+            return $comps->{ $composed } if exists $comps->{ $composed };
 
-        my @names = (
-            $name, "${appclass}::${name}",
-            map { "${appclass}::${_}::${name}" }
-              qw/Model M Controller C View V/
-        );
+            # search all of the models, views and controllers
+            my( $comp ) = $c->_comp_search_prefixes( $name, qw/Model M Controller C View V/ );
+            return $c->_filter_component( $comp, @args ) if $comp;
+        }
 
-        my $comp = $c->_comp_explicit(@names);
-        return $c->_filter_component( $comp, @_ ) if defined($comp);
+        # This is here so $c->comp( '::M::' ) works
+        my $query = ref $name ? $name : qr{$name}i;
 
-        $comp = $c->_comp_search($name);
-        return $c->_filter_component( $comp, @_ ) if defined($comp);
+        my @result = grep { m{$query} } keys %{ $c->components };
+        return @result if ref $name;
+        return $result[ 0 ] if $result[ 0 ];
+
+        # I would expect to return an empty list here, but that breaks back-compat
     }
 
+    # fallback
     return sort keys %{ $c->components };
 }
-
-
 
 =head2 CLASS DATA AND HELPER CLASSES
 
