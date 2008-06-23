@@ -1,10 +1,32 @@
 package Catalyst::DispatchType::Chained;
 
-use strict;
-use base qw/Catalyst::DispatchType/;
+use Moose;
 use Text::SimpleTable;
 use Catalyst::ActionChain;
 use URI;
+
+extends 'Catalyst::DispatchType';
+
+has _endpoints => (
+                   isa => 'rw',
+                   isa => 'ArrayRef',
+                   required => 1,
+                   default => sub{ [] },
+                  );
+
+has _actions => (
+                 isa => 'rw',
+                 isa => 'HashRef',
+                 required => 1,
+                 default => sub{ {} },
+                );
+
+has _children_of => (
+                     isa => 'rw',
+                     isa => 'HashRef',
+                     required => 1,
+                     default => sub{ {} },
+                    );
 
 # please don't perltidy this. hairy code within.
 
@@ -41,7 +63,7 @@ Debug output for Path Part dispatch points
 sub list {
     my ( $self, $c ) = @_;
 
-    return unless $self->{endpoints};
+    return unless $self->_endpoints;
 
     my $paths = Text::SimpleTable->new(
                     [ 35, 'Path Spec' ], [ 36, 'Private' ]
@@ -49,7 +71,7 @@ sub list {
 
     ENDPOINT: foreach my $endpoint (
                   sort { $a->reverse cmp $b->reverse }
-                           @{ $self->{endpoints} }
+                           @{ $self->_endpoints }
                   ) {
         my $args = $endpoint->attributes->{Args}->[0];
         my @parts = (defined($args) ? (("*") x $args) : '...');
@@ -65,7 +87,7 @@ sub list {
                     if (defined $pp->[0] && length $pp->[0]);
             }
             $parent = $curr->attributes->{Chained}->[0];
-            $curr = $self->{actions}{$parent};
+            $curr = $self->_actions->{$parent};
             unshift(@parents, $curr) if $curr;
         }
         next ENDPOINT unless $parent eq '/'; # skip dangling action
@@ -125,7 +147,7 @@ Recursive search for a matching chain.
 
 sub recurse_match {
     my ( $self, $c, $parent, $path_parts ) = @_;
-    my $children = $self->{children_of}{$parent};
+    my $children = $self->_children_of->{$parent};
     return () unless $children;
     my $best_action;
     my @captures;
@@ -175,7 +197,7 @@ sub recurse_match {
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
                 #    And therefore is a better match
-                # OR No parts and this expects 0 
+                # OR No parts and this expects 0
                 #    The current best action might also be Args(0),
                 #    but we couldn't chose between then anyway so we'll take the last seen
 
@@ -232,7 +254,7 @@ sub register {
 
     $action->attributes->{Chained} = [ $parent ];
 
-    my $children = ($self->{children_of}{$parent} ||= {});
+    my $children = $self->_children_of->{$parent};
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 
@@ -256,10 +278,10 @@ sub register {
 
     unshift(@{ $children->{$part} ||= [] }, $action);
 
-    ($self->{actions} ||= {})->{'/'.$action->reverse} = $action;
+    $self->_actions->{'/'.$action->reverse} = $action;
 
     unless ($action->attributes->{CaptureArgs}) {
-        unshift(@{ $self->{endpoints} ||= [] }, $action);
+        unshift(@{ $self->_endpoints }, $action);
     }
 
     return 1;
@@ -294,7 +316,7 @@ sub uri_for_action {
                 if (defined($pp->[0]) && length($pp->[0]));
         }
         $parent = $curr->attributes->{Chained}->[0];
-        $curr = $self->{actions}{$parent};
+        $curr = $self->_actions->{$parent};
     }
 
     return undef unless $parent eq '/'; # fail for dangling action
@@ -302,7 +324,7 @@ sub uri_for_action {
     return undef if @captures; # fail for too many captures
 
     return join('/', '', @parts);
-   
+
 }
 
 =head1 USAGE
@@ -463,7 +485,7 @@ this debugging output:
   '-----------------------+------------------------------'
   ...
 
-Here's a more detailed specification of the attributes belonging to 
+Here's a more detailed specification of the attributes belonging to
 C<:Chained>:
 
 =head2 Attributes

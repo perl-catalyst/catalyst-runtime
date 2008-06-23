@@ -1,7 +1,6 @@
 package Catalyst::DispatchType;
 
-use strict;
-use base 'Class::Accessor::Fast';
+use Moose;
 
 =head1 NAME
 
@@ -13,7 +12,7 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is an abstract base class for Dispatch Types. 
+This is an abstract base class for Dispatch Types.
 
 =head1 METHODS
 
@@ -38,7 +37,7 @@ sub match { die "Abstract method!" }
 =head2 $self->register( $c, $action )
 
 abstract method, to be implemented by dispatchtypes. Takes a
-context object and a L<Catalyst::Action> object. 
+context object and a L<Catalyst::Action> object.
 
 Should return true if it registers something, or false otherwise.
 

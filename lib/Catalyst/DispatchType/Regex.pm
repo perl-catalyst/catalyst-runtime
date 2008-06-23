@@ -1,9 +1,11 @@
 package Catalyst::DispatchType::Regex;
 
-use strict;
-use base qw/Catalyst::DispatchType::Path/;
+use Moose;
+extends 'Catalyst::DispatchType::Path';
 use Text::SimpleTable;
 use Text::Balanced ();
+
+has _compiled => (is => 'rw', isa => 'ArrayRef', required => 1, default => sub{[]});
 
 =head1 NAME
 
@@ -25,13 +27,14 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
+    my @regexes = @{ $self->_compiled };
+    return unless @regexes;
     my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ 36, 'Private' ] );
-    for my $regex ( @{ $self->{compiled} } ) {
+    for my $regex ( @regexes ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
     }
-    $c->log->debug( "Loaded Regex actions:\n" . $re->draw . "\n" )
-      if ( @{ $self->{compiled} } );
+    $c->log->debug( "Loaded Regex actions:\n" . $re->draw . "\n" );
 }
 
 =head2 $self->match( $c, $path )
@@ -43,14 +46,14 @@ altering $c.
 
 =cut
 
-sub match {
+override match => sub {
     my ( $self, $c, $path ) = @_;
 
-    return if $self->SUPER::match( $c, $path );
+    return if super();
 
     # Check path against plain text first
 
-    foreach my $compiled ( @{ $self->{compiled} || [] } ) {
+    foreach my $compiled ( @{ $self->_compiled } ) {
         if ( my @captures = ( $path =~ $compiled->{re} ) ) {
             next unless $compiled->{action}->match($c);
             $c->req->action( $compiled->{path} );
@@ -90,7 +93,7 @@ sub register {
 
 =head2 $self->register_regex($c, $re, $action)
 
-Register an individual regex on the action. Usually called from the 
+Register an individual regex on the action. Usually called from the
 register method.
 
 =cut
@@ -98,7 +101,7 @@ register method.
 sub register_regex {
     my ( $self, $c, $re, $action ) = @_;
     push(
-        @{ $self->{compiled} },    # and compiled regex for us
+        @{ $self->_compiled },    # and compiled regex for us
         {
             re     => qr#$re#,
             action => $action,

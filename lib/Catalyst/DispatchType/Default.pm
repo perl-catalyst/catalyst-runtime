@@ -1,7 +1,7 @@
 package Catalyst::DispatchType::Default;
 
-use strict;
-use base qw/Catalyst::DispatchType/;
+use Moose;
+extends 'Catalyst::DispatchType';
 
 =head1 NAME
 
