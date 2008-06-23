@@ -361,6 +361,8 @@ sub _parse_MyAction_attr {
 
 no Moose;
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

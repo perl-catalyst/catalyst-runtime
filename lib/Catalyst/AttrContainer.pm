@@ -2,15 +2,13 @@ package Catalyst::AttrContainer;
 
 use Moose;
 use Catalyst::Exception;
-
-with 'Catalyst::ClassData';
 use Scalar::Util 'blessed';
+with 'Catalyst::ClassData';
 
 no Moose;
 
-__PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache/;
-__PACKAGE__->_attr_cache( {} );
-__PACKAGE__->_action_cache( [] );
+__PACKAGE__->mk_classdata(_attr_cache => {} );
+__PACKAGE__->mk_classdata( _action_cache => [] );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {

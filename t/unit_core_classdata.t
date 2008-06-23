@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Scalar::Util qw/refaddr blessed/;
-use Test::More tests => 32;
+use Test::More tests => 37;
 
 {
   package ClassDataTest;
@@ -27,6 +27,12 @@ use Test::More tests => 32;
   my $hashref2 = {};
   my $scalarref2 = \$scalar2;
   my $coderef2 = sub { "beep" };
+
+  my $scalar3 = '300';
+  my $arrayref3 = [];
+  my $hashref3 = {};
+  my $scalarref3 = \$scalar3;
+  my $coderef3 = sub { "beep" };
 
 
 my @accessors = qw/_arrayref _hashref _scalarref _coderef _scalar/;
@@ -82,3 +88,15 @@ is(refaddr(ClassDataTest->_hashref), refaddr($hashref));
 is(refaddr(ClassDataTest->_scalarref), refaddr($scalarref));
 is(refaddr(ClassDataTest->_coderef), refaddr($coderef));
 is(ClassDataTest->_scalar, $scalar);
+
+ClassDataTest->_arrayref($arrayref3);
+ClassDataTest->_hashref($hashref3);
+ClassDataTest->_scalarref($scalarref3);
+ClassDataTest->_coderef($coderef3);
+ClassDataTest->_scalar($scalar3);
+
+is(refaddr(ClassDataTest->_arrayref), refaddr($arrayref3));
+is(refaddr(ClassDataTest->_hashref), refaddr($hashref3));
+is(refaddr(ClassDataTest->_scalarref), refaddr($scalarref3));
+is(refaddr(ClassDataTest->_coderef), refaddr($coderef3));
+is(ClassDataTest->_scalar, $scalar3);

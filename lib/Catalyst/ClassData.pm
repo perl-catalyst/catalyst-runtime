@@ -11,15 +11,20 @@ sub mk_classdata {
 
   my $slot = '$'.$attribute;
   my $accessor =  sub {
+    my $meta = $_[0]->meta;
     if(@_ > 1){
-      $_[0]->meta->add_package_symbol($slot, \ $_[1]);
+      $meta->add_package_symbol($slot, \ $_[1]);
       return $_[1];
     }
 
-    foreach my $super ( (blessed $_[0] || $_[0]), $_[0]->meta->linearized_isa ) {
-      my $meta = Moose::Meta::Class->initialize($super);
-      if( $meta->has_package_symbol($slot) ){
-        return ${ $meta->get_package_symbol($slot) };
+    if( $meta->has_package_symbol($slot) ){
+      return ${ $meta->get_package_symbol($slot) };
+    } else {
+      foreach my $super ( $meta->linearized_isa ) {
+        my $super_meta = Moose::Meta::Class->initialize($super);
+        if( $super_meta->has_package_symbol($slot) ){
+          return ${ $super_meta->get_package_symbol($slot) };
+        }
       }
     }
     return;
@@ -39,3 +44,26 @@ sub mk_classdata {
 1;
 
 __END__
+
+
+=head1 NAME
+
+Catalyst::ClassData - Class data acessors
+
+=head1 METHODS
+
+=head2 mk_classdata $name, $optional_value
+
+A moose-safe clone of L<Class::Data::Inheritable> that borrows some ideas from
+L<Class::Accessor::Grouped>;
+
+=head1 AUTHOR
+
+Guillermo Roditi
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
