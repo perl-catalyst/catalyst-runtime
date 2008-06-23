@@ -1,6 +1,7 @@
 package Catalyst::Dispatcher;
 
 use Moose;
+use Class::MOP ();
 
 use Catalyst::Exception;
 use Catalyst::Utils;
@@ -50,7 +51,7 @@ application based on the attributes you set.
 
 =head1 METHODS
 
-=head2 new 
+=head2 new
 
 Construct a new dispatcher.
 
@@ -59,7 +60,7 @@ Construct a new dispatcher.
 sub BUILD {
   my ($self, $params) = @_;
 
-  my $container = 
+  my $container =
     Catalyst::ActionContainer->new( { part => '/', actions => {} } );
 
   $self->_tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
@@ -136,7 +137,7 @@ sub forward {
     }
 
     my @args;
-    
+
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
         @args = @{ pop @extra_params }
     } else {
@@ -302,11 +303,11 @@ sub get_action {
     return $self->_action_hash->{"$namespace/$name"};
 }
 
-=head2 $self->get_action_by_path( $path ); 
-   
-Returns the named action by its full path. 
+=head2 $self->get_action_by_path( $path );
 
-=cut 
+Returns the named action by its full path.
+
+=cut
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
@@ -394,7 +395,7 @@ sub register {
         next if $key eq 'Private';
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
-            eval "require $class";
+            eval { Class::MOP::load_class($class) };
             push( @{ $self->_dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;
         }
@@ -512,7 +513,7 @@ sub _load_dispatch_types {
     for my $type (@types) {
         my $class =
           ( $type =~ /^\+(.*)$/ ) ? $1 : "Catalyst::DispatchType::${type}";
-        eval "require $class";
+        eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
         push @{ $self->_dispatch_types }, $class->new;
