@@ -1,5 +1,7 @@
 package Catalyst::Model;
 
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 extends qw/Catalyst::Component/;
 

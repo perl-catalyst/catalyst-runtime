@@ -1,7 +1,8 @@
 package Catalyst::Controller;
 
 #switch to BEGIN { extends qw/ ... /; } ?
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 use Moose;
 

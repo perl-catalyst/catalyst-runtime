@@ -1,6 +1,7 @@
 package Catalyst::DispatchType::Regex;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 extends 'Catalyst::DispatchType::Path';
 

@@ -19,6 +19,6 @@ BEGIN {
   sub config { {} };
 }
 
-is(MyApp::Controller::Foo->COMPONENT->action_namespace('Stub'), 'foo');
+is(MyApp::Controller::Foo->COMPONENT('MyApp')->action_namespace('Stub'), 'foo');
 
-is(MyApp::Controller::Root->COMPONENT->action_namespace('Stub'), '');
+is(MyApp::Controller::Root->COMPONENT('MyApp')->action_namespace('Stub'), '');

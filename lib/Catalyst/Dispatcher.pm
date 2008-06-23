@@ -1,5 +1,7 @@
 package Catalyst::Dispatcher;
 
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 use Class::MOP;
 

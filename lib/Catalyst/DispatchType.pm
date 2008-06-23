@@ -1,6 +1,7 @@
 package Catalyst::DispatchType;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose; # using it to add Moose::Object to @ISA ...
 no Moose;
 

@@ -1,6 +1,7 @@
 package Catalyst;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 extends 'Catalyst::Component';
 use bytes;
@@ -813,7 +814,7 @@ Catalyst> line.
 
 sub setup {
     my ( $class, @arguments ) = @_;
-
+    Class::C3::initialize;
     $class->log->warn("Running setup twice is not a good idea.")
       if ( $class->setup_finished );
 
@@ -933,6 +934,7 @@ EOF
     $class->log->_flush() if $class->log->can('_flush');
 
     $class->setup_finished(1);
+    Class::C3::initialize;
 }
 
 =head2 $c->uri_for( $path, @args?, \%query_values? )

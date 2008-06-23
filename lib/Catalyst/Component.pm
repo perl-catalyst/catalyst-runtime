@@ -1,6 +1,7 @@
 package Catalyst::Component;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;

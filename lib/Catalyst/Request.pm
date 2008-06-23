@@ -1,6 +1,7 @@
 package Catalyst::Request;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;

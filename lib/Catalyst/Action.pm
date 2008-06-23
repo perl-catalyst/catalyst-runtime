@@ -17,7 +17,8 @@ L<Catalyst::Controller> subclasses.
 
 =cut
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 
 has class => (is => 'rw');

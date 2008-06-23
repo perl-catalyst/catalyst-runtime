@@ -1,6 +1,7 @@
 package Catalyst::Response;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 use HTTP::Headers;
 

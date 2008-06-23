@@ -1,6 +1,7 @@
 package Catalyst::Base;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 BEGIN{ extends qw/Catalyst::Controller/ };
 no Moose;

@@ -1,5 +1,7 @@
 package Catalyst::View;
 
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 extends qw/Catalyst::Component/;
 

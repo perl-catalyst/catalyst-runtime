@@ -15,7 +15,8 @@ to represent the various dispatch points in your application.
 
 =cut
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 
 has part => (is => 'rw', required => 1, lazy => 1, default => sub { {} });

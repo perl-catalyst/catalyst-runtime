@@ -1,6 +1,7 @@
 package Catalyst::Engine;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 

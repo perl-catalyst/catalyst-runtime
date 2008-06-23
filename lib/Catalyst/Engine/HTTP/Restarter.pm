@@ -1,6 +1,7 @@
 package Catalyst::Engine::HTTP::Restarter;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 use Moose;
 extends 'Catalyst::Engine::HTTP';
 no Moose;
