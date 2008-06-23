@@ -130,9 +130,6 @@ sub finalize_error {
         # Don't show body parser in the dump
         delete $c->req->{_body};
 
-        # Don't show response header state in dump
-        delete $c->res->{_finalized_headers};
-
         my @infos;
         my $i = 0;
         for my $dump ( $c->dump_these ) {

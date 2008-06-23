@@ -49,15 +49,15 @@ sub dispatch {    # Execute ourselves against a context
     my ( $self, $c ) = @_;
     #Moose todo: grrrrrr. this is no good. i don't know enough about it to
     # debug it though. why can't we just call the accessor?
-    local $c->{namespace} = $self->namespace;
-    return $c->execute( $self->class, $self );
+    #local $c->{namespace} = $self->namespace;
+    #return $c->execute( $self->class, $self );
 
     #believed to be equivalent:
-    #my $orig = $c->namespace;
-    #$c->namespace($self->namespace);
-    #my $ret = $c->execute( $self->class, $self );
-    #$c->namespace($orig);
-    #return $ret;
+    my $orig = $c->namespace;
+    $c->namespace($self->namespace);
+    my $ret = $c->execute( $self->class, $self );
+    $c->namespace($orig);
+    return $ret;
 }
 
 sub execute {

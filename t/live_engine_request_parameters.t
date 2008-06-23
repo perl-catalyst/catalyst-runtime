@@ -32,7 +32,7 @@ use HTTP::Request::Common;
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     isa_ok( $creq, 'Catalyst::Request' );
     is( $creq->method, 'GET', 'Catalyst::Request method' );
-    is_deeply( $creq->{parameters}, $parameters,
+    is_deeply( $creq->parameters, $parameters,
         'Catalyst::Request parameters' );
 }
 
@@ -43,7 +43,7 @@ use HTTP::Request::Common;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     ok( eval '$creq = ' . $response->content );
-    is $creq->{parameters}->{q}, 'foo+bar', '%2b not double decoded';
+    is $creq->parameters->{q}, 'foo+bar', '%2b not double decoded';
 }
 
 {
@@ -53,7 +53,7 @@ use HTTP::Request::Common;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     ok( eval '$creq = ' . $response->content );
-    is $creq->{parameters}->{q}, 'foo=bar', '= not ignored';
+    is $creq->parameters->{q}, 'foo=bar', '= not ignored';
 }
 
 {
@@ -84,10 +84,10 @@ use HTTP::Request::Common;
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     isa_ok( $creq, 'Catalyst::Request' );
     is( $creq->method, 'POST', 'Catalyst::Request method' );
-    is_deeply( $creq->{parameters}, $parameters,
+    is_deeply( $creq->parameters, $parameters,
         'Catalyst::Request parameters' );
     is_deeply( $creq->arguments, [qw(a b)], 'Catalyst::Request arguments' );
-    is_deeply( $creq->{uploads}, {}, 'Catalyst::Request uploads' );
+    is_deeply( $creq->uploads,   {}, 'Catalyst::Request uploads' );
     is_deeply( $creq->cookies,   {}, 'Catalyst::Request cookie' );
 }
 
@@ -109,7 +109,7 @@ use HTTP::Request::Common;
 
     ok( my $response = request($request), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is_deeply( $creq->{parameters}, $parameters, 'Catalyst::Request parameters' );
+    is_deeply( $creq->parameters, $parameters, 'Catalyst::Request parameters' );
 }
 
 # raw query string support
@@ -129,11 +129,11 @@ use HTTP::Request::Common;
     
     ok( my $response = request($request), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is( $creq->{uri}->query, 'query+string', 'Catalyst::Request POST query_string' );
+    is( $creq->uri->query, 'query+string', 'Catalyst::Request POST query_string' );
     is( $creq->query_keywords, 'query string', 'Catalyst::Request query_keywords' );
-    is_deeply( $creq->{parameters}, $parameters, 'Catalyst::Request parameters' );
+    is_deeply( $creq->parameters, $parameters, 'Catalyst::Request parameters' );
     
     ok( $response = request('http://localhost/dump/request/a/b?x=1&y=1&z=1'), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is( $creq->{uri}->query, 'x=1&y=1&z=1', 'Catalyst::Request GET query_string' );
+    is( $creq->uri->query, 'x=1&y=1&z=1', 'Catalyst::Request GET query_string' );
 }

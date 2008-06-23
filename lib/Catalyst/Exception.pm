@@ -71,6 +71,7 @@ BEGIN {
     extends($CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base');
 }
 
-Catalyst::Exception->meta->make_immutable;
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;

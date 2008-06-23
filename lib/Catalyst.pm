@@ -29,14 +29,14 @@ use Carp qw/croak carp/;
 
 BEGIN { require 5.008001; }
 
-has stack => (is => 'rw');
-has stash => (is => 'rw');
-has state => (is => 'rw');
+has stack => (is => 'rw', default => sub { [] });
+has stash => (is => 'rw', default => sub { {} });
+has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');
 has action => (is => 'rw');
-has counter => (is => 'rw');
-has request => (is => 'rw');
-has response => (is => 'rw');
+has counter => (is => 'rw', default => sub { {} });
+has request => (is => 'rw', default => sub { $_[0]->request_class->new({}) }, required => 1, lazy => 1);
+has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
 has namespace => (is => 'rw');
 
 
@@ -46,8 +46,15 @@ sub depth { scalar @{ shift->stack || [] }; }
 
 # Laziness++
 *comp = \&component;
-*req  = \&request;
-*res  = \&response;
+
+sub req {
+    # carp "the use of req() is deprecated in favour of request()";
+    my $self = shift; return $self->request(@_);
+}
+sub res {
+    # carp "the use of res() is deprecated in favour of response()";
+    my $self = shift; return $self->response(@_);
+}
 
 # For backwards compatibility
 *finalize_output = \&finalize_body;
@@ -330,7 +337,7 @@ your code like this:
 
 =cut
 
-sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
+sub forward { my $c = shift; no warnings 'recursion'; $c->dispatcher->forward( $c, @_ ) }
 
 =head2 $c->detach( $action [, \@arguments ] )
 
@@ -375,14 +382,16 @@ Catalyst).
 around stash => sub {
     my $orig = shift;
     my $c = shift;
+
+    my $orig_stash = $c->$orig();
     if (@_) {
         my $stash = @_ > 1 ? {@_} : $_[0];
         croak('stash takes a hash or hashref') unless ref $stash;
         foreach my $key ( keys %$stash ) {
-            $c->$orig()->{$key} = $stash->{$key};
+            $orig_stash->{$key} = $stash->{$key};
         }
     }
-    return $c->$orig();
+    return $orig_stash;
 };
 
 =head2 $c->error
@@ -1429,9 +1438,8 @@ sub finalize_headers {
 
     my $response = $c->response; #accessor calls can add up?
 
-    # Moose TODO: Maybe this should be an attribute too?
     # Check if we already finalized headers
-    return if $response->{_finalized_headers};
+    return if $response->finalized_headers;
 
     # Handle redirects
     if ( my $location = $response->redirect ) {
@@ -1478,7 +1486,7 @@ sub finalize_headers {
     $c->engine->finalize_headers( $c, @_ );
 
     # Done
-    $response->{_finalized_headers} = 1;
+    $response->finalized_headers(1);
 }
 
 =head2 $c->finalize_output
@@ -1548,8 +1556,10 @@ sub handle_request {
     }
 
     $COUNT++;
-    #todo: reuse coderef from can
-    $class->log->_flush() if $class->log->can('_flush');
+    
+    if(my $coderef = $class->log->can('_flush')){
+        $class->log->$coderef();
+    }
     return $status;
 }
 
@@ -1563,49 +1573,22 @@ etc.).
 sub prepare {
     my ( $class, @arguments ) = @_;
 
-    #moose todo: context_class as attr with default
+    # XXX
+    # After the app/ctxt split, this should become an attribute based on something passed
+    # into the application.
     $class->context_class( ref $class || $class ) unless $class->context_class;
-    #Moose TODO: if we make empty containers the defaults then that can be
-    #handled by the context class itself instead of having this here
-    my $c = $class->context_class->new(
-        {
-            counter => {},
-            stack   => [],
-            request => $class->request_class->new(
-                {
-                    arguments        => [],
-                    body_parameters  => {},
-                    cookies          => {},
-                    headers          => HTTP::Headers->new,
-                    parameters       => {},
-                    query_parameters => {},
-                    secure           => 0,
-                    captures         => [],
-                    uploads          => {}
-                }
-            ),
-            response => $class->response_class->new(
-                {
-                    body    => '',
-                    cookies => {},
-                    headers => HTTP::Headers->new(),
-                    status  => 200
-                }
-            ),
-            stash => {},
-            state => 0
-        }
-    );
+   
+    my $c = $class->context_class->new({});
+
+    # For on-demand data
+    $c->request->_context($c);
+    $c->response->_context($c);
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
     if ( $c->debug ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );            
     }
-
-    # For on-demand data
-    $c->request->_context($c);
-    $c->response->_context($c);
 
     #XXX reuse coderef from can
     # Allow engine to direct the prepare flow (for POE)

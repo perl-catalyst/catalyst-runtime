@@ -328,6 +328,7 @@ sub uri_for_action {
    
 }
 
+no Moose;
 __PACKAGE__->meta->make_immutable;
 
 =head1 USAGE

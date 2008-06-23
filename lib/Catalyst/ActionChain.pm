@@ -57,6 +57,7 @@ sub from_chain {
     return $self->new({ %$final, chain => $actions });
 }
 
+no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 

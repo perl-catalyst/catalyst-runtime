@@ -171,10 +171,11 @@ sub forward {
 
     no warnings 'recursion';
 
-    #moose todo: reaching inside another object is bad
-    local $c->request->{arguments} = \@args;
+    my $orig_args = $c->request->arguments();
+    $c->request->arguments(\@args);
     $action->dispatch( $c );
-
+    $c->request->arguments($orig_args);
+    
     return $c->state;
 }
 
@@ -282,7 +283,6 @@ sub prepare_action {
         unshift @args, $arg;
     }
 
-    #Moose todo: This seems illegible, even if efficient.
     s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$req->captures||[]};
 
     $c->log->debug( 'Path is "' . $req->match . '"' )
@@ -531,6 +531,7 @@ sub _load_dispatch_types {
     return @loaded;
 }
 
+no Moose;
 __PACKAGE__->meta->make_immutable;
 
 =head2 meta

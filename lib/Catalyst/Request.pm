@@ -6,6 +6,7 @@ use utf8;
 use URI::http;
 use URI::https;
 use URI::QueryParam;
+use HTTP::Headers;
 
 use Moose;
 
@@ -26,6 +27,9 @@ has headers => (
   is      => 'rw',
   isa     => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header referer user_agent)],
+  default => sub { HTTP::Headers->new() },
+  required => 1,
+  lazy => 1,
 );
 
 has _context => (
@@ -54,7 +58,7 @@ has uploads => (
 
 before uploads => sub {
   my ($self) = @_;
-  $self->_context->prepare_body;
+  #$self->_context->prepare_body;
 };
 
 has parameters => (
@@ -66,7 +70,7 @@ has parameters => (
 
 before parameters => sub {
   my ($self, $params) = @_;
-  $self->_context->prepare_body();
+  #$self->_context->prepare_body();
   if ( $params && !ref $params ) {
     $self->_context->log->warn(
         "Attempt to retrieve '$params' with req->params(), " .

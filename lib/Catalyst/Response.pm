@@ -1,16 +1,20 @@
 package Catalyst::Response;
 
 use Moose;
+use HTTP::Headers;
 
-has cookies   => (is => 'rw');
-has body      => (is => 'rw');
+has cookies   => (is => 'rw', default => sub { {} });
+has body      => (is => 'rw', default => '');
 has location  => (is => 'rw');
-has status    => (is => 'rw');
+has status    => (is => 'rw', default => 200);
+has finalized_headers => (is => 'rw', default => 0);
 has headers   => (
   is      => 'rw',
   handles => [qw(content_encoding content_length content_type header)],
+  default => sub { HTTP::Headers->new() },
+  required => 1,
+  lazy => 1,
 );
-
 has _context => (
   is => 'rw',
   weak_ref => 1,

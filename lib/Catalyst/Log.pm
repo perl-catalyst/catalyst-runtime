@@ -99,6 +99,9 @@ sub _send_to_log {
     print STDERR @_;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
+
 1;
 
 __END__
