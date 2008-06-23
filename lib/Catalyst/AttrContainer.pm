@@ -4,6 +4,7 @@ use Moose;
 use Catalyst::Exception;
 
 with 'Catalyst::ClassData';
+use Scalar::Util 'blessed';
 
 no Moose;
 

@@ -1,6 +1,7 @@
 package Catalyst::ClassData;
 
 use Moose::Role;
+use Class::MOP;
 use Scalar::Util 'blessed';
 
 sub mk_classdata {
@@ -11,19 +12,20 @@ sub mk_classdata {
   my $slot = '$'.$attribute;
   my $accessor =  sub {
     if(@_ > 1){
-      $_[0]->meta->add_package_symbol($slot, \  $_[1]);
+      $_[0]->meta->add_package_symbol($slot, \ $_[1]);
       return $_[1];
     }
-    foreach my $super ( $_[0], $_[0]->meta->linearized_isa ) {
-      my $meta = $super->meta;
+
+    foreach my $super ( (blessed $_[0] || $_[0]), $_[0]->meta->linearized_isa ) {
+      my $meta = Moose::Meta::Class->initialize($super);
       if( $meta->has_package_symbol($slot) ){
-        return $meta->get_package_symbol($slot);
+        return ${ $meta->get_package_symbol($slot) };
       }
     }
     return;
   };
-  my $accessor = eval $code;
-  confess("Failed to create accessor: $@ \n $code \n")
+
+  confess("Failed to create accessor: $@ ")
     unless ref $accessor eq 'CODE';
 
   my $meta = $class->meta;
@@ -37,18 +39,3 @@ sub mk_classdata {
 1;
 
 __END__
-
-#   my $code = ' sub {
-#     if(@_ > 1){
-#       $_[0]->meta->add_package_symbol(\''.$slot.'\', \  $_[1]);
-#       return $_[1];
-#     }
-#     foreach my $super ( $_[0], $_[0]->meta->linearized_isa ) {
-#       my $meta = $super->meta;
-#       if( $meta->has_package_symbol(\''.$slot.'\') ){
-#         return $meta->get_package_symbol(\''.$slot.'\');
-#       }
-#     }
-#     return;
-#   }';
-#   my $accessor = eval $code;
