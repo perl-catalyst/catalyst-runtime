@@ -1,6 +1,7 @@
 package Catalyst::Controller;
 
 use Moose;
+use Class::MOP;
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 
 #Why does the following blow up?
@@ -21,11 +22,15 @@ has _namespace => (
                    predicate => '_has_namespace',
                  );
 
+__PACKAGE__->mk_accessors( qw/_application/ );
+
+has _application => (is => 'rw');
+sub _app{ shift->_application(@_) } # eww
+
 use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::Inspector;
-use NEXT;
 
 =head1 NAME
 
@@ -50,17 +55,13 @@ for more info about how Catalyst dispatches to actions.
 
 =cut
 
+#I think both of these could be attributes. doesn't really seem like they need
+#to ble class data. i think that attributes +default would work just fine
 __PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class/;
 
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
 __PACKAGE__->_action_class('Catalyst::Action');
 
-__PACKAGE__->mk_accessors( qw/_application/ );
-
-### _app as alias
-sub _app{ shift->_application }
-#for now.
-#*_app = *_application;
 
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
@@ -132,7 +133,7 @@ sub action_namespace {
     }
     if( ref($self) ){
       return $self->_namespace if $self->_has_namespace;
-    } # else {
+    } # else { #i think this is hacky and it should work with the else enabled
       return $self->config->{namespace} if exists $self->config->{namespace};
     #}
     return Catalyst::Utils::class2prefix( ref($self) || $self,
@@ -163,7 +164,7 @@ sub register_actions {
     if( $self->can('meta') ){
       my $meta = $self->meta;
       %methods = map{ $_->{code}->body => $_->{name} }
-        grep {$_->{class} ne 'Moose::Object'}
+        grep {$_->{class} ne 'Moose::Object'} #ignore Moose::Object methods
           $meta->compute_all_applicable_methods;
     } else { #until we are sure there's no moose stuff left...
       $methods{ $self->can($_) } = $_
@@ -215,9 +216,10 @@ sub create_action {
                     ? $args{attributes}{ActionClass}[0]
                     : $self->_action_class);
 
-    unless ( Class::Inspector->loaded($class) ) {
-        require Class::Inspector->filename($class);
-    }
+    Class::MOP::load_class($class);
+    #unless ( Class::Inspector->loaded($class) ) {
+    #    require Class::Inspector->filename($class);
+    #}
 
     return $class->new( \%args );
 }
@@ -243,6 +245,7 @@ sub _parse_attrs {
 
     #this will not work under moose
     #my $hash = (ref $self ? $self : $self->config); # hate app-is-class
+    #action / actions should be an attribute  of Controller
     my $hash = $self->config;
 
     if (exists $hash->{actions} || exists $hash->{action}) {
