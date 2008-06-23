@@ -26,10 +26,11 @@ our @PRELOAD = qw/Index Path Regex/;
 our @POSTLOAD = qw/Default/;
 
 has _tree => (is => 'rw');
-has _dispatch_types => (is => 'rw');
-has _registered_dispatch_types => (is => 'rw');
-has _method_action_class => (is => 'rw');
-has _action_container_class => (is => 'rw');
+has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
+has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
+has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
+has _action_container_class => (is => 'rw', default => 'Catalyst::ActionContainer');
+
 has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
 has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
@@ -460,10 +461,6 @@ sub _find_or_create_namespace_node {
 sub setup_actions {
     my ( $self, $c ) = @_;
 
-    $self->_dispatch_types( [] );
-    $self->_registered_dispatch_types( {} );
-    $self->_method_action_class('Catalyst::Action');
-    $self->_action_container_class('Catalyst::ActionContainer');
 
     my @classes =
       $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
