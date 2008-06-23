@@ -30,14 +30,14 @@ use Carp qw/croak carp/;
 
 BEGIN { require 5.008001; }
 
-has stack     => (is => 'rw');
-has stash     => (is => 'rw');
-has state     => (is => 'rw');
-has stats     => (is => 'rw');
-has action    => (is => 'rw');
-has counter   => (is => 'rw');
-has request   => (is => 'rw');
-has response  => (is => 'rw');
+has stack => (is => 'rw');
+has stash => (is => 'rw');
+has state => (is => 'rw');
+has stats => (is => 'rw');
+has action => (is => 'rw');
+has counter => (is => 'rw');
+has request => (is => 'rw');
+has response => (is => 'rw');
 has namespace => (is => 'rw');
 
 
@@ -59,6 +59,8 @@ our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = "catalyst_detach\n";
 
+#I imagine that very few of these really need to be class variables. if any.
+#maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
@@ -84,13 +86,17 @@ sub import {
     my $caller = caller(0);
 
     #why does called have to ISA Catalyst and ISA Controller ?
+    #Convert test suite to not use the behavior where Myapp ISA Controller
+    # after that is done we can eliminate that little mess.
     unless ( $caller->isa('Catalyst') ) {
         no strict 'refs';
         if( $caller->can('meta') ){
           my @superclasses = ($caller->meta->superclasses, $class, 'Catalyst::Controller');
+          #my @superclasses = ($caller->meta->superclasses, $class);
           $caller->meta->superclasses(@superclasses);
         } else {
           push @{"$caller\::ISA"}, $class, 'Catalyst::Controller';
+          #push @{"$caller\::ISA"}, $class;
         }
     }
 
@@ -1543,6 +1549,7 @@ sub handle_request {
     }
 
     $COUNT++;
+    #todo: reuse coderef from can
     $class->log->_flush() if $class->log->can('_flush');
     return $status;
 }
@@ -1557,6 +1564,7 @@ etc.).
 sub prepare {
     my ( $class, @arguments ) = @_;
 
+    #moose todo: context_class as attr with default
     $class->context_class( ref $class || $class ) unless $class->context_class;
     #Moose TODO: if we make empty containers the defaults then that can be
     #handled by the context class itself instead of having this here
@@ -1590,6 +1598,7 @@ sub prepare {
         }
     );
 
+    #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
     if ( $c->debug ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
@@ -1972,9 +1981,6 @@ sub setup_dispatcher {
     }
 
     Class::MOP::load_class($dispatcher);
-    #unless (Class::Inspector->loaded($dispatcher)) {
-    #    require Class::Inspector->filename($dispatcher);
-    #}
 
     # dispatcher instance
     $class->dispatcher( $dispatcher->new );
@@ -2114,11 +2120,8 @@ sub setup_home {
         $home = $env;
     }
 
-    unless ($home) {
-        $home = Catalyst::Utils::home($class);
-    }
+    $home ||= Catalyst::Utils::home($class);
 
-    #I remember recently being scolded for assigning config values like this
     if ($home) {
         #I remember recently being scolded for assigning config values like this
         $class->config->{home} ||= $home;
@@ -2207,7 +2210,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         # no ignore_loaded here, the plugin may already have been
         # defined in memory and we don't want to error on "no file" if so
 
-        Catalyst::Utils::ensure_class_loaded( $plugin );
+        Class::MOP::load_class( $plugin );
 
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {

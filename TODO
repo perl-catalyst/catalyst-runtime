@@ -12,6 +12,9 @@
 
 
   - GRODITI's list:
+    * Update Test suite to not assume MyApp ISA Controller
+      - After that I'll set up attr handlers that will output helpful
+        error messages when you do it as well as how to fix it.
     * comments marked /Moose TODO/i in the code
     * Fix the CDI compat hack so we can start moving to immutable
     * Profile before and after immutable.
