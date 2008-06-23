@@ -1572,10 +1572,8 @@ sub prepare {
     }
 
     # For on-demand data
-    $c->request->{_context}  = $c;
-    $c->response->{_context} = $c;
-    weaken( $c->request->{_context} );
-    weaken( $c->response->{_context} );
+    $c->request->_context($c);
+    $c->response->_context($c);
 
     # Allow engine to direct the prepare flow (for POE)
     if ( $c->engine->can('prepare') ) {

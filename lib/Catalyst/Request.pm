@@ -1,8 +1,5 @@
 package Catalyst::Request;
 
-use strict;
-use base 'Class::Accessor::Fast';
-
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;
@@ -10,25 +7,115 @@ use URI::http;
 use URI::https;
 use URI::QueryParam;
 
-__PACKAGE__->mk_accessors(
-    qw/action address arguments cookies headers query_keywords match method
-      protocol query_parameters secure captures uri user/
+use Moose;
+
+has action            => (is => 'rw');
+has address           => (is => 'rw');
+has arguments         => (is => 'rw', default => sub { [] });
+has cookies           => (is => 'rw', default => sub { {} });
+has query_keywords    => (is => 'rw');
+has match             => (is => 'rw');
+has method            => (is => 'rw');
+has protocol          => (is => 'rw');
+has query_parameters  => (is => 'rw', default => sub { {} });
+has secure            => (is => 'rw', default => 0);
+has captures          => (is => 'rw', default => sub { [] });
+has uri               => (is => 'rw');
+has user              => (is => 'rw');
+has headers           => (
+  is      => 'rw', 
+  isa     => 'HTTP::Headers',
+  handles => [qw(content_encoding content_length content_type header referer user_agent)],
 );
 
-*args         = \&arguments;
-*body_params  = \&body_parameters;
-*input        = \&body;
-*params       = \&parameters;
-*query_params = \&query_parameters;
-*path_info    = \&path;
-*snippets     = \&captures;
+has _context => (
+  is => 'rw',
+  weak_ref => 1,
+);
 
-sub content_encoding { shift->headers->content_encoding(@_) }
-sub content_length   { shift->headers->content_length(@_) }
-sub content_type     { shift->headers->content_type(@_) }
-sub header           { shift->headers->header(@_) }
-sub referer          { shift->headers->referer(@_) }
-sub user_agent       { shift->headers->user_agent(@_) }
+has body_parameters => (
+  is        => 'rw',
+  required  => 1,
+  lazy      => 1,
+  default   => sub { {} },
+);
+
+before body_parameters => sub {
+  my ($self) = @_;
+  $self->_context->prepare_body();
+};
+
+has uploads => (
+  is        => 'rw',
+  required  => 1,
+  lazy      => 1,
+  default   => sub { {} },
+);
+
+before uploads => sub {
+  my ($self) = @_;
+  $self->_context->prepare_body;
+};
+
+has parameters => (
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub { {} },
+);
+
+before parameters => sub {
+  my ($self, $params) = @_;
+  $self->_context->prepare_body();
+  if ( $params && !ref $params ) {
+    $self->_context->log->warn( 
+        "Attempt to retrieve '$params' with req->params(), " .
+        "you probably meant to call req->param('$params')" );
+    $params = undef;
+  }
+
+};
+
+has base => (
+  is        => 'rw',
+  required  => 1,
+  lazy      => 1,
+  default   => sub {
+    my $self = shift;
+    if( $self->uri ){
+      return $self->path;
+    }
+  },
+);
+
+has body => (
+  is => 'rw'
+);
+
+before body => sub {
+  my ($self) = @_;
+  $self->_context->prepare_body();
+};
+
+has hostname => (
+  is        => 'rw',
+  required  => 1,
+  lazy      => 1,
+  default   => sub {
+    my ($self) = @_;
+    gethostbyaddr( inet_aton( $self->address ), AF_INET )
+  },
+);
+
+no Moose;
+
+sub args            { shift->arguments(@_) }
+sub body_params     { shift->body_parameters(@_) }
+sub input           { shift->body(@_) }
+sub params          { shift->parameters(@_) }
+sub query_params    { shift->query_parameters(@_) }
+sub path_info       { shift->path(@_) }
+sub snippets        { shift->captures(@_) }
 
 =head1 NAME
 
@@ -122,38 +209,10 @@ Contains the URI base. This will always have a trailing slash.
 If your application was queried with the URI
 C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
-=cut
-
-sub base {
-    my ( $self, $base ) = @_;
-
-    return $self->{base} unless $base;
-
-    $self->{base} = $base;
-
-    # set the value in path for backwards-compat
-    if ( $self->uri ) {
-        $self->path;
-    }
-
-    return $self->{base};
-}
-
 =head2 $req->body
 
 Returns the message body of the request, unless Content-Type is
 C<application/x-www-form-urlencoded> or C<multipart/form-data>.
-
-=cut
-
-sub body {
-    my $self = shift;
-    $self->{_context}->prepare_body;
-    
-    return unless $self->{_body};
-    
-    return $self->{_body}->body;
-}
 
 =head2 $req->body_parameters
 
@@ -168,15 +227,6 @@ These are the parameters from the POST part of the request, if any.
 =head2 $req->body_params
 
 Shortcut for body_parameters.
-
-=cut
-
-sub body_parameters {
-    my ( $self, $params ) = @_;
-    $self->{_context}->prepare_body;
-    $self->{body_parameters} = $params if $params;
-    return $self->{body_parameters};
-}
 
 =head2 $req->content_encoding
 
@@ -241,23 +291,6 @@ Returns an L<HTTP::Headers> object containing the headers for the current reques
 
 Returns the hostname of the client.
     
-=cut
-
-sub hostname {
-    my $self = shift;
-
-    if ( @_ == 0 && not $self->{hostname} ) {
-        $self->{hostname} =
-          gethostbyaddr( inet_aton( $self->address ), AF_INET );
-    }
-
-    if ( @_ == 1 ) {
-        $self->{hostname} = shift;
-    }
-
-    return $self->{hostname};
-}
-
 =head2 $req->input
 
 Alias for $req->body.
@@ -348,24 +381,6 @@ This is the combination of C<query_parameters> and C<body_parameters>.
 
 Shortcut for $req->parameters.
 
-=cut
-
-sub parameters {
-    my ( $self, $params ) = @_;
-    $self->{_context}->prepare_body;
-    if ( $params ) {
-        if ( ref $params ) {
-            $self->{parameters} = $params;
-        }
-        else {
-            $self->{_context}->log->warn( 
-                "Attempt to retrieve '$params' with req->params(), " .
-                "you probably meant to call req->param('$params')" );
-        }
-    }
-    return $self->{parameters};
-}
-
 =head2 $req->path
 
 Returns the path, i.e. the part of the URI after $req->base, for the current request.
@@ -421,7 +436,7 @@ You have to set MyApp->config->{parse_on_demand} to use this directly.
 
 =cut
 
-sub read { shift->{_context}->read(@_); }
+sub read { shift->_context->read(@_); }
 
 =head2 $req->referer
 
@@ -509,15 +524,6 @@ L<Catalyst::Request::Upload> objects.
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
 
-=cut
-
-sub uploads {
-    my ( $self, $uploads ) = @_;
-    $self->{_context}->prepare_body;
-    $self->{uploads} = $uploads if $uploads;
-    return $self->{uploads};
-}
-
 =head2 $req->uri
 
 Returns a URI object for the current request. Stringifies to the URI text.
@@ -561,6 +567,10 @@ newer plugins is $c->user.
 
 Shortcut to $req->headers->user_agent. Returns the user agent (browser)
 version string.
+
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHORS
 

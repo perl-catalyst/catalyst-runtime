@@ -1,8 +1,9 @@
 package Catalyst::ActionChain;
 
-use strict;
-use base qw/Catalyst::Action/;
+use Moose;
+extends qw(Catalyst::Action);
 
+has chain => (is => 'rw');
 
 =head1 NAME
 
@@ -19,8 +20,6 @@ the action at the *end* of the chain except on dispatch it will execute all
 the actions in the chain in order.
 
 =cut
-
-__PACKAGE__->mk_accessors(qw/chain/);
 
 use overload (
 
@@ -79,7 +78,9 @@ actions in order.
 Takes a list of Catalyst::Action objects and constructs and returns a
 Catalyst::ActionChain object representing a chain of these actions
 
-=cut
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHOR
 

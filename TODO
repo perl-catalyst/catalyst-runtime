@@ -1,0 +1,12 @@
+
+  - Add Class::Accessor compats
+    * Catalyst::Request
+    * Catalyst::Response
+    * Catalyst::Dispatcher
+    * Catalyst::Request::Upload
+    * Catalyst::Action
+    * Catalyst::ActionChain
+    * Catalyst::ActionContainer
+
+  - Make classes immutable at setup() time
+

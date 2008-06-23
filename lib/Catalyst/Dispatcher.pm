@@ -1,7 +1,7 @@
 package Catalyst::Dispatcher;
 
-use strict;
-use base 'Class::Accessor::Fast';
+use Moose;
+
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Catalyst::Action;
@@ -16,19 +16,24 @@ use Scalar::Util ();
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
 
-__PACKAGE__->mk_accessors(
-    qw/tree dispatch_types registered_dispatch_types
-      method_action_class action_container_class
-      preload_dispatch_types postload_dispatch_types
-      action_hash container_hash
-      /
-);
 
 # Preload these action types
 our @PRELOAD = qw/Index Path Regex/;
 
 # Postload these action types
 our @POSTLOAD = qw/Default/;
+
+has _tree                       => (is => 'rw');
+has _dispatch_types             => (is => 'rw');
+has _registered_dispatch_types  => (is => 'rw');
+has _method_action_class        => (is => 'rw');
+has _action_container_class     => (is => 'rw');
+has preload_dispatch_types      => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
+has postload_dispatch_types     => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
+has _action_hash                => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has _container_hash             => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+
+no Moose;
 
 =head1 NAME
 
@@ -51,24 +56,13 @@ Construct a new dispatcher.
 
 =cut
 
-sub new {
-    my $self  = shift;
-    my $class = ref($self) || $self;
+sub BUILD {
+  my ($self, $params) = @_;
 
-    my $obj = $class->SUPER::new(@_);
+  my $container = 
+    Catalyst::ActionContainer->new( { part => '/', actions => {} } );
 
-    # set the default pre- and and postloads
-    $obj->preload_dispatch_types( \@PRELOAD );
-    $obj->postload_dispatch_types( \@POSTLOAD );
-    $obj->action_hash(    {} );
-    $obj->container_hash( {} );
-
-    # Create the root node of the tree
-    my $container =
-      Catalyst::ActionContainer->new( { part => '/', actions => {} } );
-    $obj->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
-
-    return $obj;
+  $self->_tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 }
 
 =head2 $self->preload_dispatch_types
@@ -173,6 +167,8 @@ sub forward {
 
     #push @$args, @_;
 
+    no warnings 'recursion';
+
     local $c->request->{arguments} = \@args;
     $action->dispatch( $c );
 
@@ -227,7 +223,7 @@ sub _invoke_as_component {
     my $class = $self->_find_component_class( $c, $component ) || return 0;
 
     if ( my $code = $class->can($method) ) {
-        return $self->method_action_class->new(
+        return $self->_method_action_class->new(
             {
                 name      => $method,
                 code      => $code,
@@ -272,7 +268,7 @@ sub prepare_action {
         # Check out dispatch types to see if any will handle the path at
         # this level
 
-        foreach my $type ( @{ $self->dispatch_types } ) {
+        foreach my $type ( @{ $self->_dispatch_types } ) {
             last DESCEND if $type->match( $c, $path );
         }
 
@@ -303,7 +299,7 @@ sub get_action {
 
     $namespace = join( "/", grep { length } split '/', $namespace || "" );
 
-    return $self->action_hash->{"$namespace/$name"};
+    return $self->_action_hash->{"$namespace/$name"};
 }
 
 =head2 $self->get_action_by_path( $path ); 
@@ -316,7 +312,7 @@ sub get_action_by_path {
     my ( $self, $path ) = @_;
     $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
-    $self->action_hash->{$path};
+    $self->_action_hash->{$path};
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -349,11 +345,11 @@ sub get_containers {
 
     if ( length $namespace ) {
         do {
-            push @containers, $self->container_hash->{$namespace};
+            push @containers, $self->_container_hash->{$namespace};
         } while ( $namespace =~ s#/[^/]+$## );
     }
 
-    return reverse grep { defined } @containers, $self->container_hash->{''};
+    return reverse grep { defined } @containers, $self->_container_hash->{''};
 
     my @parts = split '/', $namespace;
 }
@@ -372,7 +368,7 @@ cannot determine an appropriate URI, this method will return undef.
 sub uri_for_action {
     my ( $self, $action, $captures) = @_;
     $captures ||= [];
-    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
+    foreach my $dispatch_type ( @{ $self->_dispatch_types } ) {
         my $uri = $dispatch_type->uri_for_action( $action, $captures );
         return( $uri eq '' ? '/' : $uri )
             if defined($uri);
@@ -391,7 +387,7 @@ Also, set up the tree with the action containers.
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my $registered = $self->registered_dispatch_types;
+    my $registered = $self->_registered_dispatch_types;
 
     my $priv = 0;
     foreach my $key ( keys %{ $action->attributes } ) {
@@ -399,13 +395,13 @@ sub register {
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
             eval "require $class";
-            push( @{ $self->dispatch_types }, $class->new ) unless $@;
+            push( @{ $self->_dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;
         }
     }
 
     # Pass the action to our dispatch types so they can register it if reqd.
-    foreach my $type ( @{ $self->dispatch_types } ) {
+    foreach my $type ( @{ $self->_dispatch_types } ) {
         $type->register( $c, $action );
     }
 
@@ -417,14 +413,14 @@ sub register {
     # Set the method value
     $container->add_action($action);
 
-    $self->action_hash->{"$namespace/$name"} = $action;
-    $self->container_hash->{$namespace} = $container;
+    $self->_action_hash->{"$namespace/$name"} = $action;
+    $self->_container_hash->{$namespace} = $container;
 }
 
 sub _find_or_create_action_container {
     my ( $self, $namespace ) = @_;
 
-    my $tree ||= $self->tree;
+    my $tree ||= $self->_tree;
 
     return $tree->getNodeValue unless $namespace;
 
@@ -457,14 +453,14 @@ sub _find_or_create_namespace_node {
 sub setup_actions {
     my ( $self, $c ) = @_;
 
-    $self->dispatch_types( [] );
-    $self->registered_dispatch_types( {} );
-    $self->method_action_class('Catalyst::Action');
-    $self->action_container_class('Catalyst::ActionContainer');
+    $self->_dispatch_types( [] );
+    $self->_registered_dispatch_types( {} );
+    $self->_method_action_class('Catalyst::Action');
+    $self->_action_container_class('Catalyst::ActionContainer');
 
     my @classes =
       $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
-    @{ $self->registered_dispatch_types }{@classes} = (1) x @classes;
+    @{ $self->_registered_dispatch_types }{@classes} = (1) x @classes;
 
     foreach my $comp ( values %{ $c->components } ) {
         $comp->register_actions($c) if $comp->can('register_actions');
@@ -499,12 +495,12 @@ sub setup_actions {
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
 
-    $walker->( $walker, $self->tree, '' );
+    $walker->( $walker, $self->_tree, '' );
     $c->log->debug( "Loaded Private actions:\n" . $privates->draw . "\n" )
       if $has_private;
 
     # List all public actions
-    $_->list($c) for @{ $self->dispatch_types };
+    $_->list($c) for @{ $self->_dispatch_types };
 }
 
 sub _load_dispatch_types {
@@ -519,13 +515,17 @@ sub _load_dispatch_types {
         eval "require $class";
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
-        push @{ $self->dispatch_types }, $class->new;
+        push @{ $self->_dispatch_types }, $class->new;
 
         push @loaded, $class;
     }
 
     return @loaded;
 }
+
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHOR
 

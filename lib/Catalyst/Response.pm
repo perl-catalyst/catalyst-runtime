@@ -1,16 +1,24 @@
 package Catalyst::Response;
 
-use strict;
-use base 'Class::Accessor::Fast';
+use Moose;
 
-__PACKAGE__->mk_accessors(qw/cookies body headers location status/);
+has cookies   => (is => 'rw');
+has body      => (is => 'rw');
+has location  => (is => 'rw');
+has status    => (is => 'rw');
+has headers   => (
+  is      => 'rw',
+  handles => [qw(content_encoding content_length content_type header)],
+);
 
-*output = \&body;
+has _context => (
+  is => 'rw',
+  weak_ref => 1,
+);
 
-sub content_encoding { shift->headers->content_encoding(@_) }
-sub content_length   { shift->headers->content_length(@_) }
-sub content_type     { shift->headers->content_type(@_) }
-sub header           { shift->headers->header(@_) }
+sub output { shift->body(@_) }
+
+no Moose;
 
 =head1 NAME
 
@@ -127,6 +135,10 @@ sub redirect {
     return $self->location;
 }
 
+=head2 $res->location
+
+Sets or returns the HTTP 'Location'.
+
 =head2 $res->status
 
 Sets or returns the HTTP status.
@@ -139,7 +151,11 @@ Writes $data to the output stream.
 
 =cut
 
-sub write { shift->{_context}->write(@_); }
+sub write { shift->_context->write(@_); }
+
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHORS
 

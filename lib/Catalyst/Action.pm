@@ -1,9 +1,5 @@
 package Catalyst::Action;
 
-use strict;
-use base qw/Class::Accessor::Fast/;
-
-
 =head1 NAME
 
 Catalyst::Action - Catalyst Action
@@ -21,12 +17,25 @@ L<Catalyst::Controller> subclasses.
 
 =cut
 
-__PACKAGE__->mk_accessors(qw/class namespace reverse attributes name code/);
+use Moose;
+
+has class       => (is => 'rw');
+has namespace   => (is => 'rw');
+has 'reverse'   => (is => 'rw');
+has attributes  => (is => 'rw');
+has name        => (is => 'rw');
+has code        => (is => 'rw');
+
+no Moose;
+
+no warnings 'recursion';
+
+#__PACKAGE__->mk_accessors(qw/class namespace reverse attributes name code/);
 
 use overload (
 
     # Stringify to reverse for debug output etc.
-    q{""} => sub { shift->{reverse} },
+    q{""} => sub { shift->reverse() },
 
     # Codulate to execute to invoke the encapsulated action coderef
     '&{}' => sub { my $self = shift; sub { $self->execute(@_); }; },
@@ -44,7 +53,7 @@ sub dispatch {    # Execute ourselves against a context
 
 sub execute {
   my $self = shift;
-  $self->{code}->(@_);
+  $self->code->(@_);
 }
 
 sub match {
@@ -99,6 +108,10 @@ Returns the private path for this action.
 =head2 name
 
 returns the sub name of this action.
+
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHOR
 

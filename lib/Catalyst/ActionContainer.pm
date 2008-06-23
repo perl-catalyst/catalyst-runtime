@@ -1,8 +1,5 @@
 package Catalyst::ActionContainer;
 
-use strict;
-use base qw/Class::Accessor::Fast/;
-
 =head1 NAME
 
 Catalyst::ActionContainer - Catalyst Action Container
@@ -18,24 +15,19 @@ to represent the various dispatch points in your application.
 
 =cut
 
-__PACKAGE__->mk_accessors(qw/part actions/);
+use Moose;
 
-use overload (
+has part    => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
-    # Stringify to path part for tree search
-    q{""} => sub { shift->{part} },
+around 'new' => sub {
+  my $next = shift;
+  my ($self, $params) = @_;
+  $params = { part => $params } unless ref $params;
+  $next->($self, $params);
+};
 
-);
-
-sub new {
-    my ( $class, $fields ) = @_;
-
-    $fields = { part => $fields, actions => {} } unless ref $fields;
-
-    $class->SUPER::new($fields);
-}
-
-
+no Moose;
 
 sub get_action {
     my ( $self, $name ) = @_;
@@ -77,6 +69,10 @@ Accessor to the actions hashref, containing all actions in this container.
 
 Accessor to the path part this container resolves to. Also what the container
 stringifies to.
+
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHOR
 
