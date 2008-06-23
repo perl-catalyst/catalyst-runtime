@@ -9,6 +9,27 @@ use Text::SimpleTable;
 use Catalyst::ActionChain;
 use URI;
 
+has _endpoints => (
+                   is => 'rw',
+                   isa => 'ArrayRef',
+                   required => 1,
+                   default => sub{ [] },
+                  );
+
+has _actions => (
+                 is => 'rw',
+                 isa => 'HashRef',
+                 required => 1,
+                 default => sub{ {} },
+                );
+
+has _children_of => (
+                     is => 'rw',
+                     isa => 'HashRef',
+                     required => 1,
+                     default => sub{ {} },
+                    );
+
 # please don't perltidy this. hairy code within.
 
 =head1 NAME
@@ -44,7 +65,7 @@ Debug output for Path Part dispatch points
 sub list {
     my ( $self, $c ) = @_;
 
-    return unless $self->{endpoints};
+    return unless $self->_endpoints;
 
     my $paths = Text::SimpleTable->new(
                     [ 35, 'Path Spec' ], [ 36, 'Private' ]
@@ -52,7 +73,7 @@ sub list {
 
     ENDPOINT: foreach my $endpoint (
                   sort { $a->reverse cmp $b->reverse }
-                           @{ $self->{endpoints} }
+                           @{ $self->_endpoints }
                   ) {
         my $args = $endpoint->attributes->{Args}->[0];
         my @parts = (defined($args) ? (("*") x $args) : '...');
@@ -68,7 +89,7 @@ sub list {
                     if (defined $pp->[0] && length $pp->[0]);
             }
             $parent = $curr->attributes->{Chained}->[0];
-            $curr = $self->{actions}{$parent};
+            $curr = $self->_actions->{$parent};
             unshift(@parents, $curr) if $curr;
         }
         next ENDPOINT unless $parent eq '/'; # skip dangling action
@@ -128,7 +149,7 @@ Recursive search for a matching chain.
 
 sub recurse_match {
     my ( $self, $c, $parent, $path_parts ) = @_;
-    my $children = $self->{children_of}{$parent};
+    my $children = $self->_children_of->{$parent};
     return () unless $children;
     my $best_action;
     my @captures;
@@ -235,7 +256,7 @@ sub register {
 
     $action->attributes->{Chained} = [ $parent ];
 
-    my $children = ($self->{children_of}{$parent} ||= {});
+    my $children = ($self->_children_of->{$parent} ||= {});
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 
@@ -259,10 +280,10 @@ sub register {
 
     unshift(@{ $children->{$part} ||= [] }, $action);
 
-    ($self->{actions} ||= {})->{'/'.$action->reverse} = $action;
+    $self->_actions->{'/'.$action->reverse} = $action;
 
     unless ($action->attributes->{CaptureArgs}) {
-        unshift(@{ $self->{endpoints} ||= [] }, $action);
+        unshift(@{ $self->_endpoints }, $action);
     }
 
     return 1;
@@ -297,7 +318,7 @@ sub uri_for_action {
                 if (defined($pp->[0]) && length($pp->[0]));
         }
         $parent = $curr->attributes->{Chained}->[0];
-        $curr = $self->{actions}{$parent};
+        $curr = $self->_actions->{$parent};
     }
 
     return undef unless $parent eq '/'; # fail for dangling action
