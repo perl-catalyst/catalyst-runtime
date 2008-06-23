@@ -1,17 +1,27 @@
 package Catalyst::Component;
 
 use Moose;
-use MooseX::ClassAttribute;
+#use MooseX::ClassAttribute;
 use Catalyst::Utils;
+use Class::Data::Inheritable;
+use NEXT;
 
-has _config  => (
-                 is => 'rw',
-                 isa => 'HashRef',
-                 required => 1,
-                 default => sub { {} }
-                );
+{
+  my $mk_classdata =  Class::Data::Inheritable->can('mk_classdata');
+  __PACKAGE__->meta->add_method(mk_classdata => $mk_classdata);
+}
 
-class_has _plugins => ( is => 'rw' );
+__PACKAGE__->mk_classdata(_config => {});
+__PACKAGE__->mk_classdata('_plugins');
+
+# class_has _config  => (
+#                  is => 'rw',
+#                  isa => 'HashRef',
+#                  required => 1,
+#                  default => sub { {} }
+#                 );
+
+# class_has _plugins => ( is => 'rw' );
 
 
 =head1 NAME
@@ -81,6 +91,7 @@ sub COMPONENT {
     if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
         return $new;
     }
+    #new here will always pass because $self ISA Moose::Object
     else {
         if ( my $new = $self->new( $c, $arguments ) ) {
             return $new;
@@ -89,6 +100,7 @@ sub COMPONENT {
             my $class = ref $self || $self;
             my $new   = $self->merge_config_hashes(
                 $self->config, $arguments );
+            #this will break, Moose::Object::new won't act like this
             return bless $new, $class;
         }
     }

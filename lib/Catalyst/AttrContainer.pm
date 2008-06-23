@@ -1,21 +1,29 @@
 package Catalyst::AttrContainer;
 
 use Moose;
-use MooseX::ClassAttribute;
+#use MooseX::ClassAttribute;
 use Catalyst::Exception;
+use Class::Data::Inheritable;
+{
+  my $mk_classdata =  Class::Data::Inheritable->can('mk_classdata');
+  __PACKAGE__->meta->add_method(mk_classdata => $mk_classdata);
+}
 
-class_has _attr_cache   => (
-                            is => 'rw',
-                            isa => 'HashRef',
-                            required => 1,
-                            default => sub{{}}
-                           );
-class_has _action_cache => (
-                            is => 'rw',
-                            isa => 'ArrayRef',
-                            required => 1,
-                            default => sub{ [] }
-                          );
+__PACKAGE__->mk_classdata(_attr_cache   => {});
+__PACKAGE__->mk_classdata(_action_cache => []);
+
+# class_has _attr_cache   => (
+#                             is => 'rw',
+#                             isa => 'HashRef',
+#                             required => 1,
+#                             default => sub{{}}
+#                            );
+# class_has _action_cache => (
+#                             is => 'rw',
+#                             isa => 'ArrayRef',
+#                             required => 1,
+#                             default => sub{ [] }
+#                           );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {

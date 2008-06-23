@@ -1,12 +1,42 @@
 package Catalyst::Controller;
 
-use strict;
-use base qw/Catalyst::Component Catalyst::AttrContainer Class::Accessor::Fast/;
-
+use Moose;
+use Class::MOP ();
+#use MooseX::ClassAttribute;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::Inspector;
 use NEXT;
+
+#extends qw/Catalyst::Component Catalyst::AttrContainer/;
+use base qw/Catalyst::Component Catalyst::AttrContainer/;
+
+# class_has _dispatch_steps =>
+#   (
+#    is => 'rw',
+#    isa => 'ArrayRef',
+#    required => 1,
+#    default => sub{ [qw/_BEGIN _AUTO _ACTION/] },
+#   );
+
+# class_has _action_class =>
+#   (
+#    is => 'rw',
+#    isa => 'ClassName',
+#    required => 1,
+#    default => sub{ 'Catalyst::Action' },
+#   );
+
+__PACKAGE__->mk_classdata('_dispatch_steps');
+__PACKAGE__->mk_classdata('_action_class');
+
+__PACKAGE__->_action_class('Catalyst::Action');
+__PACKAGE__->_dispatch_steps([qw/_BEGIN _AUTO _ACTION/]);
+
+
+has _application => ( is => 'rw' );
+### _app as alias
+*_app = *_application;
 
 =head1 NAME
 
@@ -17,9 +47,9 @@ Catalyst::Controller - Catalyst Controller base class
   package MyApp::Controller::Search
   use base qw/Catalyst::Controller/;
 
-  sub foo : Local { 
+  sub foo : Local {
     my ($self,$c,@args) = @_;
-    ... 
+    ...
   } # Dispatches to /search/foo
 
 =head1 DESCRIPTION
@@ -31,15 +61,17 @@ for more info about how Catalyst dispatches to actions.
 
 =cut
 
-__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class/;
+# just emulating old behavior. we could probably do this
+# via BUILD later or pass $app as application => $app
+around new => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $app = $_[0];
+    my $new = $self->$orig(@_);
+    $new->_application( $app );
+    return $new;
+};
 
-__PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
-__PACKAGE__->_action_class('Catalyst::Action');
-
-__PACKAGE__->mk_accessors( qw/_application/ );
-
-### _app as alias
-*_app = *_application;
 
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
@@ -88,15 +120,6 @@ sub _END : Private {
     return !@{ $c->error };
 }
 
-sub new {
-    my $self = shift;
-    my $app = $_[0];
-    my $new = $self->NEXT::new(@_);
-    $new->_application( $app );
-    return $new;
-}
-
-
 sub action_for {
     my ( $self, $name ) = @_;
     my $app = ($self->isa('Catalyst') ? $self : $self->_application);
@@ -131,9 +154,12 @@ sub register_actions {
     my $class = ref $self || $self;
     my $namespace = $self->action_namespace($c);
     my %methods;
-    $methods{ $self->can($_) } = $_
-      for @{ Class::Inspector->methods($class) || [] };
+    {
+      my $meth_map = $class->meta->get_method_map;
+      @methods{values %$meth_map} = (keys %$meth_map);
+    }
 
+    #Moose TODO: something tells me that roles could kill the directly code below
     # Advanced inheritance support for plugins and the like
     my @action_cache;
     {
@@ -178,10 +204,12 @@ sub create_action {
                     ? $args{attributes}{ActionClass}[0]
                     : $self->_action_class);
 
-    unless ( Class::Inspector->loaded($class) ) {
-        require Class::Inspector->filename($class);
-    }
-    
+    #can we replace with a single call to Class::MOP::load_class() ?
+    #unless ( Class::Inspector->loaded($class) ) {
+    #    require Class::Inspector->filename($class);
+    #}
+    Class::MOP::load_class($class);
+
     return $class->new( \%args );
 }
 
@@ -310,7 +338,7 @@ controller name. For instance controller 'MyApp::Controller::Foo::Bar'
 will be bound to 'foo/bar'. The default Root controller is an example
 of setting namespace to '' (the null string).
 
-=head2 path 
+=head2 path
 
 Sets 'path_prefix', as described below.
 
