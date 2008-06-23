@@ -1,12 +1,11 @@
 package Catalyst::Engine::HTTP::Restarter;
 
-use strict;
-use warnings;
-use base 'Catalyst::Engine::HTTP';
+use Moose;
+extends 'Catalyst::Engine::HTTP';
 use Catalyst::Engine::HTTP::Restarter::Watcher;
-use NEXT;
 
-sub run {
+around run => sub {
+    my $orig = shift;
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
@@ -19,8 +18,8 @@ sub run {
         close STDOUT;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
-            directory => ( 
-                $options->{restart_directory} || 
+            directory => (
+                $options->{restart_directory} ||
                 File::Spec->catdir( $FindBin::Bin, '..' )
             ),
             follow_symlinks => $options->{follow_symlinks},
@@ -67,8 +66,8 @@ sub run {
         }
     }
 
-    return $self->NEXT::run( $class, $port, $host, $options );
-}
+    return $self->$orig( $class, $port, $host, $options );
+};
 
 1;
 __END__

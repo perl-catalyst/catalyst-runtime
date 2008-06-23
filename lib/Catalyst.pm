@@ -13,7 +13,6 @@ use Catalyst::Controller;
 use Devel::InnerPackage ();
 use File::stat;
 use Module::Pluggable::Object ();
-use NEXT;
 use Text::SimpleTable ();
 use Path::Class::Dir ();
 use Path::Class::File ();

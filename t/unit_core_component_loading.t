@@ -40,7 +40,7 @@ my @components = (
     { type => 'View', prefix => 'View', name => 'Foo' },
 );
 
-sub write_component_file { 
+sub write_component_file {
   my ($dir_list, $module_name, $content) = @_;
 
   my $dir  = File::Spec->catdir(@$dir_list);
@@ -63,6 +63,7 @@ sub make_component_file {
 
     write_component_file(\@dir_list, $name_final, <<EOF);
 package $fullname;
+use NEXT;
 use base '$compbase';
 sub COMPONENT {
     my \$self = shift->NEXT::COMPONENT(\@_);
@@ -164,7 +165,7 @@ write_component_file([$libdir, $appclass, 'Model'], 'TopLevel', <<EOF);
 package ${appclass}::Model::TopLevel;
 use base 'Catalyst::Model';
 sub COMPONENT {
- 
+
     my \$self = shift->NEXT::COMPONENT(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };

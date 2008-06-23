@@ -1,7 +1,8 @@
 package Catalyst::Engine;
 
-use strict;
-use base 'Class::Accessor::Fast';
+use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 use CGI::Simple::Cookie;
 use Data::Dump qw/dump/;
 use Errno 'EWOULDBLOCK';
@@ -12,7 +13,8 @@ use URI::QueryParam;
 use Scalar::Util ();
 
 # input position and length
-__PACKAGE__->mk_accessors(qw/read_position read_length/);
+has read_length => (is => 'rw');
+has read_position => (is => 'rw');
 
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;
@@ -66,10 +68,9 @@ sub finalize_cookies {
     my ( $self, $c ) = @_;
 
     my @cookies;
+    my $response = $c->response;
 
-    foreach my $name ( keys %{ $c->response->cookies } ) {
-
-        my $val = $c->response->cookies->{$name};
+    while( my($name, $val) = each %{ $response->cookies } ) {
 
         my $cookie = (
             Scalar::Util::blessed($val)
@@ -88,7 +89,7 @@ sub finalize_cookies {
     }
 
     for my $cookie (@cookies) {
-        $c->res->headers->push_header( 'Set-Cookie' => $cookie );
+        $response->headers->push_header( 'Set-Cookie' => $cookie );
     }
 }
 
@@ -242,7 +243,7 @@ EOF
         }
         /* from http://users.tkk.fi/~tkarvine/linux/doc/pre-wrap/pre-wrap-css3-mozilla-opera-ie.html */
         /* Browser specific (not valid) styles to make preformatted text wrap */
-        pre { 
+        pre {
             white-space: pre-wrap;       /* css-3 */
             white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
             white-space: -pre-wrap;      /* Opera 4-6 */
@@ -291,14 +292,12 @@ Clean up after uploads, deleting temp files.
 sub finalize_uploads {
     my ( $self, $c ) = @_;
 
-    if ( keys %{ $c->request->uploads } ) {
-        for my $key ( keys %{ $c->request->uploads } ) {
-            my $upload = $c->request->uploads->{$key};
-            unlink map { $_->tempname }
-              grep     { -e $_->tempname }
-              ref $upload eq 'ARRAY' ? @{$upload} : ($upload);
-        }
+    my $request = $c->request;
+    while( my($key,$upload) = each %{ $request->uploads } ) {
+        unlink grep { -e $_ } map { $_->tempname }
+          (ref $upload eq 'ARRAY' ? @{$upload} : ($upload));
     }
+
 }
 
 =head2 $self->prepare_body($c)
@@ -311,13 +310,14 @@ sub prepare_body {
     my ( $self, $c ) = @_;
 
     if ( my $length = $self->read_length ) {
-        unless ( $c->request->{_body} ) {
-            my $type = $c->request->header('Content-Type');
-            $c->request->{_body} = HTTP::Body->new( $type, $length );
-            $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp}
+        my $request = $c->request;
+        unless ( $request->{_body} ) {
+            my $type = $request->header('Content-Type');
+            $request->{_body} = HTTP::Body->new( $type, $length );
+            $request->{_body}->{tmpdir} = $c->config->{uploadtmp}
               if exists $c->config->{uploadtmp};
         }
-        
+
         while ( my $buffer = $self->read($c) ) {
             $c->prepare_body_chunk($buffer);
         }
@@ -350,15 +350,15 @@ sub prepare_body_chunk {
 
 =head2 $self->prepare_body_parameters($c)
 
-Sets up parameters from body. 
+Sets up parameters from body.
 
 =cut
 
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
-    
+
     return unless $c->request->{_body};
-    
+
     $c->request->body_parameters( $c->request->{_body}->param );
 }
 
@@ -399,25 +399,22 @@ sets up parameters from query and post parameters.
 sub prepare_parameters {
     my ( $self, $c ) = @_;
 
+    my $request = $c->request;
+    my $parameters = $request->parameters;
+    my $body_parameters = $request->body_parameters;
+    my $query_parameters = $request->query_parameters;
     # We copy, no references
-    foreach my $name ( keys %{ $c->request->query_parameters } ) {
-        my $param = $c->request->query_parameters->{$name};
-        $param = ref $param eq 'ARRAY' ? [ @{$param} ] : $param;
-        $c->request->parameters->{$name} = $param;
+    while( my($name, $param) = each(%$query_parameters) ) {
+        $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
     }
 
     # Merge query and body parameters
-    foreach my $name ( keys %{ $c->request->body_parameters } ) {
-        my $param = $c->request->body_parameters->{$name};
-        $param = ref $param eq 'ARRAY' ? [ @{$param} ] : $param;
-        if ( my $old_param = $c->request->parameters->{$name} ) {
-            if ( ref $old_param eq 'ARRAY' ) {
-                push @{ $c->request->parameters->{$name} },
-                  ref $param eq 'ARRAY' ? @$param : $param;
-            }
-            else { $c->request->parameters->{$name} = [ $old_param, $param ] }
+    while( my($name, $param) = each(%$body_parameters) ) {
+        my @values = ref $param eq 'ARRAY' ? @$param : ($param);
+        if ( my $existing = $parameters->{$name} ) {
+          unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
         }
-        else { $c->request->parameters->{$name} = $param }
+        $parameters->{$name} = @values > 1 ? \@values : $values[0];
     }
 }
 
@@ -439,7 +436,7 @@ process the query string and extract query parameters.
 
 sub prepare_query_parameters {
     my ( $self, $c, $query_string ) = @_;
-    
+
     # Check for keywords (no = signs)
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
@@ -451,17 +448,17 @@ sub prepare_query_parameters {
 
     # replace semi-colons
     $query_string =~ s/;/&/g;
-    
+
     my @params = split /&/, $query_string;
 
     for my $item ( @params ) {
-        
-        my ($param, $value) 
+
+        my ($param, $value)
             = map { $self->unescape_uri($_) }
               split( /=/, $item, 2 );
-          
+
         $param = $self->unescape_uri($item) unless defined $param;
-        
+
         if ( exists $query{$param} ) {
             if ( ref $query{$param} ) {
                 push @{ $query{$param} }, $value;
@@ -489,7 +486,7 @@ sub prepare_read {
 
     # Initialize the read position
     $self->read_position(0);
-    
+
     # Initialize the amount of data we think we need to read
     $self->read_length( $c->request->header('Content-Length') || 0 );
 }
@@ -508,40 +505,41 @@ sub prepare_request { }
 
 sub prepare_uploads {
     my ( $self, $c ) = @_;
-    
-    return unless $c->request->{_body};
-    
-    my $uploads = $c->request->{_body}->upload;
-    for my $name ( keys %$uploads ) {
-        my $files = $uploads->{$name};
-        $files = ref $files eq 'ARRAY' ? $files : [$files];
+
+    my $request = $c->request;
+    return unless $request->{_body};
+
+    my $uploads = $request->{_body}->upload;
+    my $parameters = $request->parameters;
+    while(my($name,$files) = each(%$uploads) ) {
         my @uploads;
-        for my $upload (@$files) {
-            my $u = Catalyst::Request::Upload->new;
-            $u->headers( HTTP::Headers->new( %{ $upload->{headers} } ) );
-            $u->type( $u->headers->content_type );
-            $u->tempname( $upload->{tempname} );
-            $u->size( $upload->{size} );
-            $u->filename( $upload->{filename} );
+        for my $upload (ref $files eq 'ARRAY' ? @$files : ($files)) {
+            my $headers = HTTP::Headers->new( %{ $upload->{headers} } );
+            my $u = Catalyst::Request::Upload->new
+              (
+               size => $upload->{size},
+               type => $headers->content_type,
+               headers => $headers,
+               tempname => $upload->{tempname},
+               filename => $upload->{filename},
+              );
             push @uploads, $u;
         }
-        $c->request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
+        $request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
 
         # support access to the filename as a normal param
         my @filenames = map { $_->{filename} } @uploads;
         # append, if there's already params with this name
-        if (exists $c->request->parameters->{$name}) {
-            if (ref $c->request->parameters->{$name} eq 'ARRAY') {
-                push @{ $c->request->parameters->{$name} }, @filenames;
+        if (exists $parameters->{$name}) {
+            if (ref $parameters->{$name} eq 'ARRAY') {
+                push @{ $parameters->{$name} }, @filenames;
             }
             else {
-                $c->request->parameters->{$name} = 
-                    [ $c->request->parameters->{$name}, @filenames ];
+                $parameters->{$name} = [ $parameters->{$name}, @filenames ];
             }
         }
         else {
-            $c->request->parameters->{$name} =
-                @filenames > 1 ? \@filenames : $filenames[0];
+            $parameters->{$name} = @filenames > 1 ? \@filenames : $filenames[0];
         }
     }
 }
@@ -621,15 +619,15 @@ sub write {
         $self->prepare_write($c);
         $self->{_prepared_write} = 1;
     }
-    
+
     my $len   = length($buffer);
     my $wrote = syswrite STDOUT, $buffer;
-    
+
     if ( !defined $wrote && $! == EWOULDBLOCK ) {
         # Unable to write on the first try, will retry in the loop below
         $wrote = 0;
     }
-    
+
     if ( defined $wrote && $wrote < $len ) {
         # We didn't write the whole buffer
         while (1) {
@@ -641,11 +639,11 @@ sub write {
                 next if $! == EWOULDBLOCK;
                 return;
             }
-            
+
             last if $wrote >= $len;
         }
     }
-    
+
     return $wrote;
 }
 

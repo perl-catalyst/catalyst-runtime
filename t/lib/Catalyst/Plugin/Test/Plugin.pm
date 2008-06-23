@@ -1,6 +1,7 @@
 package Catalyst::Plugin::Test::Plugin;
 
 use strict;
+use NEXT;
 
 use base qw/Catalyst::Base Class::Data::Inheritable/;
 

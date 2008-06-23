@@ -1,13 +1,12 @@
 package Catalyst::Engine::HTTP;
 
-use strict;
-use base 'Catalyst::Engine::CGI';
+use Moose;
+extends 'Catalyst::Engine::CGI';
 use Data::Dump qw(dump);
 use Errno 'EWOULDBLOCK';
 use HTTP::Date ();
 use HTTP::Headers;
 use HTTP::Status;
-use NEXT;
 use Socket;
 use IO::Socket::INET ();
 use IO::Select       ();
@@ -52,28 +51,29 @@ sub finalize_headers {
     my $protocol = $c->request->protocol;
     my $status   = $c->response->status;
     my $message  = status_message($status);
-    
+    my $res_headers = $c->response->headers;
+
     my @headers;
     push @headers, "$protocol $status $message";
-    
-    $c->response->headers->header( Date => HTTP::Date::time2str(time) );
-    $c->response->headers->header( Status => $status );
-    
+
+    $res_headers->header( Date => HTTP::Date::time2str(time) );
+    $res_headers->header( Status => $status );
+
     # Should we keep the connection open?
     my $connection = $c->request->header('Connection');
-    if (   $self->{options}->{keepalive} 
-        && $connection 
+    if (   $self->{options}->{keepalive}
+        && $connection
         && $connection =~ /^keep-alive$/i
     ) {
-        $c->response->headers->header( Connection => 'keep-alive' );
+        $res_headers->header( Connection => 'keep-alive' );
         $self->{_keepalive} = 1;
     }
     else {
-        $c->response->headers->header( Connection => 'close' );
+        $res_headers->header( Connection => 'close' );
     }
-    
-    push @headers, $c->response->headers->as_string("\x0D\x0A");
-    
+
+    push @headers, $res_headers->as_string("\x0D\x0A");
+
     # Buffer the headers so they are sent with the first write() call
     # This reduces the number of TCP packets we are sending
     $self->{_header_buf} = join("\x0D\x0A", @headers, '');
@@ -83,28 +83,20 @@ sub finalize_headers {
 
 =cut
 
-sub finalize_read {
-    my ( $self, $c ) = @_;
-
+before finalize_read => sub {
     # Never ever remove this, it would result in random length output
     # streams if STDIN eq STDOUT (like in the HTTP engine)
     *STDIN->blocking(1);
-
-    return $self->NEXT::finalize_read($c);
-}
+};
 
 =head2 $self->prepare_read($c)
 
 =cut
 
-sub prepare_read {
-    my ( $self, $c ) = @_;
-
+befpre prepare_read => sub {
     # Set the input handle to non-blocking
     *STDIN->blocking(0);
-
-    return $self->NEXT::prepare_read($c);
-}
+};
 
 =head2 $self->read_chunk($c, $buffer, $length)
 
@@ -113,7 +105,7 @@ sub prepare_read {
 sub read_chunk {
     my $self = shift;
     my $c    = shift;
-    
+
     # If we have any remaining data in the input buffer, send it back first
     if ( $_[0] = delete $self->{inputbuf} ) {
         my $read = length( $_[0] );
@@ -146,9 +138,10 @@ Writes the buffer to the client.
 
 =cut
 
-sub write {
+around write => sub {
+    my $orig = shift;
     my ( $self, $c, $buffer ) = @_;
-    
+
     # Avoid 'print() on closed filehandle Remote' warnings when using IE
     return unless *STDOUT->opened();
 
@@ -156,9 +149,9 @@ sub write {
     if ( my $headers = delete $self->{_header_buf} ) {
         $buffer = $headers . $buffer;
     }
-    
-    my $ret = $self->NEXT::write( $c, $buffer );
-    
+
+    my $ret = $self->$orig( $c, $buffer );
+
     if ( !defined $ret ) {
         $self->{_write_error} = $!;
         DEBUG && warn "write: Failed to write response ($!)\n";
@@ -166,9 +159,9 @@ sub write {
     else {
         DEBUG && warn "write: Wrote response ($ret bytes)\n";
     }
-    
+
     return $ret;
-}
+};
 
 =head2 run
 
@@ -179,7 +172,7 @@ sub run {
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
-    
+
     $self->{options} = $options;
 
     if ($options->{background}) {
@@ -239,28 +232,28 @@ sub run {
     }
 
     my $pid = undef;
-    
+
     # Ignore broken pipes as an HTTP server should
     local $SIG{PIPE} = 'IGNORE';
-    
+
     # Restart on HUP
-    local $SIG{HUP} = sub { 
+    local $SIG{HUP} = sub {
         $restart = 1;
         warn "Restarting server on SIGHUP...\n";
     };
-    
+
     LISTEN:
     while ( !$restart ) {
-        while ( accept( Remote, $daemon ) ) {        
+        while ( accept( Remote, $daemon ) ) {
             DEBUG && warn "New connection\n";
 
             select Remote;
 
             Remote->blocking(1);
-        
+
             # Read until we see all headers
             $self->{inputbuf} = '';
-            
+
             if ( !$self->_read_headers ) {
                 # Error reading, give up
                 close Remote;
@@ -268,15 +261,14 @@ sub run {
             }
 
             my ( $method, $uri, $protocol ) = $self->_parse_request_line;
-            
-            next unless $method;
-        
+
             DEBUG && warn "Parsed request: $method $uri $protocol\n";
+            next unless $method;
 
             unless ( uc($method) eq 'RESTART' ) {
 
                 # Fork
-                if ( $options->{fork} ) { 
+                if ( $options->{fork} ) {
                     if ( $pid = fork ) {
                         DEBUG && warn "Forked child $pid\n";
                         next;
@@ -284,10 +276,10 @@ sub run {
                 }
 
                 $self->_handler( $class, $port, $method, $uri, $protocol );
-            
+
                 if ( my $error = delete $self->{_write_error} ) {
                     close Remote;
-                    
+
                     if ( !defined $pid ) {
                         next LISTEN;
                     }
@@ -319,9 +311,9 @@ sub run {
             close Remote;
         }
     }
-    
+
     $daemon->close;
-    
+
     DEBUG && warn "Shutting down\n";
 
     if ($restart) {
@@ -332,8 +324,8 @@ sub run {
         ### those include dirs upon re-exec. So add them to PERL5LIB, so they
         ### are available again for the exec'ed process --kane
         use Config;
-        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC; 
-        
+        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC;
+
         exec $^X, $0, @{ $options->{argv} };
     }
 
@@ -354,11 +346,11 @@ sub _handler {
 
     my $sel = IO::Select->new;
     $sel->add( \*STDIN );
-    
+
     REQUEST:
     while (1) {
         my ( $path, $query_string ) = split /\?/, $uri, 2;
-        
+
         # Initialize CGI environment
         local %ENV = (
             PATH_INFO       => $path         || '',
@@ -379,37 +371,37 @@ sub _handler {
 
         # Pass flow control to Catalyst
         $class->handle_request;
-    
+
         DEBUG && warn "Request done\n";
-    
+
         # Allow keepalive requests, this is a hack but we'll support it until
         # the next major release.
         if ( delete $self->{_keepalive} ) {
-            
+
             DEBUG && warn "Reusing previous connection for keep-alive request\n";
-            
-            if ( $sel->can_read(1) ) {            
+
+            if ( $sel->can_read(1) ) {
                 if ( !$self->_read_headers ) {
                     # Error reading, give up
                     last REQUEST;
                 }
 
                 ( $method, $uri, $protocol ) = $self->_parse_request_line;
-                
+
                 DEBUG && warn "Parsed request: $method $uri $protocol\n";
-                
+
                 # Force HTTP/1.0
                 $protocol = '1.0';
-                
+
                 next REQUEST;
             }
-            
+
             DEBUG && warn "No keep-alive request within 1 second\n";
         }
-        
+
         last REQUEST;
     }
-    
+
     DEBUG && warn "Closing connection\n";
 
     close Remote;
@@ -417,51 +409,50 @@ sub _handler {
 
 sub _read_headers {
     my $self = shift;
-    
+
     while (1) {
         my $read = sysread Remote, my $buf, CHUNKSIZE;
-        
+
         if ( !defined $read ) {
             next if $! == EWOULDBLOCK;
             DEBUG && warn "Error reading headers: $!\n";
             return;
-        }
-        elsif ( $read == 0 ) {
+        } elsif ( $read == 0 ) {
             DEBUG && warn "EOF\n";
             return;
         }
-    
+
         DEBUG && warn "Read $read bytes\n";
         $self->{inputbuf} .= $buf;
         last if $self->{inputbuf} =~ /(\x0D\x0A?\x0D\x0A?|\x0A\x0D?\x0A\x0D?)/s;
     }
-    
+
     return 1;
 }
 
 sub _parse_request_line {
     my $self = shift;
 
-    # Parse request line    
+    # Parse request line
     if ( $self->{inputbuf} !~ s/^(\w+)[ \t]+(\S+)(?:[ \t]+(HTTP\/\d+\.\d+))?[^\012]*\012// ) {
         return ();
     }
-    
+
     my $method = $1;
     my $uri    = $2;
     my $proto  = $3 || 'HTTP/0.9';
-    
+
     return ( $method, $uri, $proto );
 }
 
 sub _parse_headers {
     my $self = shift;
-    
+
     # Copy the buffer for header parsing, and remove the header block
     # from the content buffer.
     my $buf = $self->{inputbuf};
     $self->{inputbuf} =~ s/.*?(\x0D\x0A?\x0D\x0A?|\x0A\x0D?\x0A\x0D?)//s;
-    
+
     # Parse headers
     my $headers = HTTP::Headers->new;
     my ($key, $val);
@@ -481,19 +472,19 @@ sub _parse_headers {
         }
     }
     $headers->push_header( $key, $val ) if $key;
-    
+
     DEBUG && warn "Parsed headers: " . dump($headers) . "\n";
 
     # Convert headers into ENV vars
     $headers->scan( sub {
         my ( $key, $val ) = @_;
-        
+
         $key = uc $key;
         $key = 'COOKIE' if $key eq 'COOKIES';
         $key =~ tr/-/_/;
         $key = 'HTTP_' . $key
             unless $key =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
-            
+
         if ( exists $ENV{$key} ) {
             $ENV{$key} .= ", $val";
         }
@@ -507,19 +498,19 @@ sub _socket_data {
     my ( $self, $handle ) = @_;
 
     my $remote_sockaddr       = getpeername($handle);
-    my ( undef, $iaddr )      = $remote_sockaddr 
-        ? sockaddr_in($remote_sockaddr) 
+    my ( undef, $iaddr )      = $remote_sockaddr
+        ? sockaddr_in($remote_sockaddr)
         : (undef, undef);
-        
+
     my $local_sockaddr        = getsockname($handle);
     my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
 
     # This mess is necessary to keep IE from crashing the server
     my $data = {
-        peername  => $iaddr 
+        peername  => $iaddr
             ? ( gethostbyaddr( $iaddr, AF_INET ) || 'localhost' )
             : 'localhost',
-        peeraddr  => $iaddr 
+        peeraddr  => $iaddr
             ? ( inet_ntoa($iaddr) || '127.0.0.1' )
             : '127.0.0.1',
         localname => gethostbyaddr( $localiaddr, AF_INET ) || 'localhost',
