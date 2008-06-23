@@ -13,7 +13,7 @@ sub mk_classdata {
   my $accessor =  sub {
     my $meta = $_[0]->meta;
     if(@_ > 1){
-      $meta->add_package_symbol($slot, \ $_[1]);
+      $meta->namespace->{$attribute} = \$_[1];
       return $_[1];
     }
 
