@@ -48,6 +48,8 @@ sub add_action {
     $self->actions->{$name} = $action;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
@@ -83,7 +85,7 @@ Provided by Moose
 
 =head1 AUTHOR
 
-Matt S. Trout 
+Matt S. Trout
 
 =head1 COPYRIGHT
 

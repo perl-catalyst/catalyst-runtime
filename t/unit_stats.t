@@ -80,7 +80,6 @@ $stats->profile(end => "block", comment => "end block");
 
 push(@expected, [ 2, "- attach to uid", 0.1, 0 ]);
 
-
 my @report = $stats->report;
 is_deeply(\@report, \@expected, "report");
 

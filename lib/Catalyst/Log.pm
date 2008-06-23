@@ -1,20 +1,13 @@
 package Catalyst::Log;
 
-use strict;
-#use base 'Class::Accessor::Fast';
+use Moose;
 use Data::Dump;
 
 our %LEVELS = ();
 
-use Moose;
-
 has level => (is => 'rw');
 has _body  => (is => 'rw');
 has abort => (is => 'rw');
-
-#__PACKAGE__->mk_accessors('level');
-#__PACKAGE__->mk_accessors('body');
-#__PACKAGE__->mk_accessors('abort');
 
 {
     my @levels = qw[ debug info warn error fatal ];
@@ -43,12 +36,13 @@ has abort => (is => 'rw');
     }
 }
 
-sub new {
+around new => sub {
+    my $orig = shift;
     my $class = shift;
-    my $self  = $class->SUPER::new;
+    my $self = $class->$orig;
     $self->levels( scalar(@_) ? @_ : keys %LEVELS );
     return $self;
-}
+};
 
 sub levels {
     my ( $self, @levels ) = @_;
@@ -221,8 +215,8 @@ Is the log level active?
 
 =head2 abort
 
-Should Catalyst emit logs for this request? Will be reset at the end of 
-each request. 
+Should Catalyst emit logs for this request? Will be reset at the end of
+each request.
 
 *NOTE* This method is not compatible with other log apis, so if you plan
 to use Log4Perl or another logger, you should call it like this:
@@ -255,5 +249,7 @@ This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

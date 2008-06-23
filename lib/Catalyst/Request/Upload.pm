@@ -1,13 +1,11 @@
 package Catalyst::Request::Upload;
 
-use strict;
+use Moose;
 
 use Catalyst::Exception;
 use File::Copy ();
 use IO::File   ();
 use File::Spec::Unix;
-
-use Moose;
 
 has filename  => (is => 'rw');
 has headers   => (is => 'rw');
@@ -103,7 +101,7 @@ Returns an L<HTTP::Headers> object for the request.
 
 =head2 $upload->link_to
 
-Creates a hard link to the temporary file. Returns true for success, 
+Creates a hard link to the temporary file. Returns true for success,
 false for failure.
 
     $upload->link_to('/path/to/target');
@@ -185,5 +183,7 @@ This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

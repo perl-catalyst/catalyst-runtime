@@ -170,6 +170,7 @@ sub forward {
 
     no warnings 'recursion';
 
+    #moose todo: reaching inside another object is bad
     local $c->request->{arguments} = \@args;
     $action->dispatch( $c );
 
@@ -528,6 +529,8 @@ sub _load_dispatch_types {
 
     return @loaded;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 =head2 meta
 

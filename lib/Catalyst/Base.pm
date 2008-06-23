@@ -1,7 +1,8 @@
 package Catalyst::Base;
 
-use strict;
-use base qw/Catalyst::Controller/;
+use Moose;
+BEGIN{ extends qw/Catalyst::Controller/ };
+
 
 1;
 

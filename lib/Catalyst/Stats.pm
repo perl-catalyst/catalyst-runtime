@@ -1,86 +1,81 @@
 package Catalyst::Stats;
 
-use strict;
-use warnings;
+use Moose;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Text::SimpleTable ();
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 
-sub new {
-    my $class = shift;
-
-    my $root = Tree::Simple->new({t => [gettimeofday]});
-    bless { 
-    enabled => 1,
-    stack => [ $root ],
-    tree => $root,
-    }, ref $class || $class;
-}
-
-sub enable {
-    my ($self, $enable) = @_;
-
-    $self->{enabled} = $enable;
-}
+has enable => (is => 'rw', required => 1, default => sub{ 1 });
+has tree => (
+             is => 'ro',
+             required => 1,
+             default => sub{ Tree::Simple->new({t => [gettimeofday]}) }
+            );
+has stack => (
+              is => 'ro',
+              required => 1,
+              lazy => 1,
+              default => sub { [ shift->tree ] }
+             );
 
 sub profile {
     my $self = shift;
 
-    return unless $self->{enabled};
+    return unless $self->enable;
 
     my %params;
     if (@_ <= 1) {
-    $params{comment} = shift || "";
+        $params{comment} = shift || "";
     }
     elsif (@_ % 2 != 0) {
-    die "profile() requires a single comment parameter or a list of name-value pairs; found " 
-        . (scalar @_) . " values: " . join(", ", @_);
+        die "profile() requires a single comment parameter or a list of name-value pairs; found "
+            . (scalar @_) . " values: " . join(", ", @_);
     }
     else {
-    (%params) = @_;
-    $params{comment} ||= "";
+        (%params) = @_;
+        $params{comment} ||= "";
     }
 
     my $parent;
     my $prev;
     my $t = [ gettimeofday ];
+    my $stack = $self->stack;
 
     if ($params{end}) {
-    # parent is on stack; search for matching block and splice out
-    for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
-        if ($self->{stack}->[$i]->getNodeValue->{action} eq $params{end}) {
-        my $node = $self->{stack}->[$i];
-        splice(@{$self->{stack}}, $i, 1);
-        # Adjust elapsed on partner node
-        my $v = $node->getNodeValue;
-        $v->{elapsed} =  tv_interval($v->{t}, $t);
-        return $node->getUID;
+        # parent is on stack; search for matching block and splice out
+        for (my $i = $#{$stack}; $i > 0; $i--) {
+            if ($stack->[$i]->getNodeValue->{action} eq $params{end}) {
+                my ($node) = splice(@{$stack}, $i, 1);
+                # Adjust elapsed on partner node
+                my $v = $node->getNodeValue;
+                $v->{elapsed} =  tv_interval($v->{t}, $t);
+                return $node->getUID;
+            }
         }
-    }
     # if partner not found, fall through to treat as non-closing call
     }
     if ($params{parent}) {
-    # parent is explicitly defined
-    $prev = $parent = $self->_get_uid($params{parent});
+        # parent is explicitly defined
+        $prev = $parent = $self->_get_uid($params{parent});
     }
     if (!$parent) {
-    # Find previous node, which is either previous sibling or parent, for ref time.
-    $prev = $parent = $self->{stack}->[-1] or return undef;
-    my $n = $parent->getChildCount;
-    $prev = $parent->getChild($n - 1) if $n > 0;
+        # Find previous node, which is either previous sibling or parent, for ref time.
+        $prev = $parent = $stack->[-1] or return undef;
+        my $n = $parent->getChildCount;
+        $prev = $parent->getChild($n - 1) if $n > 0;
     }
 
     my $node = Tree::Simple->new({
-    action  => $params{begin} || "",
-    t => $t, 
-    elapsed => tv_interval($prev->getNodeValue->{t}, $t),
-    comment => $params{comment},
+        action  => $params{begin} || "",
+        t => $t,
+        elapsed => tv_interval($prev->getNodeValue->{t}, $t),
+        comment => $params{comment},
     });
     $node->setUID($params{uid}) if $params{uid};
 
     $parent->addChild($node);
-    push(@{$self->{stack}}, $node) if $params{begin};
+    push(@{$stack}, $node) if $params{begin};
 
     return $node->getUID;
 }
@@ -92,14 +87,13 @@ sub elapsed {
 sub report {
     my $self = shift;
 
-# close any remaining open nodes
-    for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
-    $self->profile(end => $self->{stack}->[$i]->getNodeValue->{action});
-    }
+    # close any remaining open nodes
+    map { $self->profile(end => $_->getNodeValue->{action}) }
+      (reverse @{ $self->stack })[1 .. $#{$self->stack}];
 
     my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
     my @results;
-    $self->{tree}->traverse(
+    $self->tree->traverse(
                 sub {
                 my $action = shift;
                 my $stat   = $action->getNodeValue;
@@ -109,7 +103,7 @@ sub report {
                       $stat->{elapsed},
                       $stat->{action} ? 1 : 0,
                       );
-                $t->row( ( q{ } x $r[0] ) . $r[1], 
+                $t->row( ( q{ } x $r[0] ) . $r[1],
                      defined $r[2] ? sprintf("%fs", $r[2]) : '??');
                 push(@results, \@r);
                 }
@@ -122,9 +116,9 @@ sub _get_uid {
 
     my $visitor = Tree::Simple::Visitor::FindByUID->new;
     $visitor->searchForUID($uid);
-    $self->{tree}->accept($visitor);
+    $self->tree->accept($visitor);
     return $visitor->getResult;
-} 
+}
 
 1;
 
@@ -174,7 +168,7 @@ be like this:
     $c->stats->profile("completed second part of critical bit");
     # more code
     ...
-    $c->stats->profile(end => "mysub"); 
+    $c->stats->profile(end => "mysub");
   }
 
 Supposing mysub was called from the action "process" inside a Catalyst
@@ -201,7 +195,7 @@ part 0.111s.
 
 =head2 new
 
-Constructor. 
+Constructor.
 
     $stats = Catalyst::Stats->new;
 
@@ -220,7 +214,7 @@ Enable or disable stats collection.  By default, stats are enabled after object 
 
 Marks a profiling point.  These can appear in pairs, to time the block of code
 between the begin/end pairs, or by themselves, in which case the time of
-execution to the previous profiling point will be reported.  
+execution to the previous profiling point will be reported.
 
 The argument may be either a single comment string or a list of name-value
 pairs.  Thus the following are equivalent:
@@ -308,5 +302,7 @@ This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

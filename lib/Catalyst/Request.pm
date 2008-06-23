@@ -23,7 +23,7 @@ has captures          => (is => 'rw', default => sub { [] });
 has uri               => (is => 'rw');
 has user              => (is => 'rw');
 has headers           => (
-  is      => 'rw', 
+  is      => 'rw',
   isa     => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header referer user_agent)],
 );
@@ -68,7 +68,7 @@ before parameters => sub {
   my ($self, $params) = @_;
   $self->_context->prepare_body();
   if ( $params && !ref $params ) {
-    $self->_context->log->warn( 
+    $self->_context->log->warn(
         "Attempt to retrieve '$params' with req->params(), " .
         "you probably meant to call req->param('$params')" );
     $params = undef;
@@ -223,7 +223,7 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->body_parameters->{field}->[0];
 
 These are the parameters from the POST part of the request, if any.
-    
+
 =head2 $req->body_params
 
 Shortcut for body_parameters.
@@ -290,7 +290,7 @@ Returns an L<HTTP::Headers> object containing the headers for the current reques
 =head2 $req->hostname
 
 Returns the hostname of the client.
-    
+
 =head2 $req->input
 
 Alias for $req->body.
@@ -301,7 +301,7 @@ Contains the keywords portion of a query string, when no '=' signs are
 present.
 
     http://localhost/path?some+keywords
-    
+
     $c->request->query_keywords will contain 'some keywords'
 
 =head2 $req->match
@@ -316,7 +316,7 @@ Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
 =head2 $req->param
 
-Returns GET and POST parameters with a CGI.pm-compatible param method. This 
+Returns GET and POST parameters with a CGI.pm-compatible param method. This
 is an alternative method for accessing parameters in $c->req->parameters.
 
     $value  = $c->request->param( 'foo' );
@@ -425,7 +425,7 @@ be either a scalar or an arrayref containing scalars.
 
     print $c->request->query_parameters->{field};
     print $c->request->query_parameters->{field}->[0];
-    
+
 =head2 $req->read( [$maxlength] )
 
 Reads a chunk of data from the request body. This method is intended to be
@@ -518,7 +518,7 @@ sub upload {
 =head2 $req->uploads
 
 Returns a reference to a hash containing uploads. Values can be either a
-L<Catalyst::Request::Upload> object, or an arrayref of 
+L<Catalyst::Request::Upload> object, or an arrayref of
 L<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};
@@ -538,7 +538,7 @@ preserved.
 
 sub uri_with {
     my( $self, $args ) = @_;
-    
+
     carp( 'No arguments passed to uri_with()' ) unless $args;
 
     for my $value ( values %$args ) {
@@ -548,9 +548,9 @@ sub uri_with {
             utf8::encode( $_ ) if utf8::is_utf8($_);
         }
     };
-    
+
     my $uri = $self->uri->clone;
-    
+
     $uri->query_form( {
         %{ $uri->query_form_hash },
         %$args
@@ -584,5 +584,7 @@ This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

@@ -67,11 +67,16 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
+    #would it be unreasonable to store the number of arguments
+    #the action has as it's own attribute?
+    #it would basically eliminate the code below.  ehhh. small fish
     return 1 unless exists $self->attributes->{Args};
     my $args = $self->attributes->{Args}[0];
     return 1 unless defined($args) && length($args);
     return scalar( @{ $c->req->args } ) == $args;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

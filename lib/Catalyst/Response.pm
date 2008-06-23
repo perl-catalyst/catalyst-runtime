@@ -84,7 +84,7 @@ The keys of the hash reference on the right correspond to the L<CGI::Cookie>
 parameters of the same name, except they are used without a leading dash.
 Possible parameters are:
 
-=over 
+=over
 
 =item value
 
@@ -144,7 +144,7 @@ Sets or returns the HTTP 'Location'.
 Sets or returns the HTTP status.
 
     $c->response->status(404);
-    
+
 =head2 $res->write( $data )
 
 Writes $data to the output stream.
@@ -165,9 +165,11 @@ Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify 
+This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

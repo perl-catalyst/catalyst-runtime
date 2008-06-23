@@ -57,6 +57,7 @@ sub from_chain {
     return $self->new({ %$final, chain => $actions });
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__

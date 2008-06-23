@@ -60,6 +60,8 @@ it under the same terms as Perl itself.
 
 =cut
 
+Catalyst::Exception::Base->meta->make_immutable;
+
 package Catalyst::Exception;
 
 use Moose;
@@ -68,5 +70,7 @@ use vars qw[$CATALYST_EXCEPTION_CLASS];
 BEGIN {
     extends($CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base');
 }
+
+Catalyst::Exception->meta->make_immutable;
 
 1;

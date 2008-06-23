@@ -3,8 +3,6 @@ package Catalyst::DispatchType::Chained;
 use Moose;
 extends 'Catalyst::DispatchType';
 
-#use strict;
-#use base qw/Catalyst::DispatchType/;
 use Text::SimpleTable;
 use Catalyst::ActionChain;
 use URI;
@@ -121,20 +119,21 @@ Calls C<recurse_match> to see if a chain matches the C<$path>.
 sub match {
     my ( $self, $c, $path ) = @_;
 
-    return 0 if @{$c->req->args};
+    my $request = $c->request;
+    return 0 if @{$request->args};
 
     my @parts = split('/', $path);
 
     my ($chain, $captures, $parts) = $self->recurse_match($c, '/', \@parts);
-    push @{$c->req->args}, @$parts if $parts && @$parts;
+    push @{$request->args}, @$parts if $parts && @$parts;
 
     return 0 unless $chain;
 
     my $action = Catalyst::ActionChain->from_chain($chain);
 
-    $c->req->action("/${action}");
-    $c->req->match("/${action}");
-    $c->req->captures($captures);
+    $request->action("/${action}");
+    $request->match("/${action}");
+    $request->captures($captures);
     $c->action($action);
     $c->namespace( $action->namespace );
 
@@ -328,6 +327,8 @@ sub uri_for_action {
     return join('/', '', @parts);
 
 }
+
+__PACKAGE__->meta->make_immutable;
 
 =head1 USAGE
 
