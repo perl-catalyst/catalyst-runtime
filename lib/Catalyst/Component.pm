@@ -8,7 +8,7 @@ has _config  => (
                  is => 'rw',
                  isa => 'HashRef',
                  required => 1,
-                 default => {}
+                 default => sub { {} }
                 );
 
 class_has _plugins => ( is => 'rw' );
@@ -66,9 +66,9 @@ around new => sub {
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-    my $merged = $self->merge_config_hashes( $self->config, $arguments ) );
+    my $merged = $self->merge_config_hashes( $self->config, $arguments );
     $orig->( $self, $merged );
-}
+};
 
 sub COMPONENT {
     my ( $self, $c ) = @_;

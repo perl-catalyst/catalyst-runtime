@@ -66,7 +66,7 @@ override match => sub {
     }
 
     return 0;
-}
+};
 
 =head2 $self->register( $c, $action )
 
