@@ -1,7 +1,7 @@
 package Catalyst::Controller;
 
 use strict;
-use base qw/Catalyst::Component Catalyst::AttrContainer Class::Accessor::Fast/;
+use base qw/Catalyst::Component Catalyst::AttrContainer/;
 
 use Catalyst::Exception;
 use Catalyst::Utils;
@@ -17,9 +17,9 @@ Catalyst::Controller - Catalyst Controller base class
   package MyApp::Controller::Search
   use base qw/Catalyst::Controller/;
 
-  sub foo : Local { 
+  sub foo : Local {
     my ($self,$c,@args) = @_;
-    ... 
+    ...
   } # Dispatches to /search/foo
 
 =head1 DESCRIPTION
@@ -181,7 +181,7 @@ sub create_action {
     unless ( Class::Inspector->loaded($class) ) {
         require Class::Inspector->filename($class);
     }
-    
+
     return $class->new( \%args );
 }
 
@@ -310,7 +310,7 @@ controller name. For instance controller 'MyApp::Controller::Foo::Bar'
 will be bound to 'foo/bar'. The default Root controller is an example
 of setting namespace to '' (the null string).
 
-=head2 path 
+=head2 path
 
 Sets 'path_prefix', as described below.
 

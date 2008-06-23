@@ -1,9 +1,12 @@
 package Catalyst::Component;
 
-use strict;
-use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
-use NEXT;
+use Moose;
+use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
+
+
+with 'MooseX::Emulate::Class::Accessor::Fast';
+with 'Catalyst::ClassData';
 
 
 =head1 NAME
@@ -28,7 +31,7 @@ Catalyst::Component - Catalyst Component Base Class
         my ( $self, $c ) = @_;
         $c->response->output( $self->{foo} );
     }
-    
+
     1;
 
     # Methods can be a request step
@@ -41,7 +44,7 @@ Catalyst::Component - Catalyst Component Base Class
 
 =head1 DESCRIPTION
 
-This is the universal base class for Catalyst components 
+This is the universal base class for Catalyst components
 (Model/View/Controller).
 
 It provides you with a generic new() for instantiation through Catalyst's
@@ -51,38 +54,38 @@ component loader with config() support and a process() method placeholder.
 
 __PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
-
-
-sub new {
+around new => sub {
+    my $orig = shift;
     my ( $self, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( 
-        $self->merge_config_hashes( $self->config, $arguments ) );
-}
+    my $args =  $self->merge_config_hashes( $self->config, $arguments );
+    return $self->$orig( $args );
+};
 
 sub COMPONENT {
     my ( $self, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
+    $self->new($c, $arguments);
 
-    if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
-        return $new;
-    }
-    else {
-        if ( my $new = $self->new( $c, $arguments ) ) {
-            return $new;
-        }
-        else {
-            my $class = ref $self || $self;
-            my $new   = $self->merge_config_hashes( 
-                $self->config, $arguments );
-            return bless $new, $class;
-        }
-    }
+#     if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
+#         return $new;
+#     }
+#     else {
+#         if ( my $new = $self->new( $c, $arguments ) ) {
+#             return $new;
+#         }
+#         else {
+#             my $class = ref $self || $self;
+#             my $new   = $self->merge_config_hashes(
+#                 $self->config, $arguments );
+#             return bless $new, $class;
+#         }
+#     }
 }
 
 sub config {
@@ -143,8 +146,8 @@ If this method is present (as it is on all Catalyst::Component subclasses,
 it is called by Catalyst during setup_components with the application class
 as $c and any config entry on the application for this component (for example,
 in the case of MyApp::Controller::Foo this would be
-MyApp->config->{'Controller::Foo'}). The arguments are expected to be a 
-hashref and are merged with the __PACKAGE__->config hashref before calling 
+MyApp->config->{'Controller::Foo'}). The arguments are expected to be a
+hashref and are merged with the __PACKAGE__->config hashref before calling
 ->new to instantiate the component.
 
 =head2 $c->config
@@ -153,15 +156,15 @@ hashref and are merged with the __PACKAGE__->config hashref before calling
 
 =head2 $c->config($key, $value, ...)
 
-Accessor for this component's config hash. Config values can be set as 
+Accessor for this component's config hash. Config values can be set as
 key value pair, or you can specify a hashref. In either case the keys
-will be merged with any existing config settings. Each component in 
+will be merged with any existing config settings. Each component in
 a Catalyst application has it's own config hash.
 
 =head2 $c->process()
 
 This is the default method called on a Catalyst component in the dispatcher.
-For instance, Views implement this action to render the response body 
+For instance, Views implement this action to render the response body
 when you forward to them. The default is an abstract method.
 
 =head2 $c->merge_config_hashes( $hashref, $hashref )
