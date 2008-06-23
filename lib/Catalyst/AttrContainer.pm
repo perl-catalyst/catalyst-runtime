@@ -1,10 +1,18 @@
 package Catalyst::AttrContainer;
 
-use strict;
-use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
+use Moose;
+#use strict;
+#use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 
 use Catalyst::Exception;
 use NEXT;
+
+#dont want to ISA a C::D::I
+use Class::Data::Inheritable;
+{
+  my $mk_classdata = Class::Data::Inheritable->can('mk_classdata');
+  __PACKAGE__->meta->add_method(mk_classdata => $mk_classdata);
+}
 
 __PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache/;
 __PACKAGE__->_attr_cache( {} );
@@ -29,7 +37,7 @@ Catalyst::AttrContainer
 
 =head1 DESCRIPTION
 
-This class sets up the code attribute cache.  It's a base class for 
+This class sets up the code attribute cache.  It's a base class for
 L<Catalyst::Controller>.
 
 =head1 METHODS
