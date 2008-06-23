@@ -923,7 +923,9 @@ EOF
     }
 
     # Add our self to components, since we are also a component
-    $class->components->{$class} = $class->setup_component($class);
+    if( $class->isa('Catalyst::Controller') ){
+      $class->components->{$class} = $class;
+    }
 
     $class->setup_actions;
 

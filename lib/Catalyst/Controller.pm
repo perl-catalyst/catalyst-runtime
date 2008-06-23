@@ -140,9 +140,7 @@ sub action_for {
 
 #my opinion is that this whole sub really should be a builder method, not 
 #something that happens on every call. Anyone else disagree?? -- groditi
-
-#we are wrapping the accessor, so just uyse a modifier since a normal sub would
-#just be overridden by the generated moose method 
+## -- apparently this is all just waiting for app/ctx split
 around action_namespace => sub {
     my $orig = shift;
     my ( $self, $c ) = @_;
@@ -150,14 +148,9 @@ around action_namespace => sub {
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
     } else { 
-       warn "action_namespace called as class method";
-       # if the following won't change at runtime it should be lazy_building thing
         return $self->config->{namespace} if exists $self->config->{namespace};
     }
 
-    #the following looks like a possible target for a default setting. i am not
-    #making the below the builder because i don't know if $c will vary from
-    #call to call, which would affect case sensitivity settings -- groditi
     my $case_s;
     if( $c ){
         $case_s = $c->config->{case_sensitive};
