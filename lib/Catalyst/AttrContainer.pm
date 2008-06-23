@@ -10,11 +10,11 @@ class_has _attr_cache   => (
                             required => 1,
                             default => sub{{}}
                            );
-clas_has _action_cache => (
-                           is => 'rw',
-                           isa => 'ArrayRef',
-                           required => 1,
-                           default => sub{ [] }
+class_has _action_cache => (
+                            is => 'rw',
+                            isa => 'ArrayRef',
+                            required => 1,
+                            default => sub{ [] }
                           );
 
 # note - see attributes(3pm)
