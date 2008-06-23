@@ -8,6 +8,13 @@ extends 'Catalyst::DispatchType';
 use Text::SimpleTable;
 use URI;
 
+has _paths => (
+               is => 'rw',
+               isa => 'HashRef',
+               required => 1,
+               default => sub { +{} },
+              );
+
 =head1 NAME
 
 Catalyst::DispatchType::Path - Path DispatchType
@@ -29,14 +36,14 @@ Debug output for Path dispatch points
 sub list {
     my ( $self, $c ) = @_;
     my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
-    foreach my $path ( sort keys %{ $self->{paths} } ) {
+    foreach my $path ( sort keys %{ $self->_paths } ) {
         my $display_path = $path eq '/' ? $path : "/$path";
-        foreach my $action ( @{ $self->{paths}->{$path} } ) {
+        foreach my $action ( @{ $self->_paths->{$path} } ) {
             $paths->row( $display_path, "/$action" );
         }
     }
     $c->log->debug( "Loaded Path actions:\n" . $paths->draw . "\n" )
-      if ( keys %{ $self->{paths} } );
+      if ( keys %{ $self->_paths } );
 }
 
 =head2 $self->match( $c, $path )
@@ -52,7 +59,7 @@ sub match {
 
     $path ||= '/';
 
-    foreach my $action ( @{ $self->{paths}->{$path} || [] } ) {
+    foreach my $action ( @{ $self->_paths->{$path} || [] } ) {
         next unless $action->match($c);
         $c->req->action($path);
         $c->req->match($path);
@@ -93,7 +100,7 @@ sub register_path {
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
 
-    unshift( @{ $self->{paths}{$path} ||= [] }, $action);
+    unshift( @{ $self->_paths->{$path} ||= [] }, $action);
 
     return 1;
 }
