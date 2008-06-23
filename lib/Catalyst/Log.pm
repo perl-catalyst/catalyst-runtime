@@ -6,7 +6,7 @@ use Data::Dump;
 our %LEVELS = ();
 
 has level => (is => 'rw');
-has _body  => (is => 'rw');
+has _body => (is => 'rw');
 has abort => (is => 'rw');
 
 {

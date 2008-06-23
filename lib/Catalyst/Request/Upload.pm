@@ -7,12 +7,12 @@ use File::Copy ();
 use IO::File   ();
 use File::Spec::Unix;
 
-has filename  => (is => 'rw');
-has headers   => (is => 'rw');
-has size      => (is => 'rw');
-has tempname  => (is => 'rw');
-has type      => (is => 'rw');
-has basename  => (is => 'rw');
+has filename => (is => 'rw');
+has headers => (is => 'rw');
+has size => (is => 'rw');
+has tempname => (is => 'rw');
+has type => (is => 'rw');
+has basename => (is => 'rw');
 
 has fh => (
   is => 'rw',

@@ -18,21 +18,22 @@ use Scalar::Util ();
 use overload '""' => sub { return ref(shift) }, fallback => 1;
 
 
+#do these belong as package vars or should we build these via a builder method?
 # Preload these action types
 our @PRELOAD = qw/Index Path Regex/;
 
 # Postload these action types
 our @POSTLOAD = qw/Default/;
 
-has _tree                       => (is => 'rw');
-has _dispatch_types             => (is => 'rw');
-has _registered_dispatch_types  => (is => 'rw');
-has _method_action_class        => (is => 'rw');
-has _action_container_class     => (is => 'rw');
-has preload_dispatch_types      => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
-has postload_dispatch_types     => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
-has _action_hash                => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
-has _container_hash             => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has _tree => (is => 'rw');
+has _dispatch_types => (is => 'rw');
+has _registered_dispatch_types => (is => 'rw');
+has _method_action_class => (is => 'rw');
+has _action_container_class => (is => 'rw');
+has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
+has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
+has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
 no Moose;
 

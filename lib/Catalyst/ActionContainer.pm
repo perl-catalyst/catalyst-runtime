@@ -24,7 +24,7 @@ use overload (
 
 );
 
-has part    => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has part => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
 around 'new' => sub {

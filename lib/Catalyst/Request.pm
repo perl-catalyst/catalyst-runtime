@@ -9,20 +9,20 @@ use URI::QueryParam;
 
 use Moose;
 
-has action            => (is => 'rw');
-has address           => (is => 'rw');
-has arguments         => (is => 'rw', default => sub { [] });
-has cookies           => (is => 'rw', default => sub { {} });
-has query_keywords    => (is => 'rw');
-has match             => (is => 'rw');
-has method            => (is => 'rw');
-has protocol          => (is => 'rw');
+has action => (is => 'rw');
+has address => (is => 'rw');
+has arguments => (is => 'rw', default => sub { [] });
+has cookies => (is => 'rw', default => sub { {} });
+has query_keywords => (is => 'rw');
+has match => (is => 'rw');
+has method => (is => 'rw');
+has protocol => (is => 'rw');
 has query_parameters  => (is => 'rw', default => sub { {} });
-has secure            => (is => 'rw', default => 0);
-has captures          => (is => 'rw', default => sub { [] });
-has uri               => (is => 'rw');
-has user              => (is => 'rw');
-has headers           => (
+has secure => (is => 'rw', default => 0);
+has captures => (is => 'rw', default => sub { [] });
+has uri => (is => 'rw');
+has user => (is => 'rw');
+has headers => (
   is      => 'rw',
   isa     => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header referer user_agent)],
@@ -34,10 +34,10 @@ has _context => (
 );
 
 has body_parameters => (
-  is        => 'rw',
-  required  => 1,
-  lazy      => 1,
-  default   => sub { {} },
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub { {} },
 );
 
 before body_parameters => sub {
@@ -46,10 +46,10 @@ before body_parameters => sub {
 };
 
 has uploads => (
-  is        => 'rw',
-  required  => 1,
-  lazy      => 1,
-  default   => sub { {} },
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub { {} },
 );
 
 before uploads => sub {
@@ -77,14 +77,12 @@ before parameters => sub {
 };
 
 has base => (
-  is        => 'rw',
-  required  => 1,
-  lazy      => 1,
-  default   => sub {
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub {
     my $self = shift;
-    if( $self->uri ){
-      return $self->path;
-    }
+    return $self->path if $self->uri;
   },
 );
 

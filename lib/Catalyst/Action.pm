@@ -19,12 +19,12 @@ L<Catalyst::Controller> subclasses.
 
 use Moose;
 
-has class       => (is => 'rw');
-has namespace   => (is => 'rw');
-has 'reverse'   => (is => 'rw');
-has attributes  => (is => 'rw');
-has name        => (is => 'rw');
-has code        => (is => 'rw');
+has class => (is => 'rw');
+has namespace => (is => 'rw');
+has 'reverse' => (is => 'rw');
+has attributes => (is => 'rw');
+has name => (is => 'rw');
+has code => (is => 'rw');
 
 no Moose;
 
