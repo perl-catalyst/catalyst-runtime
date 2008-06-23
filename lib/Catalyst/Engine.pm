@@ -19,9 +19,6 @@ has read_position => (is => 'rw');
 
 no Moose;
 
-# Stringify to class
-use overload '""' => sub { return ref shift }, fallback => 1;
-
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 

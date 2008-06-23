@@ -18,7 +18,7 @@ __PACKAGE__->setup;
 sub execute {
     my $c      = shift;
     my $class  = ref( $c->component( $_[0] ) ) || $_[0];
-    my $action = "$_[1]";
+    my $action = $_[1]->reverse();
 
     my $method;
 

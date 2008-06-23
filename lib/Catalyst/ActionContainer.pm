@@ -18,13 +18,6 @@ to represent the various dispatch points in your application.
 use Class::C3;
 use Moose;
 
-use overload (
-
-    # Stringify to path part for tree search
-    q{""} => sub { shift->part },
-
-);
-
 has part => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 

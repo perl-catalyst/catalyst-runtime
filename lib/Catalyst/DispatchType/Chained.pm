@@ -268,13 +268,13 @@ sub register {
         $part = $path_part[0];
     } elsif (@path_part > 1) {
         Catalyst::Exception->throw(
-          "Multiple PathPart attributes not supported registering ${action}"
+          "Multiple PathPart attributes not supported registering " . $action->reverse()
         );
     }
 
     if ($part =~ m(^/)) {
         Catalyst::Exception->throw(
-          "Absolute parameters to PathPart not allowed registering ${action}"
+          "Absolute parameters to PathPart not allowed registering " . $action->reverse()
         );
     }
 

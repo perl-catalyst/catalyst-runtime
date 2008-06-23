@@ -14,10 +14,6 @@ use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 use Scalar::Util ();
 
-# Stringify to class
-use overload '""' => sub { return ref(shift) }, fallback => 1;
-
-
 #do these belong as package vars or should we build these via a builder method?
 # Preload these action types
 our @PRELOAD = qw/Index Path Regex/;

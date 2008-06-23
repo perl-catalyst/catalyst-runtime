@@ -24,20 +24,6 @@ the actions in the chain in order.
 
 =cut
 
-use overload (
-
-    # Stringify to reverse for debug output etc.
-    q{""} => sub { shift->{reverse} },
-
-    # Codulate to execute to invoke the encapsulated action coderef
-    '&{}' => sub { my $self = shift; sub { $self->execute(@_); }; },
-
-    # Make general $stuff still work
-    fallback => 1,
-
-);
-
-
 sub dispatch {
     my ( $self, $c ) = @_;
     my @captures = @{$c->req->captures||[]};

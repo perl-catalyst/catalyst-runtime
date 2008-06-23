@@ -1234,9 +1234,9 @@ sub execute {
     $c->state(0);
 
     if ( $c->depth >= $RECURSION ) {
-        my $action = "$code";
+        my $action = $code->reverse();
         $action = "/$action" unless $action =~ /->/;
-        my $error = qq/Deep recursion detected calling "$action"/;
+        my $error = qq/Deep recursion detected calling "${action}"/;
         $c->log->error($error);
         $c->error($error);
         $c->state(0);
@@ -1247,7 +1247,7 @@ sub execute {
 
     push( @{ $c->stack }, $code );
     
-    eval { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) };
+    eval { $c->state( $code->execute( $class, $c, @{ $c->req->args } ) || 0 ) };
 
     $c->_stats_finish_execute( $stats_info ) if $c->use_stats and $stats_info;
     
@@ -1276,9 +1276,10 @@ sub _stats_start_execute {
     return if ( ( $code->name =~ /^_.*/ )
         && ( !$c->config->{show_internal_actions} ) );
 
-    $c->counter->{"$code"}++;
+    my $action_name = $code->reverse();
+    $c->counter->{$action_name}++;
 
-    my $action = "$code";
+    my $action = $action_name;
     $action = "/$action" unless $action =~ /->/;
 
     # determine if the call was the result of a forward
@@ -1297,7 +1298,7 @@ sub _stats_start_execute {
         }
     }
 
-    my $uid = "$code" . $c->counter->{"$code"};
+    my $uid = $action_name . $c->counter->{$action_name};
 
     # is this a root-level call or a forwarded call?
     if ( $callsub =~ /forward$/ ) {
