@@ -70,7 +70,9 @@ sub finalize_cookies {
     my @cookies;
     my $response = $c->response;
 
-    while( my($name, $val) = each %{ $response->cookies } ) {
+    foreach my $name (keys %{ $response->cookies }) {
+
+        my $val = $response->cookies->{$name};
 
         my $cookie = (
             Scalar::Util::blessed($val)
@@ -293,7 +295,8 @@ sub finalize_uploads {
     my ( $self, $c ) = @_;
 
     my $request = $c->request;
-    while( my($key,$upload) = each %{ $request->uploads } ) {
+    foreach my $key (keys %{ $request->uploads }) {
+        my $upload = $request->uploads->{$key};
         unlink grep { -e $_ } map { $_->tempname }
           (ref $upload eq 'ARRAY' ? @{$upload} : ($upload));
     }
@@ -404,12 +407,14 @@ sub prepare_parameters {
     my $body_parameters = $request->body_parameters;
     my $query_parameters = $request->query_parameters;
     # We copy, no references
-    while( my($name, $param) = each(%$query_parameters) ) {
+    foreach my $name (keys %$query_parameters) {
+        my $param = $query_parameters->{$name};
         $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
     }
 
     # Merge query and body parameters
-    while( my($name, $param) = each(%$body_parameters) ) {
+    foreach my $name (keys %$body_parameters) {
+        my $param = $body_parameters->{$name};
         my @values = ref $param eq 'ARRAY' ? @$param : ($param);
         if ( my $existing = $parameters->{$name} ) {
           unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
@@ -511,7 +516,8 @@ sub prepare_uploads {
 
     my $uploads = $request->{_body}->upload;
     my $parameters = $request->parameters;
-    while(my($name,$files) = each(%$uploads) ) {
+    foreach my $name (keys %$uploads) {
+        my $files = $uploads->{$name};
         my @uploads;
         for my $upload (ref $files eq 'ARRAY' ? @$files : ($files)) {
             my $headers = HTTP::Headers->new( %{ $upload->{headers} } );
