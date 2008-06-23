@@ -19,7 +19,7 @@ This is the FastCGI engine.
 This class overloads some methods from C<Catalyst::Engine::CGI>.
 
 =head2 $self->run($c, $listen, { option => value, ... })
-
+ 
 Starts the FastCGI server.  If C<$listen> is set, then it specifies a
 location to listen for FastCGI requests;
 
@@ -61,7 +61,7 @@ Specify a filename for the pid file
 
 Specify a FCGI::ProcManager sub-class
 
-=item detach
+=item detach          
 
 Detach from console
 
@@ -99,7 +99,7 @@ sub run {
     my $error = \*STDERR; # send STDERR to the web server
        $error = \*STDOUT  # send STDERR to stdout (a logfile)
          if $options->{keep_stderr}; # (if asked to)
-
+    
     my $request =
       FCGI::Request( \*STDIN, \*STDOUT, $error, \%env, $sock,
         ( $options->{nointr} ? 0 : &FCGI::FAIL_ACCEPT_ON_INTR ),
@@ -135,16 +135,16 @@ sub run {
 
     while ( $request->Accept >= 0 ) {
         $proc_manager && $proc_manager->pm_pre_dispatch();
-
+        
         # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
         # http://lists.rawmode.org/pipermail/catalyst/2006-June/008361.html
         # Thanks to Mark Blythe for this fix
         if ( $env{SERVER_SOFTWARE} && $env{SERVER_SOFTWARE} =~ /lighttpd/ ) {
             $env{PATH_INFO} ||= delete $env{SCRIPT_NAME};
         }
-
+        
         $class->handle_request( env => \%env );
-
+        
         $proc_manager && $proc_manager->pm_post_dispatch();
     }
 }
@@ -160,11 +160,11 @@ sub write {
         $self->prepare_write($c);
         $self->{_prepared_write} = 1;
     }
-
+    
     # XXX: We can't use Engine's write() method because syswrite
     # appears to return bogus values instead of the number of bytes
     # written: http://www.fastcgi.com/om_archive/mail-archive/0128.html
-
+    
     # Prepend the headers if they have not yet been sent
     if ( my $headers = delete $self->{_header_buf} ) {
         $buffer = $headers . $buffer;
@@ -215,7 +215,7 @@ __END__
 
 =head2 Standalone FastCGI Server
 
-In server mode the application runs as a standalone server and accepts
+In server mode the application runs as a standalone server and accepts 
 connections from a web server.  The application can be on the same machine as
 the web server, on a remote machine, or even on multiple remote machines.
 Advantages of this method include running the Catalyst application as a
@@ -226,14 +226,14 @@ To start your application in server mode, install the FCGI::ProcManager
 module and then use the included fastcgi.pl script.
 
     $ script/myapp_fastcgi.pl -l /tmp/myapp.socket -n 5
-
+    
 Command line options for fastcgi.pl include:
 
     -d -daemon     Daemonize the server.
     -p -pidfile    Write a pidfile with the pid of the process manager.
     -l -listen     Listen on a socket path, hostname:port, or :port.
     -n -nproc      The number of processes started to handle requests.
-
+    
 See below for the specific web server configurations for using the external
 server.
 
@@ -242,20 +242,20 @@ server.
 Apache requires the mod_fastcgi module.  The same module supports both
 Apache 1 and 2.
 
-There are three ways to run your application under FastCGI on Apache: server,
+There are three ways to run your application under FastCGI on Apache: server, 
 static, and dynamic.
 
 =head3 Standalone server mode
 
     FastCgiExternalServer /tmp/myapp.fcgi -socket /tmp/myapp.socket
     Alias /myapp/ /tmp/myapp/myapp.fcgi/
-
+    
     # Or, run at the root
     Alias / /tmp/myapp.fcgi/
-
+    
     # Optionally, rewrite the path when accessed without a trailing slash
     RewriteRule ^/myapp$ myapp/ [R]
-
+    
 
 The FastCgiExternalServer directive tells Apache that when serving
 /tmp/myapp to use the FastCGI application listenting on the socket
@@ -264,7 +264,7 @@ it's a virtual file name.  With some versions of C<mod_fastcgi> or
 C<mod_fcgid>, you can use any name you like, but most require that the
 virtual filename end in C<.fcgi>.
 
-It's likely that Apache is not configured to serve files in /tmp, so the
+It's likely that Apache is not configured to serve files in /tmp, so the 
 Alias directive maps the url path /myapp/ to the (virtual) file that runs the
 FastCGI application. The trailing slashes are important as their use will
 correctly set the PATH_INFO environment variable used by Catalyst to
@@ -282,14 +282,14 @@ FastCGI script to run your application.
 
     FastCgiServer /path/to/myapp/script/myapp_fastcgi.pl -processes 3
     Alias /myapp/ /path/to/myapp/script/myapp_fastcgi.pl/
-
+    
 FastCgiServer tells Apache to start three processes of your application at
 startup.  The Alias command maps a path to the FastCGI application. Again,
 the trailing slashes are important.
-
+    
 =head3 Dynamic mode
 
-In FastCGI dynamic mode, Apache will run your application on demand,
+In FastCGI dynamic mode, Apache will run your application on demand, 
 typically by requesting a file with a specific extension (e.g. .fcgi).  ISPs
 often use this type of setup to provide FastCGI support to many customers.
 
@@ -321,7 +321,7 @@ Here is a complete example:
 
 Then a request for /script/myapp_fastcgi.pl will run the
 application.
-
+    
 For more information on using FastCGI under Apache, visit
 L<http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html>
 
@@ -355,7 +355,7 @@ These configurations were tested with Lighttpd 1.4.7.
 =head3 Static mode
 
     server.document-root = "/var/www/MyApp/root"
-
+    
     fastcgi.server = (
         "" => (
             "MyApp" => (
@@ -368,12 +368,12 @@ These configurations were tested with Lighttpd 1.4.7.
             )
         )
     )
-
+    
 Note that in newer versions of lighttpd, the min-procs and idle-timeout
 values are disabled.  The above example would start 5 processes.
 
 =head3 Non-root configuration
-
+    
 You can also run your application at any non-root location with either of the
 above modes.
 

@@ -10,7 +10,7 @@ Catalyst::Action - Catalyst Action
 
 =head1 DESCRIPTION
 
-This class represents a Catalyst Action. You can access the object for the
+This class represents a Catalyst Action. You can access the object for the 
 currently dispatched action via $c->action. See the L<Catalyst::Dispatcher>
 for more information on how actions are dispatched. Actions are defined in
 L<Catalyst::Controller> subclasses.

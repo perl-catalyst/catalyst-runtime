@@ -215,8 +215,8 @@ Is the log level active?
 
 =head2 abort
 
-Should Catalyst emit logs for this request? Will be reset at the end of
-each request.
+Should Catalyst emit logs for this request? Will be reset at the end of 
+each request. 
 
 *NOTE* This method is not compatible with other log apis, so if you plan
 to use Log4Perl or another logger, you should call it like this:

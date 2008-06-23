@@ -62,7 +62,7 @@ our $DETACH    = "catalyst_detach\n";
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
-  engine_class context_class request_class response_class stats_class
+  engine_class context_class request_class response_class stats_class 
   setup_finished/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
@@ -130,30 +130,30 @@ documentation and tutorials.
 
     ### in lib/MyApp.pm
     use Catalyst qw/-Debug/; # include plugins here as well
-
+    
     ### In lib/MyApp/Controller/Root.pm (autocreated)
     sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
         my ( $self, $c, @args ) = @_; # args are qw/1 2/ for /foo/1/2
         $c->stash->{template} = 'foo.tt'; # set the template
         # lookup something from db -- stash vars are passed to TT
-        $c->stash->{data} =
+        $c->stash->{data} = 
           $c->model('Database::Foo')->search( { country => $args[0] } );
         if ( $c->req->params->{bar} ) { # access GET or POST parameters
             $c->forward( 'bar' ); # process another action
-            # do something else after forward returns
+            # do something else after forward returns            
         }
     }
-
+    
     # The foo.tt TT template can use the stash data from the database
     [% WHILE (item = data.next) %]
         [% item.foo %]
     [% END %]
-
+    
     # called for /bar/of/soap, /bar/of/soap/10, etc.
     sub bar : Path('/bar/of/soap') { ... }
 
     # called for all actions, from the top-most controller downwards
-    sub auto : Private {
+    sub auto : Private { 
         my ( $self, $c ) = @_;
         if ( !$c->user_exists ) { # Catalyst::Plugin::Authentication
             $c->res->redirect( '/login' ); # require login
@@ -161,9 +161,9 @@ documentation and tutorials.
         }
         return 1; # success; carry on to next action
     }
-
+    
     # called after all actions are finished
-    sub end : Private {
+    sub end : Private { 
         my ( $self, $c ) = @_;
         if ( scalar @{ $c->error } ) { ... } # handle errors
         return if $c->res->body; # already have a response
@@ -173,20 +173,20 @@ documentation and tutorials.
     ### in MyApp/Controller/Foo.pm
     # called for /foo/bar
     sub bar : Local { ... }
-
+    
     # called for /blargle
     sub blargle : Global { ... }
-
+    
     # an index action matches /foo, but not /foo/1, etc.
     sub index : Private { ... }
-
+    
     ### in MyApp/Controller/Foo/Bar.pm
     # called for /foo/bar/baz
     sub baz : Local { ... }
-
+    
     # first Root auto is called, then Foo auto, then this
     sub auto : Private { ... }
-
+    
     # powerful regular expression paths are also possible
     sub details : Regex('^product/(\w+)/details$') {
         my ( $self, $c ) = @_;
@@ -267,7 +267,7 @@ from the system environment with CATALYST_STATS or <MYAPP>_STATS. The
 environment settings override the application, with <MYAPP>_STATS having the
 highest priority.
 
-e.g.
+e.g. 
 
    use Catalyst qw/-Stats=1/
 
@@ -338,8 +338,8 @@ sub forward { my $c = shift; $c->dispatcher->forward( $c, @_ ) }
 
 =head2 $c->detach()
 
-The same as C<forward>, but doesn't return to the previous action when
-processing is finished.
+The same as C<forward>, but doesn't return to the previous action when 
+processing is finished. 
 
 When called with no arguments it escapes the processing chain entirely.
 
@@ -366,7 +366,7 @@ Catalyst).
     $c->stash->{foo} = $bar;
     $c->stash( { moose => 'majestic', qux => 0 } );
     $c->stash( bar => 1, gorch => 2 ); # equivalent to passing a hashref
-
+    
     # stash is automatically passed to the view for use in a template
     $c->forward( 'MyApp::View::TT' );
 
@@ -475,7 +475,7 @@ sub _comp_prefixes {
     return $comp;
 }
 
-# Find possible names for a prefix
+# Find possible names for a prefix 
 
 sub _comp_names {
     my ( $c, @prefixes ) = @_;
@@ -547,7 +547,7 @@ Gets a L<Catalyst::Model> instance by name.
 
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
-If the name is omitted, it will look for
+If the name is omitted, it will look for 
  - a model object in $c->stash{current_model_instance}, then
  - a model name in $c->stash->{current_model}, then
  - a config setting 'default_model', or
@@ -561,7 +561,7 @@ sub model {
         @args )
       if $name;
     if (ref $c) {
-        return $c->stash->{current_model_instance}
+        return $c->stash->{current_model_instance} 
           if $c->stash->{current_model_instance};
         return $c->model( $c->stash->{current_model} )
           if $c->stash->{current_model};
@@ -592,7 +592,7 @@ Gets a L<Catalyst::View> instance by name.
 
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
-If the name is omitted, it will look for
+If the name is omitted, it will look for 
  - a view object in $c->stash{current_view_instance}, then
  - a view name in $c->stash->{current_view}, then
  - a config setting 'default_view', or
@@ -606,7 +606,7 @@ sub view {
         @args )
       if $name;
     if (ref $c) {
-        return $c->stash->{current_view_instance}
+        return $c->stash->{current_view_instance} 
           if $c->stash->{current_view_instance};
         return $c->view( $c->stash->{current_view} )
           if $c->stash->{current_view};
@@ -871,7 +871,7 @@ You are running an old script!
 
 EOF
     }
-
+    
     if ( $class->debug ) {
         my @plugins = map { "$_  " . ( $_->VERSION || '' ) } $class->registered_plugins;
 
@@ -980,7 +980,7 @@ sub uri_for {
         }
         unshift(@args, $namespace || '');
     }
-
+    
     # join args with '/', or a blank string
     my $args = join('/', grep { defined($_) } @args);
     $args =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
@@ -1151,7 +1151,7 @@ sub welcome_message {
                      </li>
                  </ul>
                  <h2>In conclusion</h2>
-                 <p>The Catalyst team hopes you will enjoy using Catalyst as much
+                 <p>The Catalyst team hopes you will enjoy using Catalyst as much 
                     as we enjoyed making it. Please contact us if you have ideas
                     for improvement or other feedback.</p>
              </div>
@@ -1203,8 +1203,8 @@ that will be dumped on the error page in debug mode.
 
 sub dump_these {
     my $c = shift;
-    [ Request => $c->req ],
-    [ Response => $c->res ],
+    [ Request => $c->req ], 
+    [ Response => $c->res ], 
     [ Stash => $c->stash ],
     [ Config => $c->config ];
 }
@@ -1238,11 +1238,11 @@ sub execute {
     my $stats_info = $c->_stats_start_execute( $code ) if $c->use_stats;
 
     push( @{ $c->stack }, $code );
-
+    
     eval { $c->state( &$code( $class, $c, @{ $c->req->args } ) || 0 ) };
 
     $c->_stats_finish_execute( $stats_info ) if $c->use_stats and $stats_info;
-
+    
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
@@ -1297,7 +1297,7 @@ sub _stats_start_execute {
         # forward, locate the caller
         if ( my $parent = $c->stack->[-1] ) {
             $c->stats->profile(
-                begin  => $action,
+                begin  => $action, 
                 parent => "$parent" . $c->counter->{"$parent"},
                 uid    => $uid,
             );
@@ -1312,7 +1312,7 @@ sub _stats_start_execute {
         }
     }
     else {
-
+        
         # root-level call
         $c->stats->profile(
             begin => $action,
@@ -1339,7 +1339,7 @@ sub _localize_fields {
 
     my $request = delete $localized->{request} || {};
     my $response = delete $localized->{response} || {};
-
+    
     local @{ $c }{ keys %$localized } = values %$localized;
     local @{ $c->request }{ keys %$request } = values %$request;
     local @{ $c->response }{ keys %$response } = values %$response;
@@ -1383,12 +1383,12 @@ sub finalize {
 
         $c->finalize_body;
     }
-
-    if ($c->use_stats) {
+    
+    if ($c->use_stats) {        
         my $elapsed = sprintf '%f', $c->stats->elapsed;
         my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
         $c->log->info(
-            "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
+            "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );        
     }
 
     return $c->response->status;
@@ -1539,7 +1539,7 @@ sub handle_request {
 
         my $c = $class->prepare(@arguments);
         $c->dispatch;
-        $status = $c->finalize;
+        $status = $c->finalize;   
     };
 
     if ( my $error = $@ ) {
@@ -1600,7 +1600,7 @@ sub prepare {
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
     if ( $c->debug ) {
-        $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
+        $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );            
     }
 
     # For on-demand data
@@ -1623,7 +1623,7 @@ sub prepare {
         # Prepare the body for reading, either by prepare_body
         # or the user, if they are using $c->read
         $c->prepare_read;
-
+        
         # Parse the body unless the user wants it on-demand
         unless ( $c->config->{parse_on_demand} ) {
             $c->prepare_body;
@@ -1891,9 +1891,9 @@ sub setup_components {
     my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
     my $config  = $class->config->{ setup_components };
     my $extra   = delete $config->{ search_extra } || [];
-
+    
     push @paths, @$extra;
-
+        
     my $locator = Module::Pluggable::Object->new(
         search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
         %$config
@@ -1901,7 +1901,7 @@ sub setup_components {
 
     my @comps = sort { length $a <=> length $b } $locator->plugins;
     my %comps = map { $_ => 1 } @comps;
-
+    
     for my $component ( @comps ) {
 
         # We pass ignore_loaded here so that overlay files for (e.g.)
@@ -1916,11 +1916,11 @@ sub setup_components {
             $component => $module,
             map {
                 $_ => $class->setup_component( $_ )
-            } grep {
+            } grep { 
               not exists $comps{$_}
             } Devel::InnerPackage::list_packages( $component )
         );
-
+        
         for my $key ( keys %modules ) {
             $class->components->{ $key } = $modules{ $key };
         }
@@ -2177,7 +2177,7 @@ sub setup_stats {
 }
 
 
-=head2 $c->registered_plugins
+=head2 $c->registered_plugins 
 
 Returns a sorted list of the plugins which have either been stated in the
 import list or which have been added via C<< MyApp->plugin(@args); >>.
@@ -2314,7 +2314,7 @@ but if you want to handle input yourself, you can enable on-demand
 parsing with a config parameter.
 
     MyApp->config->{parse_on_demand} = 1;
-
+    
 =head1 PROXY SUPPORT
 
 Many production servers operate using the common double-server approach,
@@ -2328,9 +2328,9 @@ Catalyst will automatically detect this situation when you are running
 the frontend and backend servers on the same machine. The following
 changes are made to the request.
 
-    $c->req->address is set to the user's real IP address, as read from
+    $c->req->address is set to the user's real IP address, as read from 
     the HTTP X-Forwarded-For header.
-
+    
     The host value for $c->req->base and $c->req->uri is set to the real
     host, as read from the HTTP X-Forwarded-Host header.
 
@@ -2342,7 +2342,7 @@ configuration option to tell Catalyst to read the proxied data from the
 headers.
 
     MyApp->config->{using_frontend_proxy} = 1;
-
+    
 If you do not wish to use the proxy support at all, you may set:
 
     MyApp->config->{ignore_frontend_proxy} = 1;

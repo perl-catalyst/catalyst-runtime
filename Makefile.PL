@@ -1,6 +1,6 @@
 use inc::Module::Install 0.64;
 
-use 5.008001;
+use 5.008001; 
 perl_version '5.8.1';
 
 name 'Catalyst-Runtime';
@@ -40,7 +40,7 @@ if (-e 'inc/.author') {
   build_requires 'Test::Pod' => 1.14;
   build_requires 'Test::Pod::Coverage' => 1.04;
 
-  if ($^O eq 'darwin') {
+  if ($^O eq 'darwin') { 
       my $osx_ver = `/usr/bin/sw_vers -productVersion`;
       chomp $osx_ver;
 
@@ -50,7 +50,7 @@ if (-e 'inc/.author') {
 
       makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
                                         qq{ echo "You must set the ENV variable $attr to true,"; }.
-                                        ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
+                                        ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
   }
 }
 
@@ -70,7 +70,7 @@ print <<"EOF";
         perl -MCPANPLUS -e 'install Catalyst::Devel' # or
         perl -MCPAN -e 'install Catalyst::Devel'
 
-    To get some commonly used plugins, as well as the TT view and DBIC
+    To get some commonly used plugins, as well as the TT view and DBIC 
     model, install Task::Catalyst in the same way.
 
  Have fun!

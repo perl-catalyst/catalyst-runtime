@@ -61,8 +61,8 @@ sub finalize_headers {
 
     # Should we keep the connection open?
     my $connection = $c->request->header('Connection');
-    if (   $self->{options}->{keepalive}
-        && $connection
+    if (   $self->{options}->{keepalive} 
+        && $connection 
         && $connection =~ /^keep-alive$/i
     ) {
         $res_headers->header( Connection => 'keep-alive' );
@@ -105,7 +105,7 @@ befpre prepare_read => sub {
 sub read_chunk {
     my $self = shift;
     my $c    = shift;
-
+    
     # If we have any remaining data in the input buffer, send it back first
     if ( $_[0] = delete $self->{inputbuf} ) {
         my $read = length( $_[0] );
@@ -159,7 +159,7 @@ around write => sub {
     else {
         DEBUG && warn "write: Wrote response ($ret bytes)\n";
     }
-
+    
     return $ret;
 };
 
@@ -172,7 +172,7 @@ sub run {
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
-
+    
     $self->{options} = $options;
 
     if ($options->{background}) {
@@ -276,10 +276,10 @@ sub run {
                 }
 
                 $self->_handler( $class, $port, $method, $uri, $protocol );
-
+            
                 if ( my $error = delete $self->{_write_error} ) {
                     close Remote;
-
+                    
                     if ( !defined $pid ) {
                         next LISTEN;
                     }
@@ -311,9 +311,9 @@ sub run {
             close Remote;
         }
     }
-
+    
     $daemon->close;
-
+    
     DEBUG && warn "Shutting down\n";
 
     if ($restart) {
@@ -324,8 +324,8 @@ sub run {
         ### those include dirs upon re-exec. So add them to PERL5LIB, so they
         ### are available again for the exec'ed process --kane
         use Config;
-        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC;
-
+        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC; 
+        
         exec $^X, $0, @{ $options->{argv} };
     }
 
@@ -346,11 +346,11 @@ sub _handler {
 
     my $sel = IO::Select->new;
     $sel->add( \*STDIN );
-
+    
     REQUEST:
     while (1) {
         my ( $path, $query_string ) = split /\?/, $uri, 2;
-
+        
         # Initialize CGI environment
         local %ENV = (
             PATH_INFO       => $path         || '',
@@ -371,37 +371,37 @@ sub _handler {
 
         # Pass flow control to Catalyst
         $class->handle_request;
-
+    
         DEBUG && warn "Request done\n";
-
+    
         # Allow keepalive requests, this is a hack but we'll support it until
         # the next major release.
         if ( delete $self->{_keepalive} ) {
-
+            
             DEBUG && warn "Reusing previous connection for keep-alive request\n";
-
-            if ( $sel->can_read(1) ) {
+            
+            if ( $sel->can_read(1) ) {            
                 if ( !$self->_read_headers ) {
                     # Error reading, give up
                     last REQUEST;
                 }
 
                 ( $method, $uri, $protocol ) = $self->_parse_request_line;
-
+                
                 DEBUG && warn "Parsed request: $method $uri $protocol\n";
-
+                
                 # Force HTTP/1.0
                 $protocol = '1.0';
-
+                
                 next REQUEST;
             }
-
+            
             DEBUG && warn "No keep-alive request within 1 second\n";
         }
-
+        
         last REQUEST;
     }
-
+    
     DEBUG && warn "Closing connection\n";
 
     close Remote;
@@ -472,19 +472,19 @@ sub _parse_headers {
         }
     }
     $headers->push_header( $key, $val ) if $key;
-
+    
     DEBUG && warn "Parsed headers: " . dump($headers) . "\n";
 
     # Convert headers into ENV vars
     $headers->scan( sub {
         my ( $key, $val ) = @_;
-
+        
         $key = uc $key;
         $key = 'COOKIE' if $key eq 'COOKIES';
         $key =~ tr/-/_/;
         $key = 'HTTP_' . $key
             unless $key =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
-
+            
         if ( exists $ENV{$key} ) {
             $ENV{$key} .= ", $val";
         }
@@ -498,19 +498,19 @@ sub _socket_data {
     my ( $self, $handle ) = @_;
 
     my $remote_sockaddr       = getpeername($handle);
-    my ( undef, $iaddr )      = $remote_sockaddr
-        ? sockaddr_in($remote_sockaddr)
+    my ( undef, $iaddr )      = $remote_sockaddr 
+        ? sockaddr_in($remote_sockaddr) 
         : (undef, undef);
-
+        
     my $local_sockaddr        = getsockname($handle);
     my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
 
     # This mess is necessary to keep IE from crashing the server
     my $data = {
-        peername  => $iaddr
+        peername  => $iaddr 
             ? ( gethostbyaddr( $iaddr, AF_INET ) || 'localhost' )
             : 'localhost',
-        peeraddr  => $iaddr
+        peeraddr  => $iaddr 
             ? ( inet_ntoa($iaddr) || '127.0.0.1' )
             : '127.0.0.1',
         localname => gethostbyaddr( $localiaddr, AF_INET ) || 'localhost',

@@ -53,9 +53,9 @@ Catalyst::Controller - Catalyst Controller base class
   package MyApp::Controller::Search
   use base qw/Catalyst::Controller/;
 
-  sub foo : Local {
+  sub foo : Local { 
     my ($self,$c,@args) = @_;
-    ...
+    ... 
   } # Dispatches to /search/foo
 
 =head1 DESCRIPTION
@@ -380,7 +380,7 @@ controller name. For instance controller 'MyApp::Controller::Foo::Bar'
 will be bound to 'foo/bar'. The default Root controller is an example
 of setting namespace to '' (the null string).
 
-=head2 path
+=head2 path 
 
 Sets 'path_prefix', as described below.
 

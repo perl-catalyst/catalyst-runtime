@@ -10,7 +10,7 @@ sub prepare {
 
     $c->response->header( 'X-Catalyst-Engine' => $c->engine );
     $c->response->header( 'X-Catalyst-Debug' => $c->debug ? 1 : 0 );
-
+    
     {
         my $components = join( ', ', sort keys %{ $c->components } );
         $c->response->header( 'X-Catalyst-Components' => $components );

@@ -198,7 +198,7 @@ sub recurse_match {
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
                 #    And therefore is a better match
-                # OR No parts and this expects 0
+                # OR No parts and this expects 0 
                 #    The current best action might also be Args(0),
                 #    but we couldn't chose between then anyway so we'll take the last seen
 
@@ -325,7 +325,7 @@ sub uri_for_action {
     return undef if @captures; # fail for too many captures
 
     return join('/', '', @parts);
-
+   
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -488,7 +488,7 @@ this debugging output:
   '-----------------------+------------------------------'
   ...
 
-Here's a more detailed specification of the attributes belonging to
+Here's a more detailed specification of the attributes belonging to 
 C<:Chained>:
 
 =head2 Attributes

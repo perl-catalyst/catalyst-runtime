@@ -51,7 +51,7 @@ application based on the attributes you set.
 
 =head1 METHODS
 
-=head2 new
+=head2 new 
 
 Construct a new dispatcher.
 
@@ -306,9 +306,9 @@ sub get_action {
     return $self->_action_hash->{"${namespace}/${name}"};
 }
 
-=head2 $self->get_action_by_path( $path );
+=head2 $self->get_action_by_path( $path ); 
 
-Returns the named action by its full path.
+Returns the named action by its full path. 
 
 =cut
 

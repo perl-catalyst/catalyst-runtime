@@ -28,7 +28,7 @@ Catalyst::AttrContainer
 
 =head1 DESCRIPTION
 
-This class sets up the code attribute cache.  It's a base class for
+This class sets up the code attribute cache.  It's a base class for 
 L<Catalyst::Controller>.
 
 =head1 METHODS

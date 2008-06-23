@@ -13,10 +13,10 @@ sub error {
     if ( $_[0] =~ /^(Unknown resource|No default action defined)/ ) {
         $c->response->status(404);
     }
-
+    
     if ( $_[0] =~ /^Couldn\'t forward/ ) {
         $c->response->status(404);
-    }
+    }    
 
     if ( $_[0] =~ /^Caught exception/ ) {
         $c->response->status(500);

@@ -18,8 +18,8 @@ around run => sub {
         close STDOUT;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
-            directory => (
-                $options->{restart_directory} ||
+            directory => ( 
+                $options->{restart_directory} || 
                 File::Spec->catdir( $FindBin::Bin, '..' )
             ),
             follow_symlinks => $options->{follow_symlinks},
