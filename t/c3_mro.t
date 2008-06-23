@@ -13,7 +13,7 @@ my @cat_mods;
 {
   local @INC = grep {/blib/} @INC;
   @cat_mods = (
-    'Catalyst', 
+    'Catalyst',
     Module::Pluggable::Object->new(search_path => ['Catalyst'])->plugins,
   );
 }

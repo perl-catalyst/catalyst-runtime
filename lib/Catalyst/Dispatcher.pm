@@ -15,7 +15,7 @@ use Tree::Simple::Visitor::FindByPath;
 use Scalar::Util ();
 
 # Stringify to class
-use overload '""' => sub { return ref shift }, fallback => 1;
+use overload '""' => sub { return ref(shift) }, fallback => 1;
 
 
 # Preload these action types
@@ -396,6 +396,7 @@ sub register {
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
             #eval "require $class";
+            #some error checking rethrowing here wouldn't hurt.
             eval { Class::MOP::load_class($class) };
             push( @{ $self->_dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;

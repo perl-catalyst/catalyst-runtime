@@ -78,7 +78,12 @@ sub import {
 
     unless ( $caller->isa('Catalyst') ) {
         no strict 'refs';
-        push @{"$caller\::ISA"}, $class, 'Catalyst::Controller';
+        if( $caller->can('meta') ){
+          my @superclasses = ($caller->meta->superclasses, $class, 'Catalyst::Controller');
+          $caller->meta->superclasses(@superclasses);
+        } else {
+          push @{"$caller\::ISA"}, $class, 'Catalyst::Controller';
+        }
     }
 
     $caller->arguments( [@arguments] );
@@ -677,14 +682,15 @@ L<Catalyst::Plugin::ConfigLoader>.
 
 =cut
 
-sub config {
+around config => sub {
+    my $orig = shift;
     my $c = shift;
 
     $c->log->warn("Setting config after setup has been run is not a good idea.")
       if ( @_ and $c->setup_finished );
 
-    $c->NEXT::config(@_);
-}
+    $c->$orig(@_);
+};
 
 =head2 $c->log
 
@@ -1875,7 +1881,8 @@ sub setup_components {
         # Model::DBI::Schema sub-classes are loaded - if it's in @comps
         # we know M::P::O found a file on disk so this is safe
 
-        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+        #Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+        Class::MOP::load_class($component);
 
         my $module  = $class->setup_component( $component );
         my %modules = (
@@ -2180,7 +2187,12 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
             no strict 'refs';
-            unshift @{"$class\::ISA"}, $plugin;
+            if( $class->can('meta') ){
+              my @superclasses = ($plugin, $class->meta->superclasses );
+              $class->meta->superclasses(@superclasses);
+            } else {
+              unshift @{"$class\::ISA"}, $plugin;
+            }
         }
         return $class;
     }

@@ -1,8 +1,27 @@
 package Catalyst::Controller;
 
-use strict;
+use Moose;
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 
+#Why does the following blow up?
+#extends qw/Catalyst::Component Catalyst::AttrContainer/;
+
+has path => (
+             is => 'ro',
+             isa => 'Str',
+             predicate => 'has_path',
+            );
+
+#this are frefixed like this because _namespace clases with something in
+#Catalyst.pm . to be fixed later.
+has _namespace => (
+                   is => 'ro',
+                   isa => 'Str',
+                   init_arg => 'namespace',
+                   predicate => '_has_namespace',
+                 );
+
+use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::Inspector;
@@ -39,7 +58,9 @@ __PACKAGE__->_action_class('Catalyst::Action');
 __PACKAGE__->mk_accessors( qw/_application/ );
 
 ### _app as alias
-*_app = *_application;
+sub _app{ shift->_application }
+#for now.
+#*_app = *_application;
 
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
@@ -88,13 +109,14 @@ sub _END : Private {
     return !@{ $c->error };
 }
 
-sub new {
+around new => sub {
+    my $orig = shift;
     my $self = shift;
     my $app = $_[0];
-    my $new = $self->NEXT::new(@_);
+    my $new = $self->$orig(@_);
     $new->_application( $app );
     return $new;
-}
+};
 
 
 sub action_for {
@@ -108,8 +130,11 @@ sub action_namespace {
     unless ( $c ) {
         $c = ($self->isa('Catalyst') ? $self : $self->_application);
     }
-    my $hash = (ref $self ? $self : $self->config); # hate app-is-class
-    return $hash->{namespace} if exists $hash->{namespace};
+    if( ref($self) ){
+      return $self->_namespace if $self->_has_namespace;
+    } # else {
+      return $self->config->{namespace} if exists $self->config->{namespace};
+    #}
     return Catalyst::Utils::class2prefix( ref($self) || $self,
         $c->config->{case_sensitive} )
       || '';
@@ -120,8 +145,11 @@ sub path_prefix {
     unless ( $c ) {
         $c = ($self->isa('Catalyst') ? $self : $self->_application);
     }
-    my $hash = (ref $self ? $self : $self->config); # hate app-is-class
-    return $hash->{path} if exists $hash->{path};
+    if( ref($self) ){
+      return $self->path if $self->has_path;
+    } # else {
+      return $self->config->{path} if exists $self->config->{path};
+    #}
     return shift->action_namespace(@_);
 }
 
@@ -129,12 +157,21 @@ sub path_prefix {
 sub register_actions {
     my ( $self, $c ) = @_;
     my $class = ref $self || $self;
+    #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
     my %methods;
-    $methods{ $self->can($_) } = $_
-      for @{ Class::Inspector->methods($class) || [] };
+    if( $self->can('meta') ){
+      my $meta = $self->meta;
+      %methods = map{ $_->{code}->body => $_->{name} }
+        grep {$_->{class} ne 'Moose::Object'}
+          $meta->compute_all_applicable_methods;
+    } else { #until we are sure there's no moose stuff left...
+      $methods{ $self->can($_) } = $_
+        for @{ Class::Inspector->methods($class) || [] };
+    }
 
     # Advanced inheritance support for plugins and the like
+    #to be modified to use meta->superclasses
     my @action_cache;
     {
         no strict 'refs';
@@ -156,7 +193,7 @@ sub register_actions {
               if $c->debug;
             next;
         }
-        my $reverse = $namespace ? "$namespace/$method" : $method;
+        my $reverse = $namespace ? "${namespace}/${method}" : $method;
         my $action = $self->create_action(
             name       => $method,
             code       => $code,
@@ -204,7 +241,9 @@ sub _parse_attrs {
         }
     }
 
-    my $hash = (ref $self ? $self : $self->config); # hate app-is-class
+    #this will not work under moose
+    #my $hash = (ref $self ? $self : $self->config); # hate app-is-class
+    my $hash = $self->config;
 
     if (exists $hash->{actions} || exists $hash->{action}) {
       my $a = $hash->{actions} || $hash->{action};
