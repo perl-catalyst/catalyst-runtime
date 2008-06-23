@@ -519,7 +519,7 @@ sub _load_dispatch_types {
     for my $type (@types) {
         my $class =
           ( $type =~ /^\+(.*)$/ ) ? $1 : "Catalyst::DispatchType::${type}";
-        #eval "require $class";
+
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;

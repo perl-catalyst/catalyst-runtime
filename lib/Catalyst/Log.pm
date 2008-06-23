@@ -1,5 +1,6 @@
 package Catalyst::Log;
 
+use Class::C3;
 use Moose;
 use Data::Dump;
 
@@ -36,13 +37,12 @@ has abort => (is => 'rw');
     }
 }
 
-around new => sub {
-    my $orig = shift;
+sub new {
     my $class = shift;
-    my $self = $class->$orig;
+    my $self = $class->next::method;
     $self->levels( scalar(@_) ? @_ : keys %LEVELS );
     return $self;
-};
+}
 
 sub levels {
     my ( $self, @levels ) = @_;

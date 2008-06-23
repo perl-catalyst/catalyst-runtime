@@ -1,10 +1,9 @@
 package Catalyst::DispatchType::Regex;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::DispatchType::Path';
 
-#use strict;
-#use base qw/Catalyst::DispatchType::Path/;
 use Text::SimpleTable;
 use Text::Balanced ();
 
@@ -14,6 +13,8 @@ has _compiled => (
                   required => 1,
                   default => sub{ [] },
                  );
+
+no Moose;
 
 =head1 NAME
 
@@ -161,7 +162,6 @@ the same terms as Perl itself.
 
 =cut
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

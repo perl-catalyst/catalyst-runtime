@@ -1,10 +1,9 @@
 package Catalyst::DispatchType::Index;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::DispatchType';
-
-#use strict;
-#use base qw/Catalyst::DispatchType/;
+no Moose;
 
 =head1 NAME
 
@@ -69,7 +68,6 @@ the same terms as Perl itself.
 
 =cut
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

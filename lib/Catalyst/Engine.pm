@@ -1,5 +1,6 @@
 package Catalyst::Engine;
 
+use Class::C3;
 use Moose;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
@@ -15,6 +16,8 @@ use Scalar::Util ();
 # input position and length
 has read_length => (is => 'rw');
 has read_position => (is => 'rw');
+
+no Moose;
 
 # Stringify to class
 use overload '""' => sub { return ref shift }, fallback => 1;

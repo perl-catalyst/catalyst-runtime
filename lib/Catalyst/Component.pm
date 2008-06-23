@@ -1,5 +1,6 @@
 package Catalyst::Component;
 
+use Class::C3;
 use Moose;
 use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
@@ -8,6 +9,7 @@ use Catalyst::Utils;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 with 'Catalyst::ClassData';
 
+no Moose;
 
 =head1 NAME
 
@@ -54,38 +56,32 @@ component loader with config() support and a process() method placeholder.
 
 __PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
-around new => sub {
-    my $orig = shift;
+sub new {
     my ( $self, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
     my $args =  $self->merge_config_hashes( $self->config, $arguments );
-    return $self->$orig( $args );
-};
+    $self->next::method( $args );
+}
 
 sub COMPONENT {
     my ( $self, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-    $self->new($c, $arguments);
 
-#     if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
-#         return $new;
-#     }
-#     else {
-#         if ( my $new = $self->new( $c, $arguments ) ) {
-#             return $new;
-#         }
-#         else {
-#             my $class = ref $self || $self;
-#             my $new   = $self->merge_config_hashes(
-#                 $self->config, $arguments );
-#             return bless $new, $class;
-#         }
-#     }
+
+    #this is not the EXACT logic we had before, since  the original tested
+    #for a true value before returning meaning that a subsequent COMPONENT
+    #call could return undef and that would trigger a try to new, which could
+    #again return undef, which would lead to a straight bless of the args and
+    #config. I did not mantain that behavior because it did not seemed sane
+    # please rip me a new one if you have reason to believe i am being stupid
+    # --groditi
+    return $self->next::can ?
+      $self->next::method($c, $arguments) : $self->new($c, $arguments);
 }
 
 sub config {

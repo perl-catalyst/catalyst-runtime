@@ -1,9 +1,12 @@
 package Catalyst::ActionChain;
 
+use Class::C3;
 use Moose;
 extends qw(Catalyst::Action);
 
 has chain => (is => 'rw');
+
+no Moose;
 
 =head1 NAME
 
@@ -57,7 +60,6 @@ sub from_chain {
     return $self->new({ %$final, chain => $actions });
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 

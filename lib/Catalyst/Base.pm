@@ -1,8 +1,9 @@
 package Catalyst::Base;
 
+use Class::C3;
 use Moose;
 BEGIN{ extends qw/Catalyst::Controller/ };
-
+no Moose;
 
 1;
 

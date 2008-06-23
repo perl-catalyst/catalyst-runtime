@@ -1,6 +1,7 @@
 package Catalyst::Controller;
 
 #switch to BEGIN { extends qw/ ... /; } ?
+use Class::C3;
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 use Moose;
 
@@ -34,7 +35,7 @@ has actions =>
 
 # isa => 'ClassName|Catalyst' ?
 has _application => (is => 'rw');
-sub _app{ shift->_application(@_) } # eww
+sub _app{ shift->_application(@_) } 
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -122,14 +123,13 @@ sub _END : Private {
     return !@{ $c->error };
 }
 
-around new => sub {
-    my $orig = shift;
+sub new {
     my $self = shift;
     my $app = $_[0];
-    my $new = $self->$orig(@_);
+    my $new = $self->next::method(@_);
     $new->_application( $app );
     return $new;
-};
+}
 
 sub action_for {
     my ( $self, $name ) = @_;
@@ -137,18 +137,25 @@ sub action_for {
     return $app->dispatcher->get_action($name, $self->action_namespace);
 }
 
+#my opinion is that this whole sub really should be a builder method, not 
+#something that happens on every call. Anyone else disagree?? -- groditi
+
+#we are wrapping the accessor, so just uyse a modifier since a normal sub would
+#just be overridden by the generated moose method 
 around action_namespace => sub {
-    my ( $orig, $self, $c ) = @_;
+    my $orig = shift;
+    my ( $self, $c ) = @_;
 
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
-    } else {
+    } else { 
+        # if the following won't change at runtime it should be lazy_building thing
         return $self->config->{namespace} if exists $self->config->{namespace};
     }
 
     #the following looks like a possible target for a default setting. i am not
     #making the below the builder because i don't know if $c will vary from
-    #call to call, which would affect case sensitivitysettings -- groditi
+    #call to call, which would affect case sensitivity settings -- groditi
     my $case_s;
     if( $c ){
         $case_s = $c->config->{case_sensitive};
@@ -167,7 +174,7 @@ around action_namespace => sub {
     return Catalyst::Utils::class2prefix(ref($self) || $self, $case_s) || '';
 };
 
-
+#Once again, this is probably better written as a builder method
 around path_prefix => sub {
     my $orig = shift;
     my $self = shift;
@@ -361,6 +368,8 @@ sub _parse_MyAction_attr {
 
     return ( 'ActionClass', $value );
 }
+
+no Moose;
 
 1;
 

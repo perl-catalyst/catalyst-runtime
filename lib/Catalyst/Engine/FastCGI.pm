@@ -1,8 +1,10 @@
 package Catalyst::Engine::FastCGI;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::Engine::CGI';
 
+# eval { Class::MOP::load_class("FCGI") };
 eval "use FCGI";
 die "Unable to load the FCGI module, you may need to install it:\n$@\n" if $@;
 

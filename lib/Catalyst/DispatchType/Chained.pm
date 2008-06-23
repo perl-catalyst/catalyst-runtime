@@ -1,5 +1,6 @@
 package Catalyst::DispatchType::Chained;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::DispatchType';
 
@@ -27,6 +28,8 @@ has _children_of => (
                      required => 1,
                      default => sub{ {} },
                     );
+
+no Moose;
 
 # please don't perltidy this. hairy code within.
 
@@ -328,7 +331,6 @@ sub uri_for_action {
    
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 =head1 USAGE

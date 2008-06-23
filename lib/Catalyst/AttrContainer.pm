@@ -5,6 +5,8 @@ use Catalyst::Exception;
 
 with 'Catalyst::ClassData';
 
+no Moose;
+
 __PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache/;
 __PACKAGE__->_attr_cache( {} );
 __PACKAGE__->_action_cache( [] );

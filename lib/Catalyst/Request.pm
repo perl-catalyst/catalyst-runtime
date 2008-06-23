@@ -1,5 +1,6 @@
 package Catalyst::Request;
 
+use Class::C3;
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;
@@ -32,9 +33,16 @@ has headers => (
   lazy => 1,
 );
 
+#Moose ToDo:
+#can we lose the before modifiers which just call prepare_body ?
+#they are wasteful, slow us down and feel cluttery.
+# Can we call prepare_body at BUILD time?
+# Can we make _body an attribute and have the rest of these lazy build from there?
+
 has _context => (
   is => 'rw',
   weak_ref => 1,
+  handles => ['read'],
 );
 
 has body_parameters => (
@@ -56,10 +64,11 @@ has uploads => (
   default => sub { {} },
 );
 
-before uploads => sub {
-  my ($self) = @_;
-  #$self->_context->prepare_body;
-};
+# modifier was a noop (groditi)
+# before uploads => sub {
+#   my ($self) = @_;
+#   #$self->_context->prepare_body;
+# };
 
 has parameters => (
   is => 'rw',
@@ -435,10 +444,6 @@ used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
 You have to set MyApp->config->{parse_on_demand} to use this directly.
-
-=cut
-
-sub read { shift->_context->read(@_); }
 
 =head2 $req->referer
 

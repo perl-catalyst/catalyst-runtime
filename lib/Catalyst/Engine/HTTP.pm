@@ -1,7 +1,10 @@
 package Catalyst::Engine::HTTP;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::Engine::CGI';
+no Moose;
+
 use Data::Dump qw(dump);
 use Errno 'EWOULDBLOCK';
 use HTTP::Date ();
@@ -83,20 +86,22 @@ sub finalize_headers {
 
 =cut
 
-before finalize_read => sub {
+sub finalize_read {
     # Never ever remove this, it would result in random length output
     # streams if STDIN eq STDOUT (like in the HTTP engine)
     *STDIN->blocking(1);
-};
+    shift->next::method(@_);
+}
 
 =head2 $self->prepare_read($c)
 
 =cut
 
-befpre prepare_read => sub {
+sub prepare_read {
     # Set the input handle to non-blocking
     *STDIN->blocking(0);
-};
+    shift->next::method(@_);
+}
 
 =head2 $self->read_chunk($c, $buffer, $length)
 
@@ -138,8 +143,7 @@ Writes the buffer to the client.
 
 =cut
 
-around write => sub {
-    my $orig = shift;
+sub write {
     my ( $self, $c, $buffer ) = @_;
 
     # Avoid 'print() on closed filehandle Remote' warnings when using IE
@@ -150,7 +154,7 @@ around write => sub {
         $buffer = $headers . $buffer;
     }
 
-    my $ret = $self->$orig( $c, $buffer );
+    my $ret = $self->next::method($c, $buffer);
 
     if ( !defined $ret ) {
         $self->{_write_error} = $!;
@@ -159,9 +163,9 @@ around write => sub {
     else {
         DEBUG && warn "write: Wrote response ($ret bytes)\n";
     }
-    
+
     return $ret;
-};
+}
 
 =head2 run
 

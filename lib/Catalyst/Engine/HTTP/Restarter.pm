@@ -1,11 +1,13 @@
 package Catalyst::Engine::HTTP::Restarter;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::Engine::HTTP';
+no Moose;
+
 use Catalyst::Engine::HTTP::Restarter::Watcher;
 
-around run => sub {
-    my $orig = shift;
+sub run {
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
@@ -66,7 +68,7 @@ around run => sub {
         }
     }
 
-    return $self->$orig( $class, $port, $host, $options );
+    return $self->next::method( $class, $port, $host, $options );
 };
 
 1;

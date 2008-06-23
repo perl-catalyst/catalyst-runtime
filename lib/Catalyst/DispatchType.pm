@@ -1,8 +1,8 @@
 package Catalyst::DispatchType;
 
-use Moose;
-#use strict;
-#use base 'Class::Accessor::Fast';
+use Class::C3;
+use Moose; # using it to add Moose::Object to @ISA ...
+no Moose;
 
 =head1 NAME
 
@@ -71,7 +71,6 @@ the same terms as Perl itself.
 
 =cut
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

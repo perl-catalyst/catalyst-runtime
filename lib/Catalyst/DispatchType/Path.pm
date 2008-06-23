@@ -1,10 +1,9 @@
 package Catalyst::DispatchType::Path;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::DispatchType';
 
-#use strict;
-#use base qw/Catalyst::DispatchType/;
 use Text::SimpleTable;
 use URI;
 
@@ -14,6 +13,8 @@ has _paths => (
                required => 1,
                default => sub { +{} },
               );
+
+no Moose;
 
 =head1 NAME
 
@@ -140,7 +141,6 @@ the same terms as Perl itself.
 
 =cut
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

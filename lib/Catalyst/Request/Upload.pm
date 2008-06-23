@@ -1,5 +1,6 @@
 package Catalyst::Request::Upload;
 
+use Class::C3;
 use Moose;
 
 use Catalyst::Exception;

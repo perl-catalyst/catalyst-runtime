@@ -1,5 +1,6 @@
 package Catalyst::Response;
 
+use Class::C3;
 use Moose;
 use HTTP::Headers;
 
@@ -18,6 +19,7 @@ has headers   => (
 has _context => (
   is => 'rw',
   weak_ref => 1,
+  handles => ['write'],
 );
 
 sub output { shift->body(@_) }
@@ -152,10 +154,6 @@ Sets or returns the HTTP status.
 =head2 $res->write( $data )
 
 Writes $data to the output stream.
-
-=cut
-
-sub write { shift->_context->write(@_); }
 
 =head2 meta
 

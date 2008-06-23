@@ -15,6 +15,7 @@ to represent the various dispatch points in your application.
 
 =cut
 
+use Class::C3;
 use Moose;
 
 use overload (
@@ -27,14 +28,14 @@ use overload (
 has part => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
-around 'new' => sub {
-  my $next = shift;
+no Moose;
+
+sub new {
   my ($self, $params) = @_;
   $params = { part => $params } unless ref $params;
-  $next->($self, $params);
-};
+  $self->next::method($params);
+}
 
-no Moose;
 
 sub get_action {
     my ( $self, $name ) = @_;

@@ -4,7 +4,9 @@ use Moose;
 extends qw/Catalyst::Component/;
 
 no Moose;
-__PACKAGE__->meta->make_immutable();
+
+#We can't immutablize anything that ISA Component just yet
+#__PACKAGE__->meta->make_immutable();
 
 =head1 NAME
 

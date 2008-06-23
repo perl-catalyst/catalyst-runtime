@@ -13,16 +13,10 @@ has directory => (is => 'rw');
 has watch_list => (is => 'rw');
 has follow_simlinks => (is => 'rw');
 
-sub new {
-    my ( $class, %args ) = @_;
+no Moose;
 
-    my $self = {%args};
-
-    bless $self, $class;
-
-    $self->_init;
-
-    return $self;
+sub BUILD {
+  shift->_init;
 }
 
 sub _init {

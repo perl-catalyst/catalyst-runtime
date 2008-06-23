@@ -1,5 +1,6 @@
 package Catalyst;
 
+use Class::C3;
 use Moose;
 extends 'Catalyst::Component';
 use bytes;
@@ -39,13 +40,12 @@ has request => (is => 'rw', default => sub { $_[0]->request_class->new({}) }, re
 has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
 has namespace => (is => 'rw');
 
+no Moose;
 
 attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
 
 sub depth { scalar @{ shift->stack || [] }; }
-
-# Laziness++
-*comp = \&component;
+sub comp { shift->component(@_) }
 
 sub req {
     # carp "the use of req() is deprecated in favour of request()";
@@ -57,7 +57,7 @@ sub res {
 }
 
 # For backwards compatibility
-*finalize_output = \&finalize_body;
+sub finalize_output { shift->finalize_body(@_) };
 
 # For statistics
 our $COUNT     = 1;
@@ -379,20 +379,20 @@ Catalyst).
 
 =cut
 
-around stash => sub {
-    my $orig = shift;
+sub stash {
     my $c = shift;
-
-    my $orig_stash = $c->$orig();
     if (@_) {
         my $stash = @_ > 1 ? {@_} : $_[0];
         croak('stash takes a hash or hashref') unless ref $stash;
         foreach my $key ( keys %$stash ) {
-            $orig_stash->{$key} = $stash->{$key};
+            #shouldn't we hold this in a var and save ourselves the subcall?
+            $c->next::method->{$key} = $stash->{$key};
         }
     }
-    return $orig_stash;
-};
+
+    return $c->next::method;
+}
+
 
 =head2 $c->error
 
@@ -704,15 +704,14 @@ L<Catalyst::Plugin::ConfigLoader>.
 
 =cut
 
-around config => sub {
-    my $orig = shift;
+sub config {
     my $c = shift;
 
     $c->log->warn("Setting config after setup has been run is not a good idea.")
       if ( @_ and $c->setup_finished );
 
-    $c->$orig(@_);
-};
+    $c->next::method(@_);
+}
 
 =head2 $c->log
 
