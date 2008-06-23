@@ -1,9 +1,17 @@
 package Catalyst::Component;
 
-use strict;
-use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
-use NEXT;
+use Moose;
+use MooseX::ClassAttribute;
 use Catalyst::Utils;
+
+has _config  => (
+                 is => 'rw',
+                 isa => 'HashRef',
+                 required => 1,
+                 default => {}
+                );
+
+class_has _plugins => ( is => 'rw' );
 
 
 =head1 NAME
@@ -28,7 +36,7 @@ Catalyst::Component - Catalyst Component Base Class
         my ( $self, $c ) = @_;
         $c->response->output( $self->{foo} );
     }
-    
+
     1;
 
     # Methods can be a request step
@@ -41,7 +49,7 @@ Catalyst::Component - Catalyst Component Base Class
 
 =head1 DESCRIPTION
 
-This is the universal base class for Catalyst components 
+This is the universal base class for Catalyst components
 (Model/View/Controller).
 
 It provides you with a generic new() for instantiation through Catalyst's
@@ -49,18 +57,17 @@ component loader with config() support and a process() method placeholder.
 
 =cut
 
-__PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
+#to do: are we switching to moose-style key => value constructors from
+#       catalyst-style {key => value} constructors ?
 
-
-
-sub new {
+around new => sub {
+    my $orig = shift;
     my ( $self, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-
-    return $self->NEXT::new( 
-        $self->merge_config_hashes( $self->config, $arguments ) );
+    my $merged = $self->merge_config_hashes( $self->config, $arguments ) );
+    $orig->( $self, $merged );
 }
 
 sub COMPONENT {
@@ -69,6 +76,8 @@ sub COMPONENT {
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
+    #Moose TODO: I don't think I fully grok NEXT. is this here for MI or something?
+    # how can we have a next here? this -is- the base class....
     if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
         return $new;
     }
@@ -78,17 +87,19 @@ sub COMPONENT {
         }
         else {
             my $class = ref $self || $self;
-            my $new   = $self->merge_config_hashes( 
+            my $new   = $self->merge_config_hashes(
                 $self->config, $arguments );
             return bless $new, $class;
         }
     }
 }
 
+#Moose TODO:  I have no fucking clue what's going on here (groditi)
 sub config {
     my $self = shift;
     my $config_sub = $self->can('_config');
-    my $config = $self->$config_sub() || {};
+    my $config = $self->$config_sub();
+    #my $config = $self->_config;
     if (@_) {
         my $newconfig = { %{@_ > 1 ? {@_} : $_[0]} };
         $self->_config(
@@ -107,6 +118,7 @@ sub config {
 
         if ((my $config_sub_now = $self->can('_config')) ne $config_sub) {
 
+            #this is retarded. if we want a new ref we could do:  { %$config }
             $config = $self->merge_config_hashes( $config, {} );
             $self->$config_sub_now( $config );
         }
@@ -143,8 +155,8 @@ If this method is present (as it is on all Catalyst::Component subclasses,
 it is called by Catalyst during setup_components with the application class
 as $c and any config entry on the application for this component (for example,
 in the case of MyApp::Controller::Foo this would be
-MyApp->config->{'Controller::Foo'}). The arguments are expected to be a 
-hashref and are merged with the __PACKAGE__->config hashref before calling 
+MyApp->config->{'Controller::Foo'}). The arguments are expected to be a
+hashref and are merged with the __PACKAGE__->config hashref before calling
 ->new to instantiate the component.
 
 =head2 $c->config
@@ -153,15 +165,15 @@ hashref and are merged with the __PACKAGE__->config hashref before calling
 
 =head2 $c->config($key, $value, ...)
 
-Accessor for this component's config hash. Config values can be set as 
+Accessor for this component's config hash. Config values can be set as
 key value pair, or you can specify a hashref. In either case the keys
-will be merged with any existing config settings. Each component in 
+will be merged with any existing config settings. Each component in
 a Catalyst application has it's own config hash.
 
 =head2 $c->process()
 
 This is the default method called on a Catalyst component in the dispatcher.
-For instance, Views implement this action to render the response body 
+For instance, Views implement this action to render the response body
 when you forward to them. The default is an abstract method.
 
 =head2 $c->merge_config_hashes( $hashref, $hashref )
