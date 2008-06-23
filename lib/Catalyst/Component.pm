@@ -1,8 +1,11 @@
 package Catalyst::Component;
 
 use Moose;
+use Class::MOP;
 use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
+use MRO::Compat;
+use mro 'c3';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 with 'Catalyst::ClassData';
@@ -70,6 +73,12 @@ sub COMPONENT {
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
+    if( my $next = $self->next::can ){
+      my $class = blessed $self || $self;
+      my ($next_package) = Class::MOP::get_code_info($next);
+      warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}. This behavior is deprecated and will stop working in future releases.";
+      return $next->($self, $arguments);
+    }
     return $self->new($c, $arguments);
 }
 
