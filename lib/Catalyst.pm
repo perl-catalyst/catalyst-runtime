@@ -1900,8 +1900,8 @@ sub setup_components {
         # Model::DBI::Schema sub-classes are loaded - if it's in @comps
         # we know M::P::O found a file on disk so this is safe
 
-        #Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
-        Class::MOP::load_class($component);
+        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+        #Class::MOP::load_class($component);
 
         my $module  = $class->setup_component( $component );
         my %modules = (
