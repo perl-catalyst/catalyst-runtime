@@ -34,9 +34,17 @@ sub mk_classdata {
     unless ref $accessor eq 'CODE';
 
   my $meta = $class->meta;
+  my $immutable_options;
+  if( $meta->is_immutable ){
+    $immutable_options = $meta->get_immutable_options;
+    $meta->make_mutable;
+  }
   my $alias = "_${attribute}_accessor";
   $meta->add_method($alias, $accessor);
   $meta->add_method($attribute, $accessor);
+  if(defined $immutable_options){
+    $meta->make_immutable($immutable_options);
+  }
   $class->$attribute($_[2]) if(@_ > 2);
   return $accessor;
 }
