@@ -314,7 +314,7 @@ sub prepare_body {
         unless ( $c->request->{_body} ) {
             my $type = $c->request->header('Content-Type');
             $c->request->{_body} = HTTP::Body->new( $type, $length );
-            $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp}
+            $c->request->{_body}->tmpdir( $c->config->{uploadtmp} )
               if exists $c->config->{uploadtmp};
         }
         
