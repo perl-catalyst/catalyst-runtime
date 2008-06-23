@@ -15,21 +15,17 @@ to represent the various dispatch points in your application.
 
 =cut
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 
 has part => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
+around new => sub {
+  my ($orig, $self, $params) = @_;
+  $orig->($self, (ref($params) ? $params :  { part => $params } ));
+};
+
 no Moose;
-
-sub new {
-  my ($self, $params) = @_;
-  $params = { part => $params } unless ref $params;
-  $self->next::method($params);
-}
-
 
 sub get_action {
     my ( $self, $name ) = @_;

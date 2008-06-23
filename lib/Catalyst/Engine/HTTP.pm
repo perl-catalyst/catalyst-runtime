@@ -1,10 +1,7 @@
 package Catalyst::Engine::HTTP;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends 'Catalyst::Engine::CGI';
-no Moose;
 
 use Data::Dump qw(dump);
 use Errno 'EWOULDBLOCK';
@@ -87,22 +84,22 @@ sub finalize_headers {
 
 =cut
 
-sub finalize_read {
+around finalize_read => sub {
     # Never ever remove this, it would result in random length output
     # streams if STDIN eq STDOUT (like in the HTTP engine)
     *STDIN->blocking(1);
-    shift->next::method(@_);
-}
+    shift->(@_);
+};
 
 =head2 $self->prepare_read($c)
 
 =cut
 
-sub prepare_read {
+around prepare_read => sub {
     # Set the input handle to non-blocking
     *STDIN->blocking(0);
-    shift->next::method(@_);
-}
+    shift->(@_);
+};
 
 =head2 $self->read_chunk($c, $buffer, $length)
 
@@ -144,7 +141,8 @@ Writes the buffer to the client.
 
 =cut
 
-sub write {
+around write => sub {
+    my $orig = shift;
     my ( $self, $c, $buffer ) = @_;
 
     # Avoid 'print() on closed filehandle Remote' warnings when using IE
@@ -155,7 +153,7 @@ sub write {
         $buffer = $headers . $buffer;
     }
 
-    my $ret = $self->next::method($c, $buffer);
+    my $ret = $self->$orig($c, $buffer);
 
     if ( !defined $ret ) {
         $self->{_write_error} = $!;
@@ -166,7 +164,7 @@ sub write {
     }
 
     return $ret;
-}
+};
 
 =head2 run
 
@@ -526,6 +524,8 @@ sub _socket_data {
 }
 
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
+
+no Moose;
 
 =head1 SEE ALSO
 

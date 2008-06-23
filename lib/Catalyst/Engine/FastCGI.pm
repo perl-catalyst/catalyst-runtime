@@ -1,7 +1,5 @@
 package Catalyst::Engine::FastCGI;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends 'Catalyst::Engine::CGI';
 

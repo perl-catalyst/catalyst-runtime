@@ -1,7 +1,5 @@
 package Catalyst;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends 'Catalyst::Component';
 use bytes;
@@ -40,8 +38,6 @@ has counter => (is => 'rw', default => sub { {} });
 has request => (is => 'rw', default => sub { $_[0]->request_class->new({}) }, required => 1, lazy => 1);
 has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
 has namespace => (is => 'rw');
-
-no Moose;
 
 attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
 
@@ -376,19 +372,20 @@ Catalyst).
 
 =cut
 
-sub stash {
+around stash => sub {
+    my $orig = shift;
     my $c = shift;
+    my $stash = $orig->($c);
     if (@_) {
-        my $stash = @_ > 1 ? {@_} : $_[0];
-        croak('stash takes a hash or hashref') unless ref $stash;
-        foreach my $key ( keys %$stash ) {
-            #shouldn't we hold this in a var and save ourselves the subcall?
-            $c->next::method->{$key} = $stash->{$key};
+        my $new_stash = @_ > 1 ? {@_} : $_[0];
+        croak('stash takes a hash or hashref') unless ref $new_stash;
+        foreach my $key ( keys %$new_stash ) {
+          $stash->{$key} = $new_stash->{$key};
         }
     }
 
-    return $c->next::method;
-}
+    return $stash;
+};
 
 
 =head2 $c->error
@@ -701,14 +698,15 @@ L<Catalyst::Plugin::ConfigLoader>.
 
 =cut
 
-sub config {
+around config => sub {
+    my $orig = shift;
     my $c = shift;
 
     $c->log->warn("Setting config after setup has been run is not a good idea.")
       if ( @_ and $c->setup_finished );
 
-    $c->next::method(@_);
-}
+    $c->$orig(@_);
+};
 
 =head2 $c->log
 
@@ -814,7 +812,6 @@ Catalyst> line.
 
 sub setup {
     my ( $class, @arguments ) = @_;
-    Class::C3::initialize;
     $class->log->warn("Running setup twice is not a good idea.")
       if ( $class->setup_finished );
 
@@ -936,7 +933,6 @@ EOF
     $class->log->_flush() if $class->log->can('_flush');
 
     $class->setup_finished(1);
-    Class::C3::initialize;
 }
 
 =head2 $c->uri_for( $path, @args?, \%query_values? )
@@ -2450,5 +2446,7 @@ This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+
+no Moose;
 
 1;

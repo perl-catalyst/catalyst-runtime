@@ -1,13 +1,9 @@
 package Catalyst::Engine::CGI;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends 'Catalyst::Engine';
 
 has env => (is => 'rw');
-
-no Moose;
 
 =head1 NAME
 
@@ -176,14 +172,15 @@ sub prepare_path {
 
 =cut
 
-sub prepare_query_parameters {
+around prepare_query_parameters => sub {
+    my $orig = shift;
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
 
     if ( $ENV{QUERY_STRING} ) {
-        $self->next::method( $c, $ENV{QUERY_STRING} );
+        $self->$orig( $c, $ENV{QUERY_STRING} );
     }
-}
+};
 
 =head2 $self->prepare_request($c, (env => \%env))
 
@@ -203,10 +200,10 @@ Enable autoflush on the output handle for CGI-based engines.
 
 =cut
 
-sub prepare_write {
+around prepare_write => sub {
     *STDOUT->autoflush(1);
-    return shift->next::method(@_);
-}
+    return shift->(@_);
+};
 
 =head2 $self->write($c, $buffer)
 
@@ -214,7 +211,8 @@ Writes the buffer to the client.
 
 =cut
 
-sub write {
+around write => sub {
+    my $orig = shift;
     my ( $self, $c, $buffer ) = @_;
 
     # Prepend the headers if they have not yet been sent
@@ -222,8 +220,8 @@ sub write {
         $buffer = $headers . $buffer;
     }
 
-    return $self->next::method( $c, $buffer );
-}
+    return $self->$orig( $c, $buffer );
+};
 
 =head2 $self->read_chunk($c, $buffer, $length)
 
@@ -255,5 +253,6 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+no Moose;
 
 1;

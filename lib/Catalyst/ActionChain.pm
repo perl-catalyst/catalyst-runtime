@@ -1,7 +1,5 @@
 package Catalyst::ActionChain;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends qw(Catalyst::Action);
 

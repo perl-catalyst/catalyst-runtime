@@ -1,16 +1,12 @@
 package Catalyst::Component;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
 
-
 with 'MooseX::Emulate::Class::Accessor::Fast';
 with 'Catalyst::ClassData';
 
-no Moose;
 
 =head1 NAME
 
@@ -57,32 +53,24 @@ component loader with config() support and a process() method placeholder.
 
 __PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
-sub new {
-    my ( $self, $c ) = @_;
+around new => sub {
+    my ( $orig, $self) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
     my $args =  $self->merge_config_hashes( $self->config, $arguments );
-    $self->next::method( $args );
-}
+    $self->$orig( $args );
+};
+
+no Moose;
 
 sub COMPONENT {
     my ( $self, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-
-
-    #this is not the EXACT logic we had before, since  the original tested
-    #for a true value before returning meaning that a subsequent COMPONENT
-    #call could return undef and that would trigger a try to new, which could
-    #again return undef, which would lead to a straight bless of the args and
-    #config. I did not mantain that behavior because it did not seemed sane
-    # please rip me a new one if you have reason to believe i am being stupid
-    # --groditi
-    return $self->next::can ?
-      $self->next::method($c, $arguments) : $self->new($c, $arguments);
+    return $self->new($c, $arguments);
 }
 
 sub config {

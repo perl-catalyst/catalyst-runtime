@@ -1,8 +1,6 @@
 package Catalyst::Controller;
 
 #switch to BEGIN { extends qw/ ... /; } ?
-use MRO::Compat;
-use mro 'c3';
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 use Moose;
 
@@ -124,13 +122,14 @@ sub _END : Private {
     return !@{ $c->error };
 }
 
-sub new {
+around new => sub {
+    my $orig = shift;
     my $self = shift;
     my $app = $_[0];
-    my $new = $self->next::method(@_);
+    my $new = $self->$orig(@_);
     $new->_application( $app );
     return $new;
-}
+};
 
 sub action_for {
     my ( $self, $name ) = @_;
@@ -147,7 +146,7 @@ around action_namespace => sub {
 
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
-    } else { 
+    } else {
         return $self->config->{namespace} if exists $self->config->{namespace};
     }
 

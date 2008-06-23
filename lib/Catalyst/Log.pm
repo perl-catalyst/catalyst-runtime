@@ -1,7 +1,5 @@
 package Catalyst::Log;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 use Data::Dump;
 
@@ -14,6 +12,7 @@ has abort => (is => 'rw');
 {
     my @levels = qw[ debug info warn error fatal ];
 
+    my $meta = __PACKAGE__->meta;
     for ( my $i = 0 ; $i < @levels ; $i++ ) {
 
         my $name  = $levels[$i];
@@ -21,29 +20,28 @@ has abort => (is => 'rw');
 
         $LEVELS{$name} = $level;
 
-        no strict 'refs';
-
-        *{$name} = sub {
+       $meta->add_method($name, sub {
             my $self = shift;
 
             if ( $self->level & $level ) {
                 $self->_log( $name, @_ );
             }
-        };
+        });
 
-        *{"is_$name"} = sub {
+        $meta->add_method("is_$name", sub {
             my $self = shift;
             return $self->level & $level;
-        };
+        });;
     }
 }
 
-sub new {
+around new => sub {
+    my $orig = shift;
     my $class = shift;
-    my $self = $class->next::method;
+    my $self = $class->$orig;
     $self->levels( scalar(@_) ? @_ : keys %LEVELS );
     return $self;
-}
+};
 
 sub levels {
     my ( $self, @levels ) = @_;

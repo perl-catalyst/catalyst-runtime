@@ -1,7 +1,5 @@
 package Catalyst::Request::Upload;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 
 use Catalyst::Exception;

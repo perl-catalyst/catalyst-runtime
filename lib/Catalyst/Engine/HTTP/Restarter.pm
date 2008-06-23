@@ -1,14 +1,12 @@
 package Catalyst::Engine::HTTP::Restarter;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends 'Catalyst::Engine::HTTP';
-no Moose;
 
 use Catalyst::Engine::HTTP::Restarter::Watcher;
 
-sub run {
+around run => sub {
+    my $orig = shift;
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
@@ -69,7 +67,8 @@ sub run {
         }
     }
 
-    return $self->next::method( $class, $port, $host, $options );
+    return $self->$orig( $class, $port, $host, $options );
+    no Moose;
 };
 
 1;

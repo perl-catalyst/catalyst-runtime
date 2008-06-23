@@ -1,7 +1,5 @@
 package Catalyst::DispatchType::Chained;
 
-use MRO::Compat;
-use mro 'c3';
 use Moose;
 extends 'Catalyst::DispatchType';
 
