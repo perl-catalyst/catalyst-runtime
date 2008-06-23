@@ -89,21 +89,17 @@ sub import {
     # callers @ISA.
     return unless $class eq 'Catalyst';
 
-    my $caller = caller(0);
+    my $caller = caller();
+    return if $caller eq 'main';
+    my $meta = Moose::Meta::Class->initialize($caller);
+    #Moose->import({ into => $caller }); #do we want to do this?
 
-    #why does called have to ISA Catalyst and ISA Controller ?
-    #Convert test suite to not use the behavior where Myapp ISA Controller
-    # after that is done we can eliminate that little mess.
     unless ( $caller->isa('Catalyst') ) {
-        no strict 'refs';
-        if( $caller->can('meta') ){
-          my @superclasses = ($caller->meta->superclasses, $class, 'Catalyst::Controller');
-          #my @superclasses = ($caller->meta->superclasses, $class);
-          $caller->meta->superclasses(@superclasses);
-        } else {
-          push @{"$caller\::ISA"}, $class, 'Catalyst::Controller';
-          #push @{"$caller\::ISA"}, $class;
-        }
+        my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller');
+        $meta->superclasses(@superclasses);
+    }
+    unless( $meta->has_method('meta') ){
+        $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
     }
 
     $caller->arguments( [@arguments] );
@@ -926,7 +922,7 @@ EOF
     }
 
     # Add our self to components, since we are also a component
-    $class->components->{$class} = $class;
+    $class->components->{$class} = $class->setup_component($class);
 
     $class->setup_actions;
 
@@ -1936,7 +1932,7 @@ sub setup_component {
     Catalyst::Exception->throw(
         message =>
         qq/Couldn't instantiate component "$component", "COMPONENT() didn't return an object-like value"/
-    ) unless eval { $instance->can( 'can' ) };
+    ) unless blessed($instance);
 
     return $instance;
 }
@@ -1988,10 +1984,7 @@ sub setup_engine {
     if ( $ENV{MOD_PERL} ) {
 
         # create the apache method
-        {
-            no strict 'refs';
-            *{"$class\::apache"} = sub { shift->engine->apache };
-        }
+        $class->meta->add_method('apache' => sub { shift->engine->apache });
 
         my ( $software, $version ) =
           $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
@@ -2126,9 +2119,7 @@ sub setup_log {
 
     my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
     if ( defined($env_debug) ? $env_debug : $debug ) {
-        no strict 'refs';
-        #Moose todo: dying to be made a bool attribute
-        *{"$class\::debug"} = sub { 1 };
+        $class->meta->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
     }
 }
@@ -2152,9 +2143,7 @@ sub setup_stats {
 
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
     if ( defined($env) ? $env : ($stats || $class->debug ) ) {
-        no strict 'refs';
-        #Moose todo: dying to be made a bool attribute
-        *{"$class\::use_stats"} = sub { 1 };
+        $class->meta->add_method('use_stats' => sub { 1 });
         $class->log->debug('Statistics enabled');
     }
 }

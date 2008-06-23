@@ -12,7 +12,7 @@ use Class::Inspector;
 
 has path_prefix =>
     (
-     is => 'ro',
+     is => 'rw',
      isa => 'Str',
      init_arg => 'path',
      predicate => 'has_path_prefix',
@@ -20,7 +20,7 @@ has path_prefix =>
 
 has action_namespace =>
     (
-     is => 'ro',
+     is => 'rw',
      isa => 'Str',
      init_arg => 'namespace',
      predicate => 'has_action_namespace',
@@ -149,7 +149,8 @@ around action_namespace => sub {
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
     } else { 
-        # if the following won't change at runtime it should be lazy_building thing
+       warn "action_namespace called as class method";
+       # if the following won't change at runtime it should be lazy_building thing
         return $self->config->{namespace} if exists $self->config->{namespace};
     }
 
@@ -171,7 +172,9 @@ around action_namespace => sub {
         }
     }
 
-    return Catalyst::Utils::class2prefix(ref($self) || $self, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix(ref($self) || $self, $case_s) || '';
+    $self->$orig($namespace) if ref($self);
+    return $namespace;
 };
 
 #Once again, this is probably better written as a builder method
@@ -183,7 +186,9 @@ around path_prefix => sub {
     } else {
       return $self->config->{path} if exists $self->config->{path};
     }
-    return $self->action_namespace(@_);
+    my $namespace = $self->action_namespace(@_);
+    $self->$orig($namespace) if ref($self);
+    return $namespace;
 };
 
 
@@ -192,26 +197,18 @@ sub register_actions {
     my $class = ref $self || $self;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
-    my %methods;
-    if( $self->can('meta') ){
-      my $meta = $self->meta;
-      %methods = map{ $_->{code}->body => $_->{name} }
+    my $meta = $self->meta;
+    my %methods = map{ $_->{code}->body => $_->{name} }
         grep {$_->{class} ne 'Moose::Object'} #ignore Moose::Object methods
-          $meta->compute_all_applicable_methods;
-    } else { #until we are sure there's no moose stuff left...
-      $methods{ $self->can($_) } = $_
-        for @{ Class::Inspector->methods($class) || [] };
-    }
+            $meta->compute_all_applicable_methods;
+
 
     # Advanced inheritance support for plugins and the like
-    #to be modified to use meta->superclasses
     #moose todo: migrate to eliminate CDI compat
     my @action_cache;
-    {
-        no strict 'refs';
-        for my $isa ( @{"$class\::ISA"}, $class ) {
-            push @action_cache, @{ $isa->_action_cache }
-              if $isa->can('_action_cache');
+    for my $isa ( $meta->superclasses, $class ) {
+        if(my $coderef = $isa->can('_action_cache')){
+            push(@action_cache, @{ $isa->$coderef });
         }
     }
 
