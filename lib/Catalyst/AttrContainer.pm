@@ -1,19 +1,28 @@
 package Catalyst::AttrContainer;
 
-use strict;
-use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
-
+use Moose;
+use MooseX::ClassAttribute;
 use Catalyst::Exception;
-use NEXT;
 
-__PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache/;
-__PACKAGE__->_attr_cache( {} );
-__PACKAGE__->_action_cache( [] );
+class_has _attr_cache   => (
+                            is => 'rw',
+                            isa => 'HashRef',
+                            required => 1,
+                            default => sub{{}}
+                           );
+clas_has _action_cache => (
+                           is => 'rw',
+                           isa => 'ArrayRef',
+                           required => 1,
+                           default => sub{ [] }
+                          );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {
     my ( $class, $code, @attrs ) = @_;
+    #can't the below just be $class->_attr_cache->{$code} = \@attrs; ?
     $class->_attr_cache( { %{ $class->_attr_cache }, $code => [@attrs] } );
+    #why can't this just be push @{$class->_action_cache}, [$code, \@attrs] ?
     $class->_action_cache(
         [ @{ $class->_action_cache }, [ $code, [@attrs] ] ] );
     return ();
@@ -29,7 +38,7 @@ Catalyst::AttrContainer
 
 =head1 DESCRIPTION
 
-This class sets up the code attribute cache.  It's a base class for 
+This class sets up the code attribute cache.  It's a base class for
 L<Catalyst::Controller>.
 
 =head1 METHODS
