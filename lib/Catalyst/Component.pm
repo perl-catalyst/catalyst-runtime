@@ -55,6 +55,7 @@ component loader with config() support and a process() method placeholder.
 =cut
 
 __PACKAGE__->mk_classdata('_plugins');
+__PACKAGE__->mk_classdata('_config');
 
 around new => sub {
     my ( $orig, $self) = @_;
@@ -83,39 +84,27 @@ sub COMPONENT {
 }
 
 sub config {
-  my $self = shift;
-  my $class = blessed $self || $self;
+    my $self = shift;
+    my $config = $self->_config || {};
+    if (@_) {
+        my $newconfig = { %{@_ > 1 ? {@_} : $_[0]} };
+        $self->_config(
+            $self->merge_config_hashes( $config, $newconfig )
+        );
+    } else {
+        # this is a bit of a kludge, required to make
+        # __PACKAGE__->config->{foo} = 'bar';
+        # work in a subclass. If we don't have the package symbol in the
+        # current class we know we need to copy up to ours, which calling
+        # the setter will do for us.
 
-  my $config;
-  my $meta = $class->meta;
-  if( $meta->has_package_symbol('$config') ){
-      $config = ${ $meta->get_package_symbol('$config') };
-  } else {
-    foreach my $super ( $meta->linearized_isa ) {
-      my $super_meta = Moose::Meta::Class->initialize($super);
-      if( $super_meta->has_package_symbol('$config') ){
-        $config = ${ $super_meta->get_package_symbol('$config') };
-        unless( @_ ){ #don't copy and write it twice
-          $config = $class->merge_config_hashes( $config, {} );
-          $meta->add_package_symbol('$config', \ $config);
+        unless ($self->meta->has_package_symbol('$_config')) {
+
+            $config = $self->merge_config_hashes( $config, {} );
+            $self->_config( $config );
         }
-        last;
-      }
     }
-  }
-
-  unless( defined $config ){
-    $config = {};
-    $meta->add_package_symbol('$config', \ $config) unless @_;
-  }
-
-  if (@_) {
-    my $from_args = { %{@_ > 1 ? {@_} : $_[0]} };
-    my $new_config = $class->merge_config_hashes( $config, $from_args);
-    $meta->add_package_symbol('$config', \ $new_config);
-  }
-
-  return $config;
+    return $config;
 }
 
 sub merge_config_hashes {
