@@ -1,17 +1,12 @@
 package Catalyst::DispatchType::Path;
 
 use Moose;
-use Text::SimpleTable;
-use URI;
-
 extends 'Catalyst::DispatchType';
 
-has _paths => (
-               is => 'rw',
-               isa => 'HashRef',
-               required => 1,
-               default => sub {{}}
-              );
+#use strict;
+#use base qw/Catalyst::DispatchType/;
+use Text::SimpleTable;
+use URI;
 
 =head1 NAME
 
@@ -33,17 +28,15 @@ Debug output for Path dispatch points
 
 sub list {
     my ( $self, $c ) = @_;
-    my %paths = %{ $self->_paths };
-    my @keys = sort keys %paths;
-    return unless @keys;
-    my $paths_table = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
-    foreach my $path ( @keys ) {
+    my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
+    foreach my $path ( sort keys %{ $self->{paths} } ) {
         my $display_path = $path eq '/' ? $path : "/$path";
-        foreach my $action ( @{ $paths{$path} } ) {
-            $paths_table->row( $display_path, "/$action" );
+        foreach my $action ( @{ $self->{paths}->{$path} } ) {
+            $paths->row( $display_path, "/$action" );
         }
     }
-    $c->log->debug( "Loaded Path actions:\n" . $paths_table->draw . "\n" );
+    $c->log->debug( "Loaded Path actions:\n" . $paths->draw . "\n" )
+      if ( keys %{ $self->{paths} } );
 }
 
 =head2 $self->match( $c, $path )
@@ -59,7 +52,7 @@ sub match {
 
     $path ||= '/';
 
-    foreach my $action ( @{ $self->_paths->{$path} || [] } ) {
+    foreach my $action ( @{ $self->{paths}->{$path} || [] } ) {
         next unless $action->match($c);
         $c->req->action($path);
         $c->req->match($path);
@@ -100,7 +93,7 @@ sub register_path {
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
 
-    unshift( @{ $self->_paths->{$path} ||= [] }, $action);
+    unshift( @{ $self->{paths}{$path} ||= [] }, $action);
 
     return 1;
 }

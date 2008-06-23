@@ -1,6 +1,8 @@
 package Catalyst::DispatchType;
 
 use Moose;
+#use strict;
+#use base 'Class::Accessor::Fast';
 
 =head1 NAME
 

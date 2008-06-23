@@ -2,10 +2,18 @@ package Catalyst::DispatchType::Regex;
 
 use Moose;
 extends 'Catalyst::DispatchType::Path';
+
+#use strict;
+#use base qw/Catalyst::DispatchType::Path/;
 use Text::SimpleTable;
 use Text::Balanced ();
 
-has _compiled => (is => 'rw', isa => 'ArrayRef', required => 1, default => sub{[]});
+has _compiled => (
+                  is => 'rw',
+                  isa => 'ArrayRef',
+                  required => 1,
+                  default => sub{ [] },
+                 );
 
 =head1 NAME
 
@@ -27,14 +35,13 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
-    my @regexes = @{ $self->_compiled };
-    return unless @regexes;
     my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ 36, 'Private' ] );
-    for my $regex ( @regexes ) {
+    for my $regex ( @{ $self->_compiled } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
     }
-    $c->log->debug( "Loaded Regex actions:\n" . $re->draw . "\n" );
+    $c->log->debug( "Loaded Regex actions:\n" . $re->draw . "\n" )
+      if ( @{ $self->_compiled } );
 }
 
 =head2 $self->match( $c, $path )
@@ -46,10 +53,10 @@ altering $c.
 
 =cut
 
-override match => sub {
+sub match {
     my ( $self, $c, $path ) = @_;
 
-    return if super();
+    return if $self->SUPER::match( $c, $path );
 
     # Check path against plain text first
 
@@ -66,7 +73,7 @@ override match => sub {
     }
 
     return 0;
-};
+}
 
 =head2 $self->register( $c, $action )
 

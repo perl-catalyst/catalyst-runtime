@@ -3,6 +3,10 @@ package Catalyst::DispatchType::Default;
 use Moose;
 extends 'Catalyst::DispatchType';
 
+
+#use strict;
+#use base qw/Catalyst::DispatchType/;
+
 =head1 NAME
 
 Catalyst::DispatchType::Default - Default DispatchType

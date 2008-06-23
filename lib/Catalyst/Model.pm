@@ -1,7 +1,7 @@
 package Catalyst::Model;
 
-use Moose;
-extends 'Catalyst::Component';
+use strict;
+use base qw/Catalyst::Component/;
 
 =head1 NAME
 

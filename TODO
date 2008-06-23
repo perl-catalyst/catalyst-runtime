@@ -7,8 +7,6 @@
     * Catalyst::Action
     * Catalyst::ActionChain
     * Catalyst::ActionContainer
-    * Catalyst::Log
-    * Catalyst::Exception
 
   - Make classes immutable at setup() time
 
