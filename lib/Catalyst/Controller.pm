@@ -1,35 +1,48 @@
 package Catalyst::Controller;
 
+#switch to BEGIN { extends qw/ ... /; } ?
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 use Moose;
-
-#Why does the following blow up?
-#extends qw/Catalyst::Component Catalyst::AttrContainer/;
-
-has path => (
-             is => 'ro',
-             isa => 'Str',
-             predicate => 'has_path',
-            );
-
-#this are frefixed like this because _namespace clases with something in
-#Catalyst.pm . to be fixed later.
-has _namespace => (
-                   is => 'ro',
-                   isa => 'Str',
-                   init_arg => 'namespace',
-                   predicate => '_has_namespace',
-                 );
-
-__PACKAGE__->mk_accessors( qw/_application/ );
-
-has _application => (is => 'rw');
-sub _app{ shift->_application(@_) } # eww
 
 use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::Inspector;
+
+has path_prefix =>
+    (
+     is => 'ro',
+     isa => 'Str',
+     init_arg => 'path',
+     predicate => 'has_path_prefix',
+    );
+
+has action_namespace =>
+    (
+     is => 'ro',
+     isa => 'Str',
+     init_arg => 'namespace',
+     predicate => 'has_action_namespace',
+    );
+
+has actions =>
+    (
+     is => 'rw',
+     isa => 'HashRef',
+     init_arg => undef,
+    );
+
+# isa => 'ClassName|Catalyst' ?
+has _application => (is => 'rw');
+sub _app{ shift->_application(@_) } # eww
+
+sub BUILD {
+    my ($self, $args) = @_;
+    my $action  = delete $args->{action}  || {};
+    my $actions = delete $args->{actions} || {};
+    my $attr_value = $self->merge_config_hashes($actions, $action);
+    $self->actions($attr_value);
+}
 
 =head1 NAME
 
@@ -118,40 +131,53 @@ around new => sub {
     return $new;
 };
 
-
 sub action_for {
     my ( $self, $name ) = @_;
     my $app = ($self->isa('Catalyst') ? $self : $self->_application);
     return $app->dispatcher->get_action($name, $self->action_namespace);
 }
 
-sub action_namespace {
-    my ( $self, $c ) = @_;
-    unless ( $c ) {
-        $c = ($self->isa('Catalyst') ? $self : $self->_application);
-    }
-    if( ref($self) ){
-      return $self->_namespace if $self->_has_namespace;
-    } # else { #i think this is hacky and it should work with the else enabled
-      return $self->config->{namespace} if exists $self->config->{namespace};
-    #}
-    return Catalyst::Utils::class2prefix( ref($self) || $self,
-        $c->config->{case_sensitive} )
-      || '';
-}
+around action_namespace => sub {
+    my ( $orig, $self, $c ) = @_;
 
-sub path_prefix {
-    my ( $self, $c ) = @_;
-    unless ( $c ) {
-        $c = ($self->isa('Catalyst') ? $self : $self->_application);
-    }
     if( ref($self) ){
-      return $self->path if $self->has_path;
-    } # else {
+        return $self->$orig if $self->has_action_namespace;
+    } else {
+        return $self->config->{namespace} if exists $self->config->{namespace};
+    }
+
+    #the following looks like a possible target for a default setting. i am not
+    #making the below the builder because i don't know if $c will vary from
+    #call to call, which would affect case sensitivitysettings -- groditi
+    my $case_s;
+    if( $c ){
+        $case_s = $c->config->{case_sensitive};
+    } else {
+        if ($self->isa('Catalyst')) {
+            $case_s = $self->config->{case_sensitive};
+        } else {
+            if (ref $self) {
+                $case_s = $self->_application->config->{case_sensitive};
+            } else {
+                confess("Can't figure out case_sensitive setting");
+            }
+        }
+    }
+
+    return Catalyst::Utils::class2prefix(ref($self) || $self, $case_s) || '';
+};
+
+
+around path_prefix => sub {
+    my $orig = shift;
+    my $self = shift;
+    if( ref($self) ){
+      return $self->$orig if $self->has_path_prefix;
+    } else {
       return $self->config->{path} if exists $self->config->{path};
-    #}
-    return shift->action_namespace(@_);
-}
+    }
+    return $self->action_namespace(@_);
+};
 
 
 sub register_actions {
@@ -172,6 +198,7 @@ sub register_actions {
 
     # Advanced inheritance support for plugins and the like
     #to be modified to use meta->superclasses
+    #moose todo: migrate to eliminate CDI compat
     my @action_cache;
     {
         no strict 'refs';
@@ -216,10 +243,6 @@ sub create_action {
                     : $self->_action_class);
 
     Class::MOP::load_class($class);
-    #unless ( Class::Inspector->loaded($class) ) {
-    #    require Class::Inspector->filename($class);
-    #}
-
     return $class->new( \%args );
 }
 
@@ -242,17 +265,23 @@ sub _parse_attrs {
         }
     }
 
-    #this will not work under moose
-    #my $hash = (ref $self ? $self : $self->config); # hate app-is-class
-    #action / actions should be an attribute  of Controller
-    my $hash = $self->config;
-
-    if (exists $hash->{actions} || exists $hash->{action}) {
-      my $a = $hash->{actions} || $hash->{action};
-      %raw_attributes = ((exists $a->{'*'} ? %{$a->{'*'}} : ()),
-                         %raw_attributes,
-                         (exists $a->{$name} ? %{$a->{$name}} : ()));
+    #I know that the original behavior was to ignore action if actions was set
+    # but i actually think this may be a little more sane? we can always remove
+    # the merge behavior quite easily and go back to having actions have
+    # presedence over action by modifying the keys. i honestly think this is
+    # superior while mantaining really high degree of compat
+    my $actions;
+    if( ref($self) ) {
+        $actions = $self->actions;
+    } else {
+        my $cfg = $self->config;
+        $actions = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
     }
+
+    %raw_attributes = ((exists $actions->{'*'} ? %{$actions->{'*'}} : ()),
+                       %raw_attributes,
+                       (exists $actions->{$name} ? %{$actions->{$name}} : ()));
+
 
     my %final_attributes;
 
@@ -263,8 +292,8 @@ sub _parse_attrs {
         foreach my $value (ref($raw) eq 'ARRAY' ? @$raw : $raw) {
 
             my $meth = "_parse_${key}_attr";
-            if ( $self->can($meth) ) {
-                ( $key, $value ) = $self->$meth( $c, $name, $value );
+            if ( my $code = $self->can($meth) ) {
+                ( $key, $value ) = $self->$code( $c, $name, $value );
             }
             push( @{ $final_attributes{$key} }, $value );
         }

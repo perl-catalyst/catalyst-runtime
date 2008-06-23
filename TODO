@@ -15,4 +15,12 @@
     * comments marked /Moose TODO/i in the code
     * Fix the CDI compat hack so we can start moving to immutable
     * Profile before and after immutable.
-    * I think now owuld be a good time to lay ground for the App / Ctx split
+    * Now would be a good time to lay ground for the App / Ctx split
+    * Howto mantain branch in sync with the latest checkins ?
+    * Eliminate all instances of $instance->{$key}
+    * MooseX::Emulate::CAF seems to be working like a charm :)
+    * General code cleanups can't hurt
+    * How do we move from NEXT to C3 ? I have never used either of them
+      - What does the lineraized mro look like when we are using moose 
+        method modifiers?
+        - Does they all get clumped together or what? Is it a non-issue?
