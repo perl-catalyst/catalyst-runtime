@@ -62,8 +62,8 @@ SKIP:
     ok( my $response = request('http://localhost/engine/request/uri?a=1;a=2;b=3'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is( $creq->{uri}->query, 'a=1;a=2;b=3', 'Query string ok' );
-    is_deeply( $creq->{parameters}, $parameters, 'Parameters ok' );
+    is( $creq->uri->query, 'a=1;a=2;b=3', 'Query string ok' );
+    is_deeply( $creq->parameters, $parameters, 'Parameters ok' );
 }
 
 # test that query params are unescaped properly
@@ -71,8 +71,8 @@ SKIP:
     ok( my $response = request('http://localhost/engine/request/uri?text=Catalyst%20Rocks'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is( $creq->{uri}->query, 'text=Catalyst%20Rocks', 'Query string ok' );
-    is( $creq->{parameters}->{text}, 'Catalyst Rocks', 'Unescaped param ok' );
+    is( $creq->uri->query, 'text=Catalyst%20Rocks', 'Query string ok' );
+    is( $creq->parameters->{text}, 'Catalyst Rocks', 'Unescaped param ok' );
 }
 
 # test that uri_with adds params

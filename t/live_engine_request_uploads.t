@@ -60,7 +60,7 @@ use HTTP::Request::Common;
         my $disposition = $part->header('Content-Disposition');
         my %parameters  = @{ ( split_header_words($disposition) )[0] };
 
-        my $upload = $creq->{uploads}->{ $parameters{filename} };
+        my $upload = $creq->uploads->{ $parameters{filename} };
 
         isa_ok( $upload, 'Catalyst::Request::Upload' );
 
@@ -68,7 +68,7 @@ use HTTP::Request::Common;
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
 
         # make sure upload is accessible via legacy params->{$file}
-        is( $creq->{parameters}->{ $upload->filename },
+        is( $creq->parameters->{ $upload->filename },
             $upload->filename, 'legacy param method ok' );
 
         ok( !-e $upload->tempname, 'Upload temp file was deleted' );
@@ -120,7 +120,7 @@ use HTTP::Request::Common;
         my $disposition = $part->header('Content-Disposition');
         my %parameters  = @{ ( split_header_words($disposition) )[0] };
 
-        my $upload = $creq->{uploads}->{ $parameters{name} }->[$i];
+        my $upload = $creq->uploads->{ $parameters{name} }->[$i];
 
         isa_ok( $upload, 'Catalyst::Request::Upload' );
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
@@ -220,7 +220,7 @@ use HTTP::Request::Common;
     is( $creq->content_length, $request->content_length,
         'Catalyst::Request Content-Length' );
 
-    my $param = $creq->{parameters}->{testfile};
+    my $param = $creq->parameters->{testfile};
 
     ok( @$param == 2, '2 values' );
     is( $param->[0], 'textfield value', 'correct value' );
@@ -233,7 +233,7 @@ use HTTP::Request::Common;
 
         next unless exists $parameters{filename};
 
-        my $upload = $creq->{uploads}->{ $parameters{name} };
+        my $upload = $creq->uploads->{ $parameters{name} };
 
         isa_ok( $upload, 'Catalyst::Request::Upload' );
 
