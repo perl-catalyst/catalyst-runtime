@@ -30,9 +30,16 @@ use Carp qw/croak carp/;
 
 BEGIN { require 5.008001; }
 
-__PACKAGE__->mk_accessors(
-    qw/counter request response state action stack namespace stats stash/
-);
+has stack     => (is => 'rw');
+has stash     => (is => 'rw');
+has state     => (is => 'rw');
+has stats     => (is => 'rw');
+has action    => (is => 'rw');
+has counter   => (is => 'rw');
+has request   => (is => 'rw');
+has response  => (is => 'rw');
+has namespace => (is => 'rw');
+
 
 attributes->import( __PACKAGE__, \&namespace, 'lvalue' );
 
@@ -76,6 +83,7 @@ sub import {
 
     my $caller = caller(0);
 
+    #why does called have to ISA Catalyst and ISA Controller ?
     unless ( $caller->isa('Catalyst') ) {
         no strict 'refs';
         if( $caller->can('meta') ){
@@ -1319,6 +1327,8 @@ sub _stats_finish_execute {
 
 =cut
 
+#Why does this exist? This is no longer safe and WILL NOT WORK.
+# it doesnt seem to be used anywhere. can we remove it?
 sub _localize_fields {
     my ( $c, $localized, $code ) = ( @_ );
 
@@ -1346,8 +1356,9 @@ sub finalize {
     }
 
     # Allow engine to handle finalize flow (for POE)
-    if ( $c->engine->can('finalize') ) {
-        $c->engine->finalize($c);
+    my $engine = $c->engine;
+    if ( my $code = $engine->can('finalize') ) {
+        $engine->$code($c);
     }
     else {
 
@@ -1411,31 +1422,35 @@ Finalizes headers.
 sub finalize_headers {
     my $c = shift;
 
+    my $response = $c->response; #accessor calls can add up?
+
+    # Moose TODO: Maybe this should be an attribute too?
     # Check if we already finalized headers
-    return if $c->response->{_finalized_headers};
+    return if $response->{_finalized_headers};
 
     # Handle redirects
-    if ( my $location = $c->response->redirect ) {
+    if ( my $location = $response->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
-        $c->response->header( Location => $location );
+        $response->header( Location => $location );
 
-        if ( !$c->response->body ) {
+        #Moose TODO: we should probably be using a predicate method here ?
+        if ( !$response->body ) {
             # Add a default body if none is already present
-            $c->response->body(
+            $response->body(
                 qq{<html><body><p>This item has moved <a href="$location">here</a>.</p></body></html>}
             );
         }
     }
 
     # Content-Length
-    if ( $c->response->body && !$c->response->content_length ) {
+    if ( $response->body && !$response->content_length ) {
 
         # get the length from a filehandle
-        if ( blessed( $c->response->body ) && $c->response->body->can('read') )
+        if ( blessed( $response->body ) && $response->body->can('read') )
         {
-            my $stat = stat $c->response->body;
+            my $stat = stat $response->body;
             if ( $stat && $stat->size > 0 ) {
-                $c->response->content_length( $stat->size );
+                $response->content_length( $stat->size );
             }
             else {
                 $c->log->warn('Serving filehandle without a content-length');
@@ -1443,14 +1458,14 @@ sub finalize_headers {
         }
         else {
             # everything should be bytes at this point, but just in case
-            $c->response->content_length( bytes::length( $c->response->body ) );
+            $response->content_length( bytes::length( $response->body ) );
         }
     }
 
     # Errors
-    if ( $c->response->status =~ /^(1\d\d|[23]04)$/ ) {
-        $c->response->headers->remove_header("Content-Length");
-        $c->response->body('');
+    if ( $response->status =~ /^(1\d\d|[23]04)$/ ) {
+        $response->headers->remove_header("Content-Length");
+        $response->body('');
     }
 
     $c->finalize_cookies;
@@ -1458,7 +1473,7 @@ sub finalize_headers {
     $c->engine->finalize_headers( $c, @_ );
 
     # Done
-    $c->response->{_finalized_headers} = 1;
+    $response->{_finalized_headers} = 1;
 }
 
 =head2 $c->finalize_output
@@ -1543,6 +1558,8 @@ sub prepare {
     my ( $class, @arguments ) = @_;
 
     $class->context_class( ref $class || $class ) unless $class->context_class;
+    #Moose TODO: if we make empty containers the defaults then that can be
+    #handled by the context class itself instead of having this here
     my $c = $class->context_class->new(
         {
             counter => {},
@@ -1582,6 +1599,7 @@ sub prepare {
     $c->request->_context($c);
     $c->response->_context($c);
 
+    #XXX reuse coderef from can
     # Allow engine to direct the prepare flow (for POE)
     if ( $c->engine->can('prepare') ) {
         $c->engine->prepare( $c, @arguments );
@@ -1633,6 +1651,7 @@ Prepares message body.
 sub prepare_body {
     my $c = shift;
 
+    #Moose TODO: what is  _body ??
     # Do we run for the first time?
     return if defined $c->request->{_body};
 
@@ -1952,9 +1971,10 @@ sub setup_dispatcher {
         $dispatcher = $class->dispatcher_class;
     }
 
-    unless (Class::Inspector->loaded($dispatcher)) {
-        require Class::Inspector->filename($dispatcher);
-    }
+    Class::MOP::load_class($dispatcher);
+    #unless (Class::Inspector->loaded($dispatcher)) {
+    #    require Class::Inspector->filename($dispatcher);
+    #}
 
     # dispatcher instance
     $class->dispatcher( $dispatcher->new );
@@ -2040,9 +2060,10 @@ sub setup_engine {
         $engine = $class->engine_class;
     }
 
-    unless (Class::Inspector->loaded($engine)) {
-        require Class::Inspector->filename($engine);
-    }
+    Class::MOP::load_class($engine);
+    #unless (Class::Inspector->loaded($engine)) {
+    #    require Class::Inspector->filename($engine);
+    #}
 
     # check for old engines that are no longer compatible
     my $old_engine;
@@ -2097,7 +2118,9 @@ sub setup_home {
         $home = Catalyst::Utils::home($class);
     }
 
+    #I remember recently being scolded for assigning config values like this
     if ($home) {
+        #I remember recently being scolded for assigning config values like this
         $class->config->{home} ||= $home;
         $class->config->{root} ||= Path::Class::Dir->new($home)->subdir('root');
     }
@@ -2119,6 +2142,7 @@ sub setup_log {
     my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
     if ( defined($env_debug) ? $env_debug : $debug ) {
         no strict 'refs';
+        #Moose todo: dying to be made a bool attribute
         *{"$class\::debug"} = sub { 1 };
         $class->log->debug('Debug messages enabled');
     }
@@ -2144,6 +2168,7 @@ sub setup_stats {
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
     if ( defined($env) ? $env : ($stats || $class->debug ) ) {
         no strict 'refs';
+        #Moose todo: dying to be made a bool attribute
         *{"$class\::use_stats"} = sub { 1 };
         $class->log->debug('Statistics enabled');
     }

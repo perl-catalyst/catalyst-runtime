@@ -108,8 +108,8 @@ message about unknown resource
 
 sub dispatch {
     my ( $self, $c ) = @_;
-    if ( $c->action ) {
-        $c->forward( join( '/', '', $c->action->namespace, '_DISPATCH' ) );
+    if ( my $action = $c->action ) {
+        $c->forward( join( '/', '', $action->namespace, '_DISPATCH' ) );
     }
 
     else {
@@ -254,9 +254,10 @@ Find an dispatch type that matches $c->req->path, and set args from it.
 
 sub prepare_action {
     my ( $self, $c ) = @_;
-    my $path = $c->req->path;
-    my @path = split /\//, $c->req->path;
-    $c->req->args( \my @args );
+    my $req = $c->req;
+    my $path = $req->path;
+    my @path = split /\//, $req->path;
+    $req->args( \my @args );
 
     unshift( @path, '' );    # Root action
 
@@ -279,10 +280,11 @@ sub prepare_action {
         unshift @args, $arg;
     }
 
-    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$c->req->captures||[]};
+    #Moose todo: This seems illegible, even if efficient.
+    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$req->captures||[]};
 
-    $c->log->debug( 'Path is "' . $c->req->match . '"' )
-      if ( $c->debug && $c->req->match );
+    $c->log->debug( 'Path is "' . $req->match . '"' )
+      if ( $c->debug && $req->match );
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
@@ -300,7 +302,7 @@ sub get_action {
 
     $namespace = join( "/", grep { length } split '/', $namespace || "" );
 
-    return $self->_action_hash->{"$namespace/$name"};
+    return $self->_action_hash->{"${namespace}/${name}"};
 }
 
 =head2 $self->get_action_by_path( $path );
@@ -352,6 +354,7 @@ sub get_containers {
 
     return reverse grep { defined } @containers, $self->_container_hash->{''};
 
+    #return (split '/', $namespace); # isnt this more clear?
     my @parts = split '/', $namespace;
 }
 
@@ -390,12 +393,11 @@ sub register {
 
     my $registered = $self->_registered_dispatch_types;
 
-    my $priv = 0;
+    #my $priv = 0; #seems to be unused
     foreach my $key ( keys %{ $action->attributes } ) {
         next if $key eq 'Private';
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
-            #eval "require $class";
             #some error checking rethrowing here wouldn't hurt.
             eval { Class::MOP::load_class($class) };
             push( @{ $self->_dispatch_types }, $class->new ) unless $@;

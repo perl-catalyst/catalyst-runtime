@@ -10,3 +10,9 @@
 
   - Make classes immutable at setup() time
 
+
+  - GRODITI's list:
+    * comments marked /Moose TODO/i in the code
+    * Fix the CDI compat hack so we can start moving to immutable
+    * Profile before and after immutable.
+    * I think now owuld be a good time to lay ground for the App / Ctx split

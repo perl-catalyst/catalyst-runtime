@@ -10,7 +10,7 @@ Catalyst::Action - Catalyst Action
 
 =head1 DESCRIPTION
 
-This class represents a Catalyst Action. You can access the object for the 
+This class represents a Catalyst Action. You can access the object for the
 currently dispatched action via $c->action. See the L<Catalyst::Dispatcher>
 for more information on how actions are dispatched. Actions are defined in
 L<Catalyst::Controller> subclasses.
@@ -47,8 +47,17 @@ use overload (
 
 sub dispatch {    # Execute ourselves against a context
     my ( $self, $c ) = @_;
+    #Moose todo: grrrrrr. this is no good. i don't know enough about it to
+    # debug it though. why can't we just call the accessor?
     local $c->{namespace} = $self->namespace;
     return $c->execute( $self->class, $self );
+
+    #believed to be equivalent:
+    #my $orig = $c->namespace;
+    #$c->namespace($self->namespace);
+    #my $ret = $c->execute( $self->class, $self );
+    #$c->namespace($orig);
+    #return $ret;
 }
 
 sub execute {
