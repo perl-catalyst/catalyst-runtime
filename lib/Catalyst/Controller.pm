@@ -1,8 +1,7 @@
 package Catalyst::Controller;
 
-use Moose;
-use Class::MOP;
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
+use Moose;
 
 #Why does the following blow up?
 #extends qw/Catalyst::Component Catalyst::AttrContainer/;
