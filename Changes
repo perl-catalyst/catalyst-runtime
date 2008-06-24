@@ -1,6 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.7xxx  xxx
+        - remove 0-length query string components so warnings aren't thrown (RT #36428)
         - Update HTTP::Body dep so that the uploadtmp config value will work (RT #22540)
         - Fix for LocalRegex when used in the Root controller
         - Get some of the optional_* tests working from dirs with spaces (RT #26455)

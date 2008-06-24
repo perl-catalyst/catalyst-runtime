@@ -452,7 +452,7 @@ sub prepare_query_parameters {
     # replace semi-colons
     $query_string =~ s/;/&/g;
     
-    my @params = split /&/, $query_string;
+    my @params = grep { length $_ } split /&/, $query_string;
 
     for my $item ( @params ) {
         
