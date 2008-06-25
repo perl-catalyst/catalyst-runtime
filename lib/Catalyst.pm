@@ -49,6 +49,7 @@ our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = "catalyst_detach\n";
+our $GO        = "catalyst_go\n";
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
@@ -326,6 +327,20 @@ When called with no arguments it escapes the processing chain entirely.
 =cut
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
+
+=head2 $c->go( $action [, \@arguments ] )
+
+=head2 $c->go( $class, $method, [, \@arguments ] )
+
+Almost the same as C<detach>, but does a full dispatch, instead of just
+calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
+C<auto> and the method you go to is called, just like a new request.
+
+C<$c-E<gt>stash> is kept unchanged.
+
+=cut
+
+sub go { my $c = shift; $c->dispatcher->go( $c, @_ ) }
 
 =head2 $c->response
 
@@ -1260,7 +1275,12 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-        if ( !ref($error) and $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
+        if ( !ref($error) and $error eq $DETACH ) {
+            die $DETACH if($c->depth > 1);
+        }
+        elsif ( !ref($error) and $error eq $GO ) {
+            die $GO if($c->depth > 0);
+        }
         else {
             unless ( ref $error ) {
                 no warnings 'uninitialized';
