@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.7xxx  xxx
+5.7099_01 2008-06-25 22:36:00
         - Refactored component resolution (component(), models(), model(), et al). We now
           throw warnings for two reasons:
           1) model() or view() was called with no arguments, and two results are returned
