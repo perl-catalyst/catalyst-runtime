@@ -13,4 +13,11 @@ sub zero : Path('0') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub localregex : LocalRegex('^localregex$') {
+    my ( $self, $c ) = @_;
+    $c->res->header( 'X-Test-Class' => ref($self) );
+    $c->response->content_type('text/plain; charset=utf-8');
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;

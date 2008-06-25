@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 28*$iters;
+use Test::More tests => 33*$iters;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -102,5 +102,20 @@ sub run_tests {
         is( scalar @{ $req->captures }, 2, 'number of captures' );
         is( $req->captures->[ 0 ], 'mandatory', 'mandatory capture' );
         is( $req->captures->[ 1 ], '/optional', 'optional capture' );
+    }
+
+    # test localregex in the root controller
+    {
+        ok( my $response = request('http://localhost/localregex'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            '^localregex$', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Root',
+            'Test Class'
+        );
     }
 }

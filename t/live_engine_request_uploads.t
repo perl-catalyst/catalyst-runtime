@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 75;
+use Test::More tests => 88;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -242,3 +242,62 @@ use HTTP::Request::Common;
         is( $upload->filename, 'catalyst_130pix.gif' );
     }
 }
+
+# test uploadtmp config var
+
+{
+    my $creq;
+
+    my $dir = "$FindBin::Bin/";
+    local TestApp->config->{ uploadtmp } = $dir;
+
+    my $request = POST(
+        'http://localhost/dump/request/',
+        'Content-Type' => 'multipart/form-data',
+        'Content'      => [
+            'testfile' => ["$FindBin::Bin/live_engine_request_uploads.t"],
+        ]
+    );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    like(
+        $response->content,
+        qr/^bless\( .* 'Catalyst::Request' \)$/s,
+        'Content is a serialized Catalyst::Request'
+    );
+
+    {
+        no strict 'refs';
+        ok(
+            eval '$creq = ' . $response->content,
+            'Unserialize Catalyst::Request'
+        );
+    }
+
+    isa_ok( $creq, 'Catalyst::Request' );
+    is( $creq->method, 'POST', 'Catalyst::Request method' );
+    is( $creq->content_type, 'multipart/form-data',
+        'Catalyst::Request Content-Type' );
+    is( $creq->content_length, $request->content_length,
+        'Catalyst::Request Content-Length' );
+
+    for my $part ( $request->parts ) {
+
+        my $disposition = $part->header('Content-Disposition');
+        my %parameters  = @{ ( split_header_words($disposition) )[0] };
+
+        next unless exists $parameters{filename};
+
+        my $upload = $creq->{uploads}->{ $parameters{name} };
+
+        isa_ok( $upload, 'Catalyst::Request::Upload' );
+
+        is( $upload->type, $part->content_type, 'Upload Content-Type' );
+        is( $upload->size, length( $part->content ), 'Upload Content-Length' );
+
+        like( $upload->tempname, qr{\Q$dir\E}, 'uploadtmp' );
+    }
+}
+

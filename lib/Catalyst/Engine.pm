@@ -314,7 +314,7 @@ sub prepare_body {
         unless ( $c->request->{_body} ) {
             my $type = $c->request->header('Content-Type');
             $c->request->{_body} = HTTP::Body->new( $type, $length );
-            $c->request->{_body}->{tmpdir} = $c->config->{uploadtmp}
+            $c->request->{_body}->tmpdir( $c->config->{uploadtmp} )
               if exists $c->config->{uploadtmp};
         }
         
@@ -452,7 +452,7 @@ sub prepare_query_parameters {
     # replace semi-colons
     $query_string =~ s/;/&/g;
     
-    my @params = split /&/, $query_string;
+    my @params = grep { length $_ } split /&/, $query_string;
 
     for my $item ( @params ) {
         

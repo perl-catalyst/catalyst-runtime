@@ -270,7 +270,11 @@ sub _parse_Regexp_attr { shift->_parse_Regex_attr(@_); }
 sub _parse_LocalRegex_attr {
     my ( $self, $c, $name, $value ) = @_;
     unless ( $value =~ s/^\^// ) { $value = "(?:.*?)$value"; }
-    return ( 'Regex', '^' . $self->path_prefix($c) . "/${value}" );
+
+    my $prefix = $self->path_prefix( $c );
+    $prefix .= '/' if length( $prefix );
+   
+    return ( 'Regex', "^${prefix}${value}" );
 }
 
 sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
