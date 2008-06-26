@@ -16,6 +16,8 @@
         - Fix Catalyst::Utils::home() when application .pm is in the current dir (RT #34437)
         - Added the ability to remove parameters in req->uri_with() by passing in
           an undef value (RT #34782)
+        - Added $c->go, to do an internal redispatch to another action, while retaining the
+          contents of the stash
 
 5.7014  2008-05-25 15:26:00
         - Addition of .conf in restart regex in Catalyst::Engine::HTTP::Restarter::Watcher
