@@ -28,6 +28,21 @@ has code => (is => 'rw');
 
 no Moose;
 
+use overload (
+
+    # Stringify to reverse for debug output etc.
+    q{""} => sub { shift->{reverse} },
+
+    # Codulate to execute to invoke the encapsulated action coderef
+    '&{}' => sub { my $self = shift; sub { $self->execute(@_); }; },
+
+    # Make general $stuff still work
+    fallback => 1,
+
+);
+
+
+
 no warnings 'recursion';
 
 #__PACKAGE__->mk_accessors(qw/class namespace reverse attributes name code/);
