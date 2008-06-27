@@ -279,6 +279,11 @@ sub _parse_LocalRegex_attr {
 
 sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
 
+sub _parse_PathPrefix_attr {
+    my $self = shift;
+    return PathPart => $self->path_prefix;
+}
+
 sub _parse_ActionClass_attr {
     my ( $self, $c, $name, $value ) = @_;
     unless ( $value =~ s/^\+// ) {
@@ -346,8 +351,8 @@ overridden from the "namespace" config key.
 
 =head2 $self->path_prefix($c)
 
-Returns the default path prefix for :Local, :LocalRegex and relative
-:Path actions in this component. Defaults to the action_namespace or
+Returns the default path prefix for :PathPrefix, :Local, :LocalRegex and
+relative :Path actions in this component. Defaults to the action_namespace or
 can be overridden from the "path" config key.
 
 =head2 $self->create_action(%args)
