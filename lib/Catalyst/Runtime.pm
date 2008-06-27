@@ -9,6 +9,8 @@ BEGIN { require 5.008001; }
 
 our $VERSION='5.7099_01';
 
+$VERSION= eval $VERSION; 
+
 =head1 NAME
 
 Catalyst::Runtime - Catalyst  Runtime version
