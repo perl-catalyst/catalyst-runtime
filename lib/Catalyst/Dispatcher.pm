@@ -114,6 +114,7 @@ message about unknown resource
 sub dispatch {
     my ( $self, $c ) = @_;
     if ( $c->action ) {
+use Data::Dumper; warn Dumper( $c->action, $c->action->namespace );
         $c->forward( join( '/', '', $c->action->namespace, '_DISPATCH' ) );
     }
 
@@ -567,10 +568,9 @@ sub _load_dispatch_types {
     return @loaded;
 }
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Matt S Trout, C<mst@shadowcatsystems.co.uk>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

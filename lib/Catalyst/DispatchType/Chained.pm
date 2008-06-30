@@ -555,9 +555,9 @@ The C<forward>ing to other actions does just what you would expect. But if
 you C<detach> out of a chain, the rest of the chain will not get called
 after the C<detach>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt S Trout <mst@shadowcatsystems.co.uk>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

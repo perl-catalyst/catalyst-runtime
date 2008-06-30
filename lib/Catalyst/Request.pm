@@ -566,9 +566,7 @@ version string.
 
 =head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-
-Marcus Ramberg, C<mramberg@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

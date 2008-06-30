@@ -331,10 +331,9 @@ sub env_value {
     return;
 }
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Yuval Kogman, C<nothingmuch@woobling.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

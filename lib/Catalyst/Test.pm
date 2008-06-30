@@ -183,11 +183,11 @@ sub remote_request {
 
 =head1 SEE ALSO
 
-L<Catalyst>.
+L<Catalyst>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

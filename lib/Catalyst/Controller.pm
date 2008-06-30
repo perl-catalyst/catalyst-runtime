@@ -368,10 +368,9 @@ Primarily designed for the use of register_actions.
 
 Returns the application instance stored by C<new()>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@oook.de>
-Marcus Ramberg C<mramberg@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

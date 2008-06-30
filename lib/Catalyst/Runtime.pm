@@ -23,9 +23,9 @@ See L<Catalyst>.
 
 This is the primary class for the Catalyst-Runtime distribution, version 5.70.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-The Catalyst Core Team - see http://catalyst.perl.org/
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

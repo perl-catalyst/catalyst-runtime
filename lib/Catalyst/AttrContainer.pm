@@ -23,7 +23,7 @@ sub FETCH_CODE_ATTRIBUTES { $_[0]->_attr_cache->{ $_[1] } || () }
 
 =head1 NAME
 
-Catalyst::AttrContainer
+Catalyst::AttrContainer - Handles code attribute storage and caching
 
 =head1 SYNOPSIS
 
@@ -47,10 +47,9 @@ Attribute function. See attributes(3pm)
 L<Catalyst::Dispatcher>
 L<Catalyst>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Marcus Ramberg, C<mramberg@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

@@ -91,12 +91,13 @@ Mailing-Lists:
     http://lists.rawmode.org/mailman/listinfo/catalyst
     http://lists.rawmode.org/mailman/listinfo/catalyst-dev
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@oook.de>
-Jesse Sheidlower, C<jester@panix.com>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
 This program is free software, you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=cut
