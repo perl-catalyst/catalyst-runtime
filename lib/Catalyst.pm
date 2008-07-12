@@ -1906,6 +1906,11 @@ search paths, specify a key named C<search_extra> as an array
 reference. Items in the array beginning with C<::> will have the
 application class name prepended to them.
 
+All components found will also have any 
+L<Devel::InnerPackage|inner packages> loaded and set up as components.
+Note, that modules which are B<not> an I<inner package> of the main
+file namespace loaded will not be instantiated as components.
+
 =cut
 
 sub setup_components {
