@@ -3,6 +3,8 @@
 5.7XXXX   XXXX
         - Added PathPrefix attribute
         - Removed Catalyst::Build; we've long since moved to Module::Install
+        - Updated Catalyst::Test docs to mention the use of HTTP::Request
+          objects (Rafael Kitover)
 
 5.7099_01 2008-06-25 22:36:00
         - Refactored component resolution (component(), models(), model(), et al). We now
