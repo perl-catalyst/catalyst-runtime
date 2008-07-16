@@ -114,7 +114,6 @@ message about unknown resource
 sub dispatch {
     my ( $self, $c ) = @_;
     if ( $c->action ) {
-use Data::Dumper; warn Dumper( $c->action, $c->action->namespace );
         $c->forward( join( '/', '', $c->action->namespace, '_DISPATCH' ) );
     }
 
