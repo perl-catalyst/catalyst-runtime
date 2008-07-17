@@ -525,7 +525,7 @@ Gets a L<Catalyst::Model> instance by name.
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
 If the name is omitted, it will look for 
- - a model object in $c->stash{current_model_instance}, then
+ - a model object in $c->stash->{current_model_instance}, then
  - a model name in $c->stash->{current_model}, then
  - a config setting 'default_model', or
  - check if there is only one model, and return it if that's the case.
@@ -578,7 +578,7 @@ Gets a L<Catalyst::View> instance by name.
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
 If the name is omitted, it will look for 
- - a view object in $c->stash{current_view_instance}, then
+ - a view object in $c->stash->{current_view_instance}, then
  - a view name in $c->stash->{current_view}, then
  - a config setting 'default_view', or
  - check if there is only one view, and return it if that's the case.
