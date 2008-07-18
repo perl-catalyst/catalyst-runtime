@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 22;
 use strict;
 use warnings;
 
@@ -23,16 +23,6 @@ is(MyApp->comp('C::Controller'), 'MyApp::C::Controller', 'Two-part return ok');
 
 is(MyApp->comp('Model'), 'MyApp::M::Model', 'Single part return ok');
 
-# regexp fallback
-{
-    my $warnings = 0;
-    no warnings 'redefine';
-    local *Catalyst::Log::warn = sub { $warnings++ };
-
-    is(MyApp->comp('::M::'), 'MyApp::M::Model', 'Regex return ok');
-    ok( $warnings, 'regexp fallback for comp() warns' );
-}
-
 is_deeply([ MyApp->comp() ], \@complist, 'Empty return ok');
 
 # Is this desired behaviour?
@@ -44,6 +34,27 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
     is_deeply( [ MyApp->comp('MyApp::V::View$') ], [ 'MyApp::V::View' ], 'Explicit return ok');
     is_deeply( [ MyApp->comp('MyApp::C::Controller$') ], [ 'MyApp::C::Controller' ], 'Explicit return ok');
     is_deeply( [ MyApp->comp('MyApp::M::Model$') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
+
+    # a couple other varieties for regexp fallback
+    is_deeply( [ MyApp->comp('M::Model') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
+
+    {
+        my $warnings = 0;
+        no warnings 'redefine';
+        local *Catalyst::Log::warn = sub { $warnings++ };
+
+        is_deeply( [ MyApp->comp('::M::Model') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
+        ok( $warnings, 'regexp fallback warnings' );
+
+        $warnings = 0;
+        is_deeply( [ MyApp->comp('Mode') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
+        ok( $warnings, 'regexp fallback warnings' );
+
+        $warnings = 0;
+        is(MyApp->comp('::M::'), 'MyApp::M::Model', 'Regex return ok');
+        ok( $warnings, 'regexp fallback for comp() warns' );
+    }
+
 }
 
 # multiple returns
@@ -56,4 +67,22 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 {
     is_deeply( scalar MyApp->comp( qr{DNE} ), 0, 'no results for failed search' );
 }
+
+
+#checking @args passed to ACCEPT_CONTEXT
+{
+    my $args;
+
+    no warnings; 
+    *MyApp::M::Model::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+
+    MyApp->component('MyApp::M::Model', qw/foo bar/);
+    is_deeply($args, [qw/foo bar/], 'args passed to ACCEPT_CONTEXT ok');
+
+    MyApp->component('M::Model', qw/foo2 bar2/);
+    is_deeply($args, [qw/foo2 bar2/], 'args passed to ACCEPT_CONTEXT ok');
+
+    MyApp->component('Mode', qw/foo3 bar3/);
+    is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
+} 
 

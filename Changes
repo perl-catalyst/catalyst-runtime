@@ -4,6 +4,7 @@
         - Fix regressions for regexp fallback in model(), view() and controller()
         - Added the supplied argument to the regexp fallback warning for easier
           debugging
+        - Ensure ACCEPT_CONTEXT is called for results from component()
 
 5.7099_02 2008-07-16 19:10:00
         - Added PathPrefix attribute

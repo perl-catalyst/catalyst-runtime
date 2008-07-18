@@ -683,11 +683,13 @@ sub component {
 
         if( !ref $name ) {
             # is it the exact name?
-            return $comps->{ $name } if exists $comps->{ $name };
+            return $c->_filter_component( $comps->{ $name }, @args )
+                       if exists $comps->{ $name };
 
             # perhaps we just omitted "MyApp"?
             my $composed = ( ref $c || $c ) . "::${name}";
-            return $comps->{ $composed } if exists $comps->{ $composed };
+            return $c->_filter_component( $comps->{ $composed }, @args )
+                       if exists $comps->{ $composed };
 
             # search all of the models, views and controllers
             my( $comp ) = $c->_comp_search_prefixes( $name, qw/Model M Controller C View V/ );
@@ -698,12 +700,13 @@ sub component {
         my $query = ref $name ? $name : qr{$name}i;
 
         my @result = grep { m{$query} } keys %{ $c->components };
-        return @result if ref $name;
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
 
         if( $result[ 0 ] ) {
+            $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
             $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
             $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-            return $result[ 0 ];
+            return $c->_filter_component( $result[ 0 ], @args );
         }
 
         # I would expect to return an empty list here, but that breaks back-compat
