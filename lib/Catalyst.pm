@@ -461,6 +461,7 @@ sub _comp_search_prefixes {
 
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {
+        $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
         $c->log->warn( 'Relying on the regexp fallback behavior for component resolution is unreliable and unsafe.' );
         $c->log->warn( 'If you really want to search, pass in a regexp as the argument.' );
     }
