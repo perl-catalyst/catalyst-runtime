@@ -454,6 +454,11 @@ sub _comp_search_prefixes {
     $query  = qr/$name/i;
     @result = map { $c->components->{ $_ } } grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
 
+    # no results? try against full names
+    if( !@result ) {
+        @result = map { $c->components->{ $_ } } grep { m{$query} } keys %eligible;
+    }
+
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {
         $c->log->warn( 'Relying on the regexp fallback behavior for component resolution is unreliable and unsafe.' );

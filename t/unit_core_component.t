@@ -1,4 +1,4 @@
-use Test::More tests => 11;
+use Test::More tests => 14;
 use strict;
 use warnings;
 
@@ -41,6 +41,9 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 # regexp behavior
 {
     is_deeply( [ MyApp->comp( qr{Model} ) ], [ 'MyApp::M::Model'], 'regexp ok' );
+    is_deeply( [ MyApp->comp('MyApp::V::View$') ], [ 'MyApp::V::View' ], 'Explicit return ok');
+    is_deeply( [ MyApp->comp('MyApp::C::Controller$') ], [ 'MyApp::C::Controller' ], 'Explicit return ok');
+    is_deeply( [ MyApp->comp('MyApp::M::Model$') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
 }
 
 # multiple returns

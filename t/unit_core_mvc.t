@@ -1,4 +1,4 @@
-use Test::More tests => 40;
+use Test::More tests => 43;
 use strict;
 use warnings;
 
@@ -121,6 +121,9 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
         ok( $warnings, 'regexp fallback warnings' );
     }
 
+    is_deeply( [ MyApp->view('MyApp::V::View$') ], [ 'MyApp::V::View' ], 'Explicit return ok');
+    is_deeply( [ MyApp->controller('MyApp::C::Controller$') ], [ 'MyApp::C::Controller' ], 'Explicit return ok');
+    is_deeply( [ MyApp->model('MyApp::M::Model$') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
 }
 
 {
