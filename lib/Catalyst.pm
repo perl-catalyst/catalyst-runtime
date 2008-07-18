@@ -452,7 +452,7 @@ sub _comp_search_prefixes {
 
     # regexp fallback
     $query  = qr/$name/i;
-    @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
+    @result = map { $c->components->{ $_ } } grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
 
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {

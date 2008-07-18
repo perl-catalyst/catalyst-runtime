@@ -1,4 +1,4 @@
-use Test::More tests => 37;
+use Test::More tests => 40;
 use strict;
 use warnings;
 
@@ -107,6 +107,20 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
     is_deeply( [ MyApp->view( qr{^V[ie]+w$} ) ], [ 'MyApp::V::View' ], 'regexp view ok' );
     is_deeply( [ MyApp->controller( qr{Dummy\::Model$} ) ], [ 'MyApp::Controller::Model::Dummy::Model' ], 'regexp controller ok' );
     is_deeply( [ MyApp->model( qr{Dum{2}y} ) ], [ 'MyApp::Model::Dummy::Model' ], 'regexp model ok' );
+    
+    # ACCEPT_CONTEXT w/ qr{}
+    is_deeply( [ MyApp->model( qr{Test} ) ], [ MyApp->components->{'MyApp::Model::Test::Object'} ], 'Object returned' );
+
+    {
+        my $warnings = 0;
+        no warnings 'redefine';
+        local *Catalyst::Log::warn = sub { $warnings++ };
+
+        # ACCEPT_CONTEXT w/ regexp fallback
+        is_deeply( [ MyApp->model( 'Test' ) ], [ MyApp->components->{'MyApp::Model::Test::Object'} ], 'Object returned' );
+        ok( $warnings, 'regexp fallback warnings' );
+    }
+
 }
 
 {

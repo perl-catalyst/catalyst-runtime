@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.7xxxxxx XXXX
+        - Fix regression for regexp fallback in model(), view() and controller()
+
 5.7099_02 2008-07-16 19:10:00
         - Added PathPrefix attribute
         - Removed Catalyst::Build; we've long since moved to Module::Install
