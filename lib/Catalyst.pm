@@ -753,8 +753,7 @@ L<Catalyst::Engine>.
 =head2 $c->path_to(@path)
 
 Merges C<@path> with C<< $c->config->{home} >> and returns a
-L<Path::Class::Dir> object. Must be called after C<< MyApp->setup >>,
-which sets up C<< $c->config->{home} >>.
+L<Path::Class::Dir> object.
 
 For example:
 
