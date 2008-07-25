@@ -61,6 +61,11 @@ sub go_die : Local {
     die $Catalyst::GO;
 }
 
+sub go_chained : Local {
+    my ( $self, $c, $val ) = @_;
+    $c->go('/action/chained/foo/spoon',[1]);
+}
+
 sub args_embed_relative : Local {
     my ( $self, $c ) = @_;
     $c->go('embed/ok');

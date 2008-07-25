@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 47 * $iters;
+use Test::More tests => 50 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -223,7 +223,27 @@ sub run_tests {
             'Test Method' );
     }
 
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Go->begin
+          TestApp::Controller::Action::Go->go_chained
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->foo
+          TestApp::Controller::Action::Chained::Foo->spoon
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/action/go/go_chained'), 'go to chained + subcontroller endpoint' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '; 1', 'Content OK' );
+    }
+
 }
+
+
 
 sub _begin {
     local $_ = shift;
