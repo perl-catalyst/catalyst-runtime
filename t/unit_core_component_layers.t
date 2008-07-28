@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 use strict;
 use warnings;
 use lib 't/lib';
@@ -19,3 +19,8 @@ my $model_foo_bar = $model_foo->bar;
 
 can_ok($model_foo_bar, 'model_foo_bar_method_from_foo');
 can_ok($model_foo_bar, 'model_foo_bar_method_from_foo_bar');
+
+TestApp->setup;
+
+is($model_foo->model_quux_method, 'chunkybacon', 'Model method getting $self->{quux} from config');
+

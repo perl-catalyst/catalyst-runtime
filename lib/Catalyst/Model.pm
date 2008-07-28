@@ -5,9 +5,6 @@ extends qw/Catalyst::Component/;
 
 no Moose;
 
-#We can't immutablize anything that ISA Component just yet
-#__PACKAGE__->meta->make_immutable();
-
 =head1 NAME
 
 Catalyst::Model - Catalyst Model base class

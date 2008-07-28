@@ -57,15 +57,16 @@ component loader with config() support and a process() method placeholder.
 __PACKAGE__->mk_classdata('_plugins');
 __PACKAGE__->mk_classdata('_config');
 
-around new => sub {
-    my ( $orig, $self) = @_;
-
+sub BUILDARGS {
+    my ($self) = @_;
+    
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
     my $args =  $self->merge_config_hashes( $self->config, $arguments );
-    $self->$orig( $args );
-};
+    
+    return $args;
+}
 
 no Moose;
 

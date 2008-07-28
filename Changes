@@ -3,6 +3,7 @@
 5.8000
         - Port to Moose
         - Added test for action stringify
+        - Added test for component instances getting $self->{value} from config.
 
 5.7013
         - Fix subdirs for scripts that run in subdirs more than one level deep.
