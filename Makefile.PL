@@ -6,7 +6,7 @@ perl_version '5.8.1';
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
-requires 'MooseX::Emulate::Class::Accessor::Fast';
+requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00300';
 requires 'Moose' => '0.51';
 requires 'Carp';
 requires 'Class::Accessor::Fast';
