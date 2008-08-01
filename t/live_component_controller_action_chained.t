@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 127*$iters;
+use Test::More tests => 136*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -525,6 +525,69 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 2', 'Content OK' );
+    }
+
+    #
+    #   Test if :Chained('../act') is working
+    #
+    {
+        local $TODO = "To Be Coded";
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->rootdef
+          TestApp::Controller::Action::Chained::ParentChain->chained_rel
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/rootdef/1/chained_rel/3/2'),
+            ":Chained('../action') chains to correct action" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 3, 2', 'Content OK' );
+    }
+
+    #
+    #   Test if :ChainedParent is working
+    #
+    {
+        local $TODO = "To Be Coded";
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->loose
+          TestApp::Controller::Action::Chained::ParentChain->loose
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/loose/4/loose/a/b'),
+            ":Chained('../action') chains to correct action" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '4; a, b', 'Content OK' );
+    }
+
+    #
+    #   Test if :Chained('../name/act') is working
+    #
+    {
+        local $TODO = "To Be Coded";
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::Bar->cross1
+          TestApp::Controller::Action::Chained::ParentChain->up_down
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/cross/4/up_down/5'),
+            ":Chained('../action') chains to correct action" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '4; 5', 'Content OK' );
     }
 
     #
