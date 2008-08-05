@@ -98,7 +98,7 @@ documentation and tutorials.
     catalyst.pl MyApp
 
     # add models, views, controllers
-    script/myapp_create.pl model MyDatabase DBIC::Schema create=dynamic dbi:SQLite:/path/to/db
+    script/myapp_create.pl model MyDatabase DBIC::Schema create=static dbi:SQLite:/path/to/db
     script/myapp_create.pl view MyTemplate TT
     script/myapp_create.pl controller Search
 
