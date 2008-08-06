@@ -157,6 +157,7 @@ EOF
 (no) Vennligst prov igjen senere
 (dk) Venligst prov igen senere
 (pl) Prosze sprobowac pozniej
+(pt) Por favor volte mais tarde
 </pre>
 
         $name = '';
