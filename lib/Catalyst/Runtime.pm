@@ -13,7 +13,7 @@ $VERSION= eval $VERSION;
 
 =head1 NAME
 
-Catalyst::Runtime - Catalyst  Runtime version
+Catalyst::Runtime - The Catalyst Framework Runtime
 
 =head1 SYNOPSIS
 
