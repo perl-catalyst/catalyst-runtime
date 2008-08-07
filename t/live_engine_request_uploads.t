@@ -14,6 +14,7 @@ use Catalyst::Request::Upload;
 use HTTP::Headers;
 use HTTP::Headers::Util 'split_header_words';
 use HTTP::Request::Common;
+use Path::Class::Dir;
 
 {
     my $creq;
@@ -250,6 +251,7 @@ use HTTP::Request::Common;
 
     my $dir = "$FindBin::Bin/";
     local TestApp->config->{ uploadtmp } = $dir;
+    $dir = Path::Class::Dir->new( $dir );
 
     my $request = POST(
         'http://localhost/dump/request/',

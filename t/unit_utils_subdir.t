@@ -9,6 +9,7 @@ use warnings;
 
 BEGIN { use_ok 'Catalyst::Utils' }
 use FindBin;
+use Path::Class::Dir;
 
 {
     $INC{'TestApp.pm'} = "$FindBin::Bin/something/script/foo/../../lib/TestApp.pm";
@@ -38,5 +39,6 @@ use FindBin;
   
     my $home = Catalyst::Utils::home('TestApp');
 
-    is( $home, $dir, 'same dir loading' );
+    $dir = Path::Class::Dir->new( $dir );
+    is( $home, "$dir", 'same dir loading' );
 }
