@@ -25,6 +25,16 @@ else {
 
 sub run_tests {
     {
+        # Test go to global private action
+        ok( my $response = request('http://localhost/action/go/global'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            'action/go/global', 'Main Class Action' );
+    }
+
+    {
         my @expected = qw[
           TestApp::Controller::Action::Go->one
           TestApp::Controller::Action::Go->two
@@ -38,16 +48,8 @@ sub run_tests {
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
         my $expected = join( ", ", @expected );
 
-        # Test go to global private action
-        ok( my $response = request('http://localhost/action/go/global'),
-            'Request' );
-        ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->content_type, 'text/plain', 'Response Content-Type' );
-        is( $response->header('X-Catalyst-Action'),
-            'action/go/global', 'Main Class Action' );
-
         # Test go to chain of actions.
-        ok( $response = request('http://localhost/action/go/one'),
+        ok( my $response = request('http://localhost/action/go/one'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
@@ -211,16 +213,15 @@ sub run_tests {
         );
     }
 
-    # test class go 
+    # test class go -- MUST FAIL!
     {
         ok(
             my $response = request(
                 'http://localhost/action/go/class_go_test_action'),
             'Request'
         );
-        ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->header('X-Class-Go-Test-Method'), 1,
-            'Test Method' );
+        ok( !$response->is_success, 'Response Fails' );
+        is( $response->content, q(FATAL ERROR: Couldn't go to command "TestApp": Invalid action or component.), 'Error message' );
     }
 
     {

@@ -176,7 +176,7 @@ sub go {
     my ( $c, $command ) = @_;
     my ( $action, $args ) = $self->_command2action(@_);
 
-    unless ($action) {
+    unless ($action && defined $action->namespace) {
         my $error =
             qq/Couldn't go to command "$command": /
           . qq/Invalid action or component./;
