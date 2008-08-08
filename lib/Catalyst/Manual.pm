@@ -16,9 +16,8 @@ run the following command from a unix (bash) prompt:
  $ perldoc -t Catalyst::Manual::Tutorial::CatalystBasics 2>&1 >/dev/null && echo OK || echo MISSING
 
 If you see "OK" as the output, it's there, if you see "MISSING" you
-need to install the
-L<Catalyst::Manual|http://search.cpan.org/search?query=Catalyst%3A%3AManual&mode=dist>
-distribution.
+need to install the L<Catalyst::Manual> distribution
+(L<http://search.cpan.org/dist/Catalyst-Manual/>).
 
 =over 4
 
