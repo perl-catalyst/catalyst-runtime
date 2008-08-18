@@ -157,7 +157,14 @@ sub recurse_match {
                 my ($actions, $captures, $action_parts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
                                            );
-                if ($actions && (!$best_action || $#$action_parts < $#{$best_action->{parts}})){
+                #    No best action currently
+                # OR The action has less parts
+                # OR The action has equal parts but less captured data (ergo more defined)
+                if ($actions    &&
+                    (!$best_action                                 ||
+                     $#$action_parts < $#{$best_action->{parts}}   ||
+                     ($#$action_parts == $#{$best_action->{parts}} &&
+                      $#$captures < $#{$best_action->{captures}}))){
                     $best_action = {
                         actions => [ $action, @$actions ],
                         captures=> [ @captures, @$captures ],
