@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 136*$iters;
+use Test::More tests => 138*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -945,4 +945,23 @@ sub run_tests {
         is( $response->content, '; 1', 'Content OK' );
     }
 
+    #
+    #   static paths vs. captures
+    #
+    {
+        my @expected = qw[
+            TestApp::Controller::Action::Chained->begin
+            TestApp::Controller::Action::Chained->apan
+            TestApp::Controller::Action::Chained->korv
+            TestApp::Controller::Action::Chained->static_end
+            TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/action/chained/static_end'),
+            "static paths are prefered over captures" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+    }
 }
