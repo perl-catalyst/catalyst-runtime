@@ -221,25 +221,7 @@ sub register {
         );
     }
 
-    my $parent = $chained_attr[0];
-
-    if (defined($parent) && length($parent)) {
-        if ($parent eq '.') {
-            $parent = '/'.$action->namespace;
-        } elsif ($parent !~ m/^\//) {
-            if ($action->namespace) {
-                $parent = '/'.join('/', $action->namespace, $parent);
-            } else {
-                $parent = '/'.$parent; # special case namespace '' (root)
-            }
-        }
-    } else {
-        $parent = '/'
-    }
-
-    $action->attributes->{Chained} = [ $parent ];
-
-    my $children = ($self->{children_of}{$parent} ||= {});
+    my $children = ($self->{children_of}{ $chained_attr[0] } ||= {});
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 

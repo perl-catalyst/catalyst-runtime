@@ -279,6 +279,28 @@ sub _parse_LocalRegex_attr {
 
 sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
 
+sub _parse_Chained_attr {
+    my ($self, $c, $name, $value) = @_;
+
+    if (defined($value) && length($value)) {
+        if ($value eq '.') {
+            $value = '/'.$self->action_namespace($c);
+        } elsif ($value !~ m/^\//) {
+            my $action_ns = $self->action_namespace($c);
+
+            if ($action_ns) {
+                $value = '/'.join('/', $action_ns, $value);
+            } else {
+                $value = '/'.$value; # special case namespace '' (root)
+            }
+        }
+    } else {
+        $value = '/'
+    }
+
+    return Chained => $value;
+}
+
 sub _parse_PathPrefix_attr {
     my $self = shift;
     return PathPart => $self->path_prefix;
