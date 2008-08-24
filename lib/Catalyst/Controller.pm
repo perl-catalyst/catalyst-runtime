@@ -304,6 +304,11 @@ sub _parse_Chained_attr {
     return Chained => $value;
 }
 
+sub _parse_ChainedParent_attr {
+    my ($self, $c, $name, $value) = @_;
+    return $self->_parse_Chained_attr($c, $name, '../'.$name);
+}
+
 sub _parse_PathPrefix_attr {
     my $self = shift;
     return PathPart => $self->path_prefix;
