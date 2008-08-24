@@ -534,14 +534,14 @@ sub run_tests {
         local $TODO = "To Be Coded";
         my @expected = qw[
           TestApp::Controller::Action::Chained->begin
-          TestApp::Controller::Action::Chained->rootdef
+          TestApp::Controller::Action::Chained->one
           TestApp::Controller::Action::Chained::ParentChain->chained_rel
           TestApp::Controller::Action::Chained->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/chained/rootdef/1/chained_rel/3/2'),
+        ok( my $response = request('http://localhost/chained/one/1/chained_rel/3/2'),
             ":Chained('../action') chains to correct action" );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );

@@ -10,8 +10,8 @@ use base qw/ Catalyst::Controller /;
 #
 sub child :Chained('.') :Args(1) { }
 
-# Should be at /chained/rootdef/*/chained_rel
-sub chained_rel :Chained('../rootdef') Args(0) {
+# Should be at /chained/rootdef/*/chained_rel/*/*
+sub chained_rel :Chained('../one') Args(2) {
 }
 
 # Should chain to loose in parent namespace - i.e. at /chained/loose/*/loose/*/*
