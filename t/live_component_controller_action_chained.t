@@ -551,7 +551,6 @@ sub run_tests {
     #   Test if ../ works to go up more than one level
     #
     {
-        local $TODO = 'to be coded';
         my @expected = qw[
             TestApp::Controller::Action::Chained->begin
             TestApp::Controller::Action::Chained->one
