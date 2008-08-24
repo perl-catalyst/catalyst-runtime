@@ -531,7 +531,6 @@ sub run_tests {
     #   Test if :Chained('../act') is working
     #
     {
-        local $TODO = "To Be Coded";
         my @expected = qw[
           TestApp::Controller::Action::Chained->begin
           TestApp::Controller::Action::Chained->one
@@ -552,7 +551,6 @@ sub run_tests {
     #   Test if :ChainedParent is working
     #
     {
-        local $TODO = "To Be Coded";
         my @expected = qw[
           TestApp::Controller::Action::Chained->begin
           TestApp::Controller::Action::Chained->loose
@@ -573,7 +571,6 @@ sub run_tests {
     #   Test if :Chained('../name/act') is working
     #
     {
-        local $TODO = "To Be Coded";
         my @expected = qw[
           TestApp::Controller::Action::Chained->begin
           TestApp::Controller::Action::Chained::Bar->cross1
