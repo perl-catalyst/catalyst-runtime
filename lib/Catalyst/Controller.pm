@@ -285,9 +285,11 @@ sub _parse_Chained_attr {
     if (defined($value) && length($value)) {
         if ($value eq '.') {
             $value = '/'.$self->action_namespace($c);
-        } elsif (my ($rest) = $value =~ /^\.{2}\/(.*)$/) {
+        } elsif (my ($rel, $rest) = $value =~ /^((?:\.{2}\/)+)(.*)$/) {
             my @parts = split '/', $self->action_namespace($c);
-            $value = '/'.join('/', @parts[0 .. $#parts-1], $rest);
+            my @levels = split '/', $rel;
+
+            $value = '/'.join('/', @parts[0 .. $#parts - @levels], $rest);
         } elsif ($value !~ m/^\//) {
             my $action_ns = $self->action_namespace($c);
 
