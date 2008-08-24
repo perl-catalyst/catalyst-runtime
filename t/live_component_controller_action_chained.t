@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 138*$iters;
+use Test::More tests => 141*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -545,6 +545,27 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '1; 3, 2', 'Content OK' );
+    }
+
+    #
+    #   Test if ../ works to go up more than one level
+    #
+    {
+        local $TODO = 'to be coded';
+        my @expected = qw[
+            TestApp::Controller::Action::Chained->begin
+            TestApp::Controller::Action::Chained->one
+            TestApp::Controller::Action::Chained::ParentChain::Relative->chained_rel_two
+            TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/one/1/chained_rel_two/42/23'),
+            "../ works to go up more than one level" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '1; 42, 23', 'Content OK' );
     }
 
     #
