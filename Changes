@@ -3,7 +3,8 @@
 5.7XXXXXX XXXX
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
-        
+        - Make :Chained('../action') work (Florian Ragwitz)
+
 5.7099_03 2008-07-20 10:10:00
         - Fix regressions for regexp fallback in model(), view() and controller()
         - Added the supplied argument to the regexp fallback warning for easier
