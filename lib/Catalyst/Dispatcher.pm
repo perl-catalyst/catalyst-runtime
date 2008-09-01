@@ -211,7 +211,7 @@ sub forward {
     no warnings 'recursion';
 
     my $orig_args = $c->request->arguments();
-    $c->request->arguments(\@args);
+    $c->request->arguments($args);
     $action->dispatch( $c );
     $c->request->arguments($orig_args);
     
