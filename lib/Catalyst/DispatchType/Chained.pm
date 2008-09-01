@@ -246,7 +246,7 @@ sub register {
         );
     }
 
-    my $children = ($self->{children_of}{ $chained_attr[0] } ||= {});
+    my $children = ($self->_children_of->{ $chained_attr[0] } ||= {});
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 
