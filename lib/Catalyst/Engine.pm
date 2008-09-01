@@ -156,6 +156,7 @@ EOF
 (no) Vennligst prov igjen senere
 (dk) Venligst prov igen senere
 (pl) Prosze sprobowac pozniej
+(pt) Por favor volte mais tarde
 </pre>
 
         $name = '';
@@ -313,7 +314,7 @@ sub prepare_body {
         unless ( $request->{_body} ) {
             my $type = $request->header('Content-Type');
             $request->{_body} = HTTP::Body->new( $type, $length );
-            $request->{_body}->{tmpdir} = $c->config->{uploadtmp}
+            $request->{_body}->tmpdir( $c->config->{uploadtmp} )
               if exists $c->config->{uploadtmp};
         }
         
@@ -450,7 +451,7 @@ sub prepare_query_parameters {
     # replace semi-colons
     $query_string =~ s/;/&/g;
     
-    my @params = split /&/, $query_string;
+    my @params = grep { length $_ } split /&/, $query_string;
 
     for my $item ( @params ) {
         
@@ -670,9 +671,7 @@ sub unescape_uri {
 
 =head1 AUTHORS
 
-Sebastian Riedel, <sri@cpan.org>
-
-Andy Grundman, <andy@hybridized.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

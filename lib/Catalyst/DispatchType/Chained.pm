@@ -182,7 +182,14 @@ sub recurse_match {
                 my ($actions, $captures, $action_parts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
                                            );
-                if ($actions && (!$best_action || $#$action_parts < $#{$best_action->{parts}})){
+                #    No best action currently
+                # OR The action has less parts
+                # OR The action has equal parts but less captured data (ergo more defined)
+                if ($actions    &&
+                    (!$best_action                                 ||
+                     $#$action_parts < $#{$best_action->{parts}}   ||
+                     ($#$action_parts == $#{$best_action->{parts}} &&
+                      $#$captures < $#{$best_action->{captures}}))){
                     $best_action = {
                         actions => [ $action, @$actions ],
                         captures=> [ @captures, @$captures ],
@@ -233,31 +240,13 @@ sub register {
 
     return 0 unless @chained_attr;
 
-    if (@chained_attr > 2) {
+    if (@chained_attr > 1) {
         Catalyst::Exception->throw(
           "Multiple Chained attributes not supported registering ${action}"
         );
     }
 
-    my $parent = $chained_attr[0];
-
-    if (defined($parent) && length($parent)) {
-        if ($parent eq '.') {
-            $parent = '/'.$action->namespace;
-        } elsif ($parent !~ m/^\//) {
-            if ($action->namespace) {
-                $parent = '/'.join('/', $action->namespace, $parent);
-            } else {
-                $parent = '/'.$parent; # special case namespace '' (root)
-            }
-        }
-    } else {
-        $parent = '/'
-    }
-
-    $action->attributes->{Chained} = [ $parent ];
-
-    my $children = ($self->_children_of->{$parent} ||= {});
+    my $children = ($self->{children_of}{ $chained_attr[0] } ||= {});
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 
@@ -582,9 +571,9 @@ The C<forward>ing to other actions does just what you would expect. But if
 you C<detach> out of a chain, the rest of the chain will not get called
 after the C<detach>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt S Trout <mst@shadowcatsystems.co.uk>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

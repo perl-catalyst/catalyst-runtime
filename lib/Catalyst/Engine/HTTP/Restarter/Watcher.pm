@@ -147,7 +147,7 @@ files
 
     my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
         directory => '/path/to/MyApp',
-        regex     => '\.yml$|\.yaml$|\.pm$',
+        regex     => '\.yml$|\.yaml$|\.conf|\.pm$',
         delay     => 1,
     );
     
@@ -178,9 +178,7 @@ L<Catalyst>, L<Catalyst::Engine::HTTP::Restarter>, L<File::Modified>
 
 =head1 AUTHORS
 
-Sebastian Riedel, <sri@cpan.org>
-
-Andy Grundman, <andy@hybridized.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 THANKS
 

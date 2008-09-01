@@ -120,6 +120,49 @@ sub _get_uid {
     return $visitor->getResult;
 } 
 
+sub accept {
+    my $self = shift;
+    $self->{tree}->accept( @_ );
+}
+
+sub addChild {
+    my $self = shift;
+    my $node = $_[ 0 ];
+
+    my $stat = $node->getNodeValue;
+
+    # do we need to fake $stat->{ t } ?
+    if( $stat->{ elapsed } ) {
+        # remove the "s" from elapsed time
+        $stat->{ elapsed } =~ s{s$}{};
+    }
+
+    $self->{tree}->addChild( @_ );
+}
+
+sub setNodeValue {
+    my $self = shift;
+    my $stat = $_[ 0 ];
+
+    # do we need to fake $stat->{ t } ?
+    if( $stat->{ elapsed } ) {
+        # remove the "s" from elapsed time
+        $stat->{ elapsed } =~ s{s$}{};
+    }
+
+    $self->{tree}->setNodeValue( @_ );
+}
+
+sub getNodeValue {
+    my $self = shift;
+    $self->{tree}->getNodeValue( @_ )->{ t };
+}
+
+sub traverse {
+    my $self = shift;
+    $self->{tree}->traverse( @_ );
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable();
 
@@ -290,14 +333,28 @@ from the previous profiling point.
 The 'rollup' flag indicates whether the reported time is the rolled up time for
 the block, or the elapsed time from the previous profiling point.
 
+=head1 COMPATABILITY METHODS
+
+Some components might expect the stats object to be a regular Tree::Simple object.
+We've added some compatability methods to handle this scenario:
+
+=head2 accept
+
+=head2 addChild
+
+=head2 setNodeValue
+
+=head2 getNodeValue
+
+=head2 traverse
 
 =head1 SEE ALSO
 
-L<Catalyst>.
+L<Catalyst>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jon Schutz
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

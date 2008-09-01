@@ -529,17 +529,11 @@ no Moose;
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine>.
+L<Catalyst>, L<Catalyst::Engine>
 
 =head1 AUTHORS
 
-Sebastian Riedel, <sri@cpan.org>
-
-Dan Kubb, <dan.kubb-cpan@onautopilot.com>
-
-Sascha Kiefer, <esskar@cpan.org>
-
-Andy Grundman, <andy@hybridized.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 THANKS
 

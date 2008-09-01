@@ -183,11 +183,9 @@ calling code in the application rather than the component itself.
 
 L<Catalyst>, L<Catalyst::Model>, L<Catalyst::View>, L<Catalyst::Controller>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Marcus Ramberg, C<mramberg@cpan.org>
-Matt S Trout, C<mst@shadowcatsystems.co.uk>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

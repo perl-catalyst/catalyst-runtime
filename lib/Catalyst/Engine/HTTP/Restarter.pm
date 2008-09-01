@@ -98,11 +98,7 @@ L<Catalyst::Engine>.
 
 =head1 AUTHORS
 
-Sebastian Riedel, <sri@cpan.org>
-
-Dan Kubb, <dan.kubb-cpan@onautopilot.com>
-
-Andy Grundman, <andy@hybridized.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 THANKS
 

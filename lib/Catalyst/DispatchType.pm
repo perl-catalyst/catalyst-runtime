@@ -58,10 +58,9 @@ arrayref, or undef if unable to do so.
 
 sub uri_for_action { }
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt S Trout
-Sebastian Riedel, C<sri@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

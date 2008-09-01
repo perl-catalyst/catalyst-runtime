@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 40;
+use Test::More tests => 53;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -136,4 +136,27 @@ use HTTP::Request::Common;
     ok( $response = request('http://localhost/dump/request/a/b?x=1&y=1&z=1'), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->uri->query, 'x=1&y=1&z=1', 'Catalyst::Request GET query_string' );
+}
+
+{
+    my $creq;
+    ok( my $response = request("http://localhost/dump/request?&&q="),
+        'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    ok( eval '$creq = ' . $response->content );
+    is( keys %{$creq->{parameters}}, 1, 'remove empty parameter' );
+    is( $creq->{parameters}->{q}, '', 'empty parameter' );
+}
+
+{
+    my $creq;
+    ok( my $response = request("http://localhost/dump/request?&0&q="),
+        'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    ok( eval '$creq = ' . $response->content );
+    is( keys %{$creq->{parameters}}, 2, 'remove empty parameter' );
+    is( $creq->{parameters}->{q}, '', 'empty parameter' );
+    ok( !defined $creq->{parameters}->{0}, 'empty parameter' );
 }

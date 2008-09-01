@@ -57,7 +57,7 @@ first action that matches, if any; if not, returns 0.
 sub match {
     my ( $self, $c, $path ) = @_;
 
-    $path ||= '/';
+    $path = '/' if !defined $path || !length $path;
 
     foreach my $action ( @{ $self->_paths->{$path} || [] } ) {
         next unless $action->match($c);
@@ -128,10 +128,9 @@ sub uri_for_action {
     }
 }
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt S Trout
-Sebastian Riedel, C<sri@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

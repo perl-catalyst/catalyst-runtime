@@ -21,11 +21,9 @@ remains here for compability reasons.
 
 L<Catalyst>, L<Catalyst::Controller>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Marcus Ramberg, C<mramberg@cpan.org>
-Matt S Trout, C<mst@shadowcatsystems.co.uk>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

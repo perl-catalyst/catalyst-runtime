@@ -48,10 +48,9 @@ sub throw {
 
 Provided by Moose
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Christian Hansen, C<ch@ngmedia.com>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

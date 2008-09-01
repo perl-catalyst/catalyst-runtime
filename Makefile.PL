@@ -1,7 +1,6 @@
 use inc::Module::Install 0.64;
 
-use 5.008001; 
-perl_version '5.8.1';
+perl_version '5.008001';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
@@ -16,7 +15,7 @@ requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
 requires 'File::Modified';
 requires 'HTML::Entities';
-requires 'HTTP::Body'    => '0.9';
+requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request';
 requires 'HTTP::Response';

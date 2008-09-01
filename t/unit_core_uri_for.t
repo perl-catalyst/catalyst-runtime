@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 use URI;
 
 use_ok('Catalyst');
@@ -56,6 +56,11 @@ is( Catalyst::uri_for( $context, qw/bar wibble?/, 'with space' )->as_string,
 is(
     Catalyst::uri_for( $context, 'quux', { param1 => "\x{2620}" } )->as_string,
     'http://127.0.0.1/foo/yada/quux?param1=%E2%98%A0',
+    'URI for undef action with query params in unicode'
+);
+is(
+    Catalyst::uri_for( $context, 'quux', { 'param:1' => "foo" } )->as_string,
+    'http://127.0.0.1/foo/yada/quux?param%3A1=foo',
     'URI for undef action with query params in unicode'
 );
 

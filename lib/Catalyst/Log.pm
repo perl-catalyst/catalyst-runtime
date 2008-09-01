@@ -239,11 +239,9 @@ over the log output.
 
 L<Catalyst>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Marcus Ramberg, C<mramberg@cpan.org>
-Christian Hansen, C<ch@ngmedia.com>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

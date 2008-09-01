@@ -71,9 +71,9 @@ Catalyst::ActionChain object representing a chain of these actions
 
 Provided by Moose
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt S. Trout
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

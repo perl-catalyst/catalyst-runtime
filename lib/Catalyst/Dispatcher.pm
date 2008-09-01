@@ -120,17 +120,15 @@ sub dispatch {
     }
 }
 
-=head2 $self->forward( $c, $command [, \@arguments ] )
+# $self->_command2action( $c, $command [, \@arguments ] )
+# Search for an action, from the command and returns C<($action, $args)> on
+# success. Returns C<(0)> on error.
 
-Documented in L<Catalyst>
-
-=cut
-
-sub forward {
+sub _command2action {
     my ( $self, $c, $command, @extra_params ) = @_;
 
     unless ($command) {
-        $c->log->debug('Nothing to forward to') if $c->debug;
+        $c->log->debug('Nothing to go to') if $c->debug;
         return 0;
     }
 
@@ -139,21 +137,65 @@ sub forward {
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
         @args = @{ pop @extra_params }
     } else {
-        # this is a copy, it may take some abuse from ->_invoke_as_path if the path had trailing parts
+        # this is a copy, it may take some abuse from
+        # ->_invoke_as_path if the path had trailing parts
         @args = @{ $c->request->arguments };
     }
 
     my $action;
 
-    # forward to a string path ("/foo/bar/gorch") or action object which stringifies to that
+    # go to a string path ("/foo/bar/gorch")
+    # or action object which stringifies to that
     $action = $self->_invoke_as_path( $c, "$command", \@args );
 
-    # forward to a component ( "MyApp::*::Foo" or $c->component("...") - a path or an object)
+    # go to a component ( "MyApp::*::Foo" or $c->component("...")
+    # - a path or an object)
     unless ($action) {
         my $method = @extra_params ? $extra_params[0] : "process";
         $action = $self->_invoke_as_component( $c, $command, $method );
     }
 
+    return $action, \@args;
+}
+
+=head2 $self->go( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub go {
+    my $self = shift;
+    my ( $c, $command ) = @_;
+    my ( $action, $args ) = $self->_command2action(@_);
+
+    unless ($action && defined $action->namespace) {
+        my $error =
+            qq/Couldn't go to command "$command": /
+          . qq/Invalid action or component./;
+        $c->error($error);
+        $c->log->debug($error) if $c->debug;
+        return 0;
+    }
+
+    local $c->request->{arguments} = $args;
+    $c->namespace($action->namespace);
+    $c->action($action);
+    $self->dispatch($c);
+
+    die $Catalyst::GO;
+}
+
+=head2 $self->forward( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub forward {
+    my $self = shift;
+    my ( $c, $command ) = @_;
+    my ( $action, $args ) = $self->_command2action(@_);
 
     unless ($action) {
         my $error =
@@ -283,7 +325,7 @@ sub prepare_action {
     s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$req->captures||[]};
 
     $c->log->debug( 'Path is "' . $req->match . '"' )
-      if ( $c->debug && $req->match );
+      if ( $c->debug && length $req->match );
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
@@ -299,7 +341,7 @@ sub get_action {
     my ( $self, $name, $namespace ) = @_;
     return unless $name;
 
-    $namespace = join( "/", grep { length } split '/', $namespace || "" );
+    $namespace = join( "/", grep { length } split '/', ( defined $namespace ? $namespace : "" ) );
 
     return $self->_action_hash->{"${namespace}/${name}"};
 }
@@ -531,10 +573,9 @@ __PACKAGE__->meta->make_immutable;
 
 Provided by Moose
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-Matt S Trout, C<mst@shadowcatsystems.co.uk>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

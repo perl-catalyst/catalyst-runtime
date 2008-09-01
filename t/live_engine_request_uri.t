@@ -1,12 +1,10 @@
-﻿#!perl
-
 use strict;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 49;
+use Test::More tests => 66;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -118,5 +116,38 @@ SKIP:
     ok( my $response = request("http://localhost/engine/request/uri/uri_with_undef"), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->header( 'X-Catalyst-warnings' ), 0, 'no warnings emitted' );
+}
+
+# more tests with undef - should be ignored
+{
+    my $uri = "http://localhost/engine/request/uri/uri_with_undef_only";
+    ok( my $response = request($uri), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-uri-with' ), $uri, 'uri_with ok' );
+
+    # try with existing param
+    $uri = "$uri?x=1";
+    ok( $response = request($uri), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-uri-with' ), $uri, 'uri_with ok' );
+}
+
+{
+    my $uri = "http://localhost/engine/request/uri/uri_with_undef_ignore";
+    ok( my $response = request($uri), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-uri-with' ), "${uri}?a=1", 'uri_with ok' );
+
+    # remove an existing param
+    ok( $response = request("${uri}?b=1"), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-uri-with' ), "${uri}?a=1", 'uri_with ok' );
+
+    # remove an existing param, leave one, and add a new one
+    ok( $response = request("${uri}?b=1&c=1"), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
+    ok( !defined $response->header( 'X-Catalyst-Param-b' ),'param "b" ok' );
+    is( $response->header( 'X-Catalyst-Param-c' ), '1', 'param "c" ok' );
 }
 

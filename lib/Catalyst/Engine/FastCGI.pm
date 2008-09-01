@@ -376,8 +376,9 @@ values are disabled.  The above example would start 5 processes.
 =head3 Non-root configuration
     
 You can also run your application at any non-root location with either of the
-above modes.
+above modes.  Note the required mod_rewrite rule.
 
+    url.rewrite = ( "myapp\$" => "myapp/" )
     fastcgi.server = (
         "/myapp" => (
             "MyApp" => (
@@ -400,11 +401,7 @@ L<Catalyst>, L<FCGI>.
 
 =head1 AUTHORS
 
-Sebastian Riedel, <sri@cpan.org>
-
-Christian Hansen, <ch@ngmedia.com>
-
-Andy Grundman, <andy@hybridized.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 THANKS
 

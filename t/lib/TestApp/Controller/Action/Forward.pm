@@ -85,4 +85,9 @@ sub class_forward_test_action : Local {
     $c->forward(qw/TestApp class_forward_test_method/);
 }
 
+sub forward_to_uri_check : Local {
+    my ( $self, $c ) = @_;
+    $c->forward( 'Action::ForwardTo', 'uri_check' );
+}
+
 1;

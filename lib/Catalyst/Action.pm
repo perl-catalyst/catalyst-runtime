@@ -129,9 +129,9 @@ returns the sub name of this action.
 
 Provided by Moose
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt S. Trout
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

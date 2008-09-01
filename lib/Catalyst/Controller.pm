@@ -107,7 +107,7 @@ sub _ACTION : Private {
     my ( $self, $c ) = @_;
     if (   ref $c->action
         && $c->action->can('execute')
-        && $c->req->action )
+        && defined $c->req->action )
     {
         $c->action->dispatch( $c );
     }
@@ -315,7 +315,7 @@ sub _parse_Relative_attr { shift->_parse_Local_attr(@_); }
 
 sub _parse_Path_attr {
     my ( $self, $c, $name, $value ) = @_;
-    $value ||= '';
+    $value = '' if !defined $value;
     if ( $value =~ m!^/! ) {
         return ( 'Path', $value );
     }
@@ -337,10 +337,51 @@ sub _parse_Regexp_attr { shift->_parse_Regex_attr(@_); }
 sub _parse_LocalRegex_attr {
     my ( $self, $c, $name, $value ) = @_;
     unless ( $value =~ s/^\^// ) { $value = "(?:.*?)$value"; }
-    return ( 'Regex', '^' . $self->path_prefix($c) . "/${value}" );
+
+    my $prefix = $self->path_prefix( $c );
+    $prefix .= '/' if length( $prefix );
+   
+    return ( 'Regex', "^${prefix}${value}" );
 }
 
 sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
+
+sub _parse_Chained_attr {
+    my ($self, $c, $name, $value) = @_;
+
+    if (defined($value) && length($value)) {
+        if ($value eq '.') {
+            $value = '/'.$self->action_namespace($c);
+        } elsif (my ($rel, $rest) = $value =~ /^((?:\.{2}\/)+)(.*)$/) {
+            my @parts = split '/', $self->action_namespace($c);
+            my @levels = split '/', $rel;
+
+            $value = '/'.join('/', @parts[0 .. $#parts - @levels], $rest);
+        } elsif ($value !~ m/^\//) {
+            my $action_ns = $self->action_namespace($c);
+
+            if ($action_ns) {
+                $value = '/'.join('/', $action_ns, $value);
+            } else {
+                $value = '/'.$value; # special case namespace '' (root)
+            }
+        }
+    } else {
+        $value = '/'
+    }
+
+    return Chained => $value;
+}
+
+sub _parse_ChainedParent_attr {
+    my ($self, $c, $name, $value) = @_;
+    return $self->_parse_Chained_attr($c, $name, '../'.$name);
+}
+
+sub _parse_PathPrefix_attr {
+    my $self = shift;
+    return PathPart => $self->path_prefix;
+}
 
 sub _parse_ActionClass_attr {
     my ( $self, $c, $name, $value ) = @_;
@@ -413,8 +454,8 @@ overridden from the "namespace" config key.
 
 =head2 $self->path_prefix($c)
 
-Returns the default path prefix for :Local, :LocalRegex and relative
-:Path actions in this component. Defaults to the action_namespace or
+Returns the default path prefix for :PathPrefix, :Local, :LocalRegex and
+relative :Path actions in this component. Defaults to the action_namespace or
 can be overridden from the "path" config key.
 
 =head2 $self->create_action(%args)
@@ -430,10 +471,9 @@ Primarily designed for the use of register_actions.
 
 Returns the application instance stored by C<new()>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@oook.de>
-Marcus Ramberg C<mramberg@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

@@ -52,12 +52,12 @@ will turn the Catalyst::Response into a HTTP Response and return it to the clien
 
 =head1 METHODS
 
-=head2 $res->body(<$text|$fh|$iofh_object)
+=head2 $res->body(<$text|$fh|$iohandle_object)
 
     $c->response->body('Catalyst rocks!');
 
 Sets or returns the output (text or binary data). If you are returning a large body,
-you might want to use a L<IO::FileHandle> type of object (Something that implements the read method
+you might want to use a L<IO::Handle> type of object (Something that implements the read method
 in the same fashion), or a filehandle GLOB. Catalyst
 will write it piece by piece into the response.
 
@@ -119,10 +119,16 @@ Alias for $res->body.
 
 =head2 $res->redirect( $url, $status )
 
-Causes the response to redirect to the specified URL.
+Causes the response to redirect to the specified URL. The default status is
+C<302>.
 
     $c->response->redirect( 'http://slashdot.org' );
     $c->response->redirect( 'http://slashdot.org', 307 );
+
+This is a convenience method that sets the Location header to the
+redirect destination, and then sets the response status.  You will
+want to C< return; > or C< $c->detach() > to interrupt the normal
+processing flow if you want the redirect to occur straight away.
 
 =cut
 
@@ -160,9 +166,7 @@ Provided by Moose
 
 =head1 AUTHORS
 
-Sebastian Riedel, C<sri@cpan.org>
-
-Marcus Ramberg, C<mramberg@cpan.org>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 

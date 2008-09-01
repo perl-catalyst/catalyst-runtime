@@ -175,6 +175,16 @@ sub cc_b		: Chained('cc_base') 	PathPart('b') 				CaptureArgs(0) { }
 sub cc_b_link	: Chained('cc_b') 	 	PathPart('') 				CaptureArgs(1) { }
 sub cc_b_anchor	: Chained('cc_b_link')  PathPart('anchor.html') 	Args() 		   { }
 
+#
+#   Test static paths vs. captures
+#
+
+sub apan        : Chained('/')     CaptureArgs(0) PathPrefix   { }
+sub korv        : Chained('apan')  CaptureArgs(0) PathPart('') { }
+sub wurst       : Chained('apan')  CaptureArgs(1) PathPart('') { }
+sub static_end  : Chained('korv')  Args(0)                     { }
+sub capture_end : Chained('wurst') Args(0)        PathPart('') { }
+
 sub end :Private {
   my ($self, $c) = @_;
   return if $c->stash->{no_end};

@@ -10,4 +10,16 @@ use base qw/ Catalyst::Controller /;
 #
 sub child :Chained('.') :Args(1) { }
 
+# Should be at /chained/rootdef/*/chained_rel/*/*
+sub chained_rel :Chained('../one') Args(2) {
+}
+
+# Should chain to loose in parent namespace - i.e. at /chained/loose/*/loose/*/*
+sub loose : ChainedParent Args(2) {
+}
+
+# Should be at /chained/cross/*/up_down/*
+sub up_down : Chained('../bar/cross1') Args(1) {
+}
+
 1;

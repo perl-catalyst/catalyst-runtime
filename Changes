@@ -5,12 +5,62 @@
         - Added test for action stringify
         - Added test for component instances getting $self->{value} from config.
 
-5.7013
+5.7XXXXXX XXXX
+        - Fix some Win32 test failures
+        - Add pt translation of error message (wreis)
+        - Make :Chained('../action') work (Florian Ragwitz)
+
+5.7099_03 2008-07-20 10:10:00
+        - Fix regressions for regexp fallback in model(), view() and controller()
+        - Added the supplied argument to the regexp fallback warning for easier
+          debugging
+        - Ensure ACCEPT_CONTEXT is called for results from component()
+
+5.7099_02 2008-07-16 19:10:00
+        - Added PathPrefix attribute
+        - Removed Catalyst::Build; we've long since moved to Module::Install
+        - Updated Catalyst::Test docs to mention the use of HTTP::Request
+          objects (Rafael Kitover)
+
+5.7099_01 2008-06-25 22:36:00
+        - Refactored component resolution (component(), models(), model(), et al). We now
+          throw warnings for two reasons:
+          1) model() or view() was called with no arguments, and two results are returned
+             -- set default_(model|view), current_(model|view) or current_(model|view)_instance
+             instead
+          2) you call a component resolution method with a string, and it resorts to a regexp 
+             fallback wherein a result is returned -- if you really want to search, call the
+             method with a regex as the argument
+        - remove 0-length query string components so warnings aren't thrown (RT #36428)
+        - Update HTTP::Body dep so that the uploadtmp config value will work (RT #22540)
+        - Fix for LocalRegex when used in the Root controller
+        - Get some of the optional_* tests working from dirs with spaces (RT #26455)
+        - Fix Catalyst::Utils::home() when application .pm is in the current dir (RT #34437)
+        - Added the ability to remove parameters in req->uri_with() by passing in
+          an undef value (RT #34782)
+        - Added $c->go, to do an internal redispatch to another action, while retaining the
+          contents of the stash
+
+5.7014  2008-05-25 15:26:00
+        - Addition of .conf in restart regex in Catalyst::Engine::HTTP::Restarter::Watcher
+        - Fix regression for relative uri_for arguments after a forward()   
+          introduced in 5.7013 (Peter Karman)  
+        - Fix regression for "sub foo : Path {}" in the root controller which 
+          was introduced when attempting to allow "0" as a Path.
+
+5.7013  2008-05-16 18:20:00
+        - Provide backwards compatability methods in Catalyst::Stats
         - Fix subdirs for scripts that run in subdirs more than one level deep.
         - Added test and updated docs for handling the Authorization header
           under mod_fastcgi/mod_cgi.
         - Fixed bug in HTTP engine where the connection was not closed properly if the
           client disconnected before sending any headers. (Ton Voon)
+        - POD fix, IO::FileHandle => IO::Handle (RT #35690)
+        - Fix grammar on welcome page (RT #33236)
+        - Fix for Path('0') handling (RT #29334)
+        - Workaround for Win32 and c3_mro.t (RT #26452, tested by Kenichi Ishigaki)
+        - Fix for encoding query parameters (edenc)
+        - Fix Chained multiple test (t0m)
 
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars
@@ -32,7 +82,7 @@
         - Fixed bug in HTTP engine where writes could fail with
           'Resource temporarily unavailable'.
         - Fixed bug where %2b in query parameter is doubly decoded to ' ', instead of '+'
-          (Gavin Henry, Tatsuhiko Miyagawa, Oleg Pronin)
+          (RT #30087, Gavin Henry, Tatsuhiko Miyagawa, Oleg Pronin)
         - Fixed bug where req->base and req->uri would include a port number when running
           in SSL mode.
         - Removed unnecessary sprintf in debug mode that caused warnings on locales where

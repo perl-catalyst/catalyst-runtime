@@ -11,6 +11,10 @@ plan skip_all => "This test requires Class::C3" if $@;
 # Get a list of all Catalyst:: packages in blib via M::P::O
 my @cat_mods;
 {
+  # problem with @INC on win32, see:
+  # http://rt.cpan.org/Ticket/Display.html?id=26452
+  if ($^O eq 'MSWin32') { require Win32; Win32::GetCwd(); }
+
   local @INC = grep {/blib/} @INC;
   @cat_mods = (
     'Catalyst', 
