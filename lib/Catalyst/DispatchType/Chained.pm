@@ -503,6 +503,19 @@ with the path of the current controller namespace, namely
 C</foo/bar>. That action chains directly to C</>, so the C</bar/*/baz/*>
 chain comes out as the end product.
 
+=item ChainedParent
+
+Chains an action to another action with the same name in the parent
+controller. For Example:
+
+  # in MyApp::Controller::Foo
+  sub bar : Chained CaptureArgs(1) { ... }
+
+  # in MyApp::Controller::Foo::Moo
+  sub bar : ChainedParent Args(1) { ... }
+
+This builds a chain like C</bar/*/bar/*>.
+
 =item CaptureArgs
 
 Must be specified for every part of the chain that is not an
