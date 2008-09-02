@@ -496,13 +496,18 @@ with C<sub bar :PathPart('foo/bar') :Chained('/')> would bind to
 C</foo/bar/...>. If you don't specify C<:PathPart> it has the same
 effect as using C<:PathPart>, it would default to the action name.
 
+=item PathPrefix
+
+Sets PathPart to the path_prefix of the current controller.
+
 =item Chained
 
 Has to be specified for every child in the chain. Possible values are
-absolute and relative private action paths, with the relatives pointing
-to the current controller, or a single slash C</> to tell Catalyst that
-this is the root of a chain. The attribute C<:Chained> without arguments
-also defaults to the C</> behavior.
+absolute and relative private action paths or a single slash C</> to
+tell Catalyst that this is the root of a chain. The attribute
+C<:Chained> without arguments also defaults to the C</> behavior.
+Relative action paths may use C<../> to refer to actions in parent
+controllers.
 
 Because you can specify an absolute path to the parent action, it
 doesn't matter to Catalyst where that parent is located. So, if your
@@ -524,6 +529,19 @@ as the argument to Chained here chains the C<baz> action to an action
 with the path of the current controller namespace, namely
 C</foo/bar>. That action chains directly to C</>, so the C</bar/*/baz/*>
 chain comes out as the end product.
+
+=item ChainedParent
+
+Chains an action to another action with the same name in the parent
+controller. For Example:
+
+  # in MyApp::Controller::Foo
+  sub bar : Chained CaptureArgs(1) { ... }
+
+  # in MyApp::Controller::Foo::Moo
+  sub bar : ChainedParent Args(1) { ... }
+
+This builds a chain like C</bar/*/bar/*>.
 
 =item CaptureArgs
 
