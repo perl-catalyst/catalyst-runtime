@@ -476,10 +476,11 @@ Sets PathPart to the path_prefix of the current controller.
 =item Chained
 
 Has to be specified for every child in the chain. Possible values are
-absolute and relative private action paths, with the relatives pointing
-to the current controller, or a single slash C</> to tell Catalyst that
-this is the root of a chain. The attribute C<:Chained> without arguments
-also defaults to the C</> behavior.
+absolute and relative private action paths or a single slash C</> to
+tell Catalyst that this is the root of a chain. The attribute
+C<:Chained> without arguments also defaults to the C</> behavior.
+Relative action paths may use C<../> to refer to actions in parent
+controllers.
 
 Because you can specify an absolute path to the parent action, it
 doesn't matter to Catalyst where that parent is located. So, if your
