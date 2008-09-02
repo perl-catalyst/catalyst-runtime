@@ -469,6 +469,10 @@ with C<sub bar :PathPart('foo/bar') :Chained('/')> would bind to
 C</foo/bar/...>. If you don't specify C<:PathPart> it has the same
 effect as using C<:PathPart>, it would default to the action name.
 
+=item PathPrefix
+
+Sets PathPart to the path_prefix of the current controller.
+
 =item Chained
 
 Has to be specified for every child in the chain. Possible values are
