@@ -9,14 +9,13 @@ if ( !-e "$FindBin::Bin/../MANIFEST.SKIP" ) {
     plan skip_all => 'Critic test only for developers.';
 }
 else {
-    eval { require Test::Perl::Critic };
+    eval { require Test::NoTabs };
     if ( $@ ) {
         plan tests => 1;
-        fail( 'You must install Test::Perl::Critic to run 04critic.t' );
+        fail( 'You must install Test::NoTabs to run 04critic.t' );
         exit;
     }
 }
 
-my $rcfile = File::Spec->catfile( 't', '04critic.rc' );
-Test::Perl::Critic->import( -profile => $rcfile );
-all_critic_ok();
+Test::NoTabs->import;
+all_perl_files_ok(qw/lib/);

@@ -34,7 +34,7 @@ requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 
 if (-e 'inc/.author') {
-  build_requires 'Test::Perl::Critic';
+  build_requires 'Test::NoTabs';
   build_requires 'Test::Pod' => 1.14;
   build_requires 'Test::Pod::Coverage' => 1.04;
 
