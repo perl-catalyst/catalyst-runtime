@@ -150,17 +150,21 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
 {
     my $args;
 
-    no warnings; 
-    *MyApp::Model::M::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
-    *MyApp::View::V::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+    {
+        no warnings 'once';
+        *MyApp::Model::M::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+        *MyApp::View::V::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+    }
 
-    MyApp->model('M', qw/foo bar/);
+    my $c = bless {}, 'MyApp';
+
+    $c->model('M', qw/foo bar/);
     is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
 
-    my $x = MyApp->view('V', qw/foo2 bar2/);
+    my $x = $c->view('V', qw/foo2 bar2/);
     is_deeply($args, [qw/foo2 bar2/], '$c->view args passed to ACCEPT_CONTEXT ok');
 
     # regexp fallback
-    MyApp->view('::View::V', qw/foo3 bar3/);
+    $c->view('::View::V', qw/foo3 bar3/);
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 }
