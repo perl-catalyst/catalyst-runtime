@@ -33,6 +33,8 @@ requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 
+tests 't/*.t t/aggregate/*.t';
+
 if (-e 'inc/.author') {
   build_requires 'Test::NoTabs';
   build_requires 'Test::Pod' => 1.14;
