@@ -12,6 +12,7 @@ my $tests = Test::Aggregate->new({
     dirs          => 't/aggregate',
     verbose       => 1,
     set_filenames => 1,
+    findbin       => 1,
 });
 
 $tests->run;
