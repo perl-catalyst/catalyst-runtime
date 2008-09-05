@@ -319,6 +319,23 @@ sub uri_for_action {
    
 }
 
+sub expand_action {
+    my ($self, $action) = @_;
+
+    return unless $action->attributes && $action->attributes->{Chained};
+
+    my @chain;
+    my $curr = $action;
+
+    while ($curr) {
+        push @chain, $curr;
+        my $parent = $curr->attributes->{Chained}->[0];
+        $curr = $self->_actions->{$parent};
+    }
+
+    return Catalyst::ActionChain->from_chain([reverse @chain]);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 USAGE
