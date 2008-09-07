@@ -178,6 +178,8 @@ sub go {
         return 0;
     }
 
+    $action = $self->expand_action($action);
+
     local $c->request->{arguments} = $args;
     $c->namespace($action->namespace);
     $c->action($action);
@@ -419,6 +421,17 @@ sub uri_for_action {
             if defined($uri);
     }
     return undef;
+}
+
+sub expand_action {
+    my ($self, $action) = @_;
+
+    foreach my $dispatch_type (@{ $self->_dispatch_types }) {
+        my $expanded = $dispatch_type->expand_action($action);
+        return $expanded if $expanded;
+    }
+
+    return $action;
 }
 
 =head2 $self->register( $c, $action )

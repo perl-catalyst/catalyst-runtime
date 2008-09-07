@@ -4,7 +4,7 @@ This is a living document, that represents the core team's current plans
 for the Catalyst framework. It's liable to change at any time. This document
 lives in the the catalyst trunk, currently at 
 
-  http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst/lib/Catalyst/ROADMAP.pod
+  http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/5.80/trunk/lib/Catalyst/ROADMAP.pod
 
 Make sure you get it from there to ensure you have the latest version.
 

@@ -58,6 +58,8 @@ arrayref, or undef if unable to do so.
 
 sub uri_for_action { }
 
+sub expand_action { }
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

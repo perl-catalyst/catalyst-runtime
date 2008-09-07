@@ -4,6 +4,7 @@
         - Port to Moose
         - Added test for action stringify
         - Added test for component instances getting $self->{value} from config.
+        - Chained doc improvements (rev 8326-8328)
 
 5.7XXXXXX XXXX
         - Fix some Win32 test failures
