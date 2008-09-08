@@ -17,7 +17,7 @@ to represent the various dispatch points in your application.
 
 use Moose;
 
-has part => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has part => (is => 'rw', required => 1);
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
 around new => sub {
