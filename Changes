@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.8000
+5.8000_01
         - Port to Moose
         - Added test for action stringify
         - Added test for component instances getting $self->{value} from config.
@@ -10,6 +10,8 @@
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
         - Make :Chained('../action') work (Florian Ragwitz)
+        - Add test actions
+        - Chained doc improvements (rev 8326-8328)
 
 5.7099_03 2008-07-20 10:10:00
         - Fix regressions for regexp fallback in model(), view() and controller()
