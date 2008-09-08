@@ -2475,6 +2475,8 @@ Gary Ashton Jones
 
 Geoff Richards
 
+ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
 jcamacho: Juan Camacho
 
 Jody Belka

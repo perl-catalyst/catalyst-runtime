@@ -164,6 +164,27 @@ Writes $data to the output stream.
 
 Provided by Moose
 
+=head2 $res->print( @data )
+
+Prints @data to the output stream, separated by $,.  This lets you pass
+the response object to functions that want to write to an L<IO::Handle>.
+
+=cut
+
+sub print {
+    my $self = shift;
+    my $data = shift;
+
+    defined $self->write($data) or return;
+
+    for (@_) {
+        defined $self->write($,) or return;
+        defined $self->write($_) or return;
+    }
+    
+    return 1;
+}
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
