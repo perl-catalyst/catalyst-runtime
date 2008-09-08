@@ -230,7 +230,7 @@ sub content_like {
     no strict 'refs';
     my $get=*{"$caller\::get"};
     my $action=shift;
-    return Test::More->builder->like(get($action),@_);
+    return Test::More->builder->like(&$get($action),@_);
 }
 
 sub action_ok {
