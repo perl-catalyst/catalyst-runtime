@@ -27,6 +27,11 @@ around new => sub {
 
 no Moose;
 
+use overload (
+    # Stringify to path part for tree search
+    q{""} => sub { shift->part },
+);
+
 sub get_action {
     my ( $self, $name ) = @_;
     return $self->actions->{$name} if defined $self->actions->{$name};
