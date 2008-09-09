@@ -33,6 +33,13 @@ requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 
+if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
+    || (!exists $ENV{AGGREGATE_TESTS} && !can_use('Test::Aggregate', '0.34_01'))) {
+    tests join q{ },
+        grep { $_ ne 't/aggregate.t' }
+        map  { glob } qw[t/*.t t/aggregate/*.t];
+}
+
 if (-e 'inc/.author') {
   build_requires 'Test::NoTabs';
   build_requires 'Test::Pod' => 1.14;
