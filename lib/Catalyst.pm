@@ -2507,6 +2507,8 @@ omega: Andreas Marienborg
 
 phaylon: Robert Sedlacek <phaylon@dunkelheit.at>
 
+rafl: Florian Ragwitz <rafl@debian.org>
+
 sky: Arthur Bergman
 
 the_jester: Jesse Sheidlower
