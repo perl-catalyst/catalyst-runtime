@@ -1011,6 +1011,15 @@ C<< $c->dispatcher->uri_for_action >>; if the first element of
 C<@args> is an arrayref it is treated as a list of captures to be passed
 to C<uri_for_action>.
 
+You can maintain the arguments captured by an action (e.g.: Regex, Chained)
+using C<< $c->req->captures >>. 
+
+  # For the current action
+  $c->uri_for($c->action, $c->req->captures);
+  
+  # For the Foo action in the Bar controller
+  $c->uri_for($c->controller->('Bar')->action_for('Foo'), $c->req->captures);
+
 =cut
 
 sub uri_for {
