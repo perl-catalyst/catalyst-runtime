@@ -5,8 +5,7 @@
         - Added test for action stringify
         - Added test for component instances getting $self->{value} from config.
         - Add Catalyst::Response->print() method (ilmari)
-         
-         ))
+        - Optionally aggregate tests using Test::Aggregate (Florian Ragwitz).
 
 5.7XXXXXX XXXX
         - Fix some Win32 test failures
