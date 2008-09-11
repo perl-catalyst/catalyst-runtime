@@ -84,21 +84,19 @@ sub finalize_headers {
 
 =cut
 
-around finalize_read => sub {
+before finalize_read => sub {
     # Never ever remove this, it would result in random length output
     # streams if STDIN eq STDOUT (like in the HTTP engine)
     *STDIN->blocking(1);
-    shift->(@_);
 };
 
 =head2 $self->prepare_read($c)
 
 =cut
 
-around prepare_read => sub {
+before prepare_read => sub {
     # Set the input handle to non-blocking
     *STDIN->blocking(0);
-    shift->(@_);
 };
 
 =head2 $self->read_chunk($c, $buffer, $length)
