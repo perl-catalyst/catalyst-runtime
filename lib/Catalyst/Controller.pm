@@ -191,10 +191,9 @@ sub register_actions {
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
     my $meta = $self->meta;
-    my %methods = map{ $_->{code}->body => $_->{name} }
-        grep {$_->{class} ne 'Moose::Object'} #ignore Moose::Object methods
-            $meta->compute_all_applicable_methods;
-
+    my %methods = map { $_->body => $_->name }
+        grep { $_->package_name ne 'Moose::Object' } #ignore Moose::Object methods
+            $meta->get_all_methods;
 
     # Advanced inheritance support for plugins and the like
     #moose todo: migrate to eliminate CDI compat
