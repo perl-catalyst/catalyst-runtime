@@ -6,7 +6,7 @@ use warnings;
   package MyApp::Component;
   use Test::More;
 
-  sub COMPONENT{
+  sub COMPONENT {
     my $caller = caller;
     is($caller, 'Catalyst::Component', 'Correct method resolution');
   }
