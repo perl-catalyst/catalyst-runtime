@@ -68,8 +68,6 @@ sub BUILDARGS {
     return $args;
 }
 
-no Moose;
-
 sub COMPONENT {
     my ( $self, $c ) = @_;
 
@@ -120,6 +118,7 @@ sub process {
           . " did not override Catalyst::Component::process" );
 }
 
+no Moose;
 
 __PACKAGE__->meta->make_immutable;
 1;
