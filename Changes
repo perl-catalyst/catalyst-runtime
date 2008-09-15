@@ -8,6 +8,7 @@
         - Optionally aggregate tests using Test::Aggregate (Florian Ragwitz).
         - Additional docs for uri_for to mention how to use $c->action and 
           $c->req->captures (jhannah)
+        - List unattached chained actions in Debug mode (Florian Ragwitz).
 
 5.7XXXXXX XXXX
         - Fix some Win32 test failures
