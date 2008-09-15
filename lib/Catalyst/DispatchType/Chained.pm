@@ -71,6 +71,11 @@ sub list {
                     [ 35, 'Path Spec' ], [ 36, 'Private' ]
                 );
 
+    my $has_unattached_actions;
+    my $unattached_actions = Text::SimpleTable->new(
+        [ 35, 'Private' ], [ 36, 'Missing parent' ],
+    );
+
     ENDPOINT: foreach my $endpoint (
                   sort { $a->reverse cmp $b->reverse }
                            @{ $self->_endpoints }
@@ -92,7 +97,11 @@ sub list {
             $curr = $self->_actions->{$parent};
             unshift(@parents, $curr) if $curr;
         }
-        next ENDPOINT unless $parent eq '/'; # skip dangling action
+        if ($parent ne '/') {
+            $has_unattached_actions = 1;
+            $unattached_actions->row('/'.$parents[0]->reverse, $parent);
+            next ENDPOINT;
+        }
         my @rows;
         foreach my $p (@parents) {
             my $name = "/${p}";
@@ -110,6 +119,8 @@ sub list {
     }
 
     $c->log->debug( "Loaded Chained actions:\n" . $paths->draw . "\n" );
+    $c->log->debug( "Unattached Chained actions:\n", $unattached_actions->draw . "\n" )
+        if $has_unattached_actions;
 }
 
 =head2 $self->match( $c, $path )
