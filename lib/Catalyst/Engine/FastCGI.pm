@@ -46,7 +46,9 @@ Options may also be specified;
 
 =item leave_umask
 
-Set to 1 to disable setting umask to 0 for socket open =item nointr
+Set to 1 to disable setting umask to 0 for socket open
+
+=item nointr
 
 Do not allow the listener to be interrupted by Ctrl+C
 
