@@ -58,6 +58,13 @@ arrayref, or undef if unable to do so.
 
 sub uri_for_action { }
 
+=head2 $self->expand_action
+
+Default fallback, returns nothing. See L<Catalyst::Dispatcher> for more info
+about expand_action.
+
+=cut
+
 sub expand_action { }
 
 =head1 AUTHORS

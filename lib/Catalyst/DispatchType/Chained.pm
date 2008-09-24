@@ -330,6 +330,14 @@ sub uri_for_action {
    
 }
 
+=head2 $c->expand_action($action)
+
+Return a list of actions that represents a chained action. See 
+L<Catalyst::Dispatcher> for more info. You probably want to
+use the expand_action it provides rather than this directly.
+
+=cut
+
 sub expand_action {
     my ($self, $action) = @_;
 

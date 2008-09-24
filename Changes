@@ -10,6 +10,7 @@
           $c->req->captures (jhannah)
         - List unattached chained actions in Debug mode (Florian Ragwitz).
         - Pod formatting fix for Engine::FastCGI (Oleg Kostyuk).
+        - Add visit, a returning ->go
 
 5.7XXXXXX XXXX
         - Fix some Win32 test failures

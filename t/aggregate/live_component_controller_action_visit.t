@@ -25,39 +25,43 @@ else {
 
 sub run_tests {
     {
-        # Test go to global private action
-        ok( my $response = request('http://localhost/action/go/global'),
+        # Test visit to global private action
+        ok( my $response = request('http://localhost/action/visit/global'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->header('X-Catalyst-Action'),
-            'action/go/global', 'Main Class Action' );
+            'action/visit/global', 'Main Class Action' );
     }
 
     {
         my @expected = qw[
-          TestApp::Controller::Action::Go->one
-          TestApp::Controller::Action::Go->two
-          TestApp::Controller::Action::Go->three
-          TestApp::Controller::Action::Go->four
-          TestApp::Controller::Action::Go->five
+          TestApp::Controller::Action::Visit->one
+          TestApp::Controller::Action::Visit->two
+          TestApp::Controller::Action::Visit->three
+          TestApp::Controller::Action::Visit->four
+          TestApp::Controller::Action::Visit->five
           TestApp::View::Dump::Request->process
+          TestApp->end
+          TestApp->end
+          TestApp->end
+          TestApp->end
           TestApp->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
         my $expected = join( ", ", @expected );
 
-        # Test go to chain of actions.
-        ok( my $response = request('http://localhost/action/go/one'),
+        # Test visit to chain of actions.
+        ok( my $response = request('http://localhost/action/visit/one'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->header('X-Catalyst-Action'),
-            'action/go/one', 'Test Action' );
+            'action/visit/one', 'Test Action' );
         is(
             $response->header('X-Test-Class'),
-            'TestApp::Controller::Action::Go',
+            'TestApp::Controller::Action::Visit',
             'Test Class'
         );
         is( $response->header('X-Catalyst-Executed'),
@@ -68,118 +72,121 @@ sub run_tests {
             'Content is a serialized Catalyst::Request'
         );
     }
-
     {
         my @expected = qw[
-          TestApp::Controller::Action::Go->go_die
-          TestApp::Controller::Action::Go->args
+          TestApp::Controller::Action::Visit->visit_die
+          TestApp::Controller::Action::Visit->args
+          TestApp->end
           TestApp->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/action/go/go_die'),
+        ok( my $response = request('http://localhost/action/visit/visit_die'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->header('X-Catalyst-Action'),
-            'action/go/go_die', 'Test Action'
+            'action/visit/visit_die', 'Test Action'
         );
         is(
             $response->header('X-Test-Class'),
-            'TestApp::Controller::Action::Go',
+            'TestApp::Controller::Action::Visit',
             'Test Class'
         );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, $Catalyst::GO, "Go died as expected" );
+        is( $response->content, "visit() doesn't die", "Visit does not die" );
     }
     {
         ok(
-            my $response = request('http://localhost/action/go/model'),
+            my $response = request('http://localhost/action/visit/model'),
             'Request with args'
         );
         is( $response->content,
-            q[FATAL ERROR: Couldn't go("Model::Foo"): Action cannot _DISPATCH. Did you try to go() a non-controller action?],
-            q[go('Model::...') test]
+            q[FATAL ERROR: Couldn't visit("Model::Foo"): Action cannot _DISPATCH. Did you try to visit() a non-controller action?]
         );
     }
     {
         ok(
-            my $response = request('http://localhost/action/go/view'),
+            my $response = request('http://localhost/action/visit/view'),
             'Request with args'
         );
         is( $response->content,
-            q[FATAL ERROR: Couldn't go("View::Dump"): Action cannot _DISPATCH. Did you try to go() a non-controller action?],
-            q[go('View::...') test]
+            q[FATAL ERROR: Couldn't visit("View::Dump"): Action cannot _DISPATCH. Did you try to visit() a non-controller action?]
         );
     }
     {
         ok(
             my $response =
-              request('http://localhost/action/go/with_args/old'),
+              request('http://localhost/action/visit/with_args/old'),
             'Request with args'
         );
         ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->content, 'old', 'go() with args (old)' );
+        is( $response->content, 'old', 'visit() with args (old)' );
     }
 
     {
         ok(
             my $response = request(
-                'http://localhost/action/go/with_method_and_args/new'),
+                'http://localhost/action/visit/with_method_and_args/new'),
             'Request with args and method'
         );
         ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->content, 'new', 'go() with args (new)' );
+        is( $response->content, 'new', 'visit() with args (new)' );
     }
 
-    # test go with embedded args
+    # test visit with embedded args
     {
         ok(
             my $response =
-              request('http://localhost/action/go/args_embed_relative'),
+              request('http://localhost/action/visit/args_embed_relative'),
             'Request'
         );
         ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->content, 'ok', 'go() with args_embed_relative' );
+        is( $response->content, 'ok', 'visit() with args_embed_relative' );
     }
 
     {
         ok(
             my $response =
-              request('http://localhost/action/go/args_embed_absolute'),
+              request('http://localhost/action/visit/args_embed_absolute'),
             'Request'
         );
         ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->content, 'ok', 'go() with args_embed_absolute' );
+        is( $response->content, 'ok', 'visit() with args_embed_absolute' );
     }
     {
         my @expected = qw[
-          TestApp::Controller::Action::TestRelative->relative_go
-          TestApp::Controller::Action::Go->one
-          TestApp::Controller::Action::Go->two
-          TestApp::Controller::Action::Go->three
-          TestApp::Controller::Action::Go->four
-          TestApp::Controller::Action::Go->five
+          TestApp::Controller::Action::TestRelative->relative_visit
+          TestApp::Controller::Action::Visit->one
+          TestApp::Controller::Action::Visit->two
+          TestApp::Controller::Action::Visit->three
+          TestApp::Controller::Action::Visit->four
+          TestApp::Controller::Action::Visit->five
           TestApp::View::Dump::Request->process
+          TestApp->end
+          TestApp->end
+          TestApp->end
+          TestApp->end
+          TestApp->end
           TestApp->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
         my $expected = join( ", ", @expected );
 
-        # Test go to chain of actions.
-        ok( my $response = request('http://localhost/action/relative/relative_go'),
+        # Test visit to chain of actions.
+        ok( my $response = request('http://localhost/action/relative/relative_visit'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->header('X-Catalyst-Action'),
-            'action/relative/relative_go', 'Test Action' );
+            'action/relative/relative_visit', 'Test Action' );
         is(
             $response->header('X-Test-Class'),
-            'TestApp::Controller::Action::Go',
+            'TestApp::Controller::Action::Visit',
             'Test Class'
         );
         is( $response->header('X-Catalyst-Executed'),
@@ -192,35 +199,40 @@ sub run_tests {
     }
     {
         my @expected = qw[
-          TestApp::Controller::Action::TestRelative->relative_go_two
-          TestApp::Controller::Action::Go->one
-          TestApp::Controller::Action::Go->two
-          TestApp::Controller::Action::Go->three
-          TestApp::Controller::Action::Go->four
-          TestApp::Controller::Action::Go->five
+          TestApp::Controller::Action::TestRelative->relative_visit_two
+          TestApp::Controller::Action::Visit->one
+          TestApp::Controller::Action::Visit->two
+          TestApp::Controller::Action::Visit->three
+          TestApp::Controller::Action::Visit->four
+          TestApp::Controller::Action::Visit->five
           TestApp::View::Dump::Request->process
+          TestApp->end
+          TestApp->end
+          TestApp->end
+          TestApp->end
+          TestApp->end
           TestApp->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
         my $expected = join( ", ", @expected );
 
-        # Test go to chain of actions.
+        # Test visit to chain of actions.
         ok(
             my $response =
-              request('http://localhost/action/relative/relative_go_two'),
+              request('http://localhost/action/relative/relative_visit_two'),
             'Request'
         );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is(
             $response->header('X-Catalyst-Action'),
-            'action/relative/relative_go_two',
+            'action/relative/relative_visit_two',
             'Test Action'
         );
         is(
             $response->header('X-Test-Class'),
-            'TestApp::Controller::Action::Go',
+            'TestApp::Controller::Action::Visit',
             'Test Class'
         );
         is( $response->header('X-Catalyst-Executed'),
@@ -232,33 +244,34 @@ sub run_tests {
         );
     }
 
-    # test class go -- MUST FAIL!
+    # test class visit -- MUST FAIL!
     {
         ok(
             my $response = request(
-                'http://localhost/action/go/class_go_test_action'),
+                'http://localhost/action/visit/class_visit_test_action'),
             'Request'
         );
         ok( !$response->is_success, 'Response Fails' );
         is( $response->content,
-            q(FATAL ERROR: Couldn't go("TestApp"): Action has no namespace: cannot go() to a plain method or component, must be a :Action or some sort.),
-            'Error message'
+            q[FATAL ERROR: Couldn't visit("TestApp"): Action has no namespace: cannot visit() to a plain method or component, must be a :Action or some sort.],
+            "Cannot visit app namespace"
         );
     }
 
     {
         my @expected = qw[
-          TestApp::Controller::Action::Go->begin
-          TestApp::Controller::Action::Go->go_chained
+          TestApp::Controller::Action::Visit->begin
+          TestApp::Controller::Action::Visit->visit_chained
           TestApp::Controller::Action::Chained->begin
           TestApp::Controller::Action::Chained->foo
           TestApp::Controller::Action::Chained::Foo->spoon
           TestApp::Controller::Action::Chained->end
+          TestApp->end
         ];
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/action/go/go_chained'), 'go to chained + subcontroller endpoint' );
+        ok( my $response = request('http://localhost/action/visit/visit_chained'), 'visit to chained + subcontroller endpoint' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '; 1', 'Content OK' );

@@ -1,26 +1,26 @@
-package TestApp::Controller::Action::Go;
+package TestApp::Controller::Action::Visit;
 
 use strict;
 use base 'TestApp::Controller::Action';
 
 sub one : Local {
     my ( $self, $c ) = @_;
-    $c->go('two');
+    $c->visit('two');
 }
 
 sub two : Private {
     my ( $self, $c ) = @_;
-    $c->go('three');
+    $c->visit('three');
 }
 
 sub three : Local {
     my ( $self, $c ) = @_;
-    $c->go( $self, 'four' );
+    $c->visit( $self, 'four' );
 }
 
 sub four : Private {
     my ( $self, $c ) = @_;
-    $c->go('/action/go/five');
+    $c->visit('/action/visit/five');
 }
 
 sub five : Local {
@@ -30,22 +30,22 @@ sub five : Local {
 
 sub inheritance : Local {
     my ( $self, $c ) = @_;
-    $c->go('/action/inheritance/a/b/default');
+    $c->visit('/action/inheritance/a/b/default');
 }
 
 sub global : Local {
     my ( $self, $c ) = @_;
-    $c->go('/global_action');
+    $c->visit('/global_action');
 }
 
 sub with_args : Local {
     my ( $self, $c, $arg ) = @_;
-    $c->go( 'args', [$arg] );
+    $c->visit( 'args', [$arg] );
 }
 
 sub with_method_and_args : Local {
     my ( $self, $c, $arg ) = @_;
-    $c->go( qw/TestApp::Controller::Action::Go args/, [$arg] );
+    $c->visit( qw/TestApp::Controller::Action::Visit args/, [$arg] );
 }
 
 sub args : Local {
@@ -54,38 +54,37 @@ sub args : Local {
     $c->res->body($val);
 }
 
-sub go_die : Local {
+sub visit_die : Local {
     my ( $self, $c, $val ) = @_;
-    eval { $c->go( 'args', [qq/new/] ) };
-    $c->res->body( $@ ? $@ : "go() did not die" );
-    die $Catalyst::GO;
+    eval { $c->visit( 'args', [qq/new/] ) };
+    $c->res->body( $@ ? $@ : "visit() doesn't die" );
 }
 
-sub go_chained : Local {
+sub visit_chained : Local {
     my ( $self, $c, $val ) = @_;
-    $c->go('/action/chained/foo/spoon',[1]);
+    $c->visit('/action/chained/foo/spoon',[1]);
 }
 
 sub view : Local {
     my ( $self, $c, $val ) = @_;
-    eval { $c->go('View::Dump') };
-    $c->res->body( $@ ? $@ : "go() did not die" );
+    eval { $c->visit('View::Dump') };
+    $c->res->body( $@ ? $@ : "visit() did not die" );
 }
 
 sub model : Local {
     my ( $self, $c, $val ) = @_;
-    eval { $c->go('Model::Foo') };
-    $c->res->body( $@ ? $@ : "go() did not die" );
+    eval { $c->visit('Model::Foo') };
+    $c->res->body( $@ ? $@ : "visit() did not die" );
 }
 
 sub args_embed_relative : Local {
     my ( $self, $c ) = @_;
-    $c->go('embed/ok');
+    $c->visit('embed/ok');
 }
 
 sub args_embed_absolute : Local {
     my ( $self, $c ) = @_;
-    $c->go('/action/go/embed/ok');
+    $c->visit('/action/visit/embed/ok');
 }
 
 sub embed : Local {
@@ -94,9 +93,9 @@ sub embed : Local {
     $c->res->body($ok);
 }
 
-sub class_go_test_action : Local {
+sub class_visit_test_action : Local {
     my ( $self, $c ) = @_;
-    $c->go(qw/TestApp class_go_test_method/);
+    $c->visit(qw/TestApp class_visit_test_method/);
 }
 
 1;

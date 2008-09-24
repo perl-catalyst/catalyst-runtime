@@ -158,21 +158,40 @@ sub _command2action {
     return $action, \@args;
 }
 
-=head2 $self->go( $c, $command [, \@arguments ] )
+=head2 $self->visit( $c, $command [, \@arguments ] )
 
 Documented in L<Catalyst>
 
 =cut
 
-sub go {
+sub visit {
     my $self = shift;
+    $self->_do_visit('visit', @_);
+}
+
+sub _do_visit {
+    my $self = shift;
+    my $opname = shift;
     my ( $c, $command ) = @_;
     my ( $action, $args ) = $self->_command2action(@_);
+    my $error = qq/Couldn't $opname("$command"): /;
 
-    unless ($action && defined $action->namespace) {
-        my $error =
-            qq/Couldn't go to command "$command": /
-          . qq/Invalid action or component./;
+    if (!$action) {
+        $error .= qq/Invalid action or component./;
+    }
+    elsif (!defined $action->namespace) {
+        $error .= qq/Action has no namespace: cannot $opname() to a plain /
+                 .qq/method or component, must be a :Action or some sort./
+    }
+    elsif (!$action->class->can('_DISPATCH')) {
+        $error .= qq/Action cannot _DISPATCH. /
+                 .qq/Did you try to $opname() a non-controller action?/;
+    }
+    else {
+        $error = q();
+    }
+
+    if($error) {
         $c->error($error);
         $c->log->debug($error) if $c->debug;
         return 0;
@@ -181,10 +200,21 @@ sub go {
     $action = $self->expand_action($action);
 
     local $c->request->{arguments} = $args;
-    $c->namespace($action->namespace);
-    $c->action($action);
-    $self->dispatch($c);
+    local $c->{namespace} = $action->{'namespace'};
+    local $c->{action} = $action;
 
+    $self->dispatch($c);
+}
+
+=head2 $self->go( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub go {
+    my $self = shift;
+    $self->_do_visit('go', @_);
     die $Catalyst::GO;
 }
 
@@ -422,6 +452,14 @@ sub uri_for_action {
     }
     return undef;
 }
+
+=head2 expand_action 
+
+expand an action into a full representation of the dispatch.
+mostly useful for chained, other actions will just return a
+single action.
+
+=cut
 
 sub expand_action {
     my ($self, $action) = @_;

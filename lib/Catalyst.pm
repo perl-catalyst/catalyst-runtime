@@ -346,13 +346,33 @@ When called with no arguments it escapes the processing chain entirely.
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
+=head2 $c->visit( $action [, \@arguments ] )
+
+=head2 $c->visit( $class, $method, [, \@arguments ] )
+
+Almost the same as C<forward>, but does a full dispatch, instead of just
+calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
+C<auto> and the method you go to are called, just like a new request.
+
+C<$c-E<gt>stash> is kept unchanged.
+
+In effect, C<visit> allows you to "wrap" another action, just as it
+would have been called by dispatching from a URL, while the analogous
+C<go> allows you to transfer control to another action as if it had
+been reached directly from a URL.
+
+=cut
+
+sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
+
 =head2 $c->go( $action [, \@arguments ] )
 
 =head2 $c->go( $class, $method, [, \@arguments ] )
 
-Almost the same as C<detach>, but does a full dispatch, instead of just
-calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
-C<auto> and the method you go to is called, just like a new request.
+Almost the same as C<detach>, but does a full dispatch like C<visit>,
+instead of just calling the new C<$action> /
+C<$class-E<gt>$method>. This means that C<begin>, C<auto> and the
+method you visit are called, just like a new request.
 
 C<$c-E<gt>stash> is kept unchanged.
 

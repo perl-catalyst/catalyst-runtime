@@ -26,4 +26,15 @@ sub relative_go_two : Local {
     my ( $self, $c ) = @_;
     $c->go( 'TestApp::Controller::Action::Go', 'one' );
 }
+
+sub relative_visit : Local {
+    my ( $self, $c ) = @_;
+    $c->visit('/action/visit/one');
+}
+
+sub relative_visit_two : Local {
+    my ( $self, $c ) = @_;
+    $c->visit( 'TestApp::Controller::Action::Visit', 'one' );
+}
+
 1;
