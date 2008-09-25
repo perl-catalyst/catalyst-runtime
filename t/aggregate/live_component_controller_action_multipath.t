@@ -24,11 +24,13 @@ if ( $ENV{CAT_BENCHMARK} ) {
 }
 else {
     for ( 1 .. $iters ) {
-        run_tests();
+        run_tests($content);
     }
 }
 
 sub run_tests {
+    my ($content) = @_;
+
     # Local
     {
         ok(
