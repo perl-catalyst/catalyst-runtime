@@ -357,7 +357,7 @@ sub prepare_action {
     s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$req->captures||[]};
 
     $c->log->debug( 'Path is "' . $req->match . '"' )
-      if ( $c->debug && length $req->match );
+      if ( $c->debug && defined $req->match && length $req->match );
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
