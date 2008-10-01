@@ -969,23 +969,75 @@ EOF
     $class->setup_finished(1);
 }
 
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
+
 =head2 $c->uri_for( $path, @args?, \%query_values? )
 
-Merges path with C<< $c->request->base >> for absolute URIs and with
-C<< $c->namespace >> for relative URIs, then returns a normalized L<URI>
-object. If any args are passed, they are added at the end of the path.
-If the last argument to C<uri_for> is a hash reference, it is assumed to
-contain GET parameter key/value pairs, which will be appended to the URI
-in standard fashion.
+=over
 
-Note that uri_for is destructive to the passed hashref.  Subsequent calls
-with the same hashref may have unintended results.
+=item $action
 
-Instead of C<$path>, you can also optionally pass a C<$action> object
-which will be resolved to a path using
-C<< $c->dispatcher->uri_for_action >>; if the first element of
-C<@args> is an arrayref it is treated as a list of captures to be passed
-to C<uri_for_action>.
+A Catalyst::Action object representing the Catalyst action you want to
+create a URI for. To get one for an action in the current controller,
+use C<< $c->action('someactionname') >>. To get one from different
+controller, fetch the controller using C<< $c->controller() >>, then
+call C<action_for> on it.
+
+This method must be used to create URIs for
+L<Catalyst::DispatchType::Chained> actions.
+
+=item $path
+
+The actual path you wish to create a URI for, this is a public path,
+not a private action path.
+
+=item \@captures
+
+If provided, this argument is used to insert values into a I<Chained>
+action in the parts where the definitions contain I<CaptureArgs>. If
+not needed, leave out this argument.
+
+=item @args
+
+If provided, this is used as a list of further path sections to append
+to the URI. In a I<Chained> action these are the equivalent to the
+endpoint L<Args>.
+
+=item \%query_values
+
+If provided, the query_values hashref is used to add query parameters
+to the URI, with the keys as the names, and the values as the values.
+
+=back
+
+Returns a L<URI> object.
+
+  ## Ex 1: a path with args and a query parameter
+  $c->uri_for('user/list', 'short', { page => 2});
+  ## -> ($c->req->base is 'http://localhost:3000/'
+  URI->new('http://localhost:3000/user/list/short?page=2)
+
+  ## Ex 2: a chained view action that captures the user id
+  ## In controller:
+  sub user : Chained('/'): PathPart('myuser'): CaptureArgs(1) {}
+  sub viewuser : Chained('user'): PathPart('view') {}
+
+  ## In uri creating code:
+  my $uaction = $c->controller('Users')->action_for('viewuser');
+  $c->uri_for($uaction, [ 42 ]);
+  ## outputs:
+  URI->new('http://localhost:3000/myuser/42/view')
+
+Creates a URI object using C<< $c->request->base >> and a path. If an
+Action object is given instead of a path, the path is constructed
+using C<< $c->dispatcher->uri_for_action >> and passing it the
+@captures array, if supplied.
+
+If any query parameters are passed they are added to the end of the
+URI in the usual way.
+
+Note that uri_for is destructive to the passed query values hashref.
+Subsequent calls with the same hashref may have unintended results.
 
 =cut
 
