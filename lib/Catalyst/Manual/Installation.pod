@@ -82,6 +82,43 @@ of VMWare images where an entire Catalyst development environment has
 already been installed, complete with database engines and a full
 complement of Catalyst plugins.
 
+=item * 
+
+Frank Speiser's Amazon EC2 Catalyst SDK
+
+There are currently two flavors of publicly available Amazon Machine
+Images (AMI) that contain all the dependencies you'd need to get a
+Catalyst development environment,with all the trimmings, up and
+running within minutes.
+
+Once you obtain an Amazon Elastic Cloud Computing account available
+here:
+L<http://www.amazon.com/EC2-AWS-Service-Pricing/b/ref=sc_fe_l_2?ie=UTF8&node=201590011>,
+you can literally get a Catalyst development instance up and running
+in less than 5 minutes.
+
+The current AMIs that are available are here in abbreviated form:
+
+  IMAGE   ami-bdbe5ad4    developer-tools/Debian-Etch_Catalyst_DBIC_TT.manifest.xml 
+  IMAGE   ami-9fbe5af6    developer-tools/Fedora8-Catalyst_DBIC_TT.manifest.xml
+
+You can run the instances according to the Amazon documentation, as follows:
+
+  ec2-run-instances <ami here> -k gsg-keypair
+
+Refer to the Amazon EC2 documentation from the "Amazon Web Services"
+section of the L<Amazon.com| Amazon.com> web site for further
+assistance.
+
+You can currently choose between ready-made SDKs on Fedora8 and Debian
+Etch.  Both machine images include Catalyst, DBIx::Class,
+Template::Toolkit, Moose, the mysql and postgresql databases, as well
+as subversion source control.  The Debian Etch machine instance also
+includes svk and git.
+
+Just run the installation instructions contained in this manual and
+go.
+
 =back
 
 =head2 OTHER METHODS
