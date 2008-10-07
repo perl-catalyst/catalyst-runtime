@@ -84,18 +84,6 @@ it with a C<+>, like so:
 
     +My::Dispatch::Type
 
-=head2 $self->detach( $c, $command [, \@arguments ] )
-
-Documented in L<Catalyst>
-
-=cut
-
-sub detach {
-    my ( $self, $c, $command, @args ) = @_;
-    $c->forward( $command, @args ) if $command;
-    die $Catalyst::DETACH;
-}
-
 =head2 $self->dispatch($c)
 
 Delegate the dispatch to the action that matched the url, or return a
@@ -177,7 +165,8 @@ sub _do_visit {
     my $error = qq/Couldn't $opname("$command"): /;
 
     if (!$action) {
-        $error .= qq/Invalid action or component./;
+        $error .= qq/Couldn't $opname to command "$command": /
+                 .qq/Invalid action or component./;
     }
     elsif (!defined $action->namespace) {
         $error .= qq/Action has no namespace: cannot $opname() to a plain /
@@ -226,19 +215,22 @@ Documented in L<Catalyst>
 
 sub forward {
     my $self = shift;
+    $self->_do_forward(forward => @_);
+}
+
+sub _do_forward {
+    my $self = shift;
+    my $opname = shift;
     my ( $c, $command ) = @_;
     my ( $action, $args ) = $self->_command2action(@_);
 
-    unless ($action) {
-        my $error =
-            qq/Couldn't forward to command "$command": /
-          . qq/Invalid action or component./;
+    if (!$action) {
+        my $error .= qq/Couldn't $opname to command "$command": /
+                    .qq/Invalid action or component./;
         $c->error($error);
         $c->log->debug($error) if $c->debug;
         return 0;
     }
-
-    #push @$args, @_;
 
     no warnings 'recursion';
 
@@ -246,8 +238,20 @@ sub forward {
     $c->request->arguments($args);
     $action->dispatch( $c );
     $c->request->arguments($orig_args);
-    
+
     return $c->state;
+}
+
+=head2 $self->detach( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub detach {
+    my ( $self, $c, $command, @args ) = @_;
+    $self->_do_forward(detach => $c, $command, @args ) if $command;
+    die $Catalyst::DETACH;
 }
 
 sub _action_rel2abs {
