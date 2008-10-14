@@ -2,14 +2,14 @@ package Catalyst::Test;
 
 use Test::More;
 
-use strict;
-use warnings;
+use Moose;
 
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::Inspector;
 
-use parent qw/Exporter/;
+extends 'Exporter';
+
 our @EXPORT=qw/&content_like &action_ok &action_redirect &action_notfound &contenttype_is/;
 
 
