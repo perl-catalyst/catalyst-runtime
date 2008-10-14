@@ -1,6 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
         - Change Catalyst::Test to use Moose
+        - Fixed typo in Engine::Restarter::Watcher causing -r to complain.
         
 5.8000_02 2008-10-14 07:59:00
        - Fix manifest
