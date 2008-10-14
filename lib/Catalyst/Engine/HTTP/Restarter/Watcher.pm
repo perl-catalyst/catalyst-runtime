@@ -11,7 +11,7 @@ has regex => (is => 'rw');
 has modified => (is => 'rw');
 has directory => (is => 'rw');
 has watch_list => (is => 'rw');
-has follow_simlinks => (is => 'rw');
+has follow_symlinks => (is => 'rw');
 
 no Moose;
 
