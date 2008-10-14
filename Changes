@@ -1,6 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.8000_01
+5.8000_02 2008-10-14 07:59:00
+       - Fix manifest
+
+5.8000_01 2008-10-13 22:52:00
         - Port to Moose
         - Added test for action stringify
         - Added test for component instances getting $self->{value} from config.
