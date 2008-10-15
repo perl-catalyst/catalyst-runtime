@@ -165,34 +165,6 @@ sub _command2action {
     return $action, \@args;
 }
 
-=head2 $self->go( $c, $command [, \@arguments ] )
-
-Documented in L<Catalyst>
-
-=cut
-
-sub go {
-    my $self = shift;
-    my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
-
-    unless ($action && defined $action->namespace) {
-        my $error =
-            qq/Couldn't go to command "$command": /
-          . qq/Invalid action or component./;
-        $c->error($error);
-        $c->log->debug($error) if $c->debug;
-        return 0;
-    }
-
-    local $c->request->{arguments} = $args;
-    $c->namespace($action->namespace);
-    $c->action($action);
-    $self->dispatch($c);
-
-    die $Catalyst::GO;
-}
-
 =head2 $self->forward( $c, $command [, \@arguments ] )
 
 Documented in L<Catalyst>
