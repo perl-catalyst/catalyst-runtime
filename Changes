@@ -19,6 +19,7 @@
         - Add visit, a returning ->go
 
 5.7XXXXXX XXXX
+        - Workaround change in LWP that broke a cookie test (RT #40037)
         - Back out go() since that feature's been pushed to 5.80
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
