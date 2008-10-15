@@ -1038,6 +1038,8 @@ using C<< $c->req->captures >>.
 
 =cut
 
+=back
+
 sub uri_for {
     my ( $c, $path, @args ) = @_;
 
