@@ -59,7 +59,6 @@ our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = "catalyst_detach\n";
-our $GO        = "catalyst_go\n";
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
@@ -1013,23 +1012,19 @@ EOF
     $class->setup_finished(1);
 }
 
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
+
 =head2 $c->uri_for( $path, @args?, \%query_values? )
 
-Merges path with C<< $c->request->base >> for absolute URIs and with
-C<< $c->namespace >> for relative URIs, then returns a normalized L<URI>
-object. If any args are passed, they are added at the end of the path.
-If the last argument to C<uri_for> is a hash reference, it is assumed to
-contain GET parameter key/value pairs, which will be appended to the URI
-in standard fashion.
+=over
 
-Note that uri_for is destructive to the passed hashref.  Subsequent calls
-with the same hashref may have unintended results.
+=item $action
 
-Instead of C<$path>, you can also optionally pass a C<$action> object
-which will be resolved to a path using
-C<< $c->dispatcher->uri_for_action >>; if the first element of
-C<@args> is an arrayref it is treated as a list of captures to be passed
-to C<uri_for_action>.
+A Catalyst::Action object representing the Catalyst action you want to
+create a URI for. To get one for an action in the current controller,
+use C<< $c->action('someactionname') >>. To get one from different
+controller, fetch the controller using C<< $c->controller() >>, then
+call C<action_for> on it.
 
 You can maintain the arguments captured by an action (e.g.: Regex, Chained)
 using C<< $c->req->captures >>. 
@@ -1339,9 +1334,6 @@ sub execute {
     if ( my $error = $@ ) {
         if ( !ref($error) and $error eq $DETACH ) {
             die $DETACH if($c->depth > 1);
-        }
-        elsif ( !ref($error) and $error eq $GO ) {
-            die $GO if($c->depth > 0);
         }
         else {
             unless ( ref $error ) {
