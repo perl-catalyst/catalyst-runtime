@@ -59,6 +59,7 @@ our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = "catalyst_detach\n";
+our $GO        = "catalyst_go\n";
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
@@ -1334,6 +1335,9 @@ sub execute {
     if ( my $error = $@ ) {
         if ( !ref($error) and $error eq $DETACH ) {
             die $DETACH if($c->depth > 1);
+        }
+        elsif ( !ref($error) and $error eq $GO ) {
+            die $GO if($c->depth > 0);
         }
         else {
             unless ( ref $error ) {
