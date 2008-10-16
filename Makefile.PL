@@ -8,7 +8,6 @@ all_from 'lib/Catalyst/Runtime.pm';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00300';
 requires 'Moose' => '0.59';
 requires 'Carp';
-requires 'Class::Data::Inheritable';
 requires 'Class::Inspector' => '1.06';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
@@ -21,7 +20,6 @@ requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
 requires 'Module::Pluggable' => '3.01';
-requires 'NEXT';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Text::SimpleTable' => '0.03';
@@ -31,6 +29,9 @@ requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
+
+test_requires 'NEXT';
+test_requires 'Class::Data::Inheritable';
 
 if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
     || (!exists $ENV{AGGREGATE_TESTS} && !can_use('Test::Aggregate', '0.34_01'))) {
