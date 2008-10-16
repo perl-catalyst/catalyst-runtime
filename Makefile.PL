@@ -8,7 +8,6 @@ all_from 'lib/Catalyst/Runtime.pm';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00300';
 requires 'Moose' => '0.59';
 requires 'Carp';
-requires 'Class::Accessor::Fast';
 requires 'Class::Data::Inheritable';
 requires 'Class::Inspector' => '1.06';
 requires 'CGI::Simple::Cookie';
