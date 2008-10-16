@@ -1036,9 +1036,9 @@ using C<< $c->req->captures >>.
   # For the Foo action in the Bar controller
   $c->uri_for($c->controller->('Bar')->action_for('Foo'), $c->req->captures);
 
-=cut
-
 =back
+
+=cut
 
 sub uri_for {
     my ( $c, $path, @args ) = @_;
