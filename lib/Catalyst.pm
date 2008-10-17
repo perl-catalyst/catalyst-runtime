@@ -2138,9 +2138,6 @@ sub setup_engine {
     }
 
     Class::MOP::load_class($engine);
-    #unless (Class::Inspector->loaded($engine)) {
-    #    require Class::Inspector->filename($engine);
-    #}
 
     # check for old engines that are no longer compatible
     my $old_engine;

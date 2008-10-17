@@ -7,7 +7,6 @@ use Moose;
 use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
-use Class::Inspector;
 
 has path_prefix =>
     (

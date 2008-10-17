@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 16;
+use Class::Inspector;
 
 use lib "t/lib";
 

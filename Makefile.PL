@@ -8,7 +8,7 @@ all_from 'lib/Catalyst/Runtime.pm';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00300';
 requires 'Moose' => '0.59';
 requires 'Carp';
-requires 'Class::Inspector' => '1.06';
+requires 'Class::MOP';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
 requires 'File::Modified';
@@ -32,6 +32,7 @@ requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 
 test_requires 'NEXT';
+test_requires 'Class::Inspector';
 test_requires 'Class::Data::Inheritable';
 
 if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
