@@ -22,6 +22,7 @@ requires 'LWP::UserAgent';
 requires 'Module::Pluggable' => '3.01';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
+requires 'Sub::Exporter';
 requires 'Text::SimpleTable' => '0.03';
 requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
