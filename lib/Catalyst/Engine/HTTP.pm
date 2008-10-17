@@ -19,6 +19,8 @@ require Catalyst::Engine::HTTP::Restarter::Watcher;
 use constant CHUNKSIZE => 64 * 1024;
 use constant DEBUG     => $ENV{CATALYST_HTTP_DEBUG} || 0;
 
+use namespace::clean -except => [qw/meta/];
+
 =head1 NAME
 
 Catalyst::Engine::HTTP - Catalyst HTTP Engine
