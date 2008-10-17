@@ -10,5 +10,5 @@ You can also install Catalyst::Manual from CPAN for more
 comprehensive information.
 
 If you are going to write your own Catalyst application, you will
-need to install Catalyst::Devel. Having done that, see catalyst.pl
+need to install Catalyst::Devel. Afterwards run catalyst.pl
 for more information about creating your first app.
