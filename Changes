@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix links to the mailing lists (Florian Ragwitz).
         - Use Class::MOP instead of Class::Inspector (Florian Ragwitz).
         - Change Catalyst::Test to use Sub::Exporter (Florian Ragwitz).
         - Fixed typo in Engine::HTTP::Restarter::Watcher causing -r to complain.

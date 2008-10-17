@@ -1233,7 +1233,7 @@ sub welcome_message {
                          <a href="http://dev.catalyst.perl.org">Wiki</a>
                      </li>
                      <li>
-                         <a href="http://lists.rawmode.org/mailman/listinfo/catalyst">Mailing-List</a>
+                         <a href="http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst">Mailing-List</a>
                      </li>
                      <li>
                          <a href="irc://irc.perl.org/catalyst">IRC channel #catalyst on irc.perl.org</a>
@@ -2430,8 +2430,8 @@ IRC:
 
 Mailing Lists:
 
-    http://lists.rawmode.org/mailman/listinfo/catalyst
-    http://lists.rawmode.org/mailman/listinfo/catalyst-dev
+    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
+    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
 
 Web:
 
