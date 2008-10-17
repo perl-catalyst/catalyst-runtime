@@ -4,7 +4,7 @@ use Test::More;
 
 use Catalyst::Exception;
 use Catalyst::Utils;
-use Class::Inspector;
+use Class::MOP;
 use Sub::Exporter;
 
 {
@@ -30,8 +30,8 @@ sub build_exports {
     } elsif (! $class) {
         $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
     } else {
-        unless( Class::Inspector->loaded( $class ) ) {
-            require Class::Inspector->filename( $class );
+        unless (Class::MOP::is_class_loaded($class)) {
+            Class::MOP::load_class($class);
         }
         $class->import;
 
