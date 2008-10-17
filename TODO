@@ -1,6 +1,3 @@
-  - Get rid of Class::Inspector. Class::MOP has 'is_class_loaded' and
-    'load_class', which is all we use Class::Inspector for.
-
   - Add Class::Accessor compats
     * Catalyst::Request
     * Catalyst::Response
