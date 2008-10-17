@@ -2,16 +2,70 @@ package Catalyst::Test;
 
 use Test::More;
 
-use Moose;
-
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::Inspector;
+use Sub::Exporter;
 
-extends 'Exporter';
+{
+    my $import = Sub::Exporter::build_exporter({
+        groups => [ all => \&build_exports ],
+        into_level => 1,
+    });
 
-our @EXPORT=qw/&content_like &action_ok &action_redirect &action_notfound &contenttype_is/;
+    sub import {
+        my ($self, $class) = @_;
+        $import->($self, '-all' => { class => $class });
+    }
+}
 
+sub build_exports {
+    my ($self, $meth, $args, $defaults) = @_;
+
+    my $request;
+    my $class = $args->{class};
+
+    if ( $ENV{CATALYST_SERVER} ) {
+        $request = sub { remote_request(@_) };
+    } elsif (! $class) {
+        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
+    } else {
+        unless( Class::Inspector->loaded( $class ) ) {
+            require Class::Inspector->filename( $class );
+        }
+        $class->import;
+
+        $request = sub { local_request( $class, @_ ) };
+    }
+
+    my $get = sub { $request->(@_)->content };
+
+    return {
+        request => $request,
+        get     => $get,
+        content_like => sub {
+            my $action = shift;
+            return Test::More->builder->like($get->($action),@_);
+        },
+        action_ok => sub {
+            my $action = shift;
+            return Test::More->builder->ok($request->($action)->is_success, @_);
+        },
+        action_redirect => sub {
+            my $action = shift;
+            return Test::More->builder->ok($request->($action)->is_redirect,@_);
+        },
+        action_notfound => sub {
+            my $action = shift;
+            return Test::More->builder->is_eq($request->($action)->code,404,@_);
+        },
+        contenttype_is => sub {
+            my $action = shift;
+            my $res = $request->($action);
+            return Test::More->builder->is_eq(scalar($res->content_type),@_);
+        },
+    };
+}
 
 =head1 NAME
 
@@ -90,37 +144,6 @@ method and the L<request> method below:
 Returns a C<HTTP::Response> object.
 
     my $res = request('foo/bar?test=1');
-
-=cut
-
-sub import {
-    my $self  = shift;
-    my $class = shift;
-
-    my ( $get, $request );
-
-    if ( $ENV{CATALYST_SERVER} ) {
-        $request = sub { remote_request(@_) };
-        $get     = sub { remote_request(@_)->content };
-    } elsif (! $class) {
-        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
-        $get     = $request;
-    } else {
-        unless( Class::Inspector->loaded( $class ) ) {
-            require Class::Inspector->filename( $class );
-        }
-        $class->import;
-
-        $request = sub { local_request( $class, @_ ) };
-        $get     = sub { local_request( $class, @_ )->content };
-    }
-
-    no strict 'refs';
-    my $caller = caller(0);
-    *{"$caller\::request"} = $request;
-    *{"$caller\::get"}     = $get;
-    __PACKAGE__->export_to_level(1);
-}
 
 =head2 local_request
 
@@ -222,52 +245,6 @@ Fetches the given url and matches the content against it.
 =head2 contenttype_is 
     
 Check for given mime type
-
-=cut
-
-sub content_like {
-    my $caller=caller(0);
-    no strict 'refs';
-    my $get=*{"$caller\::get"};
-    my $action=shift;
-    return Test::More->builder->like(&$get($action),@_);
-}
-
-sub action_ok {
-    my $caller=caller(0);
-    no strict 'refs';
-    my $request=*{"$caller\::request"};
-    my $action=shift;
-    return Test::More->builder->ok(&$request($action)->is_success, @_);
-}
-
-sub action_redirect {
-    my $caller=caller(0);
-    no strict 'refs';
-    my $request=*{"$caller\::request"};
-    my $action=shift;
-    return Test::More->builder->ok(&$request($action)->is_redirect,@_);
-    
-}
-
-sub action_notfound {
-    my $caller=caller(0);
-    no strict 'refs';
-    my $request=*{"$caller\::request"};
-    my $action=shift;
-    return Test::More->builder->is_eq(&$request($action)->code,404,@_);
-
-}
-
-
-sub contenttype_is {
-    my $caller=caller(0);
-    no strict 'refs';
-    my $request=*{"$caller\::request"};
-    my $action=shift;
-    my $res=&$request($action);
-    return Test::More->builder->is_eq(scalar($res->content_type),@_);
-}
 
 =head1 SEE ALSO
 
