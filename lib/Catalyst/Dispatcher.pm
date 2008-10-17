@@ -133,8 +133,13 @@ sub _command2action {
     my $action;
 
     # go to a string path ("/foo/bar/gorch")
-    # or action object which stringifies to that
-    $action = $self->_invoke_as_path( $c, "$command", \@args );
+    # or action object
+    if (Scalar::Util::blessed($command) && $command->isa('Catalyst::Action')) {
+        $action = $command;
+    }
+    else {
+        $action = $self->_invoke_as_path( $c, "$command", \@args );
+    }
 
     # go to a component ( "MyApp::*::Foo" or $c->component("...")
     # - a path or an object)

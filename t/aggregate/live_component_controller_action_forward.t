@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 50 * $iters;
+use Test::More tests => 53 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -244,5 +244,16 @@ sub run_tests {
         ok( $response->is_success, 'forward_to_uri_check successful');
         is( $response->content, '/action/forward/foo/bar',
              'forward_to_uri_check correct namespace');
+    }
+
+    # test forwarding to Catalyst::Action objects
+    {
+        ok( my $response = request(
+            'http://localhost/action/forward/to_action_object'),
+            'forward/to_action_object request');
+
+        ok( $response->is_success, 'forward/to_action_object successful');
+        is( $response->content, 'mtfnpy',
+             'forward/to_action_object forwards correctly');
     }
 }

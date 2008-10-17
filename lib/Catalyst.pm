@@ -2481,6 +2481,8 @@ audreyt: Audrey Tang
 
 bricas: Brian Cassidy <bricas@cpan.org>
 
+Caelum: Rafael Kitover <rkitover@io.com>
+
 chansen: Christian Hansen
 
 chicks: Christopher Hicks

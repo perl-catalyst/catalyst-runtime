@@ -57,6 +57,11 @@ sub with_method_and_args : Local {
     $c->res->body( $c->req->args->[0] );
 }
 
+sub to_action_object : Local {
+    my ( $self, $c ) = @_;
+    $c->forward($self->action_for('embed'), [qw/mtfnpy/]);
+}
+
 sub args : Local {
     my ( $self, $c, $val ) = @_;
     die "Expected argument 'new', got '$val'" unless $val eq 'new';
