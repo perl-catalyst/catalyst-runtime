@@ -1,0 +1,14 @@
+Catalyst-Runtime
+================
+This is the Runtime distribution for the Catalyst MVC framework.
+For more information about Catalyst, write
+
+$ perldoc Catalyst
+
+at the command line, or visit http://www.catalystframework.org/.
+You can also install Catalyst::Manual from CPAN for more
+comprehensive information.
+
+If you are going to write your own Catalyst application, you will
+need to install Catalyst::Devel. Having done that, see catalyst.pl
+for more information about creating your first app.
