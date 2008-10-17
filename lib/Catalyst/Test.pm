@@ -7,18 +7,6 @@ use Catalyst::Utils;
 use Class::MOP;
 use Sub::Exporter;
 
-{
-    my $import = Sub::Exporter::build_exporter({
-        groups => [ all => \&build_exports ],
-        into_level => 1,
-    });
-
-    sub import {
-        my ($self, $class) = @_;
-        $import->($self, '-all' => { class => $class });
-    }
-}
-
 sub build_exports {
     my ($self, $meth, $args, $defaults) = @_;
 
@@ -65,6 +53,20 @@ sub build_exports {
             return Test::More->builder->is_eq(scalar($res->content_type),@_);
         },
     };
+}
+
+use namespace::clean;
+
+{
+    my $import = Sub::Exporter::build_exporter({
+        groups => [ all => \&build_exports ],
+        into_level => 1,
+    });
+
+    sub import {
+        my ($self, $class) = @_;
+        $import->($self, '-all' => { class => $class });
+    }
 }
 
 =head1 NAME
