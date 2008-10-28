@@ -12,18 +12,27 @@ sub mk_classdata {
   my $slot = '$'.$attribute;
   my $accessor =  sub {
     my $meta = $_[0]->meta;
+    my $pkg = ref $_[0] || $_[0];
     if(@_ > 1){
       $meta->namespace->{$attribute} = \$_[1];
       return $_[1];
     }
 
-    if( $meta->has_package_symbol($slot) ){
-      return ${ $meta->get_package_symbol($slot) };
+    # tighter version of
+    # if ( $meta->has_package_symbol($slot) ) {
+    #   return ${ $meta->get_package_symbol($slot) };
+    # }
+    no strict 'refs';
+    my $v = *{"${pkg}::${attribute}"}{SCALAR};
+    if (defined ${$v}) {
+     return ${$v};
     } else {
       foreach my $super ( $meta->linearized_isa ) {
-        my $super_meta = Moose::Meta::Class->initialize($super);
-        if( $super_meta->has_package_symbol($slot) ){
-          return ${ $super_meta->get_package_symbol($slot) };
+        # tighter version of same after
+        # my $super_meta = Moose::Meta::Class->initialize($super);
+        my $v = *{"${super}::${attribute}"}{SCALAR};
+        if (defined ${$v}) {
+          return ${$v};
         }
       }
     }
