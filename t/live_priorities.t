@@ -8,7 +8,6 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More tests => 28;
 use Catalyst::Test 'TestApp';
-use Data::Dumper;
 
 local $^W = 0;
 

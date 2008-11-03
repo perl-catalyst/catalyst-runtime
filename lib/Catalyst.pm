@@ -63,7 +63,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.7014';
+our $VERSION = '5.7099_03';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -97,7 +97,7 @@ documentation and tutorials.
     catalyst.pl MyApp
 
     # add models, views, controllers
-    script/myapp_create.pl model MyDatabase DBIC::Schema create=dynamic dbi:SQLite:/path/to/db
+    script/myapp_create.pl model MyDatabase DBIC::Schema create=static dbi:SQLite:/path/to/db
     script/myapp_create.pl view MyTemplate TT
     script/myapp_create.pl controller Search
 
@@ -414,87 +414,66 @@ sub clear_errors {
     $c->error(0);
 }
 
-
-# search via regex
-sub _comp_search {
-    my ( $c, @names ) = @_;
-
-    foreach my $name (@names) {
-        foreach my $component ( keys %{ $c->components } ) {
-            return $c->components->{$component} if $component =~ /$name/i;
-        }
-    }
-
-    return undef;
-}
-
-# try explicit component names
-sub _comp_explicit {
-    my ( $c, @names ) = @_;
-
-    foreach my $try (@names) {
-        return $c->components->{$try} if ( exists $c->components->{$try} );
-    }
-
-    return undef;
-}
-
-# like component, but try just these prefixes before regex searching,
-#  and do not try to return "sort keys %{ $c->components }"
-sub _comp_prefixes {
+# search components given a name and some prefixes
+sub _comp_search_prefixes {
     my ( $c, $name, @prefixes ) = @_;
-
     my $appclass = ref $c || $c;
+    my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
 
-    my @names = map { "${appclass}::${_}::${name}" } @prefixes;
+    # map the original component name to the sub part that we will search against
+    my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
+        grep { /$filter/ } keys %{ $c->components };
 
-    my $comp = $c->_comp_explicit(@names);
-    return $comp if defined($comp);
-    $comp = $c->_comp_search($name);
-    return $comp;
+    # undef for a name will return all
+    return keys %eligible if !defined $name;
+
+    my $query  = ref $name ? $name : qr/^$name$/i;
+    my @result = grep { $eligible{$_} =~ m{$query} } keys %eligible;
+
+    return map { $c->components->{ $_ } } @result if @result;
+
+    # if we were given a regexp to search against, we're done.
+    return if ref $name;
+
+    # regexp fallback
+    $query  = qr/$name/i;
+    @result = map { $c->components->{ $_ } } grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
+
+    # no results? try against full names
+    if( !@result ) {
+        @result = map { $c->components->{ $_ } } grep { m{$query} } keys %eligible;
+    }
+
+    # don't warn if we didn't find any results, it just might not exist
+    if( @result ) {
+        $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
+        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution is unreliable and unsafe.' );
+        $c->log->warn( 'If you really want to search, pass in a regexp as the argument.' );
+    }
+
+    return @result;
 }
 
 # Find possible names for a prefix 
-
 sub _comp_names {
     my ( $c, @prefixes ) = @_;
-
     my $appclass = ref $c || $c;
 
-    my @pre = map { "${appclass}::${_}::" } @prefixes;
+    my $filter = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
 
-    my @names;
-
-    COMPONENT: foreach my $comp ($c->component) {
-        foreach my $p (@pre) {
-            if ($comp =~ s/^$p//) {
-                push(@names, $comp);
-                next COMPONENT;
-            }
-        }
-    }
-
+    my @names = map { s{$filter}{}; $_; } $c->_comp_search_prefixes( undef, @prefixes );
     return @names;
-}
-
-# Return a component if only one matches.
-sub _comp_singular {
-    my ( $c, @prefixes ) = @_;
-
-    my $appclass = ref $c || $c;
-
-    my ( $comp, $rest ) =
-      map { $c->_comp_search("^${appclass}::${_}::") } @prefixes;
-    return $comp unless $rest;
 }
 
 # Filter a component before returning by calling ACCEPT_CONTEXT if available
 sub _filter_component {
     my ( $c, $comp, @args ) = @_;
+
     if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
         return $comp->ACCEPT_CONTEXT( $c, @args );
     }
-    else { return $comp }
+    
+    return $comp;
 }
 
 =head2 COMPONENT ACCESSORS
@@ -508,13 +487,23 @@ Gets a L<Catalyst::Controller> instance by name.
 If the name is omitted, will return the controller for the dispatched
 action.
 
+If you want to search for controllers, pass in a regexp as the argument.
+
+    # find all controllers that start with Foo
+    my @foo_controllers = $c->controller(qr{^Foo});
+
+
 =cut
 
 sub controller {
     my ( $c, $name, @args ) = @_;
-    return $c->_filter_component( $c->_comp_prefixes( $name, qw/Controller C/ ),
-        @args )
-      if ($name);
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
     return $c->component( $c->action->class );
 }
 
@@ -527,18 +516,27 @@ Gets a L<Catalyst::Model> instance by name.
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
 If the name is omitted, it will look for 
- - a model object in $c->stash{current_model_instance}, then
+ - a model object in $c->stash->{current_model_instance}, then
  - a model name in $c->stash->{current_model}, then
  - a config setting 'default_model', or
  - check if there is only one model, and return it if that's the case.
+
+If you want to search for models, pass in a regexp as the argument.
+
+    # find all models that start with Foo
+    my @foo_models = $c->model(qr{^Foo});
 
 =cut
 
 sub model {
     my ( $c, $name, @args ) = @_;
-    return $c->_filter_component( $c->_comp_prefixes( $name, qw/Model M/ ),
-        @args )
-      if $name;
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
     if (ref $c) {
         return $c->stash->{current_model_instance} 
           if $c->stash->{current_model_instance};
@@ -547,19 +545,18 @@ sub model {
     }
     return $c->model( $c->config->{default_model} )
       if $c->config->{default_model};
-    return $c->_filter_component( $c->_comp_singular(qw/Model M/) );
 
-}
+    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
-=head2 $c->controllers
+    if( $rest ) {
+        $c->log->warn( 'Calling $c->model() will return a random model unless you specify one of:' );
+        $c->log->warn( '* $c->config->{default_model} # the name of the default model to use' );
+        $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
+        $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
+        $c->log->warn( 'NB: in version 5.80, the "random" behavior will not work at all.' );
+    }
 
-Returns the available names which can be passed to $c->controller
-
-=cut
-
-sub controllers {
-    my ( $c ) = @_;
-    return $c->_comp_names(qw/Controller C/);
+    return $c->_filter_component( $comp );
 }
 
 
@@ -572,18 +569,27 @@ Gets a L<Catalyst::View> instance by name.
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
 If the name is omitted, it will look for 
- - a view object in $c->stash{current_view_instance}, then
+ - a view object in $c->stash->{current_view_instance}, then
  - a view name in $c->stash->{current_view}, then
  - a config setting 'default_view', or
  - check if there is only one view, and return it if that's the case.
+
+If you want to search for views, pass in a regexp as the argument.
+
+    # find all views that start with Foo
+    my @foo_views = $c->view(qr{^Foo});
 
 =cut
 
 sub view {
     my ( $c, $name, @args ) = @_;
-    return $c->_filter_component( $c->_comp_prefixes( $name, qw/View V/ ),
-        @args )
-      if $name;
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
     if (ref $c) {
         return $c->stash->{current_view_instance} 
           if $c->stash->{current_view_instance};
@@ -592,7 +598,29 @@ sub view {
     }
     return $c->view( $c->config->{default_view} )
       if $c->config->{default_view};
-    return $c->_filter_component( $c->_comp_singular(qw/View V/) );
+
+    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
+
+    if( $rest ) {
+        $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
+        $c->log->warn( '* $c->config->{default_view} # the name of the default view to use' );
+        $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
+        $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
+        $c->log->warn( 'NB: in version 5.80, the "random" behavior will not work at all.' );
+    }
+
+    return $c->_filter_component( $comp );
+}
+
+=head2 $c->controllers
+
+Returns the available names which can be passed to $c->controller
+
+=cut
+
+sub controllers {
+    my ( $c ) = @_;
+    return $c->_comp_names(qw/Controller C/);
 }
 
 =head2 $c->models
@@ -627,34 +655,51 @@ unless you want to get a specific component by full
 class. C<< $c->controller >>, C<< $c->model >>, and C<< $c->view >>
 should be used instead.
 
+If C<$name> is a regexp, a list of components matched against the full
+component name will be returned.
+
 =cut
 
 sub component {
-    my $c = shift;
+    my ( $c, $name, @args ) = @_;
 
-    if (@_) {
+    if( $name ) {
+        my $comps = $c->components;
 
-        my $name = shift;
+        if( !ref $name ) {
+            # is it the exact name?
+            return $c->_filter_component( $comps->{ $name }, @args )
+                       if exists $comps->{ $name };
 
-        my $appclass = ref $c || $c;
+            # perhaps we just omitted "MyApp"?
+            my $composed = ( ref $c || $c ) . "::${name}";
+            return $c->_filter_component( $comps->{ $composed }, @args )
+                       if exists $comps->{ $composed };
 
-        my @names = (
-            $name, "${appclass}::${name}",
-            map { "${appclass}::${_}::${name}" }
-              qw/Model M Controller C View V/
-        );
+            # search all of the models, views and controllers
+            my( $comp ) = $c->_comp_search_prefixes( $name, qw/Model M Controller C View V/ );
+            return $c->_filter_component( $comp, @args ) if $comp;
+        }
 
-        my $comp = $c->_comp_explicit(@names);
-        return $c->_filter_component( $comp, @_ ) if defined($comp);
+        # This is here so $c->comp( '::M::' ) works
+        my $query = ref $name ? $name : qr{$name}i;
 
-        $comp = $c->_comp_search($name);
-        return $c->_filter_component( $comp, @_ ) if defined($comp);
+        my @result = grep { m{$query} } keys %{ $c->components };
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+
+        if( $result[ 0 ] ) {
+            $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
+            $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
+            $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+            return $c->_filter_component( $result[ 0 ], @args );
+        }
+
+        # I would expect to return an empty list here, but that breaks back-compat
     }
 
+    # fallback
     return sort keys %{ $c->components };
 }
-
-
 
 =head2 CLASS DATA AND HELPER CLASSES
 
@@ -909,23 +954,75 @@ EOF
     $class->setup_finished(1);
 }
 
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
+
 =head2 $c->uri_for( $path, @args?, \%query_values? )
 
-Merges path with C<< $c->request->base >> for absolute URIs and with
-C<< $c->namespace >> for relative URIs, then returns a normalized L<URI>
-object. If any args are passed, they are added at the end of the path.
-If the last argument to C<uri_for> is a hash reference, it is assumed to
-contain GET parameter key/value pairs, which will be appended to the URI
-in standard fashion.
+=over
 
-Note that uri_for is destructive to the passed hashref.  Subsequent calls
-with the same hashref may have unintended results.
+=item $action
 
-Instead of C<$path>, you can also optionally pass a C<$action> object
-which will be resolved to a path using
-C<< $c->dispatcher->uri_for_action >>; if the first element of
-C<@args> is an arrayref it is treated as a list of captures to be passed
-to C<uri_for_action>.
+A Catalyst::Action object representing the Catalyst action you want to
+create a URI for. To get one for an action in the current controller,
+use C<< $c->action('someactionname') >>. To get one from different
+controller, fetch the controller using C<< $c->controller() >>, then
+call C<action_for> on it.
+
+This method must be used to create URIs for
+L<Catalyst::DispatchType::Chained> actions.
+
+=item $path
+
+The actual path you wish to create a URI for, this is a public path,
+not a private action path.
+
+=item \@captures
+
+If provided, this argument is used to insert values into a I<Chained>
+action in the parts where the definitions contain I<CaptureArgs>. If
+not needed, leave out this argument.
+
+=item @args
+
+If provided, this is used as a list of further path sections to append
+to the URI. In a I<Chained> action these are the equivalent to the
+endpoint L<Args>.
+
+=item \%query_values
+
+If provided, the query_values hashref is used to add query parameters
+to the URI, with the keys as the names, and the values as the values.
+
+=back
+
+Returns a L<URI> object.
+
+  ## Ex 1: a path with args and a query parameter
+  $c->uri_for('user/list', 'short', { page => 2});
+  ## -> ($c->req->base is 'http://localhost:3000/'
+  URI->new('http://localhost:3000/user/list/short?page=2)
+
+  ## Ex 2: a chained view action that captures the user id
+  ## In controller:
+  sub user : Chained('/'): PathPart('myuser'): CaptureArgs(1) {}
+  sub viewuser : Chained('user'): PathPart('view') {}
+
+  ## In uri creating code:
+  my $uaction = $c->controller('Users')->action_for('viewuser');
+  $c->uri_for($uaction, [ 42 ]);
+  ## outputs:
+  URI->new('http://localhost:3000/myuser/42/view')
+
+Creates a URI object using C<< $c->request->base >> and a path. If an
+Action object is given instead of a path, the path is constructed
+using C<< $c->dispatcher->uri_for_action >> and passing it the
+@captures array, if supplied.
+
+If any query parameters are passed they are added to the end of the
+URI in the usual way.
+
+Note that uri_for is destructive to the passed query values hashref.
+Subsequent calls with the same hashref may have unintended results.
 
 =cut
 
@@ -1224,7 +1321,9 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-        if ( !ref($error) and $error eq $DETACH ) { die $DETACH if $c->depth > 1 }
+        if ( !ref($error) and $error eq $DETACH ) {
+            die $DETACH if($c->depth > 1);
+        }
         else {
             unless ( ref $error ) {
                 no warnings 'uninitialized';
@@ -1858,6 +1957,11 @@ search paths, specify a key named C<search_extra> as an array
 reference. Items in the array beginning with C<::> will have the
 application class name prepended to them.
 
+All components found will also have any 
+L<Devel::InnerPackage|inner packages> loaded and set up as components.
+Note, that modules which are B<not> an I<inner package> of the main
+file namespace loaded will not be instantiated as components.
+
 =cut
 
 sub setup_components {
@@ -2390,13 +2494,15 @@ Wiki:
 
 =head2 L<Catalyst::Test> - The test suite.
 
-=head1 CREDITS
+=head1 PROJECT FOUNDER
 
-Andy Grundman
+sri: Sebastian Riedel <sri@cpan.org>
 
-Andy Wardley
+=head1 CONTRIBUTORS
 
-Andreas Marienborg
+abw: Andy Wardley
+
+acme: Leon Brocard <leon@astray.com>
 
 Andrew Bramble
 
@@ -2404,65 +2510,67 @@ Andrew Ford
 
 Andrew Ruthven
 
-Arthur Bergman
+andyg: Andy Grundman <andy@hybridized.org>
 
-Autrijus Tang
+audreyt: Audrey Tang
 
-Brian Cassidy
+bricas: Brian Cassidy <bricas@cpan.org>
 
-Carl Franks
+chansen: Christian Hansen
 
-Christian Hansen
+chicks: Christopher Hicks
 
-Christopher Hicks
-
-Dan Sully
-
-Danijel Milicevic
-
-David Kamholz
-
-David Naughton
+dkubb: Dan Kubb <dan.kubb-cpan@onautopilot.com>
 
 Drew Taylor
+
+esskar: Sascha Kiefer
+
+fireartist: Carl Franks <cfranks@cpan.org>
+
+gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
 Geoff Richards
 
-Jesse Sheidlower
-
-Jesse Vincent
+jcamacho: Juan Camacho
 
 Jody Belka
 
 Johan Lindstrom
 
-Juan Camacho
+jon: Jon Schutz <jjschutz@cpan.org>
 
-Leon Brocard
+marcus: Marcus Ramberg <mramberg@cpan.org>
 
-Marcus Ramberg
+miyagawa: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
-Matt S Trout
+mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
 
-Robert Sedlacek
+mugwump: Sam Vilain
 
-Sam Vilain
+naughton: David Naughton
 
-Sascha Kiefer
+ningu: David Kamholz <dkamholz@cpan.org>
 
-Sebastian Willert
+nothingmuch: Yuval Kogman <nothingmuch@woobling.org>
 
-Tatsuhiko Miyagawa
+numa: Dan Sully <daniel@cpan.org>
+
+obra: Jesse Vincent
+
+omega: Andreas Marienborg
+
+phaylon: Robert Sedlacek <phaylon@dunkelheit.at>
+
+sky: Arthur Bergman
+
+the_jester: Jesse Sheidlower
 
 Ulf Edvinsson
 
-Yuval Kogman
-
-=head1 AUTHOR
-
-Sebastian Riedel, C<sri@oook.de>
+willert: Sebastian Willert <willert@cpan.org>
 
 =head1 LICENSE
 

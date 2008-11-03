@@ -11,8 +11,8 @@ use Catalyst::Test 'TestApp';
 use HTTP::Headers::Util 'split_header_words';
 
 my $expected = {
-    Catalyst => [qw|Catalyst Cool path /bah|],
-    Cool     => [qw|Cool Catalyst path /|]
+    catalyst => [qw|catalyst cool path /bah|],
+    cool     => [qw|cool catalyst path /|]
 };
 
 {
