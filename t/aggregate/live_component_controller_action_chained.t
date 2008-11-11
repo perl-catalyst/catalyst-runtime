@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 141*$iters;
+use Test::More tests => 143*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -978,6 +978,26 @@ sub run_tests {
 
         ok( my $response = request('http://localhost/action/chained/static_end'),
             "static paths are prefered over captures" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+    }
+    
+    #
+    #   */search
+    #   doc/*
+    # 
+    #   request for doc/search should end up in doc/*
+    {
+        my @expected = qw[
+            TestApp::Controller::Action::Chained->begin
+            TestApp::Controller::Action::Chained->doc_star
+            TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/doc/search'),
+            "we prefer static path parts earlier in the chain" );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
     }
