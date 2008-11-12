@@ -103,8 +103,10 @@ sub report {
                       $stat->{elapsed},
                       $stat->{action} ? 1 : 0,
                       );
+                # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
+                my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
                 $t->row( ( q{ } x $r[0] ) . $r[1],
-                     defined $r[2] ? sprintf("%fs", $r[2]) : '??');
+                     defined $r[2] ? $elapsed : '??');
                 push(@results, \@r);
                 }
             );
