@@ -1,5 +1,7 @@
 package Catalyst::Test;
 
+use strict;
+use warnings;
 use Test::More;
 
 use Catalyst::Exception;
@@ -56,6 +58,7 @@ sub build_exports {
 }
 
 use namespace::clean;
+our $default_host;
 
 {
     my $import = Sub::Exporter::build_exporter({
@@ -63,9 +66,12 @@ use namespace::clean;
         into_level => 1,
     });
 
+
     sub import {
-        my ($self, $class) = @_;
+        my ($self, $class, $opts) = @_;
         $import->($self, '-all' => { class => $class });
+        $opts ||= {};
+        $default_host = $opts->{default_host} if exists $opts->{default_host};
     }
 }
 
@@ -111,6 +117,15 @@ Catalyst::Test - Test Catalyst Applications
 
     ok( get('/foo') =~ /bar/ );
 
+    # mock virtual hosts
+    use Catalyst::Test 'MyApp', { default_host => 'myapp.com' };
+    like( get('/whichhost'), qr/served by myapp.com/ );
+    like( get( '/whichhost', { host => 'yourapp.com' } ), qr/served by yourapp.com/ );
+    {
+        local $Catalyst::Test::default_host = 'otherapp.com';
+        like( get('/whichhost'), qr/served by otherapp.com/ );
+    }
+
 =head1 DESCRIPTION
 
 This module allows you to make requests to a Catalyst application either without
@@ -143,9 +158,11 @@ method and the L<request> method below:
 
 =head2 request
 
-Returns a C<HTTP::Response> object.
+Returns a C<HTTP::Response> object. Accepts an optional hashref for request
+header configuration; currently only supports setting 'host' value.
 
     my $res = request('foo/bar?test=1');
+    my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
 
 =head2 local_request
 
@@ -159,6 +176,7 @@ sub local_request {
     require HTTP::Request::AsCGI;
 
     my $request = Catalyst::Utils::request( shift(@_) );
+    _customize_request($request, @_);
     my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
 
     $class->handle_request;
@@ -180,6 +198,8 @@ sub remote_request {
 
     my $request = Catalyst::Utils::request( shift(@_) );
     my $server  = URI->new( $ENV{CATALYST_SERVER} );
+
+    _customize_request($request, @_);
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         my $path = $1;
@@ -226,6 +246,14 @@ sub remote_request {
     }
 
     return $agent->request($request);
+}
+
+sub _customize_request {
+    my $request = shift;
+    my $opts = pop(@_) || {};
+    if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
+        $request->header( 'Host' => $host );
+    }
 }
 
 =head2 action_ok

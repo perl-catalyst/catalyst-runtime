@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Support mocking virtualhosts in test suite (Jason Gottshall)
+        - Add README
+
 5.8000_03 2008-10-14 14:13:00
         - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
         - Fix links to the mailing lists (RT #39754 and Florian Ragwitz).
