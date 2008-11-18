@@ -87,10 +87,6 @@ sub elapsed {
 sub report {
     my $self = shift;
 
-    # close any remaining open nodes
-    map { $self->profile(end => $_->getNodeValue->{action}) }
-      (reverse @{ $self->stack })[1 .. $#{$self->stack}];
-
     my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
     my @results;
     $self->tree->traverse(
