@@ -454,7 +454,8 @@ Returns true or false, indicating whether the connection is secure (https).
 
 =head2 $req->captures
 
-Returns a reference to an array containing regex captures.
+Returns a reference to an array containing captured args from chained
+actions or regex captures.
 
     my @captures = @{ $c->request->captures };
 
