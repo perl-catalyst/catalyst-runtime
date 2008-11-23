@@ -1,28 +1,29 @@
-  - Add Class::Accessor compats
-    * Catalyst::Request
-    * Catalyst::Response
-    * Catalyst::Dispatcher
-    * Catalyst::Request::Upload
-    * Catalyst::Action
-    * Catalyst::ActionChain
-    * Catalyst::ActionContainer
+  - Class::Accessor::Fast extra compatibility methods for MX::Emulate::CAF - groditi
+    - Tests for uses of C::A::F from Catalyst repos. - t0m
 
-  - Make classes immutable at setup() time
+  - Finish off and CPAN Class::C3::Adopt::NEXT - rafl 
+    - More POD - t0m
+    - Make core use it.
+    - Simple test for next compat in core.
 
+  - Common engine test failures, look into and get tests into core.
 
-  - GRODITI's list:
-    * Update Test suite to not assume MyApp ISA Controller
-      - After that I'll set up attr handlers that will output helpful
-        error messages when you do it as well as how to fix it.
-    * comments marked /Moose TODO/i in the code
-    * Fix the CDI compat hack so we can start moving to immutable
-    * Profile before and after immutable.
-    * Now would be a good time to lay ground for the App / Ctx split
-    * Howto mantain branch in sync with the latest checkins ?
-    * Eliminate all instances of $instance->{$key}
-    * MooseX::Emulate::CAF seems to be working like a charm :)
-    * General code cleanups can't hurt
-    * How do we move from NEXT to C3 ? I have never used either of them
-      - What does the lineraized mro look like when we are using moose 
-        method modifiers?
-        - Does they all get clumped together or what? Is it a non-issue?
+  - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" via package "Catalyst::Dispatcher", fix the plugin as tree was never a public method.
+
+  - Catalyst-Model-Akismet, incorrectly inherits from Catalyst::Component::InstancePerContext, should compose as a role, fix the module.
+
+  - Catalyst-Model-DBIC-Schema (MojoMojo test suite), test failure for the core distribution (marcus)
+
+  - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol table as methods, tests + fix?
+
+  - Update Test suite to not assume MyApp ISA Controller
+    - After that set up attr handlers that will output helpful error messages when you do it as well as how to fix it. (done already?)
+  
+  - Comments marked /Moose TODO/i in the code
+  
+  - Eliminate all instances of $instance->{$key}
+
+  - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate
+
+  - Profiling vs 5.70 and optimisation as needed.
+
