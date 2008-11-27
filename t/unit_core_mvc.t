@@ -1,4 +1,4 @@
-use Test::More tests => 45;
+use Test::More tests => 46;
 use strict;
 use warnings;
 
@@ -157,6 +157,11 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
     }
 
     my $c = bless {}, 'MyApp';
+
+    # test accept-context with class rather than instance
+    MyApp->model('M', qw/foo bar/);
+    is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
+
 
     $c->model('M', qw/foo bar/);
     is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
