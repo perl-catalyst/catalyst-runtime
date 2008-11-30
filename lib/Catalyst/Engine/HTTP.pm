@@ -359,7 +359,6 @@ sub _handler {
             PATH_INFO       => $path         || '',
             QUERY_STRING    => $query_string || '',
             REMOTE_ADDR     => $sockdata->{peeraddr},
-            REMOTE_HOST     => $sockdata->{peername},
             REQUEST_METHOD  => $method || '',
             SERVER_NAME     => $sockdata->{localname},
             SERVER_PORT     => $port,
@@ -510,9 +509,6 @@ sub _socket_data {
 
     # This mess is necessary to keep IE from crashing the server
     my $data = {
-        peername  => $iaddr 
-            ? ( gethostbyaddr( $iaddr, AF_INET ) || 'localhost' )
-            : 'localhost',
         peeraddr  => $iaddr 
             ? ( inet_ntoa($iaddr) || '127.0.0.1' )
             : '127.0.0.1',

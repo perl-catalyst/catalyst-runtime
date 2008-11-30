@@ -113,7 +113,7 @@ has hostname => (
   lazy      => 1,
   default   => sub {
     my ($self) = @_;
-    gethostbyaddr( inet_aton( $self->address ), AF_INET )
+    gethostbyaddr( inet_aton( $self->address ), AF_INET ) || 'localhost'
   },
 );
 
