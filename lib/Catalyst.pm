@@ -526,7 +526,7 @@ sub _comp_names {
 sub _filter_component {
     my ( $c, $comp, @args ) = @_;
 
-    if ( Scalar::Util::blessed($c) && eval { $comp->can('ACCEPT_CONTEXT'); } ) {
+    if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
         return $comp->ACCEPT_CONTEXT( $c, @args );
     }
     

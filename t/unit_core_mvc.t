@@ -1,4 +1,4 @@
-use Test::More tests => 46;
+use Test::More tests => 45;
 use strict;
 use warnings;
 
@@ -160,7 +160,7 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
 
     # test accept-context with class rather than instance
     MyApp->model('M', qw/foo bar/);
-    is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
+    is_deeply($args, [qw/foo bar/], 'MyApp->model args passed to ACCEPT_CONTEXT ok');
 
 
     $c->model('M', qw/foo bar/);
@@ -173,7 +173,5 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
     $c->view('::View::V', qw/foo3 bar3/);
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 
-    undef $args;
-    MyApp->model('M', qw/foo bar/);
-    is($args, undef, 'MyApp->model does not invoke ACCEPT_CONTEXT');
+
 }
