@@ -16,7 +16,10 @@ BEGIN { use_ok("Catalyst::Utils") };
 }
 
 my $warnings = 0;
-$SIG{__WARN__} = sub { $warnings++ };
+$SIG{__WARN__} = sub {
+    return if $_[0] =~ /Subroutine (?:un|re|)initialize redefined at .*C3\.pm/;
+    $warnings++;
+};
 
 ok( !Class::MOP::is_class_loaded("TestApp::View::Dump"), "component not yet loaded" );
 
