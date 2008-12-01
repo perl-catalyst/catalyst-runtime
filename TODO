@@ -12,9 +12,18 @@
 
   - Catalyst-Model-Akismet, incorrectly inherits from Catalyst::Component::InstancePerContext, should compose as a role, fix the module.
 
-  - Catalyst-Model-DBIC-Schema (MojoMojo test suite), test failure for the core distribution (marcus)
-
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol table as methods, tests + fix?
+
+  - Catalyst::Plugin::Cache::Curried
+  - Catalyst::Controller::WrapCGI
+    - Both import 'meta' into controller package - mst thinks this can be fixed?.
+      but @marcus> and the generated accessors even call $_[0]->meta, so I don't think we can remove it. 
+      . Add a test for this in core.
+      . Fix core to use CMOP to look up metaclass, rather than ->meta method, and
+        namespace::clean the meta method out, fix generated accessors to do the same?
+
+  - Catalyst::Plugin::SmartURI
+    - Core tests for behavior which causes it to fail (Caelum)
 
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages when you do it as well as how to fix it. (done already?)
@@ -26,4 +35,7 @@
   - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate
 
   - Profiling vs 5.70 and optimisation as needed.
+
+  - http://lists.scsys.co.uk/pipermail/catalyst-dev/2008-November/001546.html
+    - patch to list, andyg to look at?
 
