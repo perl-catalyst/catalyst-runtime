@@ -987,8 +987,6 @@ sub run_tests {
     #   doc/*
     # 
     #   request for doc/search should end up in doc/*
-TODO: {
-    local $TODO = 'gbjk never got off his ass and fixed this';
     {
         my @expected = qw[
             TestApp::Controller::Action::Chained->begin
@@ -1000,8 +998,10 @@ TODO: {
 
         ok( my $response = request('http://localhost/chained/doc/search'),
             "we prefer static path parts earlier in the chain" );
-        is( $response->header('X-Catalyst-Executed'),
-            $expected, 'Executed actions' );
+        TODO: {
+            local $TODO = 'gbjk never got off his ass and fixed this';
+            is( $response->header('X-Catalyst-Executed'),
+                $expected, 'Executed actions' );
+        }
     }
-}; 
 }
