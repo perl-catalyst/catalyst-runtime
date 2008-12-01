@@ -9,6 +9,7 @@ requires 'namespace::clean';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00400';
 requires 'Moose' => '0.59';
 requires 'Carp';
+requires 'Class::C3::Adopt::NEXT';
 requires 'Class::MOP';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';

@@ -4,6 +4,7 @@ use Moose;
 use Class::MOP;
 use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
+use Class::C3::Adopt::NEXT;
 use MRO::Compat;
 use mro 'c3';
 
