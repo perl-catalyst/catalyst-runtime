@@ -1,10 +1,11 @@
-  - Class::Accessor::Fast extra compatibility methods for MX::Emulate::CAF - groditi
+  - MooseX::Emulate::Class::Accessor::Fast 
     - Tests for uses of C::A::F from Catalyst repos. - t0m
+    - Can't locate object method "mk_accessors" via package "Catalyst::Request::REST"
+    - New release once these are done.
 
-  - Finish off and CPAN Class::C3::Adopt::NEXT - rafl 
-    - More POD - t0m
-    - Make core use it.
-    - Simple test for next compat in core.
+  - Look into FormFu test fails, get tests in core (marcus?)
+
+  - Simple test for NEXT compat in core.
 
   - Common engine test failures, look into and get tests into core.
 
