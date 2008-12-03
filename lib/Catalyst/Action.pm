@@ -19,6 +19,8 @@ L<Catalyst::Controller> subclasses.
 
 use Moose;
 
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 has class => (is => 'rw');
 has namespace => (is => 'rw');
 has 'reverse' => (is => 'rw');

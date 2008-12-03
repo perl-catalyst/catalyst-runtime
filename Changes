@@ -1,6 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.8000_04
+        - Add MooseX::Emulate::Class::Accessor::Fast to Catalyst::Action,
+          needed by Catalyst::Controller::HTML::FormFu (zamolxes)
+          - Test for this (zamolxes)
         - Add MooseX::Emulate::Class::Accessor::Fast to Catalyst::Request,
           needed by Catalyst::Request::REST (t0m)
           - Test for this (t0m)

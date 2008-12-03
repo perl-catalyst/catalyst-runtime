@@ -1,9 +1,9 @@
   - MooseX::Emulate::Class::Accessor::Fast 
     - Tests for uses of C::A::F from Catalyst repos. - t0m
-    - Can't locate object method "mk_accessors" via package "Catalyst::Request::REST"
     - New release once these are done.
 
-  - Look into FormFu test fails, get tests in core (marcus?)
+  - Go through everything which used to use CAF, and ensure that it now uses MX::E::CAF + tests, 
+    extending t/caf_backcompat.t and replacing t/custom_request.t (t0m)
 
   - Simple test for NEXT compat in core.
 
