@@ -10,6 +10,8 @@ use HTTP::Headers;
 
 use Moose;
 
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 has action => (is => 'rw');
 has address => (is => 'rw');
 has arguments => (is => 'rw', default => sub { [] });
