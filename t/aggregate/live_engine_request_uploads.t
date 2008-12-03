@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 88;
+use Test::More tests => 96;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -242,6 +242,41 @@ use Path::Class::Dir;
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
         is( $upload->filename, 'catalyst_130pix.gif' );
     }
+}
+
+# Test PUT request with application/octet-stream file gets deleted
+
+{
+    my $body;
+
+    my $request = PUT(
+        'http://localhost/dump/body/',
+        'Content-Type' => 'application/octet-stream',
+        'Content'      => 'foobarbaz',
+        'Content-Length' => 9,
+    );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    like(
+       $response->content,
+       qr/bless\( .* 'HTTP::Body::OctetStream' \)/s,
+       'Content is a serialized HTTP::Body::OctetStream'
+    );
+
+    {
+        no strict 'refs';
+        ok(
+            eval '$body = ' . substr( $response->content, 8 ), # FIXME - substr not needed in other test cases?
+            'Unserialize HTTP::Body::OctetStream'
+        ) or warn $@;
+    }
+
+    isa_ok( $body, 'HTTP::Body::OctetStream' );
+    isa_ok($body->body, 'File::Temp');
+
+    ok( !-e $body->body->filename, 'Upload temp file was deleted' );
 }
 
 # test uploadtmp config var

@@ -22,6 +22,8 @@
         - Change Catalyst::ClassData to tweak the symbol table inline for
           performance after profiling (mst)
         - Fix POD typo in finalize_error (jhannah)
+        - Add tests to ensure that we delete the temp files created by 
+          HTTP::Body's OctetStream parser (t0m)
 
 5.8000_03 2008-10-14 14:13:00
         - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
