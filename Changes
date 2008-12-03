@@ -1,8 +1,27 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.8000_04
         - Make hostname resolution lazy (Marc Mims)
         - Support mocking virtualhosts in test suite (Jason Gottshall)
-        - Add README
+        - Add README (marcus)
+        - Fix TODO list (t0m)
+        - Use Class::C3::Adopt::NEXT (rafl)
+        - Ignore C3 warnings on 5.10 when testing ensure_class_loaded (rafl)
+        - Add TODO test for chained bug (gbjk)
+        - Fix list address in documentation (zarquon)
+        - Fix ACCEPT_CONTEXT on MyApp, called as a class method (marcus)
+           - Test for this (marcus)
+        - Bump MX::Emulate::CAF version requirement to get more back
+          compatibility (t0m)
+        - Improve documentation for $req->captures (caelum)
+        - Fix a bug in Catalyst::Stats, stopping garbage being inserted into
+          the stats if a user calls begin => but no end => (jhannah)
+           - Test for this (jhannah)
+        - Trim lines sooner in stats to avoid ugly Text::SimpleTable wrapping
+          (jhannah)
+        - Change Catalyst::ClassData to tweak the symbol table inline for
+          performance after profiling (mst)
+        - Fix POD typo in finalize_error (jhannah)
 
 5.8000_03 2008-10-14 14:13:00
         - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
