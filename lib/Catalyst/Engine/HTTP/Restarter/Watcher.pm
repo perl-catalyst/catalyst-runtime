@@ -1,6 +1,8 @@
 package Catalyst::Engine::HTTP::Restarter::Watcher;
 
 use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 use File::Find;
 use File::Modified;
 use File::Spec;

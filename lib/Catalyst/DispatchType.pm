@@ -1,6 +1,7 @@
 package Catalyst::DispatchType;
 
-use Moose; # using it to add Moose::Object to @ISA ...
+use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
 no Moose;
 
 =head1 NAME

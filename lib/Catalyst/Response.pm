@@ -3,6 +3,8 @@ package Catalyst::Response;
 use Moose;
 use HTTP::Headers;
 
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 has cookies   => (is => 'rw', default => sub { {} });
 has body      => (is => 'rw', default => '');
 has location  => (is => 'rw');

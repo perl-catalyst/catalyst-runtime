@@ -1,6 +1,8 @@
 package Catalyst::Log;
 
 use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 use Data::Dump;
 
 our %LEVELS = ();

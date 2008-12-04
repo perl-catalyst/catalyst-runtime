@@ -1,6 +1,7 @@
 package Catalyst::Request::Upload;
 
 use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Catalyst::Exception;
 use File::Copy ();

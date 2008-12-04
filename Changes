@@ -1,11 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.8000_04
-        - Add MooseX::Emulate::Class::Accessor::Fast to Catalyst::Action,
-          needed by Catalyst::Controller::HTML::FormFu (zamolxes)
-          - Test for this (zamolxes)
-        - Add MooseX::Emulate::Class::Accessor::Fast to Catalyst::Request,
-          needed by Catalyst::Request::REST (t0m)
+        - Compose the MooseX::Emulate::Class::Accessor::Fast role to 
+          Catalyst::Action, Catalyst::Request, and all other modules which 
+          inherit from Class::Accessor::Fast in 5.70.
+          This fixes:
+            - Catalyst::Controller::HTML::FormFu (zamolxes)
+            - Catalyst::Request::REST (t0m)
           - Test for this (t0m)
         - Make hostname resolution lazy (Marc Mims)
         - Support mocking virtualhosts in test suite (Jason Gottshall)
@@ -17,8 +18,8 @@
         - Fix list address in documentation (zarquon)
         - Fix ACCEPT_CONTEXT on MyApp, called as a class method (marcus)
            - Test for this (marcus)
-        - Bump MX::Emulate::CAF version requirement to get more back
-          compatibility (t0m)
+        - Bump MooseX::Emulate::Class::Accessor::Fast version requirement to 
+          get more back compatibility (t0m)
         - Improve documentation for $req->captures (caelum)
         - Fix a bug in Catalyst::Stats, stopping garbage being inserted into
           the stats if a user calls begin => but no end => (jhannah)

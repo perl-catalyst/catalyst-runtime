@@ -16,6 +16,7 @@ to represent the various dispatch points in your application.
 =cut
 
 use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has part => (is => 'rw', required => 1);
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });

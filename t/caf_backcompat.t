@@ -1,9 +1,29 @@
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More;
 use Test::Exception;
-use Catalyst::Action;
+use Class::MOP ();
+use Moose::Util ();
 
-my $action=Catalyst::Action->new({foo=>'bar'});
+# List of everything which used Class::Accessor::Fast in 5.70.
+my @modules = qw/
+    Catalyst::Action
+    Catalyst::ActionContainer
+    Catalyst::Component
+    Catalyst::Dispatcher
+    Catalyst::DispatchType
+    Catalyst::Engine::HTTP::Restarter::Watcher
+    Catalyst::Engine
+    Catalyst::Log
+    Catalyst::Request::Upload
+    Catalyst::Request
+    Catalyst::Response
+/;
 
-is $action->{foo}, 'bar', 'custom Action attribute';
+plan tests => scalar @modules;
+
+foreach my $module (@modules) {
+    Class::MOP::load_class($module);
+    ok Moose::Util::does_role($module => 'MooseX::Emulate::Class::Accessor::Fast'),
+        "$module has Class::Accessor::Fast back-compat";
+}
