@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 66;
+use Test::More tests => 68;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -149,5 +149,14 @@ SKIP:
     is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
     ok( !defined $response->header( 'X-Catalyst-Param-b' ),'param "b" ok' );
     is( $response->header( 'X-Catalyst-Param-c' ), '1', 'param "c" ok' );
+}
+
+SKIP: {
+    skip 'This currently causes infinite recursion', 2;
+    require TestApp::RequestBaseBug;
+    TestApp->request_class('TestApp::RequestBaseBug');
+    ok( my $response = request('http://localhost/engine/request/uri'), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    TestApp->request_class('Catalyst::Request');
 }
 

@@ -1,11 +1,37 @@
-  - MooseX::Emulate::Class::Accessor::Fast 
-    - Tests for uses of C::A::F from Catalyst repos. - t0m
-    - New release once these are done.
+TBD pre 5.8000_04 dev release:
 
   - Go through everything which used to use CAF, and ensure that it now uses MX::E::CAF + tests, 
     extending t/caf_backcompat.t and replacing t/custom_request.t (t0m)
 
-  - Simple test for NEXT compat in core.
+  - Simple test for NEXT compat in core (t0m).
+
+  - Looks like stash is not available during prepare_path when running under
+    Catalyst::Test.. Run MojoMojo's t/01app.t and it will explode with
+    "Can't use an undefined value as a HASH reference" - test case for core
+    + fix maybe (marcus)
+
+---
+
+  - Make the skipped test at the bottom of t/aggregate/live_engine_request_uri.t
+    pass / not be skipped. (From what C::P::SmartURI used to do)
+
+    This can be fixed by the following patch:
+
+Index: lib/Catalyst/Request.pm
+===================================================================
+--- lib/Catalyst/Request.pm (revision 8709)
++++ lib/Catalyst/Request.pm (working copy)
+@@ -96,7 +96,7 @@
+   lazy => 1,
+   default => sub {
+     my $self = shift;
+-    return $self->path if $self->uri;
++    return $self->{path} if $self->{uri};
+   },
+ );
+
+    But I'd like a 2nd opinion from someone who knows core better than me
+    about if that is the correct fix.. (t0m / Caelum)
 
   - Common engine test failures, look into and get tests into core.
 
@@ -23,8 +49,9 @@
       . Fix core to use CMOP to look up metaclass, rather than ->meta method, and
         namespace::clean the meta method out, fix generated accessors to do the same?
 
-  - Catalyst::Plugin::SmartURI
-    - Core tests for behavior which causes it to fail (Caelum)
+  - MooseX::Emulate::Class::Accessor::Fast
+    - Tests for uses of C::A::F from Catalyst repos. - t0m
+    - New release once these are done.
 
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages when you do it as well as how to fix it. (done already?)
