@@ -151,8 +151,8 @@ SKIP:
     is( $response->header( 'X-Catalyst-Param-c' ), '1', 'param "c" ok' );
 }
 
-SKIP: {
-    skip 'This currently causes infinite recursion', 2;
+# Test an overridden uri method which calls the base method, SmartURI does this.
+{
     require TestApp::RequestBaseBug;
     TestApp->request_class('TestApp::RequestBaseBug');
     ok( my $response = request('http://localhost/engine/request/uri'), 'Request' );

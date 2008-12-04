@@ -23,7 +23,7 @@ has protocol => (is => 'rw');
 has query_parameters  => (is => 'rw', default => sub { {} });
 has secure => (is => 'rw', default => 0);
 has captures => (is => 'rw', default => sub { [] });
-has uri => (is => 'rw');
+has uri => (is => 'rw', predicate => 'has_uri');
 has user => (is => 'rw');
 has headers => (
   is      => 'rw',
@@ -96,7 +96,7 @@ has base => (
   lazy => 1,
   default => sub {
     my $self = shift;
-    return $self->path if $self->uri;
+    return $self->path if $self->has_uri;
   },
 );
 

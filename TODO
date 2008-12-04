@@ -1,8 +1,5 @@
 TBD pre 5.8000_04 dev release:
 
-  - Go through everything which used to use CAF, and ensure that it now uses MX::E::CAF + tests, 
-    extending t/caf_backcompat.t and replacing t/custom_request.t (t0m)
-
   - Simple test for NEXT compat in core (t0m).
 
   - Looks like stash is not available during prepare_path when running under
@@ -11,27 +8,6 @@ TBD pre 5.8000_04 dev release:
     + fix maybe (marcus)
 
 ---
-
-  - Make the skipped test at the bottom of t/aggregate/live_engine_request_uri.t
-    pass / not be skipped. (From what C::P::SmartURI used to do)
-
-    This can be fixed by the following patch:
-
-Index: lib/Catalyst/Request.pm
-===================================================================
---- lib/Catalyst/Request.pm (revision 8709)
-+++ lib/Catalyst/Request.pm (working copy)
-@@ -96,7 +96,7 @@
-   lazy => 1,
-   default => sub {
-     my $self = shift;
--    return $self->path if $self->uri;
-+    return $self->{path} if $self->{uri};
-   },
- );
-
-    But I'd like a 2nd opinion from someone who knows core better than me
-    about if that is the correct fix.. (t0m / Caelum)
 
   - Common engine test failures, look into and get tests into core.
 

@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.8000_04
+        - Use a predicate to avoid recursion in cases where the uri
+          method is overridden by a plugin, and calls the base method,
+          for example Catalyst::Plugin::SmartURI (t0m)
+          - Test for this (caelum)
         - Compose the MooseX::Emulate::Class::Accessor::Fast role to 
           Catalyst::Action, Catalyst::Request, and all other modules which 
           inherit from Class::Accessor::Fast in 5.70.
