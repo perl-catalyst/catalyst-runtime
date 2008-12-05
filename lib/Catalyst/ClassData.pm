@@ -30,7 +30,7 @@ sub mk_classdata {
       foreach my $super ( $meta->linearized_isa ) {
         # tighter version of same after
         # my $super_meta = Moose::Meta::Class->initialize($super);
-        my $v = *{"${super}::${attribute}"}{SCALAR};
+        my $v = ${"${super}::"}{$attribute} ? *{"${super}::${attribute}"}{SCALAR} : undef;
         if (defined ${$v}) {
           return ${$v};
         }
