@@ -37,7 +37,7 @@ if ( !-e 't/optional_apache-cgi.pl' ) {
     die "ERROR: Please run test from the Catalyst-Runtime directory\n";
 }
 
-push @ARGV, glob( 't/live_*' );
+push @ARGV, glob( 't/aggregate/live_*' );
 
 Apache::TestRun->new->run(@ARGV);
 

@@ -53,7 +53,7 @@ if ( $single_test ) {
     $return = system( "$^X -Ilib/ $single_test" );
 }
 else {
-    $return = prove( '-r', '-Ilib/', glob('t/live_*.t') );
+    $return = prove( '-r', '-Ilib/', glob('t/aggregate/live_*.t') );
 }
 
 # shut it down
