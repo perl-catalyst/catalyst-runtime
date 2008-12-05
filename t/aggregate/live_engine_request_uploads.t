@@ -11,6 +11,7 @@ use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
 use Catalyst::Request::Upload;
+use HTTP::Body::OctetStream;
 use HTTP::Headers;
 use HTTP::Headers::Util 'split_header_words';
 use HTTP::Request::Common;
@@ -72,7 +73,13 @@ use Path::Class::Dir;
         is( $creq->parameters->{ $upload->filename },
             $upload->filename, 'legacy param method ok' );
 
-        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        SKIP:
+        {
+            if ( $ENV{CATALYST_SERVER} ) {
+                skip 'Not testing for deleted file on remote server', 1;
+            }
+            ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        }
     }
 }
 
@@ -128,7 +135,13 @@ use Path::Class::Dir;
         is( $upload->filename, $parameters{filename}, 'Upload filename' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
 
-        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        SKIP:
+        {
+            if ( $ENV{CATALYST_SERVER} ) {
+                skip 'Not testing for deleted file on remote server', 1;
+            }
+            ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        }
     }
 }
 
@@ -197,7 +210,13 @@ use Path::Class::Dir;
     
     for my $file ( $creq->upload ) {
         my $upload = $creq->upload($file);
-        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        SKIP:
+        {
+            if ( $ENV{CATALYST_SERVER} ) {
+                skip 'Not testing for deleted file on remote server', 1;
+            }
+            ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        }
     }
 }
 
@@ -257,7 +276,14 @@ use Path::Class::Dir;
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
         is( $upload->filename, 'catalyst_130pix.gif', 'Upload Filename' );
-        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        
+        SKIP:
+        {
+            if ( $ENV{CATALYST_SERVER} ) {
+                skip 'Not testing for deleted file on remote server', 1;
+            }
+            ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+        }
     }
 }
 
@@ -293,12 +319,22 @@ use Path::Class::Dir;
     isa_ok( $body, 'HTTP::Body::OctetStream' );
     isa_ok($body->body, 'File::Temp');
 
-    ok( !-e $body->body->filename, 'Upload temp file was deleted' );
+    SKIP:
+    {
+        if ( $ENV{CATALYST_SERVER} ) {
+            skip 'Not testing for deleted file on remote server', 1;
+        }
+        ok( !-e $body->body->filename, 'Upload temp file was deleted' );
+    }
 }
 
 # test uploadtmp config var
-
+SKIP:
 {
+    if ( $ENV{CATALYST_SERVER} ) {
+        skip 'Not testing uploadtmp on remote server', 14;
+    }
+    
     my $creq;
 
     my $dir = "$FindBin::Bin/";
