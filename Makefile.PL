@@ -41,6 +41,9 @@ if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
+else {
+    test_requires('Test::Aggregate', '0.34_01');
+}
 
 if (-e 'inc/.author') {
   build_requires 'Test::NoTabs';
