@@ -1,5 +1,9 @@
 package Catalyst;
 
+# we don't need really need this, but if we load it before MRO::Compat gets
+# loaded (via Moose and Class::MOP), we can avoid some nasty warnings
+use Class::C3;
+
 use Moose;
 extends 'Catalyst::Component';
 use bytes;
