@@ -33,6 +33,8 @@ my $expected = {
     is_deeply( $cookies, $expected, 'Response Cookies' );
 }
 
+# XXX: these fail on remote servers due to LWP max_redirect 0 bug:
+# http://rt.cpan.org/Ticket/Display.html?id=40260
 {
     ok( my $response = request('http://localhost/engine/response/cookies/two'),
         'Request' );
