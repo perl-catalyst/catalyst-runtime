@@ -270,7 +270,6 @@ use Path::Class::Dir;
         'http://localhost/dump/body/',
         'Content-Type' => 'application/octet-stream',
         'Content'      => 'foobarbaz',
-        'Content-Length' => 9,
     );
 
     ok( my $response = request($request), 'Request' );
