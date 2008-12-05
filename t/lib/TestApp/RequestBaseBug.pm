@@ -1,6 +1,6 @@
 package TestApp::RequestBaseBug;
 
-use parent 'Catalyst::Request';
+use base 'Catalyst::Request';
 
 sub uri {
     my $self = shift;
