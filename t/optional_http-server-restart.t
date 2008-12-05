@@ -29,7 +29,7 @@ rmtree $tmpdir if -d $tmpdir;
 mkdir $tmpdir;
 chdir $tmpdir;
 
-system( 'perl', "-I$FindBin::Bin/../lib", "$FindBin::Bin/../script/catalyst.pl", 'TestApp' );
+system( $^X, "-I$FindBin::Bin/../lib", "$FindBin::Bin/../script/catalyst.pl", 'TestApp' );
 
 chdir "$FindBin::Bin/..";
 File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
@@ -42,7 +42,7 @@ my $port = 30000 + int rand( 1 + 10000 );
 
 my( $server, $pid );
 $pid = open3( undef, $server, undef,
-  'perl', "-I$FindBin::Bin/../lib",
+  $^X, "-I$FindBin::Bin/../lib",
   "$FindBin::Bin/../t/tmp/TestApp/script/testapp_server.pl", '-port',
   $port, '-restart' )
     or die "Unable to spawn standalone HTTP server: $!";
@@ -173,7 +173,7 @@ my $restartdirs = join ' ', map{
 } qw/Action Engine/;
 
 $pid = open3( undef, $server, undef,
-  'perl', "-I$FindBin::Bin/../lib",
+  $^X, "-I$FindBin::Bin/../lib",
   "$FindBin::Bin/../t/tmp/TestApp/script/testapp_server.pl", '-port',
   $port, '-restart', $restartdirs )
     or die "Unable to spawn standalone HTTP server: $!";

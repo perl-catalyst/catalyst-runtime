@@ -37,7 +37,7 @@ rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
 # create a TestApp and copy the test libs into it
 mkdir "$FindBin::Bin/../t/tmp";
 chdir "$FindBin::Bin/../t/tmp";
-system "perl -I$FindBin::Bin/../lib $FindBin::Bin/../script/catalyst.pl TestApp";
+system "$^X -I$FindBin::Bin/../lib $FindBin::Bin/../script/catalyst.pl TestApp";
 chdir "$FindBin::Bin/..";
 File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
 
