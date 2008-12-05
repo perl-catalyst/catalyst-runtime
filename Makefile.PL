@@ -33,7 +33,6 @@ requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 
-test_requires 'NEXT';
 test_requires 'Class::Data::Inheritable';
 
 if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})

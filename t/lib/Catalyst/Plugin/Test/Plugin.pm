@@ -1,7 +1,6 @@
 package Catalyst::Plugin::Test::Plugin;
 
 use strict;
-use NEXT;
 
 use base qw/Catalyst::Base Class::Data::Inheritable/;
 
@@ -16,6 +15,9 @@ sub  prepare {
 
     my $class = shift;
 
+# Note: This use of NEXT is deliberately left here to ensure back
+#       compat, as NEXT always used to be loaded, but is now replaced
+#       by Class::C3::Adopt::NEXT.
     my $c = $class->NEXT::prepare(@_);
     $c->response->header( 'X-Catalyst-Plugin-Setup' => $c->ran_setup );
 

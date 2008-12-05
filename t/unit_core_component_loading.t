@@ -63,10 +63,10 @@ sub make_component_file {
 
     write_component_file(\@dir_list, $name_final, <<EOF);
 package $fullname;
-use NEXT;
+use Class::C3;
 use base '$compbase';
 sub COMPONENT {
-    my \$self = shift->NEXT::COMPONENT(\@_);
+    my \$self = shift->next::method(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
     \$self;
@@ -166,7 +166,7 @@ package ${appclass}::Model::TopLevel;
 use base 'Catalyst::Model';
 sub COMPONENT {
  
-    my \$self = shift->NEXT::COMPONENT(\@_);
+    my \$self = shift->next::method(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
     \$self;
@@ -185,7 +185,7 @@ package ${appclass}::Model::TopLevel::Nested;
 use base 'Catalyst::Model';
 
 no warnings 'redefine';
-sub COMPONENT { return shift->NEXT::COMPONENT(\@_); }
+sub COMPONENT { return shift->next::method(\@_); }
 1;
 
 EOF

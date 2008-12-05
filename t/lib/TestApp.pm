@@ -61,7 +61,7 @@ sub execute {
 sub finalize_error {
     my $c = shift;
     
-    $c->NEXT::finalize_error(@_);
+    $c->next::method(@_);
     
     $c->res->status(500);
     $c->res->body( 'FATAL ERROR: ' . join( ', ', @{ $c->error } ) );

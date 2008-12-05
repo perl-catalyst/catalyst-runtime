@@ -9,7 +9,7 @@ sub execute {
     my $self = shift;
     my ( $controller, $c ) = @_;
     $c->stash->{test} = 'works';
-    $self->NEXT::execute( @_ );
+    $self->next::method( @_ );
 }
 
 1;
