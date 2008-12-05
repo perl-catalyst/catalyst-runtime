@@ -623,6 +623,8 @@ sub write {
         $self->{_prepared_write} = 1;
     }
     
+    return 0 if !defined $buffer;
+    
     my $len   = length($buffer);
     my $wrote = syswrite STDOUT, $buffer;
     
