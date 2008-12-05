@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.8000_04
+5.8000_04  2008-12-05 12:15:00
         - Silence Class::C3::Adopt::NEXT warnings in the test suite (rafl)
         - Fix loads of 'used once, possible typo' warnings (rafl)
         - Additional tests to ensure upload temp files are deleted (andyg)
