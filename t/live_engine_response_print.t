@@ -15,7 +15,7 @@ my $expected = {
    three => "foo,bar,baz",
 };
 
-for my $action ( keys %{$expected} ) {
+for my $action ( sort keys %{$expected} ) {
     ok( my $response = request('http://localhost/engine/response/print/' . $action ),
         'Request' );
     ok( $response->is_success, "Response $action successful 2xx" );
