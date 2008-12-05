@@ -152,11 +152,15 @@ SKIP:
 }
 
 # Test an overridden uri method which calls the base method, SmartURI does this.
+SKIP:
 {
+    if ( $ENV{CATALYST_SERVER} ) {
+        skip 'Using remote server', 2;
+    }
+ 
     require TestApp::RequestBaseBug;
     TestApp->request_class('TestApp::RequestBaseBug');
     ok( my $response = request('http://localhost/engine/request/uri'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     TestApp->request_class('Catalyst::Request');
 }
-
