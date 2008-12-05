@@ -17,9 +17,9 @@ sub  prepare {
 
     my $class = shift;
 
-# Note: This use of NEXT is deliberately left here to ensure back
-#       compat, as NEXT always used to be loaded, but is now replaced
-#       by Class::C3::Adopt::NEXT.
+# Note: This use of NEXT is deliberately left here (without a use NEXT)
+#       to ensure back compat, as NEXT always used to be loaded, but 
+#       is now replaced by Class::C3::Adopt::NEXT.
     my $c = $class->NEXT::prepare(@_);
     $c->response->header( 'X-Catalyst-Plugin-Setup' => $c->ran_setup );
 
