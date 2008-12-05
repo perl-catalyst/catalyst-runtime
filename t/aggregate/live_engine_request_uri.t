@@ -121,27 +121,31 @@ SKIP:
 # more tests with undef - should be ignored
 {
     my $uri = "http://localhost/engine/request/uri/uri_with_undef_only";
+    my ($check) = $uri =~ m{^http://localhost(.+)}; # needed to work with remote servers
     ok( my $response = request($uri), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->header( 'X-Catalyst-uri-with' ), $uri, 'uri_with ok' );
+    like( $response->header( 'X-Catalyst-uri-with' ), qr/$check$/, 'uri_with ok' );
 
     # try with existing param
     $uri = "$uri?x=1";
+    ($check) = $uri =~ m{^http://localhost(.+)}; # needed to work with remote servers
+    $check =~ s/\?/\\\?/g;
     ok( $response = request($uri), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->header( 'X-Catalyst-uri-with' ), $uri, 'uri_with ok' );
+    like( $response->header( 'X-Catalyst-uri-with' ), qr/$check$/, 'uri_with ok' );
 }
 
 {
     my $uri = "http://localhost/engine/request/uri/uri_with_undef_ignore";
+    my ($check) = $uri =~ m{^http://localhost(.+)}; # needed to work with remote servers
     ok( my $response = request($uri), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->header( 'X-Catalyst-uri-with' ), "${uri}?a=1", 'uri_with ok' );
+    like( $response->header( 'X-Catalyst-uri-with' ), qr/$check\?a=1/, 'uri_with ok' );
 
     # remove an existing param
     ok( $response = request("${uri}?b=1"), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    is( $response->header( 'X-Catalyst-uri-with' ), "${uri}?a=1", 'uri_with ok' );
+    like( $response->header( 'X-Catalyst-uri-with' ), qr/$check\?a=1/, 'uri_with ok' );
 
     # remove an existing param, leave one, and add a new one
     ok( $response = request("${uri}?b=1&c=1"), 'Request' );
