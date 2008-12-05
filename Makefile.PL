@@ -49,6 +49,7 @@ if (-e 'inc/.author') {
   build_requires 'Test::NoTabs';
   build_requires 'Test::Pod' => 1.14;
   build_requires 'Test::Pod::Coverage' => 1.04;
+  build_requires 'Pod::Coverage' => 0.19;
 
   if ($^O eq 'darwin') { 
       my $osx_ver = `/usr/bin/sw_vers -productVersion`;
