@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 96;
+use Test::More tests => 101;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -146,6 +146,8 @@ use Path::Class::Dir;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->content, ( $request->parts )[0]->content, 'Content' );
+    
+    # XXX: no way to test that temporary file for this test was deleted
 }
 
 {
@@ -183,6 +185,20 @@ use Path::Class::Dir;
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     like( $response->content, qr/file1 => bless/, 'Upload with name file1');
     like( $response->content, qr/file2 => bless/, 'Upload with name file2');
+    
+    my $creq;
+    {
+        no strict 'refs';
+        ok(
+            eval '$creq = ' . $response->content,
+            'Unserialize Catalyst::Request'
+        );
+    }
+    
+    for my $file ( $creq->upload ) {
+        my $upload = $creq->upload($file);
+        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
+    }
 }
 
 {
@@ -240,7 +256,8 @@ use Path::Class::Dir;
 
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
-        is( $upload->filename, 'catalyst_130pix.gif' );
+        is( $upload->filename, 'catalyst_130pix.gif', 'Upload Filename' );
+        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
     }
 }
 
@@ -335,6 +352,8 @@ use Path::Class::Dir;
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
 
         like( $upload->tempname, qr{\Q$dir\E}, 'uploadtmp' );
+
+        ok( !-e $upload->tempname, 'Upload temp file was deleted' );
     }
 }
 
