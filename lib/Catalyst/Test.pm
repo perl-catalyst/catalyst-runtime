@@ -240,6 +240,10 @@ sub remote_request {
             keep_alive   => 1,
             max_redirect => 0,
             timeout      => 60,
+            
+            # work around newer LWP max_redirect 0 bug
+            # http://rt.cpan.org/Ticket/Display.html?id=40260
+            requests_redirectable => [],
         );
 
         $agent->env_proxy;

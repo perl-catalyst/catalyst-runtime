@@ -9,8 +9,6 @@ use lib "$FindBin::Bin/../lib";
 use Test::More tests => 26;
 use Catalyst::Test 'TestApp';
 
-# XXX: these fail on remote servers due to LWP max_redirect 0 bug:
-# http://rt.cpan.org/Ticket/Display.html?id=40260
 {
     ok( my $response = request('http://localhost/engine/response/redirect/one'), 'Request' );
     ok( $response->is_redirect, 'Response Redirection 3xx' );
