@@ -204,7 +204,7 @@ for ( 1 .. 20 ) {
         sleep 0.1;
         if ( $count++ > 100 ) {
             fail "Server restarted";
-            SKIP_NO_RESTART_2: {
+            SKIP: {
                 skip "Server didn't restart, no sense in checking response", 1;
             }
             next MULTI_DIR_RESTART;
