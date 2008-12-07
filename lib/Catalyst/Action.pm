@@ -6,7 +6,7 @@ Catalyst::Action - Catalyst Action
 
 =head1 SYNOPSIS
 
-    <form action="[%c.uri_for(c.action.reverse)%]">
+    <form action="[%c.uri_for(c.action)%]">
 
 =head1 DESCRIPTION
 
