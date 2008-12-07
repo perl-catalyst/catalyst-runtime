@@ -1,9 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-        - Fix issues in Catalyst::Controller::WrapCGI, 
-          Catalyst::Plugin::Cache::Curried and any other component which
-          import (or define) their own meta method by always explicitly
-          calling Class::MOP::Object->meta inside Catalyst (t0m)
+        - Fix issues in Catalyst::Controller::WrapCGI 
+          and any other components which import (or define) their 
+          own meta method by always explicitly calling
+          Class::MOP::Object->meta inside Catalyst (t0m)
           - Add test for this (t0m)
         - Add test case for the bug which is causing the 
           Catalyst::Plugin::Authentication tests to fail (t0m)

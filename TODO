@@ -1,24 +1,24 @@
   - Fix t/caf_backcompat_plugin_accessor_override.t
   
-  - Looks like stash is not available during prepare_path when running under
-    Catalyst::Test.. Run MojoMojo's t/01app.t and it will explode with
-    "Can't use an undefined value as a HASH reference" - test case for core
-    + fix maybe (marcus)
+  - meta-method.diff test for MX::Emulate::CAF needed by 
+    ::Plugin::Cache::Curried
 
   - Common engine test failures, look into and get tests into core.
 
-  - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" via package "Catalyst::Dispatcher", fix the plugin as tree was never a public method.
+  - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" 
+    via package "Catalyst::Dispatcher", fix the plugin as tree was never 
+    a public method.
 
-  - Catalyst-Model-Akismet, incorrectly inherits from Catalyst::Component::InstancePerContext, should compose as a role, fix the module.
+  - Catalyst-Model-Akismet, incorrectly inherits from 
+    Catalyst::Component::InstancePerContext, should compose as a role. 
+    Fix the module.
 
-  - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol table as methods, tests + fix?
-
-  - MooseX::Emulate::Class::Accessor::Fast
-    - Tests for uses of C::A::F from Catalyst repos. - t0m
-    - New release once these are done.
+  - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
+    table as methods, tests + fix?
 
   - Update Test suite to not assume MyApp ISA Controller
-    - After that set up attr handlers that will output helpful error messages when you do it as well as how to fix it. (done already?)
+    - After that set up attr handlers that will output helpful error messages 
+      when you do it as well as how to fix it. (done already?)
   
   - Comments marked /Moose TODO/i in the code
   
