@@ -1,5 +1,24 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Add test case for the bug which is causing the 
+          Catalyst::Plugin::Authentication tests to fail (t0m)
+        - Fix a bug in uri_for which could cause it to generate paths
+          with multiple slashes in them. (t0m)
+          - Add test for this (t0m)
+        - Fix SKIP block name in t/optional_http-server-restart.t,
+          stopping 'Label not found for "last SKIP"' error from 
+          Test::More (t0m)
+        - Workaround max_redirect 0 bug in LWP (andyg)
+        - Move live_engine_response_print into aggregate (andyg)
+        - Fix dependency bug, s/parent/base/ in new test (rafl)
+        - Fix optional tests to run the live tests in the aggregate 
+          dir (andyg)
+        - Fix Catalyst->go error in remote tests (andyg)
+        - Fix upload test to work with remote servers, don't check for 
+          deleted files (andyg)
+        - Fix engine_request_uri tests to work on remote server with 
+          different URI (andyg)
+
 5.8000_04  2008-12-05 12:15:00
         - Silence Class::C3::Adopt::NEXT warnings in the test suite (rafl)
         - Fix loads of 'used once, possible typo' warnings (rafl)

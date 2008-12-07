@@ -1,11 +1,5 @@
-  - Class::C3::Adopt::NEXT - some people are getting more than one warning
-    per package, make a test case for this (t0m)
-
-  - Catalyst::Plugin::Authentication fails tests. Believed to be as
-    Catalyst::Plugin::Authentication::Credential::Password has a
-    ->mk_accessors('_config'), which is also class data.
-    Make a test case for this (t0m)
-
+  - Fix t/caf_backcompat_plugin_accessor_override.t
+  
   - Looks like stash is not available during prepare_path when running under
     Catalyst::Test.. Run MojoMojo's t/01app.t and it will explode with
     "Can't use an undefined value as a HASH reference" - test case for core
