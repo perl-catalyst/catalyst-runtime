@@ -5,6 +5,7 @@ package Catalyst;
 use Class::C3;
 
 use Moose;
+use Class::MOP::Object ();
 extends 'Catalyst::Component';
 use bytes;
 use Catalyst::Exception;
@@ -2082,9 +2083,10 @@ sub setup_engine {
     }
 
     if ( $ENV{MOD_PERL} ) {
-
+        my $meta = $class->Class::MOP::Object::meta();
+        
         # create the apache method
-        $class->meta->add_method('apache' => sub { shift->engine->apache });
+        $meta->add_method('apache' => sub { shift->engine->apache });
 
         my ( $software, $version ) =
           $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
@@ -2216,7 +2218,7 @@ sub setup_log {
 
     my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
     if ( defined($env_debug) ? $env_debug : $debug ) {
-        $class->meta->add_method('debug' => sub { 1 });
+        $class->Class::MOP::Object::meta()->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
     }
 }
@@ -2240,7 +2242,7 @@ sub setup_stats {
 
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
     if ( defined($env) ? $env : ($stats || $class->debug ) ) {
-        $class->meta->add_method('use_stats' => sub { 1 });
+        $class->Class::MOP::Object::meta()->add_method('use_stats' => sub { 1 });
         $class->log->debug('Statistics enabled');
     }
 }
@@ -2283,9 +2285,9 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
             no strict 'refs';
-            if( $class->can('meta') ){
-              my @superclasses = ($plugin, $class->meta->superclasses );
-              $class->meta->superclasses(@superclasses);
+            if ( my $meta = $class->Class::MOP::Object::meta() ) {
+              my @superclasses = ($plugin, $meta->superclasses );
+              $meta->superclasses(@superclasses);
             } else {
               unshift @{"$class\::ISA"}, $plugin;
             }

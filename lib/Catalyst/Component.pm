@@ -2,6 +2,7 @@ package Catalyst::Component;
 
 use Moose;
 use Class::MOP;
+use Class::MOP::Object;
 use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
 use Class::C3::Adopt::NEXT;
@@ -97,8 +98,8 @@ sub config {
         # work in a subclass. If we don't have the package symbol in the
         # current class we know we need to copy up to ours, which calling
         # the setter will do for us.
-
-        unless ($self->meta->has_package_symbol('$_config')) {
+        my $meta = $self->Class::MOP::Object::meta();
+        unless ($meta->has_package_symbol('$_config')) {
 
             $config = $self->merge_config_hashes( $config, {} );
             $self->_config( $config );

@@ -4,6 +4,7 @@ package Catalyst::Controller;
 use base qw/Catalyst::Component Catalyst::AttrContainer/;
 use Moose;
 
+use Class::MOP::Object ();
 use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
@@ -189,7 +190,7 @@ sub register_actions {
     my $class = ref $self || $self;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
-    my $meta = $self->meta;
+    my $meta = $self->Class::MOP::Object::meta();
     my %methods = map { $_->body => $_->name }
         grep { $_->package_name ne 'Moose::Object' } #ignore Moose::Object methods
             $meta->get_all_methods;

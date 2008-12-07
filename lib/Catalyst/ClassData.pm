@@ -2,6 +2,7 @@ package Catalyst::ClassData;
 
 use Moose::Role;
 use Class::MOP;
+use Class::MOP::Object;
 use Scalar::Util 'blessed';
 
 sub mk_classdata {
@@ -11,9 +12,9 @@ sub mk_classdata {
 
   my $slot = '$'.$attribute;
   my $accessor =  sub {
-    my $meta = $_[0]->meta;
     my $pkg = ref $_[0] || $_[0];
-    if(@_ > 1){
+    my $meta = $pkg->Class::MOP::Object::meta();
+    if (@_ > 1){
       $meta->namespace->{$attribute} = \$_[1];
       return $_[1];
     }
@@ -42,7 +43,7 @@ sub mk_classdata {
   confess("Failed to create accessor: $@ ")
     unless ref $accessor eq 'CODE';
 
-  my $meta = $class->meta;
+  my $meta = $class->Class::MOP::Object::meta();
   my $immutable_options;
   if( $meta->is_immutable ){
     $immutable_options = $meta->get_immutable_options;

@@ -13,14 +13,6 @@
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol table as methods, tests + fix?
 
-  - Catalyst::Plugin::Cache::Curried
-  - Catalyst::Controller::WrapCGI
-    - Both import 'meta' into controller package - mst thinks this can be fixed?.
-      but @marcus> and the generated accessors even call $_[0]->meta, so I don't think we can remove it. 
-      . Add a test for this in core.
-      . Fix core to use CMOP to look up metaclass, rather than ->meta method, and
-        namespace::clean the meta method out, fix generated accessors to do the same?
-
   - MooseX::Emulate::Class::Accessor::Fast
     - Tests for uses of C::A::F from Catalyst repos. - t0m
     - New release once these are done.
