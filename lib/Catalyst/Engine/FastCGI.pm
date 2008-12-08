@@ -159,9 +159,9 @@ sub run {
 sub write {
     my ( $self, $c, $buffer ) = @_;
 
-    unless ( $self->{_prepared_write} ) {
+    unless ( $self->_prepared_write ) {
         $self->prepare_write($c);
-        $self->{_prepared_write} = 1;
+        $self->_prepared_write(1);
     }
     
     # XXX: We can't use Engine's write() method because syswrite
@@ -169,8 +169,8 @@ sub write {
     # written: http://www.fastcgi.com/om_archive/mail-archive/0128.html
     
     # Prepend the headers if they have not yet been sent
-    if ( my $headers = delete $self->{_header_buf} ) {
-        $buffer = $headers . $buffer;
+    if ( $self->_has_header_buf ) {
+        $buffer = $self->_clear_header_buf . $buffer;
     }
 
     # FastCGI does not stream data properly if using 'print $handle',

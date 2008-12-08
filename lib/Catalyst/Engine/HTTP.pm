@@ -19,6 +19,10 @@ require Catalyst::Engine::HTTP::Restarter::Watcher;
 use constant CHUNKSIZE => 64 * 1024;
 use constant DEBUG     => $ENV{CATALYST_HTTP_DEBUG} || 0;
 
+has options => ( is => 'rw' );
+has _keepalive => ( is => 'rw', predicate => '_is_keepalive', clearer => '_clear_keepalive' );
+has _write_error => ( is => 'rw', predicate => '_has_write_error' );
+
 use namespace::clean -except => [qw/meta/];
 
 =head1 NAME
@@ -64,12 +68,12 @@ sub finalize_headers {
 
     # Should we keep the connection open?
     my $connection = $c->request->header('Connection');
-    if (   $self->{options}->{keepalive} 
+    if (   $self->options->{keepalive} 
         && $connection 
         && $connection =~ /^keep-alive$/i
     ) {
         $res_headers->header( Connection => 'keep-alive' );
-        $self->{_keepalive} = 1;
+        $self->_keepalive(1);
     }
     else {
         $res_headers->header( Connection => 'close' );
@@ -79,7 +83,7 @@ sub finalize_headers {
 
     # Buffer the headers so they are sent with the first write() call
     # This reduces the number of TCP packets we are sending
-    $self->{_header_buf} = join("\x0D\x0A", @headers, '');
+    $self->_header_buf( join("\x0D\x0A", @headers, '') );
 }
 
 =head2 $self->finalize_read($c)
@@ -149,14 +153,14 @@ around write => sub {
     return unless *STDOUT->opened();
 
     # Prepend the headers if they have not yet been sent
-    if ( my $headers = delete $self->{_header_buf} ) {
-        $buffer = $headers . $buffer;
+    if ( $self->_has_header_buf ) {
+        $buffer = $self->_clear_header_buf . $buffer;
     }
 
     my $ret = $self->$orig($c, $buffer);
 
     if ( !defined $ret ) {
-        $self->{_write_error} = $!;
+        $self->_write_error($!);
         DEBUG && warn "write: Failed to write response ($!)\n";
     }
     else {
@@ -176,7 +180,7 @@ sub run {
 
     $options ||= {};
     
-    $self->{options} = $options;
+    $self->options($options);
 
     if ($options->{background}) {
         my $child = fork;
@@ -280,7 +284,7 @@ sub run {
 
                 $self->_handler( $class, $port, $method, $uri, $protocol );
             
-                if ( my $error = delete $self->{_write_error} ) {
+                if ( $self->_has_write_error ) {
                     close Remote;
                     
                     if ( !defined $pid ) {
@@ -378,7 +382,8 @@ sub _handler {
     
         # Allow keepalive requests, this is a hack but we'll support it until
         # the next major release.
-        if ( delete $self->{_keepalive} ) {
+        if ( $self->_is_keepalive ) {
+            $self->_clear_keepalive;
             
             DEBUG && warn "Reusing previous connection for keep-alive request\n";
             
@@ -522,6 +527,11 @@ sub _socket_data {
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
 
 no Moose;
+
+=head2 options
+
+Options hash passed to the http engine to control things like if keepalive
+is supported.
 
 =head1 SEE ALSO
 

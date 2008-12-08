@@ -1537,8 +1537,7 @@ sub finalize_headers {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $response->header( Location => $location );
 
-        #Moose TODO: we should probably be using a predicate method here ?
-        if ( !$response->body ) {
+        if ( !$response->has_body ) {
             # Add a default body if none is already present
             $response->body(
                 qq{<html><body><p>This item has moved <a href="$location">here</a>.</p></body></html>}

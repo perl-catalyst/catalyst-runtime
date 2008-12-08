@@ -16,6 +16,8 @@ use Scalar::Util ();
 has read_length => (is => 'rw');
 has read_position => (is => 'rw');
 
+has _prepared_write => (is => 'rw');
+
 no Moose;
 
 # Amount of data to read from input on each pass
@@ -123,8 +125,8 @@ sub finalize_error {
         $name  = "<h1>$name</h1>";
 
         # Don't show context in the dump
-        delete $c->req->{_context};
-        delete $c->res->{_context};
+        $c->req->_clear_context;
+        $c->res->_clear_context;
 
         # Don't show body parser in the dump
         delete $c->req->{_body};
@@ -618,9 +620,9 @@ Writes the buffer to the client.
 sub write {
     my ( $self, $c, $buffer ) = @_;
 
-    unless ( $self->{_prepared_write} ) {
+    unless ( $self->_prepared_write ) {
         $self->prepare_write($c);
-        $self->{_prepared_write} = 1;
+        $self->_prepared_write(1);
     }
     
     return 0 if !defined $buffer;

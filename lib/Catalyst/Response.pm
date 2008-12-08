@@ -6,7 +6,7 @@ use HTTP::Headers;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has cookies   => (is => 'rw', default => sub { {} });
-has body      => (is => 'rw', default => '');
+has body      => (is => 'rw', default => '', lazy => 1, predicate => 'has_body');
 has location  => (is => 'rw');
 has status    => (is => 'rw', default => 200);
 has finalized_headers => (is => 'rw', default => 0);
@@ -21,6 +21,7 @@ has _context => (
   is => 'rw',
   weak_ref => 1,
   handles => ['write'],
+  clearer => '_clear_context',
 );
 
 sub output { shift->body(@_) }
@@ -62,6 +63,10 @@ Sets or returns the output (text or binary data). If you are returning a large b
 you might want to use a L<IO::Handle> type of object (Something that implements the read method
 in the same fashion), or a filehandle GLOB. Catalyst
 will write it piece by piece into the response.
+
+=head2 $res->has_body
+
+Predicate which returns true when a body has been set.
 
 =head2 $res->content_encoding
 

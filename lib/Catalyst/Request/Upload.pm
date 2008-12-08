@@ -13,7 +13,7 @@ has headers => (is => 'rw');
 has size => (is => 'rw');
 has tempname => (is => 'rw');
 has type => (is => 'rw');
-has basename => (is => 'rw');
+has basename => (is => 'ro', lazy_build => 1);
 
 has fh => (
   is => 'rw',
@@ -32,6 +32,15 @@ has fh => (
     return $fh;
   },
 );
+
+sub _build_basename {
+    my $self = shift;
+    my $basename = $self->filename;
+    $basename =~ s|\\|/|g;
+    $basename = ( File::Spec::Unix->splitpath($basename) )[2];
+    $basename =~ s|[^\w\.-]+|_|g;
+    return $basename;
+}
 
 no Moose;
 
@@ -136,19 +145,6 @@ sub slurp {
     }
 
     return $content;
-}
-
-sub basename {
-    my $self = shift;
-    unless ( $self->{basename} ) {
-        my $basename = $self->filename;
-        $basename =~ s|\\|/|g;
-        $basename = ( File::Spec::Unix->splitpath($basename) )[2];
-        $basename =~ s|[^\w\.-]+|_|g;
-        $self->{basename} = $basename;
-    }
-
-    return $self->{basename};
 }
 
 =head2 $upload->basename

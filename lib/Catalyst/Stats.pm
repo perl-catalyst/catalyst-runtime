@@ -10,7 +10,8 @@ has enable => (is => 'rw', required => 1, default => sub{ 1 });
 has tree => (
              is => 'ro',
              required => 1,
-             default => sub{ Tree::Simple->new({t => [gettimeofday]}) }
+             default => sub{ Tree::Simple->new({t => [gettimeofday]}) },
+             handles => [qw/ accept traverse /],
             );
 has stack => (
               is => 'ro',
@@ -89,7 +90,7 @@ sub report {
 
     my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
     my @results;
-    $self->tree->traverse(
+    $self->traverse(
                 sub {
                 my $action = shift;
                 my $stat   = $action->getNodeValue;
@@ -114,14 +115,9 @@ sub _get_uid {
 
     my $visitor = Tree::Simple::Visitor::FindByUID->new;
     $visitor->searchForUID($uid);
-    $self->tree->accept($visitor);
+    $self->accept($visitor);
     return $visitor->getResult;
 } 
-
-sub accept {
-    my $self = shift;
-    $self->{tree}->accept( @_ );
-}
 
 sub addChild {
     my $self = shift;
@@ -135,7 +131,7 @@ sub addChild {
         $stat->{ elapsed } =~ s{s$}{};
     }
 
-    $self->{tree}->addChild( @_ );
+    $self->tree->addChild( @_ );
 }
 
 sub setNodeValue {
@@ -148,17 +144,12 @@ sub setNodeValue {
         $stat->{ elapsed } =~ s{s$}{};
     }
 
-    $self->{tree}->setNodeValue( @_ );
+    $self->tree->setNodeValue( @_ );
 }
 
 sub getNodeValue {
     my $self = shift;
-    $self->{tree}->getNodeValue( @_ )->{ t };
-}
-
-sub traverse {
-    my $self = shift;
-    $self->{tree}->traverse( @_ );
+    $self->tree->getNodeValue( @_ )->{ t };
 }
 
 no Moose;

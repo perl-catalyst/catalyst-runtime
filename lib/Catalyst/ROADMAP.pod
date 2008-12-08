@@ -46,7 +46,7 @@ through switches / ENV
 
 =back
 
-=head2 5.80000 4. Quarter 2006
+=head2 5.80000 1st Quarter 2009
 
 Next major planned release.
 
@@ -79,7 +79,7 @@ This depends on the progress of Isotope
 
 =back
  
-=head2 5.90000 2007
+=head2 5.90000 2009
 
 Blue Sky. Will start planning this once we land 5.8 :)
 

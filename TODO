@@ -1,7 +1,7 @@
   - Fix t/caf_backcompat_plugin_accessor_override.t
   
   - meta-method.diff test for MX::Emulate::CAF needed by 
-    ::Plugin::Cache::Curried
+    Catalyst::Plugin::Cache::Curried
 
   - Common engine test failures, look into and get tests into core.
 
@@ -20,14 +20,20 @@
     - After that set up attr handlers that will output helpful error messages 
       when you do it as well as how to fix it. (done already?)
   
-  - Comments marked /Moose TODO/i in the code
+  - Comments marked /Moose TODO/i in Catalyst::Request re {_body}
   
-  - Eliminate all instances of $instance->{$key}
+  - Eliminate all instances of $instance->{$key}, I think the only thing
+    left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
+    touched as it is used as an lvalue in a lot of places.
 
-  - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate
+  - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate. 
 
   - Profiling vs 5.70 and optimisation as needed.
 
   - http://lists.scsys.co.uk/pipermail/catalyst-dev/2008-November/001546.html
     - patch to list, andyg to look at?
 
+  - Fix the Roadmap to be less full of lies.
+  
+  - Run another round of repository smokes against latest 5.80 trunk, manually
+    go through all the things which are broken.

@@ -34,16 +34,19 @@ has headers => (
   lazy => 1,
 );
 
-#Moose ToDo:
-#can we lose the before modifiers which just call prepare_body ?
-#they are wasteful, slow us down and feel cluttery.
+# Moose TODO:
+# - Can we lose the before modifiers which just call prepare_body ?
+#   they are wasteful, slow us down and feel cluttery.
 # Can we call prepare_body at BUILD time?
-# Can we make _body an attribute and have the rest of these lazy build from there?
+# Can we make _body an attribute, have the rest of 
+# these lazy build from there and kill all the direct hash access
+# in Catalyst.pm and Engine.pm?
 
 has _context => (
   is => 'rw',
   weak_ref => 1,
   handles => ['read'],
+  clearer => '_clear_context',
 );
 
 has body_parameters => (
@@ -118,6 +121,8 @@ has hostname => (
     gethostbyaddr( inet_aton( $self->address ), AF_INET ) || 'localhost'
   },
 );
+
+has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
 
 no Moose;
 
@@ -408,17 +413,17 @@ sub path {
 
     if (@params) {
         $self->uri->path(@params);
-        undef $self->{path};
+        $self->_clear_path;
     }
-    elsif ( defined( my $path = $self->{path} ) ) {
-        return $path;
+    elsif ( $self->_has_path ) {
+        return $self->_path;
     }
     else {
         my $path     = $self->uri->path;
         my $location = $self->base->path;
         $path =~ s/^(\Q$location\E)?//;
         $path =~ s/^\///;
-        $self->{path} = $path;
+        $self->_path($path);
 
         return $path;
     }

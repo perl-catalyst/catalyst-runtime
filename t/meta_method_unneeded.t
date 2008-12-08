@@ -16,6 +16,7 @@ $SIG{__DIE__} = \&Carp::confess; # Stacktrace please.
 {    
     package TestAppWithMeta;
     use Catalyst;
+    no warnings 'redefine';
     sub meta {}
 }
 

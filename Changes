@@ -1,5 +1,18 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Add a clearer method on request and response _context 
+          attributes, and use if from ::Engine rather than deleting
+          the key from the instance hash (t0m)
+        - Use handles on tree attribute of Catalyst::Stats to replace
+          trivial delegation methods (t0m)
+        - Change the following direct hash accesses into attributes:
+          Catalyst::Engine: _prepared_write
+          Catalyst::Engine::CGI: _header_buf
+          Catalyst::Engine::HTTP: options, _keepalive, _write_error
+          Catalyst::Request: _path
+          Catalyst::Request::Upload: basename
+          Catalyst::Stats: tree
+          (t0m)
         - Fix issues in Catalyst::Controller::WrapCGI 
           and any other components which import (or define) their 
           own meta method by always explicitly calling

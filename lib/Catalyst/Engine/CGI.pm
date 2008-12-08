@@ -4,6 +4,7 @@ use Moose;
 extends 'Catalyst::Engine';
 
 has env => (is => 'rw');
+has _header_buf => (is => 'rw', clearer => '_clear_header_buf', predicate => '_has_header_buf');
 
 =head1 NAME
 
@@ -41,8 +42,7 @@ sub finalize_headers {
 
     $c->response->header( Status => $c->response->status );
 
-    $self->{_header_buf} 
-        = $c->response->headers->as_string("\015\012") . "\015\012";
+    $self->_header_buf($c->response->headers->as_string("\015\012") . "\015\012");
 }
 
 =head2 $self->prepare_connection($c)
@@ -216,8 +216,8 @@ around write => sub {
     my ( $self, $c, $buffer ) = @_;
 
     # Prepend the headers if they have not yet been sent
-    if ( my $headers = delete $self->{_header_buf} ) {
-        $buffer = $headers . $buffer;
+    if ( $self->_has_header_buf ) {
+        $buffer = $self->_clear_header_buf . $buffer;
     }
 
     return $self->$orig( $c, $buffer );
