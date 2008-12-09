@@ -32,9 +32,19 @@ has actions =>
      init_arg => undef,
     );
 
-# isa => 'ClassName|Catalyst' ?
-has _application => (is => 'rw');
-sub _app{ shift->_application(@_) } 
+# Future - isa => 'ClassName|Catalyst' performance?
+#           required => 1 breaks tests..
+has _application => (is => 'ro');
+sub _app { shift->_application(@_) } 
+
+override 'BUILDARGS' => sub {
+    my ($self, $app) = @_;
+    
+    my $args = super();
+    $args->{_application} = $app;
+ 
+    return $args;
+};
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -121,15 +131,6 @@ sub _END : Private {
     $end->dispatch( $c );
     return !@{ $c->error };
 }
-
-around new => sub {
-    my $orig = shift;
-    my $self = shift;
-    my $app = $_[0];
-    my $new = $self->$orig(@_);
-    $new->_application( $app );
-    return $new;
-};
 
 sub action_for {
     my ( $self, $name ) = @_;

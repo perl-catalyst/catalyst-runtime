@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Switch an around 'new' in Catalyst::Controller to a BUILDARGS
+          method as it's much neater and more obvious what is going on (t0m)
         - Add a clearer method on request and response _context 
           attributes, and use if from ::Engine rather than deleting
           the key from the instance hash (t0m)
