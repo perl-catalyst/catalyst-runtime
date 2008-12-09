@@ -1,7 +1,9 @@
-  - Fix t/caf_backcompat_plugin_accessor_override.t
+  - Fix t/caf_backcompat_plugin_accessor_override.t - complex case
+    to do with class data / instance data.. Maybe need better tests?
   
-  - meta-method.diff test for MX::Emulate::CAF needed by 
-    Catalyst::Plugin::Cache::Curried
+  - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
+    http://code2.0beta.co.uk/moose/svnweb/index.cgi/moose/revision?rev=7036
+    (groditi)
 
   - Common engine test failures, look into and get tests into core.
 
@@ -14,7 +16,8 @@
     Fix the module.
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
-    table as methods, tests + fix?
+    table as methods, tests + fix, or explanation and documentation?
+    (rafl & phaylon)
 
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages 
@@ -26,14 +29,36 @@
     left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
     touched as it is used as an lvalue in a lot of places.
 
-  - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate. 
+  - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate 
+    (t0m) 
 
   - Profiling vs 5.70 and optimisation as needed.
-
-  - http://lists.scsys.co.uk/pipermail/catalyst-dev/2008-November/001546.html
-    - patch to list, andyg to look at?
 
   - Fix the Roadmap to be less full of lies.
   
   - Run another round of repository smokes against latest 5.80 trunk, manually
-    go through all the things which are broken.
+    go through all the things which are broken (t0m).
+    
+  - Adopt::NEXT
+     - New warning message (Bill Moseley)
+     - Updated docs with how it works (t0m)
+     - provide an env var to just turn the warnings off globally?
+
+   - Issues with TWMC not being loaded when it used to be in 5.70 
+     (Bill Moseley)
+     
+   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
+
+   - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
+     disk and fix it. (Believed to be in the optional tests?)
+
+   - Docsdocsdocs
+      - extends in components must be inside a BEGIN block.
+      - Moose package loading - document it spits feathers if you don't define 
+        any symbols.
+        
+    - Tests
+      - Moosified test application?
+
+    - batman's chained patch / issue?
+    
