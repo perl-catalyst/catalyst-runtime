@@ -68,12 +68,6 @@ has uploads => (
   default => sub { {} },
 );
 
-# modifier was a noop (groditi)
-# before uploads => sub {
-#   my ($self) = @_;
-#   #$self->_context->prepare_body;
-# };
-
 has parameters => (
   is => 'rw',
   required => 1,
@@ -83,7 +77,6 @@ has parameters => (
 
 before parameters => sub {
   my ($self, $params) = @_;
-  #$self->_context->prepare_body();
   if ( $params && !ref $params ) {
     $self->_context->log->warn(
         "Attempt to retrieve '$params' with req->params(), " .
