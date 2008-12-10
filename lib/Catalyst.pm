@@ -262,7 +262,9 @@ MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
 
 =head2 -Log
 
-Specifies log level.
+    use Catalyst '-Log=warn,fatal,error';
+ 
+Specifies a comma-delimited list of log levels.
 
 =head2 -Stats
 
@@ -2204,19 +2206,34 @@ sub setup_home {
 
 =head2 $c->setup_log
 
-Sets up log.
+Sets up log by instantiating a L<Catalyst::Log|Catalyst::Log> object and
+passing it to C<log()>. Pass in a comma-delimited list of levels to set the
+log to.
+ 
+This method also installs a C<debug> method that returns a true value into the
+catalyst subclass if the "debug" level is passed in the comma-delimited list,
+or if the C<$CATALYST_DEBUG> environment variable is set to a true value.
+
+Note that if the log has already been setup, by either a previous call to
+C<setup_log> or by a call such as C<< __PACKAGE__->log( MyLogger->new ) >>,
+that this method won't actually set up the log.
 
 =cut
 
 sub setup_log {
-    my ( $class, $debug ) = @_;
+    my ( $class, $levels ) = @_;
 
+    my %levels;
     unless ( $class->log ) {
-        $class->log( Catalyst::Log->new );
+        $levels ||= '';
+        $levels =~ s/^\s+//;
+        $levels =~ s/\s+$//;
+        %levels = map { $_ => 1 } split /\s*,\s*/, $levels || '';
+        $class->log( Catalyst::Log->new(keys %levels) );
     }
 
     my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
-    if ( defined($env_debug) ? $env_debug : $debug ) {
+    if ( defined($env_debug) or $levels{debug} ) {
         $class->Class::MOP::Object::meta()->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
     }
@@ -2491,6 +2508,8 @@ Caelum: Rafael Kitover <rkitover@io.com>
 chansen: Christian Hansen
 
 chicks: Christopher Hicks
+
+David E. Wheeler
 
 dkubb: Dan Kubb <dan.kubb-cpan@onautopilot.com>
 
