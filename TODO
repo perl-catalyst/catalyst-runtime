@@ -29,9 +29,6 @@
     left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
     touched as it is used as an lvalue in a lot of places.
 
-  - Catalyst-Log-Log4perl - deep recursion in the test suite, investigate 
-    (t0m) 
-
   - Profiling vs 5.70 and optimisation as needed.
 
   - Fix the Roadmap to be less full of lies.
