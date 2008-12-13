@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Bump MooseX::Emulate::Class::Accessor::Fast dependency
+          to force new version which fixes a lot of plugins (t0m)
         - Make log levels additive, and add documentation and tests
           for the setup_log method, which previously had none.
           Sewn together by t0m from two patches provided by David E. Wheeler
