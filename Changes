@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix loading of classes which do not define any symbols to not
+          die, as it didn't in 5.70 (t0m)
+          - Test for this (t0m)
         - Bump MooseX::Emulate::Class::Accessor::Fast dependency
           to force new version which fixes a lot of plugins (t0m)
         - Make log levels additive, and add documentation and tests

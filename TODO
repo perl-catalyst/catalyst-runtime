@@ -5,6 +5,9 @@
     http://code2.0beta.co.uk/moose/svnweb/index.cgi/moose/revision?rev=7036
     (groditi)
 
+  - Fix 'as soon as Class::MOP 0.67 + 1 is released 
+    Class::MOP::load_class($class) can be used instead' in Catalyst::Utils
+
   - Common engine test failures, look into and get tests into core.
 
   - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" 

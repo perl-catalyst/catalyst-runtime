@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Class::MOP;
 
 use lib "t/lib";
@@ -65,4 +65,10 @@ like($@, qr/Malformed class Name/, 'errored when attempting to load a file begin
 undef $@;
 eval { Catalyst::Utils::ensure_class_loaded('Silly::File::Name.pm') };
 like($@, qr/Malformed class Name/, 'errored sanely when given a classname ending in .pm');
+
+undef $@;
+$warnings = 0;
+Catalyst::Utils::ensure_class_loaded("NullPackage");
+is( $warnings, 1, 'Loading a package which defines no symbols warns');
+is( $@, undef, '$@ still undef' );
 
