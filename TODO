@@ -1,14 +1,25 @@
-  - Fix t/caf_backcompat_plugin_accessor_override.t - complex case
-    to do with class data / instance data.. Maybe need better tests?
-  
+Pending patches:
   - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
     http://code2.0beta.co.uk/moose/svnweb/index.cgi/moose/revision?rev=7036
     (groditi)
 
-  - Fix 'as soon as Class::MOP 0.67 + 1 is released 
-    Class::MOP::load_class($class) can be used instead' in Catalyst::Utils
+  - batman's chained patch / issue?
 
-  - Common engine test failures, look into and get tests into core.
+  - Adopt::NEXT
+     - New warning message + updated docs with how it works (t0m/rafl)
+
+Known issues:  
+
+  - Fix t/caf_backcompat_plugin_accessor_override.t - complex case
+    to do with class data / instance data.. Maybe need better tests?
+
+Cleanups:
+
+  - Fix 'as soon as Class::MOP 0.67 + 1 is released 
+    Class::MOP::load_class($class) can be used instead' in Catalyst::Utils 
+    (t0m)
+    
+  - Provide an env var in Adopt::NEXT to just turn the warnings off globally?
 
   - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" 
     via package "Catalyst::Dispatcher", fix the plugin as tree was never 
@@ -17,48 +28,50 @@
   - Catalyst-Model-Akismet, incorrectly inherits from 
     Catalyst::Component::InstancePerContext, should compose as a role. 
     Fix the module.
+    
+  - Update Test suite to not assume MyApp ISA Controller
+    - After that set up attr handlers that will output helpful error messages 
+      when you do it as well as how to fix it. (done already?)
+
+  - Comments marked /Moose TODO/i in Catalyst::Request re {_body} (t0m)
+
+  - Eliminate all instances of $instance->{$key}, I think the only thing
+    left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
+    touched as it is used as an lvalue in a lot of places (t0m)
+
+  - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
+    disk and fix it. (Believed to be in the optional tests?) (t0m)
+
+Documentation:
+
+   - extends in components must be inside a BEGIN block.
+
+   - How to write Moosified Catalyst components.
+
+   - Manual / Tutorial updates
+
+   - Fix the Roadmap to be less full of lies.
+
+Profiling:
+
+  - vs 5.70 and optimisation as needed.
+
+Back-compat investigation:
+
+  - Common engine test failures, look into and get tests into core.
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
     table as methods, tests + fix, or explanation and documentation?
     (rafl & phaylon)
-
-  - Update Test suite to not assume MyApp ISA Controller
-    - After that set up attr handlers that will output helpful error messages 
-      when you do it as well as how to fix it. (done already?)
-  
-  - Comments marked /Moose TODO/i in Catalyst::Request re {_body}
-  
-  - Eliminate all instances of $instance->{$key}, I think the only thing
-    left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
-    touched as it is used as an lvalue in a lot of places.
-
-  - Profiling vs 5.70 and optimisation as needed.
-
-  - Fix the Roadmap to be less full of lies.
   
   - Run another round of repository smokes against latest 5.80 trunk, manually
     go through all the things which are broken (t0m).
     
-  - Adopt::NEXT
-     - New warning message (Bill Moseley)
-     - Updated docs with how it works (t0m)
-     - provide an env var to just turn the warnings off globally?
-
    - Issues with TWMC not being loaded when it used to be in 5.70 
      (Bill Moseley)
      
    - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
 
-   - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
-     disk and fix it. (Believed to be in the optional tests?)
+Tests:
 
-   - Docsdocsdocs
-      - extends in components must be inside a BEGIN block.
-      - Moose package loading - document it spits feathers if you don't define 
-        any symbols.
-        
-    - Tests
-      - Moosified test application?
-
-    - batman's chained patch / issue?
-    
+  - Moosified test application?
