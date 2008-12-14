@@ -44,12 +44,19 @@ if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
 else {
     test_requires('Test::Aggregate', '0.34_01');
 }
+my @force_build_requires_if_author = qw(
+  Test::NoTabs 
+  Test::Pod 
+  Test::Pod::Coverage 
+  Pod::Coverage
+);
 
-if (-e 'inc/.author') {
-  build_requires 'Test::NoTabs';
-  build_requires 'Test::Pod' => 1.14;
-  build_requires 'Test::Pod::Coverage' => 1.04;
-  build_requires 'Pod::Coverage' => 0.19;
+if ($Module::Install::AUTHOR) {
+
+  foreach my $module (@force_build_requires_if_author) {
+    build_requires $module;
+  }
+
 
   if ($^O eq 'darwin') { 
       my $osx_ver = `/usr/bin/sw_vers -productVersion`;
@@ -69,6 +76,31 @@ install_script glob('script/*.pl');
 auto_install;
 WriteAll;
 
+if ($Module::Install::AUTHOR) {
+
+  # Strip out the author only build_requires from META.yml
+  # Need to do this _after_ WriteAll else it looses track of them
+  Meta->{values}{build_requires} = [ grep {
+    my $ok = 1;
+    foreach my $module (@force_build_requires_if_author) {
+      if ($_->[0] =~ /$module/) {
+        $ok = 0;
+        last;
+      }
+    }
+    $ok;
+  } @{Meta->{values}{build_requires}} ];
+
+  Meta->{values}{resources} = [ 
+    [ 'MailingList', 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
+    [ 'IRC', 'irc://irc.perl.org/#catalyst' ],
+    [ 'license', 'http://dev.perl.org/licenses/' ],
+    [ 'homepage', 'http://dev.catalyst.perl.org/'], 
+    [ 'repository', 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
+  ];
+
+  Meta->write;
+}
 print <<"EOF";
 
  Important:
