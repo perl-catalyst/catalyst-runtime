@@ -6,7 +6,7 @@ Pending patches:
   - batman's chained patch / issue?
 
   - Adopt::NEXT
-     - New warning message + updated docs with how it works (t0m/rafl)
+     - updated docs with how it works (t0m/rafl)
 
 Known issues:  
 
