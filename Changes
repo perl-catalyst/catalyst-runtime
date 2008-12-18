@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix bug causing Catalyst::Request::Upload's basename method
+          to return undef (t0m)
+          - Test for this (Carl Franks)
         - Fix loading of classes which do not define any symbols to not
           die, as it didn't in 5.70 (t0m)
           - Test for this (t0m)
@@ -20,7 +23,6 @@
           Catalyst::Engine::CGI: _header_buf
           Catalyst::Engine::HTTP: options, _keepalive, _write_error
           Catalyst::Request: _path
-          Catalyst::Request::Upload: basename
           Catalyst::Stats: tree
           (t0m)
         - Fix issues in Catalyst::Controller::WrapCGI 

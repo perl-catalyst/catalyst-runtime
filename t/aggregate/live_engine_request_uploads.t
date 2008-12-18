@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 101;
+use Test::More tests => 105;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -134,6 +134,7 @@ use Path::Class::Dir;
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->filename, $parameters{filename}, 'Upload filename' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
+        is( $upload->basename, $parameters{filename}, 'Upload basename' );
 
         SKIP:
         {
@@ -276,6 +277,7 @@ use Path::Class::Dir;
         is( $upload->type, $part->content_type, 'Upload Content-Type' );
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
         is( $upload->filename, 'catalyst_130pix.gif', 'Upload Filename' );
+        is( $upload->basename, 'catalyst_130pix.gif', 'Upload basename' );
         
         SKIP:
         {
