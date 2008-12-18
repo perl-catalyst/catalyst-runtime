@@ -12,7 +12,7 @@ use Test::More tests => 18;
 
 TESTDEBUG: {
     package MyTestDebug;
-    use parent qw/Catalyst/;
+    use base qw/Catalyst/;
     __PACKAGE__->setup(
         '-Debug',
     );
@@ -32,7 +32,7 @@ ok +MyTestDebug->debug, 'And it should return true';
 
 TESTAPP: {
     package MyTestLog;
-    use parent qw/Catalyst/;
+    use base qw/Catalyst/;
     __PACKAGE__->setup(
         '-Log=warn,error,fatal'
     );
