@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Make MyApp immutable at the end of the scope after the setup
+          method is called, fixing issues with plugins which have their 
+          own new methods by inlining a constructor on MyApp (t0m)
+          - Test for this and method modifiers in MyApp (t0m)
         - Fix Catalyst::Plugin::Authentication's authentication
           plugin backwards compatibility issues by fixing 
           Class::Data::Inheritable compatibility (t0m)

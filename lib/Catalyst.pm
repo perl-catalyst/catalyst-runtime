@@ -8,6 +8,7 @@ use Moose;
 use Class::MOP::Object ();
 extends 'Catalyst::Component';
 use bytes;
+use B::Hooks::EndOfScope;
 use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Request;
@@ -34,7 +35,6 @@ use Carp qw/croak carp/;
 
 BEGIN { require 5.008001; }
 
-# FIXME lazy => 1 here makes C::P::Auth tests pass?!?
 has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });
 has state => (is => 'rw', default => 0);
@@ -1017,6 +1017,17 @@ EOF
         $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
     $class->log->_flush() if $class->log->can('_flush');
+
+    # Make sure that the application class becomes immutable at this point, 
+    # which ensures that it gets an inlined constructor. This means that it 
+    # works even if the user has added a plugin which contains a new method.
+    # Note however that we have to do the work on scope end, so that method
+    # modifiers work correctly in MyApp (as you have to call setup _before_ 
+    # applying modifiers).
+    on_scope_end {
+        my $meta = $class->Moose::Object::meta();
+        $meta->make_immutable unless $meta->is_immutable;
+    };
 
     $class->setup_finished(1);
 }
