@@ -6,9 +6,9 @@ Pending patches:
 
 Known issues:  
 
-  - Fix t/caf_backcompat_plugin_accessor_override.t - Test doesn't properly
-    demonstrate the issue as it fails against 5.70. Only passes in real auth
-    plugin due to method ordering?
+  - Fix t/cdi_backcompat_plugin_accessor_override.t - Catalyst::ClassData
+    doesn't emulate Class::Data::Inheritable by crapping on the symbol table
+    of the top level MyApp class, which causes back-compat fail.
 
 Cleanups:
 
