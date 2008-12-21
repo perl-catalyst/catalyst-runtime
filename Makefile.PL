@@ -6,10 +6,10 @@ name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'namespace::clean';
-requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00500';
+requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00600';
 requires 'Moose' => '0.59';
 requires 'Carp';
-requires 'Class::C3::Adopt::NEXT';
+requires 'Class::C3::Adopt::NEXT' => '0.05';
 requires 'Class::MOP';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';

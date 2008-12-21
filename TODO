@@ -1,25 +1,16 @@
 Pending patches:
   - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
-    http://code2.0beta.co.uk/moose/svnweb/index.cgi/moose/revision?rev=7036
-    (groditi)
-
-  - batman's chained patch / issue?
 
   - Adopt::NEXT
-     - updated docs with how it works (t0m/rafl)
+     - updated docs with how to disable it (t0m/rafl)
 
 Known issues:  
 
-  - Fix t/caf_backcompat_plugin_accessor_override.t - complex case
-    to do with class data / instance data.. Maybe need better tests?
+  - Fix t/caf_backcompat_plugin_accessor_override.t - Test doesn't properly
+    demonstrate the issue as it fails against 5.70. Only passes in real auth
+    plugin due to method ordering?
 
 Cleanups:
-
-  - Fix 'as soon as Class::MOP 0.67 + 1 is released 
-    Class::MOP::load_class($class) can be used instead' in Catalyst::Utils 
-    (t0m)
-    
-  - Provide an env var in Adopt::NEXT to just turn the warnings off globally?
 
   - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" 
     via package "Catalyst::Dispatcher", fix the plugin as tree was never 
