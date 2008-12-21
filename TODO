@@ -6,9 +6,6 @@ Pending patches:
 
 Back-compat investigation / konwon issues:
 
-  - Find out why C::P::A's test suite causes the 'stack' attributes
-    default method to not be called. (new not being run??)
-
   - Common engine test failures, look into and get tests into core.
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
