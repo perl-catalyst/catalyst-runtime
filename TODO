@@ -4,11 +4,25 @@ Pending patches:
   - Adopt::NEXT
      - updated docs with how to disable it (t0m/rafl)
 
-Known issues:  
+Back-compat investigation / konwon issues:
 
-  - Fix t/cdi_backcompat_plugin_accessor_override.t - Catalyst::ClassData
-    doesn't emulate Class::Data::Inheritable by crapping on the symbol table
-    of the top level MyApp class, which causes back-compat fail.
+  - Find out why C::P::A's test suite causes the 'stack' attributes
+    default method to not be called. (new not being run??)
+
+  - Common engine test failures, look into and get tests into core.
+
+  - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
+    table as methods, tests + fix, or explanation and documentation?
+    (rafl & phaylon)
+
+  - Run another round of repository smokes against latest 5.80 trunk, manually
+    go through all the things which are broken (t0m).
+
+  - Issues with TWMC not being loaded when it used to be in 5.70 
+    (Bill Moseley)
+
+  - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
+
 
 Cleanups:
 
@@ -46,22 +60,6 @@ Documentation:
 Profiling:
 
   - vs 5.70 and optimisation as needed.
-
-Back-compat investigation:
-
-  - Common engine test failures, look into and get tests into core.
-
-  - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
-    table as methods, tests + fix, or explanation and documentation?
-    (rafl & phaylon)
-  
-  - Run another round of repository smokes against latest 5.80 trunk, manually
-    go through all the things which are broken (t0m).
-    
-   - Issues with TWMC not being loaded when it used to be in 5.70 
-     (Bill Moseley)
-     
-   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
 
 Tests:
 

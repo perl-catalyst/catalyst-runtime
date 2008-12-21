@@ -15,13 +15,14 @@ package CDICompatTestPlugin;
 use strict;
 use warnings;
 use base qw/Class::Accessor::Fast/;
+use MRO::Compat;
 __PACKAGE__->mk_accessors(qw/_config/);
 
 sub setup {
     my $app = shift;
 
     $app->config;
-    $app->NEXT::setup(@_);
+    $app->next::method(@_);
 }
 
 1;

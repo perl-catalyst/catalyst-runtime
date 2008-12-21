@@ -24,9 +24,7 @@ $SIG{__DIE__} = \&Carp::confess;
     __PACKAGE__->config;
 }
 
-TODO: {
-    local $TODO = 'The overridden setup in CDICompatTestApp + the overridden accessor causes destruction';
-    lives_ok {
-        CDICompatTestApp->setup;
-    } 'Setup app with plugins which says use base qw/Class::Accessor::Fast/';
-}
+lives_ok {
+    CDICompatTestApp->setup;
+} 'Setup app with plugins which says use base qw/Class::Accessor::Fast/';
+

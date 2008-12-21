@@ -29,6 +29,13 @@ sub mk_classdata {
      return ${$v};
     } else {
       foreach my $super ( $meta->linearized_isa ) {
+        # If there is a code symbol for this attr in a parent class, 
+        # then copy it into our package. Is this the correct
+        # fix for C::D::I back-compat? (t0m)
+        my $parent_symbol = *{"${super}::${attribute}"}{CODE} ? \&{"${super}::${attribute}"} : undef;
+        if (defined $parent_symbol) {
+          *{"${pkg}::${attribute}"} = $parent_symbol;
+        }
         # tighter version of same after
         # my $super_meta = Moose::Meta::Class->initialize($super);
         my $v = ${"${super}::"}{$attribute} ? *{"${super}::${attribute}"}{SCALAR} : undef;

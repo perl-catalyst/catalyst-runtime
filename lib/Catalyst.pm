@@ -34,7 +34,8 @@ use Carp qw/croak carp/;
 
 BEGIN { require 5.008001; }
 
-has stack => (is => 'rw', default => sub { [] });
+# FIXME lazy => 1 here makes C::P::Auth tests pass?!?
+has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });
 has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');

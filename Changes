@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix Catalyst::Plugin::Authentication's authentication
+          plugin backwards compatibility issues by fixing 
+          Class::Data::Inheritable compatibility (t0m)
+          - Test for this (t0m)
         - Fix bug causing Catalyst::Request::Upload's basename method
           to return undef (t0m)
           - Test for this (Carl Franks)
