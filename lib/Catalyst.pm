@@ -973,8 +973,8 @@ EOF
         my $engine     = $class->engine;
         my $home       = $class->config->{home};
 
-        $class->log->debug(qq/Loaded dispatcher "$dispatcher"/);
-        $class->log->debug(qq/Loaded engine "$engine"/);
+        $class->log->debug(sprintf(q/Loaded dispatcher "%s"/, blessed($dispatcher)));
+        $class->log->debug(sprintf(q/Loaded engine "%s"/, blessed($engine)));
 
         $home
           ? ( -d $home )

@@ -20,7 +20,6 @@ Back-compat investigation / konwon issues:
 
   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
 
-
 Cleanups:
 
   - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" 

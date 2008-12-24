@@ -13,5 +13,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";use Test::More tests => 3;
 
 use Catalyst::Test qw/TestAppPluginWithNewMethod/; # 1 test for adding a modifer not throwing.
+BEGIN { warn("COMPILE TIME finished use of Catalyst::Test"); }
 ok request('/foo')->is_success; 
 is $TestAppPluginWithNewMethod::MODIFIER_FIRED, 1, 'Before modifier was fired correctly.';
