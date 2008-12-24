@@ -10,10 +10,12 @@ Tests if Catalyst can fork/exec other processes successfully
 use strict;
 use warnings;
 use Test::More;
-use YAML;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Catalyst::Test qw(TestApp);
+
+eval 'use YAML';
+plan skip_all => 'YAML required' if $@;
 
 plan skip_all => 'Using remote server'
     if $ENV{CATALYST_SERVER};

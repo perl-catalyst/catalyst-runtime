@@ -8,13 +8,15 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 use Catalyst::Test 'TestApp';
-use YAML;
 
 our ( $iters, $tests );
 
 BEGIN {
     plan skip_all => 'set TEST_STRESS to enable this test'
       unless $ENV{TEST_STRESS};
+
+    eval "use YAML";
+    plan skip_all => 'YAML is required for this test' if $@;
 
     $iters = $ENV{TEST_STRESS} || 10;
     $tests = YAML::LoadFile("$FindBin::Bin/optional_stress.yml");
