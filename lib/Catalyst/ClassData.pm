@@ -60,7 +60,7 @@ sub mk_classdata {
   $meta->add_method($alias, $accessor);
   $meta->add_method($attribute, $accessor);
   if(defined $immutable_options){
-    $meta->make_immutable($immutable_options);
+    $meta->make_immutable(%{ $immutable_options });
   }
   $class->$attribute($_[2]) if(@_ > 2);
   return $accessor;
