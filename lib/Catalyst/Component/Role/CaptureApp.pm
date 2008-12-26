@@ -5,7 +5,7 @@ use namespace::clean -except => 'meta';
 
 # Future - isa => 'ClassName|Catalyst' performance?
 #           required => 1 breaks tests..
-has _application => (is => 'ro');
+has _application => (is => 'ro', weak_ref => 1);
 sub _app { (shift)->_application(@_) }
 
 override BUILDARGS => sub {
