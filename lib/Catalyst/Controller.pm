@@ -9,6 +9,8 @@ use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
 
+with 'Catalyst::Component::Role::CaptureApp';
+
 has path_prefix =>
     (
      is => 'rw',
@@ -31,20 +33,6 @@ has actions =>
      isa => 'HashRef',
      init_arg => undef,
     );
-
-# Future - isa => 'ClassName|Catalyst' performance?
-#           required => 1 breaks tests..
-has _application => (is => 'ro');
-sub _app { shift->_application(@_) } 
-
-override 'BUILDARGS' => sub {
-    my ($self, $app) = @_;
-    
-    my $args = super();
-    $args->{_application} = $app;
- 
-    return $args;
-};
 
 sub BUILD {
     my ($self, $args) = @_;
