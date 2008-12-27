@@ -6,8 +6,6 @@ use base qw/Catalyst::Base Class::Data::Inheritable/;
 
  __PACKAGE__->mk_classdata('ran_setup');
 
-no warnings 'Class::C3::Adopt::NEXT';
-
 sub setup {
    my $c = shift;
    $c->ran_setup('1');
