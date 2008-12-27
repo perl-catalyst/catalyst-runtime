@@ -1,12 +1,11 @@
 #!perl
-
 use strict;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -39,6 +38,7 @@ use HTTP::Request::Common;
     isa_ok( $creq, 'Catalyst::Request' );
     is( $creq->method,       'POST',       'Catalyst::Request method' );
     is( $creq->content_type, 'text/plain', 'Catalyst::Request Content-Type' );
+    is( $creq->{__body_type}, 'File::Temp' );
     is( $creq->content_length, $request->content_length,
         'Catalyst::Request Content-Length' );
 }
@@ -72,6 +72,7 @@ use HTTP::Request::Common;
     isa_ok( $creq, 'Catalyst::Request' );
     is( $creq->method,       'POST',       'Catalyst::Request method' );
     is( $creq->content_type, 'text/plain', 'Catalyst::Request Content-Type' );
+    is( $creq->{__body_type}, 'File::Temp' );
     is( $creq->content_length, $request->content_length,
         'Catalyst::Request Content-Length' );
 }

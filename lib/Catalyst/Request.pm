@@ -98,13 +98,15 @@ has base => (
 
 has _body => (
   is => 'rw',
-  accessor => 'body',
 );
-
-before body => sub {
-  my ($self) = @_;
+# Eugh, ugly. Should just be able to rename accessor methods to 'body'
+#             and provide a custom reader.. 
+sub body {
+  my $self = shift;
   $self->_context->prepare_body();
-};
+  $self->_body(@_) if scalar @_;
+  return blessed $self->_body ? $self->_body->body : $self->_body;
+}
 
 has hostname => (
   is        => 'rw',

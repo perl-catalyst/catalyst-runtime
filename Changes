@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix return value of $c->req->body, which delegates to the body
+          method on the HTTP::Body of the request (t0m)
+          - Test for this (t0m)
         - Fix calling $c->req->body from inside an overridden prepare_action
           method in a plugin, as used by Catalyst::Plugin::Server (t0m)
           - Test for this (t0m)

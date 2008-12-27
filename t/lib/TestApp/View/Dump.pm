@@ -4,7 +4,7 @@ use strict;
 use base 'Catalyst::View';
 
 use Data::Dumper ();
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(blessed weaken);
 
 sub dump {
     my ( $self, $reference ) = @_;
@@ -28,11 +28,13 @@ sub process {
     # Force processing of on-demand data
     $c->prepare_body;
 
+    # Remove body from reference if needed
+    $reference->{__body_type} = blessed $reference->body
+        if (blessed $reference->{_body});
+    my $body = delete $reference->{_body};
+
     # Remove context from reference if needed
     my $context = delete $reference->{_context};
-
-    # Remove body from reference if needed
-    my $body = delete $reference->{_body};
 
     if ( my $output =
         $self->dump( $reference || $c->stash->{dump} || $c->stash ) )
@@ -46,6 +48,7 @@ sub process {
         weaken( $reference->{_context} );
 
         # Repair body
+        delete $reference->{__body_type};
         $reference->{_body} = $body;
 
         return 1;
