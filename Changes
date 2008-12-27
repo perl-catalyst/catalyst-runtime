@@ -1,11 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Add TODO tests for calling $c->req->body from inside an overridden
+          prepare_action method in a plugin, as used by 
+          Catalyst::Plugin::Server (t0m)
         - Fix assignment to Catalyst::Dispatcher's preload_dispatch_types and
           postload_dispatch_types attributes - assigning a list should later 
           return a listref. Fixes Catalyst::Plugin::Server. (t0m)
           - Tests for this (t0m)
-        - Change streaming test to serve itself rather than 01use.t, making test
-          sync for engines easier (t0m)
+        - Change streaming test to serve itself rather than 01use.t, making 
+          test sync for engines easier (t0m)
         - Refactor capturing of $app from Catalyst::Controller into
           Catalyst::Component::Role::CaptureApp for easier reuse in other
           components (Florian Ragwitz)

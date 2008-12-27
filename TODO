@@ -9,6 +9,9 @@ Pending patches:
   
 Back-compat investigation / known issues:
 
+  - Catalyst::Plugin::Server is still buggered in various ways..
+    - Fix TODO tests in t/aggregate/live_engine_request_body.t
+
   - Common engine test failures, look into and get tests into core.
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 

@@ -75,3 +75,19 @@ use HTTP::Request::Common;
     is( $creq->content_length, $request->content_length,
         'Catalyst::Request Content-Length' );
 }
+
+# 5.80 regression, see note in Catalyst::Plugin::Test::Plugin
+TODO: {
+    local $TODO = 'On demand request body parsing in prepare_action broken';
+
+    my $request = GET(
+        'http://localhost/have_req_body_in_prepare_action',
+        'Content-Type' => 'text/plain',
+        'Content'      => 'x' x 100_000
+    );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    like( $response->content, qr/^[1-9]/, 'Has body' );
+}
+
