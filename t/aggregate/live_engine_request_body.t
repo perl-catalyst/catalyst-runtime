@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -77,9 +77,7 @@ use HTTP::Request::Common;
 }
 
 # 5.80 regression, see note in Catalyst::Plugin::Test::Plugin
-TODO: {
-    local $TODO = 'On demand request body parsing in prepare_action broken';
-
+{
     my $request = GET(
         'http://localhost/have_req_body_in_prepare_action',
         'Content-Type' => 'text/plain',
@@ -88,6 +86,9 @@ TODO: {
 
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    like( $response->content, qr/^[1-9]/, 'Has body' );
+    TODO: {
+        local $TODO = 'On demand request body parsing in prepare_action broken';
+        like( $response->content, qr/^[1-9]/, 'Has body' );
+    }
 }
 
