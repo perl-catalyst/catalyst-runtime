@@ -1747,9 +1747,7 @@ Prepares message body.
 sub prepare_body {
     my $c = shift;
 
-    #Moose TODO: what is  _body ??
-    # Do we run for the first time?
-    return if defined $c->request->{_body};
+    return if $c->request->_has_body;
 
     # Initialize on-demand data
     $c->engine->prepare_body( $c, @_ );

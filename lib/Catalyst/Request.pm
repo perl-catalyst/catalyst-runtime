@@ -97,7 +97,7 @@ has base => (
 );
 
 has _body => (
-  is => 'rw',
+  is => 'rw', clearer => '_clear_body', predicate => '_has_body',
 );
 # Eugh, ugly. Should just be able to rename accessor methods to 'body'
 #             and provide a custom reader.. 

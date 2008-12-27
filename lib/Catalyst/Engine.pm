@@ -129,7 +129,7 @@ sub finalize_error {
         $c->res->_clear_context;
 
         # Don't show body parser in the dump
-        delete $c->req->{_body};
+        $c->req->_clear_body;
 
         my @infos;
         my $i = 0;
@@ -313,10 +313,10 @@ sub prepare_body {
 
     if ( my $length = $self->read_length ) {
         my $request = $c->request;
-        unless ( $request->{_body} ) {
+        unless ( $request->_body ) {
             my $type = $request->header('Content-Type');
-            $request->{_body} = HTTP::Body->new( $type, $length );
-            $request->{_body}->tmpdir( $c->config->{uploadtmp} )
+            $request->_body(HTTP::Body->new( $type, $length ));
+            $request->_body->tmpdir( $c->config->{uploadtmp} )
               if exists $c->config->{uploadtmp};
         }
         
@@ -334,7 +334,7 @@ sub prepare_body {
     }
     else {
         # Defined but will cause all body code to be skipped
-        $c->request->{_body} = 0;
+        $c->request->_body(0);
     }
 }
 
@@ -347,7 +347,7 @@ Add a chunk to the request body.
 sub prepare_body_chunk {
     my ( $self, $c, $chunk ) = @_;
 
-    $c->request->{_body}->add($chunk);
+    $c->request->_body->add($chunk);
 }
 
 =head2 $self->prepare_body_parameters($c)
@@ -359,9 +359,9 @@ Sets up parameters from body.
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
     
-    return unless $c->request->{_body};
+    return unless $c->request->_body;
     
-    $c->request->body_parameters( $c->request->{_body}->param );
+    $c->request->body_parameters( $c->request->_body->param );
 }
 
 =head2 $self->prepare_connection($c)
@@ -511,9 +511,9 @@ sub prepare_uploads {
     my ( $self, $c ) = @_;
 
     my $request = $c->request;
-    return unless $request->{_body};
+    return unless $request->_body;
 
-    my $uploads = $request->{_body}->upload;
+    my $uploads = $request->_body->upload;
     my $parameters = $request->parameters;
     foreach my $name (keys %$uploads) {
         my $files = $uploads->{$name};
