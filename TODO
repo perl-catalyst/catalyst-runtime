@@ -1,10 +1,7 @@
 Pending patches:
   - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
 
-  - Adopt::NEXT
-     - updated docs with how to disable it (t0m/rafl)
-
-Back-compat investigation / konwon issues:
+Back-compat investigation / known issues:
 
   - Common engine test failures, look into and get tests into core.
 
@@ -14,11 +11,43 @@ Back-compat investigation / konwon issues:
 
   - Run another round of repository smokes against latest 5.80 trunk, manually
     go through all the things which are broken (t0m).
+    
+     - Catalyst-Plugin-Server dies due to "package is not defined" error
+       which was reduced to a warning, retest.
+    
+     - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
+    
+     - Catalyst-Action-REST appears to have real issues, investigate
+    
+     - Catalyst-Model-Search ditto
+     
+     - CatalystX-CRUD ditto
+    
+     - Catalyst-Engine-Apache - Deep recursion on subroutine 
+       "Catalyst::Action::execute", investigate once all other tests pass
+    
+     - Catalyst-Plugin-Scheduler
+     - Catalyst-Engine-HTTPEngine
+     - Catalyst-View-HTML-Template
+     - Catalyst-View-XSLT
+     - Catalyst-Plugin-Setenv
+     - Catalyst-Plugin-RequireSSL - Bullshit 'cannot locate' errors
+                                    Bug in smoke test rig.
+                                    
+     - Catalyst::Plugin::HTML::Widget - Undefined subroutine 
+       &HTML::Widget::Result::attributes called at 
+       lib/perl5/HTML/Widget/Result.pm line 68.
 
   - Issues with TWMC not being loaded when it used to be in 5.70 
     (Bill Moseley)
 
   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
+
+  -  In 5.70, you can have a component which doesn't inherit from ::Component, 
+     and has no new method, and it'll do the right thing for you. We just 
+     ignore that, we should still support that, but warn for/deprecate it so 
+     it can go for 5.9X...
+     This all obviously needs better tests :/
 
 Cleanups:
 
