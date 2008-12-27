@@ -86,9 +86,6 @@ use HTTP::Request::Common;
 
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    TODO: {
-        local $TODO = 'On demand request body parsing in prepare_action broken';
-        like( $response->content, qr/^[1-9]/, 'Has body' );
-    }
+    like( $response->content, qr/^[1-9]/, 'Has body' );
 }
 

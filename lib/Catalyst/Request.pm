@@ -96,8 +96,9 @@ has base => (
   },
 );
 
-has body => (
-  is => 'rw'
+has _body => (
+  is => 'rw',
+  accessor => 'body',
 );
 
 before body => sub {
