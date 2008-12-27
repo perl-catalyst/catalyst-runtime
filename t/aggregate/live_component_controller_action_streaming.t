@@ -54,7 +54,7 @@ EOF
             skip "Using remote server", 5;
         }
 
-        my $file = "$FindBin::Bin/../01use.t";
+        my $file = "$FindBin::Bin/../lib/TestApp/Controller/Action/Streaming.pm";
         my $fh = IO::File->new( $file, 'r' );
         my $buffer;
         if ( defined $fh ) {
