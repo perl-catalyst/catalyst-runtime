@@ -9,8 +9,7 @@ Pending patches:
   
 Back-compat investigation / known issues:
 
-  - Catalyst::Plugin::Server is still buggered in various ways..
-    - Fix TODO tests in t/aggregate/live_engine_request_body.t
+  - FIXME notes in Catalyst::Dispatcher
 
   - Common engine test failures, look into and get tests into core.
 
@@ -21,6 +20,10 @@ Back-compat investigation / known issues:
   - Run another round of repository smokes against latest 5.80 trunk, manually
     go through all the things which are broken (t0m).
     
+     - Catalyst::Plugin::Authorization::ACL
+     - Catalyst::Plugin::Server
+       - Should hopefully be fixed now..
+     
      - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
     
      - Catalyst-Action-REST appears to have real issues, investigate
