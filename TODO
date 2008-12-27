@@ -1,6 +1,12 @@
 Pending patches:
   - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
-
+  
+  - Class::Accessor::Chained::Fast test for MX::Emulate::CAF, to fix 
+    HTML::Widget
+  
+  - Re-opening packages with MX::Emulate::CAF (for 
+    Catalyst::Plugin::HashedCookies)
+  
 Back-compat investigation / known issues:
 
   - Common engine test failures, look into and get tests into core.
@@ -11,9 +17,6 @@ Back-compat investigation / known issues:
 
   - Run another round of repository smokes against latest 5.80 trunk, manually
     go through all the things which are broken (t0m).
-    
-     - Catalyst-Plugin-Server dies due to "package is not defined" error
-       which was reduced to a warning, retest.
     
      - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
     
@@ -33,10 +36,6 @@ Back-compat investigation / known issues:
      - Catalyst-Plugin-Setenv
      - Catalyst-Plugin-RequireSSL - Bullshit 'cannot locate' errors
                                     Bug in smoke test rig.
-                                    
-     - Catalyst::Plugin::HTML::Widget - Undefined subroutine 
-       &HTML::Widget::Result::attributes called at 
-       lib/perl5/HTML/Widget/Result.pm line 68.
 
   - Issues with TWMC not being loaded when it used to be in 5.70 
     (Bill Moseley)

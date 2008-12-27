@@ -33,6 +33,14 @@ has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default =>
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
+# Wrap accessors so you can assign a list and it will capture a list ref.
+around qw/preload_dispatch_types postload_dispatch_types/ => sub {
+    my $orig = shift;
+    my $self = shift;
+    return $self->$orig([@_]) if (scalar @_ && ref $_[0] ne 'ARRAY');
+    return $self->$orig(@_);
+};
+
 no Moose;
 
 =head1 NAME

@@ -14,6 +14,7 @@ my @expected = qw[
   Catalyst::Plugin::Test::Headers
   Catalyst::Plugin::Test::Inline
   Catalyst::Plugin::Test::Plugin
+  TestApp::Plugin::AddDispatchTypes
   TestApp::Plugin::FullyQualified
 ];
 
