@@ -11,7 +11,12 @@ Pending patches:
   
 Back-compat investigation / known issues:
 
-  - FIXME notes in Catalyst::Dispatcher
+  - Plugins with new methods.
+    - Moose 'not inlining new method' warnings need to be fixed.
+      - Warning in Moose could also be more helpful..
+    - Why does the current test not fail / warn?
+    - Generally unhappy with the on_end_of_scope immutable approach,
+      try removing new method from plugins (and emitting warning).
 
   - Common engine test failures, look into and get tests into core.
 
@@ -58,10 +63,6 @@ Back-compat investigation / known issues:
 
 Cleanups:
 
-  - Catalyst-Plugin-Authorization-ACL, Can't locate object method "tree" 
-    via package "Catalyst::Dispatcher", fix the plugin as tree was never 
-    a public method.
-
   - Catalyst-Model-Akismet, incorrectly inherits from 
     Catalyst::Component::InstancePerContext, should compose as a role. 
     Fix the module.
@@ -75,7 +76,7 @@ Cleanups:
     touched as it is used as an lvalue in a lot of places (t0m)
 
   - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
-    disk and fix it. (Believed to be in the optional tests?) (t0m)
+    disk and fix it. (Believed to be in the optional TEST_HTTP tests?) (t0m)
 
 Documentation:
 
@@ -94,3 +95,5 @@ Profiling:
 Tests:
 
   - Moosified test application?
+
+  - Test warning from back-compat methods in Catalyst::Dispatcher

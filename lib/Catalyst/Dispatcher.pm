@@ -15,23 +15,23 @@ use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 use Scalar::Util ();
 
-#do these belong as package vars or should we build these via a builder method?
+# Refactoring note:
+# do these belong as package vars or should we build these via a builder method?
+# See Catalyst-Plugin-Server for them being added to, which should be much less ugly.
+
 # Preload these action types
 our @PRELOAD = qw/Index Path Regex/;
 
 # Postload these action types
 our @POSTLOAD = qw/Default/;
 
-# FIXME - All of these should be _private attributes, and should have public accessors
-#         which warn about back-compat if you use them.
-has tree => (is => 'rw');
-has dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
-has registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
-has method_action_class => (is => 'rw', default => 'Catalyst::Action');
-has action_container_class => (is => 'rw', default => 'Catalyst::ActionContainer');
-has action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
-has container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
-# END FIXME
+# Note - see back-compat methods at end of file.
+has _tree => (is => 'rw');
+has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
+has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
+has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
+has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
 has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
 has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
@@ -73,7 +73,7 @@ sub BUILD {
   my $container =
     Catalyst::ActionContainer->new( { part => '/', actions => {} } );
 
-  $self->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
+  $self->_tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 }
 
 =head2 $self->preload_dispatch_types
@@ -319,7 +319,7 @@ sub _invoke_as_component {
     my $class = $self->_find_component_class( $c, $component ) || return 0;
 
     if ( my $code = $class->can($method) ) {
-        return $self->method_action_class->new(
+        return $self->_method_action_class->new(
             {
                 name      => $method,
                 code      => $code,
@@ -365,7 +365,7 @@ sub prepare_action {
         # Check out dispatch types to see if any will handle the path at
         # this level
 
-        foreach my $type ( @{ $self->dispatch_types } ) {
+        foreach my $type ( @{ $self->_dispatch_types } ) {
             last DESCEND if $type->match( $c, $path );
         }
 
@@ -396,7 +396,7 @@ sub get_action {
 
     $namespace = join( "/", grep { length } split '/', ( defined $namespace ? $namespace : "" ) );
 
-    return $self->action_hash->{"${namespace}/${name}"};
+    return $self->_action_hash->{"${namespace}/${name}"};
 }
 
 =head2 $self->get_action_by_path( $path ); 
@@ -409,7 +409,7 @@ sub get_action_by_path {
     my ( $self, $path ) = @_;
     $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
-    $self->action_hash->{$path};
+    $self->_action_hash->{$path};
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -442,11 +442,11 @@ sub get_containers {
 
     if ( length $namespace ) {
         do {
-            push @containers, $self->container_hash->{$namespace};
+            push @containers, $self->_container_hash->{$namespace};
         } while ( $namespace =~ s#/[^/]+$## );
     }
 
-    return reverse grep { defined } @containers, $self->container_hash->{''};
+    return reverse grep { defined } @containers, $self->_container_hash->{''};
 
     #return (split '/', $namespace); # isnt this more clear?
     my @parts = split '/', $namespace;
@@ -466,7 +466,7 @@ cannot determine an appropriate URI, this method will return undef.
 sub uri_for_action {
     my ( $self, $action, $captures) = @_;
     $captures ||= [];
-    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
+    foreach my $dispatch_type ( @{ $self->_dispatch_types } ) {
         my $uri = $dispatch_type->uri_for_action( $action, $captures );
         return( $uri eq '' ? '/' : $uri )
             if defined($uri);
@@ -485,7 +485,7 @@ single action.
 sub expand_action {
     my ($self, $action) = @_;
 
-    foreach my $dispatch_type (@{ $self->dispatch_types }) {
+    foreach my $dispatch_type (@{ $self->_dispatch_types }) {
         my $expanded = $dispatch_type->expand_action($action);
         return $expanded if $expanded;
     }
@@ -504,22 +504,23 @@ Also, set up the tree with the action containers.
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my $registered = $self->registered_dispatch_types;
+    my $registered = $self->_registered_dispatch_types;
 
     #my $priv = 0; #seems to be unused
     foreach my $key ( keys %{ $action->attributes } ) {
         next if $key eq 'Private';
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
-            #some error checking rethrowing here wouldn't hurt.
+            # FIXME - Some error checking and re-throwing needed here, as
+            #         we eat exceptions loading dispatch types.
             eval { Class::MOP::load_class($class) };
-            push( @{ $self->dispatch_types }, $class->new ) unless $@;
+            push( @{ $self->_dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;
         }
     }
 
     # Pass the action to our dispatch types so they can register it if reqd.
-    foreach my $type ( @{ $self->dispatch_types } ) {
+    foreach my $type ( @{ $self->_dispatch_types } ) {
         $type->register( $c, $action );
     }
 
@@ -531,14 +532,14 @@ sub register {
     # Set the method value
     $container->add_action($action);
 
-    $self->action_hash->{"$namespace/$name"} = $action;
-    $self->container_hash->{$namespace} = $container;
+    $self->_action_hash->{"$namespace/$name"} = $action;
+    $self->_container_hash->{$namespace} = $container;
 }
 
 sub _find_or_create_action_container {
     my ( $self, $namespace ) = @_;
 
-    my $tree ||= $self->tree;
+    my $tree ||= $self->_tree;
 
     return $tree->getNodeValue unless $namespace;
 
@@ -574,7 +575,7 @@ sub setup_actions {
 
     my @classes =
       $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
-    @{ $self->registered_dispatch_types }{@classes} = (1) x @classes;
+    @{ $self->_registered_dispatch_types }{@classes} = (1) x @classes;
 
     foreach my $comp ( values %{ $c->components } ) {
         $comp->register_actions($c) if $comp->can('register_actions');
@@ -609,12 +610,12 @@ sub setup_actions {
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
 
-    $walker->( $walker, $self->tree, '' );
+    $walker->( $walker, $self->_tree, '' );
     $c->log->debug( "Loaded Private actions:\n" . $privates->draw . "\n" )
       if $has_private;
 
     # List all public actions
-    $_->list($c) for @{ $self->dispatch_types };
+    $_->list($c) for @{ $self->_dispatch_types };
 }
 
 sub _load_dispatch_types {
@@ -630,13 +631,52 @@ sub _load_dispatch_types {
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
-        push @{ $self->dispatch_types }, $class->new;
+        push @{ $self->_dispatch_types }, $class->new;
 
         push @loaded, $class;
     }
 
     return @loaded;
 }
+
+use Moose;
+
+# 5.70 backwards compatibility hacks.
+
+# Various plugins (e.g. Plugin::Server and Plugin::Authorization::ACL)
+# need the methods here which *should* be private..
+
+# However we can't really take them away until there is a sane API for
+# building actions and configuring / introspecting the dispatcher.
+# In 5.90, we should build that infrastructure, port the plugins which
+# use it, and then take the crap below away.
+# See also t/lib/TestApp/Plugin/AddDispatchTypes.pm
+
+# Alias _method_name to method_name, add a before modifier to warn..
+foreach my $public_method_name (qw/ 
+        tree 
+        dispatch_types 
+        registered_dispatch_types 
+        method_action_class  
+        action_hash 
+        container_hash
+    /) {
+    my $private_method_name = '_' . $public_method_name;
+    my $meta = __PACKAGE__->meta; # Calling meta method here fine as we happen at compile time.
+    $meta->add_method($public_method_name, $meta->get_method($private_method_name));
+    {
+        my %package_hash; # Only warn once per method, per package. These are infrequent enough that
+                          # I haven't provided a way to disable them, patches welcome.
+        $meta->add_before_method_modifier($public_method_name, sub {
+            my $class = Scalar::Util::blessed(shift);
+            $package_hash{$class}++ || do { 
+                warn("Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
+                    . "this will be removed in Catalyst 5.9X");
+            };
+        });
+    }
+}
+# End 5.70 backwards compatibility hacks.
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

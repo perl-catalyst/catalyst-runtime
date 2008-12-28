@@ -7,6 +7,8 @@ sub setup_dispatcher {
     my $class = shift;
 
     ### Load custom DispatchTypes, as done by Catalyst::Plugin::Server
+    # There should be a waaay less ugly method for doing this,
+    # FIXME in 5.9
     $class->next::method( @_ );
     $class->dispatcher->preload_dispatch_types(
         @{$class->dispatcher->preload_dispatch_types},
