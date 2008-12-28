@@ -20,7 +20,7 @@
         - Change streaming test to serve itself rather than 01use.t, making 
           test sync for engines easier (t0m)
         - Refactor capturing of $app from Catalyst::Controller into
-          Catalyst::Component::Role::CaptureApp for easier reuse in other
+          Catalyst::Component::ApplicationAttribute for easier reuse in other
           components (Florian Ragwitz)
         - Make the test suites YAML dependency optional (Florian Ragwitz)
         - Make debug output show class name for the engine and dispatcher

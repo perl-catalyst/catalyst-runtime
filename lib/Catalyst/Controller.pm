@@ -9,7 +9,7 @@ use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
 
-with 'Catalyst::Component::Role::CaptureApp';
+with 'Catalyst::Component::ApplicationAttribute';
 
 has path_prefix =>
     (

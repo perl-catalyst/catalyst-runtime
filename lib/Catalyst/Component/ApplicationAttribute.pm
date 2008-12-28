@@ -1,4 +1,4 @@
-package Catalyst::Component::Role::CaptureApp;
+package Catalyst::Component::ApplicationAttribute;
 
 use Moose::Role;
 use namespace::clean -except => 'meta';
