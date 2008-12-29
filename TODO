@@ -1,13 +1,7 @@
 Pending patches:
   - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
   
-  - Class::Accessor::Chained::Fast test for MX::Emulate::CAF, to fix 
-    HTML::Widget
-  
-  - Re-opening packages with MX::Emulate::CAF (for 
-    Catalyst::Plugin::HashedCookies)
-    
-  - Double-applying mk_accessors breaks, t/double_apply.t for MX::Emulate::CAF
+  - Bump MX::Emulate::CAF for fixes to t/double_apply.t 
   
 Back-compat investigation / known issues:
 
@@ -29,6 +23,7 @@ Back-compat investigation / known issues:
     
      - Catalyst::Plugin::Authorization::ACL
      - Catalyst::Plugin::Server
+     - Catalyst::Plugin::HTML::Widget
        - Should hopefully be fixed now..
      
      - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
@@ -42,14 +37,6 @@ Back-compat investigation / known issues:
      - Catalyst-Engine-Apache - Deep recursion on subroutine 
        "Catalyst::Action::execute", investigate once all other tests pass
     
-     - Catalyst-Plugin-Scheduler
-     - Catalyst-Engine-HTTPEngine
-     - Catalyst-View-HTML-Template
-     - Catalyst-View-XSLT
-     - Catalyst-Plugin-Setenv
-     - Catalyst-Plugin-RequireSSL - Bullshit 'cannot locate' errors
-                                    Bug in smoke test rig.
-
   - Issues with TWMC not being loaded when it used to be in 5.70 
     (Bill Moseley)
 
@@ -62,14 +49,10 @@ Back-compat investigation / known issues:
      This all obviously needs better tests :/
 
 Cleanups:
-
-  - Catalyst-Model-Akismet, incorrectly inherits from 
-    Catalyst::Component::InstancePerContext, should compose as a role. 
-    Fix the module.
     
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages 
-      when you do it as well as how to fix it. (done already?)
+      when you do it as well as how to fix it.
 
   - Eliminate all instances of $instance->{$key}, I think the only thing
     left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
