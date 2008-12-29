@@ -3,7 +3,6 @@ package Catalyst::Component;
 use Moose;
 use Class::MOP;
 use Class::MOP::Object;
-use MooseX::Adopt::Class::Accessor::Fast;
 use Catalyst::Utils;
 use Class::C3::Adopt::NEXT;
 use MRO::Compat;

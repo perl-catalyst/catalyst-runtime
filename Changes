@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Stop using MooseX::Adopt::Class::Accessor::Fast by default, to stop
+          breaking other packages which use Class::Accessor::Fast
         - Remove unused action_container_class attribute from 
           Catalyst::Dispatcher (t0m)
         - Replace {_body} instance access with calls to _body accessors (t0m)
