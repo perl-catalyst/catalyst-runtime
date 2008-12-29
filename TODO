@@ -10,7 +10,8 @@ Back-compat investigation / known issues:
     - Generally unhappy with the on_end_of_scope immutable approach,
       try removing new method from plugins (and emitting warning).
 
-  - Common engine test failures, look into and get tests into core.
+  - Engine test failures, look into and update tests / do fixes as
+    needed.
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
     table as methods, tests + fix, or explanation and documentation?
@@ -30,10 +31,7 @@ Back-compat investigation / known issues:
      - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
      
      - CatalystX-CRUD fails tests against 5.80 (karpet)
-    
-     - Catalyst-Engine-Apache - Deep recursion on subroutine 
-       "Catalyst::Action::execute", investigate once all other tests pass
-    
+
   - Issues with TWMC not being loaded when it used to be in 5.70 
     (Bill Moseley)
 

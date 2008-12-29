@@ -64,7 +64,6 @@ before body_parameters => sub {
 has uploads => (
   is => 'rw',
   required => 1,
-  lazy => 1,
   default => sub { {} },
 );
 
