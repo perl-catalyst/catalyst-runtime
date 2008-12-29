@@ -8,49 +8,18 @@ lives in the the catalyst trunk, currently at
 
 Make sure you get it from there to ensure you have the latest version.
 
-=head2 5.7x series
-
-Stable relases, no major features planned. Bugfixes for current release
-and documentation improvements.
-
-Will be working on developing more ActionClasses, and Reusable chained 
-controllers, as well as opinonated highlevel frameworks on top of the 
-Catalyst Core.
-
-=head3 5.7.1
-
-=over 4
-
-=item make deployment of Catalyst easier
-
-=over 4
-
-=item Add htaccess files to distro
-
-=item Trim runtime dependencies
-
-=item test dependency graph, make sure everything installs cleanly on different platforms.
-
-=back
-
-=item Add support for configuration profiles to be selected at startup time
-through switches / ENV
-
-=item add call method to do a forward with eval case.
-
-=item add go method to do a call while setting action.
-
-=item move all inline pod to bottom of file.
-
-=item update pod coverage tests to detect stubbed pod, ensure real coverage
-
-=back
-
 =head2 5.80000 1st Quarter 2009
 
 Next major planned release.
 
 =over 4
+
+=item move all inline pod to bottom of file.
+
+=item update pod coverage tests to detect stubbed pod, ensure real coverage
+
+=item Add support for configuration profiles to be selected at startup time
+through switches / ENV
 
 =item  Application / Context Split 
 
@@ -61,11 +30,6 @@ Catalyst needs to be split so that $c refers to the current context, and is a se
 good support for reusable components good support for reusable plugins good 
 separation of plugins (some reusable components want different plugins) 
 near total engine independence
-
-=item Moose roles instead of NEXT.  
-
-Change the Catalyst core to use Moose for the plugin system as well as
-accessors/constructors.
 
 =item Reduce core class data usage.
 

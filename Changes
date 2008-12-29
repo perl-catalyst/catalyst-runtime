@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Bump version of MooseX::Emulate::Class::Accessor::Fast (t0m)
         - Stop using MooseX::Adopt::Class::Accessor::Fast by default, to stop
           breaking other packages which use Class::Accessor::Fast
         - Remove unused action_container_class attribute from 

@@ -983,7 +983,7 @@ EOF
           : $class->log->debug(q/Couldn't find home/);
     }
 
-    # Call plugins setup
+    # Call plugins setup, this is stupid and evil.
     {
         no warnings qw/redefine/;
         local *setup = sub { };

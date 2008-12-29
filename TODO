@@ -1,8 +1,6 @@
 Pending patches:
   - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
-  
-  - Bump MX::Emulate::CAF for fixes to t/double_apply.t 
-  
+    
 Back-compat investigation / known issues:
 
   - Plugins with new methods.
@@ -26,13 +24,12 @@ Back-compat investigation / known issues:
      - Catalyst::Plugin::HTML::Widget
        - Should hopefully be fixed now..
      
-     - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
-    
-     - Catalyst-Action-REST appears to have real issues, investigate
-    
-     - Catalyst-Model-Search ditto
+     - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" 
+       (rafl)
      
-     - CatalystX-CRUD ditto
+     - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
+     
+     - CatalystX-CRUD fails tests against 5.80 (karpet)
     
      - Catalyst-Engine-Apache - Deep recursion on subroutine 
        "Catalyst::Action::execute", investigate once all other tests pass
