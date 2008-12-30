@@ -18,3 +18,56 @@ override BUILDARGS => sub {
 };
 
 1;
+
+__END__
+
+=head1 NAME
+
+Catalyst::Component::ApplicationAttribute - Moose Role for components which capture the application context.
+
+=head1 SYNOPSIS
+
+    package My::Component;
+    use Moose;
+    extends 'Catalyst::Component';
+    with 'Catalyst::Component::ApplicationAttribute';
+    
+    # Your code here
+    
+    1;
+
+=head1 DESCRIPTION
+
+This role provides a BUILDARGS method which captures the application context into an attribute.
+
+=head1 ATTRIBUTES
+
+=head2 _application
+
+Weak reference to the application context.
+
+=head1 METHODS
+
+=head2 BUILDARGS ($self, $app)
+
+BUILDARGS method captures the application context into the C<_application> attribute.
+
+=head2 _application
+
+Reader method for the application context.
+
+=head1 SEE ALSO
+
+L<Catalyst::Component>,
+L<Catalyst::Controller>.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

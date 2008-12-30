@@ -10,8 +10,13 @@ Back-compat investigation / known issues:
     - Generally unhappy with the on_end_of_scope immutable approach,
       try removing new method from plugins (and emitting warning).
 
-  - Engine test failures, look into and update tests / do fixes as
-    needed.
+  - Get engines tested:
+    - Catalyst-Engine-Zeus
+    - Catalyst-Engine-XMPP2
+    - Catalyst-Engine-HTTPEngine
+    - Catalyst-Engine-HTTP-Prefork
+    - Catalyst-Engine-SCGI
+    - Catalyst-Engine-Wx
 
   - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
     table as methods, tests + fix, or explanation and documentation?
@@ -38,9 +43,8 @@ Back-compat investigation / known issues:
   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
 
   -  In 5.70, you can have a component which doesn't inherit from ::Component, 
-     and has no new method, and it'll do the right thing for you. We just 
-     ignore that, we should still support that, but warn for/deprecate it so 
-     it can go for 5.9X...
+     and has no new method, and it'll do the right thing for you. We should 
+     still support that, but warn for/deprecate it so it can go for 5.9X...
      This all obviously needs better tests :/
 
 Cleanups:

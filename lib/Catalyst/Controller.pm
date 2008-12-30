@@ -1,8 +1,8 @@
 package Catalyst::Controller;
 
-#switch to BEGIN { extends qw/ ... /; } ?
-use base qw/Catalyst::Component Catalyst::AttrContainer/;
 use Moose;
+# Note - Must be done at compile time due to attributes (::AttrContainer)
+BEGIN { extends qw/Catalyst::Component Catalyst::AttrContainer/; }
 
 use Class::MOP::Object ();
 use Scalar::Util qw/blessed/;
