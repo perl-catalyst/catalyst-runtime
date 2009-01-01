@@ -3,13 +3,6 @@ Pending patches:
     
 Back-compat investigation / known issues:
 
-  - Plugins with new methods.
-    - Moose 'not inlining new method' warnings need to be fixed.
-      - Warning in Moose could also be more helpful..
-    - Why does the current test not fail / warn?
-    - Generally unhappy with the on_end_of_scope immutable approach,
-      try removing new method from plugins (and emitting warning).
-
   - Get engines tested:
     - Catalyst-Engine-Zeus
     - Catalyst-Engine-XMPP2
@@ -45,7 +38,11 @@ Back-compat investigation / known issues:
   -  In 5.70, you can have a component which doesn't inherit from ::Component, 
      and has no new method, and it'll do the right thing for you. We should 
      still support that, but warn for/deprecate it so it can go for 5.9X...
-     This all obviously needs better tests :/
+     This obviously needs better tests :/
+
+  -  With 5.7 people did extends qw/Moose::Object Catalyst::Component/, now 
+     Catalyst::Component isa Moose::Object so now isa doesn't linearize 
+     anymore, test case..
 
 Cleanups:
     
@@ -60,9 +57,11 @@ Cleanups:
   - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
     disk and fix it. (Believed to be in the optional TEST_HTTP tests?) (t0m)
 
+  - Deprecate runtime plugins with warning.
+
 Documentation:
 
-   - extends in components must be inside a BEGIN block.
+   - extends in components with attributes must be inside a BEGIN block.
 
    - How to write Moosified Catalyst components.
 
