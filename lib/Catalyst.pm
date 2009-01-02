@@ -2226,19 +2226,19 @@ or if the C<$CATALYST_DEBUG> environment variable is set to a true value.
 
 Note that if the log has already been setup, by either a previous call to
 C<setup_log> or by a call such as C<< __PACKAGE__->log( MyLogger->new ) >>,
-that this method won't actually set up the log.
+that this method won't actually set up the log object.
 
 =cut
 
 sub setup_log {
     my ( $class, $levels ) = @_;
 
-    my %levels;
+    $levels ||= '';
+    $levels =~ s/^\s+//;
+    $levels =~ s/\s+$//;
+    my %levels = map { $_ => 1 } split /\s*,\s*/, $levels || '';
+    
     unless ( $class->log ) {
-        $levels ||= '';
-        $levels =~ s/^\s+//;
-        $levels =~ s/\s+$//;
-        %levels = map { $_ => 1 } split /\s*,\s*/, $levels || '';
         $class->log( Catalyst::Log->new(keys %levels) );
     }
 

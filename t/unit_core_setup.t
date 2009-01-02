@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Catalyst::Runtime;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 {
     # Silence the log.
@@ -46,3 +46,16 @@ ok $log->is_error,  'Errors should be enabled';
 ok $log->is_fatal,  'Fatal errors should be enabled';
 ok !$log->is_info,  'Info should be disabled';
 ok !$log->is_debug, 'Debugging should be disabled';
+
+TESTOWNLOGGER: {
+    package MyTestAppWithOwnLogger;
+    use base qw/Catalyst/;
+    use Test::MockObject;
+    my $log = Test::MockObject->new;
+    $log->set_false(qw/debug error fatal info warn/);
+    __PACKAGE__->log($log);
+    __PACKAGE__->setup('-Debug');
+}
+
+ok $c = MyTestAppWithOwnLogger->new, 'Get with own logger app object';
+ok $c->debug, '$c->debug is true';
