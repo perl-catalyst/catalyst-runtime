@@ -8,7 +8,7 @@ use Moose;
 use Class::MOP::Object ();
 extends 'Catalyst::Component';
 use bytes;
-use B::Hooks::EndOfScope;
+use Scope::Upper ();
 use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Request;
@@ -1024,10 +1024,10 @@ EOF
     # Note however that we have to do the work on scope end, so that method
     # modifiers work correctly in MyApp (as you have to call setup _before_ 
     # applying modifiers).
-    on_scope_end {
+    Scope::Upper::reap(sub {
         my $meta = $class->Moose::Object::meta();
         $meta->make_immutable unless $meta->is_immutable;
-    };
+    }, 1);
 
     $class->setup_finished(1);
 }

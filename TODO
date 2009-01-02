@@ -18,10 +18,13 @@ Back-compat investigation / known issues:
   - Run another round of repository smokes against latest 5.80 trunk, manually
     go through all the things which are broken (t0m).
     
-     - Catalyst::Plugin::Authorization::ACL
-     - Catalyst::Plugin::Server
-     - Catalyst::Plugin::HTML::Widget
-       - Should hopefully be fixed now..
+     - Catalyst-Plugin-Session-State-Cookie
+       Catalyst-Plugin-Session-Store-FastMmap
+       Catalyst-Plugin-Session-PerUser
+       Catalyst-Plugin-Session-Store-File
+       Catalyst-Authentication-Credential-HTTP
+       Catalyst-Plugin-SmartURI
+        - All fixed by Scope::Upper
      
      - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" 
        (rafl)
@@ -39,10 +42,6 @@ Back-compat investigation / known issues:
      and has no new method, and it'll do the right thing for you. We should 
      still support that, but warn for/deprecate it so it can go for 5.9X...
      This obviously needs better tests :/
-
-  -  With 5.7 people did extends qw/Moose::Object Catalyst::Component/, now 
-     Catalyst::Component isa Moose::Object so now isa doesn't linearize 
-     anymore, test case..
 
 Cleanups:
     
@@ -68,6 +67,10 @@ Documentation:
    - Manual / Tutorial updates
 
    - Fix the Roadmap to be less full of lies.
+
+   -  With 5.7 people did extends qw/Moose::Object Catalyst::Component/, now 
+      Catalyst::Component isa Moose::Object so now isa doesn't linearize 
+      anymore, docs of what doesn't work and why (rafl)
 
 Profiling:
 
