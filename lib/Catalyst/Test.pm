@@ -70,7 +70,7 @@ our $default_host;
     sub import {
         my ($self, $class, $opts) = @_;
         $import->($self, '-all' => { class => $class });
-        $opts ||= {};
+        $opts = {} unless ref $opts eq 'HASH';
         $default_host = $opts->{default_host} if exists $opts->{default_host};
     }
 }

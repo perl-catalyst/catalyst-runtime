@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use Test::More;
+use FindBin qw/$Bin/;
+use lib "$Bin/lib";
 use Catalyst::Utils;
 
-plan tests => 8;
+plan tests => 9;
 
 use_ok('Catalyst::Test');
 
@@ -50,3 +52,6 @@ sub customize { Catalyst::Test::_customize_request(@_) }
     customize( $req, { host => '' } );
     is( $req->header('Host'), undef, 'default value can be temporarily cleared via opts hash' );
 }
+
+# Back compat test, extra args used to be ignored, now a hashref of options.
+use_ok('Catalyst::Test', 'TestApp', 'foobar');
