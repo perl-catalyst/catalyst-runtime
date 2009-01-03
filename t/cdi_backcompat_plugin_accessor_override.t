@@ -32,7 +32,7 @@ lives_ok {
 # are not created in MyApp until the data is written to.
 TODO: {
     local $TODO = "Copying the class data accessor down into MyApp other than at runtime\n" .
-    " when assigned (as pre exact CDI behavior) causes methods to not get run';
+    " when assigned (as pre exact CDI behavior) causes methods to not get run";
     no warnings 'once';
     is $CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED, 1, 'Plugin setup_finish run';
 }
