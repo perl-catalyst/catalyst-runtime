@@ -33,6 +33,14 @@ Back-compat investigation / known issues:
      
      - CatalystX-CRUD fails tests against 5.80 (karpet)
 
+     - Catalyst-Plugin-Authorization-ACL fails as 
+       Catalyst::Dispatcher::_do_forward does not fix arguments if you throw
+       an exception. Needs a test case (Caelum)
+     
+     - Catalyst::Plugin::Authentication::Store::DBIC fails as
+       overriding the setup_finished class data method in a plugin no longer
+       works correctly (see t/cdi_backcompat_accessor_override.t).
+
   - Issues with TWMC not being loaded when it used to be in 5.70 
     (Bill Moseley)
 

@@ -33,6 +33,7 @@ sub mk_classdata {
         # then copy it into our package. Is this the correct
         # fix for C::D::I back-compat? (t0m)
         my $parent_symbol = *{"${super}::${attribute}"}{CODE} ? \&{"${super}::${attribute}"} : undef;
+        # FIXME - this is over-enthusiastic?
         if (defined $parent_symbol) {
           *{"${pkg}::${attribute}"} = $parent_symbol;
         }

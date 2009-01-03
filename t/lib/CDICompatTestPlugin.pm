@@ -25,4 +25,18 @@ sub setup {
     $app->next::method(@_);
 }
 
+# However, if we are too enthusiastic about adding accessors to the
+# MyApp package, then this method isn't called (as there is a local 
+# symbol already).
+
+# Note - use a different package here, so that Moose's 
+# package detection code doesn't get confused..
+$CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED = 0;
+
+sub setup_finished {
+    my $app = shift;
+    $CDICompatTestPlugin::Data::AS_RUN_SETUP_FINISHED = 1;
+    $app->next::method(@_);
+}
+
 1;
