@@ -35,7 +35,7 @@ $CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED = 0;
 
 sub setup_finished {
     my $app = shift;
-    $CDICompatTestPlugin::Data::AS_RUN_SETUP_FINISHED = 1;
+    $CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED = 1;
     $app->next::method(@_);
 }
 
