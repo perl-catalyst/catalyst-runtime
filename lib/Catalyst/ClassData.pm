@@ -14,8 +14,20 @@ sub mk_classdata {
   my $accessor =  sub {
     my $pkg = ref $_[0] || $_[0];
     my $meta = $pkg->Class::MOP::Object::meta();
-    if (@_ > 1){
+    if (@_ > 1) {
       $meta->namespace->{$attribute} = \$_[1];
+      no strict 'refs';
+      if (! *{"${pkg}::${attribute}"}{CODE} ) {
+        foreach my $super ( $meta->linearized_isa ) {
+          # If there is a code symbol for this class data in a parent class, but not in our 
+          # class then copy it into our package. This is evil.
+          my $parent_symbol = *{"${super}::${attribute}"}{CODE} ? \&{"${super}::${attribute}"} : undef;
+          if (defined $parent_symbol) {
+            *{"${pkg}::${attribute}"} = $parent_symbol;
+            last;
+          }
+        }      
+      }
       return $_[1];
     }
 
@@ -29,14 +41,6 @@ sub mk_classdata {
      return ${$v};
     } else {
       foreach my $super ( $meta->linearized_isa ) {
-        # If there is a code symbol for this attr in a parent class, 
-        # then copy it into our package. Is this the correct
-        # fix for C::D::I back-compat? (t0m)
-        my $parent_symbol = *{"${super}::${attribute}"}{CODE} ? \&{"${super}::${attribute}"} : undef;
-        # FIXME - this is over-enthusiastic?
-        if (defined $parent_symbol) {
-          *{"${pkg}::${attribute}"} = $parent_symbol;
-        }
         # tighter version of same after
         # my $super_meta = Moose::Meta::Class->initialize($super);
         my $v = ${"${super}::"}{$attribute} ? *{"${super}::${attribute}"}{SCALAR} : undef;
