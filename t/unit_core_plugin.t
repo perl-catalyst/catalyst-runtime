@@ -19,6 +19,8 @@ use lib 't/lib';
 use Catalyst::Test qw/PluginTestApp/;
 
 ok( get("/compile_time_plugins"), "get ok" );
+# FIXME - Run time plugin support is insane, and should be removed
+#         for Catalyst 5.9
 ok( get("/run_time_plugins"),     "get ok" );
 
 use_ok 'TestApp';

@@ -862,11 +862,19 @@ loads and instantiates the given class.
     MyApp->plugin( 'prototype', 'HTML::Prototype' );
 
     $c->prototype->define_javascript_functions;
+    
+B<Note:> This method of adding plugins is deprecated. The ability
+to add plugins like this B<will be removed> in a Catalyst 5.9.
+Please do not use this functionality in new code.
 
 =cut
 
 sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
+
+    # See block comment in t/unit_core_plugin.t    
+    $class->log->debug(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.9/);
+    
     $class->_register_plugin( $plugin, 1 );
 
     eval { $plugin->import };

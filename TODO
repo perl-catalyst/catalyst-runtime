@@ -1,6 +1,3 @@
-Pending patches:
-  - meta test for MX::Emulate::CAF needed by Catalyst::Plugin::Cache::Curried
-    
 Back-compat investigation / known issues:
 
   - Get engines tested:
@@ -39,9 +36,6 @@ Back-compat investigation / known issues:
        an exception. Needs a test case (Caelum)
      
      - Catalyst::Plugin::Authentication new release.
-     
-     - Deprecation/Upgrade notice in Catalyst Makefile.PL for known broken
-       versions of plugins.
 
   - Issues with TWMC not being loaded when it used to be in 5.70 
     (Bill Moseley)
@@ -54,7 +48,10 @@ Back-compat investigation / known issues:
      This obviously needs better tests :/
 
 Cleanups:
-    
+
+  - Allow turning deprecated warnings off with use Catalyst 
+    qw/-NoDeprecationWarnings/
+
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages 
       when you do it as well as how to fix it.
@@ -65,8 +62,6 @@ Cleanups:
 
   - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
     disk and fix it. (Believed to be in the optional TEST_HTTP tests?) (t0m)
-
-  - Deprecate runtime plugins with warning.
 
 Documentation:
 
@@ -91,3 +86,6 @@ Tests:
   - Moosified test application?
 
   - Test warning from back-compat methods in Catalyst::Dispatcher
+  
+  - Test warnings from plugin method on Catalyst
+
