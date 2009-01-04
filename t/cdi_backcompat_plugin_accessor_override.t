@@ -24,13 +24,16 @@ $SIG{__DIE__} = \&Carp::confess;
     __PACKAGE__->config;
 }
 
-lives_ok {
-    CDICompatTestApp->setup;
-} 'Setup app with plugins which says use base qw/Class::Accessor::Fast/';
+SKIP: {
+  skip 'Not trying to replicate the nasty CDI hackness', 2;
+  lives_ok {
+      CDICompatTestApp->setup;
+  } 'Setup app with plugins which says use base qw/Class::Accessor::Fast/';
 
-# And the plugin's setup_finished method should have been run, as accessors
-# are not created in MyApp until the data is written to.
-{
-    no warnings 'once';
-    is $CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED, 1, 'Plugin setup_finish run';
+  # And the plugin's setup_finished method should have been run, as accessors
+  # are not created in MyApp until the data is written to.
+  {
+      no warnings 'once';
+      is $CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED, 1, 'Plugin setup_finish run';
+  }
 }

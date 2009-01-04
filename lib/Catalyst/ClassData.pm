@@ -16,18 +16,6 @@ sub mk_classdata {
     my $meta = $pkg->Class::MOP::Object::meta();
     if (@_ > 1) {
       $meta->namespace->{$attribute} = \$_[1];
-      no strict 'refs';
-      if (! *{"${pkg}::${attribute}"}{CODE} ) {
-        foreach my $super ( $meta->linearized_isa ) {
-          # If there is a code symbol for this class data in a parent class, but not in our 
-          # class then copy it into our package. This is evil.
-          my $parent_symbol = *{"${super}::${attribute}"}{CODE} ? \&{"${super}::${attribute}"} : undef;
-          if (defined $parent_symbol) {
-            *{"${pkg}::${attribute}"} = $parent_symbol;
-            last;
-          }
-        }      
-      }
       return $_[1];
     }
 

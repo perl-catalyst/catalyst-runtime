@@ -1,7 +1,5 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-        - Fix plugins which hook onto setup_finished being called (t0m)
-          - Test for this (t0m)
         - Fix calling use Catalyst::Test 'MyApp' 'foo' which used to work,
           but stopped as the 2nd parameter can be an options hash now (t0m)
         - Bump Moose dependency to fix make_immutable bug (t0m)
@@ -40,10 +38,6 @@
           method is called, fixing issues with plugins which have their 
           own new methods by inlining a constructor on MyApp (t0m)
           - Test for this and method modifiers in MyApp (t0m)
-        - Fix Catalyst::Plugin::Authentication's authentication
-          plugin backwards compatibility issues by fixing 
-          Class::Data::Inheritable compatibility (t0m)
-          - Test for this (t0m)
         - Fix bug causing Catalyst::Request::Upload's basename method
           to return undef (t0m)
           - Test for this (Carl Franks)
