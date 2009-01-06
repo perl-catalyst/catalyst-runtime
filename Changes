@@ -8,6 +8,7 @@
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
         - Make :Chained('../action') work (Florian Ragwitz)
+        - Handle leading CRLF in HTTP requests sometimes sent by IE6 in keep-alive requests.
 
 5.7099_03 2008-07-20 10:10:00
         - Fix regressions for regexp fallback in model(), view() and controller()
