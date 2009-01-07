@@ -45,6 +45,10 @@ FIXME
 
 FIXME Warning
 
+=head2 $c->plugin method
+
+Deprecated
+
 =head2 Components which inherit Catalyst::Component's COMPONENT method, who's new method does not return a true value.
 
 Previously if your new method returned a false value, then your class' configuration would be blessed into a hash on your behalf,

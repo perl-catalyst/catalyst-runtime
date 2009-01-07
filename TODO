@@ -5,7 +5,6 @@ Back-compat investigation:
     - Catalyst-Engine-XMPP2
     - Catalyst-Engine-HTTPEngine
     - Catalyst-Engine-HTTP-Prefork
-    - Catalyst-Engine-SCGI
     - Catalyst-Engine-Wx
 
 Known issues:
@@ -32,8 +31,6 @@ Known issues:
        - Conflict with each other: $c->config->{debug}->{foo} = 'bar'
          now breaks, unsure why..
 
-  - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
-
 Cleanups:
 
   - Update Test suite to not assume MyApp ISA Controller
@@ -56,11 +53,7 @@ Documentation:
        - How to write Moosified Catalyst components.
 
    - Fix the Roadmap to be less full of lies.
-      
-   - Document all other known failure cases / upgrade issues.
-   
-   - Tidy up / finish off incompatibility warnings etc.
-   
+
    - Catalyst/Upgrading.pod
 
 Reported bugs:
