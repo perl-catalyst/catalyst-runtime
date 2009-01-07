@@ -1,6 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.7XXXXXX XXXX
+        - Add environment hack for FastCGI under IIS (Simon Bertrang)
+          - Test for this and preexisting Lighty hack (Simon Bertrang)
         - Change streaming test to serve itself rather than 01use.t, making test
           sync for engines easier (t0m)
         - Workaround change in LWP that broke a cookie test (RT #40037)
