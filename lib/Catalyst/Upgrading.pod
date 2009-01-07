@@ -19,6 +19,28 @@ your Class' @ISA will not linearise with C3.
 
 rafl to fix this bit :)
 
+=head2 Anonymous closures installed directly into the symbol table
+
+If you have any code which installs anonymous subroutine references directly
+into the symbol table, you may encounter breakages. The simplest solution is
+to use L<Sub::Name> to name the subroutine. Example:
+
+    #Originalcode, likely to break:
+    my $full_method_name = join('::',$package_name, $method_name);
+    *$full_method_name = sub { ... };
+
+    #Fixed Code
+    use Sub::Name 'subname';
+    my $full_method_name = join('::',$package_name, $method_name);
+    *$full_method_name = subname $full_method_name, sub { ... };
+
+Additionally, you can take advantage of Catalyst's use of L<Class::MOP> and
+install the closure using the appropriate metaclass. Example:
+
+    use Class::MOP;
+    my $metaclass = Moose::Meta::Class->initialize($package_name);
+    $metaclass->add_method($method_name => sub { ... });
+
 =head2 Components without new methods
 
 FIXME
