@@ -66,7 +66,7 @@ sub run_test {
     print "Final Size:   $final\n";
     
     if ( $final > $initial ) {
-        print "Leaked:       " . ($final - $initial) . "\n";
+        print "Leaked:       " . ($final - $initial) . "K\n";
     }
     
     is( $final, $initial, "'$uri' memory is not leaking" );
