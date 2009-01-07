@@ -1,0 +1,84 @@
+=head1 Upgrading to Catalyst 5.80
+
+Work in progress
+
+=head1 Known backwards compatibility breakages.
+
+=head2 Catalyst::Plugin::Authentication
+
+You need at least version FIXME of Catalyst::Plugin::Authentication.
+
+=head2 Moose applications
+
+Applications made by early adopters, which say:
+
+    extends qw/Moose::Object Catalyst::Component/
+
+need the C<Moose::Object> removing to run with Catalyst 5.80, otherwise
+your Class' @ISA will not linearise with C3.
+
+rafl to fix this bit :)
+
+=head2 Components without new methods
+
+FIXME
+
+=head2 Components without COMPONENT methods
+
+FIXME
+
+=head2 __PACKAGE__->mk_accessor('meta');
+
+Won't work due to a limitation of L<MooseX::Emulate::Class::Accessor::Fast>
+
+FIXME
+
+=head2 Class::Data::Inheritable side effects
+
+FIXME
+
+=head2 Extending Catalyst::Request or other classes in an ad-hoc manor using mk_accessor
+
+FIXME
+
+=head2 require $class was successful but the package is not defined.
+
+FIXME Warning
+
+=head2 Components which inherit Catalyst::Component's COMPONENT method, who's new method does not return a true value.
+
+Previously if your new method returned a false value, then your class' configuration would be blessed into a hash on your behalf,
+and this would be returned from the COMPONENT method. This is no longer supported. You are not recommended to implement your own new method
+in components, instead, you should inherit the new method from Catalyst::Component, and use Moose's BUILD functionality
+to perform any construction work necessary for your sub-class.
+
+
+=head Methods in Catalyst::Dispatcher
+
+    Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
+    . "this will be removed in Catalyst 5.9X"
+
+FIXME
+
+=head2 Confused multiple inheritence with Catalyst::Component::COMPONENT
+
+Warning message:
+
+    There is a COMPONENT method resolving after Catalyst::Component 
+    in ${next_package}.
+    
+This means that one of the packages on the right hand side of 
+Catalyst::Component in your Class' inheritance hierarchy defines
+a COMPONENT method.
+
+Previously, Catalyst's COMPONENT method would delegate to the
+method on the right hand side, which could then delegate back again
+with NEXT. This (as it is insane), is no longer supported, as it
+makes no sense with C3 method dispatch order.
+
+Therefore the correct fix is to re-arrange your class' inheritance
+hierarchy so that the COMPONENT method you would like to inherit is
+the first COMPONENT method in your @ISA. 
+
+
+=cut

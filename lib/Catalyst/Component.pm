@@ -77,8 +77,10 @@ sub COMPONENT {
     if( my $next = $self->next::can ){
       my $class = blessed $self || $self;
       my ($next_package) = Class::MOP::get_code_info($next);
-      warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}. This behavior is deprecated and will stop working in future releases.";
-      return $next->($self, $arguments);
+      warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}.\n";
+      warn "This behavior can no longer be supported, and so your application is probably broken.\n";
+      warn "Your linearised isa hierarchy is: " . join(', ', mro::get_linear_isa($class)) . "\n";
+      warn "Please see perldoc Catalyst::Upgrading for more information about this issue.\n";
     }
     return $self->new($c, $arguments);
 }

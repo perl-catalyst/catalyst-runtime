@@ -31,26 +31,10 @@ Known issues:
      - Catalyst::Plugin::DebugCookie
        - Conflict with each other: $c->config->{debug}->{foo} = 'bar'
          now breaks, unsure why..
-         
-      - Catalyst::Component::ACCEPT_CONTEXT - Having a COMPONENT method
-        after Catalyst::Component::COMPONENT used to work, and will still
-        delegate (and warn), but then NEXT::COMPONENT will not dtrt if you
-        re-dispatch again (NEXT would seemingly go back to the start?)..
-        See Reaction test suite for example of this happening.
-        FIXME - Also don't think this correctly delegates - $c appears 
-        missing.
 
   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
 
-  -  In 5.70, you can have a component which doesn't inherit from ::Component, 
-     and has no new method, and it'll do the right thing for you. We should 
-     still support that, but warn for/deprecate it so it can go for 5.9X...
-     This obviously needs better tests :/
-
 Cleanups:
-
-  - Allow turning deprecated warnings off with use Catalyst 
-    qw/-NoDeprecationWarnings/
 
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages 
@@ -65,21 +49,19 @@ Cleanups:
 
 Documentation:
 
-   - extends in components with attributes must be inside a BEGIN block.
-
-   - How to write Moosified Catalyst components.
-
    - Manual / Tutorial updates
 
-   - Fix the Roadmap to be less full of lies.
+       - extends in components with attributes must be inside a BEGIN block.
 
-   -  With 5.7 people did extends qw/Moose::Object Catalyst::Component/, now 
-      Catalyst::Component isa Moose::Object so now isa doesn't linearize 
-      anymore, docs of what doesn't work and why (rafl)
+       - How to write Moosified Catalyst components.
+
+   - Fix the Roadmap to be less full of lies.
       
    - Document all other known failure cases / upgrade issues.
    
    - Tidy up / finish off incompatibility warnings etc.
+   
+   - Catalyst/Upgrading.pod
 
 Reported bugs:
 
@@ -94,7 +76,7 @@ Tests:
 
   - Moosified test application?
 
-  - Test warning from back-compat methods in Catalyst::Dispatcher
+  - Test & document warnings from back-compat methods in Catalyst::Dispatcher
   
-  - Test warnings from plugin method on Catalyst
+  - Test & document warnings from plugin method on Catalyst
 
