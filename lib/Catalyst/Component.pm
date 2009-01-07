@@ -7,6 +7,7 @@ use Catalyst::Utils;
 use Class::C3::Adopt::NEXT;
 use MRO::Compat;
 use mro 'c3';
+use Scalar::Util qw/blessed/;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 with 'Catalyst::ClassData';
@@ -99,7 +100,8 @@ sub config {
         # work in a subclass. If we don't have the package symbol in the
         # current class we know we need to copy up to ours, which calling
         # the setter will do for us.
-        my $meta = $self->Class::MOP::Object::meta();
+        my $class = blessed($self) || $self;
+        my $meta = Class::MOP::get_metaclass_by_name($class);
         unless ($meta->has_package_symbol('$_config')) {
 
             $config = $self->merge_config_hashes( $config, {} );

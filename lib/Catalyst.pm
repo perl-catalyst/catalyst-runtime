@@ -5,7 +5,6 @@ package Catalyst;
 use Class::C3;
 
 use Moose;
-use Class::MOP::Object ();
 extends 'Catalyst::Component';
 use bytes;
 use Scope::Upper ();
@@ -1033,7 +1032,7 @@ EOF
     # modifiers work correctly in MyApp (as you have to call setup _before_ 
     # applying modifiers).
     Scope::Upper::reap(sub {
-        my $meta = $class->Moose::Object::meta();
+        my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_immutable unless $meta->is_immutable;
     }, 1);
 
@@ -2102,7 +2101,7 @@ sub setup_engine {
     }
 
     if ( $ENV{MOD_PERL} ) {
-        my $meta = $class->Class::MOP::Object::meta();
+        my $meta = Class::MOP::get_metaclass_by_name($class);
         
         # create the apache method
         $meta->add_method('apache' => sub { shift->engine->apache });
@@ -2252,7 +2251,7 @@ sub setup_log {
 
     my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
     if ( defined($env_debug) or $levels{debug} ) {
-        $class->Class::MOP::Object::meta()->add_method('debug' => sub { 1 });
+        Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
     }
 }
@@ -2276,7 +2275,7 @@ sub setup_stats {
 
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
     if ( defined($env) ? $env : ($stats || $class->debug ) ) {
-        $class->Class::MOP::Object::meta()->add_method('use_stats' => sub { 1 });
+        Class::MOP::get_metaclass_by_name($class)->add_method('use_stats' => sub { 1 });
         $class->log->debug('Statistics enabled');
     }
 }
@@ -2319,7 +2318,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
             no strict 'refs';
-            if ( my $meta = $class->Class::MOP::Object::meta() ) {
+            if ( my $meta = Class::MOP::get_metaclass_by_name($class) ) {
               my @superclasses = ($plugin, $meta->superclasses );
               $meta->superclasses(@superclasses);
             } else {

@@ -4,7 +4,7 @@ use Moose;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Data::Dump;
-use Class::MOP::Object ();
+use Class::MOP ();
 
 our %LEVELS = ();
 
@@ -15,7 +15,7 @@ has abort => (is => 'rw');
 {
     my @levels = qw[ debug info warn error fatal ];
 
-    my $meta = __PACKAGE__->Class::MOP::Object::meta();
+    my $meta = Class::MOP::get_metaclass_by_name(__PACKAGE__);
     for ( my $i = 0 ; $i < @levels ; $i++ ) {
 
         my $name  = $levels[$i];
