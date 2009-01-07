@@ -74,7 +74,7 @@ sub size_of {
     
     foreach my $p ( @{ $t->table } ) {
         if ( $p->pid == $pid ) {
-            return $p->size;
+            return $p->rss;
         }
     }
     
