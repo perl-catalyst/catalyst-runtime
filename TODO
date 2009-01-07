@@ -1,4 +1,4 @@
-Back-compat investigation / known issues:
+Back-compat investigation:
 
   - Get engines tested:
     - Catalyst-Engine-Zeus
@@ -8,21 +8,11 @@ Back-compat investigation / known issues:
     - Catalyst-Engine-SCGI
     - Catalyst-Engine-Wx
 
-  - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
-    table as methods, tests + fix, or explanation and documentation?
-    (rafl & phaylon)
-
-  - Run another round of repository smokes against latest 5.80 trunk, manually
-    go through all the things which are broken (t0m).
-    
-     - Catalyst-Plugin-Session-State-Cookie
-       Catalyst-Plugin-Session-Store-FastMmap
-       Catalyst-Plugin-Session-PerUser
-       Catalyst-Plugin-Session-Store-File
-       Catalyst-Authentication-Credential-HTTP
-       Catalyst-Plugin-SmartURI
-        - All fixed by Scope::Upper
-     
+Known issues:
+     - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
+       table as methods, tests + fix, or explanation and documentation?
+       (rafl & phaylon)
+ 
      - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" 
        (rafl)
      
@@ -36,9 +26,19 @@ Back-compat investigation / known issues:
        an exception. Needs a test case (Caelum)
      
      - Catalyst::Plugin::Authentication new release.
-
-  - Issues with TWMC not being loaded when it used to be in 5.70 
-    (Bill Moseley)
+     
+     - Catalyst::Action::RenderView
+     - Catalyst::Plugin::DebugCookie
+       - Conflict with each other: $c->config->{debug}->{foo} = 'bar'
+         now breaks, unsure why..
+         
+      - Catalyst::Component::ACCEPT_CONTEXT - Having a COMPONENT method
+        after Catalyst::Component::COMPONENT used to work, and will still
+        delegate (and warn), but then NEXT::COMPONENT will not dtrt if you
+        re-dispatch again (NEXT would seemingly go back to the start?)..
+        See Reaction test suite for example of this happening.
+        FIXME - Also don't think this correctly delegates - $c appears 
+        missing.
 
   - Fix memory leaks (I already tried Devel::Leak::Object, but no joy).
 
@@ -76,6 +76,15 @@ Documentation:
    -  With 5.7 people did extends qw/Moose::Object Catalyst::Component/, now 
       Catalyst::Component isa Moose::Object so now isa doesn't linearize 
       anymore, docs of what doesn't work and why (rafl)
+      
+   - Document all other known failure cases / upgrade issues.
+   
+   - Tidy up / finish off incompatibility warnings etc.
+
+Reported bugs:
+
+   - Issues with TWMC not being loaded when it used to be in 5.70 
+     (Bill Moseley)
 
 Profiling:
 
