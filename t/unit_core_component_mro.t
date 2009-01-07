@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More tests => 1;
 use strict;
 use warnings;
 
@@ -7,8 +7,7 @@ use warnings;
   use Test::More;
 
   sub COMPONENT {
-    my $caller = caller;
-    is($caller, 'Catalyst::Component', 'Correct method resolution');
+    fail 'This no longer gets dispatched to';
   }
 
   package MyApp::MyComponent;
@@ -17,10 +16,14 @@ use warnings;
 
 }
 
-{
-  my $expects = qr/after Catalyst::Component in MyApp::Component/;
+my $warn = '';
+{  
   local $SIG{__WARN__} = sub {
-    like($_[0], $expects, 'correct warning thrown');
+    $warn .= $_[0];  
   };
   MyApp::MyComponent->COMPONENT('MyApp');
 }
+
+like($warn, qr/after Catalyst::Component in MyApp::Component/, 
+    'correct warning thrown');
+
