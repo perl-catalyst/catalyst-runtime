@@ -9,14 +9,12 @@ Back-compat investigation:
 
 Known issues:
      - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
-       table as methods, tests + fix, or explanation and documentation?
-       (rafl & phaylon)
- 
+       table as methods, new version of fixed plugin (rafl), explanation of 
+       the issue in Catalyst::Upgrading (groditi)
+       
      - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" 
        (rafl)
-     
-     - Catalyst-Plugin-Cache dies due to mk_accessors('meta')
-     
+
      - CatalystX-CRUD and CatalystX-CRUD-ModelAdapter-DBIC
        fail tests against 5.80 (karpet)
 
@@ -32,6 +30,13 @@ Known issues:
          now breaks, unsure why..
 
 Cleanups:
+
+18:01 <@mst> hmm. I think that warning should show what it found
+18:01 <@mst> and say "you probably called ->model("Sessions") when you meant ->model("DB::Sessions")" or whatever
+18:05 <@mst> unsafe_component_use_ok
+18:05 <@mst> like we did for BindLex
+
+
 
   - Update Test suite to not assume MyApp ISA Controller
     - After that set up attr handlers that will output helpful error messages 
@@ -68,8 +73,6 @@ Profiling:
 Tests:
 
   - Moosified test application?
-
-  - Test & document warnings from back-compat methods in Catalyst::Dispatcher
   
   - Test & document warnings from plugin method on Catalyst
 

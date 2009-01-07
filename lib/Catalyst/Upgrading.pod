@@ -79,12 +79,40 @@ in components, instead, you should inherit the new method from Catalyst::Compone
 to perform any construction work necessary for your sub-class.
 
 
-=head Methods in Catalyst::Dispatcher
+=head1 WARNINGS
+
+=head2 Methods in Catalyst::Dispatcher
+
+The following methods in Catalyst::Dispatcher are likely to change 
+significantly in the 5.8X release series, and therefore their use is highly
+deprecated.
+
+=over
+
+=item tree 
+
+=item dispatch_types 
+
+=item registered_dispatch_types 
+
+=item method_action_class  
+
+=item action_hash 
+
+=item container_hash
+
+=back
+
+The first time one of these methods is called, a warning will be emitted:
 
     Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
     . "this will be removed in Catalyst 5.9X"
 
-FIXME
+You should B<NEVER> be calling any of these methods from application code.
+
+Plugins authors and maintainers whos plugins need to call these methods 
+should email the development list to discuss your use-case, and what a 
+better API should look like.
 
 =head2 Confused multiple inheritence with Catalyst::Component::COMPONENT
 

@@ -126,6 +126,7 @@ check_conflicts();
 sub check_conflicts {
     my %conflicts = (
         'Catalyst::Plugin::Authentication' => '0.100092',
+        'CatalystX::Imports' => '0.03',
     );
 
     my $found = 0;
