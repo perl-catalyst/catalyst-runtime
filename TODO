@@ -8,8 +8,11 @@ Back-compat investigation:
     - Catalyst-Engine-Wx
 
 Known issues:
-     - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" 
-       (rafl)
+
+     - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" due
+       to Adopt::NEXT not remembering which setup methods were already called
+       and which not, like NEXT does. Log::Log4perl needs to be fixed and the
+       problem should be described in Upgrading.pod. (rafl)
 
      - CatalystX-CRUD and CatalystX-CRUD-ModelAdapter-DBIC
        fail tests against 5.80 (karpet)
