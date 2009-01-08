@@ -8,10 +8,6 @@ Back-compat investigation:
     - Catalyst-Engine-Wx
 
 Known issues:
-     - CatalystX-Imports, Class::MOP doesn't consider anon subs in the symbol 
-       table as methods, new version of fixed plugin (rafl), explanation of 
-       the issue in Catalyst::Upgrading (groditi)
-       
      - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" 
        (rafl)
 
