@@ -10,14 +10,14 @@ You need at least version FIXME of Catalyst::Plugin::Authentication.
 
 =head2 Moose applications
 
-Applications made by early adopters, which say:
+Moose components for Catalyst 5.70 needed to do
 
-    extends qw/Moose::Object Catalyst::Component/
+    extends qw/Moose::Object Catalyst::Component/;
 
-need the C<Moose::Object> removing to run with Catalyst 5.80, otherwise
-your Class' @ISA will not linearise with C3.
-
-rafl to fix this bit :)
+to be able to use the constructor provided by Moose. In 5.80
+C<Catalyst::Component> already inherits from C<Moose::Object>. Therefor you
+shouldn't directly inherit from C<Moose::Object> yourself, otherwise your
+Class' @ISA will not linearise with C3.
 
 =head2 Anonymous closures installed directly into the symbol table
 
