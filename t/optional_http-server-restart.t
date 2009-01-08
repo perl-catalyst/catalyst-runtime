@@ -3,16 +3,19 @@
 use strict;
 use warnings;
 
+use Test::More;
+BEGIN {
+    plan skip_all => 'set TEST_HTTP to enable this test' unless $ENV{TEST_HTTP};
+}
+
 use File::Path;
 use FindBin;
 use LWP::Simple;
 use IO::Socket;
 use IPC::Open3;
-use Test::More;
 use Time::HiRes qw/sleep/;
 eval "use Catalyst::Devel 1.0;";
 
-plan skip_all => 'set TEST_HTTP to enable this test' unless $ENV{TEST_HTTP};
 plan skip_all => 'Catalyst::Devel required' if $@;
 plan skip_all => 'Catalyst::Devel >= 1.04 required' if $Catalyst::Devel::VERSION <= 1.03;
 eval "use File::Copy::Recursive";

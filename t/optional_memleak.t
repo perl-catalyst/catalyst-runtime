@@ -3,14 +3,15 @@
 use strict;
 use warnings;
 
+use Test::More;
+BEGIN {
+    plan skip_all => 'set TEST_MEMLEAK to enable this test'
+        unless $ENV{TEST_MEMLEAK};
+}
+
 use FindBin;
 use lib "$FindBin::Bin/lib";
-
-use Test::More;
 use Catalyst::Test 'TestApp';
-
-plan skip_all => 'set TEST_MEMLEAK to enable this test'
-    unless $ENV{TEST_MEMLEAK};
 
 eval "use Proc::ProcessTable";
 plan skip_all => 'Proc::ProcessTable required for this test' if $@;

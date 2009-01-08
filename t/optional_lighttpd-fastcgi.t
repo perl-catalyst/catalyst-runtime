@@ -3,14 +3,16 @@
 use strict;
 use warnings;
 
+use Test::More;
+BEGIN {
+    plan skip_all => 'set TEST_LIGHTTPD to enable this test'
+        unless $ENV{TEST_LIGHTTPD};
+}
+
 use File::Path;
 use FindBin;
 use IO::Socket;
-use Test::More;
 
-plan skip_all => 'set TEST_LIGHTTPD to enable this test' 
-    unless $ENV{TEST_LIGHTTPD};
-    
 eval "use FCGI";
 plan skip_all => 'FCGI required' if $@;
 

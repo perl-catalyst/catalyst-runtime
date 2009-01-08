@@ -3,18 +3,19 @@
 use strict;
 use warnings;
 
+use Test::More;
+BEGIN {
+    plan skip_all => 'set TEST_STRESS to enable this test'
+      unless $ENV{TEST_STRESS};
+}
+
 use FindBin;
 use lib "$FindBin::Bin/lib";
-
-use Test::More;
 use Catalyst::Test 'TestApp';
 
 our ( $iters, $tests );
 
 BEGIN {
-    plan skip_all => 'set TEST_STRESS to enable this test'
-      unless $ENV{TEST_STRESS};
-
     eval "use YAML";
     plan skip_all => 'YAML is required for this test' if $@;
 
