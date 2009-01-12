@@ -1,8 +1,3 @@
-Back-compat investigation:
-
-  - Get engines tested:
-    - Catalyst-Engine-HTTP-Prefork
-
 Known issues:
 
      - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" due
@@ -13,18 +8,14 @@ Known issues:
      - Waiting on new releases:
        - Catalyst::Plugin::Authentication - 0.100092
        - Catalyst::Action::RenderView     - 0.08
-       - Catalyst::Plugin::DebugCookie    - 0.999002
        - CatalystX::CRUD                  - 0.38
+
+     - MX::Emulate::CAF - list assignment (see notes in Upgrading.pod and 
+       branch in svn)
 
 Documentation:
 
-   - Manual / Tutorial updates
-
-       - extends in components with attributes must be inside a BEGIN block.
-
-       - How to write Moosified Catalyst components.
-
-   - Catalyst/Upgrading.pod
+   - Catalyst/Upgrading.pod needs brushing up
 
 Profiling:
 
