@@ -139,12 +139,7 @@ sub run {
     while ( $request->Accept >= 0 ) {
         $proc_manager && $proc_manager->pm_pre_dispatch();
         
-        # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
-        # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
-        # Thanks to Mark Blythe for this fix
-        if ( $env{SERVER_SOFTWARE} && $env{SERVER_SOFTWARE} =~ /lighttpd/ ) {
-            $env{PATH_INFO} ||= delete $env{SCRIPT_NAME};
-        }
+        $self->_fix_env( \%env );
         
         $class->handle_request( env => \%env );
         
@@ -209,6 +204,43 @@ sub daemon_detach {
     open STDOUT, ">&STDIN"     or die $!;
     open STDERR, ">&STDIN"     or die $!;
     POSIX::setsid();
+}
+
+=head2 $self->_fix_env( $env )
+
+Adjusts the environment variables when necessary.
+
+=cut
+
+sub _fix_env
+{
+    my $self = shift;
+    my $env = shift;
+
+    return unless ( $env->{SERVER_SOFTWARE} );
+
+    # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
+    # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
+    # Thanks to Mark Blythe for this fix
+    if ( $env->{SERVER_SOFTWARE} =~ /lighttpd/ ) {
+        $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
+    }
+    # Fix the environment variables PATH_INFO and SCRIPT_NAME when running under IIS 6.0
+    elsif ( $env->{SERVER_SOFTWARE} =~ /IIS\/6.0/ ) {
+        my @script_name = split(m!/!, $env->{PATH_INFO});
+        my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
+        my @path_info;
+
+        while ($script_name[$#script_name] eq $path_translated[$#path_translated]) {
+            pop(@path_translated);
+            unshift(@path_info, pop(@script_name));
+        }
+
+        unshift(@path_info, '', '');
+
+        $env->{PATH_INFO} = join('/', @path_info);
+        $env->{SCRIPT_NAME} = join('/', @script_name);
+    }
 }
 
 1;
