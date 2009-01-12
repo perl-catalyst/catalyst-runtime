@@ -1,11 +1,7 @@
 Back-compat investigation:
 
   - Get engines tested:
-    - Catalyst-Engine-Zeus
-    - Catalyst-Engine-XMPP2
-    - Catalyst-Engine-HTTPEngine
     - Catalyst-Engine-HTTP-Prefork
-    - Catalyst-Engine-Wx
 
 Known issues:
 
@@ -23,8 +19,8 @@ Known issues:
      
      - Waiting on new releases:
        - Catalyst::Plugin::Authentication - 0.100092
-       - Catalyst::Action::RenderView    - 0.08
-       - Catalyst::Plugin::DebugCookie'    - 0.999002
+       - Catalyst::Action::RenderView     - 0.08
+       - Catalyst::Plugin::DebugCookie    - 0.999002
 
 Cleanups:
 
@@ -40,11 +36,6 @@ Documentation:
        - How to write Moosified Catalyst components.
 
    - Catalyst/Upgrading.pod
-
-Reported bugs:
-
-   - Issues with TWMC not being loaded when it used to be in 5.70 
-     (Bill Moseley)
 
 Profiling:
 
