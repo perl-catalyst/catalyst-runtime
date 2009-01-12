@@ -18,11 +18,6 @@ Known issues:
        - Catalyst::Action::RenderView     - 0.08
        - Catalyst::Plugin::DebugCookie    - 0.999002
 
-Cleanups:
-
-  - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
-    disk and fix it. (Believed to be in the optional TEST_HTTP tests?) (t0m)
-
 Documentation:
 
    - Manual / Tutorial updates
