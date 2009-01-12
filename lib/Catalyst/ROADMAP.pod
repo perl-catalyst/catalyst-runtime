@@ -10,9 +10,58 @@ Make sure you get it from there to ensure you have the latest version.
 
 =head2 5.80000 1st Quarter 2009
 
-Next major planned release.
+Next major planned release, ports Catalyst to Moose, and does some refactoring to help app/ctx.
 
-=over 4
+=head2 5.81000 
+
+=over
+
+=item Reduce core class data usage.
+
+Refactor everything that doesn't have to be class data into object data
+
+=item Work towards a declarative syntax mode
+
+Dispatcher refactoring to provide alternatives to deprecated methods, and 
+support for pluggable dispatcher builders (so that attributes can be replaced).
+
+=item MyApp should not ISA Catalyst::Controller
+
+=over
+
+=item Update Test suite to not assume MyApp ISA Controller
+
+=item After that set up attr handlers that will output helpful error messages when you do it as well as how to fix it.
+
+=back
+
+=back
+
+=head2 5.82000
+
+=over
+
+=item Extend pluggability of the Catalyst core.
+
+good support for reusable components good support for reusable plugins good 
+separation of plugins (some reusable components want different plugins) 
+near total engine independence
+
+=back
+
+=head2 5.90000
+
+=over
+
+=item  Application / Context Split 
+
+Catalyst needs to be split so that $c refers to the current context, and is a separate thing from the Application class.
+
+=back
+
+=head2 Wishlist
+
+=over
 
 =item move all inline pod to bottom of file.
 
@@ -21,29 +70,4 @@ Next major planned release.
 =item Add support for configuration profiles to be selected at startup time
 through switches / ENV
 
-=item  Application / Context Split 
-
-Catalyst needs to be split so that $c refers to the current context, and is a separate thing from the Application class.
-
-=item Extend pluggability of the Catalyst core.
-
-good support for reusable components good support for reusable plugins good 
-separation of plugins (some reusable components want different plugins) 
-near total engine independence
-
-=item Reduce core class data usage.
-
-Refactor everything that doesn't have to be class data into object data
-
-=item Add support for Isotope Engines
-
-This depends on the progress of Isotope
-
-=item Work towards a declarative syntax mode
-
 =back
- 
-=head2 5.90000 2009
-
-Blue Sky. Will start planning this once we land 5.8 :)
-

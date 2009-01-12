@@ -617,7 +617,7 @@ sub model {
         $c->log->warn( '* $c->config->{default_model} # the name of the default model to use' );
         $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
         $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
-        $c->log->warn( 'NB: in version 5.80, the "random" behavior will not work at all.' );
+        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
     return $c->_filter_component( $comp );
@@ -670,7 +670,7 @@ sub view {
         $c->log->warn( '* $c->config->{default_view} # the name of the default view to use' );
         $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
         $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
-        $c->log->warn( 'NB: in version 5.80, the "random" behavior will not work at all.' );
+        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
     return $c->_filter_component( $comp );

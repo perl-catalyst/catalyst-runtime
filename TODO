@@ -30,21 +30,6 @@ Known issues:
 
 Cleanups:
 
-18:01 <@mst> hmm. I think that warning should show what it found
-18:01 <@mst> and say "you probably called ->model("Sessions") when you meant ->model("DB::Sessions")" or whatever
-18:05 <@mst> unsafe_component_use_ok
-18:05 <@mst> like we did for BindLex
-
-
-
-  - Update Test suite to not assume MyApp ISA Controller
-    - After that set up attr handlers that will output helpful error messages 
-      when you do it as well as how to fix it.
-
-  - Eliminate all instances of $instance->{$key}, I think the only thing
-    left is lib/Catalyst/Engine/HTTP.pm: $self->{inputbuf}, which I haven't
-    touched as it is used as an lvalue in a lot of places (t0m)
-
   - Find whatever in the test suite craps a file called GLOB(0xfoo) onto my 
     disk and fix it. (Believed to be in the optional TEST_HTTP tests?) (t0m)
 
@@ -55,8 +40,6 @@ Documentation:
        - extends in components with attributes must be inside a BEGIN block.
 
        - How to write Moosified Catalyst components.
-
-   - Fix the Roadmap to be less full of lies.
 
    - Catalyst/Upgrading.pod
 
@@ -72,6 +55,4 @@ Profiling:
 Tests:
 
   - Moosified test application?
-  
-  - Test & document warnings from plugin method on Catalyst
 

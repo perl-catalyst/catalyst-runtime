@@ -25,6 +25,10 @@ has _write_error => ( is => 'rw', predicate => '_has_write_error' );
 
 use namespace::clean -except => [qw/meta/];
 
+# Refactoring note - could/should Eliminate all instances of $self->{inputbuf},
+# which I haven't touched as it is used as an lvalue in a lot of places, and I guess
+# doing it differently could be expensive.. Feel free to refactor and NYTProf :)
+
 =head1 NAME
 
 Catalyst::Engine::HTTP - Catalyst HTTP Engine

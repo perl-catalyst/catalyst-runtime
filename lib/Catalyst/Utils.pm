@@ -265,8 +265,6 @@ sub ensure_class_loaded {
     return if !$opts->{ ignore_loaded }
         && Class::MOP::is_class_loaded($class); # if a symbol entry exists we don't load again
 
-    # FIXME - as soon as Class::MOP 0.67 + 1 is released Class::MOP::load_class($class) can be used instead
-
     # this hack is so we don't overwrite $@ if the load did not generate an error
     my $error;
     {
