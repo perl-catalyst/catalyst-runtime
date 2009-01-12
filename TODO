@@ -12,6 +12,8 @@ Known issues:
 
      - CatalystX-CRUD and CatalystX-CRUD-ModelAdapter-DBIC
        fail tests against 5.80 (karpet)
+       
+     - Catalyst-Plugin-Cache dies due to mk_accessors('meta') - work round.
 
      - Waiting on new releases:
        - Catalyst::Plugin::Authentication - 0.100092

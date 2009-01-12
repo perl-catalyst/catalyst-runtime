@@ -1,12 +1,21 @@
 =head1 Upgrading to Catalyst 5.80
 
-Work in progress
+Most applications and plugins should run unaltered on Catalyst 5.80.
+
+However as a lot of refactoring work has taken place, several changes
+have been made which could cause incompatibilties, if your application
+or plugin is using deprecated code, or relying on side-effects then
+there could be incompatibility.
+
+Most issues found with pre-existing components have been easy to solve, 
+and a complete description of behavior changes which may cause compatibility
+issues, or warnings to be emitted is included below to help if you have
+problems.
+
+If you think you have found an upgrade related issue which is not covered in
+this document, then please email the Catalyst list to discuss the problem.
 
 =head1 Known backwards compatibility breakages.
-
-=head2 Catalyst::Plugin::Authentication
-
-You need at least version FIXME of Catalyst::Plugin::Authentication.
 
 =head2 Moose applications
 
@@ -41,43 +50,60 @@ install the closure using the appropriate metaclass. Example:
     my $metaclass = Moose::Meta::Class->initialize($package_name);
     $metaclass->add_method($method_name => sub { ... });
 
-=head2 Components without new methods
+=head2 Components whos new method returns false
 
-FIXME
+Previously if your new method returned a false value, 
 
-=head2 Components without COMPONENT methods
+Previously, if you had a component which inherited from Catalyst::COMPONENT, but 
+overrode the new method, to return false, then your class' configuration would be blessed into a hash on your behalf,
+and this would be returned from the COMPONENT method. T
 
-FIXME
-
-=head2 __PACKAGE__->mk_accessor('meta');
-
-Won't work due to a limitation of L<MooseX::Emulate::Class::Accessor::Fast>
-
-FIXME
-
-=head2 Class::Data::Inheritable side effects
-
-FIXME
-
-=head2 Extending Catalyst::Request or other classes in an ad-hoc manor using mk_accessor
-
-FIXME
-
-=head2 require $class was successful but the package is not defined.
-
-FIXME Warning
-
-=head2 $c->plugin method
-
-Deprecated
-
-=head2 Components which inherit Catalyst::Component's COMPONENT method, who's new method does not return a true value.
-
-Previously if your new method returned a false value, then your class' configuration would be blessed into a hash on your behalf,
-and this would be returned from the COMPONENT method. This is no longer supported. You are not recommended to implement your own new method
+This behaviour makes no sense, and so has been removed.. You are recommended to implement your own new method
 in components, instead, you should inherit the new method from Catalyst::Component, and use Moose's BUILD functionality
 to perform any construction work necessary for your sub-class.
 
+=head2 __PACKAGE__->mk_accessor('meta');
+
+Won't work due to a limitation of L<Moose>
+
+This is currently being fixed inside core Moose.
+
+=head2 Class::Data::Inheritable side effects
+
+Previously, writing to a class data accessor would copy the accessor method down into your package.
+
+This behavior has been removed. Whilst the class data is still stored per-class, it is stored on
+the metaclass of the class defining the accessor.
+
+Therefore anything relying on the side-effect of the accessor being copied down will be broken.
+
+=head2 Extending Catalyst::Request or other classes in an ad-hoc manor using mk_accessors
+
+Previously, it was possible to add additional accessors to Catalyst::Request (or other classes)
+by calling the mk_accessors class method.
+
+This is no longer supported - users should make a sub-class of the class who's behavior they would
+like to change, rather than globally polluting the Catalyst objects.
+
+=head2 Confused multiple inheritence with Catalyst::Component::COMPONENT
+
+Warning message:
+
+    There is a COMPONENT method resolving after Catalyst::Component 
+    in ${next_package}.
+    
+This means that one of the packages on the right hand side of 
+Catalyst::Component in your Class' inheritance hierarchy defines
+a COMPONENT method.
+
+Previously, Catalyst's COMPONENT method would delegate to the
+method on the right hand side, which could then delegate back again
+with NEXT. This (as it is insane), is no longer supported, as it
+makes no sense with C3 method dispatch order.
+
+Therefore the correct fix is to re-arrange your class' inheritance
+hierarchy so that the COMPONENT method you would like to inherit is
+the first COMPONENT method in your @ISA. 
 
 =head1 WARNINGS
 
@@ -114,25 +140,20 @@ Plugins authors and maintainers whos plugins need to call these methods
 should email the development list to discuss your use-case, and what a 
 better API should look like.
 
-=head2 Confused multiple inheritence with Catalyst::Component::COMPONENT
+=head2 require $class was successful but the package is not defined.
 
-Warning message:
+In this version of Catalyst, if a component is loaded from disk, but no symbols are defined in that component's namespace
+after it is loaded, this warning will be issued.
 
-    There is a COMPONENT method resolving after Catalyst::Component 
-    in ${next_package}.
-    
-This means that one of the packages on the right hand side of 
-Catalyst::Component in your Class' inheritance hierarchy defines
-a COMPONENT method.
+This is to pretect against confusing bugs caused by mis-typing package names.
 
-Previously, Catalyst's COMPONENT method would delegate to the
-method on the right hand side, which could then delegate back again
-with NEXT. This (as it is insane), is no longer supported, as it
-makes no sense with C3 method dispatch order.
+This will become a fatal error in a future version.
 
-Therefore the correct fix is to re-arrange your class' inheritance
-hierarchy so that the COMPONENT method you would like to inherit is
-the first COMPONENT method in your @ISA. 
+=head2 $c->plugin method
 
+Calling the plugin method is deprecated, and calling it at runtime is B<highly deprecated>.
+
+Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to compose the functionality
+you need outside of the main application namespace.
 
 =cut

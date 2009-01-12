@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.8000_05
         - Fix request argumentss getting corrupted if you override the 
           dispatcher and call an action which detaches (for 
           Catalyst::Plugin::Authorization::ACL) (t0m)
