@@ -151,9 +151,14 @@ sub _command2action {
 
     my $action;
 
-    # go to a string path ("/foo/bar/gorch")
-    # or action object which stringifies to that
-    $action = $self->_invoke_as_path( $c, "$command", \@args );
+    if (Scalar::Util::blessed($command) && $command->isa('Catalyst::Action')) {
+        $action = $command;
+    }
+    else {
+        # go to a string path ("/foo/bar/gorch")
+        # or action object which stringifies to that
+        $action = $self->_invoke_as_path( $c, "$command", \@args );
+    }
 
     # go to a component ( "MyApp::*::Foo" or $c->component("...")
     # - a path or an object)
@@ -163,6 +168,67 @@ sub _command2action {
     }
 
     return $action, \@args;
+}
+
+=head2 $self->visit( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub visit {
+    my $self = shift;
+    $self->_do_visit('visit', @_);
+}
+
+sub _do_visit {
+    my $self = shift;
+    my $opname = shift;
+    my ( $c, $command ) = @_;
+    my ( $action, $args ) = $self->_command2action(@_);
+    my $error = qq/Couldn't $opname("$command"): /;
+
+    if (!$action) {
+        $error .= qq/Couldn't $opname to command "$command": /
+                 .qq/Invalid action or component./;
+    }
+    elsif (!defined $action->namespace) {
+        $error .= qq/Action has no namespace: cannot $opname() to a plain /
+                 .qq/method or component, must be a :Action or some sort./
+    }
+    elsif (!$action->class->can('_DISPATCH')) {
+        $error .= qq/Action cannot _DISPATCH. /
+                 .qq/Did you try to $opname() a non-controller action?/;
+    }
+    else {
+        $error = q();
+    }
+
+    if($error) {
+        $c->error($error);
+        $c->log->debug($error) if $c->debug;
+        return 0;
+    }
+
+    $action = $self->expand_action($action);
+
+    local $c->request->{arguments} = $args;
+    local $c->{namespace} = $action->{'namespace'};
+    local $c->{action} = $action;
+
+    $self->dispatch($c);
+}
+
+=head2 $self->go( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub go {
+    my $self = shift;
+    $self->_do_visit('go', @_);
+    die $Catalyst::GO;
 }
 
 =head2 $self->forward( $c, $command [, \@arguments ] )
@@ -390,6 +456,25 @@ sub uri_for_action {
             if defined($uri);
     }
     return undef;
+}
+
+=head2 expand_action 
+
+expand an action into a full representation of the dispatch.
+mostly useful for chained, other actions will just return a
+single action.
+
+=cut
+
+sub expand_action {
+    my ($self, $action) = @_;
+
+    foreach my $dispatch_type (@{ $self->dispatch_types }) {
+        my $expanded = $dispatch_type->expand_action($action);
+        return $expanded if $expanded;
+    }
+
+    return $action;
 }
 
 =head2 $self->register( $c, $action )

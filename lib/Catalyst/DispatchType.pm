@@ -46,6 +46,15 @@ Should return true if it registers something, or false otherwise.
 
 sub register { }
 
+=head2 $self->expand_action
+
+Default fallback, returns nothing. See L<Catalyst::Dispatcher> for more info
+about expand_action.
+
+=cut
+
+sub expand_action { }
+
 =head2 $self->uri_for_action( $action, \@captures )
 
 abstract method, to be implemented by dispatchtypes. Takes a

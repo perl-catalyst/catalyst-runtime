@@ -49,6 +49,7 @@ our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = "catalyst_detach\n";
+our $GO        = "catalyst_go\n";
 
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
@@ -63,7 +64,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.7099_03';
+our $VERSION = '5.7099_04';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -326,6 +327,40 @@ When called with no arguments it escapes the processing chain entirely.
 =cut
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
+
+=head2 $c->visit( $action [, \@arguments ] )
+
+=head2 $c->visit( $class, $method, [, \@arguments ] )
+
+Almost the same as C<forward>, but does a full dispatch, instead of just
+calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
+C<auto> and the method you go to are called, just like a new request.
+
+C<$c-E<gt>stash> is kept unchanged.
+
+In effect, C<visit> allows you to "wrap" another action, just as it
+would have been called by dispatching from a URL, while the analogous
+C<go> allows you to transfer control to another action as if it had
+been reached directly from a URL.
+
+=cut
+
+sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
+
+=head2 $c->go( $action [, \@arguments ] )
+
+=head2 $c->go( $class, $method, [, \@arguments ] )
+
+Almost the same as C<detach>, but does a full dispatch like C<visit>,
+instead of just calling the new C<$action> /
+C<$class-E<gt>$method>. This means that C<begin>, C<auto> and the
+method you visit are called, just like a new request.
+
+C<$c-E<gt>stash> is kept unchanged.
+
+=cut
+
+sub go { my $c = shift; $c->dispatcher->go( $c, @_ ) }
 
 =head2 $c->response
 
@@ -1338,6 +1373,9 @@ sub execute {
     if ( my $error = $@ ) {
         if ( !ref($error) and $error eq $DETACH ) {
             die $DETACH if($c->depth > 1);
+        }
+        elsif ( !ref($error) and $error eq $GO ) {
+            die $GO if($c->depth > 0);
         }
         else {
             unless ( ref $error ) {
@@ -2553,6 +2591,8 @@ the_jester: Jesse Sheidlower
 Ulf Edvinsson
 
 willert: Sebastian Willert <willert@cpan.org>
+
+batman: Jan Henning Thorsen <pm@flodhest.net>
 
 =head1 LICENSE
 

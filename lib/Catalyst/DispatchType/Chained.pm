@@ -294,6 +294,31 @@ sub uri_for_action {
    
 }
 
+=head2 $c->expand_action($action)
+
+Return a list of actions that represents a chained action. See 
+L<Catalyst::Dispatcher> for more info. You probably want to
+use the expand_action it provides rather than this directly.
+
+=cut
+
+sub expand_action {
+    my ($self, $action) = @_;
+
+    return unless $action->attributes && $action->attributes->{Chained};
+
+    my @chain;
+    my $curr = $action;
+
+    while ($curr) {
+        push @chain, $curr;
+        my $parent = $curr->attributes->{Chained}->[0];
+        $curr = $self->{'actions'}{$parent};
+    }
+
+    return Catalyst::ActionChain->from_chain([reverse @chain]);
+}
+
 =head1 USAGE
 
 =head2 Introduction
