@@ -22,11 +22,6 @@ Known issues:
        an exception. Needs a test case (Caelum)
      
      - Catalyst::Plugin::Authentication new release.
-     
-     - Catalyst::Action::RenderView
-     - Catalyst::Plugin::DebugCookie
-       - Conflict with each other: $c->config->{debug}->{foo} = 'bar'
-         now breaks, unsure why..
 
 Cleanups:
 

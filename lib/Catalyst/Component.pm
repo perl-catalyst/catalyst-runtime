@@ -97,9 +97,7 @@ sub config {
     } else {
         # this is a bit of a kludge, required to make
         # __PACKAGE__->config->{foo} = 'bar';
-        # work in a subclass. If we don't have the package symbol in the
-        # current class we know we need to copy up to ours, which calling
-        # the setter will do for us.
+        # work in a subclass.
         my $class = blessed($self) || $self;
         my $meta = Class::MOP::get_metaclass_by_name($class);
         unless ($meta->has_package_symbol('$_config')) {
