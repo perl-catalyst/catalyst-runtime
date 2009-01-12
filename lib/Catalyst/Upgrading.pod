@@ -105,6 +105,10 @@ Therefore the correct fix is to re-arrange your class' inheritance
 hierarchy so that the COMPONENT method you would like to inherit is
 the first COMPONENT method in your @ISA. 
 
+=head2 Assigning lists to accessors
+
+FIXME
+
 =head1 WARNINGS
 
 =head2 Methods in Catalyst::Dispatcher
