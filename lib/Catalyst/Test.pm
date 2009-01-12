@@ -255,6 +255,7 @@ sub remote_request {
 sub _customize_request {
     my $request = shift;
     my $opts = pop(@_) || {};
+    $opts = {} unless ref($opts) eq 'HASH';
     if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
         $request->header( 'Host' => $host );
     }

@@ -7,8 +7,9 @@ use Test::More;
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 use Catalyst::Utils;
+use HTTP::Request::Common;
 
-plan tests => 9;
+plan tests => 11;
 
 use_ok('Catalyst::Test');
 
@@ -17,6 +18,8 @@ isnt( $@, "", "get returns an error message with no app specified");
 
 eval "request('http://localhost')";
 isnt( $@, "", "request returns an error message with no app specified");
+
+# FIXME - These vhosts in tests tests should be somewhere else...
 
 sub customize { Catalyst::Test::_customize_request(@_) }
 
@@ -55,3 +58,11 @@ sub customize { Catalyst::Test::_customize_request(@_) }
 
 # Back compat test, extra args used to be ignored, now a hashref of options.
 use_ok('Catalyst::Test', 'TestApp', 'foobar');
+
+# Back compat test, ensure that request ignores anything which isn't a hash.
+lives_ok {
+    request(GET('/dummy'), 'foo');
+} 'scalar additional param to request method ignored';
+lives_ok {
+    request(GET('/dummy'), []);
+} 'array additional param to request method ignored';
