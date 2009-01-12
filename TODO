@@ -40,8 +40,3 @@ Documentation:
 Profiling:
 
   - vs 5.70 and optimisation as needed.
-
-Tests:
-
-  - Moosified test application?
-
