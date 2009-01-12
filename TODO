@@ -10,7 +10,7 @@ Known issues:
        and which not, like NEXT does. Log::Log4perl needs to be fixed and the
        problem should be described in Upgrading.pod. (rafl)
 
-     - CatalystX-CRUD and CatalystX-CRUD-ModelAdapter-DBIC
+     - CatalystX-CRUD-ModelAdapter-DBIC
        fail tests against 5.80 (karpet)
 
      - Waiting on new releases:

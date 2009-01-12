@@ -126,6 +126,7 @@ check_conflicts();
 # Nicked straight from Moose!
 sub check_conflicts {
     my %conflicts = (
+        'CatalystX::CRUD'                  => '0.37',
         'Catalyst::Action::RenderView'     => '0.08',
         'Catalyst::Plugin::DebugCookie'    => '0.999002',
         'Catalyst::Plugin::Authentication' => '0.100092',
