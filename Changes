@@ -6,10 +6,11 @@
         - Change streaming test to serve itself rather than 01use.t, making test
           sync for engines easier (t0m)
         - Workaround change in LWP that broke a cookie test (RT #40037)
-        - Back out go() since that feature's been pushed to 5.80
+        - Backport go() from 5.8 branch.
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
         - Make :Chained('../action') work (Florian Ragwitz)
+        - Fix forwarding to action object.
         - Handle leading CRLF in HTTP requests sometimes sent by IE6 in keep-alive requests.
 
 5.7099_03 2008-07-20 10:10:00
