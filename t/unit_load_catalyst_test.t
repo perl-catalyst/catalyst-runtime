@@ -8,6 +8,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 use Catalyst::Utils;
 use HTTP::Request::Common;
+use Test::Exception;
 
 plan tests => 11;
 
