@@ -13,10 +13,6 @@ Known issues:
      - CatalystX-CRUD and CatalystX-CRUD-ModelAdapter-DBIC
        fail tests against 5.80 (karpet)
 
-     - Catalyst-Plugin-Authorization-ACL fails as 
-       Catalyst::Dispatcher::_do_forward does not fix arguments if you throw
-       an exception. Needs a test case (Caelum)
-     
      - Waiting on new releases:
        - Catalyst::Plugin::Authentication - 0.100092
        - Catalyst::Action::RenderView     - 0.08

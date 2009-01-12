@@ -251,10 +251,8 @@ sub _do_forward {
 
     no warnings 'recursion';
 
-    my $orig_args = $c->request->arguments();
-    $c->request->arguments($args);
+    local $c->request->{arguments} = $args;
     $action->dispatch( $c );
-    $c->request->arguments($orig_args);
 
     return $c->state;
 }
