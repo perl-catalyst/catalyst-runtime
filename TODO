@@ -21,7 +21,10 @@ Known issues:
        Catalyst::Dispatcher::_do_forward does not fix arguments if you throw
        an exception. Needs a test case (Caelum)
      
-     - Catalyst::Plugin::Authentication new release.
+     - Waiting on new releases:
+       - Catalyst::Plugin::Authentication - 0.100092
+       - Catalyst::Action::RenderView    - 0.08
+       - Catalyst::Plugin::DebugCookie'    - 0.999002
 
 Cleanups:
 

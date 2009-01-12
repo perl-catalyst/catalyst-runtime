@@ -135,7 +135,7 @@ sub check_conflicts {
 
     my $found = 0;
     for my $mod ( sort keys %conflicts ) {
-        eval "require $mod";
+        eval "require($mod)";
         next if $@;
 
         my $installed = $mod->VERSION();
