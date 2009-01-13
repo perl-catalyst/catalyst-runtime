@@ -8,7 +8,6 @@ Known issues:
      - Waiting on new releases:
        - Catalyst::Plugin::Authentication - 0.100092
        - Catalyst::Action::RenderView     - 0.08
-       - CatalystX::CRUD                  - 0.38
 
      - MX::Emulate::CAF - list assignment (see notes in Upgrading.pod and 
        branch in svn)

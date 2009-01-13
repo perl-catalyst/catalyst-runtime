@@ -2597,6 +2597,8 @@ sky: Arthur Bergman
 
 the_jester: Jesse Sheidlower
 
+t0m: Tomas Doran <bobtfish@bobtfish.net>
+
 Ulf Edvinsson
 
 willert: Sebastian Willert <willert@cpan.org>
