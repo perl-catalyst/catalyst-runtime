@@ -1,6 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.8000_05
+        - Improve the clarity and verbosity of the warning when component
+          resolution uses regex fallback. (jhannah)
         - Handle leading CRLF in HTTP requests sometimes sent by IE6 in 
           keep-alive requests. (andyg)
         - Fixes for FastCGI with IIS 6.0 (janus)

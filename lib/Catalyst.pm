@@ -30,7 +30,7 @@ use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
 use utf8;
-use Carp qw/croak carp/;
+use Carp qw/croak carp shortmess/;
 
 BEGIN { require 5.008001; }
 
@@ -510,9 +510,24 @@ sub _comp_search_prefixes {
 
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {
-        $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
-        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution is unreliable and unsafe.' );
-        $c->log->warn( 'If you really want to search, pass in a regexp as the argument.' );
+        my $msg = "Used regexp fallback for \$c->model('${name}'), which found '" .
+           (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
+           "component resolution is unreliable and unsafe.";
+        my $short = $result[0];
+        $short =~ s/.*?Model:://;
+        my $shortmess = Carp::shortmess('');
+        if ($shortmess =~ m#Catalyst/Plugin#) {
+           $msg .= " You probably need to set '$short' instead of '${name}' in this " .
+              "plugin's config";
+        } elsif ($shortmess =~ m#Catalyst/lib/(View|Controller)#) {
+           $msg .= " You probably need to set '$short' instead of '${name}' in this " .
+              "component's config";
+        } else {
+           $msg .= " You probably meant \$c->model('$short') instead of \$c->model{'${name}'}, " .
+              "but if you really wanted to search, pass in a regexp as the argument " .
+              "like so: \$c->model(qr/${name}/)";
+        }
+        $c->log->warn( "${msg}$shortmess" );
     }
 
     return @result;
@@ -613,7 +628,7 @@ sub model {
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
     if( $rest ) {
-        $c->log->warn( 'Calling $c->model() will return a random model unless you specify one of:' );
+        $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
         $c->log->warn( '* $c->config->{default_model} # the name of the default model to use' );
         $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
         $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
@@ -752,7 +767,7 @@ sub component {
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
 
         if( $result[ 0 ] ) {
-            $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
+            $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
             $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
             $c->log->warn( 'is unreliable and unsafe. You have been warned' );
             return $c->_filter_component( $result[ 0 ], @args );
@@ -2545,6 +2560,8 @@ Geoff Richards
 ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
+
+jhannah: Jay Hannah <jay@jays.net>
 
 Jody Belka
 
