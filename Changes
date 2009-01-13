@@ -1,6 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.8000_05
+        - Added ru/ua translations to error page
         - Improve the clarity and verbosity of the warning when component
           resolution uses regex fallback. (jhannah)
         - Handle leading CRLF in HTTP requests sometimes sent by IE6 in 
