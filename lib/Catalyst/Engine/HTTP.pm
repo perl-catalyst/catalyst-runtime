@@ -445,7 +445,8 @@ sub _parse_request_line {
     my $self = shift;
 
     # Parse request line
-    if ( $self->{inputbuf} !~ s/^(\w+)[ \t]+(\S+)(?:[ \t]+(HTTP\/\d+\.\d+))?[^\012]*\012// ) {
+    # Leading CRLF sometimes sent by buggy IE versions
+    if ( $self->{inputbuf} !~ s/^(?:\x0D\x0A)?(\w+)[ \t]+(\S+)(?:[ \t]+(HTTP\/\d+\.\d+))?[^\012]*\012// ) {
         return ();
     }
 
