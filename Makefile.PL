@@ -31,29 +31,63 @@ requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 
 
-if (-e 'inc/.author') {
-  build_requires 'Test::Perl::Critic';
-  build_requires 'Test::Pod' => 1.14;
-  build_requires 'Test::Pod::Coverage' => 1.04;
+my @force_build_requires_if_author = qw(
+        Test::NoTabs 
+        Test::Pod 
+        Test::Pod::Coverage 
+        Pod::Coverage
+);
+ 
+if ($Module::Install::AUTHOR) {
 
-  if ($^O eq 'darwin') { 
-      my $osx_ver = `/usr/bin/sw_vers -productVersion`;
-      chomp $osx_ver;
+    foreach my $module (@force_build_requires_if_author) {
+        build_requires $module;
+    }
 
-      # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
-      # On 10.5 (Leopard) it wants COPYFILE_DISABLE
-      my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
-      makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
-                                        qq{ echo "You must set the ENV variable $attr to true,"; }.
-                                        ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
-  }
+    if ($^O eq 'darwin') { 
+        my $osx_ver = `/usr/bin/sw_vers -productVersion`;
+        chomp $osx_ver;
+
+# TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
+# On 10.5 (Leopard) it wants COPYFILE_DISABLE
+        my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+
+        makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
+                qq{ echo "You must set the ENV variable $attr to true,"; }.
+                ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
+    }
 }
 
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
 
+if ($Module::Install::AUTHOR) {
+
+# Strip out the author only build_requires from META.yml
+# Need to do this _after_ WriteAll else it looses track of them
+    Meta->{values}{build_requires} = [ grep {
+        my $ok = 1;
+        foreach my $module (@force_build_requires_if_author) {
+            if ($_->[0] =~ /$module/) {
+                $ok = 0;
+                last;
+            }
+        }
+        $ok;
+   } @{Meta->{values}{build_requires}} ];
+
+   Meta->{values}{resources} = [ 
+     [ 'MailingList', 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
+     [ 'IRC', 'irc://irc.perl.org/#catalyst' ],
+     [ 'license', 'http://dev.perl.org/licenses/' ],
+     [ 'homepage', 'http://dev.catalyst.perl.org/'], 
+     [ 'repository', 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
+   ];
+
+   Meta->write;
+}
 print <<"EOF";
 
  Important:
