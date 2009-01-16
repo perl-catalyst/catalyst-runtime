@@ -131,7 +131,7 @@ sub check_conflicts {
         'Catalyst::Plugin::DebugCookie'    => '0.999002',
         'Catalyst::Plugin::Authentication' => '0.100092',
         'CatalystX::Imports'               => '0.03',
-        'Catalyst-Plugin-HashedCookies'    => '1.03',
+        'Catalyst::Plugin::HashedCookies'  => '1.03',
     );
 
     my $found = 0;
