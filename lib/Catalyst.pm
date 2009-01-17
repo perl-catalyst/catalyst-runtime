@@ -1045,7 +1045,7 @@ EOF
     Scope::Upper::reap(sub {
         my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_immutable unless $meta->is_immutable;
-    }, 1);
+    }, Scope::Upper::SCOPE(1));
 
     $class->setup_finished(1);
 }
