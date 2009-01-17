@@ -357,6 +357,13 @@ Almost the same as C<forward>, but does a full dispatch, instead of just
 calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
 C<auto> and the method you go to are called, just like a new request.
 
+In addition both C<< $c->action >> and C<< $c->namespace >> are localized.
+This means, for example, that $c->action methods such as C<name>, C<class> and
+C<reverse> return information for the visited action when they are invoked
+within the visited action.  This is different from the behavior of C<forward>
+which continues to use the $c->action object from the caller action even when
+invoked from the callee.
+
 C<$c-E<gt>stash> is kept unchanged.
 
 In effect, C<visit> allows you to "wrap" another action, just as it
