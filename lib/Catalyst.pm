@@ -1047,6 +1047,11 @@ EOF
         $meta->make_immutable unless $meta->is_immutable;
     }, Scope::Upper::SCOPE(1));
 
+    $class->setup_finalize;
+}
+
+sub setup_finalize {
+    my ($class) = @_;
     $class->setup_finished(1);
 }
 
