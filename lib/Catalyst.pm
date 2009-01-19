@@ -1057,6 +1057,26 @@ EOF
     $class->setup_finalize;
 }
 
+
+=head2 $app->setup_finalize
+
+A hook to attach modifiers to.
+Using C< after setup => sub{}; > doesn't work, because of quirky things done for plugin setup.
+Also better than C< setup_finished(); >, as that is a getter method.
+
+    sub setup_finalize {
+
+        my $app = shift;
+
+        ## do stuff, i.e., determine a primary key column for sessions stored in a DB
+
+        $app->next::method(@_);
+
+
+    }
+
+=cut
+
 sub setup_finalize {
     my ($class) = @_;
     $class->setup_finished(1);
