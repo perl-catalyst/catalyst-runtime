@@ -5,10 +5,6 @@ Known issues:
        and which not, like NEXT does. Log::Log4perl needs to be fixed and the
        problem should be described in Upgrading.pod. (rafl)
 
-     - Waiting on new releases:
-       - Catalyst::Plugin::Authentication - 0.100092
-       - Catalyst::Action::RenderView     - 0.08
-
      - MX::Emulate::CAF - list assignment (see notes in Upgrading.pod and
        branch in svn)
 
