@@ -3,6 +3,7 @@ package Catalyst::DispatchType::Regex;
 use strict;
 use base qw/Catalyst::DispatchType::Path/;
 use Text::SimpleTable;
+use Catalyst::Utils;
 use Text::Balanced ();
 
 =head1 NAME
@@ -25,7 +26,8 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ 36, 'Private' ] );
+    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ $column_width, 'Private' ] );
     for my $regex ( @{ $self->{compiled} } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );

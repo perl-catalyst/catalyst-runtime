@@ -4,6 +4,7 @@ use strict;
 use base qw/Catalyst::DispatchType/;
 use Text::SimpleTable;
 use Catalyst::ActionChain;
+use Catalyst::Utils;
 use URI;
 
 # please don't perltidy this. hairy code within.
@@ -43,9 +44,10 @@ sub list {
 
     return unless $self->{endpoints};
 
+    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
     my $paths = Text::SimpleTable->new(
-                    [ 35, 'Path Spec' ], [ 36, 'Private' ]
-                );
+       [ 35, 'Path Spec' ], [ 36, 'Private' ], [ $column_width, 'Private' ]
+    );
 
     ENDPOINT: foreach my $endpoint (
                   sort { $a->reverse cmp $b->reverse }

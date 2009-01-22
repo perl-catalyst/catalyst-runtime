@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Text::SimpleTable ();
+use Catalyst::Utils;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 
@@ -92,12 +93,8 @@ sub elapsed {
 sub report {
     my $self = shift;
 
-# close any remaining open nodes
-    for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
-    $self->profile(end => $self->{stack}->[$i]->getNodeValue->{action});
-    }
-
-    my $t = Text::SimpleTable->new( [ 62, 'Action' ], [ 9, 'Time' ] );
+    my $column_width = Catalyst::Utils::term_width() - 9 - 13;
+    my $t = Text::SimpleTable->new( [ $column_width, 'Action' ], [ 9, 'Time' ] );
     my @results;
     $self->{tree}->traverse(
                 sub {

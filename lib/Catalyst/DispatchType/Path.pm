@@ -3,6 +3,7 @@ package Catalyst::DispatchType::Path;
 use strict;
 use base qw/Catalyst::DispatchType/;
 use Text::SimpleTable;
+use Catalyst::Utils;
 use URI;
 
 =head1 NAME
@@ -25,7 +26,10 @@ Debug output for Path dispatch points
 
 sub list {
     my ( $self, $c ) = @_;
-    my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
+    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $paths = Text::SimpleTable->new( 
+       [ 35, 'Path' ], [ $column_width, 'Private' ]
+    );
     foreach my $path ( sort keys %{ $self->{paths} } ) {
         my $display_path = $path eq '/' ? $path : "/$path";
         foreach my $action ( @{ $self->{paths}->{$path} } ) {
