@@ -4,6 +4,7 @@ use Moose;
 extends 'Catalyst::DispatchType';
 
 use Text::SimpleTable;
+use Catalyst::Utils;
 use URI;
 
 has _paths => (
@@ -35,7 +36,10 @@ Debug output for Path dispatch points
 
 sub list {
     my ( $self, $c ) = @_;
-    my $paths = Text::SimpleTable->new( [ 35, 'Path' ], [ 36, 'Private' ] );
+    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $paths = Text::SimpleTable->new( 
+       [ 35, 'Path' ], [ $column_width, 'Private' ]
+    );
     foreach my $path ( sort keys %{ $self->_paths } ) {
         my $display_path = $path eq '/' ? $path : "/$path";
         foreach my $action ( @{ $self->_paths->{$path} } ) {

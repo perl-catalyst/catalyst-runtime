@@ -10,6 +10,7 @@ use Catalyst::Action;
 use Catalyst::ActionContainer;
 use Catalyst::DispatchType::Default;
 use Catalyst::DispatchType::Index;
+use Catalyst::Utils;
 use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
@@ -583,10 +584,9 @@ sub setup_actions {
 
     return unless $c->debug;
 
+    my $column_width = Catalyst::Utils::term_width() - 20 - 36 - 12;
     my $privates = Text::SimpleTable->new(
-        [ 20, 'Private' ],
-        [ 36, 'Class' ],
-        [ 12, 'Method' ]
+        [ 20, 'Private' ], [ 36, 'Class' ], [ $column_width, 'Method' ]
     );
 
     my $has_private = 0;

@@ -19,6 +19,8 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
+Catalyst Utilities. 
+
 =head1 METHODS
 
 =head2 appprefix($class)
@@ -332,6 +334,45 @@ sub env_value {
     }
 
     return;
+}
+
+=head2 term_width
+
+Try to guess terminal width to use with formatting of debug output
+
+All you need to get this work, is:
+
+1) Install Term::Size::Any, or
+
+2) Export $COLUMNS from your shell. 
+
+(Warning to bash users: 'echo $COLUMNS' may be showing you the bash
+variable, not $ENV{COLUMNS}. 'export COLUMNS=$COLUMNS' and you should see 
+that 'env' now lists COLUMNS.)
+
+As last resort, default value of 80 chars will be used.
+
+=cut
+
+my $_term_width;
+
+sub term_width {
+    return $_term_width if $_term_width;
+
+    my $width = eval '
+        use Term::Size::Any;
+        my ($columns, $rows) = Term::Size::Any::chars;
+        return $columns;
+    ';
+
+    if ($@) {
+        $width = $ENV{COLUMNS}
+            if exists($ENV{COLUMNS})
+            && $ENV{COLUMNS} =~ m/^\d+$/;
+    }
+
+    $width = 80 unless ($width && $width >= 80);
+    return $_term_width = $width;
 }
 
 =head1 AUTHORS

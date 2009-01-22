@@ -989,7 +989,8 @@ EOF
         my @plugins = map { "$_  " . ( $_->VERSION || '' ) } $class->registered_plugins;
 
         if (@plugins) {
-            my $t = Text::SimpleTable->new(74);
+            my $column_width = Catalyst::Utils::term_width() - 6;
+            my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @plugins;
             $class->log->debug( "Loaded plugins:\n" . $t->draw . "\n" );
         }
@@ -1021,7 +1022,8 @@ EOF
     $class->setup_components;
 
     if ( $class->debug ) {
-        my $t = Text::SimpleTable->new( [ 63, 'Class' ], [ 8, 'Type' ] );
+        my $column_width = Catalyst::Utils::term_width() - 8 - 9;
+        my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
         for my $comp ( sort keys %{ $class->components } ) {
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
             $t->row( $comp, $type );
@@ -2616,6 +2618,8 @@ numa: Dan Sully <daniel@cpan.org>
 obra: Jesse Vincent
 
 omega: Andreas Marienborg
+
+Oleg Kostyuk <cub.uanic@gmail.com>
 
 phaylon: Robert Sedlacek <phaylon@dunkelheit.at>
 

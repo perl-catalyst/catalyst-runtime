@@ -4,6 +4,7 @@ use Moose;
 extends 'Catalyst::DispatchType::Path';
 
 use Text::SimpleTable;
+use Catalyst::Utils;
 use Text::Balanced ();
 
 has _compiled => (
@@ -35,7 +36,8 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ 36, 'Private' ] );
+    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ $column_width, 'Private' ] );
     for my $regex ( @{ $self->_compiled } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );

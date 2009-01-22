@@ -1,6 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.8000_05
+        - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
+          Patch written by Oleg Kostyuk <cub.uanic@gmail.com>
         - Improve docs for visit (mateu)
         - Add docs for finalize hook (dhoss)
         - Added ru/ua translations to error page

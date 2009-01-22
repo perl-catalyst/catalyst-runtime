@@ -5,6 +5,7 @@ extends 'Catalyst::DispatchType';
 
 use Text::SimpleTable;
 use Catalyst::ActionChain;
+use Catalyst::Utils;
 use URI;
 
 has _endpoints => (
@@ -67,9 +68,10 @@ sub list {
 
     return unless $self->_endpoints;
 
+    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
     my $paths = Text::SimpleTable->new(
-                    [ 35, 'Path Spec' ], [ 36, 'Private' ]
-                );
+       [ 35, 'Path Spec' ], [ 36, 'Private' ], [ $column_width, 'Private' ]
+    );
 
     my $has_unattached_actions;
     my $unattached_actions = Text::SimpleTable->new(
