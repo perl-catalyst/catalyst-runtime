@@ -50,6 +50,8 @@ Catalyst::Request::Upload - handles file upload requests
 
 =head1 SYNOPSIS
 
+    my $upload = $c->req->upload('field');
+
     $upload->basename;
     $upload->copy_to;
     $upload->fh;
