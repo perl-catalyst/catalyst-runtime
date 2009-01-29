@@ -1806,10 +1806,15 @@ sub prepare_body {
     $c->prepare_parameters;
     $c->prepare_uploads;
 
-    if ( $c->debug ) {
-        $c->log_parameters( 
-            'Body Parameters are', $c->request->body_parameters
-        );
+    if ( $c->debug && keys %{ $c->req->body_parameters } ) {
+        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ 36, 'Value' ] );
+        for my $key ( sort keys %{ $c->req->body_parameters } ) {
+            my $param = $c->req->body_parameters->{$key};
+            my $value = defined($param) ? $param : '';
+            $t->row( $key,
+                ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
+        }
+        $c->log->debug( "Body Parameters are:\n" . $t->draw );
     }
 }
 
@@ -1895,65 +1900,15 @@ sub prepare_query_parameters {
 
     $c->engine->prepare_query_parameters( $c, @_ );
 
-    if ( $c->debug ) {
-        $c->log_parameters( 
-            'Query Parameters are', $c->request->query_parameters 
-        );
-    }
-}
-
-=head2 $c->log_parameters($name, $parameters)
-
-Logs a hash reference of key value pairs, with a caption above the table.
-
-Looks like:
-
- [debug] Query Parameters are:
- .-------------------------------------+--------------------------------------.
- | Parameter                           | Value                                |
- +-------------------------------------+--------------------------------------+
- | search                              | Moose                                |
- | searchtype                          | modules                              |
- '-------------------------------------+--------------------------------------'
-
-If there are query parameters you don't want to display in this output, such
-as passwords or other sensitive input, you can configure your application to
-redact those parameters:
-
-  C<< MyApp->config->{Debug}->{redact_parameters} = [ 'password' ] >>
-
-In that case, the output will look like:
-
- [debug] Query Parameters are:
- .-------------------------------------+--------------------------------------.
- | Parameter                           | Value                                |
- +-------------------------------------+--------------------------------------+
- | password                            | (redacted by config)                 |
- | username                            | some_user                            |
- '-------------------------------------+--------------------------------------'
-
-=cut
-
-sub log_parameters {
-    my ( $c, $name, $parameters ) = @_;
-
-    my $skip = $c->config->{Debug}->{redact_parameters};
-    if ( 
-        ( not defined $skip or ref $skip eq 'ARRAY' )
-        && keys %{ $parameters } 
-     ) {
-        my $t = Text::SimpleTable->new( 
-            [ 35, 'Parameter' ], [ 36, 'Value' ] );
-        my %skip_params = map { $_ => $_ } @{ $skip || [] };
-        for my $key ( sort keys %$parameters ) {
-            my $param = $parameters->{$key};
+    if ( $c->debug && keys %{ $c->request->query_parameters } ) {
+        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ 36, 'Value' ] );
+        for my $key ( sort keys %{ $c->req->query_parameters } ) {
+            my $param = $c->req->query_parameters->{$key};
             my $value = defined($param) ? $param : '';
-            $value = '(redacted by config)' if exists $skip_params{$key};
-
             $t->row( $key,
                 ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
         }
-        $c->log->debug( "$name:\n" . $t->draw );
+        $c->log->debug( "Query Parameters are:\n" . $t->draw );
     }
 }
 
@@ -2609,8 +2564,6 @@ andyg: Andy Grundman <andy@hybridized.org>
 audreyt: Audrey Tang
 
 bricas: Brian Cassidy <bricas@cpan.org>
-
-Byron Young <Byron.Young@riverbed.com>
 
 Caelum: Rafael Kitover <rkitover@io.com>
 
