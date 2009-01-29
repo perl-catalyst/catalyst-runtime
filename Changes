@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+Not yet released
+        - Allow redaction of parameters in debug output by configuration
+          (Byron Young)
+
 5.8000_05 2008-29-01 00:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
           Patch written by Oleg Kostyuk <cub.uanic@gmail.com>
