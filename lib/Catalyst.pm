@@ -805,8 +805,8 @@ around config => sub {
     my $orig = shift;
     my $c = shift;
 
-    $c->log->warn("Setting config after setup has been run is not a good idea.")
-      if ( @_ and $c->setup_finished );
+    croak('Setting config after setup has been run is not allowed.')
+        if ( @_ and $c->setup_finished );
 
     $c->$orig(@_);
 };
