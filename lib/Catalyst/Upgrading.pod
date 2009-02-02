@@ -3,7 +3,7 @@
 Most applications and plugins should run unaltered on Catalyst 5.80.
 
 However as a lot of refactoring work has taken place, several changes
-have been made which could cause incompatibilties, if your application
+have been made which could cause incompatibilities, if your application
 or plugin is using deprecated code, or relying on side-effects then
 there could be incompatibility.
 
@@ -26,7 +26,7 @@ Moose components for Catalyst 5.70 needed to do
 to be able to use the constructor provided by Moose. In 5.80
 C<Catalyst::Component> already inherits from C<Moose::Object>. Therefor you
 shouldn't directly inherit from C<Moose::Object> yourself, otherwise your
-Class' @ISA will not linearise with C3.
+Class' @ISA will not linearize with C3.
 
 =head2 Anonymous closures installed directly into the symbol table
 
@@ -85,7 +85,7 @@ by calling the mk_accessors class method.
 This is no longer supported - users should make a sub-class of the class who's behavior they would
 like to change, rather than globally polluting the Catalyst objects.
 
-=head2 Confused multiple inheritence with Catalyst::Component::COMPONENT
+=head2 Confused multiple inheritance with Catalyst::Component::COMPONENT
 
 Warning message:
 
@@ -156,7 +156,7 @@ better API should look like.
 In this version of Catalyst, if a component is loaded from disk, but no symbols are defined in that component's namespace
 after it is loaded, this warning will be issued.
 
-This is to pretect against confusing bugs caused by mis-typing package names.
+This is to protect against confusing bugs caused by mis-typing package names.
 
 This will become a fatal error in a future version.
 

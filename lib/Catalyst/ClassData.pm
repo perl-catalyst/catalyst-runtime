@@ -66,7 +66,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::ClassData - Class data acessors
+Catalyst::ClassData - Class data accessors
 
 =head1 METHODS
 

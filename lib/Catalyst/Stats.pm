@@ -324,10 +324,10 @@ from the previous profiling point.
 The 'rollup' flag indicates whether the reported time is the rolled up time for
 the block, or the elapsed time from the previous profiling point.
 
-=head1 COMPATABILITY METHODS
+=head1 COMPATIBILITY METHODS
 
 Some components might expect the stats object to be a regular Tree::Simple object.
-We've added some compatability methods to handle this scenario:
+We've added some compatibility methods to handle this scenario:
 
 =head2 accept
 

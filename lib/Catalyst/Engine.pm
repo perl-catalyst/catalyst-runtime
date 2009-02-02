@@ -589,7 +589,7 @@ sub read {
 
 =head2 $self->read_chunk($c, $buffer, $length)
 
-Each engine inplements read_chunk as its preferred way of reading a chunk
+Each engine implements read_chunk as its preferred way of reading a chunk
 of data.
 
 =cut

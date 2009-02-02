@@ -399,7 +399,7 @@ Returns the path, i.e. the part of the URI after $req->base, for the current req
 
 =head2 $req->path_info
 
-Alias for path, added for compability with L<CGI>.
+Alias for path, added for compatibility with L<CGI>.
 
 =cut
 
@@ -463,7 +463,7 @@ actions or regex captures.
 
 =head2 $req->snippets
 
-C<captures> used to be called snippets. This is still available for backwoards
+C<captures> used to be called snippets. This is still available for backwards
 compatibility, but is considered deprecated.
 
 =head2 $req->upload

@@ -871,7 +871,7 @@ sub path_to {
 
 =head2 $c->plugin( $name, $class, @args )
 
-Helper method for plugins. It creates a classdata accessor/mutator and
+Helper method for plugins. It creates a class data accessor/mutator and
 loads and instantiates the given class.
 
     MyApp->plugin( 'prototype', 'HTML::Prototype' );

@@ -306,7 +306,7 @@ Note: Once the C<perl cat-install> is complete, you may want to rerun the
 command to check the status of the packages listed in <cat-install>. Ideally, 
 everything should return a I<name> C<is up to date> message.  If any packages 
 try to re-install, the you could need to manually install the package with the 
-C<force> option.  Also, look for new optional dependences that C<cat-install> 
+C<force> option.  Also, look for new optional dependencies that C<cat-install>
 was not able to automatically handle. You can address these by manually 
 installing the dependency and then re-running C<perl cat-install>.  
 
