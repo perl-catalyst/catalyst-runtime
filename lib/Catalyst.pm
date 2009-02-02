@@ -842,13 +842,11 @@ sub debug { 0 }
 
 =head2 $c->dispatcher
 
-Returns the dispatcher instance. Stringifies to class name. See
-L<Catalyst::Dispatcher>.
+Returns the dispatcher instance. See L<Catalyst::Dispatcher>.
 
 =head2 $c->engine
 
-Returns the engine instance. Stringifies to the class name. See
-L<Catalyst::Engine>.
+Returns the engine instance. See L<Catalyst::Engine>.
 
 
 =head2 UTILITY METHODS
