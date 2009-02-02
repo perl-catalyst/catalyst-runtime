@@ -8,9 +8,6 @@ Known issues:
      - MX::Emulate::CAF - list assignment (see notes in Upgrading.pod and
        branch in svn)
 
-     - Catalyst::Plugin::Session::State::Cookie - cookie_name is undefined
-       unless explicitly configured because setup_session isn't executed.
-
 Documentation:
 
    - Catalyst/Upgrading.pod needs brushing up
