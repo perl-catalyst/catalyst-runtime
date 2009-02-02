@@ -171,7 +171,7 @@ Alias for the method in L<Catalyst::Utils>.
 
 =head2 ACCEPT_CONTEXT($c, @args)
 
-Catalyst components are normally initalized during server startup, either
+Catalyst components are normally initialized during server startup, either
 as a Class or a Instance. However, some components require information about
 the current request. To do so, they can implement an ACCEPT_CONTEXT method.
 
