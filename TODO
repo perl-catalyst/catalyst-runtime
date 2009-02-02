@@ -15,6 +15,11 @@ Documentation:
 
    - Catalyst/Upgrading.pod needs brushing up
 
+   - Warning when you pass $c->model("MyApp::Model::Foo") is the generic 
+     warning for regex fall back. Should be more specific about what you 
+     screwed up, and the docs for $c->model should be more explicit about
+     what is expected. This probably also applies to view/controller.
+
 Profiling:
 
   - vs 5.70 and optimisation as needed.
