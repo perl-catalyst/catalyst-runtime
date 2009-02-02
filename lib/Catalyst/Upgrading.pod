@@ -7,7 +7,7 @@ have been made which could cause incompatibilities, if your application
 or plugin is using deprecated code, or relying on side-effects then
 there could be incompatibility.
 
-Most issues found with pre-existing components have been easy to solve, 
+Most issues found with pre-existing components have been easy to solve,
 and a complete description of behavior changes which may cause compatibility
 issues, or warnings to be emitted is included below to help if you have
 problems.
@@ -17,26 +17,43 @@ this document, then please email the Catalyst list to discuss the problem.
 
 =head1 Known backwards compatibility breakages.
 
-=head2 Moose applications
+=head2 Components which inherit from Moose::Object before Catalyst::Component
 
-Moose components for Catalyst 5.70 needed to do
+Moose components which say:
 
+    package TestApp::Controller::Example;
+    use Moose;
     extends qw/Moose::Object Catalyst::Component/;
 
-to be able to use the constructor provided by Moose. In 5.80
-C<Catalyst::Component> already inherits from C<Moose::Object>. Therefore you
-shouldn't directly inherit from C<Moose::Object> yourself, otherwise your
-Class' @ISA will not linearize with C3.
+to use the constructor provided by Moose, whilst working if you do some hacks
+with the C< BUILDARGS > method, will not work with Catalyst 5.80 as
+C<Catalyst::Component> inherits from C<Moose::Object>, and so C< @ISA > fails
+to linearise.
+
+The fix for this, is to not inherit directly from C<Moose::Object>
+yourself. Having components which do not inherit their constructor from
+C<Catalyst::Component> is B<unsupported>, and has never been recommended,
+therefore you're on your own if you're using this technique. You'll need
+to detect the version of Catalyst your application is running with and deal
+with it appropriately.
 
 You will also see this issue if you do the following:
 
-    use Moose; 
+    package TestApp::Controller::Example;
+    use Moose;
     use base 'Catalyst::Controller';
 
 as C< use base > appends to @ISA.
 
-FIXME - Add note about the appropriate magic to detect $Catalyst::VERSION
-and work around it at compile time.
+The correct way to use Moose in a component in a both forward and backwards
+compatible way is:
+
+    package TestApp::Controller::Root;
+    use Moose;
+    BEGIN { extends 'Catalyst::Component' }; # Or ::Controller, or whatever
+
+Note that the C< extends > decleration needs to occur in a begin block for
+L<attributes> to operate correctly.
 
 =head2 Anonymous closures installed directly into the symbol table
 
