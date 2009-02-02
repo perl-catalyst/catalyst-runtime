@@ -24,9 +24,19 @@ Moose components for Catalyst 5.70 needed to do
     extends qw/Moose::Object Catalyst::Component/;
 
 to be able to use the constructor provided by Moose. In 5.80
-C<Catalyst::Component> already inherits from C<Moose::Object>. Therefor you
+C<Catalyst::Component> already inherits from C<Moose::Object>. Therefore you
 shouldn't directly inherit from C<Moose::Object> yourself, otherwise your
 Class' @ISA will not linearize with C3.
+
+You will also see this issue if you do the following:
+
+    use Moose; 
+    use base 'Catalyst::Controller';
+
+as C< use base > appends to @ISA.
+
+FIXME - Add note about the appropriate magic to detect $Catalyst::VERSION
+and work around it at compile time.
 
 =head2 Anonymous closures installed directly into the symbol table
 
