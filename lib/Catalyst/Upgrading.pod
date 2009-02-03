@@ -77,6 +77,32 @@ install the closure using the appropriate metaclass. Example:
     my $metaclass = Moose::Meta::Class->initialize($package_name);
     $metaclass->add_method($method_name => sub { ... });
 
+=head2 Hooking into application setup
+
+To execute code during application startup the following snippet in MyApp.pm
+used to work:
+
+    sub setup {
+        my ($class, @args) = @_;
+        $class->NEXT::setup(@args);
+        ... # things to do after the actual setup
+    }
+
+With Catalyst 5.80 this won't work anymore. Because instead of using NEXT.pm it
+relies on Class::C3::Adopt::NEXT, which doesn't remember what methods it
+already called, like NEXT does and therefore goes into a deep recursion between
+MyApp::setup and Catalyst::setup.
+
+Moose method modifiers line C<< before|after|around 'setup => sub { ... }; >>
+won't work either because of backward compatibility issues related to plugin
+setup methods.
+
+The right way to do it is this:
+
+    after setup_finalize => sub {
+        ... # things to do after the actual setup
+    };
+
 =head2 Components whos new method returns false
 
 Previously if your new method returned a false value, 
