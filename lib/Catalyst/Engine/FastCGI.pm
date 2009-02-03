@@ -102,7 +102,7 @@ sub run {
     my $error = \*STDERR; # send STDERR to the web server
        $error = \*STDOUT  # send STDERR to stdout (a logfile)
          if $options->{keep_stderr}; # (if asked to)
-    
+
     my $request =
       FCGI::Request( \*STDIN, \*STDOUT, $error, \%env, $sock,
         ( $options->{nointr} ? 0 : &FCGI::FAIL_ACCEPT_ON_INTR ),
@@ -130,6 +130,9 @@ sub run {
             $self->daemon_detach() if $options->{detach};
 
             $proc_manager->pm_manage();
+
+            # Give each child its own RNG state.
+            srand;
         }
         elsif ( $options->{detach} ) {
             $self->daemon_detach();
@@ -138,11 +141,11 @@ sub run {
 
     while ( $request->Accept >= 0 ) {
         $proc_manager && $proc_manager->pm_pre_dispatch();
-        
+
         $self->_fix_env( \%env );
-        
+
         $class->handle_request( env => \%env );
-        
+
         $proc_manager && $proc_manager->pm_post_dispatch();
     }
 }
