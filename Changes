@@ -1,5 +1,15 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Disallow writing to config after setup (rafl)
+        - Disallow calling setup more than once (rafl)
+        - Documentation fix regarding overloading of Engine and Dispatcher
+          instances (rafl)
+        - Several documentation typo fixes (rafl)
+        - Stop Makefile.PL from warning about versions that fixed a conflict
+          (t0m)
+        - Improved upgrading documentation (t0m, rafl)
+        - Seed the RNG in each FastCGI child process (Andrew Rodland)
+
 5.8000_05 2008-29-01 00:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
           Patch written by Oleg Kostyuk <cub.uanic@gmail.com>
