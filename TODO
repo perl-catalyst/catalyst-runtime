@@ -1,10 +1,5 @@
 Known issues:
 
-     - Catalyst-Log-Log4perl Deep recursion on subroutine "MockApp::setup" due
-       to Adopt::NEXT not remembering which setup methods were already called
-       and which not, like NEXT does. Log::Log4perl needs to be fixed and the
-       problem should be described in Upgrading.pod. (rafl)
-
      - MX::Emulate::CAF - list assignment (see notes in Upgrading.pod and
        branch in svn)
 
@@ -12,8 +7,8 @@ Documentation:
 
    - Catalyst/Upgrading.pod needs brushing up
 
-   - Warning when you pass $c->model("MyApp::Model::Foo") is the generic 
-     warning for regex fall back. Should be more specific about what you 
+   - Warning when you pass $c->model("MyApp::Model::Foo") is the generic
+     warning for regex fall back. Should be more specific about what you
      screwed up, and the docs for $c->model should be more explicit about
      what is expected. This probably also applies to view/controller.
 
