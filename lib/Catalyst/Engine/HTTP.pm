@@ -382,7 +382,14 @@ sub _handler {
         }
 
         # Pass flow control to Catalyst
-        $class->handle_request;
+        {
+            # FIXME: don't ignore SIGCHLD while handling requests so system()
+            # et al. work within actions. it might be a little risky to do that
+            # this far out, but then again it's only the dev server anyway.
+            local $SIG{CHLD} = 'DEFAULT';
+
+            $class->handle_request;
+        }
     
         DEBUG && warn "Request done\n";
     
