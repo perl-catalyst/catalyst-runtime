@@ -9,6 +9,12 @@
           (t0m)
         - Improved upgrading documentation (t0m, rafl)
         - Seed the RNG in each FastCGI child process (Andrew Rodland)
+        - Properly report dynamic bind port for the development server (rafl)
+          (Closes RT#38544)
+        - Use the way documented by IO::Socket::INET to get the error message
+          after trying to create a listening socket (rafl) (Closes RT#41828)
+        - Don't ignore SIGCHLD while handling requests with the dev server
+          (rafl) (Closes RT#42962)
 
 5.8000_05 2008-29-01 00:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
