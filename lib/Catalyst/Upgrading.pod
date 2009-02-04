@@ -105,15 +105,15 @@ The right way to do it is this:
 
 =head2 Components whos new method returns false
 
-Previously if your new method returned a false value, 
+Previously, if you had a component which inherited from Catalyst::COMPONENT,
+but overrode the new method, to return false, then your class' configuration
+would be blessed into a hash on your behalf, and this would be returned from
+the COMPONENT method. T
 
-Previously, if you had a component which inherited from Catalyst::COMPONENT, but 
-overrode the new method, to return false, then your class' configuration would be blessed into a hash on your behalf,
-and this would be returned from the COMPONENT method. T
-
-This behaviour makes no sense, and so has been removed.. You are recommended to implement your own new method
-in components, instead, you should inherit the new method from Catalyst::Component, and use Moose's BUILD functionality
-to perform any construction work necessary for your sub-class.
+This behaviour makes no sense, and so has been removed.. You are recommended to
+implement your own new method in components, instead, you should inherit the
+new method from Catalyst::Component, and use Moose's BUILD functionality to
+perform any construction work necessary for your sub-class.
 
 =head2 __PACKAGE__->mk_accessor('meta');
 
@@ -123,29 +123,50 @@ This is currently being fixed inside core Moose.
 
 =head2 Class::Data::Inheritable side effects
 
-Previously, writing to a class data accessor would copy the accessor method down into your package.
+Previously, writing to a class data accessor would copy the accessor method
+down into your package.
 
-This behavior has been removed. Whilst the class data is still stored per-class, it is stored on
-the metaclass of the class defining the accessor.
+This behavior has been removed. Whilst the class data is still stored
+per-class, it is stored on the metaclass of the class defining the accessor.
 
-Therefore anything relying on the side-effect of the accessor being copied down will be broken.
+Therefore anything relying on the side-effect of the accessor being copied down
+will be broken.
+
+The following example demonstrates the problem:
+
+    {
+        package BaseClass;
+        use base qw/Class::Data::Inheritable/;
+        __PACKAGE__->mk_classdata('foo');
+    }
+
+    {
+        package Child;
+        use base qw/BaseClass/;
+    }
+
+    BaseClass->foo('base class');
+    Child->foo('sub class');
+
+    isnt(BaseClass->can('foo'), Child->can('foo'));
 
 =head2 Extending Catalyst::Request or other classes in an ad-hoc manor using mk_accessors
 
-Previously, it was possible to add additional accessors to Catalyst::Request (or other classes)
-by calling the mk_accessors class method.
+Previously, it was possible to add additional accessors to Catalyst::Request
+(or other classes) by calling the mk_accessors class method.
 
-This is no longer supported - users should make a sub-class of the class who's behavior they would
-like to change, rather than globally polluting the Catalyst objects.
+This is no longer supported - users should make a sub-class of the class who's
+behavior they would like to change, rather than globally polluting the Catalyst
+objects.
 
 =head2 Confused multiple inheritance with Catalyst::Component::COMPONENT
 
 Warning message:
 
-    There is a COMPONENT method resolving after Catalyst::Component 
+    There is a COMPONENT method resolving after Catalyst::Component
     in ${next_package}.
-    
-This means that one of the packages on the right hand side of 
+
+This means that one of the packages on the right hand side of
 Catalyst::Component in your Class' inheritance hierarchy defines
 a COMPONENT method.
 
@@ -156,27 +177,27 @@ makes no sense with C3 method dispatch order.
 
 Therefore the correct fix is to re-arrange your class' inheritance
 hierarchy so that the COMPONENT method you would like to inherit is
-the first COMPONENT method in your @ISA. 
+the first COMPONENT method in your @ISA.
 
 =head1 WARNINGS
 
 =head2 Methods in Catalyst::Dispatcher
 
-The following methods in Catalyst::Dispatcher are likely to change 
+The following methods in Catalyst::Dispatcher are likely to change
 significantly in the 5.8X release series, and therefore their use is highly
 deprecated.
 
 =over
 
-=item tree 
+=item tree
 
-=item dispatch_types 
+=item dispatch_types
 
-=item registered_dispatch_types 
+=item registered_dispatch_types
 
-=item method_action_class  
+=item method_action_class
 
-=item action_hash 
+=item action_hash
 
 =item container_hash
 
@@ -189,14 +210,15 @@ The first time one of these methods is called, a warning will be emitted:
 
 You should B<NEVER> be calling any of these methods from application code.
 
-Plugins authors and maintainers whos plugins need to call these methods 
-should email the development list to discuss your use-case, and what a 
-better API should look like.
+Plugins authors and maintainers whos plugins need to call these methods should
+email the development list to discuss your use-case, and what a better API
+should look like.
 
 =head2 require $class was successful but the package is not defined.
 
-In this version of Catalyst, if a component is loaded from disk, but no symbols are defined in that component's namespace
-after it is loaded, this warning will be issued.
+In this version of Catalyst, if a component is loaded from disk, but no symbols
+are defined in that component's namespace after it is loaded, this warning will
+be issued.
 
 This is to protect against confusing bugs caused by mis-typing package names.
 
@@ -204,9 +226,10 @@ This will become a fatal error in a future version.
 
 =head2 $c->plugin method
 
-Calling the plugin method is deprecated, and calling it at runtime is B<highly deprecated>.
+Calling the plugin method is deprecated, and calling it at runtime is B<highly
+deprecated>.
 
-Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to compose the functionality
-you need outside of the main application namespace.
+Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to
+compose the functionality you need outside of the main application namespace.
 
 =cut
