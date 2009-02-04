@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
         - Disallow calling setup more than once (rafl)
         - Documentation fix regarding overloading of Engine and Dispatcher
