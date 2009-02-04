@@ -2,7 +2,7 @@ package Catalyst::Plugin::Test::Plugin;
 
 use strict;
 use warnings;
-use Class::C3;
+use MRO::Compat;
 
 use base qw/Catalyst::Base Class::Data::Inheritable/;
 

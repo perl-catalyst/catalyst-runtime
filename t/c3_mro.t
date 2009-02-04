@@ -4,9 +4,7 @@ use warnings;
 use Test::More;
 require Catalyst;
 require Module::Pluggable::Object;
-
-eval "require Class::C3";
-plan skip_all => "This test requires Class::C3" if $@;
+use MRO::Compat;
 
 # Get a list of all Catalyst:: packages in blib via M::P::O
 my @cat_mods;
@@ -34,7 +32,7 @@ plan tests => scalar @cat_mods;
 #
 foreach my $cat_mod (@cat_mods) {
   eval " require $cat_mod ";
-  eval { Class::C3::calculateMRO($cat_mod) };
+  eval { mro::get_linear_isa($cat_mod, 'c3') };
   ok(!$@, "calculateMRO for $cat_mod: $@");
 }
 

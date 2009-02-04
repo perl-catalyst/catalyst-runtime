@@ -1,7 +1,7 @@
 package TestApp::Plugin::AddDispatchTypes;
 use strict;
 use warnings;
-use Class::C3;
+use MRO::Compat;
 
 sub setup_dispatcher {
     my $class = shift;

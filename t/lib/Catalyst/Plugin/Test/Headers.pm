@@ -1,7 +1,7 @@
 package Catalyst::Plugin::Test::Headers;
 
 use strict;
-use Class::C3;
+use MRO::Compat;
 
 sub prepare {
     my $class = shift;

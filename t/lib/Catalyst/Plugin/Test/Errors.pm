@@ -1,7 +1,7 @@
 package Catalyst::Plugin::Test::Errors;
 
 use strict;
-use Class::C3;
+use MRO::Compat;
 
 sub error {
     my $c = shift;
