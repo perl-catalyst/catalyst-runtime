@@ -108,7 +108,7 @@ The right way to do it is this:
 Previously, if you had a component which inherited from Catalyst::COMPONENT,
 but overrode the new method, to return false, then your class' configuration
 would be blessed into a hash on your behalf, and this would be returned from
-the COMPONENT method. T
+the COMPONENT method.
 
 This behaviour makes no sense, and so has been removed.. You are recommended to
 implement your own new method in components, instead, you should inherit the
