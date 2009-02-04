@@ -216,7 +216,7 @@ sub run {
         ReuseAddr => 1,
         Type      => SOCK_STREAM,
       )
-      or die "Couldn't create daemon: $!";
+      or die "Couldn't create daemon: $@";
 
     $port = $daemon->sockport();
 
