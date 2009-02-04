@@ -183,7 +183,7 @@ sub run {
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
-    
+
     $self->options($options);
 
     if ($options->{background}) {
@@ -217,6 +217,8 @@ sub run {
         Type      => SOCK_STREAM,
       )
       or die "Couldn't create daemon: $!";
+
+    $port = $daemon->sockport();
 
     my $url = "http://$host";
     $url .= ":$port" unless $port == 80;
@@ -287,10 +289,10 @@ sub run {
                 }
 
                 $self->_handler( $class, $port, $method, $uri, $protocol );
-            
+
                 if ( $self->_has_write_error ) {
                     close Remote;
-                    
+
                     if ( !defined $pid ) {
                         next LISTEN;
                     }
@@ -322,9 +324,9 @@ sub run {
             close Remote;
         }
     }
-    
+
     $daemon->close;
-    
+
     DEBUG && warn "Shutting down\n";
 
     if ($restart) {
@@ -335,8 +337,8 @@ sub run {
         ### those include dirs upon re-exec. So add them to PERL5LIB, so they
         ### are available again for the exec'ed process --kane
         use Config;
-        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC; 
-        
+        $ENV{PERL5LIB} .= join $Config{path_sep}, @INC;
+
         exec $^X, $0, @{ $options->{argv} };
     }
 
