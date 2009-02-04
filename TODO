@@ -1,8 +1,5 @@
 Known issues:
 
-     - MX::Emulate::CAF - list assignment (see notes in Upgrading.pod and
-       branch in svn)
-
 Documentation:
 
    - Catalyst/Upgrading.pod needs brushing up
