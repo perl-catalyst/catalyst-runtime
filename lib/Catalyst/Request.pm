@@ -210,6 +210,9 @@ For example, if your action was
 and the URI for the request was C<http://.../foo/moose/bah>, the string C<bah>
 would be the first and only argument.
 
+Arguments just get passed through and B<don't> get unescaped automatically, so
+you should do that explicitly.
+
 =head2 $req->args
 
 Shortcut for arguments.
