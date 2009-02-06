@@ -125,9 +125,10 @@ check_conflicts();
 
 # Nicked straight from Moose!
 sub check_conflicts {
-    # NOTE - This is the version number of the _incompatible_ code, 
+    # NOTE - This is the version number of the _incompatible_ code,
     #        not the version number of the fixed version.
     my %conflicts = (
+        'Catalyst::Plugin::SmartURI'       => '0.029',
         'CatalystX::CRUD'                  => '0.37',
         'Catalyst::Action::RenderView'     => '0.07',
         'Catalyst::Plugin::DebugCookie'    => '0.999002',
