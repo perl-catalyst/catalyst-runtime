@@ -70,7 +70,7 @@ sub list {
 
     my $column_width = Catalyst::Utils::term_width() - 35 - 9;
     my $paths = Text::SimpleTable->new(
-       [ 35, 'Path Spec' ], [ 36, 'Private' ], [ $column_width, 'Private' ]
+       [ 35, 'Path Spec' ], [ $column_width, 'Private' ],
     );
 
     my $has_unattached_actions;
