@@ -7,7 +7,6 @@ use Catalyst::Utils;
 use Class::C3::Adopt::NEXT;
 use MRO::Compat;
 use mro 'c3';
-use Scalar::Util qw/blessed/;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 with 'Catalyst::ClassData';

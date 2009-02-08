@@ -3,7 +3,6 @@ package Catalyst::ClassData;
 use Moose::Role;
 use Class::MOP;
 use Class::MOP::Object;
-use Scalar::Util 'blessed';
 
 sub mk_classdata {
   my ($class, $attribute) = @_;

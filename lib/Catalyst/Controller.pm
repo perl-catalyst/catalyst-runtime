@@ -5,7 +5,6 @@ use Moose;
 BEGIN { extends qw/Catalyst::Component Catalyst::AttrContainer/; }
 
 use Class::MOP::Object ();
-use Scalar::Util qw/blessed/;
 use Catalyst::Exception;
 use Catalyst::Utils;
 

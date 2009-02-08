@@ -2,7 +2,6 @@ package Catalyst::AttrContainer;
 
 use Moose;
 use Catalyst::Exception;
-use Scalar::Util 'blessed';
 with 'Catalyst::ClassData';
 
 no Moose;
