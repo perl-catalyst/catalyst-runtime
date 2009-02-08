@@ -10,6 +10,8 @@ use HTTP::Headers;
 
 use Moose;
 
+use namespace::clean -except => 'meta';
+
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has action => (is => 'rw');
@@ -118,8 +120,6 @@ has hostname => (
 );
 
 has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
-
-no Moose;
 
 sub args            { shift->arguments(@_) }
 sub body_params     { shift->body_parameters(@_) }
