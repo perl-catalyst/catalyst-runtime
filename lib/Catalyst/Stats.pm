@@ -7,6 +7,8 @@ use Catalyst::Utils;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 
+use namespace::clean -except => 'meta';
+
 has enable => (is => 'rw', required => 1, default => sub{ 1 });
 has tree => (
              is => 'ro',
@@ -154,7 +156,6 @@ sub getNodeValue {
     $self->tree->getNodeValue( @_ )->{ t };
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable();
 
 1;
