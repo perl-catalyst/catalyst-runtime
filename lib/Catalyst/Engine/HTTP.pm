@@ -19,11 +19,11 @@ require Catalyst::Engine::HTTP::Restarter::Watcher;
 use constant CHUNKSIZE => 64 * 1024;
 use constant DEBUG     => $ENV{CATALYST_HTTP_DEBUG} || 0;
 
+use namespace::clean -except => 'meta';
+
 has options => ( is => 'rw' );
 has _keepalive => ( is => 'rw', predicate => '_is_keepalive', clearer => '_clear_keepalive' );
 has _write_error => ( is => 'rw', predicate => '_has_write_error' );
-
-use namespace::clean -except => [qw/meta/];
 
 # Refactoring note - could/should Eliminate all instances of $self->{inputbuf},
 # which I haven't touched as it is used as an lvalue in a lot of places, and I guess
