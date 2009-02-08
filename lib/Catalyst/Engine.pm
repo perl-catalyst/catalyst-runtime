@@ -12,13 +12,13 @@ use HTTP::Headers;
 use URI::QueryParam;
 use Scalar::Util ();
 
+use namespace::clean -except => 'meta';
+
 # input position and length
 has read_length => (is => 'rw');
 has read_position => (is => 'rw');
 
 has _prepared_write => (is => 'rw');
-
-no Moose;
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
