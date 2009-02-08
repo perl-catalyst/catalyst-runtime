@@ -1,8 +1,8 @@
 =head1 ROADMAP
 
-This is a living document, that represents the core team's current plans
-for the Catalyst framework. It's liable to change at any time. This document
-lives in the the catalyst trunk, currently at 
+This is a living document, that represents the core team's current plans for
+the Catalyst framework. It's liable to change at any time. This document lives
+in the the catalyst trunk, currently at
 
   http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/5.80/trunk/lib/Catalyst/ROADMAP.pod
 
@@ -10,7 +10,8 @@ Make sure you get it from there to ensure you have the latest version.
 
 =head2 5.80000 1st Quarter 2009
 
-Next major planned release, ports Catalyst to Moose, and does some refactoring to help app/ctx.
+Next major planned release, ports Catalyst to Moose, and does some refactoring
+to help app/ctx.
 
 =head2 5.81000 
 
@@ -22,16 +23,22 @@ Refactor everything that doesn't have to be class data into object data
 
 =item Work towards a declarative syntax mode
 
-Dispatcher refactoring to provide alternatives to deprecated methods, and 
-support for pluggable dispatcher builders (so that attributes can be replaced).
+Dispatcher refactoring to provide alternatives to deprecated methods, and
+support for pluggable dispatcher builders (so that attributes can be
+replaced).
 
 =item MyApp should not ISA Catalyst::Controller
 
 =over
 
-=item Update Test suite to not assume MyApp ISA Controller
+=item * 
 
-=item After that set up attr handlers that will output helpful error messages when you do it as well as how to fix it.
+Update Test suite to not assume MyApp ISA Controller
+
+=item *
+
+After that set up attr handlers that will output helpful error messages when
+you do it as well as how to fix it.
 
 =back
 
@@ -43,9 +50,9 @@ support for pluggable dispatcher builders (so that attributes can be replaced).
 
 =item Extend pluggability of the Catalyst core.
 
-good support for reusable components good support for reusable plugins good 
-separation of plugins (some reusable components want different plugins) 
-near total engine independence
+good support for reusable components good support for reusable plugins good
+separation of plugins (some reusable components want different plugins) near
+total engine independence
 
 =back
 
@@ -55,7 +62,8 @@ near total engine independence
 
 =item  Application / Context Split 
 
-Catalyst needs to be split so that $c refers to the current context, and is a separate thing from the Application class.
+Catalyst needs to be split so that $c refers to the current context, and is a
+separate thing from the Application class.
 
 =back
 
