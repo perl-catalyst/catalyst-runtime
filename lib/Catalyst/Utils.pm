@@ -9,6 +9,8 @@ use URI;
 use Carp qw/croak/;
 use Cwd;
 
+use namespace::clean;
+
 =head1 NAME
 
 Catalyst::Utils - The Catalyst Utils
