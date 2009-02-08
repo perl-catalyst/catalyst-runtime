@@ -17,7 +17,6 @@ use Module::Pluggable::Object ();
 use Text::SimpleTable ();
 use Path::Class::Dir ();
 use Path::Class::File ();
-use Time::HiRes qw/gettimeofday tv_interval/;
 use URI ();
 use URI::http;
 use URI::https;
