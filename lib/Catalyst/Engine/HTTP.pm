@@ -540,8 +540,6 @@ sub _socket_data {
 
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
 
-no Moose;
-
 =head2 options
 
 Options hash passed to the http engine to control things like if keepalive
