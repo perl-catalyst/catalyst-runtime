@@ -21,7 +21,6 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 use URI ();
 use URI::http;
 use URI::https;
-use Scalar::Util qw/weaken/;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use attributes;
