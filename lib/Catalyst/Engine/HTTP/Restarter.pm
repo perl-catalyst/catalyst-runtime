@@ -68,8 +68,9 @@ around run => sub {
     }
 
     return $self->$orig( $class, $port, $host, $options );
-    no Moose;
 };
+
+no Moose;
 
 1;
 __END__
