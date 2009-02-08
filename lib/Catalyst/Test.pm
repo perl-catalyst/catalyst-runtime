@@ -9,7 +9,7 @@ use Catalyst::Utils;
 use Class::MOP;
 use Sub::Exporter;
 
-sub build_exports {
+my $build_exports = sub {
     my ($self, $meth, $args, $defaults) = @_;
 
     my $request;
@@ -55,14 +55,13 @@ sub build_exports {
             return Test::More->builder->is_eq(scalar($res->content_type),@_);
         },
     };
-}
+};
 
-use namespace::clean;
 our $default_host;
 
 {
     my $import = Sub::Exporter::build_exporter({
-        groups => [ all => \&build_exports ],
+        groups => [ all => $build_exports ],
         into_level => 1,
     });
 
