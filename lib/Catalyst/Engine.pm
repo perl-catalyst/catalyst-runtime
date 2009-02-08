@@ -10,7 +10,6 @@ use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
-use Scalar::Util ();
 
 use namespace::clean -except => 'meta';
 

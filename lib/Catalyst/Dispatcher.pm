@@ -14,7 +14,6 @@ use Catalyst::Utils;
 use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
-use Scalar::Util ();
 
 # Refactoring note:
 # do these belong as package vars or should we build these via a builder method?
