@@ -2,15 +2,14 @@
 
 Most applications and plugins should run unaltered on Catalyst 5.80.
 
-However as a lot of refactoring work has taken place, several changes
-have been made which could cause incompatibilities, if your application
-or plugin is using deprecated code, or relying on side-effects then
-there could be incompatibility.
+However as a lot of refactoring work has taken place, several changes have
+been made which could cause incompatibilities, if your application or plugin
+is using deprecated code, or relying on side-effects then there could be
+incompatibility.
 
-Most issues found with pre-existing components have been easy to solve,
-and a complete description of behavior changes which may cause compatibility
-issues, or warnings to be emitted is included below to help if you have
-problems.
+Most issues found with pre-existing components have been easy to solve, and a
+complete description of behavior changes which may cause compatibility issues,
+or warnings to be emitted is included below to help if you have problems.
 
 If you think you have found an upgrade related issue which is not covered in
 this document, then please email the Catalyst list to discuss the problem.
@@ -55,22 +54,43 @@ compatible way is:
 Note that the C< extends > decleration needs to occur in a begin block for
 L<attributes> to operate correctly.
 
+=head3 use Moose in MyApp
+
+Similar to the above, this will also fail:
+
+    package MyApp;
+    use Moose;
+    use Catalyst qw/
+      ConfigLoader
+    /;
+    __PACKAGE__->setup;
+
+If you need to use Moose in your application class (e.g. for method modifiers
+etc) then the correct technique is:
+
+    package MyApp;
+    use Moose;
+    extends 'Catalyst';
+    __PACKAGE__->setup(qw/
+        ConfigLoader
+    /);
+
 =head2 Anonymous closures installed directly into the symbol table
 
 If you have any code which installs anonymous subroutine references directly
 into the symbol table, you may encounter breakages. The simplest solution is
 to use L<Sub::Name> to name the subroutine. Example:
 
-    #Originalcode, likely to break:
+    # Original code, likely to break:
     my $full_method_name = join('::',$package_name, $method_name);
     *$full_method_name = sub { ... };
 
-    #Fixed Code
+    # Fixed Code
     use Sub::Name 'subname';
     my $full_method_name = join('::',$package_name, $method_name);
     *$full_method_name = subname $full_method_name, sub { ... };
 
-Additionally, you can take advantage of Catalyst's use of L<Class::MOP> and
+Additionally, you can take advantage of Catalysts use of L<Class::MOP> and
 install the closure using the appropriate metaclass. Example:
 
     use Class::MOP;
@@ -89,13 +109,14 @@ used to work:
     }
 
 With Catalyst 5.80 this won't work anymore. Because instead of using NEXT.pm it
-relies on Class::C3::Adopt::NEXT, which doesn't remember what methods it
-already called, like NEXT does and therefore goes into a deep recursion between
-MyApp::setup and Catalyst::setup.
+relies on L<Class::C3::Adopt::NEXT>, which uses plain C3 method resolution.
 
-Moose method modifiers line C<< before|after|around 'setup => sub { ... }; >>
-won't work either because of backward compatibility issues related to plugin
-setup methods.
+As L<NEXTs|NEXT> hacks to remember what methods have already been called, this
+causes infinite recursion between MyApp::setup and Catalyst::setup.
+
+Moose method modifiers like C<< before|after|around 'setup => sub { ... }; >>
+also will not operate correctly due to backward compatibility issues with the
+way plugin setup methods.
 
 The right way to do it is this:
 
@@ -103,23 +124,22 @@ The right way to do it is this:
         ... # things to do after the actual setup
     };
 
-=head2 Components whos new method returns false
+=head2 Components with a new method which returns false
 
 Previously, if you had a component which inherited from Catalyst::COMPONENT,
-but overrode the new method, to return false, then your class' configuration
+but overrode the new method to return false, then your class' configuration
 would be blessed into a hash on your behalf, and this would be returned from
 the COMPONENT method.
 
-This behaviour makes no sense, and so has been removed.. You are recommended to
-implement your own new method in components, instead, you should inherit the
-new method from Catalyst::Component, and use Moose's BUILD functionality to
-perform any construction work necessary for your sub-class.
+This behaviour makes no sense, and so has been removed. Implementing your own
+new method in components is B<highly> discouraged, instead, you should inherit
+the new method from Catalyst::Component, and use Moose's BUILD functionality
+to perform any construction work necessary for your sub-class.
 
 =head2 __PACKAGE__->mk_accessor('meta');
 
-Won't work due to a limitation of L<Moose>
-
-This is currently being fixed inside core Moose.
+Won't work due to a limitation of L<Moose>. This is currently being fixed
+inside Moose.
 
 =head2 Class::Data::Inheritable side effects
 
@@ -147,7 +167,8 @@ The following example demonstrates the problem:
 
     BaseClass->foo('base class');
     Child->foo('sub class');
-
+    
+    use Test::More;
     isnt(BaseClass->can('foo'), Child->can('foo'));
 
 =head2 Extending Catalyst::Request or other classes in an ad-hoc manor using mk_accessors
@@ -155,9 +176,9 @@ The following example demonstrates the problem:
 Previously, it was possible to add additional accessors to Catalyst::Request
 (or other classes) by calling the mk_accessors class method.
 
-This is no longer supported - users should make a sub-class of the class who's
-behavior they would like to change, rather than globally polluting the Catalyst
-objects.
+This is no longer supported - users should make a sub-class of the class whos
+behavior they would like to change, rather than globally polluting the
+Catalyst objects.
 
 =head2 Confused multiple inheritance with Catalyst::Component::COMPONENT
 
@@ -167,17 +188,17 @@ Warning message:
     in ${next_package}.
 
 This means that one of the packages on the right hand side of
-Catalyst::Component in your Class' inheritance hierarchy defines
-a COMPONENT method.
+Catalyst::Component in your Class' inheritance hierarchy defines a COMPONENT
+method.
 
-Previously, Catalyst's COMPONENT method would delegate to the
-method on the right hand side, which could then delegate back again
-with NEXT. This (as it is insane), is no longer supported, as it
-makes no sense with C3 method dispatch order.
+Previously, Catalyst's COMPONENT method would delegate to the method on the
+right hand side, which could then delegate back again with NEXT. This (as it
+is insane), is no longer supported, as it makes no sense with C3 method
+dispatch order.
 
-Therefore the correct fix is to re-arrange your class' inheritance
-hierarchy so that the COMPONENT method you would like to inherit is
-the first COMPONENT method in your @ISA.
+Therefore the correct fix is to re-arrange your class' inheritance hierarchy
+so that the COMPONENT method you would like to inherit is the first COMPONENT
+method in your @ISA.
 
 =head1 WARNINGS
 
@@ -216,9 +237,9 @@ should look like.
 
 =head2 require $class was successful but the package is not defined.
 
-In this version of Catalyst, if a component is loaded from disk, but no symbols
-are defined in that component's namespace after it is loaded, this warning will
-be issued.
+In this version of Catalyst, if a component is loaded from disk, but no
+symbols are defined in that component's namespace after it is loaded, this
+warning will be issued.
 
 This is to protect against confusing bugs caused by mis-typing package names.
 
