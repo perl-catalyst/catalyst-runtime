@@ -1110,7 +1110,7 @@ using C<< $c->req->captures >>.
 sub uri_for {
     my ( $c, $path, @args ) = @_;
 
-    if ( Scalar::Util::blessed($path) ) { # action object
+    if ( blessed($path) ) { # action object
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? shift(@args)
                          : [] );

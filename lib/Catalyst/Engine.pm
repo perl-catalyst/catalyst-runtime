@@ -46,7 +46,7 @@ sub finalize_body {
     my ( $self, $c ) = @_;
     my $body = $c->response->body;
     no warnings 'uninitialized';
-    if ( Scalar::Util::blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
+    if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
         while ( !eof $body ) {
             read $body, my ($buffer), $CHUNKSIZE;
             last unless $self->write( $c, $buffer );
@@ -76,7 +76,7 @@ sub finalize_cookies {
         my $val = $response->cookies->{$name};
 
         my $cookie = (
-            Scalar::Util::blessed($val)
+            blessed($val)
             ? $val
             : CGI::Simple::Cookie->new(
                 -name    => $name,

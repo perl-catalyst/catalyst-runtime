@@ -147,7 +147,7 @@ sub _command2action {
 
     # go to a string path ("/foo/bar/gorch")
     # or action object
-    if (Scalar::Util::blessed($command) && $command->isa('Catalyst::Action')) {
+    if (blessed($command) && $command->isa('Catalyst::Action')) {
         $action = $command;
     }
     else {
@@ -666,7 +666,7 @@ foreach my $public_method_name (qw/
         my %package_hash; # Only warn once per method, per package. These are infrequent enough that
                           # I haven't provided a way to disable them, patches welcome.
         $meta->add_before_method_modifier($public_method_name, sub {
-            my $class = Scalar::Util::blessed(shift);
+            my $class = blessed(shift);
             $package_hash{$class}++ || do { 
                 warn("Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
                     . "this will be removed in Catalyst 5.9X");
