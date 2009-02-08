@@ -2,7 +2,7 @@ package Catalyst::Test;
 
 use strict;
 use warnings;
-use Test::More;
+use Test::More ();
 
 use Catalyst::Exception;
 use Catalyst::Utils;
