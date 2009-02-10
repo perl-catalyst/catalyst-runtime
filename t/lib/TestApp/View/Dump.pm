@@ -37,7 +37,7 @@ sub process {
     my $context = delete $reference->{_context};
 
     if ( my $output =
-        $self->dump( $reference || $c->stash->{dump} || $c->stash ) )
+        $self->dump( $reference ) )
     {
 
         $c->res->headers->content_type('text/plain');
