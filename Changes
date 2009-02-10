@@ -2,6 +2,12 @@
 
         - Clarify that request arguments aren't unescaped automatically
           (Simon Bertrang) (Closes RT#41153)
+        - Don't require C3 for the MRO test (rafl)
+        - Bump MX::Emulate::CAF prereq to support list assignment (rafl)
+        - Remove useless column in chained action debug table. (rafl)
+        - namespace::clean related cleanups (rafl)
+        - Import related cleanups and consistency fixes (rafl)
+        - Fix test suite TestApp /dump/env action (t0m)
 
 5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
