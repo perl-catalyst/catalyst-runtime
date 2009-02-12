@@ -1,13 +1,13 @@
 package Catalyst::Controller;
 
 use Moose;
+use Moose::Util qw/find_meta/;
 
 use namespace::clean -except => 'meta';
 
 # Note - Must be done at compile time due to attributes (::AttrContainer)
 BEGIN { extends qw/Catalyst::Component Catalyst::AttrContainer/; }
 
-use Class::MOP::Object ();
 use Catalyst::Exception;
 use Catalyst::Utils;
 
@@ -181,7 +181,7 @@ sub register_actions {
     my $class = ref $self || $self;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
-    my $meta = $self->Class::MOP::Object::meta();
+    my $meta = find_meta($self);
     my %methods = map { $_->body => $_->name }
         grep { $_->package_name ne 'Moose::Object' } #ignore Moose::Object methods
             $meta->get_all_methods;
