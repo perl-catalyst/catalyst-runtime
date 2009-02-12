@@ -1,6 +1,9 @@
 package Catalyst::Controller;
 
 use Moose;
+
+use namespace::clean -except => 'meta';
+
 # Note - Must be done at compile time due to attributes (::AttrContainer)
 BEGIN { extends qw/Catalyst::Component Catalyst::AttrContainer/; }
 
@@ -386,8 +389,6 @@ sub _parse_MyAction_attr {
 
     return ( 'ActionClass', $value );
 }
-
-no Moose;
 
 __PACKAGE__->meta->make_immutable;
 
