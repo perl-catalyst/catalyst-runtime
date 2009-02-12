@@ -183,7 +183,6 @@ sub register_actions {
     my $namespace = $self->action_namespace($c);
     my $meta = find_meta($self);
     my %methods = map { $_->body => $_->name }
-        grep { $_->package_name ne 'Moose::Object' } #ignore Moose::Object methods
             $meta->get_all_methods;
 
     # Advanced inheritance support for plugins and the like
