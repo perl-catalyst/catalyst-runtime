@@ -9,6 +9,17 @@ Documentation:
      screwed up, and the docs for $c->model should be more explicit about
      what is expected. This probably also applies to view/controller.
 
+   - Run more smokes
+
+   - Test/document ->Class::MOP::Object::meta call in ::ClassData
+
+   - Change dispatcher and upgrade docs appropriately (no new method needed)
+
+   - Using anything ::[CMV]:: should warn (once, on boot).
+
+   - TestApp should not use NEXT. There should be a TestAppNEXTCompat
+     which does but is standalone..
+
 Profiling:
 
-  - vs 5.70 and optimisation as needed.
+  - vs 5.70 and optimisation as needed on perl 5.8 (5.10 is already faster!).
