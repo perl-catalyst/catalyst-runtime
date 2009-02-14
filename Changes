@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Bump Moose dependency to 0.70 so that we avoid nasty surprises
+          with is_class_loaded and perl 5.80 when you Moosify MyApp.pm (t0m)
         - Clarify that request arguments aren't unescaped automatically
           (Simon Bertrang) (Closes RT#41153)
         - Don't require C3 for the MRO test (rafl)
