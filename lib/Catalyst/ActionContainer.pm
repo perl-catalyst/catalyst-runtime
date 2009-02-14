@@ -21,9 +21,10 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 has part => (is => 'rw', required => 1);
 has actions => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 
-around new => sub {
-  my ($orig, $self, $params) = @_;
-  $orig->($self, (ref($params) ? $params :  { part => $params } ));
+around BUILDARGS => sub {
+    my ($next, $self, @args) = @_;
+    unshift @args, 'part' if scalar @args == 1 && !ref $args[0];
+    return $self->$next(@args);
 };
 
 no Moose;
