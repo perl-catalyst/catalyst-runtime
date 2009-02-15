@@ -20,9 +20,11 @@ around run => sub {
         close STDIN;
         close STDOUT;
 
+        # Avoid "Setting config after setup" error restarting MyApp.pm
+        $class->setup_finished(0);
         # Best effort if we can't trap compiles..
         $self->_make_components_mutable($class)
-            if !Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION();
+            if !Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
             directory => ( 

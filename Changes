@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Make MyApp.pm restartable by unsetting setup_finished in
+          the restarter process (t0m)
         - Non-naive implementation of making mutable on restart using
           B::Hooks::OP::Check::StashChange if installed (t0m)
           - Tests for this (t0m)
