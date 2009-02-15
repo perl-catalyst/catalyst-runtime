@@ -13,6 +13,7 @@ use FindBin;
 use LWP::Simple;
 use IO::Socket;
 use IPC::Open3;
+use Catalyst::Engine::HTTP::Restarter::Watcher;
 use Time::HiRes qw/sleep/;
 eval "use Catalyst::Devel 1.0;";
 
@@ -67,6 +68,9 @@ my @files = (
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Action/Begin.pm",
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Immutable.pm",
 );
+
+push(@files, "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Immutable/HardToReload.pm")
+    if Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION();
 
 # change some files and make sure the server restarts itself
 NON_ERROR_RESTART:

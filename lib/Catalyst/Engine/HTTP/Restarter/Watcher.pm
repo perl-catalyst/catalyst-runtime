@@ -7,6 +7,18 @@ use File::Find;
 use File::Modified;
 use File::Spec;
 use Time::HiRes qw/sleep/;
+use Moose::Util qw/find_meta/;
+use namespace::clean -except => 'meta';
+
+BEGIN {
+    # If we can detect stash changes, then we do magic
+    # to make their metaclass mutable (if they have one)
+    # so that restarting works as expected.
+    eval { require B::Hooks::OP::Check::StashChange; };
+    *DETECT_PACKAGE_COMPILATION = $@
+        ? sub () { 0 }
+        : sub () { 1 }
+}
 
 has delay => (is => 'rw');
 has regex => (is => 'rw');
@@ -15,10 +27,8 @@ has directory => (is => 'rw');
 has watch_list => (is => 'rw');
 has follow_symlinks => (is => 'rw');
 
-no Moose;
-
 sub BUILD {
-  shift->_init;
+    shift->_init;
 }
 
 sub _init {
@@ -126,13 +136,26 @@ sub _index_directory {
 sub _test {
     my ( $self, $file ) = @_;
 
-    delete $INC{$file};
+    my $id;
+    if (DETECT_PACKAGE_COMPILATION) {
+        $id = B::Hooks::OP::Check::StashChange::register(sub {
+            my ($new, $old) = @_;
+            my $meta = find_meta($new);
+            if ($meta) {
+                $meta->make_mutable if $meta->is_immutable;
+            }
+        });
+    }
+
+    delete $INC{$file}; # Remove from %INC so it will reload
     local $SIG{__WARN__} = sub { };
 
     open my $olderr, '>&STDERR';
     open STDERR, '>', File::Spec->devnull;
     eval "require '$file'";
     open STDERR, '>&', $olderr;
+
+    B::Hooks::OP::Check::StashChange::unregister($id) if $id;
 
     return ($@) ? $@ : 0;
 }

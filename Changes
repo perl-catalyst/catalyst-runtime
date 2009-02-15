@@ -1,7 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-        - Naive implementation of making packages mutable before restarting so
-          that restarter works with native Moose apps using immutable (t0m)
+        - Non-naive implementation of making mutable on restart using
+          B::Hooks::OP::Check::StashChange if installed (t0m)
+          - Tests for this (t0m)
+        - Naive implementation of making all components mutable in the
+          forked restart watcher process so native Moose apps using
+          immutable restart correctly. (t0m)
           - Tests for this (t0m)
         - Bump Moose dependency to 0.70 so that we avoid nasty surprises
           with is_class_loaded and perl 5.80 when you Moosify MyApp.pm (t0m)

@@ -34,6 +34,8 @@ requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 
+recommends 'B::Hooks::OP::Check::StashChange';
+
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::MockObject';
 
