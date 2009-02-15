@@ -79,7 +79,7 @@ around run => sub {
 sub _make_components_mutable {
     my ($self, $class) = @_;
 
-    my @metas = map { find_meta(@_) } ($class, map { blessed($_) } values %{ $class->components });
+    my @metas = map { find_meta($_) } ($class, map { blessed($_) } values %{ $class->components });
 
     foreach my $meta (@metas) {
         $meta->make_mutable if $meta->is_immutable;
