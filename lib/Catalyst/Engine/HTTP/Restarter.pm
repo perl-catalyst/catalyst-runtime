@@ -1,6 +1,8 @@
 package Catalyst::Engine::HTTP::Restarter;
-
 use Moose;
+use Moose::Util qw/find_meta/;
+use namespace::clean -except => 'meta';
+
 extends 'Catalyst::Engine::HTTP';
 
 use Catalyst::Engine::HTTP::Restarter::Watcher;
@@ -17,6 +19,8 @@ around run => sub {
         # Prepare
         close STDIN;
         close STDOUT;
+
+        $self->_make_components_mutable($class);
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
             directory => ( 
@@ -70,7 +74,17 @@ around run => sub {
     return $self->$orig( $class, $port, $host, $options );
 };
 
-no Moose;
+# Naive way of trying to avoid Moose blowing up when you re-require components
+# which have been made immutable.
+sub _make_components_mutable {
+    my ($self, $class) = @_;
+
+    my @metas = map { find_meta(@_) } ($class, map { blessed($_) } values %{ $class->components });
+
+    foreach my $meta (@metas) {
+        $meta->make_mutable if $meta->is_immutable;
+    }
+}
 
 1;
 __END__

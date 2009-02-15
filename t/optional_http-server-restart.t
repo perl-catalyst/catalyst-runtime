@@ -65,7 +65,7 @@ while ( check_port( 'localhost', $port ) != 1 ) {
 my @files = (
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp.pm",
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Action/Begin.pm",
-"$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Engine/Request/URI.pm",
+    "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Immutable.pm",
 );
 
 # change some files and make sure the server restarts itself
