@@ -141,8 +141,10 @@ sub _test {
         $id = B::Hooks::OP::Check::StashChange::register(sub {
             my ($new, $old) = @_;
             my $meta = find_meta($new);
-            if ($meta) {
-                $meta->make_mutable if $meta->is_immutable;
+            if ($meta) { # A little paranoia here - Moose::Meta::Role has neither of these methods.
+                my $is_immutable = $meta->can('is_immutable');
+                my $make_mutable = $meta->can('make_mutable');
+                $meta->$make_mutable() if $is_immutable && $make_mutable && $meta->$is_immutable();
             }
         });
     }

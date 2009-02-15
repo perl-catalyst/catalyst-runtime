@@ -86,6 +86,7 @@ sub _make_components_mutable {
     my @metas = map { find_meta($_) } ($class, map { blessed($_) } values %{ $class->components });
 
     foreach my $meta (@metas) {
+        # Paranoia unneeded, all component metaclasses should have immutable
         $meta->make_mutable if $meta->is_immutable;
     }
 }

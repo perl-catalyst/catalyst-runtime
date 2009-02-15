@@ -1,3 +1,7 @@
+package TestApp::Controller::Immutable::HardToReload::Role;
+use Moose::Role; # Role metaclass does not have make_immutable..
+no Moose::Role;
+
 package TestApp::Controller::Immutable::HardToReload;
 use Moose;
 BEGIN { extends 'Catalyst::Controller' }
