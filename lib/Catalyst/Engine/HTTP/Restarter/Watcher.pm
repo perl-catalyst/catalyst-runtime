@@ -197,6 +197,17 @@ Creates a new Watcher object.
 Returns a list of files that have been added, deleted, or changed since the
 last time watch was called.
 
+=head2 DETECT_PACKAGE_COMPILATION
+
+Returns true if L<B::Hooks::OP::Check::StashChange> is installed and
+can be used to detect when files are compiled. This is used internally
+to make the L<Moose> metaclass of any class being reloaded immutable.
+
+If L<B::Hooks::OP::Check::StashChange> is not installed, then the
+restarter makes all application components immutable. This covers the
+simple case, but is less useful if you're using Moose in components
+outside Catalyst's namespaces, but inside your application directory.
+
 =head1 SEE ALSO
 
 L<Catalyst>, L<Catalyst::Engine::HTTP::Restarter>, L<File::Modified>

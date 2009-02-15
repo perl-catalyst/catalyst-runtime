@@ -20,7 +20,9 @@ around run => sub {
         close STDIN;
         close STDOUT;
 
-        $self->_make_components_mutable($class);
+        # Best effort if we can't trap compiles..
+        $self->_make_components_mutable($class)
+            if !Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION();
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
             directory => ( 
