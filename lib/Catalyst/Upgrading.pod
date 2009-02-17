@@ -204,9 +204,9 @@ method in your @ISA.
 
 =head2 Methods in Catalyst::Dispatcher
 
-The following methods in Catalyst::Dispatcher are likely to change
-significantly in the 5.8X release series, and therefore their use is highly
-deprecated.
+The following methods in Catalyst::Dispatcher are both an implementation detail,
+and also likely to change significantly in the 5.8X release series, and therefore 
+their use is highly deprecated.
 
 =over
 
@@ -231,9 +231,10 @@ The first time one of these methods is called, a warning will be emitted:
 
 You should B<NEVER> be calling any of these methods from application code.
 
-Plugins authors and maintainers whos plugins need to call these methods should
-email the development list to discuss your use-case, and what a better API
-should look like.
+Plugins authors and maintainers whos plugins currently call these methods
+should change to using the public API, or, if you do not feel the public API
+adaquately supports your use-case, please email the development list to
+discuss what API features you need so that you can be appropriately supported.
 
 =head2 require $class was successful but the package is not defined.
 

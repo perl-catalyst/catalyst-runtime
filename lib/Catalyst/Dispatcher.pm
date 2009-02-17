@@ -101,7 +101,6 @@ it with a C<+>, like so:
 Delegate the dispatch to the action that matched the url, or return a
 message about unknown resource
 
-
 =cut
 
 sub dispatch {
@@ -109,7 +108,6 @@ sub dispatch {
     if ( my $action = $c->action ) {
         $c->forward( join( '/', '', $action->namespace, '_DISPATCH' ) );
     }
-
     else {
         my $path  = $c->req->path;
         my $error = $path
@@ -472,7 +470,7 @@ sub uri_for_action {
     return undef;
 }
 
-=head2 expand_action 
+=head2 expand_action
 
 expand an action into a full representation of the dispatch.
 mostly useful for chained, other actions will just return a
@@ -564,12 +562,13 @@ sub _find_or_create_namespace_node {
 
 =head2 $self->setup_actions( $class, $context )
 
+Loads all of the preload dispatch types, registers their actions and then
+loads all of the postload dispatch types, and does dispatcher initialization.
 
 =cut
 
 sub setup_actions {
     my ( $self, $c ) = @_;
-
 
     my @classes =
       $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
