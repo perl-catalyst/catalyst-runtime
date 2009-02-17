@@ -563,7 +563,8 @@ sub _find_or_create_namespace_node {
 =head2 $self->setup_actions( $class, $context )
 
 Loads all of the preload dispatch types, registers their actions and then
-loads all of the postload dispatch types, and does dispatcher initialization.
+loads all of the postload dispatch types, and iterates over the tree of
+actions, displaying the debug information if appropriate.
 
 =cut
 
