@@ -90,7 +90,7 @@ sub import {
 
     # Kill Adopt::NEXT warnings if we're a non-RC version
     if ($VERSION !~ /_\d{2}$/) {
-        Class::C3::Adopt::NEXT->unimport(qr/^Catalyst/);
+        Class::C3::Adopt::NEXT->unimport(qr/^Catalyst::/);
     }
 
     my $meta = Moose::Meta::Class->initialize($caller);
