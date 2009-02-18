@@ -10,7 +10,7 @@ requires 'Scope::Upper' => '0.06';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00800';
 requires 'Moose' => '0.70';
 requires 'Carp';
-requires 'Class::C3::Adopt::NEXT' => '0.05';
+requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'Class::MOP';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';

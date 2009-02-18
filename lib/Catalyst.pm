@@ -22,6 +22,7 @@ use URI::http;
 use URI::https;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
+use Class::C3::Adopt::NEXT;
 use attributes;
 use utf8;
 use Carp qw/croak carp shortmess/;
@@ -86,6 +87,12 @@ sub import {
 
     my $caller = caller();
     return if $caller eq 'main';
+
+    # Kill Adopt::NEXT warnings if we're a non-RC version
+    if ($VERSION !~ /_\d{2}$/) {
+        Class::C3::Adopt::NEXT->unimport(qr/^Catalyst/);
+    }
+
     my $meta = Moose::Meta::Class->initialize($caller);
     #Moose->import({ into => $caller }); #do we want to do this?
 

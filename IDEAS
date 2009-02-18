@@ -1,27 +1,5 @@
 * improve NEXT warnings. related irc conversation from 09/01/21:
 
-04:34:45  * mst wonders if that reports via caller or ref($self)
-04:35:29 < dhoss-laptop> jshirley: but but but i'm not
-04:36:01 <@jshirley> Oh, latest Catalyst::View::TT does
-04:36:11 <@jshirley> I thought that was well tested on 5.8
-04:36:18  * dhoss-laptop thought so too
-04:36:25 < dhoss-laptop> *and* config loader
-04:36:52 < dhoss-laptop> would that be any reason for my templates not being found? or would that be a whole different case? my code looks fine
-                         in my view
-04:37:15 <@rafl> mst: ref $self, currently
-04:37:24 < shadowpaste> "dhoss-laptop" at 76.10.60.8 pasted "pasting anyway" (15 lines) at http://scsys.co.uk:8001/22854
-04:37:48 <@rafl> which admittedly sucks a little
-04:37:50 <@mst> rafl: mm. caller would be better in terms of reporting the error against the package it's meant to be reported against
-04:37:55 <@rafl> right
-04:38:14 <@mst> I also wonder if we should exclude /^Catalyst::/ stuff and then do a pass across CPAN reporting bugs against people
-04:38:47 <@mst> rather than having people's apps scream at them just because an author is being a prat
-04:39:02 <@rafl> patch, anyone? git://github.com/rafl/class-c3-adopt-next.git
-04:39:16 <@rafl> i'd prefer not to exclude ^Catalyst
-04:39:55 <@mst> well, I was thinking an import argument
-04:40:02 <@rafl> the more annoying it is, the more likely it is to be fixed by authors is what i was thinking
-04:40:08 <@mst> so Catalyst can ask you to exclude ^Catalyst
-04:40:30 <@rafl> figured that
-04:41:04 <@mst> hrm
 04:41:15 <@mst> actually, even better, it can pass an exclude list
 04:41:22 <@mst> and an include list with versions that contain fixage
 04:41:39 <@mst> then as shit on CPAN gets fixed it can start warning that you should upgrade
