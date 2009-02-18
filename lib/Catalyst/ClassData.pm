@@ -12,6 +12,7 @@ sub mk_classdata {
   my $slot = '$'.$attribute;
   my $accessor =  sub {
     my $pkg = ref $_[0] || $_[0];
+    # Hack - delberately create a metaclass instance
     my $meta = $pkg->Class::MOP::Object::meta();
     if (@_ > 1) {
       $meta->namespace->{$attribute} = \$_[1];

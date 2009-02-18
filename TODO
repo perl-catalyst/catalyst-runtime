@@ -11,10 +11,6 @@ Documentation:
 
    - Run more smokes
 
-   - Test/document ->Class::MOP::Object::meta call in ::ClassData
-
-   - Change dispatcher and upgrade docs appropriately (no new method needed)
-
    - Using anything ::[CMV]:: should warn (once, on boot).
 
    - TestApp should not use NEXT. There should be a TestAppNEXTCompat
