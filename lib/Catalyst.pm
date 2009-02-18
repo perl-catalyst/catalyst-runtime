@@ -2047,7 +2047,12 @@ sub setup_components {
 
     my @comps = sort { length $a <=> length $b } $locator->plugins;
     my %comps = map { $_ => 1 } @comps;
-    
+
+    my $deprecated_component_names = grep { /::[CMV]::/ } @comps;
+    $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
+        qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
+    );
+
     for my $component ( @comps ) {
 
         # We pass ignore_loaded here so that overlay files for (e.g.)
