@@ -56,12 +56,11 @@ sub with_method_and_args : Local {
     $c->forward( qw/TestApp::Controller::Action::Forward args/, [qq/new/] );
     $c->res->body( $c->req->args->[0] );
 }
- 
+
 sub to_action_object : Local {
     my ( $self, $c ) = @_;
     $c->forward($self->action_for('embed'), [qw/mtfnpy/]);
 }
-
 
 sub args : Local {
     my ( $self, $c, $val ) = @_;

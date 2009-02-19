@@ -7,16 +7,13 @@ use Catalyst qw/
     Test::Plugin
     Test::Inline
     +TestApp::Plugin::FullyQualified
+    +TestApp::Plugin::AddDispatchTypes
 /;
 use Catalyst::Utils;
 
 our $VERSION = '0.01';
 
 TestApp->config( name => 'TestApp', root => '/some/dir' );
-
-unless (eval 'require Moose; 1') {
-    TestApp->config(setup_components => { except => 'TestApp::Controller::Moose' });
-}
 
 TestApp->setup;
 
@@ -33,7 +30,7 @@ sub global_action : Private {
 sub execute {
     my $c      = shift;
     my $class  = ref( $c->component( $_[0] ) ) || $_[0];
-    my $action = "$_[1]";
+    my $action = $_[1]->reverse;
 
     my $method;
 
@@ -65,7 +62,7 @@ sub execute {
 sub finalize_error {
     my $c = shift;
     
-    $c->NEXT::finalize_error(@_);
+    $c->next::method(@_);
     
     $c->res->status(500);
     $c->res->body( 'FATAL ERROR: ' . join( ', ', @{ $c->error } ) );

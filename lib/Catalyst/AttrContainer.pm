@@ -1,14 +1,13 @@
 package Catalyst::AttrContainer;
 
-use strict;
-use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
-
+use Moose;
 use Catalyst::Exception;
-use NEXT;
+with 'Catalyst::ClassData';
 
-__PACKAGE__->mk_classdata($_) for qw/_attr_cache _action_cache/;
-__PACKAGE__->_attr_cache( {} );
-__PACKAGE__->_action_cache( [] );
+no Moose;
+
+__PACKAGE__->mk_classdata(_attr_cache => {} );
+__PACKAGE__->mk_classdata( _action_cache => [] );
 
 # note - see attributes(3pm)
 sub MODIFY_CODE_ATTRIBUTES {

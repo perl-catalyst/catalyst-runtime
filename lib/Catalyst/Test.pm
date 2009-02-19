@@ -2,10 +2,77 @@ package Catalyst::Test;
 
 use strict;
 use warnings;
+use Test::More ();
 
 use Catalyst::Exception;
 use Catalyst::Utils;
-use Class::Inspector;
+use Class::MOP;
+use Sub::Exporter;
+
+my $build_exports = sub {
+    my ($self, $meth, $args, $defaults) = @_;
+
+    my $request;
+    my $class = $args->{class};
+
+    if ( $ENV{CATALYST_SERVER} ) {
+        $request = sub { remote_request(@_) };
+    } elsif (! $class) {
+        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
+    } else {
+        unless (Class::MOP::is_class_loaded($class)) {
+            Class::MOP::load_class($class);
+        }
+        $class->import;
+
+        $request = sub { local_request( $class, @_ ) };
+    }
+
+    my $get = sub { $request->(@_)->content };
+
+    return {
+        request => $request,
+        get     => $get,
+        content_like => sub {
+            my $action = shift;
+            return Test::More->builder->like($get->($action),@_);
+        },
+        action_ok => sub {
+            my $action = shift;
+            return Test::More->builder->ok($request->($action)->is_success, @_);
+        },
+        action_redirect => sub {
+            my $action = shift;
+            return Test::More->builder->ok($request->($action)->is_redirect,@_);
+        },
+        action_notfound => sub {
+            my $action = shift;
+            return Test::More->builder->is_eq($request->($action)->code,404,@_);
+        },
+        contenttype_is => sub {
+            my $action = shift;
+            my $res = $request->($action);
+            return Test::More->builder->is_eq(scalar($res->content_type),@_);
+        },
+    };
+};
+
+our $default_host;
+
+{
+    my $import = Sub::Exporter::build_exporter({
+        groups => [ all => $build_exports ],
+        into_level => 1,
+    });
+
+
+    sub import {
+        my ($self, $class, $opts) = @_;
+        $import->($self, '-all' => { class => $class });
+        $opts = {} unless ref $opts eq 'HASH';
+        $default_host = $opts->{default_host} if exists $opts->{default_host};
+    }
+}
 
 =head1 NAME
 
@@ -44,17 +111,27 @@ Catalyst::Test - Test Catalyst Applications
 
     package main;
 
-    use Test::More tests => 1;
     use Catalyst::Test 'TestApp';
+    use Test::More tests => 1;
 
     ok( get('/foo') =~ /bar/ );
+
+    # mock virtual hosts
+    use Catalyst::Test 'MyApp', { default_host => 'myapp.com' };
+    like( get('/whichhost'), qr/served by myapp.com/ );
+    like( get( '/whichhost', { host => 'yourapp.com' } ), qr/served by yourapp.com/ );
+    {
+        local $Catalyst::Test::default_host = 'otherapp.com';
+        like( get('/whichhost'), qr/served by otherapp.com/ );
+    }
 
 =head1 DESCRIPTION
 
 This module allows you to make requests to a Catalyst application either without
 a server, by simulating the environment of an HTTP request using
 L<HTTP::Request::AsCGI> or remotely if you define the CATALYST_SERVER
-environment variable.
+environment variable. This module also adds a few catalyst
+specific testing methods as displayed in the method section.
 
 The </get> and </request> functions take either a URI or an L<HTTP::Request>
 object.
@@ -80,39 +157,11 @@ method and the L<request> method below:
 
 =head2 request
 
-Returns a C<HTTP::Response> object.
+Returns a C<HTTP::Response> object. Accepts an optional hashref for request
+header configuration; currently only supports setting 'host' value.
 
     my $res = request('foo/bar?test=1');
-
-=cut
-
-sub import {
-    my $self  = shift;
-    my $class = shift;
-
-    my ( $get, $request );
-
-    if ( $ENV{CATALYST_SERVER} ) {
-        $request = sub { remote_request(@_) };
-        $get     = sub { remote_request(@_)->content };
-    } elsif (! $class) {
-        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
-        $get     = $request;
-    } else {
-        unless( Class::Inspector->loaded( $class ) ) {
-            require Class::Inspector->filename( $class );
-        }
-        $class->import;
-
-        $request = sub { local_request( $class, @_ ) };
-        $get     = sub { local_request( $class, @_ )->content };
-    }
-
-    no strict 'refs';
-    my $caller = caller(0);
-    *{"$caller\::request"} = $request;
-    *{"$caller\::get"}     = $get;
-}
+    my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
 
 =head2 local_request
 
@@ -126,6 +175,7 @@ sub local_request {
     require HTTP::Request::AsCGI;
 
     my $request = Catalyst::Utils::request( shift(@_) );
+    _customize_request($request, @_);
     my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
 
     $class->handle_request;
@@ -147,6 +197,8 @@ sub remote_request {
 
     my $request = Catalyst::Utils::request( shift(@_) );
     my $server  = URI->new( $ENV{CATALYST_SERVER} );
+
+    _customize_request($request, @_);
 
     if ( $server->path =~ m|^(.+)?/$| ) {
         my $path = $1;
@@ -198,6 +250,35 @@ sub remote_request {
 
     return $agent->request($request);
 }
+
+sub _customize_request {
+    my $request = shift;
+    my $opts = pop(@_) || {};
+    $opts = {} unless ref($opts) eq 'HASH';
+    if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
+        $request->header( 'Host' => $host );
+    }
+}
+
+=head2 action_ok
+
+Fetches the given url and check that the request was successful
+
+=head2 action_redirect
+
+Fetches the given url and check that the request was a redirect
+
+=head2 action_notfound
+
+Fetches the given url and check that the request was not found
+
+=head2 content_like
+
+Fetches the given url and matches the content against it.
+
+=head2 contenttype_is 
+    
+Check for given mime type
 
 =head1 SEE ALSO
 

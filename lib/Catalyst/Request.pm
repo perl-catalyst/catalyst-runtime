@@ -1,34 +1,133 @@
 package Catalyst::Request;
 
-use strict;
-use base 'Class::Accessor::Fast';
-
 use IO::Socket qw[AF_INET inet_aton];
 use Carp;
 use utf8;
 use URI::http;
 use URI::https;
 use URI::QueryParam;
+use HTTP::Headers;
 
-__PACKAGE__->mk_accessors(
-    qw/action address arguments cookies headers query_keywords match method
-      protocol query_parameters secure captures uri user/
+use Moose;
+
+use namespace::clean -except => 'meta';
+
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
+has action => (is => 'rw');
+has address => (is => 'rw');
+has arguments => (is => 'rw', default => sub { [] });
+has cookies => (is => 'rw', default => sub { {} });
+has query_keywords => (is => 'rw');
+has match => (is => 'rw');
+has method => (is => 'rw');
+has protocol => (is => 'rw');
+has query_parameters  => (is => 'rw', default => sub { {} });
+has secure => (is => 'rw', default => 0);
+has captures => (is => 'rw', default => sub { [] });
+has uri => (is => 'rw', predicate => 'has_uri');
+has user => (is => 'rw');
+has headers => (
+  is      => 'rw',
+  isa     => 'HTTP::Headers',
+  handles => [qw(content_encoding content_length content_type header referer user_agent)],
+  default => sub { HTTP::Headers->new() },
+  required => 1,
+  lazy => 1,
 );
 
-*args         = \&arguments;
-*body_params  = \&body_parameters;
-*input        = \&body;
-*params       = \&parameters;
-*query_params = \&query_parameters;
-*path_info    = \&path;
-*snippets     = \&captures;
+# Moose TODO:
+# - Can we lose the before modifiers which just call prepare_body ?
+#   they are wasteful, slow us down and feel cluttery.
+# Can we call prepare_body at BUILD time?
+# Can we make _body an attribute, have the rest of 
+# these lazy build from there and kill all the direct hash access
+# in Catalyst.pm and Engine.pm?
 
-sub content_encoding { shift->headers->content_encoding(@_) }
-sub content_length   { shift->headers->content_length(@_) }
-sub content_type     { shift->headers->content_type(@_) }
-sub header           { shift->headers->header(@_) }
-sub referer          { shift->headers->referer(@_) }
-sub user_agent       { shift->headers->user_agent(@_) }
+has _context => (
+  is => 'rw',
+  weak_ref => 1,
+  handles => ['read'],
+  clearer => '_clear_context',
+);
+
+has body_parameters => (
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub { {} },
+);
+
+before body_parameters => sub {
+  my ($self) = @_;
+  $self->_context->prepare_body();
+};
+
+has uploads => (
+  is => 'rw',
+  required => 1,
+  default => sub { {} },
+);
+
+has parameters => (
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub { {} },
+);
+
+before parameters => sub {
+  my ($self, $params) = @_;
+  if ( $params && !ref $params ) {
+    $self->_context->log->warn(
+        "Attempt to retrieve '$params' with req->params(), " .
+        "you probably meant to call req->param('$params')" );
+    $params = undef;
+  }
+
+};
+
+has base => (
+  is => 'rw',
+  required => 1,
+  lazy => 1,
+  default => sub {
+    my $self = shift;
+    return $self->path if $self->has_uri;
+  },
+);
+
+has _body => (
+  is => 'rw', clearer => '_clear_body', predicate => '_has_body',
+);
+# Eugh, ugly. Should just be able to rename accessor methods to 'body'
+#             and provide a custom reader.. 
+sub body {
+  my $self = shift;
+  $self->_context->prepare_body();
+  $self->_body(@_) if scalar @_;
+  return blessed $self->_body ? $self->_body->body : $self->_body;
+}
+
+has hostname => (
+  is        => 'rw',
+  required  => 1,
+  lazy      => 1,
+  default   => sub {
+    my ($self) = @_;
+    gethostbyaddr( inet_aton( $self->address ), AF_INET ) || 'localhost'
+  },
+);
+
+has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
+
+sub args            { shift->arguments(@_) }
+sub body_params     { shift->body_parameters(@_) }
+sub input           { shift->body(@_) }
+sub params          { shift->parameters(@_) }
+sub query_params    { shift->query_parameters(@_) }
+sub path_info       { shift->path(@_) }
+sub snippets        { shift->captures(@_) }
 
 =head1 NAME
 
@@ -111,6 +210,9 @@ For example, if your action was
 and the URI for the request was C<http://.../foo/moose/bah>, the string C<bah>
 would be the first and only argument.
 
+Arguments just get passed through and B<don't> get unescaped automatically, so
+you should do that explicitly.
+
 =head2 $req->args
 
 Shortcut for arguments.
@@ -122,38 +224,10 @@ Contains the URI base. This will always have a trailing slash.
 If your application was queried with the URI
 C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
-=cut
-
-sub base {
-    my ( $self, $base ) = @_;
-
-    return $self->{base} unless $base;
-
-    $self->{base} = $base;
-
-    # set the value in path for backwards-compat
-    if ( $self->uri ) {
-        $self->path;
-    }
-
-    return $self->{base};
-}
-
 =head2 $req->body
 
 Returns the message body of the request, unless Content-Type is
 C<application/x-www-form-urlencoded> or C<multipart/form-data>.
-
-=cut
-
-sub body {
-    my $self = shift;
-    $self->{_context}->prepare_body;
-    
-    return unless $self->{_body};
-    
-    return $self->{_body}->body;
-}
 
 =head2 $req->body_parameters
 
@@ -164,19 +238,10 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->body_parameters->{field}->[0];
 
 These are the parameters from the POST part of the request, if any.
-    
+
 =head2 $req->body_params
 
 Shortcut for body_parameters.
-
-=cut
-
-sub body_parameters {
-    my ( $self, $params ) = @_;
-    $self->{_context}->prepare_body;
-    $self->{body_parameters} = $params if $params;
-    return $self->{body_parameters};
-}
 
 =head2 $req->content_encoding
 
@@ -240,23 +305,6 @@ Returns an L<HTTP::Headers> object containing the headers for the current reques
 =head2 $req->hostname
 
 Returns the hostname of the client.
-    
-=cut
-
-sub hostname {
-    my $self = shift;
-
-    if ( @_ == 0 && not $self->{hostname} ) {
-        $self->{hostname} =
-          gethostbyaddr( inet_aton( $self->address ), AF_INET );
-    }
-
-    if ( @_ == 1 ) {
-        $self->{hostname} = shift;
-    }
-
-    return $self->{hostname};
-}
 
 =head2 $req->input
 
@@ -348,31 +396,13 @@ This is the combination of C<query_parameters> and C<body_parameters>.
 
 Shortcut for $req->parameters.
 
-=cut
-
-sub parameters {
-    my ( $self, $params ) = @_;
-    $self->{_context}->prepare_body;
-    if ( $params ) {
-        if ( ref $params ) {
-            $self->{parameters} = $params;
-        }
-        else {
-            $self->{_context}->log->warn( 
-                "Attempt to retrieve '$params' with req->params(), " .
-                "you probably meant to call req->param('$params')" );
-        }
-    }
-    return $self->{parameters};
-}
-
 =head2 $req->path
 
 Returns the path, i.e. the part of the URI after $req->base, for the current request.
 
 =head2 $req->path_info
 
-Alias for path, added for compability with L<CGI>.
+Alias for path, added for compatibility with L<CGI>.
 
 =cut
 
@@ -381,17 +411,17 @@ sub path {
 
     if (@params) {
         $self->uri->path(@params);
-        undef $self->{path};
+        $self->_clear_path;
     }
-    elsif ( defined( my $path = $self->{path} ) ) {
-        return $path;
+    elsif ( $self->_has_path ) {
+        return $self->_path;
     }
     else {
         my $path     = $self->uri->path;
         my $location = $self->base->path;
         $path =~ s/^(\Q$location\E)?//;
         $path =~ s/^\///;
-        $self->{path} = $path;
+        $self->_path($path);
 
         return $path;
     }
@@ -419,10 +449,6 @@ defaults to the size of the request if not specified.
 
 You have to set MyApp->config->{parse_on_demand} to use this directly.
 
-=cut
-
-sub read { shift->{_context}->read(@_); }
-
 =head2 $req->referer
 
 Shortcut for $req->headers->referer. Returns the referring page.
@@ -433,13 +459,14 @@ Returns true or false, indicating whether the connection is secure (https).
 
 =head2 $req->captures
 
-Returns a reference to an array containing regex captures.
+Returns a reference to an array containing captured args from chained
+actions or regex captures.
 
     my @captures = @{ $c->request->captures };
 
 =head2 $req->snippets
 
-C<captures> used to be called snippets. This is still available for backwoards
+C<captures> used to be called snippets. This is still available for backwards
 compatibility, but is considered deprecated.
 
 =head2 $req->upload
@@ -509,15 +536,6 @@ L<Catalyst::Request::Upload> objects.
     my $upload = $c->request->uploads->{field};
     my $upload = $c->request->uploads->{field}->[0];
 
-=cut
-
-sub uploads {
-    my ( $self, $uploads ) = @_;
-    $self->{_context}->prepare_body;
-    $self->{uploads} = $uploads if $uploads;
-    return $self->{uploads};
-}
-
 =head2 $req->uri
 
 Returns a URI object for the current request. Stringifies to the URI text.
@@ -564,6 +582,10 @@ newer plugins is $c->user.
 Shortcut to $req->headers->user_agent. Returns the user agent (browser)
 version string.
 
+=head2 meta
+
+Provided by Moose
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
@@ -574,5 +596,7 @@ This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

@@ -1,11 +1,12 @@
 package Catalyst::Plugin::Test::Headers;
 
 use strict;
+use MRO::Compat;
 
 sub prepare {
     my $class = shift;
 
-    my $c = $class->NEXT::prepare(@_);
+    my $c = $class->next::method(@_);
 
     $c->response->header( 'X-Catalyst-Engine' => $c->engine );
     $c->response->header( 'X-Catalyst-Debug' => $c->debug ? 1 : 0 );
@@ -26,7 +27,7 @@ sub prepare {
 
 sub prepare_action {
     my $c = shift;
-    $c->NEXT::prepare_action(@_);
+    $c->next::method(@_);
     $c->res->header( 'X-Catalyst-Action' => $c->req->action );
 }
 

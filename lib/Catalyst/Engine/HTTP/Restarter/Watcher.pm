@@ -1,32 +1,34 @@
 package Catalyst::Engine::HTTP::Restarter::Watcher;
 
-use strict;
-use warnings;
-use base 'Class::Accessor::Fast';
+use Moose;
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 use File::Find;
 use File::Modified;
 use File::Spec;
 use Time::HiRes qw/sleep/;
+use Moose::Util qw/find_meta/;
+use namespace::clean -except => 'meta';
 
-__PACKAGE__->mk_accessors(
-    qw/delay
-      directory
-      modified
-      regex
-      follow_symlinks
-      watch_list/
-);
+BEGIN {
+    # If we can detect stash changes, then we do magic
+    # to make their metaclass mutable (if they have one)
+    # so that restarting works as expected.
+    eval { require B::Hooks::OP::Check::StashChange; };
+    *DETECT_PACKAGE_COMPILATION = $@
+        ? sub () { 0 }
+        : sub () { 1 }
+}
 
-sub new {
-    my ( $class, %args ) = @_;
+has delay => (is => 'rw');
+has regex => (is => 'rw');
+has modified => (is => 'rw');
+has directory => (is => 'rw');
+has watch_list => (is => 'rw');
+has follow_symlinks => (is => 'rw');
 
-    my $self = {%args};
-
-    bless $self, $class;
-
-    $self->_init;
-
-    return $self;
+sub BUILD {
+    shift->_init;
 }
 
 sub _init {
@@ -134,13 +136,28 @@ sub _index_directory {
 sub _test {
     my ( $self, $file ) = @_;
 
-    delete $INC{$file};
+    my $id;
+    if (DETECT_PACKAGE_COMPILATION) {
+        $id = B::Hooks::OP::Check::StashChange::register(sub {
+            my ($new, $old) = @_;
+            my $meta = find_meta($new);
+            if ($meta) { # A little paranoia here - Moose::Meta::Role has neither of these methods.
+                my $is_immutable = $meta->can('is_immutable');
+                my $make_mutable = $meta->can('make_mutable');
+                $meta->$make_mutable() if $is_immutable && $make_mutable && $meta->$is_immutable();
+            }
+        });
+    }
+
+    delete $INC{$file}; # Remove from %INC so it will reload
     local $SIG{__WARN__} = sub { };
 
     open my $olderr, '>&STDERR';
     open STDERR, '>', File::Spec->devnull;
     eval "require '$file'";
     open STDERR, '>&', $olderr;
+
+    B::Hooks::OP::Check::StashChange::unregister($id) if $id;
 
     return ($@) ? $@ : 0;
 }
@@ -181,6 +198,17 @@ Creates a new Watcher object.
 
 Returns a list of files that have been added, deleted, or changed since the
 last time watch was called.
+
+=head2 DETECT_PACKAGE_COMPILATION
+
+Returns true if L<B::Hooks::OP::Check::StashChange> is installed and
+can be used to detect when files are compiled. This is used internally
+to make the L<Moose> metaclass of any class being reloaded immutable.
+
+If L<B::Hooks::OP::Check::StashChange> is not installed, then the
+restarter makes all application components immutable. This covers the
+simple case, but is less useful if you're using Moose in components
+outside Catalyst's namespaces, but inside your application directory.
 
 =head1 SEE ALSO
 

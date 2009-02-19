@@ -1,9 +1,15 @@
 package Catalyst::Component;
 
-use strict;
-use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
-use NEXT;
+use Moose;
+use Class::MOP;
+use Class::MOP::Object;
 use Catalyst::Utils;
+use Class::C3::Adopt::NEXT;
+use MRO::Compat;
+use mro 'c3';
+
+with 'MooseX::Emulate::Class::Accessor::Fast';
+with 'Catalyst::ClassData';
 
 
 =head1 NAME
@@ -49,18 +55,18 @@ component loader with config() support and a process() method placeholder.
 
 =cut
 
-__PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
+__PACKAGE__->mk_classdata('_plugins');
+__PACKAGE__->mk_classdata('_config');
 
-
-
-sub new {
-    my ( $self, $c ) = @_;
-
+sub BUILDARGS {
+    my ($self) = @_;
+    
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( 
-        $self->merge_config_hashes( $self->config, $arguments ) );
+    my $args =  $self->merge_config_hashes( $self->config, $arguments );
+    
+    return $args;
 }
 
 sub COMPONENT {
@@ -68,27 +74,20 @@ sub COMPONENT {
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-
-    if ( my $new = $self->NEXT::COMPONENT( $c, $arguments ) ) {
-        return $new;
+    if( my $next = $self->next::can ){
+      my $class = blessed $self || $self;
+      my ($next_package) = Class::MOP::get_code_info($next);
+      warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}.\n";
+      warn "This behavior can no longer be supported, and so your application is probably broken.\n";
+      warn "Your linearised isa hierarchy is: " . join(', ', mro::get_linear_isa($class)) . "\n";
+      warn "Please see perldoc Catalyst::Upgrading for more information about this issue.\n";
     }
-    else {
-        if ( my $new = $self->new( $c, $arguments ) ) {
-            return $new;
-        }
-        else {
-            my $class = ref $self || $self;
-            my $new   = $self->merge_config_hashes( 
-                $self->config, $arguments );
-            return bless $new, $class;
-        }
-    }
+    return $self->new($c, $arguments);
 }
 
 sub config {
     my $self = shift;
-    my $config_sub = $self->can('_config');
-    my $config = $self->$config_sub() || {};
+    my $config = $self->_config || {};
     if (@_) {
         my $newconfig = { %{@_ > 1 ? {@_} : $_[0]} };
         $self->_config(
@@ -97,18 +96,13 @@ sub config {
     } else {
         # this is a bit of a kludge, required to make
         # __PACKAGE__->config->{foo} = 'bar';
-        # work in a subclass. Calling the Class::Data::Inheritable setter
-        # will create a new _config method in the current class if it's
-        # currently inherited from the superclass. So, the can() call will
-        # return a different subref in that case and that means we know to
-        # copy and reset the value stored in the class data.
-
-        $self->_config( $config );
-
-        if ((my $config_sub_now = $self->can('_config')) ne $config_sub) {
+        # work in a subclass.
+        my $class = blessed($self) || $self;
+        my $meta = Class::MOP::get_metaclass_by_name($class);
+        unless ($meta->has_package_symbol('$_config')) {
 
             $config = $self->merge_config_hashes( $config, {} );
-            $self->$config_sub_now( $config );
+            $self->_config( $config );
         }
     }
     return $config;
@@ -126,6 +120,9 @@ sub process {
           . " did not override Catalyst::Component::process" );
 }
 
+no Moose;
+
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -173,7 +170,7 @@ Alias for the method in L<Catalyst::Utils>.
 
 =head2 ACCEPT_CONTEXT($c, @args)
 
-Catalyst components are normally initalized during server startup, either
+Catalyst components are normally initialized during server startup, either
 as a Class or a Instance. However, some components require information about
 the current request. To do so, they can implement an ACCEPT_CONTEXT method.
 

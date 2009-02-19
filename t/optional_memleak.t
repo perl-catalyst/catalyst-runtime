@@ -3,20 +3,24 @@
 use strict;
 use warnings;
 
+use Test::More;
+BEGIN {
+    plan skip_all => 'set TEST_MEMLEAK to enable this test'
+        unless $ENV{TEST_MEMLEAK};
+}
+
 use FindBin;
 use lib "$FindBin::Bin/lib";
-
-use Test::More;
 use Catalyst::Test 'TestApp';
-use YAML;
-eval "use Proc::ProcessTable";
 
-plan skip_all => 'set TEST_MEMLEAK to enable this test'
-    unless $ENV{TEST_MEMLEAK};
+eval "use Proc::ProcessTable";
 plan skip_all => 'Proc::ProcessTable required for this test' if $@;
 
 eval "use HTTP::Body 0.03";
 plan skip_all => 'HTTP::Body >= 0.03 required for this test' if $@;
+
+eval "use YAML";
+plan skip_all => 'YAML required for this test' if $@;
 
 our $t = Proc::ProcessTable->new( cache_ttys => 1 );
 our ( $initial, $final ) = ( 0, 0 ); 
@@ -63,7 +67,7 @@ sub run_test {
     print "Final Size:   $final\n";
     
     if ( $final > $initial ) {
-        print "Leaked:       " . ($final - $initial) . " K\n";
+        print "Leaked:       " . ($final - $initial) . "K\n";
     }
     
     is( $final, $initial, "'$uri' memory is not leaking" );

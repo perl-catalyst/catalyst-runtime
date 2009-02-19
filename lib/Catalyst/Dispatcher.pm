@@ -1,7 +1,9 @@
 package Catalyst::Dispatcher;
 
-use strict;
-use base 'Class::Accessor::Fast';
+use Moose;
+use Class::MOP;
+with 'MooseX::Emulate::Class::Accessor::Fast';
+
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Catalyst::Action;
@@ -12,24 +14,37 @@ use Catalyst::Utils;
 use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
-use Scalar::Util ();
 
-# Stringify to class
-use overload '""' => sub { return ref shift }, fallback => 1;
-
-__PACKAGE__->mk_accessors(
-    qw/tree dispatch_types registered_dispatch_types
-      method_action_class action_container_class
-      preload_dispatch_types postload_dispatch_types
-      action_hash container_hash
-      /
-);
+# Refactoring note:
+# do these belong as package vars or should we build these via a builder method?
+# See Catalyst-Plugin-Server for them being added to, which should be much less ugly.
 
 # Preload these action types
 our @PRELOAD = qw/Index Path Regex/;
 
 # Postload these action types
 our @POSTLOAD = qw/Default/;
+
+# Note - see back-compat methods at end of file.
+has _tree => (is => 'rw');
+has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
+has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
+has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
+has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
+
+has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
+has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
+
+# Wrap accessors so you can assign a list and it will capture a list ref.
+around qw/preload_dispatch_types postload_dispatch_types/ => sub {
+    my $orig = shift;
+    my $self = shift;
+    return $self->$orig([@_]) if (scalar @_ && ref $_[0] ne 'ARRAY');
+    return $self->$orig(@_);
+};
+
+no Moose;
 
 =head1 NAME
 
@@ -52,24 +67,13 @@ Construct a new dispatcher.
 
 =cut
 
-sub new {
-    my $self  = shift;
-    my $class = ref($self) || $self;
+sub BUILD {
+  my ($self, $params) = @_;
 
-    my $obj = $class->SUPER::new(@_);
+  my $container =
+    Catalyst::ActionContainer->new( { part => '/', actions => {} } );
 
-    # set the default pre- and and postloads
-    $obj->preload_dispatch_types( \@PRELOAD );
-    $obj->postload_dispatch_types( \@POSTLOAD );
-    $obj->action_hash(    {} );
-    $obj->container_hash( {} );
-
-    # Create the root node of the tree
-    my $container =
-      Catalyst::ActionContainer->new( { part => '/', actions => {} } );
-    $obj->tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
-
-    return $obj;
+  $self->_tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
 }
 
 =head2 $self->preload_dispatch_types
@@ -92,32 +96,18 @@ it with a C<+>, like so:
 
     +My::Dispatch::Type
 
-=head2 $self->detach( $c, $command [, \@arguments ] )
-
-Documented in L<Catalyst>
-
-=cut
-
-sub detach {
-    my ( $self, $c, $command, @args ) = @_;
-    $c->forward( $command, @args ) if $command;
-    die $Catalyst::DETACH;
-}
-
 =head2 $self->dispatch($c)
 
 Delegate the dispatch to the action that matched the url, or return a
 message about unknown resource
 
-
 =cut
 
 sub dispatch {
     my ( $self, $c ) = @_;
-    if ( $c->action ) {
-        $c->forward( join( '/', '', $c->action->namespace, '_DISPATCH' ) );
+    if ( my $action = $c->action ) {
+        $c->forward( join( '/', '', $action->namespace, '_DISPATCH' ) );
     }
-
     else {
         my $path  = $c->req->path;
         my $error = $path
@@ -141,7 +131,7 @@ sub _command2action {
     }
 
     my @args;
-    
+
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
         @args = @{ pop @extra_params }
     } else {
@@ -152,12 +142,12 @@ sub _command2action {
 
     my $action;
 
-    if (Scalar::Util::blessed($command) && $command->isa('Catalyst::Action')) {
+    # go to a string path ("/foo/bar/gorch")
+    # or action object
+    if (blessed($command) && $command->isa('Catalyst::Action')) {
         $action = $command;
     }
     else {
-        # go to a string path ("/foo/bar/gorch")
-        # or action object which stringifies to that
         $action = $self->_invoke_as_path( $c, "$command", \@args );
     }
 
@@ -240,22 +230,41 @@ Documented in L<Catalyst>
 
 sub forward {
     my $self = shift;
+    $self->_do_forward(forward => @_);
+}
+
+sub _do_forward {
+    my $self = shift;
+    my $opname = shift;
     my ( $c, $command ) = @_;
     my ( $action, $args ) = $self->_command2action(@_);
 
-    unless ($action) {
-        my $error =
-            qq/Couldn't forward to command "$command": /
-          . qq/Invalid action or component./;
+    if (!$action) {
+        my $error .= qq/Couldn't $opname to command "$command": /
+                    .qq/Invalid action or component./;
         $c->error($error);
         $c->log->debug($error) if $c->debug;
         return 0;
     }
 
+    no warnings 'recursion';
+
     local $c->request->{arguments} = $args;
     $action->dispatch( $c );
 
     return $c->state;
+}
+
+=head2 $self->detach( $c, $command [, \@arguments ] )
+
+Documented in L<Catalyst>
+
+=cut
+
+sub detach {
+    my ( $self, $c, $command, @args ) = @_;
+    $self->_do_forward(detach => $c, $command, @args ) if $command;
+    die $Catalyst::DETACH;
 }
 
 sub _action_rel2abs {
@@ -306,7 +315,7 @@ sub _invoke_as_component {
     my $class = $self->_find_component_class( $c, $component ) || return 0;
 
     if ( my $code = $class->can($method) ) {
-        return $self->method_action_class->new(
+        return $self->_method_action_class->new(
             {
                 name      => $method,
                 code      => $code,
@@ -336,9 +345,10 @@ Find an dispatch type that matches $c->req->path, and set args from it.
 
 sub prepare_action {
     my ( $self, $c ) = @_;
-    my $path = $c->req->path;
-    my @path = split /\//, $c->req->path;
-    $c->req->args( \my @args );
+    my $req = $c->req;
+    my $path = $req->path;
+    my @path = split /\//, $req->path;
+    $req->args( \my @args );
 
     unshift( @path, '' );    # Root action
 
@@ -351,7 +361,7 @@ sub prepare_action {
         # Check out dispatch types to see if any will handle the path at
         # this level
 
-        foreach my $type ( @{ $self->dispatch_types } ) {
+        foreach my $type ( @{ $self->_dispatch_types } ) {
             last DESCEND if $type->match( $c, $path );
         }
 
@@ -361,10 +371,10 @@ sub prepare_action {
         unshift @args, $arg;
     }
 
-    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$c->req->captures||[]};
+    s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$req->captures||[]};
 
-    $c->log->debug( 'Path is "' . $c->req->match . '"' )
-      if ( $c->debug && length $c->req->match );
+    $c->log->debug( 'Path is "' . $req->match . '"' )
+      if ( $c->debug && defined $req->match && length $req->match );
 
     $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
       if ( $c->debug && @args );
@@ -382,20 +392,20 @@ sub get_action {
 
     $namespace = join( "/", grep { length } split '/', ( defined $namespace ? $namespace : "" ) );
 
-    return $self->action_hash->{"$namespace/$name"};
+    return $self->_action_hash->{"${namespace}/${name}"};
 }
 
 =head2 $self->get_action_by_path( $path ); 
-   
+
 Returns the named action by its full path. 
 
-=cut 
+=cut
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
     $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
-    $self->action_hash->{$path};
+    $self->_action_hash->{$path};
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -428,12 +438,13 @@ sub get_containers {
 
     if ( length $namespace ) {
         do {
-            push @containers, $self->container_hash->{$namespace};
+            push @containers, $self->_container_hash->{$namespace};
         } while ( $namespace =~ s#/[^/]+$## );
     }
 
-    return reverse grep { defined } @containers, $self->container_hash->{''};
+    return reverse grep { defined } @containers, $self->_container_hash->{''};
 
+    #return (split '/', $namespace); # isnt this more clear?
     my @parts = split '/', $namespace;
 }
 
@@ -451,7 +462,7 @@ cannot determine an appropriate URI, this method will return undef.
 sub uri_for_action {
     my ( $self, $action, $captures) = @_;
     $captures ||= [];
-    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
+    foreach my $dispatch_type ( @{ $self->_dispatch_types } ) {
         my $uri = $dispatch_type->uri_for_action( $action, $captures );
         return( $uri eq '' ? '/' : $uri )
             if defined($uri);
@@ -459,7 +470,7 @@ sub uri_for_action {
     return undef;
 }
 
-=head2 expand_action 
+=head2 expand_action
 
 expand an action into a full representation of the dispatch.
 mostly useful for chained, other actions will just return a
@@ -470,7 +481,7 @@ single action.
 sub expand_action {
     my ($self, $action) = @_;
 
-    foreach my $dispatch_type (@{ $self->dispatch_types }) {
+    foreach my $dispatch_type (@{ $self->_dispatch_types }) {
         my $expanded = $dispatch_type->expand_action($action);
         return $expanded if $expanded;
     }
@@ -489,21 +500,23 @@ Also, set up the tree with the action containers.
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    my $registered = $self->registered_dispatch_types;
+    my $registered = $self->_registered_dispatch_types;
 
-    my $priv = 0;
+    #my $priv = 0; #seems to be unused
     foreach my $key ( keys %{ $action->attributes } ) {
         next if $key eq 'Private';
         my $class = "Catalyst::DispatchType::$key";
         unless ( $registered->{$class} ) {
-            eval "require $class";
-            push( @{ $self->dispatch_types }, $class->new ) unless $@;
+            # FIXME - Some error checking and re-throwing needed here, as
+            #         we eat exceptions loading dispatch types.
+            eval { Class::MOP::load_class($class) };
+            push( @{ $self->_dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;
         }
     }
 
     # Pass the action to our dispatch types so they can register it if reqd.
-    foreach my $type ( @{ $self->dispatch_types } ) {
+    foreach my $type ( @{ $self->_dispatch_types } ) {
         $type->register( $c, $action );
     }
 
@@ -515,14 +528,14 @@ sub register {
     # Set the method value
     $container->add_action($action);
 
-    $self->action_hash->{"$namespace/$name"} = $action;
-    $self->container_hash->{$namespace} = $container;
+    $self->_action_hash->{"$namespace/$name"} = $action;
+    $self->_container_hash->{$namespace} = $container;
 }
 
 sub _find_or_create_action_container {
     my ( $self, $namespace ) = @_;
 
-    my $tree ||= $self->tree;
+    my $tree ||= $self->_tree;
 
     return $tree->getNodeValue unless $namespace;
 
@@ -549,20 +562,18 @@ sub _find_or_create_namespace_node {
 
 =head2 $self->setup_actions( $class, $context )
 
+Loads all of the preload dispatch types, registers their actions and then
+loads all of the postload dispatch types, and iterates over the tree of
+actions, displaying the debug information if appropriate.
 
 =cut
 
 sub setup_actions {
     my ( $self, $c ) = @_;
 
-    $self->dispatch_types( [] );
-    $self->registered_dispatch_types( {} );
-    $self->method_action_class('Catalyst::Action');
-    $self->action_container_class('Catalyst::ActionContainer');
-
     my @classes =
       $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
-    @{ $self->registered_dispatch_types }{@classes} = (1) x @classes;
+    @{ $self->_registered_dispatch_types }{@classes} = (1) x @classes;
 
     foreach my $comp ( values %{ $c->components } ) {
         $comp->register_actions($c) if $comp->can('register_actions');
@@ -596,12 +607,12 @@ sub setup_actions {
         $walker->( $walker, $_, $prefix ) for $parent->getAllChildren;
     };
 
-    $walker->( $walker, $self->tree, '' );
+    $walker->( $walker, $self->_tree, '' );
     $c->log->debug( "Loaded Private actions:\n" . $privates->draw . "\n" )
       if $has_private;
 
     # List all public actions
-    $_->list($c) for @{ $self->dispatch_types };
+    $_->list($c) for @{ $self->_dispatch_types };
 }
 
 sub _load_dispatch_types {
@@ -613,16 +624,63 @@ sub _load_dispatch_types {
     for my $type (@types) {
         my $class =
           ( $type =~ /^\+(.*)$/ ) ? $1 : "Catalyst::DispatchType::${type}";
-        eval "require $class";
+
+        eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
-        push @{ $self->dispatch_types }, $class->new;
+        push @{ $self->_dispatch_types }, $class->new;
 
         push @loaded, $class;
     }
 
     return @loaded;
 }
+
+use Moose;
+
+# 5.70 backwards compatibility hacks.
+
+# Various plugins (e.g. Plugin::Server and Plugin::Authorization::ACL)
+# need the methods here which *should* be private..
+
+# However we can't really take them away until there is a sane API for
+# building actions and configuring / introspecting the dispatcher.
+# In 5.90, we should build that infrastructure, port the plugins which
+# use it, and then take the crap below away.
+# See also t/lib/TestApp/Plugin/AddDispatchTypes.pm
+
+# Alias _method_name to method_name, add a before modifier to warn..
+foreach my $public_method_name (qw/ 
+        tree 
+        dispatch_types 
+        registered_dispatch_types 
+        method_action_class  
+        action_hash 
+        container_hash
+    /) {
+    my $private_method_name = '_' . $public_method_name;
+    my $meta = __PACKAGE__->meta; # Calling meta method here fine as we happen at compile time.
+    $meta->add_method($public_method_name, $meta->get_method($private_method_name));
+    {
+        my %package_hash; # Only warn once per method, per package. These are infrequent enough that
+                          # I haven't provided a way to disable them, patches welcome.
+        $meta->add_before_method_modifier($public_method_name, sub {
+            my $class = blessed(shift);
+            $package_hash{$class}++ || do { 
+                warn("Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
+                    . "this will be removed in Catalyst 5.9X");
+            };
+        });
+    }
+}
+# End 5.70 backwards compatibility hacks.
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
+=head2 meta
+
+Provided by Moose
 
 =head1 AUTHORS
 

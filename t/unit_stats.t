@@ -69,6 +69,10 @@ BEGIN { use_ok("Catalyst::Stats") };
     $stats->profile(comment => "interleave 2");
     push(@expected, [ 4, "- interleave 2", 0.2, 0 ]);
 
+    $fudge_t[1] = 550000;
+    $stats->profile(begin => "begin with no end");
+    push(@expected, [ 4, "begin with no end", 0.05, 1 ]);
+
     $fudge_t[1] = 600000; # end badly nested block time
     $stats->profile(end => "badly nested block 1");
 
@@ -84,6 +88,8 @@ BEGIN { use_ok("Catalyst::Stats") };
 
     my @report = $stats->report;
     is_deeply(\@report, \@expected, "report");
+
+    # print scalar($stats->report);
 
     is ($stats->elapsed, 14, "elapsed");
 }

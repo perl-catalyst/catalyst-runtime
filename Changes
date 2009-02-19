@@ -1,24 +1,218 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.71000   2009-01-19 17:50:00
+        - Make MyApp.pm restartable by unsetting setup_finished in
+          the restarter process (t0m)
+        - Non-naive implementation of making mutable on restart using
+          B::Hooks::OP::Check::StashChange if installed (t0m)
+          - Tests for this (t0m)
+        - Naive implementation of making all components mutable in the
+          forked restart watcher process so native Moose apps using
+          immutable restart correctly. (t0m)
+          - Tests for this (t0m)
+        - Bump Moose dependency to 0.70 so that we avoid nasty surprises
+          with is_class_loaded and perl 5.80 when you Moosify MyApp.pm (t0m)
+        - Clarify that request arguments aren't unescaped automatically
+          (Simon Bertrang) (Closes RT#41153)
+        - Don't require C3 for the MRO test (rafl)
+        - Bump MX::Emulate::CAF prereq to support list assignment (rafl)
+        - Remove useless column in chained action debug table. (rafl)
+        - namespace::clean related cleanups (rafl)
+        - Import related cleanups and consistency fixes (rafl)
+        - Fix test suite TestApp /dump/env action (t0m)
+
+5.8000_06 2009-02-04 21:00
+        - Disallow writing to config after setup (rafl)
+        - Disallow calling setup more than once (rafl)
+        - Documentation fix regarding overloading of Engine and Dispatcher
+          instances (rafl)
+        - Several documentation typo fixes (rafl)
+        - Stop Makefile.PL from warning about versions that fixed a conflict
+          (t0m)
+        - Improved upgrading documentation (t0m, rafl)
+        - Seed the RNG in each FastCGI child process (Andrew Rodland)
+        - Properly report dynamic bind port for the development server (rafl)
+          (Closes RT#38544)
+        - Use the way documented by IO::Socket::INET to get the error message
+          after trying to create a listening socket (rafl) (Closes RT#41828)
+        - Don't ignore SIGCHLD while handling requests with the dev server
+          (rafl) (Closes RT#42962)
+
+5.8000_05 2008-29-01 00:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
           Patch written by Oleg Kostyuk <cub.uanic@gmail.com>
-        - backport go doc patch
-        - added ru/ua translations to error page
-        - backport stripping build_requires
+        - Improve docs for visit (mateu)
+        - Add docs for finalize hook (dhoss)
+        - Added ru/ua translations to error page
+        - Improve the clarity and verbosity of the warning when component
+          resolution uses regex fallback. (jhannah)
+        - Handle leading CRLF in HTTP requests sometimes sent by IE6 in 
+          keep-alive requests. (andyg)
+        - Fixes for FastCGI with IIS 6.0 (janus)
+        - Passing request method exported by Catalyst::Test an extra
+          parameter used to be ignored, but started breaking if the parameter
+          was not a hash in 5.8000_04. Extra parameter is now ignored if
+          it isn't a hashref (t0m)
+        - Fix request argumentss getting corrupted if you override the 
+          dispatcher and call an action which detaches (for 
+          Catalyst::Plugin::Authorization::ACL) (t0m)
+        - Fix calling use Catalyst::Test 'MyApp' 'foo' which used to work,
+          but stopped as the 2nd parameter can be an options hash now (t0m)
+        - Bump Moose dependency to fix make_immutable bug (t0m)
+        - Use compile time extends in Catalyst::Controller (t0m)
+        - Make Catalyst::Request::uploads attribute non-lazy, to fix
+          test for Catalyst-Engine-Apache (t0m)
+        - Bump version of MooseX::Emulate::Class::Accessor::Fast (t0m)
+        - Stop using MooseX::Adopt::Class::Accessor::Fast by default, to stop
+          breaking other packages which use Class::Accessor::Fast
+        - Remove unused action_container_class attribute from 
+          Catalyst::Dispatcher (t0m)
+        - Replace {_body} instance access with calls to _body accessors (t0m)
+        - Add backwards compatibility alias methods for private attributes on 
+          Catalyst::Dispatcher which used to be public. Needed by 
+          Catalyst::Plugin::Server and  Catalyst::Plugin::Authorization::ACL 
+          (t0m)
+        - Fix return value of $c->req->body, which delegates to the body
+          method on the requests HTTP::Body instance (t0m)
+          - Test for this (t0m)
+        - Fix calling $c->req->body from inside an overridden prepare_action
+          method in a plugin, as used by Catalyst::Plugin::Server (t0m)
+          - Test for this (t0m)
+        - Fix assignment to Catalyst::Dispatcher's preload_dispatch_types and
+          postload_dispatch_types attributes - assigning a list should later 
+          return a listref. Fixes Catalyst::Plugin::Server. (t0m)
+          - Tests for this (t0m)
+        - Change streaming test to serve itself rather than 01use.t, making 
+          test sync for engines easier (t0m)
+        - Refactor capturing of $app from Catalyst::Controller into
+          Catalyst::Component::ApplicationAttribute for easier reuse in other
+          components (Florian Ragwitz)
+        - Make the test suites YAML dependency optional (Florian Ragwitz)
+        - Make debug output show class name for the engine and dispatcher
+          rather than the stringified ref. (t0m)
+        - Make MyApp immutable at the end of the scope after the setup
+          method is called, fixing issues with plugins which have their 
+          own new methods by inlining a constructor on MyApp (t0m)
+          - Test for this and method modifiers in MyApp (t0m)
+        - Fix bug causing Catalyst::Request::Upload's basename method
+          to return undef (t0m)
+          - Test for this (Carl Franks)
+        - Fix loading of classes which do not define any symbols to not
+          die, as it didn't in 5.70 (t0m)
+          - Test for this (t0m)
+        - Bump MooseX::Emulate::Class::Accessor::Fast dependency
+          to force new version which fixes a lot of plugins (t0m)
+        - Make log levels additive, and add documentation and tests
+          for the setup_log method, which previously had none.
+          Sewn together by t0m from two patches provided by David E. Wheeler
+        - Switch an around 'new' in Catalyst::Controller to a BUILDARGS
+          method as it's much neater and more obvious what is going on (t0m)
+        - Add a clearer method on request and response _context 
+          attributes, and use if from ::Engine rather than deleting
+          the key from the instance hash (t0m)
+        - Use handles on tree attribute of Catalyst::Stats to replace
+          trivial delegation methods (t0m)
+        - Change the following direct hash accesses into attributes:
+          Catalyst::Engine: _prepared_write
+          Catalyst::Engine::CGI: _header_buf
+          Catalyst::Engine::HTTP: options, _keepalive, _write_error
+          Catalyst::Request: _path
+          Catalyst::Stats: tree
+          (t0m)
+        - Fix issues in Catalyst::Controller::WrapCGI 
+          and any other components which import (or define) their 
+          own meta method by always explicitly calling
+          Class::MOP::Object->meta inside Catalyst (t0m)
+          - Add test for this (t0m)
+        - Add test case for the bug which is causing the 
+          Catalyst::Plugin::Authentication tests to fail (t0m)
+        - Fix a bug in uri_for which could cause it to generate paths
+          with multiple slashes in them. (t0m)
+          - Add test for this (t0m)
+        - Fix SKIP block name in t/optional_http-server-restart.t,
+          stopping 'Label not found for "last SKIP"' error from 
+          Test::More (t0m)
+        - Workaround max_redirect 0 bug in LWP (andyg)
+        - Move live_engine_response_print into aggregate (andyg)
+        - Fix dependency bug, s/parent/base/ in new test (rafl)
+        - Fix optional tests to run the live tests in the aggregate 
+          dir (andyg)
+        - Fix Catalyst->go error in remote tests (andyg)
+        - Fix upload test to work with remote servers, don't check for 
+          deleted files (andyg)
+        - Fix engine_request_uri tests to work on remote server with 
+          different URI (andyg)
 
-5.7099_04 2009-01-12 13:06:00
-        - Add environment hack for FastCGI under IIS (Simon Bertrang)
-          - Test for this and preexisting Lighty hack (Simon Bertrang)
-        - Change streaming test to serve itself rather than 01use.t, making test
-          sync for engines easier (t0m)
+5.8000_04  2008-12-05 12:15:00
+        - Silence Class::C3::Adopt::NEXT warnings in the test suite (rafl)
+        - Fix loads of 'used once, possible typo' warnings (rafl)
+        - Additional tests to ensure upload temp files are deleted (andyg)
+        - Remove use of NEXT from the test suite, except for one case
+          which tests if Class::C3::Adopt::NEXT is working (t0m)
+        - Use a predicate to avoid recursion in cases where the uri
+          method is overridden by a plugin, and calls the base method,
+          for example Catalyst::Plugin::SmartURI (t0m)
+          - Test for this (caelum)
+        - Compose the MooseX::Emulate::Class::Accessor::Fast role to 
+          Catalyst::Action, Catalyst::Request, and all other modules which 
+          inherit from Class::Accessor::Fast in 5.70.
+          This fixes:
+            - Catalyst::Controller::HTML::FormFu (zamolxes)
+            - Catalyst::Request::REST (t0m)
+          - Test for this (t0m)
+        - Make hostname resolution lazy (Marc Mims)
+        - Support mocking virtualhosts in test suite (Jason Gottshall)
+        - Add README (marcus)
+        - Fix TODO list (t0m)
+        - Use Class::C3::Adopt::NEXT (rafl)
+        - Ignore C3 warnings on 5.10 when testing ensure_class_loaded (rafl)
+        - Add TODO test for chained bug (gbjk)
+        - Fix list address in documentation (zarquon)
+        - Fix ACCEPT_CONTEXT on MyApp, called as a class method (marcus)
+           - Test for this (marcus)
+        - Bump MooseX::Emulate::Class::Accessor::Fast version requirement to 
+          get more back compatibility (t0m)
+        - Improve documentation for $req->captures (caelum)
+        - Fix a bug in Catalyst::Stats, stopping garbage being inserted into
+          the stats if a user calls begin => but no end => (jhannah)
+           - Test for this (jhannah)
+        - Trim lines sooner in stats to avoid ugly Text::SimpleTable wrapping
+          (jhannah)
+        - Change Catalyst::ClassData to tweak the symbol table inline for
+          performance after profiling (mst)
+        - Fix POD typo in finalize_error (jhannah)
+        - Add tests to ensure that we delete the temp files created by 
+          HTTP::Body's OctetStream parser (t0m)
+
+5.8000_03 2008-10-14 14:13:00
+        - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
+        - Fix links to the mailing lists (RT #39754 and Florian Ragwitz).
+        - Use Class::MOP instead of Class::Inspector (Florian Ragwitz).
+        - Change Catalyst::Test to use Sub::Exporter (Florian Ragwitz).
+        - Fixed typo in Engine::HTTP::Restarter::Watcher causing -r to complain.
+
+5.8000_02 2008-10-14 07:59:00
+       - Fix manifest
+
+5.8000_01 2008-10-13 22:52:00
+        - Port to Moose
+        - Added test for action stringify
+        - Added test for component instances getting $self->{value} from config.
+        - Add Catalyst::Response->print() method (ilmari)
+        - Optionally aggregate tests using Test::Aggregate (Florian Ragwitz).
+        - Additional docs for uri_for to mention how to use $c->action and 
+          $c->req->captures (jhannah)
+        - List unattached chained actions in Debug mode (Florian Ragwitz).
+        - Pod formatting fix for Engine::FastCGI (Oleg Kostyuk).
+        - Add visit, a returning ->go
+
+5.7XXXXXX XXXX
         - Workaround change in LWP that broke a cookie test (RT #40037)
-        - Backport go() from 5.8 branch.
+        - Back out go() since that feature's been pushed to 5.80
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
         - Make :Chained('../action') work (Florian Ragwitz)
-        - Fix forwarding to action object.
-        - Handle leading CRLF in HTTP requests sometimes sent by IE6 in keep-alive requests.
+        - Add test actions
+        - Chained doc improvements (rev 8326-8328)
 
 5.7099_03 2008-07-20 10:10:00
         - Fix regressions for regexp fallback in model(), view() and controller()

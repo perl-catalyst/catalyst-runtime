@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 use URI;
 
 use_ok('Catalyst');
@@ -102,4 +102,9 @@ is(
     Catalyst::uri_for( $context, '/bar/baz', { foo => undef } )->as_string,
     is( $warnings, 0, "no warnings emitted" );
 }
+
+# Test with parameters '/', 'foo', 'bar' - should not generate a //
+is( Catalyst::uri_for( $context, qw| / foo bar | )->as_string,
+    'http://127.0.0.1/foo/bar', 'uri is /foo/bar, not //foo/bar'
+);
 

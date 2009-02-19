@@ -1,7 +1,9 @@
 package Catalyst::DispatchType::Default;
 
-use strict;
-use base qw/Catalyst::DispatchType/;
+use Moose;
+extends 'Catalyst::DispatchType';
+
+no Moose;
 
 =head1 NAME
 
@@ -55,5 +57,7 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

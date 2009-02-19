@@ -1,7 +1,9 @@
 package Catalyst::Model;
 
-use strict;
-use base qw/Catalyst::Component/;
+use Moose;
+extends qw/Catalyst::Component/;
+
+no Moose;
 
 =head1 NAME
 
@@ -30,5 +32,7 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

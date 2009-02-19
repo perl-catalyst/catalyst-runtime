@@ -1,14 +1,17 @@
-use inc::Module::Install 0.77;
+use inc::Module::Install 0.64;
 
 perl_version '5.008001';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
+requires 'namespace::clean';
+requires 'Scope::Upper' => '0.06';
+requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00800';
+requires 'Moose' => '0.70';
 requires 'Carp';
-requires 'Class::Accessor::Fast';
-requires 'Class::Data::Inheritable';
-requires 'Class::Inspector' => '1.06';
+requires 'Class::C3::Adopt::NEXT' => '0.07';
+requires 'Class::MOP';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
 requires 'File::Modified';
@@ -20,43 +23,57 @@ requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.5';
 requires 'LWP::UserAgent';
 requires 'Module::Pluggable' => '3.01';
-requires 'NEXT';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
+requires 'Sub::Exporter';
 requires 'Text::SimpleTable' => '0.03';
 requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
+requires 'MRO::Compat';
 
+recommends 'B::Hooks::OP::Check::StashChange';
 
+test_requires 'Class::Data::Inheritable';
+test_requires 'Test::MockObject';
+
+if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
+    || (!exists $ENV{AGGREGATE_TESTS} && !can_use('Test::Aggregate', '0.34_01'))) {
+    tests join q{ },
+        grep { $_ ne 't/aggregate.t' }
+        map  { glob } qw[t/*.t t/aggregate/*.t];
+}
+else {
+    test_requires('Test::Aggregate', '0.34_01');
+}
 my @force_build_requires_if_author = qw(
-        Test::NoTabs 
-        Test::Pod 
-        Test::Pod::Coverage 
-        Pod::Coverage
+  Test::NoTabs 
+  Test::Pod 
+  Test::Pod::Coverage 
+  Pod::Coverage
 );
- 
+
 if ($Module::Install::AUTHOR) {
 
-    foreach my $module (@force_build_requires_if_author) {
-        build_requires $module;
-    }
+  foreach my $module (@force_build_requires_if_author) {
+    build_requires $module;
+  }
 
 
-    if ($^O eq 'darwin') { 
-        my $osx_ver = `/usr/bin/sw_vers -productVersion`;
-        chomp $osx_ver;
+  if ($^O eq 'darwin') { 
+      my $osx_ver = `/usr/bin/sw_vers -productVersion`;
+      chomp $osx_ver;
 
-# TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
-# On 10.5 (Leopard) it wants COPYFILE_DISABLE
-        my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+      # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
+      # On 10.5 (Leopard) it wants COPYFILE_DISABLE
+      my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
-        makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
-                qq{ echo "You must set the ENV variable $attr to true,"; }.
-                ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
-    }
+      makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
+                                        qq{ echo "You must set the ENV variable $attr to true,"; }.
+                                        ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
+  }
 }
 
 install_script glob('script/*.pl');
@@ -65,28 +82,28 @@ WriteAll;
 
 if ($Module::Install::AUTHOR) {
 
-# Strip out the author only build_requires from META.yml
-# Need to do this _after_ WriteAll else it looses track of them
-    Meta->{values}{build_requires} = [ grep {
-        my $ok = 1;
-        foreach my $module (@force_build_requires_if_author) {
-            if ($_->[0] =~ /$module/) {
-                $ok = 0;
-                last;
-            }
-        }
-        $ok;
-   } @{Meta->{values}{build_requires}} ];
+  # Strip out the author only build_requires from META.yml
+  # Need to do this _after_ WriteAll else it looses track of them
+  Meta->{values}{build_requires} = [ grep {
+    my $ok = 1;
+    foreach my $module (@force_build_requires_if_author) {
+      if ($_->[0] =~ /$module/) {
+        $ok = 0;
+        last;
+      }
+    }
+    $ok;
+  } @{Meta->{values}{build_requires}} ];
 
-   Meta->{values}{resources} = [ 
-     [ 'MailingList', 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
-     [ 'IRC', 'irc://irc.perl.org/#catalyst' ],
-     [ 'license', 'http://dev.perl.org/licenses/' ],
-     [ 'homepage', 'http://dev.catalyst.perl.org/'], 
-     [ 'repository', 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
-   ];
+  Meta->{values}{resources} = [ 
+    [ 'MailingList', 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
+    [ 'IRC', 'irc://irc.perl.org/#catalyst' ],
+    [ 'license', 'http://dev.perl.org/licenses/' ],
+    [ 'homepage', 'http://dev.catalyst.perl.org/'], 
+    [ 'repository', 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
+  ];
 
-   Meta->write;
+  Meta->write;
 }
 print <<"EOF";
 
@@ -105,3 +122,52 @@ print <<"EOF";
 
  Have fun!
 EOF
+
+check_conflicts();
+
+# Nicked straight from Moose!
+sub check_conflicts {
+    # NOTE - This is the version number of the _incompatible_ code,
+    #        not the version number of the fixed version.
+    my %conflicts = (
+        'Catalyst::Plugin::SmartURI'       => '0.029',
+        'CatalystX::CRUD'                  => '0.37',
+        'Catalyst::Action::RenderView'     => '0.07',
+        'Catalyst::Plugin::DebugCookie'    => '0.999002',
+        'Catalyst::Plugin::Authentication' => '0.100091',
+        'CatalystX::Imports'               => '0.03',
+        'Catalyst::Plugin::HashedCookies'  => '1.03',
+    );
+
+    my $found = 0;
+    for my $mod ( sort keys %conflicts ) {
+        eval "require($mod)";
+        next if $@;
+
+        my $installed = $mod->VERSION();
+        if ( $installed le $conflicts{$mod} ) {
+
+            print <<"EOF";
+
+***
+    This version of Catalyst conflicts with the version of
+    $mod ($installed) you have installed.
+
+    You will need to upgrade $mod after installing
+    this version of Catalyst.
+***
+
+EOF
+
+            $found = 1;
+        }
+    }
+
+    return unless $found;
+
+    # More or less copied from Module::Build
+    return if $ENV{PERL_MM_USE_DEFAULT};
+    return unless -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
+
+    sleep 4;
+}

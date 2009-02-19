@@ -73,16 +73,20 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 {
     my $args;
 
-    no warnings; 
-    *MyApp::M::Model::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+    {
+        no warnings 'once';
+        *MyApp::M::Model::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+    }
 
-    MyApp->component('MyApp::M::Model', qw/foo bar/);
+    my $c = bless {}, 'MyApp';
+
+    $c->component('MyApp::M::Model', qw/foo bar/);
     is_deeply($args, [qw/foo bar/], 'args passed to ACCEPT_CONTEXT ok');
 
-    MyApp->component('M::Model', qw/foo2 bar2/);
+    $c->component('M::Model', qw/foo2 bar2/);
     is_deeply($args, [qw/foo2 bar2/], 'args passed to ACCEPT_CONTEXT ok');
 
-    MyApp->component('Mode', qw/foo3 bar3/);
+    $c->component('Mode', qw/foo3 bar3/);
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 } 
 

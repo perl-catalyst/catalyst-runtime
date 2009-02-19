@@ -1,12 +1,14 @@
 package Catalyst::Engine::HTTP::Restarter;
+use Moose;
+use Moose::Util qw/find_meta/;
+use namespace::clean -except => 'meta';
 
-use strict;
-use warnings;
-use base 'Catalyst::Engine::HTTP';
+extends 'Catalyst::Engine::HTTP';
+
 use Catalyst::Engine::HTTP::Restarter::Watcher;
-use NEXT;
 
-sub run {
+around run => sub {
+    my $orig = shift;
     my ( $self, $class, $port, $host, $options ) = @_;
 
     $options ||= {};
@@ -17,6 +19,12 @@ sub run {
         # Prepare
         close STDIN;
         close STDOUT;
+
+        # Avoid "Setting config after setup" error restarting MyApp.pm
+        $class->setup_finished(0);
+        # Best effort if we can't trap compiles..
+        $self->_make_components_mutable($class)
+            if !Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
             directory => ( 
@@ -67,7 +75,20 @@ sub run {
         }
     }
 
-    return $self->NEXT::run( $class, $port, $host, $options );
+    return $self->$orig( $class, $port, $host, $options );
+};
+
+# Naive way of trying to avoid Moose blowing up when you re-require components
+# which have been made immutable.
+sub _make_components_mutable {
+    my ($self, $class) = @_;
+
+    my @metas = map { find_meta($_) } ($class, map { blessed($_) } values %{ $class->components });
+
+    foreach my $meta (@metas) {
+        # Paranoia unneeded, all component metaclasses should have immutable
+        $meta->make_mutable if $meta->is_immutable;
+    }
 }
 
 1;

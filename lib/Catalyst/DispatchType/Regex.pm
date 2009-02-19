@@ -1,10 +1,20 @@
 package Catalyst::DispatchType::Regex;
 
-use strict;
-use base qw/Catalyst::DispatchType::Path/;
+use Moose;
+extends 'Catalyst::DispatchType::Path';
+
 use Text::SimpleTable;
 use Catalyst::Utils;
 use Text::Balanced ();
+
+has _compiled => (
+                  is => 'rw',
+                  isa => 'ArrayRef',
+                  required => 1,
+                  default => sub{ [] },
+                 );
+
+no Moose;
 
 =head1 NAME
 
@@ -28,12 +38,12 @@ sub list {
     my ( $self, $c ) = @_;
     my $column_width = Catalyst::Utils::term_width() - 35 - 9;
     my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ $column_width, 'Private' ] );
-    for my $regex ( @{ $self->{compiled} } ) {
+    for my $regex ( @{ $self->_compiled } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
     }
     $c->log->debug( "Loaded Regex actions:\n" . $re->draw . "\n" )
-      if ( @{ $self->{compiled} } );
+      if ( @{ $self->_compiled } );
 }
 
 =head2 $self->match( $c, $path )
@@ -52,7 +62,7 @@ sub match {
 
     # Check path against plain text first
 
-    foreach my $compiled ( @{ $self->{compiled} || [] } ) {
+    foreach my $compiled ( @{ $self->_compiled } ) {
         if ( my @captures = ( $path =~ $compiled->{re} ) ) {
             next unless $compiled->{action}->match($c);
             $c->req->action( $compiled->{path} );
@@ -92,7 +102,7 @@ sub register {
 
 =head2 $self->register_regex($c, $re, $action)
 
-Register an individual regex on the action. Usually called from the 
+Register an individual regex on the action. Usually called from the
 register method.
 
 =cut
@@ -100,7 +110,7 @@ register method.
 sub register_regex {
     my ( $self, $c, $re, $action ) = @_;
     push(
-        @{ $self->{compiled} },    # and compiled regex for us
+        @{ $self->_compiled },    # and compiled regex for us
         {
             re     => qr#$re#,
             action => $action,
@@ -151,5 +161,7 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;

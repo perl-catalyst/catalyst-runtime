@@ -3,14 +3,16 @@
 use strict;
 use warnings;
 
+use Test::More;
+BEGIN {
+    plan skip_all => 'set TEST_LIGHTTPD to enable this test'
+        unless $ENV{TEST_LIGHTTPD};
+}
+
 use File::Path;
 use FindBin;
 use IO::Socket;
-use Test::More;
 
-plan skip_all => 'set TEST_LIGHTTPD to enable this test' 
-    unless $ENV{TEST_LIGHTTPD};
-    
 eval "use FCGI";
 plan skip_all => 'FCGI required' if $@;
 
@@ -37,7 +39,7 @@ rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
 # create a TestApp and copy the test libs into it
 mkdir "$FindBin::Bin/../t/tmp";
 chdir "$FindBin::Bin/../t/tmp";
-system "perl -I$FindBin::Bin/../lib $FindBin::Bin/../script/catalyst.pl TestApp";
+system "$^X -I$FindBin::Bin/../lib $FindBin::Bin/../script/catalyst.pl TestApp";
 chdir "$FindBin::Bin/..";
 File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
 
@@ -102,7 +104,7 @@ while ( check_port( 'localhost', $port ) != 1 ) {
 # run the testsuite against the server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
 
-my @tests = (shift) || glob('t/live_*');
+my @tests = (shift) || glob('t/aggregate/live_*');
 eval {
     runtests(@tests);
 };

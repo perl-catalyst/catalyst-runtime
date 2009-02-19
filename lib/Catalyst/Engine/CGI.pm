@@ -1,10 +1,10 @@
 package Catalyst::Engine::CGI;
 
-use strict;
-use base 'Catalyst::Engine';
-use NEXT;
+use Moose;
+extends 'Catalyst::Engine';
 
-__PACKAGE__->mk_accessors('env');
+has env => (is => 'rw');
+has _header_buf => (is => 'rw', clearer => '_clear_header_buf', predicate => '_has_header_buf');
 
 =head1 NAME
 
@@ -42,8 +42,7 @@ sub finalize_headers {
 
     $c->response->header( Status => $c->response->status );
 
-    $self->{_header_buf} 
-        = $c->response->headers->as_string("\015\012") . "\015\012";
+    $self->_header_buf($c->response->headers->as_string("\015\012") . "\015\012");
 }
 
 =head2 $self->prepare_connection($c)
@@ -54,7 +53,8 @@ sub prepare_connection {
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
 
-    $c->request->address( $ENV{REMOTE_ADDR} );
+    my $request = $c->request;
+    $request->address( $ENV{REMOTE_ADDR} );
 
   PROXY_CHECK:
     {
@@ -67,20 +67,20 @@ sub prepare_connection {
         # If we are running as a backend server, the user will always appear
         # as 127.0.0.1. Select the most recent upstream IP (last in the list)
         my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
-        $c->request->address($ip);
+        $request->address($ip);
     }
 
-    $c->request->hostname( $ENV{REMOTE_HOST} );
-    $c->request->protocol( $ENV{SERVER_PROTOCOL} );
-    $c->request->user( $ENV{REMOTE_USER} );
-    $c->request->method( $ENV{REQUEST_METHOD} );
+    $request->hostname( $ENV{REMOTE_HOST} ) if exists $ENV{REMOTE_HOST};
+    $request->protocol( $ENV{SERVER_PROTOCOL} );
+    $request->user( $ENV{REMOTE_USER} );
+    $request->method( $ENV{REQUEST_METHOD} );
 
     if ( $ENV{HTTPS} && uc( $ENV{HTTPS} ) eq 'ON' ) {
-        $c->request->secure(1);
+        $request->secure(1);
     }
 
     if ( $ENV{SERVER_PORT} == 443 ) {
-        $c->request->secure(1);
+        $request->secure(1);
     }
 }
 
@@ -91,12 +91,12 @@ sub prepare_connection {
 sub prepare_headers {
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
-
+    my $headers = $c->request->headers;
     # Read headers from %ENV
     foreach my $header ( keys %ENV ) {
         next unless $header =~ /^(?:HTTP|CONTENT|COOKIE)/i;
         ( my $field = $header ) =~ s/^HTTPS?_//;
-        $c->req->headers->header( $field => $ENV{$header} );
+        $headers->header( $field => $ENV{$header} );
     }
 }
 
@@ -172,14 +172,15 @@ sub prepare_path {
 
 =cut
 
-sub prepare_query_parameters {
+around prepare_query_parameters => sub {
+    my $orig = shift;
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
 
     if ( $ENV{QUERY_STRING} ) {
-        $self->SUPER::prepare_query_parameters( $c, $ENV{QUERY_STRING} );
+        $self->$orig( $c, $ENV{QUERY_STRING} );
     }
-}
+};
 
 =head2 $self->prepare_request($c, (env => \%env))
 
@@ -199,14 +200,10 @@ Enable autoflush on the output handle for CGI-based engines.
 
 =cut
 
-sub prepare_write {
-    my ( $self, $c ) = @_;
-
-    # Set the output handle to autoflush
+around prepare_write => sub {
     *STDOUT->autoflush(1);
-
-    $self->NEXT::prepare_write($c);
-}
+    return shift->(@_);
+};
 
 =head2 $self->write($c, $buffer)
 
@@ -214,16 +211,17 @@ Writes the buffer to the client.
 
 =cut
 
-sub write {
+around write => sub {
+    my $orig = shift;
     my ( $self, $c, $buffer ) = @_;
 
     # Prepend the headers if they have not yet been sent
-    if ( my $headers = delete $self->{_header_buf} ) {
-        $buffer = $headers . $buffer;
+    if ( $self->_has_header_buf ) {
+        $buffer = $self->_clear_header_buf . $buffer;
     }
-    
-    return $self->NEXT::write( $c, $buffer );
-}
+
+    return $self->$orig( $c, $buffer );
+};
 
 =head2 $self->read_chunk($c, $buffer, $length)
 
@@ -251,5 +249,6 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+no Moose;
 
 1;

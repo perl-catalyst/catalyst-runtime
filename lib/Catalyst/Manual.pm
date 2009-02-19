@@ -87,8 +87,8 @@ IRC:
 
 Mailing-Lists:
 
-    http://lists.rawmode.org/mailman/listinfo/catalyst
-    http://lists.rawmode.org/mailman/listinfo/catalyst-dev
+    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
+    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
 
 =head1 AUTHORS
 

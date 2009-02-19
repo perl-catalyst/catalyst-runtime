@@ -185,6 +185,12 @@ sub wurst       : Chained('apan')  CaptureArgs(1) PathPart('') { }
 sub static_end  : Chained('korv')  Args(0)                     { }
 sub capture_end : Chained('wurst') Args(0)        PathPart('') { }
 
+
+# */search vs doc/*
+sub view : Chained('/') PathPart('chained') CaptureArgs(1) {}
+sub star_search : Chained('view') PathPart('search') Args(0) { }
+sub doc_star : Chained('/') PathPart('chained/doc') Args(1) {}
+
 sub end :Private {
   my ($self, $c) = @_;
   return if $c->stash->{no_end};

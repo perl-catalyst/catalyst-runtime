@@ -1,87 +1,85 @@
 package Catalyst::Stats;
 
-use strict;
-use warnings;
+use Moose;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Text::SimpleTable ();
 use Catalyst::Utils;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 
-sub new {
-    my $class = shift;
+use namespace::clean -except => 'meta';
 
-    my $root = Tree::Simple->new({t => [gettimeofday]});
-    bless { 
-    enabled => 1,
-    stack => [ $root ],
-    tree => $root,
-    }, ref $class || $class;
-}
-
-sub enable {
-    my ($self, $enable) = @_;
-
-    $self->{enabled} = $enable;
-}
+has enable => (is => 'rw', required => 1, default => sub{ 1 });
+has tree => (
+             is => 'ro',
+             required => 1,
+             default => sub{ Tree::Simple->new({t => [gettimeofday]}) },
+             handles => [qw/ accept traverse /],
+            );
+has stack => (
+              is => 'ro',
+              required => 1,
+              lazy => 1,
+              default => sub { [ shift->tree ] }
+             );
 
 sub profile {
     my $self = shift;
 
-    return unless $self->{enabled};
+    return unless $self->enable;
 
     my %params;
     if (@_ <= 1) {
-    $params{comment} = shift || "";
+        $params{comment} = shift || "";
     }
     elsif (@_ % 2 != 0) {
-    die "profile() requires a single comment parameter or a list of name-value pairs; found " 
-        . (scalar @_) . " values: " . join(", ", @_);
+        die "profile() requires a single comment parameter or a list of name-value pairs; found "
+            . (scalar @_) . " values: " . join(", ", @_);
     }
     else {
-    (%params) = @_;
-    $params{comment} ||= "";
+        (%params) = @_;
+        $params{comment} ||= "";
     }
 
     my $parent;
     my $prev;
     my $t = [ gettimeofday ];
+    my $stack = $self->stack;
 
     if ($params{end}) {
-    # parent is on stack; search for matching block and splice out
-    for (my $i = $#{$self->{stack}}; $i > 0; $i--) {
-        if ($self->{stack}->[$i]->getNodeValue->{action} eq $params{end}) {
-        my $node = $self->{stack}->[$i];
-        splice(@{$self->{stack}}, $i, 1);
-        # Adjust elapsed on partner node
-        my $v = $node->getNodeValue;
-        $v->{elapsed} =  tv_interval($v->{t}, $t);
-        return $node->getUID;
+        # parent is on stack; search for matching block and splice out
+        for (my $i = $#{$stack}; $i > 0; $i--) {
+            if ($stack->[$i]->getNodeValue->{action} eq $params{end}) {
+                my ($node) = splice(@{$stack}, $i, 1);
+                # Adjust elapsed on partner node
+                my $v = $node->getNodeValue;
+                $v->{elapsed} =  tv_interval($v->{t}, $t);
+                return $node->getUID;
+            }
         }
-    }
     # if partner not found, fall through to treat as non-closing call
     }
     if ($params{parent}) {
-    # parent is explicitly defined
-    $prev = $parent = $self->_get_uid($params{parent});
+        # parent is explicitly defined
+        $prev = $parent = $self->_get_uid($params{parent});
     }
     if (!$parent) {
-    # Find previous node, which is either previous sibling or parent, for ref time.
-    $prev = $parent = $self->{stack}->[-1] or return undef;
-    my $n = $parent->getChildCount;
-    $prev = $parent->getChild($n - 1) if $n > 0;
+        # Find previous node, which is either previous sibling or parent, for ref time.
+        $prev = $parent = $stack->[-1] or return undef;
+        my $n = $parent->getChildCount;
+        $prev = $parent->getChild($n - 1) if $n > 0;
     }
 
     my $node = Tree::Simple->new({
-    action  => $params{begin} || "",
-    t => $t, 
-    elapsed => tv_interval($prev->getNodeValue->{t}, $t),
-    comment => $params{comment},
+        action  => $params{begin} || "",
+        t => $t,
+        elapsed => tv_interval($prev->getNodeValue->{t}, $t),
+        comment => $params{comment},
     });
     $node->setUID($params{uid}) if $params{uid};
 
     $parent->addChild($node);
-    push(@{$self->{stack}}, $node) if $params{begin};
+    push(@{$stack}, $node) if $params{begin};
 
     return $node->getUID;
 }
@@ -96,7 +94,7 @@ sub report {
     my $column_width = Catalyst::Utils::term_width() - 9 - 13;
     my $t = Text::SimpleTable->new( [ $column_width, 'Action' ], [ 9, 'Time' ] );
     my @results;
-    $self->{tree}->traverse(
+    $self->traverse(
                 sub {
                 my $action = shift;
                 my $stat   = $action->getNodeValue;
@@ -106,8 +104,10 @@ sub report {
                       $stat->{elapsed},
                       $stat->{action} ? 1 : 0,
                       );
-                $t->row( ( q{ } x $r[0] ) . $r[1], 
-                     defined $r[2] ? sprintf("%fs", $r[2]) : '??');
+                # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
+                my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
+                $t->row( ( q{ } x $r[0] ) . $r[1],
+                     defined $r[2] ? $elapsed : '??');
                 push(@results, \@r);
                 }
             );
@@ -119,15 +119,9 @@ sub _get_uid {
 
     my $visitor = Tree::Simple::Visitor::FindByUID->new;
     $visitor->searchForUID($uid);
-    $self->{tree}->accept($visitor);
+    $self->accept($visitor);
     return $visitor->getResult;
 } 
-
-
-sub accept {
-    my $self = shift;
-    $self->{tree}->accept( @_ );
-}
 
 sub addChild {
     my $self = shift;
@@ -141,7 +135,7 @@ sub addChild {
         $stat->{ elapsed } =~ s{s$}{};
     }
 
-    $self->{tree}->addChild( @_ );
+    $self->tree->addChild( @_ );
 }
 
 sub setNodeValue {
@@ -154,18 +148,15 @@ sub setNodeValue {
         $stat->{ elapsed } =~ s{s$}{};
     }
 
-    $self->{tree}->setNodeValue( @_ );
+    $self->tree->setNodeValue( @_ );
 }
 
 sub getNodeValue {
     my $self = shift;
-    $self->{tree}->getNodeValue( @_ )->{ t };
+    $self->tree->getNodeValue( @_ )->{ t };
 }
 
-sub traverse {
-    my $self = shift;
-    $self->{tree}->traverse( @_ );
-}
+__PACKAGE__->meta->make_immutable();
 
 1;
 
@@ -334,10 +325,10 @@ from the previous profiling point.
 The 'rollup' flag indicates whether the reported time is the rolled up time for
 the block, or the elapsed time from the previous profiling point.
 
-=head1 COMPATABILITY METHODS
+=head1 COMPATIBILITY METHODS
 
 Some components might expect the stats object to be a regular Tree::Simple object.
-We've added some compatability methods to handle this scenario:
+We've added some compatibility methods to handle this scenario:
 
 =head2 accept
 
@@ -363,5 +354,7 @@ This program is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;
