@@ -1,7 +1,7 @@
 package Catalyst::Controller;
 
 use Moose;
-use Moose::Util qw/find_meta does_role/;
+use Moose::Util qw/find_meta/;
 
 use namespace::clean -except => 'meta';
 
@@ -181,8 +181,7 @@ sub register_actions {
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
     my $meta = find_meta($self);
-    my @methods = grep { does_role($_, 'MooseX::MethodAttributes::Role::Meta::Method') }
-            $meta->get_all_methods;
+    my @methods = $meta->get_all_methods_with_attributes;
 
     foreach my $method (@methods) {
         my $name = $method->name;
