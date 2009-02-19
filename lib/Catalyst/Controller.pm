@@ -1,12 +1,11 @@
 package Catalyst::Controller;
 
 use Moose;
-use Moose::Util qw/find_meta/;
+use Moose::Util qw/find_meta does_role/;
 
 use namespace::clean -except => 'meta';
 
-# Note - Must be done at compile time due to attributes (::AttrContainer)
-BEGIN { extends qw/Catalyst::Component Catalyst::AttrContainer/; }
+BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
 
 use Catalyst::Exception;
 use Catalyst::Utils;
@@ -182,34 +181,25 @@ sub register_actions {
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
     my $meta = find_meta($self);
-    my %methods = map { $_->body => $_->name }
+    my @methods = grep { does_role($_, 'MooseX::MethodAttributes::Role::Meta::Method') }
             $meta->get_all_methods;
 
-    # Advanced inheritance support for plugins and the like
-    #moose todo: migrate to eliminate CDI compat
-    my @action_cache;
-    for my $isa ( $meta->superclasses, $class ) {
-        if(my $coderef = $isa->can('_action_cache')){
-            push(@action_cache, @{ $isa->$coderef });
-        }
-    }
-
-    foreach my $cache (@action_cache) {
-        my $code   = $cache->[0];
-        my $method = delete $methods{$code}; # avoid dupe registers
-        next unless $method;
-        my $attrs = $self->_parse_attrs( $c, $method, @{ $cache->[1] } );
+    foreach my $method (@methods) {
+        my $name = $method->name;
+        my $attributes = $method->attributes;
+        next unless $attributes;
+        my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
             $c->log->debug( 'Bad action definition "'
-                  . join( ' ', @{ $cache->[1] } )
-                  . qq/" for "$class->$method"/ )
+                  . join( ' ', @{ $attributes } )
+                  . qq/" for "$class->$name"/ )
               if $c->debug;
             next;
         }
         my $reverse = $namespace ? "${namespace}/${method}" : $method;
         my $action = $self->create_action(
-            name       => $method,
-            code       => $code,
+            name       => $name,
+            code       => $method->body,
             reverse    => $reverse,
             namespace  => $namespace,
             class      => $class,
