@@ -14,6 +14,10 @@ our $VERSION = '0.01';
 
 TestApp->config( name => 'TestApp', root => '/some/dir' );
 
+unless (eval 'require Moose; 1') {
+    TestApp->config(setup_components => { except => 'TestApp::Controller::Moose' });
+}
+
 TestApp->setup;
 
 sub index : Private {
