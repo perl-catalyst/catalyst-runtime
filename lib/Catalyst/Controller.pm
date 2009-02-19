@@ -196,7 +196,7 @@ sub register_actions {
               if $c->debug;
             next;
         }
-        my $reverse = $namespace ? "${namespace}/${method}" : $method;
+        my $reverse = $namespace ? "${namespace}/${name}" : $name;
         my $action = $self->create_action(
             name       => $name,
             code       => $method->body,
