@@ -1,12 +1,8 @@
-#!perl
-
 use strict;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-
-our $iters;
 
 use Test::More tests => 2;
 use Catalyst::Test 'TestApp';
