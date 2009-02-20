@@ -9,7 +9,7 @@ BEGIN { require 5.008001; }
 
 our $VERSION='5.8000_06';
 
-$VERSION= eval $VERSION; 
+$VERSION = eval $VERSION;
 
 =head1 NAME
 
