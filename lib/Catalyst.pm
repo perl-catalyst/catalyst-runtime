@@ -897,7 +897,7 @@ sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
 
     # See block comment in t/unit_core_plugin.t    
-    $class->log->debug(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.9/);
+    $class->log->warn(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.9/);
     
     $class->_register_plugin( $plugin, 1 );
 

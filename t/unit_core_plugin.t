@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
+use Test::MockObject::Extends;
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 use lib 't/lib';
 
@@ -16,12 +17,28 @@ use lib 't/lib';
     sub count { $count++ }
 }
 
+my $warnings = 0;
+
+use PluginTestApp;
+my $logger = Test::MockObject::Extends->new(PluginTestApp->log);
+$logger->mock('warn', sub {
+    if ($_[1] =~ /plugin method is deprecated/) {
+        $warnings++;
+        return;
+    }
+    die "Caught unexpected warning: " . $_[1];
+});
+#PluginTestApp->log($logger);
+
 use Catalyst::Test qw/PluginTestApp/;
 
 ok( get("/compile_time_plugins"), "get ok" );
+is( $warnings, 0, 'no warnings' );
 # FIXME - Run time plugin support is insane, and should be removed
 #         for Catalyst 5.9
 ok( get("/run_time_plugins"),     "get ok" );
+
+is( $warnings, 1, '1 warning' );
 
 use_ok 'TestApp';
 my @expected = qw(
