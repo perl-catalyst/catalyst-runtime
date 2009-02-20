@@ -1,13 +1,16 @@
-Known issues:
+Compatibility:
+   - Deal with component downwards compatibility in 5.71 (make 5.71 call
+     mooses construction logic so that attributes get initialized etc).
+   - Provide an extension so that components can have a Moose::Object
+     constructor and an @ISA which makes c3 happy on both 5.7X and 5.8X.
 
 Documentation:
-
-   - Catalyst/Upgrading.pod needs brushing up
 
    - Warning when you pass $c->model("MyApp::Model::Foo") is the generic
      warning for regex fall back. Should be more specific about what you
      screwed up, and the docs for $c->model should be more explicit about
      what is expected. This probably also applies to view/controller.
+     Note: This behavior is also present in 5.71, and so is not a blocker.
 
    - Run more smokes
 

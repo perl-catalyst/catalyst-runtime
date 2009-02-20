@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Change the warning when you have conflicting components to
+          present a list (t0m)
         - Move NEXT use and testing deprecated features out to its own
           test application so that the main TestApp isn't polluted with
           spurious warnings (t0m)
