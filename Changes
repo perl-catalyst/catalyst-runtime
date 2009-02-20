@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Move NEXT use and testing deprecated features out to its own
+          test application so that the main TestApp isn't polluted with
+          spurious warnings (t0m)
+        - Add a warning for the old ::[MVC]:: style naming scheme (t0m)
+          - Test for this (t0m)
         - Kill Class::C3::Adopt::NEXT warnings for the Catalyst:: namespace
           in production versions (t0m)
         - Make MyApp.pm restartable by unsetting setup_finished in

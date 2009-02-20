@@ -2051,7 +2051,7 @@ sub setup_components {
     my $deprecated_component_names = grep { /::[CMV]::/ } @comps;
     $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
         qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
-    );
+    ) if $deprecated_component_names;
 
     for my $component ( @comps ) {
 

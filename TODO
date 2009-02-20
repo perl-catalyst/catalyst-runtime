@@ -11,11 +11,6 @@ Documentation:
 
    - Run more smokes
 
-   - Using anything ::[CMV]:: should warn (once, on boot).
-
-   - TestApp should not use NEXT. There should be a TestAppNEXTCompat
-     which does but is standalone..
-
 Profiling:
 
   - vs 5.70 and optimisation as needed on perl 5.8 (5.10 is already faster!).
