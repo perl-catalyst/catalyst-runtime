@@ -188,31 +188,29 @@ Catalyst objects.
 
 =head2 Confused multiple inheritance with Catalyst::Component::COMPONENT
 
-Warning message:
+Previously, Catalyst's COMPONENT method would delegate to the method on the
+right hand side, which could then delegate back again with NEXT. This (as it
+is insane AND makes no sense with C3 method dispatch order), and is therefore
+no longer supported.
+
+If a COMPONENT method is detected in the inheritence hierarchy to the right
+hand side of Catalyst::Component::COMPONENT, then the following warning
+message will be emitted:
 
     There is a COMPONENT method resolving after Catalyst::Component
     in ${next_package}.
 
-This means that one of the packages on the right hand side of
-Catalyst::Component in your Class' inheritance hierarchy defines a COMPONENT
-method.
-
-Previously, Catalyst's COMPONENT method would delegate to the method on the
-right hand side, which could then delegate back again with NEXT. This (as it
-is insane), is no longer supported, as it makes no sense with C3 method
-dispatch order.
-
-Therefore the correct fix is to re-arrange your class' inheritance hierarchy
-so that the COMPONENT method you would like to inherit is the first COMPONENT
-method in your @ISA.
+The correct fix is to re-arrange your class' inheritance hierarchy so that the
+COMPONENT method you would like to inherit is the first (left-hand most)
+COMPONENT method in your @ISA.
 
 =head1 WARNINGS
 
 =head2 Methods in Catalyst::Dispatcher
 
-The following methods in Catalyst::Dispatcher are both an implementation detail,
-and also likely to change significantly in the 5.8X release series, and therefore 
-their use is highly deprecated.
+The following methods in Catalyst::Dispatcher are both an implementation
+detail, which may change in the 5.8X release series, and therefore their use
+is highly deprecated.
 
 =over
 
@@ -232,8 +230,8 @@ their use is highly deprecated.
 
 The first time one of these methods is called, a warning will be emitted:
 
-    Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
-    . "this will be removed in Catalyst 5.9X"
+    Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,
+    this will be removed in Catalyst 5.9X
 
 You should B<NEVER> be calling any of these methods from application code.
 
@@ -242,15 +240,20 @@ should change to using the public API, or, if you do not feel the public API
 adaquately supports your use-case, please email the development list to
 discuss what API features you need so that you can be appropriately supported.
 
-=head2 require $class was successful but the package is not defined.
+=head2 Class naming to packages defined does not correspond.
 
 In this version of Catalyst, if a component is loaded from disk, but no
 symbols are defined in that component's namespace after it is loaded, this
-warning will be issued.
+warning will be issued:
 
-This is to protect against confusing bugs caused by mis-typing package names.
+    require $class was successful but the package is not defined.
 
-This will become a fatal error in a future version.
+This is to protect against confusing bugs caused by mis-typing package names,
+and will become a fatal error in a future version.
+
+Please note that 'inner packages' (via L<Devel::InnerPackage>) are still fully
+supported, this warning is only issued when component file naming does not map
+to B<any> of the packages defined within that component.
 
 =head2 $c->plugin method
 
@@ -259,5 +262,7 @@ deprecated>.
 
 Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to
 compose the functionality you need outside of the main application namespace.
+
+Calling the plugin method at runtime will not be supported past Catalyst 5.81.
 
 =cut
