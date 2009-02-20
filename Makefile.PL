@@ -39,6 +39,8 @@ recommends 'B::Hooks::OP::Check::StashChange';
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::MockObject';
 
+# Run aggregate tests if AGGREGATE_TESTS environment = 1, but not if it = 0
+# Otherwise default to using Test::Aggregate if installed, but not requiring it.
 if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
     || (!exists $ENV{AGGREGATE_TESTS} && !can_use('Test::Aggregate', '0.34_01'))) {
     tests join q{ },
@@ -56,24 +58,10 @@ my @force_build_requires_if_author = qw(
 );
 
 if ($Module::Install::AUTHOR) {
-
-  foreach my $module (@force_build_requires_if_author) {
-    build_requires $module;
-  }
-
-
-  if ($^O eq 'darwin') { 
-      my $osx_ver = `/usr/bin/sw_vers -productVersion`;
-      chomp $osx_ver;
-
-      # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
-      # On 10.5 (Leopard) it wants COPYFILE_DISABLE
-      my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
-
-      makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
-                                        qq{ echo "You must set the ENV variable $attr to true,"; }.
-                                        ' echo "to avoid getting resource forks in your dist."; exit 255; fi' }); 
-  }
+    foreach my $module (@force_build_requires_if_author) {
+        build_requires $module;
+    }
+    darwin_check_no_resource_forks();
 }
 
 install_script glob('script/*.pl');
@@ -84,27 +72,19 @@ if ($Module::Install::AUTHOR) {
 
   # Strip out the author only build_requires from META.yml
   # Need to do this _after_ WriteAll else it looses track of them
-  Meta->{values}{build_requires} = [ grep {
-    my $ok = 1;
-    foreach my $module (@force_build_requires_if_author) {
-      if ($_->[0] =~ /$module/) {
-        $ok = 0;
-        last;
-      }
-    }
-    $ok;
-  } @{Meta->{values}{build_requires}} ];
+  strip_author_only_build_requires(@force_build_requires_if_author);
 
-  Meta->{values}{resources} = [ 
-    [ 'MailingList', 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
-    [ 'IRC', 'irc://irc.perl.org/#catalyst' ],
-    [ 'license', 'http://dev.perl.org/licenses/' ],
-    [ 'homepage', 'http://dev.catalyst.perl.org/'], 
-    [ 'repository', 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
+  Meta->{values}{resources} = [
+    [ 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
+    [ 'IRC'         => 'irc://irc.perl.org/#catalyst' ],
+    [ 'license',    => 'http://dev.perl.org/licenses/' ],
+    [ 'homepage',   => 'http://dev.catalyst.perl.org/'],
+    [ 'repository', => 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
   ];
 
   Meta->write;
 }
+
 print <<"EOF";
 
  Important:
@@ -123,49 +103,84 @@ print <<"EOF";
  Have fun!
 EOF
 
-check_conflicts();
+# NOTE - This is the version number of the _incompatible_ code,
+#        not the version number of the fixed version.
+my %conflicts = (
+    'Catalyst::Plugin::SmartURI'       => '0.029',
+    'CatalystX::CRUD'                  => '0.37',
+    'Catalyst::Action::RenderView'     => '0.07',
+    'Catalyst::Plugin::DebugCookie'    => '0.999002',
+    'Catalyst::Plugin::Authentication' => '0.100091',
+    'CatalystX::Imports'               => '0.03',
+    'Catalyst::Plugin::HashedCookies'  => '1.03',
+);
+check_conflicts(%conflicts);
 
-# Nicked straight from Moose!
+# End of script, helper functions below.
+
+sub darwin_check_no_resource_forks {
+    if ($^O eq 'darwin') {
+        my $osx_ver = `/usr/bin/sw_vers -productVersion`;
+        chomp $osx_ver;
+
+        # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
+        # On 10.5 (Leopard) it wants COPYFILE_DISABLE
+        my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+
+        makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
+                                          qq{ echo "You must set the ENV variable $attr to true,"; }.
+                                          ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
+        }
+}
+
+sub strip_author_only_build_requires {
+    my @build_requires_to_strip = @_;
+    Meta->{values}{build_requires} = [ grep {
+      my $ok = 1;
+      foreach my $module (@build_requires_to_strip) {
+        if ($_->[0] =~ /$module/) {
+          $ok = 0;
+          last;
+        }
+      }
+      $ok;
+    } @{Meta->{values}{build_requires}} ];
+}
+
 sub check_conflicts {
-    # NOTE - This is the version number of the _incompatible_ code,
-    #        not the version number of the fixed version.
-    my %conflicts = (
-        'Catalyst::Plugin::SmartURI'       => '0.029',
-        'CatalystX::CRUD'                  => '0.37',
-        'Catalyst::Action::RenderView'     => '0.07',
-        'Catalyst::Plugin::DebugCookie'    => '0.999002',
-        'Catalyst::Plugin::Authentication' => '0.100091',
-        'CatalystX::Imports'               => '0.03',
-        'Catalyst::Plugin::HashedCookies'  => '1.03',
-    );
+    my %conflicts = @_;
 
-    my $found = 0;
+    my %conflicts_found;
     for my $mod ( sort keys %conflicts ) {
         eval "require($mod)";
         next if $@;
 
         my $installed = $mod->VERSION();
-        if ( $installed le $conflicts{$mod} ) {
+        $conflicts_found{$mod} = $installed if ( $installed le $conflicts{$mod} );
+    }
 
-            print <<"EOF";
+    return unless scalar keys %conflicts_found;
 
-***
-    This version of Catalyst conflicts with the version of
-    $mod ($installed) you have installed.
+    print <<"EOF";
 
-    You will need to upgrade $mod after installing
+ WARNING:
+
+    This version of Catalyst conflicts with the versions of
+    some components you have installed.
+
+    You will need to upgrade these modules after installing
     this version of Catalyst.
-***
+
+    List of the conflicting components and their installed versions:
 
 EOF
 
-            $found = 1;
-        }
+    foreach my $mod (keys %conflicts_found) {
+        print sprintf("    %s => %s\n", $mod, $conflicts_found{$mod});
     }
+    print "\n";
 
-    return unless $found;
-
-    # More or less copied from Module::Build
+    # More or less copied from Module::Build, via Moose
     return if $ENV{PERL_MM_USE_DEFAULT};
     return unless -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
 
