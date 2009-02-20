@@ -26,4 +26,7 @@ is( $mvc_warnings, 1, 'Get the ::MVC:: warning' );
 ok( my $response = request('http://localhost/'), 'Request' );
 is( $response->header('X-Catalyst-Plugin-Deprecated'), '1', 'NEXT plugin ran correctly' );
 
-is( $warnings, 1, 'Got one and only one Adopt::NEXT warning');
+SKIP: {
+    skip 'non-dev release', 1 unless Catalyst::_IS_DEVELOPMENT_VERSION();
+    is( $warnings, 1, 'Got one and only one Adopt::NEXT warning');
+}
