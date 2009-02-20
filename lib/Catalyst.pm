@@ -1296,7 +1296,7 @@ sub welcome_message {
                     they can save you a lot of work.</p>
                     <pre><code>script/${prefix}_create.pl -help</code></pre>
                     <p>Also, be sure to check out the vast and growing
-                    collection of <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3APlugin%3A%3A&amp;mode=all">plugins for Catalyst on CPAN</a>;
+                    collection of <a href="http://search.cpan.org/search?query=Catalyst">plugins for Catalyst on CPAN</a>;
                     you are likely to find what you need there.
                     </p>
 
