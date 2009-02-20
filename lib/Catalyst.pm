@@ -492,6 +492,7 @@ sub _comp_search_prefixes {
     my ( $c, $name, @prefixes ) = @_;
     my $appclass = ref $c || $c;
     my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
+    $filter = qr/$filter/; # Compile regex now rather than once per loop
 
     # map the original component name to the sub part that we will search against
     my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
@@ -519,7 +520,9 @@ sub _comp_search_prefixes {
 
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {
-        my $msg = "Used regexp fallback for \$c->model('${name}'), which found '" .
+        # Disgusting hack to work out correct method name
+        my $warn_for = lc $prefixes[0];
+        my $msg = "Used regexp fallback for \$c->{$warn_for}('${name}'), which found '" .
            (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
            "component resolution is unreliable and unsafe.";
         my $short = $result[0];
@@ -532,9 +535,9 @@ sub _comp_search_prefixes {
            $msg .= " You probably need to set '$short' instead of '${name}' in this " .
               "component's config";
         } else {
-           $msg .= " You probably meant \$c->model('$short') instead of \$c->model{'${name}'}, " .
+           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}({'${name}'}), " .
               "but if you really wanted to search, pass in a regexp as the argument " .
-              "like so: \$c->model(qr/${name}/)";
+              "like so: \$c->${warn_for}(qr/${name}/)";
         }
         $c->log->warn( "${msg}$shortmess" );
     }
