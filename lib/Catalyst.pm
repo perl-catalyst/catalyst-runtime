@@ -77,6 +77,12 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 # Remember to update this in Catalyst::Runtime as well!
 
 our $VERSION = '5.8000_06';
+
+{
+    my $dev_version = $VERSION =~ /_\d{2}$/;
+    *_IS_DEVELOPMENT_VERSION = sub () { $dev_version };
+}
+
 $VERSION = eval $VERSION;
 
 sub import {
@@ -90,7 +96,7 @@ sub import {
     return if $caller eq 'main';
 
     # Kill Adopt::NEXT warnings if we're a non-RC version
-    if ($VERSION !~ /_\d{2}$/) {
+    unless (_IS_DEVELOPMENT_VERSION()) {
         Class::C3::Adopt::NEXT->unimport(qr/^Catalyst::/);
     }
 
