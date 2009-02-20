@@ -2,14 +2,14 @@
 
 Most applications and plugins should run unaltered on Catalyst 5.80.
 
-However as a lot of refactoring work has taken place, several changes have
-been made which could cause incompatibilities, if your application or plugin
-is using deprecated code, or relying on side-effects then there could be
-incompatibility.
+However as a lot of refactoring work has taken place, and several changes have
+been made which could cause incompatibilities. If your application or plugin
+is using deprecated code, or relying on side-effects, then you could have
+issues upgrding to this release.
 
 Most issues found with pre-existing components have been easy to solve, and a
 complete description of behavior changes which may cause compatibility issues,
-or warnings to be emitted is included below to help if you have problems.
+or warnings which are now emitted is included below to help if you have problems.
 
 If you think you have found an upgrade related issue which is not covered in
 this document, then please email the Catalyst list to discuss the problem.
@@ -24,12 +24,12 @@ Moose components which say:
     use Moose;
     extends qw/Moose::Object Catalyst::Component/;
 
-to use the constructor provided by Moose, whilst working if you do some hacks
-with the C< BUILDARGS > method, will not work with Catalyst 5.80 as
+to use the constructor provided by Moose, whilst working (if you do some hacks
+with the C< BUILDARGS > method), will not work with Catalyst 5.80 as
 C<Catalyst::Component> inherits from C<Moose::Object>, and so C< @ISA > fails
 to linearise.
 
-The fix for this, is to not inherit directly from C<Moose::Object>
+The fix for this is to not inherit directly from C<Moose::Object>
 yourself. Having components which do not inherit their constructor from
 C<Catalyst::Component> is B<unsupported>, and has never been recommended,
 therefore you're on your own if you're using this technique. You'll need
@@ -52,7 +52,10 @@ compatible way is:
     BEGIN { extends 'Catalyst::Component' }; # Or ::Controller, or whatever
 
 Note that the C< extends > decleration needs to occur in a begin block for
-L<attributes> to operate correctly.
+L<attributes> to operate correctly. You also don't get the L<Moose::Object>
+constructor, and therefore attribute initialization will not work as normally
+expected. If you want to use Moose attributes, then they need to be made lazy
+to correctly initialize.
 
 =head3 use Moose in MyApp
 
@@ -82,7 +85,7 @@ into the symbol table, you may encounter breakages. The simplest solution is
 to use L<Sub::Name> to name the subroutine. Example:
 
     # Original code, likely to break:
-    my $full_method_name = join('::',$package_name, $method_name);
+    my $full_method_name = join('::', $package_name, $method_name);
     *$full_method_name = sub { ... };
 
     # Fixed Code
@@ -108,21 +111,23 @@ used to work:
         ... # things to do after the actual setup
     }
 
-With Catalyst 5.80 this won't work anymore. Because instead of using NEXT.pm it
-relies on L<Class::C3::Adopt::NEXT>, which uses plain C3 method resolution.
+With Catalyst 5.80 this won't work anymore. Due to the fact that Catalyst is
+no longer using NEXT.pm for method resolution, this no longer works. The
+functionality was only ever originally operational as L<NEXT> remembers what
+methods have already been called, and will not call them again.
 
-As L<NEXTs|NEXT> hacks to remember what methods have already been called, this
-causes infinite recursion between MyApp::setup and Catalyst::setup.
-
-Moose method modifiers like C<< before|after|around 'setup => sub { ... }; >>
-also will not operate correctly due to backward compatibility issues with the
-way plugin setup methods.
+Using this now causes infinite recursion between MyApp::setup and
+Catalyst::setup, due to other backwards compatibility issues related to how
+plugin setup works. Moose method modifiers like C<< before|after|around 'setup
+=> sub { ... }; >> also will not operate correctly on the setup method.
 
 The right way to do it is this:
 
     after setup_finalize => sub {
         ... # things to do after the actual setup
     };
+
+The setup_finalize hook was introduced as a way to void this issue.
 
 =head2 Components with a new method which returns false
 
@@ -132,9 +137,10 @@ would be blessed into a hash on your behalf, and this would be returned from
 the COMPONENT method.
 
 This behaviour makes no sense, and so has been removed. Implementing your own
-new method in components is B<highly> discouraged, instead, you should inherit
-the new method from Catalyst::Component, and use Moose's BUILD functionality
-to perform any construction work necessary for your sub-class.
+C< new > method in components is B<highly> discouraged, instead, you should
+inherit the new method from Catalyst::Component, and use Mooses BUILD
+functionality and/or Moose attributes to perform any construction work
+necessary for your class.
 
 =head2 __PACKAGE__->mk_accessor('meta');
 
@@ -152,7 +158,7 @@ per-class, it is stored on the metaclass of the class defining the accessor.
 Therefore anything relying on the side-effect of the accessor being copied down
 will be broken.
 
-The following example demonstrates the problem:
+The following test demonstrates the problem:
 
     {
         package BaseClass;
