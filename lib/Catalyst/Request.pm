@@ -26,7 +26,7 @@ has query_parameters  => (is => 'rw', default => sub { {} });
 has secure => (is => 'rw', default => 0);
 has captures => (is => 'rw', default => sub { [] });
 has uri => (is => 'rw', predicate => 'has_uri');
-has user => (is => 'rw');
+has remote_user => (is => 'rw');
 has headers => (
   is      => 'rw',
   isa     => 'HTTP::Headers',
@@ -120,6 +120,20 @@ has hostname => (
 );
 
 has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
+
+# XXX: Deprecated in 5.8000 due to confusion between Engines and Plugin::Authentication. Remove in 5.x000?
+has user => (is => 'rw');
+
+before user => sub {
+  my ($self, $user) = @_;
+  # Allow Engines and Plugin::Authentication to set without warning
+  my $caller = (caller(2))[0];
+  if ( $caller !~ /^Catalyst::(Engine|Plugin::Authentication)/ ) {
+    $self->_context->log->warn(
+      'Attempt to use $c->req->user; this is deprecated. ' .
+      'You probably meant to call $c->user or $c->req->remote_user' );
+  }
+};
 
 sub args            { shift->arguments(@_) }
 sub body_params     { shift->body_parameters(@_) }
@@ -576,6 +590,11 @@ sub uri_with {
 
 Returns the currently logged in user. Deprecated. The method recommended for
 newer plugins is $c->user.
+
+=head2 $req->remote_user
+
+Returns the value of the C<REMOTE_USER> environment variable. Previously
+available via $req->user.
 
 =head2 $req->user_agent
 
