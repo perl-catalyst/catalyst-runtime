@@ -28,7 +28,6 @@
         - namespace::clean related cleanups (rafl)
         - Import related cleanups and consistency fixes (rafl)
         - Fix test suite TestApp /dump/env action (t0m)
-        - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
 
 5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
