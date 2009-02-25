@@ -1022,10 +1022,18 @@ EOF
 =item $action
 
 A Catalyst::Action object representing the Catalyst action you want to
-create a URI for. To get one for an action in the current controller,
-use C<< $c->action('someactionname') >>. To get one from different
-controller, fetch the controller using C<< $c->controller() >>, then
-call C<action_for> on it.
+create a URI for. 
+
+To get an action object:
+
+  From another controller, anywhere:
+    C<< $c->controller('ControllerName')->action_for('someactionname') >>
+  Shorter styles useful in particular places:
+    In the current controller's action method:
+      C<< $self->action_for('someactionname') >>
+    From the view for currently dispatched action: 
+      C<< $c->controller->action_for('someactionname') >>
+
 
 This method must be used to create URIs for
 L<Catalyst::DispatchType::Chained> actions.
@@ -1057,7 +1065,7 @@ to the URI, with the keys as the names, and the values as the values.
 Returns a L<URI> object.
 
   ## Ex 1: a path with args and a query parameter
-  $c->uri_for('user/list', 'short', { page => 2});
+  $c->uri_for($c->controller('User')->action_for('list'), 'short', { page => 2});
   ## -> ($c->req->base is 'http://localhost:3000/'
   URI->new('http://localhost:3000/user/list/short?page=2)
 
@@ -1071,6 +1079,11 @@ Returns a L<URI> object.
   $c->uri_for($uaction, [ 42 ]);
   ## outputs:
   URI->new('http://localhost:3000/myuser/42/view')
+
+  ## Ex 3: this style is deprecated and should be omitted
+  $c->uri_for('user/list', 'short', { page => 2});
+  ## -> ($c->req->base is 'http://localhost:3000/'
+  URI->new('http://localhost:3000/user/list/short?page=2)
 
 Creates a URI object using C<< $c->request->base >> and a path. If an
 Action object is given instead of a path, the path is constructed
