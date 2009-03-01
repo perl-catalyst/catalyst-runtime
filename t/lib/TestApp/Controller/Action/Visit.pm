@@ -62,7 +62,9 @@ sub visit_die : Local {
 
 sub visit_chained : Local {
     my ( $self, $c, $val ) = @_;
-    $c->visit('/action/chained/foo/spoon',[1]);
+      $val eq 1 ? $c->visit( '/action/chained/foo/spoon',                                 [$val] )
+    : $val eq 2 ? $c->visit( qw/ Action::Chained::Foo spoon /,                            [$val] )
+    :             $c->visit( $c->controller('Action::Chained::Foo')->action_for('spoon'), [$val] )
 }
 
 sub view : Local {

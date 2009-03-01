@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 54 * $iters;
+use Test::More tests => 60 * $iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -271,10 +271,13 @@ sub run_tests {
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/action/visit/visit_chained'), 'visit to chained + subcontroller endpoint' );
-        is( $response->header('X-Catalyst-Executed'),
-            $expected, 'Executed actions' );
-        is( $response->content, '; 1', 'Content OK' );
+        for my $i ( 1..3 ) {
+            ok( my $response = request("http://localhost/action/visit/visit_chained/$i"),
+                "visit to chained + subcontroller endpoint for $i" );
+            is( $response->header('X-Catalyst-Executed'),
+                $expected, "Executed actions for $i" );
+            is( $response->content, "; $i", "Content OK for $i" );
+        }
     }
 
 }

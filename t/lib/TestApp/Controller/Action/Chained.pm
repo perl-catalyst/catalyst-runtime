@@ -15,7 +15,11 @@ sub begin :Private { }
 #
 #   Simple parent/child action test
 #
-sub foo  :PathPart('chained/foo')  :CaptureArgs(1) :Chained('/') { }
+sub foo  :PathPart('chained/foo')  :CaptureArgs(1) :Chained('/') {
+    my ( $self, $c, @args ) = @_;
+    die "missing argument" unless @args;
+    die "more than 1 argument" if @args > 1;
+}
 sub endpoint  :PathPart('end')  :Chained('/action/chained/foo')  :Args(1) { }
 
 #
