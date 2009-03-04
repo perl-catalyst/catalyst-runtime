@@ -4,6 +4,9 @@ Compatibility:
    - Provide an extension so that components can have a Moose::Object
      constructor and an @ISA which makes c3 happy on both 5.7X and 5.8X.
 
+   - $self->config should warn as config should only ever be called as a
+     class method.
+
 Testing:
 
    - Run more smokes
