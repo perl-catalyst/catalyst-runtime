@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.71000_01 UNRELEASED
+        - Support Moose components so that attribute defaults work
+          and BUILD methods are correctly called (t0m)
+          - Add tests for this (Florian Ragwitz)
+
 5.71000   2009-01-19 17:50:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
           Patch written by Oleg Kostyuk <cub.uanic@gmail.com>

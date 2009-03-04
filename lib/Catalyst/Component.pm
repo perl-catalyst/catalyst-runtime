@@ -5,6 +5,14 @@ use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 use NEXT;
 use Catalyst::Utils;
 
+BEGIN {
+    if (eval 'require Moose; 1') {
+        *__HAVE_MOOSE = sub () { 1 };
+    }
+    else {
+        *__HAVE_MOOSE = sub () { 0 };
+    }
+}
 
 =head1 NAME
 
@@ -54,13 +62,28 @@ __PACKAGE__->mk_classdata($_) for qw/_config _plugins/;
 
 
 sub new {
-    my ( $self, $c ) = @_;
+    my ( $class, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
 
-    return $self->NEXT::new( 
-        $self->merge_config_hashes( $self->config, $arguments ) );
+    my $config = $class->merge_config_hashes( $class->config, $arguments );
+
+    my $self = $class->NEXT::new($config);
+
+    if (__HAVE_MOOSE) {
+        my $meta = Class::MOP::get_metaclass_by_name($class);
+        if ($meta) {
+            $self = $meta->new_object(
+                __INSTANCE__ => $self,
+                %$config
+            );
+            # May not inherit from Moose::Object at all, so
+            # call BUILDALL explicitly.
+            $self->Moose::Object::BUILDALL($config);
+        }
+    }
+    return $self;
 }
 
 sub COMPONENT {

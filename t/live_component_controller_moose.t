@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestApp';
 
 {
-    my $response = request('http://localhost/moose/get_attribute');
+    my $response = request('http://localhost/moose/the_answer');
     ok($response->is_success);
-    is($response->content, '42', 'attribute default values get set correctly');
+    is($response->content, 'the meaning of life: 42', 'attr defaults + BUILD works correctly');
 }
