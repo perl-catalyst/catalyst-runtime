@@ -70,13 +70,5 @@ sub end : Private {
     my ( $self, $c ) = @_;
 }
 
-package TestApp::Controller::Action::Inheritance::Chained;
-
-use strict;
-use base qw/TestApp::ControllerBase::Middle TestApp::ControllerBase::RealMiddle/;
-
-sub chain_first : CaptureArgs(0) PathPart('') Chained('chain_root') {}
-
-
 1;
 

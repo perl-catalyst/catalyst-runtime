@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 26*$iters;
+use Test::More tests => 21*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -115,27 +115,5 @@ sub run_tests {
             qr/^bless\( .* 'Catalyst::Request' \)$/s,
             'Content is a serialized Catalyst::Request'
         );
-    }
-
-    {
-        my @expected = qw[
-          TestApp::Controller::Action::Inheritance->begin
-          TestApp::Controller::Action::Inheritance->auto
-          TestApp::Controller::Action::Inheritance::Chained->chain_root
-          TestApp::Controller::Action::Inheritance::Chained->chain_first
-          TestApp::Controller::Action::Inheritance::Chained->chain_middle
-          TestApp::Controller::Action::Inheritance::Chained->chain_end
-          TestApp::Controller::Action::Inheritance->end
-        ];
-
-        my $expected = join( ", ", @expected );
-
-        ok( my $response = request('http://localhost/action/inheritance/chained/chain_end'),
-            'Request' );
-        ok( $response->is_success, 'Response Successful 2xx' );
-        is( $response->content_type, 'text/plain', 'Response Content-Type' );
-        is( $response->header('X-Catalyst-Action'), '/action/inheritance/chained/chain_end', 'Test Action' );
-        is( $response->header('X-Catalyst-Executed'),
-            $expected, 'Executed actions' );
     }
 }
