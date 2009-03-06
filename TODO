@@ -2,7 +2,7 @@ Known issues:
 
 Documentation:
 
-   - Catalyst/Upgrading.pod needs brushing up and C3 linerisation covering.
+   - Catalyst/Upgrading.pod needs brushing up
 
    - Warning when you pass $c->model("MyApp::Model::Foo") is the generic
      warning for regex fall back. Should be more specific about what you
@@ -11,7 +11,10 @@ Documentation:
 
    - Run more smokes
 
-   - Fix the bleedin visit bug
+   - Using anything ::[CMV]:: should warn (once, on boot).
+
+   - TestApp should not use NEXT. There should be a TestAppNEXTCompat
+     which does but is standalone..
 
 Profiling:
 
