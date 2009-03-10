@@ -846,10 +846,14 @@ L<Catalyst::Log>.
 
 =head2 $c->debug
 
-Overload to enable debug messages (same as -Debug option).
+Returns 1 if debug mode is enabled, 0 otherwise.
 
-Note that this is a static method, not an accessor and should be overloaded
-by declaring "sub debug { 1 }" in your MyApp.pm, not by calling $c->debug(1).
+You can enable debug mode in several ways: 
+(1) with the environment variables MYAPP_DEBUG, or CATALYST_DEBUG
+(2) the -Debug option in your MyApp.pm 
+(3) by declaring "sub debug { 1 }" in your MyApp.pm. 
+
+Calling $c->debug(1) has no effect.
 
 =cut
 

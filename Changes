@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - debug() POD rewrite (jhannah)
         - Change the warning when you have conflicting components to
           present a list (t0m)
         - Move NEXT use and testing deprecated features out to its own
