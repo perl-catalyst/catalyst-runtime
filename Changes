@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Add Catalyst::Test::crequest to return both HTTP::Response object
+          & $c for local requests (kane)
         - debug() POD rewrite (jhannah)
         - Change the warning when you have conflicting components to
           present a list (t0m)

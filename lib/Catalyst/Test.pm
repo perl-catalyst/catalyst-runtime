@@ -30,9 +30,39 @@ my $build_exports = sub {
 
     my $get = sub { $request->(@_)->content };
 
+    my $crequest = sub {
+        my $me      = ref $self || $self;
+
+        ### throw an exception if crequest is being used against a remote
+        ### server
+        Catalyst::Exception->throw("$me only works with local requests, not remote")
+            if $ENV{CATALYST_SERVER};
+
+        ### place holder for $c after the request finishes; reset every time
+        ### requests are done.
+        my $c;
+
+        ### hook into 'dispatch' -- the function gets called after all plugins
+        ### have done their work, and it's an easy place to capture $c.
+        no warnings 'redefine';
+        my $dispatch = Catalyst->can('dispatch');
+        local *Catalyst::dispatch = sub {
+            $c = shift;
+            $dispatch->( $c, @_ );
+        };
+
+        ### do the request; C::T::request will know about the class name, and
+        ### we've already stopped it from doing remote requests above.
+        my $res = $request->( @_ );
+
+        ### return both values
+        return ( $res, $c );
+    };
+
     return {
-        request => $request,
-        get     => $get,
+        request  => $request,
+        get      => $get,
+        crequest => $crequest,
         content_like => sub {
             my $action = shift;
             return Test::More->builder->like($get->($action),@_);
@@ -71,6 +101,7 @@ our $default_host;
         $import->($self, '-all' => { class => $class });
         $opts = {} unless ref $opts eq 'HASH';
         $default_host = $opts->{default_host} if exists $opts->{default_host};
+        return 1;
     }
 }
 
@@ -85,8 +116,9 @@ Catalyst::Test - Test Catalyst Applications
 
     # Tests
     use Catalyst::Test 'TestApp';
-    request('index.html');
-    get('index.html');
+    my $content  = get('index.html');           # Content as string
+    my $response = request('index.html');       # HTTP::Response object
+    my($res, $c) = crequest('index.html');      # HTTP::Response & context object
 
     use HTTP::Request::Common;
     my $response = request POST '/foo', [
@@ -138,7 +170,7 @@ object.
 
 =head2 METHODS
 
-=head2 get
+=head2 $content = get( ... )
 
 Returns the content.
 
@@ -155,7 +187,7 @@ method and the L<request> method below:
     is ( $uri->path , '/y');
     my $content = get($uri->path);
 
-=head2 request
+=head2 $res = request( ... );
 
 Returns a C<HTTP::Response> object. Accepts an optional hashref for request
 header configuration; currently only supports setting 'host' value.
@@ -163,7 +195,14 @@ header configuration; currently only supports setting 'host' value.
     my $res = request('foo/bar?test=1');
     my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
 
-=head2 local_request
+=head1 FUNCTIONS
+
+=head2 ($res, $c) = crequest( ... );
+
+Works exactly like C<Catalyst::Test::request>, except it also returns the
+catalyst context object, C<$c>. Note that this only works for local requests.
+
+=head2 $res = Catalyst::Test::local_request( $AppClass, $url );
 
 Simulate a request using L<HTTP::Request::AsCGI>.
 
@@ -185,7 +224,7 @@ sub local_request {
 
 my $agent;
 
-=head2 remote_request
+=head2 $res = Catalyst::Test::remote_request( $url );
 
 Do an actual remote request using LWP.
 
