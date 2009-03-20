@@ -848,10 +848,17 @@ L<Catalyst::Log>.
 
 Returns 1 if debug mode is enabled, 0 otherwise.
 
-You can enable debug mode in several ways: 
-(1) with the environment variables MYAPP_DEBUG, or CATALYST_DEBUG
-(2) the -Debug option in your MyApp.pm 
-(3) by declaring "sub debug { 1 }" in your MyApp.pm. 
+You can enable debug mode in several ways:
+
+=over
+
+=item With the environment variables MYAPP_DEBUG, or CATALYST_DEBUG
+
+=item The -Debug option in your MyApp.pm
+
+=item By declaring "sub debug { 1 }" in your MyApp.pm.
+
+=back
 
 Calling $c->debug(1) has no effect.
 
