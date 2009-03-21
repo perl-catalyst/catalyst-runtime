@@ -32,8 +32,8 @@ has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required =
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
-
 has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
+
 has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
 
 # Wrap accessors so you can assign a list and it will capture a list ref.
@@ -641,6 +641,20 @@ sub _load_dispatch_types {
     return @loaded;
 }
 
+# Dont document this until someone else is happy with beaviour. Ash 2009/03/16
+sub dispatch_type {
+    my ($self, $name) = @_;
+
+    unless ($name =~ s/^\+//) {
+        $name = "Catalyst::DispatchType::" . $name;
+    }
+
+    for (@{ $self->_dispatch_types }) {
+        return $_ if ref($_) eq $name;
+    }
+    return undef;
+}
+
 use Moose;
 
 # 5.70 backwards compatibility hacks.
@@ -686,20 +700,6 @@ __PACKAGE__->meta->make_immutable;
 =head2 meta
 
 Provided by Moose
-
-# Dont document this until someone else is happy with beaviour. Ash 2009/03/16
-sub dispatch_type {
-    my ($self, $name) = @_;
-
-    unless ($name =~ s/^\+//) {
-        $name = "Catalyst::DispatchType::" . $name;
-    }
-
-    for (@{ $self->dispatch_types }) {
-        return $_ if ref($_) eq $name;
-    }
-    return undef;
-}
 
 =head1 AUTHORS
 
