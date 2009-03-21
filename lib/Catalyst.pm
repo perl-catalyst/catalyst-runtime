@@ -361,9 +361,9 @@ When called with no arguments it escapes the processing chain entirely.
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
-=head2 $c->visit( $action [, \@arguments ] )
+=head2 $c->visit( $action [, \@captures, \@arguments ] )
 
-=head2 $c->visit( $class, $method, [, \@arguments ] )
+=head2 $c->visit( $class, $method, [, \@captures, \@arguments ] )
 
 Almost the same as C<forward>, but does a full dispatch, instead of just
 calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
@@ -387,9 +387,9 @@ been reached directly from a URL.
 
 sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
-=head2 $c->go( $action [, \@arguments ] )
+=head2 $c->go( $action [, \@captures, \@arguments ] )
 
-=head2 $c->go( $class, $method, [, \@arguments ] )
+=head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
 Almost the same as C<detach>, but does a full dispatch like C<visit>,
 instead of just calling the new C<$action> /
