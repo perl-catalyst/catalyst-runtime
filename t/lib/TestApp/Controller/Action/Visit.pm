@@ -61,10 +61,11 @@ sub visit_die : Local {
 }
 
 sub visit_chained : Local {
-    my ( $self, $c, $val ) = @_;
-      $val eq 1 ? $c->visit( '/action/chained/foo/spoon',                                 [$val] )
-    : $val eq 2 ? $c->visit( qw/ Action::Chained::Foo spoon /,                            [$val] )
-    :             $c->visit( $c->controller('Action::Chained::Foo')->action_for('spoon'), [$val] )
+    my ( $self, $c, $val, $capture, @args ) = @_;
+    my @cap_and_args = ([$capture], [@args]);
+      $val eq 1 ? $c->visit( '/action/chained/foo/spoon',                                 @cap_and_args)
+    : $val eq 2 ? $c->visit( qw/ Action::Chained::Foo spoon /,                            @cap_and_args)
+    :             $c->visit( $c->controller('Action::Chained::Foo')->action_for('spoon'), @cap_and_args)
 }
 
 sub view : Local {

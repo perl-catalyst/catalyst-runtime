@@ -119,7 +119,8 @@ sub dispatch {
 }
 
 # $self->_command2action( $c, $command [, \@arguments ] )
-# Search for an action, from the command and returns C<($action, $args)> on
+# $self->_command2action( $c, $command [, \@captures, \@arguments ] )
+# Search for an action, from the command and returns C<($action, $args, $captures)> on
 # success. Returns C<(0)> on error.
 
 sub _command2action {
@@ -130,7 +131,11 @@ sub _command2action {
         return 0;
     }
 
-    my @args;
+    my (@args, @captures);
+
+    if ( ref( $extra_params[-2] ) eq 'ARRAY' ) {
+        @captures = @{ pop @extra_params };
+    }
 
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
         @args = @{ pop @extra_params }
@@ -158,7 +163,7 @@ sub _command2action {
         $action = $self->_invoke_as_component( $c, $command, $method );
     }
 
-    return $action, \@args;
+    return $action, \@args, \@captures;
 }
 
 =head2 $self->visit( $c, $command [, \@arguments ] )
@@ -176,7 +181,7 @@ sub _do_visit {
     my $self = shift;
     my $opname = shift;
     my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
+    my ( $action, $args, $captures ) = $self->_command2action(@_);
     my $error = qq/Couldn't $opname("$command"): /;
 
     if (!$action) {
@@ -204,6 +209,7 @@ sub _do_visit {
     $action = $self->expand_action($action);
 
     local $c->request->{arguments} = $args;
+    local $c->request->{captures}  = $captures;
     local $c->{namespace} = $action->{'namespace'};
     local $c->{action} = $action;
 
@@ -237,7 +243,7 @@ sub _do_forward {
     my $self = shift;
     my $opname = shift;
     my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
+    my ( $action, $args, $captures ) = $self->_command2action(@_);
 
     if (!$action) {
         my $error .= qq/Couldn't $opname to command "$command": /
