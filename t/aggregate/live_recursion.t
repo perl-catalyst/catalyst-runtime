@@ -23,3 +23,4 @@ SKIP:
     ok( !$response->is_success, 'Response Not Successful' );
     is( $response->header('X-Catalyst-Error'), 'Deep recursion detected calling "/recursion_test"', 'Deep Recursion Detected' );
 }
+

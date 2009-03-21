@@ -20,4 +20,8 @@ sub localregex : LocalRegex('^localregex$') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub chain_to_self : Chained('chain_to_self') PathPart('') CaptureArgs(1) { }
+
+sub chain_recurse_endoint : Chained('chain_to_self') Args(0) { }
+
 1;

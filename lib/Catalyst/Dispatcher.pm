@@ -582,6 +582,11 @@ sub setup_actions {
     $self->_load_dispatch_types( @{ $self->postload_dispatch_types } );
 
     return unless $c->debug;
+    $self->_display_action_tables($c);
+}
+
+sub _display_action_tables {
+    my ($self, $c) = @_;
 
     my $column_width = Catalyst::Utils::term_width() - 20 - 36 - 12;
     my $privates = Text::SimpleTable->new(
@@ -681,6 +686,20 @@ __PACKAGE__->meta->make_immutable;
 =head2 meta
 
 Provided by Moose
+
+# Dont document this until someone else is happy with beaviour. Ash 2009/03/16
+sub dispatch_type {
+    my ($self, $name) = @_;
+
+    unless ($name =~ s/^\+//) {
+        $name = "Catalyst::DispatchType::" . $name;
+    }
+
+    for (@{ $self->dispatch_types }) {
+        return $_ if ref($_) eq $name;
+    }
+    return undef;
+}
 
 =head1 AUTHORS
 
