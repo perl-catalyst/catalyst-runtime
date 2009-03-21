@@ -190,7 +190,7 @@ sub _do_visit {
     }
     elsif (!defined $action->namespace) {
         $error .= qq/Action has no namespace: cannot $opname() to a plain /
-                 .qq/method or component, must be a :Action or some sort./
+                 .qq/method or component, must be an :Action of some sort./
     }
     elsif (!$action->class->can('_DISPATCH')) {
         $error .= qq/Action cannot _DISPATCH. /
@@ -320,14 +320,8 @@ sub _invoke_as_component {
 
     my $class = $self->_find_component_class( $c, $component ) || return 0;
 
-    ### XXX FIXME - Horrible hack to get proper action objects for
-    ###             controller paths..
-    if ($class =~ /::C(ontroller)?::/) {
-        my $possible_path = $class . '/' . $method;
-        $possible_path =~ s/.+::C(ontroller)?:://;
-        $possible_path =~ s|::|/|g;
-        $possible_path =~ tr/A-Z/a-z/;
-        my $possible_action = $self->_invoke_as_path( $c, '/' . $possible_path );
+    if (my $code = $component_instance->can('action_for')) {
+        my $possible_action = $component_instance->$code($method);
         return $possible_action if $possible_action;
     }
 

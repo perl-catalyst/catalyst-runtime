@@ -98,7 +98,7 @@ sub embed : Local {
 
 sub class_visit_test_action : Local {
     my ( $self, $c ) = @_;
-    $c->visit(qw/TestApp class_visit_test_method/);
+    $c->visit(qw/TestApp/);
 }
 
 1;
