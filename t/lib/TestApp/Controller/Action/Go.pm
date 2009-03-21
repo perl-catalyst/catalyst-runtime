@@ -63,7 +63,7 @@ sub go_die : Local {
 
 sub go_chained : Local {
     my ( $self, $c, $val ) = @_;
-    $c->go('/action/chained/foo/spoon',[1]);
+    $c->go('/action/chained/foo/spoon', ['captureme'], [qw/arg1 arg2/]);
 }
 
 sub view : Local {
