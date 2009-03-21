@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Change the $c->visit and $c->go methods to optionally take
+          CaptureArgs, making them useful to call ActionChains with (t0m)
+          - Tests for this (radek)
+        - Fix _invoke_as_component method to find the proper action instance
+          for dispatchable actions so that ->visit or ->going to ActionChains
+          with qw/Class::Name method_name/ works correctly (t0m)
+          - Tests for this (radek)
         - Added Catalyst::Test::ctx_request to be able to inspect
           the context object after a request is made (Jos Boumans)
         - debug() POD rewrite (jhannah)

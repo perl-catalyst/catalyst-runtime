@@ -307,43 +307,44 @@ sub _invoke_as_path {
     }
 }
 
-sub _find_component_class {
+sub _find_component {
     my ( $self, $c, $component ) = @_;
 
-    return ref($component)
-      || ref( $c->component($component) )
-      || $c->component($component);
+    # fugly, why doesn't ->component('MyApp') work?
+    return $c if ($component eq blessed($c));
+
+    return blessed($component)
+        ? $component
+        : $c->component($component);
 }
 
 sub _invoke_as_component {
-    my ( $self, $c, $component, $method ) = @_;
+    my ( $self, $c, $component_or_class, $method ) = @_;
 
-    #FIXME - Is this resolving needed/should it just return the instance
-    #        directly
-    my $class = $self->_find_component_class( $c, $component ) || return 0;
+    my $component = $self->_find_component($c, $component_or_class);
+    my $component_class = blessed $component || return 0;
 
-    my $component_instance = $c->component($class);
-    if (my $code = $component_instance->can('action_for')) {
-        my $possible_action = $component_instance->$code($method);
+    if (my $code = $component_class->can('action_for')) {
+        my $possible_action = $component->$code($method);
         return $possible_action if $possible_action;
     }
 
-    if ( my $code = $class->can($method) ) {
+    if ( my $code = $component_class->can($method) ) {
         return $self->_method_action_class->new(
             {
                 name      => $method,
                 code      => $code,
-                reverse   => "$class->$method",
-                class     => $class,
+                reverse   => "$component_class->$method",
+                class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $class, $c->config->{case_sensitive}
+                    $component_class, $c->config->{case_sensitive}
                 ),
             }
         );
     }
     else {
         my $error =
-          qq/Couldn't forward to "$class". Does not implement "$method"/;
+          qq/Couldn't forward to "$component_class". Does not implement "$method"/;
         $c->error($error);
         $c->log->debug($error)
           if $c->debug;
