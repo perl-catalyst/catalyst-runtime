@@ -19,7 +19,7 @@ my $Url     = 'http://localhost/';
 my $Content = "root index";
 
 my %Meth    = (
-    $Pkg    => [qw|get request crequest|],          # exported
+    $Pkg    => [qw|get request ctx_request|],          # exported
     $Class  => [qw|local_request remote_request|],  # not exported
 );
 
@@ -66,7 +66,7 @@ use_ok( $Class );
     ### test exported methods again
     for my $meth ( @{ $Meth{$Pkg} } ) { SKIP: {
 
-        ### do a call, we should get a result and perhaps a $c if it's 'crequest';
+        ### do a call, we should get a result and perhaps a $c if it's 'ctx_request';
         my ($res, $c) = eval { $Pkg->can($meth)->( $Url ) };
         
         ok( 1,                  "   Called $Pkg->$meth( $Url )" );
@@ -78,8 +78,8 @@ use_ok( $Class );
         is( $res_as_string, $Content,
                                 "           Content as expected: $res_as_string" );    
         
-        ### some tests for 'crequest'
-        skip "Context tests skipped for '$meth'", 6 unless $meth eq 'crequest';
+        ### some tests for 'ctx_request'
+        skip "Context tests skipped for '$meth'", 6 unless $meth eq 'ctx_request';
         
         ok( $c,                 "           Context object returned" );
         isa_ok( $c, $App,       "               Object" );

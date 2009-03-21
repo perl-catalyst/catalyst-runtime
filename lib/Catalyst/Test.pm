@@ -30,10 +30,10 @@ my $build_exports = sub {
 
     my $get = sub { $request->(@_)->content };
 
-    my $crequest = sub {
+    my $ctx_request = sub {
         my $me      = ref $self || $self;
 
-        ### throw an exception if crequest is being used against a remote
+        ### throw an exception if ctx_request is being used against a remote
         ### server
         Catalyst::Exception->throw("$me only works with local requests, not remote")
             if $ENV{CATALYST_SERVER};
@@ -60,9 +60,9 @@ my $build_exports = sub {
     };
 
     return {
-        request  => $request,
-        get      => $get,
-        crequest => $crequest,
+        request      => $request,
+        get          => $get,
+        ctx_request  => $ctx_request,
         content_like => sub {
             my $action = shift;
             return Test::More->builder->like($get->($action),@_);
@@ -118,7 +118,7 @@ Catalyst::Test - Test Catalyst Applications
     use Catalyst::Test 'TestApp';
     my $content  = get('index.html');           # Content as string
     my $response = request('index.html');       # HTTP::Response object
-    my($res, $c) = crequest('index.html');      # HTTP::Response & context object
+    my($res, $c) = ctx_request('index.html');      # HTTP::Response & context object
 
     use HTTP::Request::Common;
     my $response = request POST '/foo', [
@@ -197,7 +197,7 @@ header configuration; currently only supports setting 'host' value.
 
 =head1 FUNCTIONS
 
-=head2 ($res, $c) = crequest( ... );
+=head2 ($res, $c) = ctx_request( ... );
 
 Works exactly like C<Catalyst::Test::request>, except it also returns the
 catalyst context object, C<$c>. Note that this only works for local requests.
