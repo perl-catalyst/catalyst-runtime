@@ -320,6 +320,17 @@ sub _invoke_as_component {
 
     my $class = $self->_find_component_class( $c, $component ) || return 0;
 
+    ### XXX FIXME - Horrible hack to get proper action objects for
+    ###             controller paths..
+    if ($class =~ /::C(ontroller)?::/) {
+        my $possible_path = $class . '/' . $method;
+        $possible_path =~ s/.+::C(ontroller)?:://;
+        $possible_path =~ s|::|/|g;
+        $possible_path =~ tr/A-Z/a-z/;
+        my $possible_action = $self->_invoke_as_path( $c, '/' . $possible_path );
+        return $possible_action if $possible_action;
+    }
+
     if ( my $code = $class->can($method) ) {
         return $self->_method_action_class->new(
             {
