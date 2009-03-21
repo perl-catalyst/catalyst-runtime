@@ -96,7 +96,7 @@ sub embed : Local {
 
 sub class_go_test_action : Local {
     my ( $self, $c ) = @_;
-    $c->go(qw/TestApp class_go_test_method/);
+    $c->go(qw/TestApp/);
 }
 
 1;

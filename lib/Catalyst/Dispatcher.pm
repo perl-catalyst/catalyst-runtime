@@ -318,8 +318,11 @@ sub _find_component_class {
 sub _invoke_as_component {
     my ( $self, $c, $component, $method ) = @_;
 
+    #FIXME - Is this resolving needed/should it just return the instance
+    #        directly
     my $class = $self->_find_component_class( $c, $component ) || return 0;
 
+    my $component_instance = $c->component($class);
     if (my $code = $component_instance->can('action_for')) {
         my $possible_action = $component_instance->$code($method);
         return $possible_action if $possible_action;
