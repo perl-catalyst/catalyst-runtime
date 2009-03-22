@@ -297,9 +297,9 @@ static, and dynamic.
 
 The FastCgiExternalServer directive tells Apache that when serving
 /tmp/myapp to use the FastCGI application listenting on the socket
-/tmp/mapp.socket.  Note that /tmp/myapp.fcgi does not need to exist --
+/tmp/mapp.socket.  Note that /tmp/myapp.fcgi B<MUST NOT> exist --
 it's a virtual file name.  With some versions of C<mod_fastcgi> or
-C<mod_fcgid>, you can use any name you like, but most require that the
+C<mod_fcgid>, you can use any name you like, but some require that the
 virtual filename end in C<.fcgi>.
 
 It's likely that Apache is not configured to serve files in /tmp, so the 
