@@ -1,4 +1,4 @@
-module.Catalyst-Controller-FormBuilder
+module.Catalyst-Controller-FormBuilder - t/unit_metaclass_compat_non_moose.t
 module.Catalyst-Controller-WrapCGI
 module.Catalyst-Log-Log4perl
 module.Catalyst-Model-Search
