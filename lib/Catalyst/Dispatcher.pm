@@ -119,7 +119,8 @@ sub dispatch {
 }
 
 # $self->_command2action( $c, $command [, \@arguments ] )
-# Search for an action, from the command and returns C<($action, $args)> on
+# $self->_command2action( $c, $command [, \@captures, \@arguments ] )
+# Search for an action, from the command and returns C<($action, $args, $captures)> on
 # success. Returns C<(0)> on error.
 
 sub _command2action {
@@ -130,7 +131,11 @@ sub _command2action {
         return 0;
     }
 
-    my @args;
+    my (@args, @captures);
+
+    if ( ref( $extra_params[-2] ) eq 'ARRAY' ) {
+        @captures = @{ pop @extra_params };
+    }
 
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
         @args = @{ pop @extra_params }
@@ -158,7 +163,7 @@ sub _command2action {
         $action = $self->_invoke_as_component( $c, $command, $method );
     }
 
-    return $action, \@args;
+    return $action, \@args, \@captures;
 }
 
 =head2 $self->visit( $c, $command [, \@arguments ] )
@@ -176,7 +181,7 @@ sub _do_visit {
     my $self = shift;
     my $opname = shift;
     my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
+    my ( $action, $args, $captures ) = $self->_command2action(@_);
     my $error = qq/Couldn't $opname("$command"): /;
 
     if (!$action) {
@@ -185,7 +190,7 @@ sub _do_visit {
     }
     elsif (!defined $action->namespace) {
         $error .= qq/Action has no namespace: cannot $opname() to a plain /
-                 .qq/method or component, must be a :Action or some sort./
+                 .qq/method or component, must be an :Action of some sort./
     }
     elsif (!$action->class->can('_DISPATCH')) {
         $error .= qq/Action cannot _DISPATCH. /
@@ -204,6 +209,7 @@ sub _do_visit {
     $action = $self->expand_action($action);
 
     local $c->request->{arguments} = $args;
+    local $c->request->{captures}  = $captures;
     local $c->{namespace} = $action->{'namespace'};
     local $c->{action} = $action;
 
@@ -237,7 +243,7 @@ sub _do_forward {
     my $self = shift;
     my $opname = shift;
     my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
+    my ( $action, $args, $captures ) = $self->_command2action(@_);
 
     if (!$action) {
         my $error .= qq/Couldn't $opname to command "$command": /
@@ -301,35 +307,44 @@ sub _invoke_as_path {
     }
 }
 
-sub _find_component_class {
+sub _find_component {
     my ( $self, $c, $component ) = @_;
 
-    return ref($component)
-      || ref( $c->component($component) )
-      || $c->component($component);
+    # fugly, why doesn't ->component('MyApp') work?
+    return $c if ($component eq blessed($c));
+
+    return blessed($component)
+        ? $component
+        : $c->component($component);
 }
 
 sub _invoke_as_component {
-    my ( $self, $c, $component, $method ) = @_;
+    my ( $self, $c, $component_or_class, $method ) = @_;
 
-    my $class = $self->_find_component_class( $c, $component ) || return 0;
+    my $component = $self->_find_component($c, $component_or_class);
+    my $component_class = blessed $component || return 0;
 
-    if ( my $code = $class->can($method) ) {
+    if (my $code = $component_class->can('action_for')) {
+        my $possible_action = $component->$code($method);
+        return $possible_action if $possible_action;
+    }
+
+    if ( my $code = $component_class->can($method) ) {
         return $self->_method_action_class->new(
             {
                 name      => $method,
                 code      => $code,
-                reverse   => "$class->$method",
-                class     => $class,
+                reverse   => "$component_class->$method",
+                class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $class, $c->config->{case_sensitive}
+                    $component_class, $c->config->{case_sensitive}
                 ),
             }
         );
     }
     else {
         my $error =
-          qq/Couldn't forward to "$class". Does not implement "$method"/;
+          qq/Couldn't forward to "$component_class". Does not implement "$method"/;
         $c->error($error);
         $c->log->debug($error)
           if $c->debug;

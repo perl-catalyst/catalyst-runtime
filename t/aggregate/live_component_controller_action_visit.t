@@ -253,7 +253,7 @@ sub run_tests {
         );
         ok( !$response->is_success, 'Response Fails' );
         is( $response->content,
-            q[FATAL ERROR: Couldn't visit("TestApp"): Action has no namespace: cannot visit() to a plain method or component, must be a :Action or some sort.],
+            q{FATAL ERROR: Couldn't visit("TestApp"): Action has no namespace: cannot visit() to a plain method or component, must be an :Action of some sort.},
             "Cannot visit app namespace"
         );
     }
@@ -272,11 +272,12 @@ sub run_tests {
         my $expected = join( ", ", @expected );
 
         for my $i ( 1..3 ) {
-            ok( my $response = request("http://localhost/action/visit/visit_chained/$i"),
+            ok( my $response = request("http://localhost/action/visit/visit_chained/$i/becomescapture/arg1/arg2"),
                 "visit to chained + subcontroller endpoint for $i" );
             is( $response->header('X-Catalyst-Executed'),
                 $expected, "Executed actions for $i" );
-            is( $response->content, "; $i", "Content OK for $i" );
+            is( $response->content, "arg1, arg2; becomescapture",
+                "Content OK for $i" );
         }
     }
 
