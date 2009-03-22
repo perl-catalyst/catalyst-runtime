@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Throw an exception rather than loading an app if an action
+          tries to chain to itself (t0m)
+          - Tests for this
         - Added Catalyst::Test::ctx_request to be able to inspect
           the context object after a request is made (Jos Boumans)
         - debug() POD rewrite (jhannah)

@@ -258,8 +258,13 @@ sub register {
           "Multiple Chained attributes not supported registering ${action}"
         );
     }
+    my $chained_to = $chained_attr[0];
 
-    my $children = ($self->_children_of->{ $chained_attr[0] } ||= {});
+    Catalyst::Exception->throw(
+      "Actions cannot chain to themselves registering /${action}"
+    ) if ($chained_to eq '/' . $action);
+
+    my $children = ($self->_children_of->{ $chained_to } ||= {});
 
     my @path_part = @{ $action->attributes->{PathPart} || [] };
 
