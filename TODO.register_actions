@@ -1,0 +1,9 @@
+module.Catalyst-Controller-FormBuilder
+module.Catalyst-Controller-WrapCGI
+module.Catalyst-Log-Log4perl
+module.Catalyst-Model-Search
+module.Catalyst-View-ContentNegotiation-XHTML
+module.Catalyst-View-Mason
+module.CatalystX-CRUD
+module.CatalystX-Imports
+
