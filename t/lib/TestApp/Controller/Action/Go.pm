@@ -63,7 +63,7 @@ sub go_die : Local {
 
 sub go_chained : Local {
     my ( $self, $c, $val ) = @_;
-    $c->go('/action/chained/foo/spoon',[1]);
+    $c->go('/action/chained/foo/spoon', ['captureme'], [qw/arg1 arg2/]);
 }
 
 sub view : Local {
@@ -96,7 +96,7 @@ sub embed : Local {
 
 sub class_go_test_action : Local {
     my ( $self, $c ) = @_;
-    $c->go(qw/TestApp class_go_test_method/);
+    $c->go(qw/TestApp/);
 }
 
 1;
