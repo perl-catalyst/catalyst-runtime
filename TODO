@@ -5,10 +5,6 @@ Compatibility:
 
    - Need at least good docs on how C3 fail occurs.
 
-Bugs:
-
-  - Fix the bleedin visit bug
-
 Testing:
 
    - Run more smokes
