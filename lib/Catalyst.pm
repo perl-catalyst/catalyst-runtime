@@ -1142,8 +1142,13 @@ sub uri_for {
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? shift(@args)
                          : [] );
-        $path = $c->dispatcher->uri_for_action($path, $captures);
-        return undef unless defined($path);
+        my $action = $path;
+        $path = $c->dispatcher->uri_for_action($action, $captures);
+        if (not defined $path) {
+            $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
+                if $c->debug;
+            return undef;
+        }
         $path = '/' if $path eq '';
     }
 
