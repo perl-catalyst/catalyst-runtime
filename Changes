@@ -16,6 +16,8 @@
           - Tests for this
         - Added Catalyst::Test::ctx_request to be able to inspect
           the context object after a request is made (Jos Boumans)
+        - Fix the warnings about regex fallback in component resolution to
+          not hard code ->model in the warning message (t0m)
 
 5.71000   2009-01-19 17:50:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
