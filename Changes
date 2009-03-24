@@ -11,6 +11,9 @@
           for dispatchable actions so that ->visit or ->going to ActionChains
           with qw/Class::Name method_name/ works correctly (t0m)
           - Tests for this (Radoslaw Zielinski)
+        - Throw an exception rather than loading an app if an action
+          tries to chain to itself (t0m)
+          - Tests for this
         - Added Catalyst::Test::ctx_request to be able to inspect
           the context object after a request is made (Jos Boumans)
 
