@@ -807,12 +807,34 @@ Returns or takes a hashref containing the application's configuration.
     __PACKAGE__->config( { db => 'dsn:SQLite:foo.db' } );
 
 You can also use a C<YAML>, C<XML> or C<Config::General> config file
-like myapp.yml in your applications home directory. See
+like myapp.conf in your applications home directory. See
 L<Catalyst::Plugin::ConfigLoader>.
 
-    ---
-    db: dsn:SQLite:foo.db
+=head3 Cascading configuration.
 
+The config method is present on all Catalyst components, and configuration
+will be merged when an application is started. Configuration loaded with
+L<Catalyst::Plugin::ConfigLoader> takes precedence over other configuration,
+followed by configuration in your top level C<MyApp> class. These two 
+configurations are merged, and then configuration data whos hash key matches a
+component name is merged with configuration for that component.
+
+The configuration for a component is then passed to the C<new> method when a
+component is constructed.
+
+For example:
+
+    MyApp->config({ 'Model::Foo' => { bar => 'baz', overrides => 'me' } });
+    MyApp::Model::Foo->config({ quux => 'frob', 'overrides => 'this' });
+    
+will mean that C<MyApp::Model::Foo> receives the following data when 
+constructed:
+
+    MyApp::Model::Foo->new({
+        bar => 'baz',
+        quux => 'frob',
+        overrides => 'me',
+    });
 
 =cut
 
@@ -914,7 +936,7 @@ sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
 
     # See block comment in t/unit_core_plugin.t    
-    $class->log->warn(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.9/);
+    $class->log->warn(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.81/);
     
     $class->_register_plugin( $plugin, 1 );
 
