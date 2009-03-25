@@ -656,7 +656,14 @@ sub _load_dispatch_types {
     return @loaded;
 }
 
-# Dont document this until someone else is happy with beaviour. Ash 2009/03/16
+=head2 $self->dispatch_type( $type )
+
+Get the DispatchType object of the relevant type, i.e. passing C<$type> of
+C<Chained> would return a L<Catalyst::DispatchType::Chained> object (assuming
+of course it's being used.) 
+
+=cut
+
 sub dispatch_type {
     my ($self, $name) = @_;
 
