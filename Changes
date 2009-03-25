@@ -1,6 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.71000_01 UNRELEASED
+5.71001 UNRELEASED
+        - Add the Catalyst::Dispatcher->dispatch_type method (ash)
         - Support Moose components so that attribute defaults work
           and BUILD methods are correctly called (t0m)
           - Add tests for this (Florian Ragwitz)
