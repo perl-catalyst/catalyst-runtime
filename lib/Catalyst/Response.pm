@@ -26,6 +26,8 @@ has _context => (
 
 sub output { shift->body(@_) }
 
+sub code   { shift->status(@_) }
+
 no Moose;
 
 =head1 NAME
@@ -36,6 +38,7 @@ Catalyst::Response - stores output responding to the current client request
 
     $res = $c->response;
     $res->body;
+    $res->code;
     $res->content_encoding;
     $res->content_length;
     $res->content_type;
@@ -67,6 +70,10 @@ will write it piece by piece into the response.
 =head2 $res->has_body
 
 Predicate which returns true when a body has been set.
+
+=head2 $res->code
+
+Alias for $res->status.
 
 =head2 $res->content_encoding
 
@@ -162,6 +169,8 @@ Sets or returns the HTTP 'Location'.
 Sets or returns the HTTP status.
 
     $c->response->status(404);
+
+$res->code is an alias for this, to match HTTP::Response->code.
     
 =head2 $res->write( $data )
 
