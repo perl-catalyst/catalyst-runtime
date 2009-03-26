@@ -3,6 +3,7 @@
 \bCVS\b
 ,v$
 \B\.svn\b
+\B\.git\b
 
 # Avoid Makemaker generated and utility files.
 \bMakefile$
