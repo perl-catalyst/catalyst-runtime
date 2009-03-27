@@ -1109,7 +1109,7 @@ EOF
 =head2 $app->setup_finalize
 
 A hook to attach modifiers to.
-Using C< after setup => sub{}; > doesn't work, because of quirky things done for plugin setup.
+Using C<< after setup => sub{}; >> doesn't work, because of quirky things done for plugin setup.
 Also better than C< setup_finished(); >, as that is a getter method.
 
     sub setup_finalize {
