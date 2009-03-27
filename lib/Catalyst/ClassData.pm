@@ -44,6 +44,8 @@ sub mk_classdata {
     unless ref $accessor eq 'CODE';
 
   my $meta = $class->Class::MOP::Object::meta();
+  confess "${class}'s metaclass is not a Class::MOP::Class"
+    unless $meta->isa('Class::MOP::Class');
   my $immutable_options;
   if( $meta->is_immutable ){
     $immutable_options = $meta->get_immutable_options;
