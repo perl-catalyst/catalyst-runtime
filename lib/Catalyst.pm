@@ -1250,6 +1250,9 @@ sub uri_for_action {
     my $action = blessed($path) 
       ? $path 
       : $c->dispatcher->get_action_by_path($path);
+    unless (defined $action) {
+      croak "Can't find action for path '$path'";
+    }
     return $c->uri_for( $action, @args );
 }
 

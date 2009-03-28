@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 28;
+plan tests => 29;
 
 use_ok('TestApp');
 
@@ -164,6 +164,10 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
     is( $context->uri_for_action( $complex_chained, [23], (13), {q => 3} ),
         'http://127.0.0.1/foo/chained/empty/23/13?q=3',
         'uri_for_action returns correct uri for chain with many empty path parts' );
-}
 
+    eval { $context->uri_for_action( '/does/not/exist' ) };
+    like $@, qr{^Can't find action for path '/does/not/exist'},
+        'uri_for_action croaks on nonexistent path';
+      
+}
 
