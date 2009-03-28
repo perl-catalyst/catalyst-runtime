@@ -30,8 +30,7 @@ sub cross2 :PathPart('end') :Chained('/action/chained/bar/cross1') :Args(1) { }
 #
 sub to_root : Chained('/') PathPart('action/chained/to_root') {
     my ( $self, $c ) = @_;
-    my $uri = $c->uri_for(
-        $c->controller('Root')->action_for('chain_root_index') );
+    my $uri = $c->uri_for_action('/chain_root_index');
     $c->res->body( "URI:$uri" );
     $c->stash->{no_end}++;
 }
