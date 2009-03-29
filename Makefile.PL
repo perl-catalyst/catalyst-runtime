@@ -11,7 +11,7 @@ requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00800';
 requires 'Moose' => '0.70';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
-requires 'Class::MOP';
+requires 'Class::MOP' => '0.79';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
 requires 'File::Modified';

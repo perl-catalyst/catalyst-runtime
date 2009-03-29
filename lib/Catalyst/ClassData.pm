@@ -46,17 +46,16 @@ sub mk_classdata {
   my $meta = $class->Class::MOP::Object::meta();
   confess "${class}'s metaclass is not a Class::MOP::Class"
     unless $meta->isa('Class::MOP::Class');
-  my $immutable_options;
-  if( $meta->is_immutable ){
-    $immutable_options = $meta->get_immutable_options;
-    $meta->make_mutable;
-  }
+
+  my $was_immutable = $meta->is_immutable;
+  $meta->make_mutable if $was_immutable;
+
   my $alias = "_${attribute}_accessor";
   $meta->add_method($alias, $accessor);
   $meta->add_method($attribute, $accessor);
-  if(defined $immutable_options){
-    $meta->make_immutable(%{ $immutable_options });
-  }
+
+  $meta->make_immutable if $was_immutable;
+
   $class->$attribute($_[2]) if(@_ > 2);
   return $accessor;
 }
