@@ -43,6 +43,8 @@
         - Import related cleanups and consistency fixes (rafl)
         - Fix test suite TestApp /dump/env action (t0m)
         - Add $res->code as alias for $res->status (hdp)
+        - Make Catalyst::ClassData compatible with the latest Class::MOP::Class
+          changes. Also depend on the latest Class::MOP. (rafl)
 
 5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
