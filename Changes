@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Tidy up Catalyst::ClassData to ensure that all components get
+          the correct metaclass (t0m)
         - Make MyApp.pm restartable by unsetting setup_finished in
           the restarter process (t0m)
         - Non-naive implementation of making mutable on restart using

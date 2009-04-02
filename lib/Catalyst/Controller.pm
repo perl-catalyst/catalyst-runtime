@@ -181,7 +181,8 @@ sub register_actions {
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
     my $meta = find_meta($self);
-    confess("Wrong metaclass $meta for $self - " . $meta->name)
+    confess("Metaclass for " . ref($meta) ." for " . $meta->name 
+        . " cannot support register_actions.")
         unless $meta->can('get_all_methods_with_attributes');
     my @methods = $meta->get_all_methods_with_attributes;
 

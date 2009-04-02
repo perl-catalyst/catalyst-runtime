@@ -2085,8 +2085,6 @@ sub setup_components {
 sub setup_component {
     my( $class, $component ) = @_;
 
-
-    #warn("Component $component has meta " . $component->meta);
     unless ( $component->can( 'COMPONENT' ) ) {
         return $component;
     }
