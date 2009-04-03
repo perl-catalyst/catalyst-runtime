@@ -168,6 +168,6 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
     eval { $context->uri_for_action( '/does/not/exist' ) };
     like $@, qr{^Can't find action for path '/does/not/exist'},
         'uri_for_action croaks on nonexistent path';
-      
+
 }
 
