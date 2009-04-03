@@ -1224,6 +1224,38 @@ sub uri_for {
     $res;
 }
 
+=head2 $c->uri_for_action( $path, \@captures?, @args?, \%query_values? )
+
+=head2 $c->uri_for_action( $action, \@captures?, @args?, \%query_values? )
+
+=over
+
+=item $path
+
+A private path to the Catalyst action you want to create a URI for.
+
+This is a shortcut for calling C<< $c->dispatcher->get_action_by_path($path)
+>> and passing the resulting C<$action> and the remaining arguments to C<<
+$c->uri_for >>.
+
+You can also pass in a Catalyst::Action object, in which case it is passed to
+C<< $c->uri_for >>.
+
+=back
+
+=cut
+
+sub uri_for_action {
+    my ( $c, $path, @args ) = @_;
+    my $action = blessed($path) 
+      ? $path 
+      : $c->dispatcher->get_action_by_path($path);
+    unless (defined $action) {
+      croak "Can't find action for path '$path'";
+    }
+    return $c->uri_for( $action, @args );
+}
+
 =head2 $c->welcome_message
 
 Returns the Catalyst welcome HTML page.
