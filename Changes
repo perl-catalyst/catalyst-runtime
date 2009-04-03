@@ -45,6 +45,7 @@
         - Add $res->code as alias for $res->status (hdp)
         - Make Catalyst::ClassData compatible with the latest Class::MOP::Class
           changes. Also depend on the latest Class::MOP. (rafl)
+        - Add $c->uri_for_action method. (hdp)
 
 5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
