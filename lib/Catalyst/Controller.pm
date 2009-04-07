@@ -52,9 +52,9 @@ Catalyst::Controller - Catalyst Controller base class
   package MyApp::Controller::Search
   use base qw/Catalyst::Controller/;
 
-  sub foo : Local { 
+  sub foo : Local {
     my ($self,$c,@args) = @_;
-    ... 
+    ...
   } # Dispatches to /search/foo
 
 =head1 DESCRIPTION
@@ -127,7 +127,7 @@ sub action_for {
     return $app->dispatcher->get_action($name, $self->action_namespace);
 }
 
-#my opinion is that this whole sub really should be a builder method, not 
+#my opinion is that this whole sub really should be a builder method, not
 #something that happens on every call. Anyone else disagree?? -- groditi
 ## -- apparently this is all just waiting for app/ctx split
 around action_namespace => sub {
@@ -177,7 +177,7 @@ around path_prefix => sub {
 sub get_action_methods {
     my $self = shift;
     my $meta = find_meta($self);
-    confess("Metaclass for " . ref($meta) ." for " . $meta->name 
+    confess("Metaclass for " . ref($meta) ." for " . $meta->name
         . " cannot support register_actions.")
         unless $meta->can('get_all_methods_with_attributes');
     my @methods = $meta->get_all_methods_with_attributes;
@@ -330,7 +330,7 @@ sub _parse_LocalRegex_attr {
 
     my $prefix = $self->path_prefix( $c );
     $prefix .= '/' if length( $prefix );
-   
+
     return ( 'Regex', "^${prefix}${value}" );
 }
 
@@ -410,7 +410,7 @@ controller name. For instance controller 'MyApp::Controller::Foo::Bar'
 will be bound to 'foo/bar'. The default Root controller is an example
 of setting namespace to '' (the null string).
 
-=head2 path 
+=head2 path
 
 Sets 'path_prefix', as described below.
 
