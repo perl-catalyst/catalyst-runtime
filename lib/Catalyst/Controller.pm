@@ -174,16 +174,26 @@ around path_prefix => sub {
     return $namespace;
 };
 
-
-sub register_actions {
-    my ( $self, $c ) = @_;
-    my $class = ref $self || $self;
-    #this is still not correct for some reason.
-    my $namespace = $self->action_namespace($c);
+sub get_action_methods {
+    my $self = shift;
     my $meta = find_meta($self);
     confess("Metaclass for " . ref($meta) ." for " . $meta->name 
         . " cannot support register_actions.")
         unless $meta->can('get_all_methods_with_attributes');
+    my @methods = $meta->get_all_methods_with_attributes;
+    return @methods;
+}
+
+sub register_actions {
+    my ( $self, $c ) = @_;
+    $self->register_action_methods( $c, $self->get_action_methods );
+}
+
+sub register_action_methods {
+    my ( $self, $c, @methods ) = @_;
+    my $class = ref $self || $self;
+    #this is still not correct for some reason.
+    my $namespace = $self->action_namespace($c);
     my @methods = $meta->get_all_methods_with_attributes;
 
     foreach my $method (@methods) {
