@@ -194,7 +194,6 @@ sub register_action_methods {
     my $class = ref $self || $self;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
-    my @methods = $meta->get_all_methods_with_attributes;
 
     foreach my $method (@methods) {
         my $name = $method->name;
