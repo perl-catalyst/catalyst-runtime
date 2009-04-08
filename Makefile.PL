@@ -7,7 +7,7 @@ all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'namespace::clean';
 requires 'Scope::Upper' => '0.06';
-requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00800';
+requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
 requires 'Moose' => '0.73';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
@@ -51,9 +51,9 @@ else {
     test_requires('Test::Aggregate', '0.34_01');
 }
 my @force_build_requires_if_author = qw(
-  Test::NoTabs 
-  Test::Pod 
-  Test::Pod::Coverage 
+  Test::NoTabs
+  Test::Pod
+  Test::Pod::Coverage
   Pod::Coverage
 );
 
