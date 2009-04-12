@@ -16,6 +16,36 @@ this document, then please email the Catalyst list to discuss the problem.
 
 =head1 Known backwards compatibility breakages.
 
+=head2 Issues with Class::C3
+
+Catalyst 5.80 uses L<Algorithm::C3> method dispatch order. This is built into
+perl 5.10, and comes via L<Class::C3> for perl 5.8. This replaces L<NEXT>
+with L<Class::C3::Adopt::NEXT>, forcing all components to resolve methods using
+C3, rather than the unpredictable dispatch order of L<NEXT>.
+
+To be able to do this, however, entails that the graph of superclasses for each
+class must be linearizable using the C3 algorithm. Unfortunately, when
+superclasses are being used as mixins, it is easy to get this wrong.
+
+Most common is the case of:
+
+    package Component1; # Note, this is the common case
+    use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
+
+    package Component2; # Accidentally saying it this way round causes fail.
+    use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
+
+    package GoesBang;
+    use base qw/Component1 Component2/;
+
+And the Catalyst plugin most often causing this, is
+L<Catalyst::Plugin::Sesssion::Store::FastMMap> - if you are using this plugin
+and see issues, then please upgrade!
+
+This can, however, be found in your own application - the only solution is to
+go through each base class of the class the error was reported against, until
+you identify the ones in conflict, and resolve them.
+
 =head2 Components which inherit from Moose::Object before Catalyst::Component
 
 Moose components which say:
