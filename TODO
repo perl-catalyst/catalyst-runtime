@@ -5,10 +5,3 @@ Compatibility:
 
    - Need at least good docs on how C3 fail occurs.
 
-Testing:
-
-   - Run more smokes
-
-Profiling:
-
-  - vs 5.70 and optimisation as needed on perl 5.8 (5.10 is already faster!).
