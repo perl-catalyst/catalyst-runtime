@@ -416,21 +416,15 @@ Sets 'path_prefix', as described below.
 
 =head1 METHODS
 
-=head2 $class->new($app, @args)
+=head2 BUILDARGS ($app, @args)
 
-Proxies through to NEXT::new and stashes the application instance as
-$self->_application.
+From L<Catalyst::Component::ApplicationAttribute>, stashes the application
+instance as $self->_application.
 
 =head2 $self->action_for('name')
 
 Returns the Catalyst::Action object (if any) for a given method name
 in this component.
-
-=head2 $self->register_actions($c)
-
-Finds all applicable actions for this component, creates
-Catalyst::Action objects (using $self->create_action) for them and
-registers them with $c->dispatcher.
 
 =head2 $self->action_namespace($c)
 
@@ -446,12 +440,27 @@ Returns the default path prefix for :PathPrefix, :Local, :LocalRegex and
 relative :Path actions in this component. Defaults to the action_namespace or
 can be overridden from the "path" config key.
 
+=head2 $self->register_actions($c)
+
+Finds all applicable actions for this component, creates
+Catalyst::Action objects (using $self->create_action) for them and
+registers them with $c->dispatcher.
+
+=head2 $self->get_action_methods()
+
+Returns a list of L<Moose::Meta::Method> objects, doing the
+L<MooseX::MethodAttributes::Role::Meta::Method> role, which are the set of
+action methods for this package.
+
+=head2 $self->register_action_methods($c, @methods)
+
+Creates action objects for a set of action methods using C< create_action >,
+and registers them with the dispatcher.
+
 =head2 $self->create_action(%args)
 
 Called with a hash of data to be use for construction of a new
 Catalyst::Action (or appropriate sub/alternative class) object.
-
-Primarily designed for the use of register_actions.
 
 =head2 $self->_application
 

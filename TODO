@@ -3,5 +3,3 @@ Compatibility:
    - $self->config should warn as config should only ever be called as a
      class method.
 
-   - Need at least good docs on how C3 fail occurs.
-
