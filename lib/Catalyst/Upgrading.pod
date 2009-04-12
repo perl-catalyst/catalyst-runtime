@@ -263,6 +263,7 @@ deprecated>.
 Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to
 compose the functionality you need outside of the main application name space.
 
-Calling the plugin method at runtime will not be supported past Catalyst 5.81.
+Calling the plugin method will not be supported past Catalyst 5.81.
 
 =cut
+
