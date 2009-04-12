@@ -46,12 +46,6 @@ sub process {
 
 }
 
-=head2 $c->merge_hash_config( $hashref, $hashref )
-
-Merges two hashes together recursively, giving right-hand precedence.
-
-=cut
-
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
