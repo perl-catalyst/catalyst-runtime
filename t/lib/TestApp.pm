@@ -97,6 +97,6 @@ package Catalyst::Plugin::Test::Inline;
 
 use strict;
 
-use base qw/Catalyst::Base Class::Data::Inheritable/;
+use base qw/Class::Data::Inheritable/;
 
 1;

@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use NEXT;
 
-use base qw/Catalyst::Base/;
-
 sub prepare {
     my $class = shift;
     # Note: This use of NEXT is deliberately left here (without a use NEXT)

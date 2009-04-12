@@ -1,7 +1,7 @@
 package TestApp::Controller::Dump;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub default : Action Private {
     my ( $self, $c ) = @_;

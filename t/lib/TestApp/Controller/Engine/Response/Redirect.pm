@@ -1,7 +1,7 @@
 package TestApp::Controller::Engine::Response::Redirect;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub one : Relative {
     my ( $self, $c ) = @_;

@@ -1,7 +1,7 @@
 package TestApp::Controller::Engine::Response::Cookies;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub one : Local {
     my ( $self, $c ) = @_;

@@ -1,7 +1,7 @@
 package TestApp::Controller::Engine::Request::URI;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub default : Private {
     my ( $self, $c ) = @_;

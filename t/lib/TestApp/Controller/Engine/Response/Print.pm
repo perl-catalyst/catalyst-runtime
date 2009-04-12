@@ -1,7 +1,7 @@
 package TestApp::Controller::Engine::Response::Print;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub one :Relative {
     my ( $self, $c ) = @_;

@@ -1,7 +1,7 @@
 package TestApp::Controller::Engine::Request::Uploads;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub slurp : Relative {
     my ( $self, $c ) = @_;

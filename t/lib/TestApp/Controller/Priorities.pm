@@ -1,7 +1,7 @@
 package TestApp::Controller::Priorities;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 #
 #   Regex vs. Local

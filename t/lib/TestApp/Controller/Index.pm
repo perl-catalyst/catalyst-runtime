@@ -1,7 +1,7 @@
 package TestApp::Controller::Index;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 sub index : Private {
     my ( $self, $c ) = @_;

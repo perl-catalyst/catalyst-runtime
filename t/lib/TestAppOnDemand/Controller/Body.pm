@@ -1,7 +1,7 @@
 package TestAppOnDemand::Controller::Body;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 
 use Data::Dump ();
 
