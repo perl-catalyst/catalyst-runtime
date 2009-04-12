@@ -23,6 +23,8 @@
           - Test for this (t0m)
         - Kill Class::C3::Adopt::NEXT warnings for the Catalyst:: namespace
           in production versions (t0m)
+        - Tidy up Catalyst::ClassData to ensure that all components get
+          the correct metaclass (t0m)
         - Make MyApp.pm restartable by unsetting setup_finished in
           the restarter process (t0m)
         - Non-naive implementation of making mutable on restart using

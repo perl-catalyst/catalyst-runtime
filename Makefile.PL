@@ -9,6 +9,7 @@ requires 'namespace::clean';
 requires 'Scope::Upper' => '0.06';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
 requires 'Moose' => '0.73';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.05';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'Class::MOP' => '0.79';

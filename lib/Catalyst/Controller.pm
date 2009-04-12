@@ -5,8 +5,7 @@ use Moose::Util qw/find_meta/;
 
 use namespace::clean -except => 'meta';
 
-# Note - Must be done at compile time due to attributes (::AttrContainer)
-BEGIN { extends qw/Catalyst::Component Catalyst::AttrContainer/; }
+BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
 
 use Catalyst::Exception;
 use Catalyst::Utils;
@@ -53,9 +52,9 @@ Catalyst::Controller - Catalyst Controller base class
   package MyApp::Controller::Search
   use base qw/Catalyst::Controller/;
 
-  sub foo : Local { 
+  sub foo : Local {
     my ($self,$c,@args) = @_;
-    ... 
+    ...
   } # Dispatches to /search/foo
 
 =head1 DESCRIPTION
@@ -128,7 +127,7 @@ sub action_for {
     return $app->dispatcher->get_action($name, $self->action_namespace);
 }
 
-#my opinion is that this whole sub really should be a builder method, not 
+#my opinion is that this whole sub really should be a builder method, not
 #something that happens on every call. Anyone else disagree?? -- groditi
 ## -- apparently this is all just waiting for app/ctx split
 around action_namespace => sub {
@@ -175,41 +174,43 @@ around path_prefix => sub {
     return $namespace;
 };
 
+sub get_action_methods {
+    my $self = shift;
+    my $meta = find_meta($self);
+    confess("Metaclass for " . ref($meta) ." for " . $meta->name
+        . " cannot support register_actions.")
+        unless $meta->can('get_all_methods_with_attributes');
+    my @methods = $meta->get_all_methods_with_attributes;
+    return @methods;
+}
 
 sub register_actions {
     my ( $self, $c ) = @_;
+    $self->register_action_methods( $c, $self->get_action_methods );
+}
+
+sub register_action_methods {
+    my ( $self, $c, @methods ) = @_;
     my $class = ref $self || $self;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
-    my $meta = find_meta($self);
-    my %methods = map { $_->body => $_->name }
-            $meta->get_all_methods;
 
-    # Advanced inheritance support for plugins and the like
-    #moose todo: migrate to eliminate CDI compat
-    my @action_cache;
-    for my $isa ( $meta->superclasses, $class ) {
-        if(my $coderef = $isa->can('_action_cache')){
-            push(@action_cache, @{ $isa->$coderef });
-        }
-    }
-
-    foreach my $cache (@action_cache) {
-        my $code   = $cache->[0];
-        my $method = delete $methods{$code}; # avoid dupe registers
-        next unless $method;
-        my $attrs = $self->_parse_attrs( $c, $method, @{ $cache->[1] } );
+    foreach my $method (@methods) {
+        my $name = $method->name;
+        my $attributes = $method->attributes;
+        next unless $attributes;
+        my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
             $c->log->debug( 'Bad action definition "'
-                  . join( ' ', @{ $cache->[1] } )
-                  . qq/" for "$class->$method"/ )
+                  . join( ' ', @{ $attributes } )
+                  . qq/" for "$class->$name"/ )
               if $c->debug;
             next;
         }
-        my $reverse = $namespace ? "${namespace}/${method}" : $method;
+        my $reverse = $namespace ? "${namespace}/${name}" : $name;
         my $action = $self->create_action(
-            name       => $method,
-            code       => $code,
+            name       => $name,
+            code       => $method->body,
             reverse    => $reverse,
             namespace  => $namespace,
             class      => $class,
@@ -329,7 +330,7 @@ sub _parse_LocalRegex_attr {
 
     my $prefix = $self->path_prefix( $c );
     $prefix .= '/' if length( $prefix );
-   
+
     return ( 'Regex', "^${prefix}${value}" );
 }
 
@@ -409,7 +410,7 @@ controller name. For instance controller 'MyApp::Controller::Foo::Bar'
 will be bound to 'foo/bar'. The default Root controller is an example
 of setting namespace to '' (the null string).
 
-=head2 path 
+=head2 path
 
 Sets 'path_prefix', as described below.
 
