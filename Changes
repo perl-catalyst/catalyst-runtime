@@ -48,6 +48,19 @@
         - Make Catalyst::ClassData compatible with the latest Class::MOP::Class
           changes. Also depend on the latest Class::MOP. (rafl)
         - Add $c->uri_for_action method. (hdp)
+        - Don't stringify the meta method. Use its name instead. (rafl)
+        - Use MooseX::MethodAttributes::Inheritable to contain action
+          attributes. This means that attributes are now represented in the MOP,
+          allowing method modifiers on actions to work as expected. (rafl)
+        - Provide a reasonable API in Catalyst::Controller for working with
+          and registering actions, allowing a controller sub-class to replace
+          subroutine attributes for action declerations with an alternate
+          syntax. (rafl/hdp)
+        - Instantiate correct sub-class of Moose::Meta::Class for non-Moose
+          components where Catalyst forces the creation of a metaclass instance.
+          This is more correct, and avoids metaclass incompatibility in complex
+          cases (t0m)
+          - Tests for this (t0m)
 
 5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
