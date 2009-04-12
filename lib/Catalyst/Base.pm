@@ -1,12 +1,13 @@
 package Catalyst::Base;
 use Moose;
 BEGIN { extends 'Catalyst::Controller' }
-no Moose;
 
 after 'BUILD' => sub {
     my $self = shift;
     warn(ref($self) . " is using the deprecated Catalyst::Base, update your application as this will be removed in the next major release");
 };
+
+no Moose;
 
 1;
 
