@@ -32,11 +32,13 @@ sub uri_with : Local {
     my ( $self, $c ) = @_;
 
     # change the current uri
-    my $uri   = $c->req->uri_with( { b => 1 } );
+    my $uri   = $c->req->uri_with( { b => 1, c => undef } );
     my %query = $uri->query_form;
     
     $c->res->header( 'X-Catalyst-Param-a' => $query{ a } );
     $c->res->header( 'X-Catalyst-Param-b' => $query{ b } );
+    $c->res->header( 'X-Catalyst-Param-c' => exists($query{ c }) ? $query{ c } : '--notexists--' );
+    $c->res->header( 'X-Catalyst-query' => $uri->query);
     
     $c->forward('TestApp::View::Dump::Request');
 }

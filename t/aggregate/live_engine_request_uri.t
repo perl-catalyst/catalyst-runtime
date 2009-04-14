@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 68;
+use Test::More tests => 74;
 use Catalyst::Test 'TestApp';
 use Catalyst::Request;
 
@@ -79,6 +79,8 @@ SKIP:
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( !defined $response->header( 'X-Catalyst-Param-a' ), 'param "a" ok' );
     is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
+    is( $response->header( 'X-Catalyst-Param-c' ), '--notexists--', 'param "c" ok' );
+    unlike($response->header ('X-Catalyst-query'), qr/c=/, 'no c in return');
 }
 
 # test that uri_with adds params (and preserves)
@@ -87,14 +89,18 @@ SKIP:
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
     is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
+    is( $response->header( 'X-Catalyst-Param-c' ), '--notexists--', 'param "c" ok' );
+    unlike($response->header ('X-Catalyst-query'), qr/c=/, 'no c in return');
 }
 
 # test that uri_with replaces params (and preserves)
 {
-    ok( my $response = request('http://localhost/engine/request/uri/uri_with?a=1&b=2'), 'Request' );
+    ok( my $response = request('http://localhost/engine/request/uri/uri_with?a=1&b=2&c=3'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->header( 'X-Catalyst-Param-a' ), '1', 'param "a" ok' );
     is( $response->header( 'X-Catalyst-Param-b' ), '1', 'param "b" ok' );
+    is( $response->header( 'X-Catalyst-Param-c' ), '--notexists--', 'param "c" deleted ok' );
+    unlike($response->header ('X-Catalyst-query'), qr/c=/, 'no c in return');
 }
 
 # test that uri_with replaces params (and preserves)

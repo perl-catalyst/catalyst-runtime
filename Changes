@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Test uri_with clears query params when they are set to undef 
+          (Ian Wells)
+
 5.8000_07 2009-04-12 13:37
         - Add the Catalyst::Dispatcher->dispatch_type method (ash)
         - Throw an exception rather than loading an app if an action
