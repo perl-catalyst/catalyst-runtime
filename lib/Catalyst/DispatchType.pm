@@ -14,7 +14,12 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-This is an abstract base class for Dispatch Types. 
+This is an abstract base class for Dispatch Types.
+
+From a code perspective, dispatch types are used to find which actions
+to call for a given request URL.  Website authors will typically work
+with them via subroutine names attributes; a description of dispatch
+at the attribute/URL level is given in L<Catalyst::Manual::Intro>.
 
 =head1 METHODS
 

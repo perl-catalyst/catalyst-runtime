@@ -39,6 +39,8 @@ Catalyst::DispatchType::Chained - Path Part DispatchType
 
 =head1 SYNOPSIS
 
+Path part matching, allowing several actions to sequentially take care of processing a request:
+
   #   root action - captures one argument after it
   sub foo_setup : Chained('/') PathPart('foo') CaptureArgs(1) {
       my ( $self, $c, $foo_arg ) = @_;
@@ -53,7 +55,16 @@ Catalyst::DispatchType::Chained - Path Part DispatchType
 
 =head1 DESCRIPTION
 
-See L</USAGE>.
+Dispatch type managing default behaviour.  For more information on
+dispatch types, see:
+
+=over 4
+
+=item * L<Catalyst::Manual::Intro> for how they affect website authors
+
+=item * L<Catalyst::DispatchType> for implementation information.
+
+=back
 
 =head1 METHODS
 

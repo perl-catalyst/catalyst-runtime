@@ -10,9 +10,20 @@ Catalyst::DispatchType::Index - Index DispatchType
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+See L<Catalyst::DispatchType>.
 
 =head1 DESCRIPTION
+
+Dispatch type managing behaviour for index pages.  For more information on
+dispatch types, see:
+
+=over 4
+
+=item * L<Catalyst::Manual::Intro> for how they affect website authors
+
+=item * L<Catalyst::DispatchType> for implementation information.
+
+=back
 
 =head1 METHODS
 
