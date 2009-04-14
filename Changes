@@ -63,6 +63,7 @@
           cases (t0m)
           - Tests for this (t0m)
         - Use of deprecated Catalyst::Base now warns. (t0m)
+        - Add uri_with tests (gphat)
 
 5.8000_06 2009-02-04 21:00
         - Disallow writing to config after setup (rafl)
