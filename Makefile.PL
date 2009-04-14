@@ -107,6 +107,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Devel'                  => '0.09',
     'Catalyst::Plugin::SmartURI'       => '0.029',
     'CatalystX::CRUD'                  => '0.37',
     'Catalyst::Action::RenderView'     => '0.07',

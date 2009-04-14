@@ -2,6 +2,8 @@
 
         - Test uri_with clears query params when they are set to undef 
           (Ian Wells)
+        - Complain about old Catalyst::Devel versions which generated
+          ->setup(qw/-Debug... etc as this is disrecommended (t0m)
 
 5.8000_07 2009-04-12 13:37
         - Add the Catalyst::Dispatcher->dispatch_type method (ash)
