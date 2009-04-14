@@ -60,7 +60,7 @@ dispatch types, see:
 
 =over 4
 
-=item * L<Catalyst::Manual::Intro> for how they affect website authors
+=item * L<Catalyst::Manual::Intro> for how they affect application authors
 
 =item * L<Catalyst::DispatchType> for implementation information.
 
