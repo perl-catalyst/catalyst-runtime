@@ -2181,11 +2181,15 @@ sub setup_component {
         );
     }
 
-    Catalyst::Exception->throw(
-        message =>
-        qq/Couldn't instantiate component "$component", "COMPONENT() didn't return an object-like value"/
-    ) unless blessed($instance);
-
+    unless (blessed $instance) {
+        my $metaclass = Moose::Util::find_meta($component);
+        my $method_meta = $metaclass->find_method_by_name('COMPONENT');
+        my $component_method_from = $method_meta->associated_metaclass->name;
+        Catalyst::Exception->throw(
+            message =>
+            qq/Couldn't instantiate component "$component", COMPONENT() method (from $component_method_from) didn't return an object-like value./
+        );
+    }
     return $instance;
 }
 
