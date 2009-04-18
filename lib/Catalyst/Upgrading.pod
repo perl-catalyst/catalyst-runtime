@@ -82,10 +82,18 @@ compatible way is:
     BEGIN { extends 'Catalyst::Component' }; # Or ::Controller, or whatever
 
 Note that the C< extends > declaration needs to occur in a begin block for
-L<attributes> to operate correctly. You also don't get the L<Moose::Object>
-constructor, and therefore attribute initialization will not work as normally
-expected. If you want to use Moose attributes, then they need to be made lazy
-to correctly initialize.
+L<attributes> to operate correctly.
+
+You also don't get the L<Moose::Object> constructor, and therefore attribute 
+initialization will not work as normally expected. If you want to use Moose 
+attributes, then they need to be made lazy to correctly initialize.
+
+Note that this only applies if your component needs to maintain component
+backwards compatibility for Catalyst versions before 5.71001 - in 5.71001
+attributes work as expected, and the BUILD method is called normally
+(although BUILDARGS is not). 
+
+If you depend on Catalyst 5.8, then B<all> Moose features work as expected.
 
 =head3 use Moose in MyApp
 
