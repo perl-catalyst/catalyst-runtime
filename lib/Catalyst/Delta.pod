@@ -1,6 +1,6 @@
 =head1 Deltachanges from 5.7 to 5.8
 
-This is an overview of the user visible changes in 5.8
+This is an overview of the user visible changes in 5.8.
 
 =head2 Deprecations
 
@@ -21,13 +21,21 @@ Below is a brief list of features which have been deprecated in this release:
 
 =item __PACKAGE__->mk_accessors() is supported for backward compatibility only, use Moose attributes instead in new code.
 
+=item Use of Catalyst::Base now warns
+
 =back
 
 =head2 New features
 
 =head3 Dispatcher
 
-Fix forwarding to Catalyst::Action objects (Rafael Kitover).
+=over
+
+=item Fix forwarding to Catalyst::Action objects.
+
+=item Add the dispatch_type method
+
+=back
 
 =head3 Restarter
 
@@ -36,17 +44,13 @@ immutable Moose classes, and also to optionally use
 L<B::Hooks::OP::Check::StashChange> to handle more complex application layouts
 correctly.
 
-=head3 $c->uri_for_action method. (hdp)
+=head3 $c->uri_for_action method.
 
-A private path to the Catalyst action you want to create a URI for.
-This is a shortcut for calling C<< $c->dispatcher->get_action_by_path($path) >>
-and passing the resulting C<$action> and the remaining arguments to 
-C<< $c->uri_for >>.
+Give a private path to the Catalyst action you want to create a URI for.
 
 =head3 Logging
 
-Log levels have been madeadditive, and add documentation to the setup_log 
-method.
+Log levels have been made additive.
 
 =head3 L<Catalyst::Test>
 
@@ -54,18 +58,25 @@ method.
 
 =item Change to use L<Sub::Exporter>.
 
-=item Port to L<Moose>.
-
 =item Support mocking multiple virtual hosts
 
 =item New methods like action_ok and action_redirect to write more compact tests
 
 =back
 
-=head3 $c->response->print()
+=head3 Catalyst::Response
 
-Prints @data to the output stream, separated by $,.  This lets you pass
-the response object to functions that want to write to an L<IO::Handle>.
+=over
+
+=item *
+
+New print method which prints @data to the output stream, separated by $,.  
+This lets you pass the response object to functions that want to write to an 
+L<IO::Handle>.
+
+=item *
+
+Added code method as an alias for C<< $res->status >>
 
 =head2 Consequences of the Moose backend
 
@@ -73,9 +84,20 @@ the response object to functions that want to write to an L<IO::Handle>.
 
 =item *
 
-L<MooseX::MethodAttributes::Inheritable> used to contain action
-attributes. This means that attributes are now represented in the MOP,
-allowing method modifiers on actions to work as expected.
+Components are fully compatible with Moose, and all Moose features, such as
+method modifiers, attributes, roles, BUILD and BUILDARGS methods are fully
+supported and may be used in components and applications.
+
+=item *
+
+Many reusable extensions which would previously have been plugins or base 
+classes are better implemented as Moose roles.
+
+=item *
+
+L<MooseX::MethodAttributes::Inheritable> is used to contain action
+attributes. This means that attributes are represented in the MOP, and
+decouples action creation from attributes.
 
 =item *
 
@@ -88,12 +110,36 @@ syntax.
 
 Refactored capturing of $app from L<Catalyst::Controller> into
 L<Catalyst::Component::ApplicationAttribute> for easier reuse in other
-components
+components.
 
 =item *
 
-Your application is forced to become immutable after the setup
-method is called.
+Your application class is forced to become immutable at the end of compilation.
+
+=back
+
+=head2 Bug fixes
+
+=over
+
+=item *
+
+Don't ignore SIGCHLD while handling requests with the dev server, so that
+system() and other ways of creating child processes work as expected.
+
+=item *
+
+Fixes for FastCGI when used with IIS 6.0
+
+=item *
+
+Fix a bug in uri_for which could cause it to generate paths with multiple 
+slashes in them.
+
+=item *
+
+Fix a bug in Catalyst::Stats, stopping garbage being inserted into
+the stats if a user calls begin => but no end
 
 =back
 
