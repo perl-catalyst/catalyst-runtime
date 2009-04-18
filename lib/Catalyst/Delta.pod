@@ -1,6 +1,10 @@
-=head1 Delta changes from 5.7 to 5.8
+=head1 NAME
 
-This is an overview of the user visible changes in 5.8.
+Catalyst::Delta - Overview of changes between versions of Catalyst
+
+=head1 DESCRIPTION
+
+This is an overview of the user-visible changes to Catalyst in version 5.8.
 
 =head2 Deprecations
 

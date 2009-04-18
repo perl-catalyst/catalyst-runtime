@@ -1,3 +1,7 @@
+=head1 NAME
+
+Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
+
 =head1 Upgrading to Catalyst 5.80
 
 Most applications and plugins should run unaltered on Catalyst 5.80.
@@ -39,7 +43,7 @@ Most common is the case of:
     use base qw/Component1 Component2/;
 
 And the Catalyst plugin most often causing this, is
-L<Catalyst::Plugin::Sesssion::Store::FastMMap> - if you are using this plugin
+L<Catalyst::Plugin::Sesssion::Store::FastMmap> - if you are using this plugin
 and see issues, then please upgrade!
 
 This can, however, be found in your own application - the only solution is to
