@@ -4,10 +4,11 @@ This is an overview of the user visible changes in 5.8
 
 =head2 Deprecations
 
-::[MVC]:: style naming scheme has been deprecated and will warn
+=over
 
+=item ::[MVC]:: style naming scheme has been deprecated and will warn
 
- - Use Class::C3::Adopt::NEXT (rafl)
+=item Use Class::C3::Adopt::NEXT (rafl)
 
 Catalyst 5.80 uses L<Algorithm::C3> method dispatch order. This is built into
 perl 5.10 (new pragma mro), and comes via L<Class::C3> for perl 5.8. This
@@ -17,6 +18,10 @@ L<NEXT>. Please "use MRO::Compat" in both perl 5.8 and perl 5.10 to activate
 this feature.
 - Disallow writing to config after setup and disallow calling setup more 
 than once (rafl)
+
+=item Dispatcher methods
+
+=back
 
 =head2 Dispatcher
 
@@ -43,22 +48,35 @@ method.
 
 =head2 Consequences of the Moose backend
 
-        - Use MooseX::MethodAttributes::Inheritable to contain action
-          attributes. This means that attributes are now represented in the MOP,
-          allowing method modifiers on actions to work as expected. (rafl)
-        - Provide a reasonable API in Catalyst::Controller for working with
-          and registering actions, allowing a controller sub-class to replace
-          subroutine attributes for action declerations with an alternate
-          syntax. (rafl/hdp)
-        - Refactor capturing of $app from Catalyst::Controller into
-          Catalyst::Component::ApplicationAttribute for easier reuse in other
-          components (Florian Ragwitz)
-        - Make MyApp immutable at the end of the scope after the setup
-          method is called, fixing issues with plugins which have their 
-          own new methods by inlining a constructor on MyApp (t0m)        
-        - Instantiate correct sub-class of Moose::Meta::Class for non-Moose
-          components where Catalyst forces the creation of a metaclass instance.
- 
+=over
+
+=item *
+
+Use MooseX::MethodAttributes::Inheritable to contain action
+attributes. This means that attributes are now represented in the MOP,
+allowing method modifiers on actions to work as expected. (rafl)
+
+=item *
+
+Provide a reasonable API in Catalyst::Controller for working with
+and registering actions, allowing a controller sub-class to replace
+subroutine attributes for action declerations with an alternate
+syntax. (rafl/hdp)
+
+=item *
+
+Refactor capturing of $app from Catalyst::Controller into
+Catalyst::Component::ApplicationAttribute for easier reuse in other
+components (Florian Ragwitz)
+
+=item *
+
+Make MyApp immutable at the end of the scope after the setup
+method is called, fixing issues with plugins which have their 
+own new methods by inlining a constructor on MyApp (t0m)        
+
+=back
+
 =head2 Test Suite
 
         - Change Catalyst::Test to use Sub::Exporter (Florian Ragwitz).
