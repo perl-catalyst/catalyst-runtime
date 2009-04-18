@@ -19,30 +19,53 @@ Below is a brief list of features which have been deprecated in this release:
 
 =item MyApp->plugin method is deprecated, use L<Catalyst::Model::Adaptor> instead.
 
+=item __PACKAGE__->mk_accessors() is supported for backward compatibility only, use Moose attributes instead in new code.
+
 =back
 
-=head2 Dispatcher
+=head2 New features
+
+=head3 Dispatcher
 
 Fix forwarding to Catalyst::Action objects (Rafael Kitover).
 
-=head2 Restarter
+=head3 Restarter
 
 The development server restarter has been improved to be compatible with
 immutable Moose classes, and also to optionally use 
 L<B::Hooks::OP::Check::StashChange> to handle more complex application layouts
 correctly.
 
-=head2 $c->uri_for_action method. (hdp)
+=head3 $c->uri_for_action method. (hdp)
 
 A private path to the Catalyst action you want to create a URI for.
 This is a shortcut for calling C<< $c->dispatcher->get_action_by_path($path) >>
 and passing the resulting C<$action> and the remaining arguments to 
 C<< $c->uri_for >>.
 
-=head2 Logging
+=head3 Logging
 
 Log levels have been madeadditive, and add documentation to the setup_log 
 method.
+
+=head3 L<Catalyst::Test>
+
+=over
+
+=item Change to use L<Sub::Exporter>.
+
+=item Port to L<Moose>.
+
+=item Support mocking multiple virtual hosts
+
+=item New methods like action_ok and action_redirect to write more compact tests
+
+=back
+
+=head3 $c->response->print()
+
+Prints @data to the output stream, separated by $,.  This lets you pass
+the response object to functions that want to write to an L<IO::Handle>.
 
 =head2 Consequences of the Moose backend
 
@@ -50,41 +73,27 @@ method.
 
 =item *
 
-Use MooseX::MethodAttributes::Inheritable to contain action
+L<MooseX::MethodAttributes::Inheritable> used to contain action
 attributes. This means that attributes are now represented in the MOP,
-allowing method modifiers on actions to work as expected. (rafl)
+allowing method modifiers on actions to work as expected.
 
 =item *
 
-Provide a reasonable API in Catalyst::Controller for working with
+There is a reasonable API in Catalyst::Controller for working with
 and registering actions, allowing a controller sub-class to replace
 subroutine attributes for action declerations with an alternate
-syntax. (rafl/hdp)
+syntax.
 
 =item *
 
-Refactor capturing of $app from Catalyst::Controller into
-Catalyst::Component::ApplicationAttribute for easier reuse in other
-components (Florian Ragwitz)
+Refactored capturing of $app from L<Catalyst::Controller> into
+L<Catalyst::Component::ApplicationAttribute> for easier reuse in other
+components
 
 =item *
 
-Make MyApp immutable at the end of the scope after the setup
-method is called, fixing issues with plugins which have their 
-own new methods by inlining a constructor on MyApp (t0m)        
+Your application is forced to become immutable after the setup
+method is called.
 
 =back
-
-=head2 Test Suite
-
-        - Change Catalyst::Test to use Sub::Exporter (Florian Ragwitz).
-        - Port to Moose
-        - Support mocking virtualhosts in test suite ()
-        - Add methods like action_ok and action_redirect to write
-          more compact tests
-
-=head2 Catalyst::Response->print()
-
-Prints @data to the output stream, separated by $,.  This lets you pass
-the response object to functions that want to write to an L<IO::Handle>.
 
