@@ -57,7 +57,7 @@ Moose components which say:
 to use the constructor provided by Moose, whilst working (if you do some hacks
 with the C< BUILDARGS > method), will not work with Catalyst 5.80 as
 C<Catalyst::Component> inherits from C<Moose::Object>, and so C< @ISA > fails
-to linearise.
+to linearize.
 
 The fix for this is to not inherit directly from C<Moose::Object>
 yourself. Having components which do not inherit their constructor from
@@ -132,7 +132,7 @@ to use L<Sub::Name> to name the subroutine. Example:
     *$full_method_name = subname $full_method_name, sub { ... };
 
 Additionally, you can take advantage of Catalysts use of L<Class::MOP> and
-install the closure using the appropriate metaclass. Example:
+install the closure using the appropriate meta class. Example:
 
     use Class::MOP;
     my $metaclass = Moose::Meta::Class->initialize($package_name);
@@ -140,7 +140,7 @@ install the closure using the appropriate metaclass. Example:
 
 =head2 Hooking into application setup
 
-To execute code during application startup the following snippet in MyApp.pm
+To execute code during application start-up the following snippet in MyApp.pm
 used to work:
 
     sub setup {
@@ -300,7 +300,7 @@ to B<any> of the packages defined within that component.
 
 =head2 $c->plugin method
 
-Calling the plugin method is deprecated, and calling it at runtime is B<highly
+Calling the plugin method is deprecated, and calling it at run time is B<highly
 deprecated>.
 
 Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to

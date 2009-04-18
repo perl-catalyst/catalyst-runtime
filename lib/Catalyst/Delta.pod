@@ -1,4 +1,4 @@
-=head1 Deltachanges from 5.7 to 5.8
+=head1 Delta changes from 5.7 to 5.8
 
 This is an overview of the user visible changes in 5.8.
 
@@ -78,7 +78,7 @@ L<IO::Handle>.
 
 Added code method as an alias for C<< $res->status >>
 
-=head2 Consequences of the Moose backend
+=head2 Consequences of the Moose back end
 
 =over
 
@@ -103,7 +103,7 @@ decouples action creation from attributes.
 
 There is a reasonable API in Catalyst::Controller for working with
 and registering actions, allowing a controller sub-class to replace
-subroutine attributes for action declerations with an alternate
+subroutine attributes for action declarations with an alternate
 syntax.
 
 =item *
@@ -124,7 +124,7 @@ Your application class is forced to become immutable at the end of compilation.
 
 =item *
 
-Don't ignore SIGCHLD while handling requests with the dev server, so that
+Don't ignore SIGCHLD while handling requests with the development server, so that
 system() and other ways of creating child processes work as expected.
 
 =item *
