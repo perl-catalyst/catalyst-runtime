@@ -78,6 +78,8 @@ L<IO::Handle>.
 
 Added code method as an alias for C<< $res->status >>
 
+=back
+
 =head2 Consequences of the Moose back end
 
 =over
