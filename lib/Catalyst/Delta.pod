@@ -4,22 +4,20 @@ This is an overview of the user visible changes in 5.8
 
 =head2 Deprecations
 
+Please see L<Catalyst::Upgrading> for a full description of how changes in the
+framework may affect your application.
+
+Below is a brief list of features which have been deprecated in this release:
+
 =over
 
 =item ::[MVC]:: style naming scheme has been deprecated and will warn
 
-=item Use Class::C3::Adopt::NEXT (rafl)
+=item NEXT is deprecated for all applications and components, use MRO::Compat
 
-Catalyst 5.80 uses L<Algorithm::C3> method dispatch order. This is built into
-perl 5.10 (new pragma mro), and comes via L<Class::C3> for perl 5.8. This
-replaces L<NEXT> with L<Class::C3::Adopt::NEXT>, forcing all components to
-resolve methods using C3, rather than the unpredictable dispatch order of
-L<NEXT>. Please "use MRO::Compat" in both perl 5.8 and perl 5.10 to activate
-this feature.
-- Disallow writing to config after setup and disallow calling setup more 
-than once (rafl)
+=item Dispatcher methods which are an implementation detail made private, public versions now warn.
 
-=item Dispatcher methods
+=item MyApp->plugin method is deprecated, use L<Catalyst::Model::Adaptor> instead.
 
 =back
 
