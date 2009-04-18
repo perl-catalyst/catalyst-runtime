@@ -1,6 +1,5 @@
 =head1 Deltachanges from 5.7 to 5.8
 
-
 This is an overview of the user visible changes in 5.8
 
 =head2 Deprecations
@@ -21,33 +20,26 @@ than once (rafl)
 
 =head2 Dispatcher
 
-- visit and go now takes CaptureArgs
+Fix forwarding to Catalyst::Action objects (Rafael Kitover).
 
-        - Change the $c->visit and $c->go methods to optionally take
-          CaptureArgs, making them useful to call ActionChains with (t0m)
+=head2 Restarter
 
-        - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
+The development server restarter has been improved to be compatible with
+immutable Moose classes, and also to optionally use 
+L<B::Hooks::OP::Check::StashChange> to handle more complex application layouts
+correctly.
 
-=head2 restarter
-
-- Non-naive implementation of making mutable on restart using
-  B::Hooks::OP::Check::StashChange if installed (t0m)
-  For a restart the immutable Moose-objects need to turn back to mutable.
-  With L<B::Hooks::OP::Check::StashChange> installed this will be done.
-
-= head2 $c->uri_for_action method. (hdp)
+=head2 $c->uri_for_action method. (hdp)
 
 A private path to the Catalyst action you want to create a URI for.
 This is a shortcut for calling C<< $c->dispatcher->get_action_by_path($path) >>
 and passing the resulting C<$action> and the remaining arguments to 
 C<< $c->uri_for >>.
 
-
 =head2 Logging
 
-        - Make log levels additive, and add documentation and tests
-          for the setup_log method, which previously had none.
-          Sewn together by t0m from two patches provided by David E. Wheeler
+Log levels have been madeadditive, and add documentation to the setup_log 
+method.
 
 =head2 Consequences of the Moose backend
 
