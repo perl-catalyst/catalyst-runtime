@@ -1,9 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Don't inline the constructor for Catalyst::Log to avoid a
+          warning on recent Moose versions.
         - Add delta documentation
         - Clean up recursion errors
         - Extra cross links in dispatch types POD (Ian Wells)
-        - Test uri_with clears query params when they are set to undef 
+        - Test uri_with clears query params when they are set to undef
           (Ian Wells)
         - Complain about old Catalyst::Devel versions which generated
           ->setup(qw/-Debug... etc. as this is not recommended (t0m)
