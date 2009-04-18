@@ -1480,6 +1480,7 @@ sub execute {
 
     push( @{ $c->stack }, $code );
     
+    no warnings 'recursion';
     eval { $c->state( $code->execute( $class, $c, @{ $c->req->args } ) || 0 ) };
 
     $c->_stats_finish_execute( $stats_info ) if $c->use_stats and $stats_info;

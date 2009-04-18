@@ -15,6 +15,7 @@ use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 
+
 # Refactoring note:
 # do these belong as package vars or should we build these via a builder method?
 # See Catalyst-Plugin-Server for them being added to, which should be much less ugly.
@@ -236,6 +237,7 @@ Documented in L<Catalyst>
 
 sub forward {
     my $self = shift;
+    no warnings 'recursion';
     $self->_do_forward(forward => @_);
 }
 
@@ -253,9 +255,9 @@ sub _do_forward {
         return 0;
     }
 
-    no warnings 'recursion';
 
     local $c->request->{arguments} = $args;
+    no warnings 'recursion';
     $action->dispatch( $c );
 
     return $c->state;
