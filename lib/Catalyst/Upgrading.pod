@@ -43,7 +43,7 @@ Most common is the case of:
     use base qw/Component1 Component2/;
 
 And the Catalyst plugin most often causing this, is
-L<Catalyst::Plugin::Sesssion::Store::FastMmap> - if you are using this plugin
+L<Catalyst::Plugin::Session::Store::FastMmap> - if you are using this plugin
 and see issues, then please upgrade!
 
 This can, however, be found in your own application - the only solution is to
@@ -287,7 +287,7 @@ should change to using the public API, or, if you do not feel the public API
 adequately supports your use-case, please email the development list to
 discuss what API features you need so that you can be appropriately supported.
 
-=head2 Class naming to packages defined does not correspond.
+=head2 Class files with names that don't correspond to the packages they define
 
 In this version of Catalyst, if a component is loaded from disk, but no
 symbols are defined in that component's name space after it is loaded, this
