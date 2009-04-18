@@ -1,21 +1,55 @@
 =head1 Deltachanges from 5.7 to 5.8
 
-        - Add the Catalyst::Dispatcher->dispatch_type method (ash)
+
+This is an overview of the user visible changes in 5.8
+
+=head2 Deprecations
+
+::[MVC]:: style naming scheme has been deprecated and will warn
+
+
+ - Use Class::C3::Adopt::NEXT (rafl)
+
+Catalyst 5.80 uses L<Algorithm::C3> method dispatch order. This is built into
+perl 5.10 (new pragma mro), and comes via L<Class::C3> for perl 5.8. This
+replaces L<NEXT> with L<Class::C3::Adopt::NEXT>, forcing all components to
+resolve methods using C3, rather than the unpredictable dispatch order of
+L<NEXT>. Please "use MRO::Compat" in both perl 5.8 and perl 5.10 to activate
+this feature.
+- Disallow writing to config after setup and disallow calling setup more 
+than once (rafl)
+
+=head2 Dispatcher
+
+- visit and go now takes CaptureArgs
+
         - Change the $c->visit and $c->go methods to optionally take
           CaptureArgs, making them useful to call ActionChains with (t0m)
-        - Added Catalyst::Test::ctx_request to be able to inspect
-          the context object after a request is made (Jos Boumans)
-        - Add a warning for the old ::[MVC]:: style naming scheme (t0m)
-        - Non-naive implementation of making mutable on restart using
-          B::Hooks::OP::Check::StashChange if installed (t0m)
-For a restart the immutable Moose-objects need to turn back to mutable.
-With L<B::Hooks::OP::Check::StashChange> installed this will be done.
 
-        - Add $c->uri_for_action method. (hdp)
+        - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
+
+=head2 restarter
+
+- Non-naive implementation of making mutable on restart using
+  B::Hooks::OP::Check::StashChange if installed (t0m)
+  For a restart the immutable Moose-objects need to turn back to mutable.
+  With L<B::Hooks::OP::Check::StashChange> installed this will be done.
+
+= head2 $c->uri_for_action method. (hdp)
+
 A private path to the Catalyst action you want to create a URI for.
 This is a shortcut for calling C<< $c->dispatcher->get_action_by_path($path) >>
 and passing the resulting C<$action> and the remaining arguments to 
 C<< $c->uri_for >>.
+
+
+=head2 Logging
+
+        - Make log levels additive, and add documentation and tests
+          for the setup_log method, which previously had none.
+          Sewn together by t0m from two patches provided by David E. Wheeler
+
+=head2 Consequences of the Moose backend
 
         - Use MooseX::MethodAttributes::Inheritable to contain action
           attributes. This means that attributes are now represented in the MOP,
@@ -24,41 +58,25 @@ C<< $c->uri_for >>.
           and registering actions, allowing a controller sub-class to replace
           subroutine attributes for action declerations with an alternate
           syntax. (rafl/hdp)
-        - Disallow writing to config after setup and
-          disallow calling setup more than once (rafl)
         - Refactor capturing of $app from Catalyst::Controller into
           Catalyst::Component::ApplicationAttribute for easier reuse in other
           components (Florian Ragwitz)
         - Make MyApp immutable at the end of the scope after the setup
           method is called, fixing issues with plugins which have their 
-          own new methods by inlining a constructor on MyApp (t0m)
-        - Make log levels additive, and add documentation and tests
-          for the setup_log method, which previously had none.
-          Sewn together by t0m from two patches provided by David E. Wheeler
-        - Switch an around 'new' in Catalyst::Controller to a BUILDARGS
-          method as it's much neater and more obvious what is going on (t0m)
-        - Use a predicate to avoid recursion in cases where the uri
-          method is overridden by a plugin, and calls the base method,
-          for example Catalyst::Plugin::SmartURI (t0m)
-        - Use Class::C3::Adopt::NEXT (rafl)
-Catalyst 5.80 uses L<Algorithm::C3> method dispatch order. This is built into
-perl 5.10 (new pragma mro), and comes via L<Class::C3> for perl 5.8. This
-replaces L<NEXT> with L<Class::C3::Adopt::NEXT>, forcing all components to
-resolve methods using C3, rather than the unpredictable dispatch order of
-L<NEXT>. Please "use MRO::Compat" in both perl 5.8 and perl 5.10 to activate
-this feature.
+          own new methods by inlining a constructor on MyApp (t0m)        
+        - Instantiate correct sub-class of Moose::Meta::Class for non-Moose
+          components where Catalyst forces the creation of a metaclass instance.
+ 
+=head2 Test Suite
 
-        - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
         - Change Catalyst::Test to use Sub::Exporter (Florian Ragwitz).
         - Port to Moose
-        - Add Catalyst::Response->print() method (ilmari)
+        - Support mocking virtualhosts in test suite ()
+        - Add methods like action_ok and action_redirect to write
+          more compact tests
+
+=head2 Catalyst::Response->print()
+
 Prints @data to the output stream, separated by $,.  This lets you pass
 the response object to functions that want to write to an L<IO::Handle>.
 
-        - Add visit, a returning ->go
-In effect, visit allows you to "wrap" another action, just as it
-would have been called by dispatching from a URL, while the analogous
-go allows you to transfer control to another action as if it had
-been reached directly from a URL.
-C<< $c->stash >> is kept unchanged.
-=cut

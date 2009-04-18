@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Add delta documentation
+        - Clean up recursion errors
         - Extra cross links in dispatch types POD (Ian Wells)
         - Test uri_with clears query params when they are set to undef 
           (Ian Wells)
