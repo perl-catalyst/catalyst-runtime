@@ -165,7 +165,7 @@ The right way to do it is this:
         ... # things to do after the actual setup
     };
 
-The setup_finalize hook was introduced as a way to void this issue.
+The setup_finalize hook was introduced as a way to avoid this issue.
 
 =head2 Components with a new method which returns false
 
@@ -243,6 +243,11 @@ COMPONENT method you would like to inherit is the first (left-hand most)
 COMPONENT method in your @ISA.
 
 =head1 WARNINGS
+
+=head2 Catalyst::Base
+
+Any code using L<Catalyst::Base> will now warn, and this module will be removed
+in a future release.
 
 =head2 Methods in Catalyst::Dispatcher
 
