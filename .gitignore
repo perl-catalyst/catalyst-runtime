@@ -1,0 +1,15 @@
+.*
+!.gitignore
+Makefile*
+!Makefile.PL
+META.yml
+blib
+build
+inc
+pm_to_blib
+MANIFEST*
+!MANIFEST.SKIP
+Debian*
+#README
+Catalyst-Runtime-*
+*.bs
