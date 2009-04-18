@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80001 2009-04-18 22:18
         - Don't inline the constructor for Catalyst::Log to avoid a
           warning on recent Moose versions.
         - Add delta documentation
