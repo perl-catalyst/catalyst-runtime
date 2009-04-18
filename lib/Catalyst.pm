@@ -43,11 +43,9 @@ sub depth { scalar @{ shift->stack || [] }; }
 sub comp { shift->component(@_) }
 
 sub req {
-    # carp "the use of req() is deprecated in favour of request()";
     my $self = shift; return $self->request(@_);
 }
 sub res {
-    # carp "the use of res() is deprecated in favour of response()";
     my $self = shift; return $self->response(@_);
 }
 
