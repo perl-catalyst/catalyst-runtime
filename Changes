@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Require MX::MethodAttributes 0.06 to avoid issues with saying
+          use base 'Catalyst::Controller'; use Moose; losing actions (t0m)
+        - Fix all of t0m's typos in ::Upgrading and ::Delta (hobbs)
+
 5.80001 2009-04-18 22:18
         - Don't inline the constructor for Catalyst::Log to avoid a
           warning on recent Moose versions.
