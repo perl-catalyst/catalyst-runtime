@@ -79,7 +79,7 @@ sub COMPONENT {
       my ($next_package) = Class::MOP::get_code_info($next);
       warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}.\n";
       warn "This behavior can no longer be supported, and so your application is probably broken.\n";
-      warn "Your linearised isa hierarchy is: " . join(', ', mro::get_linear_isa($class)) . "\n";
+      warn "Your linearized isa hierarchy is: " . join(', ', @{ mro::get_linear_isa($class) }) . "\n";
       warn "Please see perldoc Catalyst::Upgrading for more information about this issue.\n";
     }
     return $self->new($c, $arguments);
