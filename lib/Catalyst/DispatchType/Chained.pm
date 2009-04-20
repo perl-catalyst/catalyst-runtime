@@ -86,7 +86,7 @@ sub list {
 
     my $has_unattached_actions;
     my $unattached_actions = Text::SimpleTable->new(
-        [ 35, 'Private' ], [ 36, 'Missing parent' ],
+        [ 35, 'Private' ], [ $column_width, 'Missing parent' ],
     );
 
     ENDPOINT: foreach my $endpoint (
