@@ -13,13 +13,10 @@ sub env : Action Relative {
     $c->forward('TestApp::View::Dump', [\%ENV]);
 }
 
-sub parameters : Action Relative {
-    my ( $self, $c ) = @_;
-    $c->forward('TestApp::View::Dump::Parameters');
-}
-
 sub request : Action Relative {
     my ( $self, $c ) = @_;
+    $c->req->params(undef); # Should be a no-op, and be ignored.
+                            # Back compat test for 5.7
     $c->forward('TestApp::View::Dump::Request');
 }
 
