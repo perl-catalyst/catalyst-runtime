@@ -76,15 +76,19 @@ has parameters => (
   default => sub { {} },
 );
 
-before parameters => sub {
-  my ($self, $params) = @_;
-  if ( $params && !ref $params ) {
-    $self->_context->log->warn(
-        "Attempt to retrieve '$params' with req->params(), " .
-        "you probably meant to call req->param('$params')" );
-    $params = undef;
-  }
-
+around parameters => sub {
+    my ($orig, $self, $params) = @_;
+    if ($params) {
+        if ( !ref $params ) {
+            $self->_context->log->warn(
+                "Attempt to retrieve '$params' with req->params(), " .
+                "you probably meant to call req->param('$params')"
+            );
+            $params = undef;
+        }
+        return $self->$orig($params);
+    }
+    $self->$orig();
 };
 
 has base => (

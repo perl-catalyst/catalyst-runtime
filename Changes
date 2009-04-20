@@ -1,9 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix so that calling $c->req->parameters(undef) does not flatten
+          the request parameters with undef + test (t0m)
         - Fix so that width of table of unattached actions for debugging
-          ::DispatchType::Chained varies according to your terminal width 
+          ::DispatchType::Chained varies according to your terminal width
           (Oleg Kostyuk)
-        - Fix warning message about linearized @ISA in Catalyst::Component 
+        - Fix warning message about linearized @ISA in Catalyst::Component
           (Emanuele Zeppieri)
         - Require MX::MethodAttributes 0.06 to avoid issues with saying
           use base 'Catalyst::Controller'; use Moose; losing actions (t0m)
