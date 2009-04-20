@@ -101,6 +101,21 @@ sub _send_to_log {
     print STDERR @_;
 }
 
+# 5.7 compat code.
+# Alias _body to body, add a before modifier to warn..
+my $meta = __PACKAGE__->meta; # Calling meta method here fine as we happen at compile time.
+$meta->add_method('body', $meta->get_method('_body'));
+my %package_hash; # Only warn once per method, per package. 
+                  # I haven't provided a way to disable them, patches welcome.
+$meta->add_before_method_modifier('body', sub {
+    my $class = blessed(shift);
+    $package_hash{$class}++ || do {
+        warn("Class $class is calling the deprecated method Catalyst::Log->body method,\n"
+            . "this will be removed in Catalyst 5.81");
+    };
+});
+# End 5.70 backwards compatibility hacks.
+
 no Moose;
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 

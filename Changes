@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Add backwards compatibility method for Catalyst::Log->body, which
+          has been made private (t0m)
         - Fix so that calling $c->req->parameters(undef) does not flatten
           the request parameters with undef + test (t0m)
         - Fix so that width of table of unattached actions for debugging
