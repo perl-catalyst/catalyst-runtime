@@ -115,6 +115,7 @@ my %conflicts = (
     'Catalyst::Plugin::Authentication' => '0.100091',
     'CatalystX::Imports'               => '0.03',
     'Catalyst::Plugin::HashedCookies'  => '1.03',
+    'Catalyst::Action::REST'           => '0.67',
 );
 check_conflicts(%conflicts);
 
