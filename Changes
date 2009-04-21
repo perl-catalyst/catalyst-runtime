@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix issues with restarting the application class due to C3 failures
+          on perl 5.10 (t0m)
         - Work around issues in Moose with initialization order of multiple
           levels of non-Moose classes inheriting from a Moose class (t0m)
           - Test for this

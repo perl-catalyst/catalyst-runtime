@@ -145,10 +145,15 @@ sub _test {
                 my $is_immutable = $meta->can('is_immutable');
                 my $make_mutable = $meta->can('make_mutable');
                 $meta->$make_mutable() if $is_immutable && $make_mutable && $meta->$is_immutable();
+                eval { # Do not explode the watcher process if this fails.
+                    my $superclasses = $meta->can('superclasses');
+                    $meta->$superclasses('Moose::Object') if $superclasses;
+                };
             }
         });
     }
 
+    local $Catalyst::__AM_RESTARTING = 1; # Hack to avoid C3 fail
     delete $INC{$file}; # Remove from %INC so it will reload
     local $SIG{__WARN__} = sub { };
 

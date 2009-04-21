@@ -1055,10 +1055,11 @@ EOF
     }
 
     # Call plugins setup, this is stupid and evil.
+    # Also screws C3 badly on 5.10, hack to avoid.
     {
         no warnings qw/redefine/;
         local *setup = sub { };
-        $class->setup;
+        $class->setup unless $Catalyst::__AM_RESTARTING;
     }
 
     # Initialize our data structure
