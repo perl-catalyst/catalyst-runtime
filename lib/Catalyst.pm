@@ -2398,14 +2398,19 @@ sub setup_log {
     $levels ||= '';
     $levels =~ s/^\s+//;
     $levels =~ s/\s+$//;
-    my %levels = map { $_ => 1 } split /\s*,\s*/, $levels || '';
-    
+    my %levels = map { $_ => 1 } split /\s*,\s*/, $levels;
+
+    my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
+    if ( defined $env_debug ) {
+        $levels{debug} = 1 if $env_debug; # Ugly!
+        delete($levels{debug}) unless $env_debug;
+    }
+
     unless ( $class->log ) {
         $class->log( Catalyst::Log->new(keys %levels) );
     }
 
-    my $env_debug = Catalyst::Utils::env_value( $class, 'DEBUG' );
-    if ( defined($env_debug) or $levels{debug} ) {
+    if ( $levels{debug} ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
     }

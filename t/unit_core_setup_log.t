@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 30;
 use Test::Exception;
 
 use Catalyst ();
 
 sub mock_app {
     my $name = shift;
+    warn("Setting up mock application: $name\n");
     my $meta = Moose->init_meta( for_class => $name );
     $meta->superclasses('Catalyst');
     return $meta->name;
@@ -48,16 +49,28 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     $app->setup_log('');
     ok $app->debug, 'In debug mode';
     test_log_object($app->log,
-        fatal => 1, # Note, log levels _are_ seemingly additive if debug is on.
-        error => 1, # CRACK - someone has been smoking it.
-        warn => 1,
-        info => 1,
+        fatal => 0,
+        error => 0,
+        warn => 0,
+        info => 0,
         debug => 1,
     );
 }
 {
     local %ENV = ( CATALYST_DEBUG => 0 );
     my $app = mock_app('TestLogAppDebugEnvUnset');
+    $app->setup_log('warn');
+    ok !$app->debug, 'Not In debug mode';
+    test_log_object($app->log,
+        fatal => 0,
+        error => 0,
+        warn => 1,
+        info => 0,
+        debug => 0,
+    );
+}
+{
+    my $app = mock_app('TestLogAppEmptyString');
     $app->setup_log('');
     ok !$app->debug, 'Not In debug mode';
     test_log_object($app->log,
