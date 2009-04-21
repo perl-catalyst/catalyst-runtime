@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - pass replace_constructor to the immutable call to ensure
+          applications get a Moose constructor rather than a C::A one
+
 5.80002 2009-04-21 12:21:00
         - Fix issues with restarting the application class due to C3 failures
           on perl 5.10 (t0m)

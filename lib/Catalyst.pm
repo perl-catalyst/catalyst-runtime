@@ -1,7 +1,7 @@
 package Catalyst;
 
 use Moose;
-extends 'Catalyst::Component';
+extends 'Catalyst::Component', 'Class::Accessor::Fast';
 use Moose::Util qw/find_meta/;
 use bytes;
 use Scope::Upper ();
@@ -1099,7 +1099,7 @@ EOF
     # applying modifiers).
     Scope::Upper::reap(sub {
         my $meta = Class::MOP::get_metaclass_by_name($class);
-        $meta->make_immutable unless $meta->is_immutable;
+        $meta->make_immutable(replace_constructor => 1) unless $meta->is_immutable;
     }, Scope::Upper::SCOPE(1));
 
     $class->setup_finalize;
