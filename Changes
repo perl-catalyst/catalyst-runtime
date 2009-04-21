@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
           turning debuging on if defined, rather than if set.
           They now force debugging on or off, taking precedence over
@@ -7,8 +8,6 @@
           - Tests for this (t0m)
         - pass replace_constructor to the immutable call to ensure
           applications get a Moose constructor rather than a C::A one
-
-5.80002 2009-04-21 12:21:00
         - Fix issues with restarting the application class due to C3 failures
           on perl 5.10 (t0m)
         - Work around issues in Moose with initialization order of multiple
