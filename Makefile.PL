@@ -40,6 +40,22 @@ recommends 'B::Hooks::OP::Check::StashChange';
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::MockObject';
 
+# NOTE - This is the version number which the user must upgrade to to be ok,
+my %conflicts = (
+    'Catalyst::Plugin::ConfigLoader'   => '0.23', # Older versions work but
+                                                  # throw Data::Visitor warns
+    'Catalyst::Devel'                  => '0.10',
+    'Catalyst::Plugin::SmartURI'       => '0.030',
+    'CatalystX::CRUD'                  => '0.38',
+    'Catalyst::Action::RenderView'     => '0.08',
+    'Catalyst::Plugin::DebugCookie'    => '0.999003',
+    'Catalyst::Plugin::Authentication' => '0.100092',
+    'CatalystX::Imports'               => '0.04',
+    'Catalyst::Plugin::HashedCookies'  => '1.04',
+    'Catalyst::Action::REST'           => '0.68',
+);
+check_conflicts(%conflicts);
+
 # Run aggregate tests if AGGREGATE_TESTS environment = 1, but not if it = 0
 # Otherwise default to using Test::Aggregate if installed, but not requiring it.
 if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
@@ -73,7 +89,11 @@ if ($Module::Install::AUTHOR) {
 
   # Strip out the author only build_requires from META.yml
   # Need to do this _after_ WriteAll else it looses track of them
-  strip_author_only_build_requires(@force_build_requires_if_author);
+  strip_build_requires(@force_build_requires_if_author);
+
+  # Strip out any conflicts, so that even if the author has a conflicting
+  # module installed, we don't end up with META.fail
+  strip_requires(keys %conflicts);
 
   Meta->{values}{resources} = [
     [ 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
@@ -104,23 +124,6 @@ print <<"EOF";
  Have fun!
 EOF
 
-# NOTE - This is the version number of the _incompatible_ code,
-#        not the version number of the fixed version.
-my %conflicts = (
-    'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
-                                                  # throw Data::Visitor warns
-    'Catalyst::Devel'                  => '0.09',
-    'Catalyst::Plugin::SmartURI'       => '0.029',
-    'CatalystX::CRUD'                  => '0.37',
-    'Catalyst::Action::RenderView'     => '0.07',
-    'Catalyst::Plugin::DebugCookie'    => '0.999002',
-    'Catalyst::Plugin::Authentication' => '0.100091',
-    'CatalystX::Imports'               => '0.03',
-    'Catalyst::Plugin::HashedCookies'  => '1.03',
-    'Catalyst::Action::REST'           => '0.67',
-);
-check_conflicts(%conflicts);
-
 # End of script, helper functions below.
 
 sub darwin_check_no_resource_forks {
@@ -138,18 +141,24 @@ sub darwin_check_no_resource_forks {
         }
 }
 
-sub strip_author_only_build_requires {
-    my @build_requires_to_strip = @_;
-    Meta->{values}{build_requires} = [ grep {
+sub strip_build_requires {
+    _strip_a_requires('build_requires', @_);
+}
+sub strip_requires {
+    _strip_a_requires('requires', @_);
+}
+sub _strip_a_requires {
+    my ($type, @to_strip) = @_;
+    Meta->{values}{$type} = [ grep {
       my $ok = 1;
-      foreach my $module (@build_requires_to_strip) {
+      foreach my $module (@to_strip) {
         if ($_->[0] =~ /$module/) {
           $ok = 0;
           last;
         }
       }
       $ok;
-    } @{Meta->{values}{build_requires}} ];
+    } @{Meta->{values}{$type}} ];
 }
 
 sub check_conflicts {
@@ -161,7 +170,8 @@ sub check_conflicts {
         next if $@;
 
         my $installed = $mod->VERSION();
-        $conflicts_found{$mod} = $installed if ( $installed le $conflicts{$mod} );
+        $conflicts_found{$mod} = $installed
+            if ( $installed lt $conflicts{$mod} );
     }
 
     return unless scalar keys %conflicts_found;
@@ -183,11 +193,11 @@ EOF
     foreach my $mod (keys %conflicts_found) {
         print sprintf("    %s => %s\n", $mod, $conflicts_found{$mod});
     }
-    print "\n";
+    print "\n\n";
+    return unless prompt("Would you like to upgrade these modules as part of this install?", 'N') =~ /Y/i;
 
-    # More or less copied from Module::Build, via Moose
-    return if $ENV{PERL_MM_USE_DEFAULT};
-    return unless -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
-
-    sleep 4;
+    foreach my $mod (keys %conflicts_found) {
+        requires($mod, $conflicts{$mod})
+            if prompt("Install $mod?", 'Y') =~ /Y/i;
+    }
 }
