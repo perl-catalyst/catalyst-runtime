@@ -1,7 +1,7 @@
 package Catalyst;
 
 use Moose;
-extends 'Catalyst::Component', 'Class::Accessor::Fast';
+extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
 use bytes;
 use Scope::Upper ();
