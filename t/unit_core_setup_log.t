@@ -8,7 +8,7 @@ use Catalyst ();
 
 sub mock_app {
     my $name = shift;
-    warn("Setting up mock application: $name\n");
+    print "Setting up mock application: $name\n";
     my $meta = Moose->init_meta( for_class => $name );
     $meta->superclasses('Catalyst');
     return $meta->name;
