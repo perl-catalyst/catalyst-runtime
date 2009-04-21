@@ -2,6 +2,7 @@ package Catalyst;
 
 use Moose;
 extends 'Catalyst::Component';
+use Moose::Util qw/find_meta/;
 use bytes;
 use Scope::Upper ();
 use Catalyst::Exception;
@@ -2161,6 +2162,14 @@ sub setup_components {
 
 =cut
 
+sub _controller_init_base_classes {
+    my ($class, $component) = @_;
+    foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
+        Moose->init_meta( for_class => $class )
+            unless find_meta($class);
+    }
+}
+
 sub setup_component {
     my( $class, $component ) = @_;
 
@@ -2168,6 +2177,14 @@ sub setup_component {
         return $component;
     }
 
+    # FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
+    #         nearest to Catalyst::Controller first, no matter what order stuff happens
+    #         to be loaded. There are TODO tests in Moose for this, see
+    #         f2391d17574eff81d911b97be15ea51080500003
+    if ($component->isa('Catalyst::Controller')) {
+        $class->_controller_init_base_classes($component);
+    }
+    
     my $suffix = Catalyst::Utils::class2classsuffix( $component );
     my $config = $class->config->{ $suffix } || {};
 

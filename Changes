@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Work around issues in Moose with initialization order of multiple
+          levels of non-Moose classes inheriting from a Moose class (t0m)
+          - Test for this
         - Add backwards compatibility method for Catalyst::Log->body, which
           has been made private (t0m)
         - Fix so that calling $c->req->parameters(undef) does not flatten
