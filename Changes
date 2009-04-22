@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Turn of test aggregation by default. Only aggregate if the
+          AGGREGATE_TESTS environment variable is set and a recent
+          Test::Aggregate is available. (rafl)
+
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
           turning debuging on if defined, rather than if set.

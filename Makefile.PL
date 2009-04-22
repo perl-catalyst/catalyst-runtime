@@ -40,17 +40,16 @@ recommends 'B::Hooks::OP::Check::StashChange';
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::MockObject';
 
-# Run aggregate tests if AGGREGATE_TESTS environment = 1, but not if it = 0
-# Otherwise default to using Test::Aggregate if installed, but not requiring it.
-if (   ( exists $ENV{AGGREGATE_TESTS} && !$ENV{AGGREGATE_TESTS})
-    || (!exists $ENV{AGGREGATE_TESTS} && !can_use('Test::Aggregate', '0.34_01'))) {
+# aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate is available
+if ($ENV{AGGREGATE_TESTS} && can_use('Test::Aggregate', '0.34_01')) {
+    test_requires('Test::Aggregate', '0.34_01');
+}
+else {
     tests join q{ },
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
-else {
-    test_requires('Test::Aggregate', '0.34_01');
-}
+
 my @force_build_requires_if_author = qw(
   Test::NoTabs
   Test::Pod
