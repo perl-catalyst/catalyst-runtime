@@ -112,7 +112,7 @@ sub list {
         }
         if ($parent ne '/') {
             $has_unattached_actions = 1;
-            $unattached_actions->row('/'.$parents[0]->reverse, $parent);
+            $unattached_actions->row('/' . ($parents[0] || $endpoint)->reverse, $parent);
             next ENDPOINT;
         }
         my @rows;
@@ -345,7 +345,7 @@ sub uri_for_action {
     return undef if @captures; # fail for too many captures
 
     return join('/', '', @parts);
-   
+
 }
 
 =head2 $c->expand_action($action)
