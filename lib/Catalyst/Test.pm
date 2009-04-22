@@ -168,7 +168,7 @@ specific testing methods as displayed in the method section.
 The L<get> and L<request> functions take either a URI or an L<HTTP::Request>
 object.
 
-=head2 METHODS
+=head1 METHODS
 
 =head2 $content = get( ... )
 
