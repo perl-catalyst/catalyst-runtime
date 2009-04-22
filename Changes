@@ -3,6 +3,7 @@
         - Turn of test aggregation by default. Only aggregate if the
           AGGREGATE_TESTS environment variable is set and a recent
           Test::Aggregate is available. (rafl)
+        - POD formatting fix for Catalyst::Test (Dan Dascalescu)
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
