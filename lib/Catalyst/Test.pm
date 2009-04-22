@@ -165,7 +165,7 @@ L<HTTP::Request::AsCGI> or remotely if you define the CATALYST_SERVER
 environment variable. This module also adds a few catalyst
 specific testing methods as displayed in the method section.
 
-The </get> and </request> functions take either a URI or an L<HTTP::Request>
+The L<get> and L<request> functions take either a URI or an L<HTTP::Request>
 object.
 
 =head2 METHODS
@@ -189,7 +189,7 @@ method and the L<request> method below:
 
 =head2 $res = request( ... );
 
-Returns a C<HTTP::Response> object. Accepts an optional hashref for request
+Returns a L<HTTP::Response> object. Accepts an optional hashref for request
 header configuration; currently only supports setting 'host' value.
 
     my $res = request('foo/bar?test=1');
@@ -199,8 +199,8 @@ header configuration; currently only supports setting 'host' value.
 
 =head2 ($res, $c) = ctx_request( ... );
 
-Works exactly like C<Catalyst::Test::request>, except it also returns the
-catalyst context object, C<$c>. Note that this only works for local requests.
+Works exactly like L<request>, except it also returns the Catalyst context object,
+C<$c>. Note that this only works for local requests.
 
 =head2 $res = Catalyst::Test::local_request( $AppClass, $url );
 
@@ -301,23 +301,23 @@ sub _customize_request {
 
 =head2 action_ok
 
-Fetches the given url and check that the request was successful
+Fetches the given URL and check that the request was successful
 
 =head2 action_redirect
 
-Fetches the given url and check that the request was a redirect
+Fetches the given URL and check that the request was a redirect
 
 =head2 action_notfound
 
-Fetches the given url and check that the request was not found
+Fetches the given URL and check that the request was not found
 
 =head2 content_like
 
-Fetches the given url and matches the content against it.
+Fetches the given URL and matches the content against it.
 
 =head2 contenttype_is 
     
-Check for given mime type
+Check for given MIME type
 
 =head1 SEE ALSO
 
