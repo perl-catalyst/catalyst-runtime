@@ -42,7 +42,13 @@ around new => sub {
     my $orig = shift;
     my $class = shift;
     my $self = $class->$orig;
-    $self->levels( scalar(@_) ? @_ : keys %LEVELS );
+
+    if (@_ == 1 && $_[0] eq 'debug') {
+        $self->levels( keys %LEVELS );
+    } else {
+        $self->levels( scalar(@_) ? @_ : keys %LEVELS );
+    }
+
     return $self;
 };
 

@@ -49,10 +49,10 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     $app->setup_log('');
     ok $app->debug, 'In debug mode';
     test_log_object($app->log,
-        fatal => 0,
-        error => 0,
-        warn => 0,
-        info => 0,
+        fatal => 1,
+        error => 1,
+        warn => 1,
+        info => 1,
         debug => 1,
     );
 }
@@ -89,10 +89,10 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     $app->setup_log('debug');
     ok $app->debug, 'In debug mode';
     test_log_object($app->log,
-        fatal => 0,
-        error => 0,
-        warn => 0,
-        info => 0,
+        fatal => 1,
+        error => 1,
+        warn => 1,
+        info => 1,
         debug => 1,
     );
 }
