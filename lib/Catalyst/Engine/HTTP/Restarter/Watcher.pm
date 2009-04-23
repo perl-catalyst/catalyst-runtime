@@ -1,7 +1,7 @@
 package Catalyst::Engine::HTTP::Restarter::Watcher;
 
 use Moose;
-with 'MooseX::Emulate::Class::Accessor::Fast';
+with 'MooseX::Emulate::Class::Accessor::Fast' => { excludes => [ 'BUILD' ] };
 
 use File::Find;
 use File::Modified;

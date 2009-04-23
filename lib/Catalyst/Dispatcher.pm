@@ -2,7 +2,7 @@ package Catalyst::Dispatcher;
 
 use Moose;
 use Class::MOP;
-with 'MooseX::Emulate::Class::Accessor::Fast';
+with 'MooseX::Emulate::Class::Accessor::Fast' => { excludes => [ 'BUILD' ] };
 
 use Catalyst::Exception;
 use Catalyst::Utils;
