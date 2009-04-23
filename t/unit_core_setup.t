@@ -25,6 +25,8 @@ sub build_test_app_with_setup {
     return $name;
 }
 
+local %ENV; # Don't allow env variables to mess us up.
+
 {
     my $app = build_test_app_with_setup('MyTestDebug', '-Debug');
 
