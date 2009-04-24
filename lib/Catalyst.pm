@@ -527,7 +527,7 @@ sub _comp_search_prefixes {
     if( @result ) {
         # Disgusting hack to work out correct method name
         my $warn_for = lc $prefixes[0];
-        my $msg = "Used regexp fallback for \$c->{$warn_for}('${name}'), which found '" .
+        my $msg = "Used regexp fallback for \$c->${warn_for}('${name}'), which found '" .
            (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
            "component resolution is unreliable and unsafe.";
         my $short = $result[0];
