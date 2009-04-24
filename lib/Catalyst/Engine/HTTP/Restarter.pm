@@ -83,7 +83,10 @@ around run => sub {
 sub _make_components_mutable {
     my ($self, $class) = @_;
 
-    my @metas = map { find_meta($_) } ($class, map { blessed($_) } values %{ $class->components });
+    my @metas = grep { defined($_) }
+                map { find_meta($_) }
+                ($class, map { blessed($_) }
+                values %{ $class->components });
 
     foreach my $meta (@metas) {
         # Paranoia unneeded, all component metaclasses should have immutable

@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Fix classes without metaclasses restarting, when not using
+          B::Hooks::OP::Check::StashChange (t0m)
         - Fix the unattached chain debug table for endpoints with no
           parents at all. (rafl)
         - Turn of test aggregation by default. Only aggregate if the
