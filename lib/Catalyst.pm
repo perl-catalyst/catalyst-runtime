@@ -877,11 +877,11 @@ You can enable debug mode in several ways:
 
 =item The -Debug option in your MyApp.pm
 
-=item By declaring "sub debug { 1 }" in your MyApp.pm.
+=item By declaring C<sub debug { 1 }> in your MyApp.pm.
 
 =back
 
-Calling $c->debug(1) has no effect.
+Calling C<< $c->debug(1) >> has no effect.
 
 =cut
 
@@ -2519,8 +2519,8 @@ Returns 1 when stats collection is enabled.  Stats collection is enabled
 when the -Stats options is set, debug is on or when the <MYAPP>_STATS
 environment variable is set.
 
-Note that this is a static method, not an accessor and should be overloaded
-by declaring "sub use_stats { 1 }" in your MyApp.pm, not by calling $c->use_stats(1).
+Note that this is a static method, not an accessor and should be overridden
+by declaring C<sub use_stats { 1 }> in your MyApp.pm, not by calling C<< $c->use_stats(1) >>.
 
 =cut
 
