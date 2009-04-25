@@ -815,7 +815,7 @@ The config method is present on all Catalyst components, and configuration
 will be merged when an application is started. Configuration loaded with
 L<Catalyst::Plugin::ConfigLoader> takes precedence over other configuration,
 followed by configuration in your top level C<MyApp> class. These two
-configurations are merged, and then configuration data whos hash key matches a
+configurations are merged, and then configuration data whose hash key matches a
 component name is merged with configuration for that component.
 
 The configuration for a component is then passed to the C<new> method when a
