@@ -8,6 +8,11 @@
           AGGREGATE_TESTS environment variable is set and a recent
           Test::Aggregate is available. (rafl)
         - POD formatting fix for Catalyst::Test (Dan Dascalescu)
+        - Bump to MooseX::MethodAttributes 0.08, to gain the 
+          get_nearest_methods_with_attributes method allowing methods without
+          attributes in a subclass to override those with attributes in a superclass.
+          This fixes CatalystX::CRUD's method of overriding/disabling functionality
+          base controllers (t0m).
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables

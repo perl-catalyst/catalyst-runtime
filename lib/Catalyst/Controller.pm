@@ -7,6 +7,7 @@ use namespace::clean -except => 'meta';
 
 BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
 
+use MooseX::MethodAttributes;
 use Catalyst::Exception;
 use Catalyst::Utils;
 
@@ -179,8 +180,8 @@ sub get_action_methods {
     my $meta = find_meta($self);
     confess("Metaclass for " . ref($meta) ." for " . $meta->name
         . " cannot support register_actions.")
-        unless $meta->can('get_all_methods_with_attributes');
-    my @methods = $meta->get_all_methods_with_attributes;
+        unless $meta->can('get_nearest_methods_with_attributes');
+    my @methods = $meta->get_nearest_methods_with_attributes;
     return @methods;
 }
 
