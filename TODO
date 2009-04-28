@@ -2,7 +2,6 @@ Bugs:
    - Make logging levels properly additive.
    - Stats bugs?
    - Moose tests failing - new MX::MethodAttributes helps with this somewhat.
-   - HTTP::Request::AsCGI 0.8
 
    - Chained bugs in http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
 

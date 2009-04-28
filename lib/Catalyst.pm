@@ -3,7 +3,6 @@ package Catalyst;
 use Moose;
 extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
-use Moose::Util::MetaRole ();
 use bytes;
 use Scope::Upper ();
 use Catalyst::Exception;
