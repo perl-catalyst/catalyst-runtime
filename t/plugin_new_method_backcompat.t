@@ -8,7 +8,8 @@
 # that plugins don't get it wrong for us.
 
 # Also tests method modifiers and etc in MyApp.pm still work as expected.
-use Test::More tests => 3;
+use Test::More tests => 4;
+use Test::Exception;
 
 {
     package NewTestPlugin;
@@ -50,3 +51,15 @@ use lib "$FindBin::Bin/lib";
 use Catalyst::Test qw/TestAppPluginWithNewMethod/;
 ok request('/foo')->is_success; 
 is $TestAppPluginWithNewMethod::MODIFIER_FIRED, 1, 'Before modifier was fired correctly.';
+
+throws_ok {
+    package TestAppBadlyImmutable;
+    use Catalyst qw/+NewTestPlugin/;
+
+    TestAppBadlyImmutable->setup;
+
+    __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
+}
+    qr/\QYou made your application class (TestAppBadlyImmutable) immutable/,
+    'An application class that is already immutable but does not inline the constructor dies at ->setup';
+

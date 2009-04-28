@@ -1101,6 +1101,12 @@ EOF
     # applying modifiers).
     Scope::Upper::reap(sub {
         my $meta = Class::MOP::get_metaclass_by_name($class);
+        if ( $meta->is_immutable && ! { $meta->immutable_options }->{inline_constructor} ) {
+            die "You made your application class ($class) immutable, "
+                . "but did not inline the constructor.\n"
+                . "This will break catalyst, please pass "
+                . "(replace_constructor => 1) when making your class immutable.\n";
+        }
         $meta->make_immutable(replace_constructor => 1) unless $meta->is_immutable;
     }, Scope::Upper::SCOPE(1));
 
