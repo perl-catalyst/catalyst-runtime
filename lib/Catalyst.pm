@@ -2168,7 +2168,6 @@ sub setup_components {
 sub _controller_init_base_classes {
     my ($app_class, $component) = @_;
     foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
-        next unless $class =~ /^$app_class/;
         Moose->init_meta( for_class => $class )
             unless find_meta($class);
     }
