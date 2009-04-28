@@ -1,6 +1,10 @@
 use Catalyst ();
 
 {
+    package TestApp;
+    use base qw/Catalyst/;
+}
+{
     package TestApp::Controller::Base;
     use base qw/Catalyst::Controller/;
 }
@@ -9,8 +13,8 @@ use Catalyst ();
     use base qw/TestApp::Controller::Base/;
 }
 
-Catalyst->setup_component('TestApp::Controller::Other');
-Catalyst->setup_component('TestApp::Controller::Base');
+TestApp->setup_component('TestApp::Controller::Other');
+TestApp->setup_component('TestApp::Controller::Base');
 
 use Test::More tests => 1;
 use Test::Exception;
