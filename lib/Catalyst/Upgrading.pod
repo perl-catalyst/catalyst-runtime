@@ -27,9 +27,23 @@ perl 5.10, and comes via L<Class::C3> for perl 5.8. This replaces L<NEXT>
 with L<Class::C3::Adopt::NEXT>, forcing all components to resolve methods using
 C3, rather than the unpredictable dispatch order of L<NEXT>.
 
-To be able to do this, however, entails that the graph of superclasses for each
-class must be linearizable using the C3 algorithm. Unfortunately, when
-superclasses are being used as mixins, it is easy to get this wrong.
+This issue is characterised by your application failing to start due to an
+error message about having a non-linear @ISA.
+
+The Catalyst plugin most often causing this, is
+L<Catalyst::Plugin::Session::Store::FastMmap> - if you are using this plugin
+and see issues, then please upgrade - and please try upgrading your plugins
+if you have this issue, as it has been fixed. Note that Makefile.PL in the
+distribution will warn about known incompatible components. 
+
+This issue can, however, be found in your own application - the only solution is
+to go through each base class of the class the error was reported against, until
+you identify the ones in conflict, and resolve them.
+
+To be able to generate a linear @ISA, the list of superclasses for each
+class must be resolvable using the C3 algorithm. Unfortunately, when
+superclasses are being used as mixins (to add functionality used in your class),
+and with multiple inheritence, it is easy to get this wrong.
 
 Most common is the case of:
 
@@ -42,13 +56,10 @@ Most common is the case of:
     package GoesBang;
     use base qw/Component1 Component2/;
 
-And the Catalyst plugin most often causing this, is
-L<Catalyst::Plugin::Session::Store::FastMmap> - if you are using this plugin
-and see issues, then please upgrade!
+Any situation like this will cause your application to fail to start.
 
-This can, however, be found in your own application - the only solution is to
-go through each base class of the class the error was reported against, until
-you identify the ones in conflict, and resolve them.
+Please see additional documentation about this issue, and how to resolve it in
+L<Class::C3::Adopt::NEXT>.
 
 =head2 Components which inherit from Moose::Object before Catalyst::Component
 
