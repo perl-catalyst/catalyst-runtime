@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 33*$iters;
+use Test::More tests => 38*$iters;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -118,4 +118,24 @@ sub run_tests {
             'Test Class'
         );
     }
+    
+    {
+        my $url = 'http://localhost/action/regexp/redirect/life/universe/42/everything';
+        ok( my $response = request($url),
+            'Request' );
+        ok( $response->is_redirect, 'Response is redirect' );
+        is( $response->header('X-Catalyst-Action'),
+            '^action/regexp/redirect/(\w+)/universe/(\d+)/everything$', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Regexp',
+            'Test Class'
+        );
+        is(
+            $response->header('location'),
+            $url,
+            'Redirect URI is the same as the request URI'
+        );
+    }
 }
+

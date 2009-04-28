@@ -19,6 +19,8 @@
         - Additional tests for setup_stats method. (t0m)
         - Fix log levels in Catalyst::Log to be properly additive. (t0m)
         - Fix RT#43375 by sorting results before testing them (t0m)
+        - Fixes for uri_for_action when using Catalyst::DispatchType::Regex
+          + tests from RT#39369 (norbi)
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables

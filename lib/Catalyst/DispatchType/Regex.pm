@@ -150,11 +150,13 @@ sub uri_for_action {
             my $final = '/';
             my @captures = @$captures;
             while (my ($front, $rest) = split(/\(/, $re, 2)) {
+                last unless defined $rest;
                 ($rest, $re) =
                     Text::Balanced::extract_bracketed("(${rest}", '(');
                 next REGEX unless @captures;
                 $final .= $front.shift(@captures);
             }
+            $final .= $re;
             next REGEX if @captures;
             return $final;
          }
