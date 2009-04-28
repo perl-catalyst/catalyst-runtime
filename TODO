@@ -18,9 +18,6 @@ Known Bugs:
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-unknown-error/tree/master
 
-    - Unattached Chained actions can cause issues starting the application.
-      (Is this fixed already by rafl's work??)
-
 Compatibility warnings to add:
 
    - $self->config should warn as config should only ever be called as a
