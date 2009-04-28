@@ -15,6 +15,7 @@
           disabling functionality from base controllers. (t0m)
         - Bump Moose dependency to latest version to fix metaclass
           incompatibility issues in some cases. (t0m)
+        - Additional tests for setup_stats method. (t0m)
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
