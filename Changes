@@ -26,7 +26,7 @@
         - If you make your application class immutable and turn off
           constructor inlining, Catalyst will die and tell you pass
           the (replace_constructor => 1) argument to
-          make_immutable. (autarch)
+          make_immutable. (Dave Rolsky)
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
