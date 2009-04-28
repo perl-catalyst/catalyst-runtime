@@ -59,8 +59,9 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 
 # multiple returns
 {
-    my @expected = qw( MyApp::C::Controller MyApp::M::Model );
-    is_deeply( [ MyApp->comp( qr{::[MC]::} ) ], \@expected, 'multiple results fro regexp ok' );
+    my @expected = sort qw( MyApp::C::Controller MyApp::M::Model );
+    my @got = sort MyApp->comp( qr{::[MC]::} );
+    is_deeply( \@got, \@expected, 'multiple results from regexp ok' );
 }
 
 # failed search
