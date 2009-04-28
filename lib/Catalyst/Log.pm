@@ -6,7 +6,8 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 use Data::Dump;
 use Class::MOP ();
 
-our %LEVELS = ();
+our %LEVELS = (); # Levels stored as bit field, ergo debug = 1, warn = 2 etc
+our %LEVEL_MATCH = (); # Stored as additive, thus debug = 31, warn = 30 etc
 
 has level => (is => 'rw');
 has _body => (is => 'rw');
@@ -16,12 +17,16 @@ has abort => (is => 'rw');
     my @levels = qw[ debug info warn error fatal ];
 
     my $meta = Class::MOP::get_metaclass_by_name(__PACKAGE__);
-    for ( my $i = 0 ; $i < @levels ; $i++ ) {
+    my $summed_level = 0;
+    for ( my $i = $#levels ; $i >= 0 ; $i-- ) {
 
         my $name  = $levels[$i];
+        
         my $level = 1 << $i;
-
+        $summed_level |= $level;
+        
         $LEVELS{$name} = $level;
+        $LEVEL_MATCH{$name} = $summed_level;
 
        $meta->add_method($name, sub {
             my $self = shift;
@@ -43,11 +48,7 @@ around new => sub {
     my $class = shift;
     my $self = $class->$orig;
 
-    if (@_ == 1 && $_[0] eq 'debug') {
-        $self->levels( keys %LEVELS );
-    } else {
-        $self->levels( scalar(@_) ? @_ : keys %LEVELS );
-    }
+    $self->levels( scalar(@_) ? @_ : keys %LEVELS );
 
     return $self;
 };
@@ -61,7 +62,7 @@ sub levels {
 sub enable {
     my ( $self, @levels ) = @_;
     my $level = $self->level;
-    for(map { $LEVELS{$_} } @levels){
+    for(map { $LEVEL_MATCH{$_} } @levels){
       $level |= $_;
     }
     $self->level($level);

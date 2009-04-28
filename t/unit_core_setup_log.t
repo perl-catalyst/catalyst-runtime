@@ -34,9 +34,7 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     $app->setup_log('error,warn');
     ok !$app->debug, 'Not in debug mode';
     test_log_object($app->log,
-        fatal => 0, # WTF - I thought log levels were additive these days,
-                    # or do I not understand the patch which pupported to make
-                    # them so?
+        fatal => 1, 
         error => 1,
         warn => 1,
         info => 0,
@@ -62,8 +60,8 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     $app->setup_log('warn');
     ok !$app->debug, 'Not In debug mode';
     test_log_object($app->log,
-        fatal => 0,
-        error => 0,
+        fatal => 1,
+        error => 1,
         warn => 1,
         info => 0,
         debug => 0,
@@ -73,16 +71,14 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     my $app = mock_app('TestLogAppEmptyString');
     $app->setup_log('');
     ok !$app->debug, 'Not In debug mode';
-    TODO: {
-        local $TODO = 'THis is insane';
-        test_log_object($app->log,
-            fatal => 0,
-            error => 0,
-            warn => 0,
-            info => 0,
-            debug => 0,
-        );
-    }
+    # Note that by default, you get _all_ the log levels turned on
+    test_log_object($app->log,
+        fatal => 1,
+        error => 1,
+        warn => 1,
+        info => 1,
+        debug => 1,
+    );
 }
 {
     my $app = mock_app('TestLogAppDebugOnly');
