@@ -8,8 +8,8 @@ Known Bugs:
            Moose, or applications which do not use Moose, and causes a 
            compile-time error if present.
 
-   - Bugs with actions with Args or CaptureArgs being caled multiple times
-     when called via ->go or ->visit.
+   - Bug ->go or ->visit causes actions which have Args or CaptureArgs caled
+     twice when called via ->go or ->visit.
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
 
