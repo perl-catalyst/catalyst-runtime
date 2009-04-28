@@ -414,7 +414,7 @@ sub get_action {
 
 =head2 $self->get_action_by_path( $path ); 
 
-Returns the named action by its full path. 
+Returns the named action by its full private path.
 
 =cut
 
