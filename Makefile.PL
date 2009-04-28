@@ -8,6 +8,7 @@ all_from 'lib/Catalyst/Runtime.pm';
 requires 'namespace::clean';
 requires 'Scope::Upper' => '0.06';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
+requires 'Class::MOP' => '0.83';
 requires 'Moose' => '0.76';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.09';
 requires 'Carp';
