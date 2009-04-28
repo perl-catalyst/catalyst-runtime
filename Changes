@@ -13,9 +13,11 @@
           attributes in a subclass to override those with attributes in a
           superclass. This fixes CatalystX::CRUD's method of overriding /
           disabling functionality from base controllers. (t0m)
+        - Bump HTTP::Request::AsCGI dependency to avoid broken version (t0m)
         - Bump Moose dependency to latest version to fix metaclass
           incompatibility issues in some cases. (t0m)
         - Additional tests for setup_stats method. (t0m)
+        - Fix log levels in Catalyst::Log to be properly additive. (t0m)
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
