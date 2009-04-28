@@ -20,7 +20,12 @@ sub get_attribute : Local {
     $c->response->body($self->attribute);
 }
 
-before get_attribute => sub {
+sub with_local_modifier : Local {
+    my ($self, $c) = @_;
+    $c->forward('get_attribute');
+}
+
+before with_local_modifier => sub {
     my ($self, $c) = @_;
     $c->response->header( 'X-Catalyst-Test-Before' => 'before called' );
 };

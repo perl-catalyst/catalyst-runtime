@@ -3,6 +3,7 @@ package Catalyst;
 use Moose;
 extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
+use Moose::Util::MetaRole ();
 use bytes;
 use Scope::Upper ();
 use Catalyst::Exception;
@@ -2166,8 +2167,9 @@ sub setup_components {
 =cut
 
 sub _controller_init_base_classes {
-    my ($class, $component) = @_;
+    my ($app_class, $component) = @_;
     foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
+        next unless $class =~ /^$app_class/;
         Moose->init_meta( for_class => $class )
             unless find_meta($class);
     }
