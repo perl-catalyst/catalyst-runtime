@@ -1,9 +1,27 @@
-Bugs:
-   - Make logging levels properly additive.
+Known Bugs:
+   - Moose bug causes issues if you use Moose in your application, but want to
+     use base classes which have not been converted to Moose yet.
 
-   - Chained bugs in http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
+     Tests in Moose for this are: http://tinyurl.com/c2k85c
 
-Compatibility:
+     Note: This issue _does not affect_ components which have been converted to
+           Moose, or applications which do not use Moose, and causes a 
+           compile-time error if present.
+
+   - Bugs with actions with Args or CaptureArgs being caled multiple times
+     when called via ->go or ->visit.
+
+     Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
+
+   - Certain errors in your application to do with using other code which does
+     not exist can cause an 'Unknown error' issue.
+
+     Test app: http://github.com/bobtfish/catalyst-app-bug-unknown-error/tree/master
+
+    - Unattached Chained actions can cause issues starting the application.
+      (Is this fixed already by rafl's work??)
+
+Compatibility warnings to add:
 
    - $self->config should warn as config should only ever be called as a
      class method.
