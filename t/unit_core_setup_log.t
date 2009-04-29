@@ -34,7 +34,7 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     $app->setup_log('error,warn');
     ok !$app->debug, 'Not in debug mode';
     test_log_object($app->log,
-        fatal => 1, 
+        fatal => 1,
         error => 1,
         warn => 1,
         info => 0,

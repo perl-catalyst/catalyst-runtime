@@ -34,7 +34,7 @@ The Catalyst plugin most often causing this, is
 L<Catalyst::Plugin::Session::Store::FastMmap> - if you are using this plugin
 and see issues, then please upgrade - and please try upgrading your plugins
 if you have this issue, as it has been fixed. Note that Makefile.PL in the
-distribution will warn about known incompatible components. 
+distribution will warn about known incompatible components.
 
 This issue can, however, be found in your own application - the only solution is
 to go through each base class of the class the error was reported against, until
@@ -99,14 +99,14 @@ compatible way is:
 Note that the C< extends > declaration needs to occur in a begin block for
 L<attributes> to operate correctly.
 
-You also don't get the L<Moose::Object> constructor, and therefore attribute 
-initialization will not work as normally expected. If you want to use Moose 
+You also don't get the L<Moose::Object> constructor, and therefore attribute
+initialization will not work as normally expected. If you want to use Moose
 attributes, then they need to be made lazy to correctly initialize.
 
 Note that this only applies if your component needs to maintain component
 backwards compatibility for Catalyst versions before 5.71001 - in 5.71001
 attributes work as expected, and the BUILD method is called normally
-(although BUILDARGS is not). 
+(although BUILDARGS is not).
 
 If you depend on Catalyst 5.8, then B<all> Moose features work as expected.
 
@@ -226,7 +226,7 @@ The following test demonstrates the problem:
 
     BaseClass->foo('base class');
     Child->foo('sub class');
-    
+
     use Test::More;
     isnt(BaseClass->can('foo'), Child->can('foo'));
 
