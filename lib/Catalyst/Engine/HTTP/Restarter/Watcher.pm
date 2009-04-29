@@ -22,26 +22,21 @@ BEGIN {
 
 has delay => (is => 'rw');
 has regex => (is => 'rw');
-has modified => (is => 'rw');
+has modified => (is => 'rw', builder => '_build_modified', lazy => 1);
 has directory => (is => 'rw');
-has watch_list => (is => 'rw');
+has watch_list => (is => 'rw', builder => '_build_watch_list', lazy => 1);
 has follow_symlinks => (is => 'rw');
 
-sub BUILD {
-    shift->_init;
+sub _build_watch_list {
+    my ($self) = @_;
+    return $self->_index_directory;
 }
 
-sub _init {
-    my $self = shift;
-
-    my $watch_list = $self->_index_directory;
-    $self->watch_list($watch_list);
-
-    $self->modified(
-        File::Modified->new(
-            method => 'mtime',
-            files  => [ keys %{$watch_list} ],
-        )
+sub _build_modified {
+    my ($self) = @_;
+    return File::Modified->new(
+        method => 'mtime',
+        files  => [ keys %{ $self->watch_list } ],
     );
 }
 
