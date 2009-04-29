@@ -15,6 +15,7 @@ use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 
+use namespace::clean -except => 'meta';
 
 # Refactoring note:
 # do these belong as package vars or should we build these via a builder method?
@@ -27,7 +28,7 @@ our @PRELOAD = qw/Index Path Regex/;
 our @POSTLOAD = qw/Default/;
 
 # Note - see back-compat methods at end of file.
-has _tree => (is => 'rw');
+has _tree => (is => 'rw', builder => '_build__tree');
 has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
 has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
@@ -44,8 +45,6 @@ around qw/preload_dispatch_types postload_dispatch_types/ => sub {
     return $self->$orig([@_]) if (scalar @_ && ref $_[0] ne 'ARRAY');
     return $self->$orig(@_);
 };
-
-no Moose;
 
 =head1 NAME
 
@@ -68,13 +67,13 @@ Construct a new dispatcher.
 
 =cut
 
-sub BUILD {
-  my ($self, $params) = @_;
+sub _build__tree {
+  my ($self) = @_;
 
   my $container =
     Catalyst::ActionContainer->new( { part => '/', actions => {} } );
 
-  $self->_tree( Tree::Simple->new( $container, Tree::Simple->ROOT ) );
+  return Tree::Simple->new($container, Tree::Simple->ROOT);
 }
 
 =head2 $self->preload_dispatch_types
@@ -718,7 +717,6 @@ foreach my $public_method_name (qw/
 }
 # End 5.70 backwards compatibility hacks.
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 =head2 meta
