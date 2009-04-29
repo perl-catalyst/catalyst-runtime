@@ -13,3 +13,4 @@ Debian*
 #README
 Catalyst-Runtime-*
 *.bs
+t/tmp
