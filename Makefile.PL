@@ -72,7 +72,7 @@ if ($Module::Install::AUTHOR) {
 
   # Strip out the author only build_requires from META.yml
   # Need to do this _after_ WriteAll else it looses track of them
-  strip_author_only_build_requires(@force_build_requires_if_author);
+  strip_author_only_build_requires(@force_build_requires_if_author, 'Test::Aggregate');
 
   Meta->{values}{resources} = [
     [ 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
