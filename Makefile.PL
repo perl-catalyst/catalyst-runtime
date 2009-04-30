@@ -117,6 +117,8 @@ my %conflicts = (
     'CatalystX::Imports'               => '0.03',
     'Catalyst::Plugin::HashedCookies'  => '1.03',
     'Catalyst::Action::REST'           => '0.67',
+    'CatalystX::CRUD'                  => '0.42',
+    'CatalystX::CRUD::Model::RDBO'     => '0.20',
 );
 check_conflicts(%conflicts);
 
