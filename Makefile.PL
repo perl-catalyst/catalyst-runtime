@@ -106,6 +106,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
     'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
     'Catalyst::Devel'                  => '0.09',
