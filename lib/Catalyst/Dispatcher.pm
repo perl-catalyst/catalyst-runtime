@@ -708,9 +708,12 @@ foreach my $public_method_name (qw/
                           # I haven't provided a way to disable them, patches welcome.
         $meta->add_before_method_modifier($public_method_name, sub {
             my $class = blessed(shift);
+            my $class = caller(2);
+            chomp($class);
             $package_hash{$class}++ || do {
-                warn("Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,\n"
-                    . "this will be removed in Catalyst 5.9X\n");
+                warn("Class $class is calling the deprecated method\n"
+                    . "  Catalyst::Dispatcher::$public_method_name,\n"
+                    . "  this will be removed in Catalyst 5.9X\n");
             };
         });
     }
