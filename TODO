@@ -18,6 +18,9 @@ Known Bugs:
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-unknown-error/tree/master
 
+   - -restarter.t will fail if you don't have ::StashChange installed, and
+      also quite often at other times.
+
 Compatibility warnings to add:
 
    - $self->config should warn as config should only ever be called as a
