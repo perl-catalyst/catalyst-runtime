@@ -5,7 +5,7 @@ use warnings;
 
 use FindBin;
 use lib         "$FindBin::Bin/lib";
-use Test::More  tests => 56;
+use Test::More  tests => 59;
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 use Catalyst::Utils;
@@ -91,6 +91,18 @@ use_ok( $Class );
         ok( $c->action,         "               Action object accessible" );
     } }
 }
+
+### perl5.8.8 + cat 5.80's Cat::Test->ctx_request didn't return $c the 2nd 
+### time it was invoked. Without tracking the bug down all the way, it was
+### clearly related to the Moose'ification of Cat::Test and a scoping issue
+### with a 'my'd variable. Since the same code works fine in 5.10, a bug in
+### either Moose or perl 5.8 is suspected.
+{   ok( 1,                      "Testing consistency of ctx_request()" );
+    for( 1..2 ) {
+        my($res, $c) = ctx_request( $Url );
+        ok( $c,                 "   Call $_: Context object returned" );
+    }
+}    
 
 # FIXME - These vhosts in tests tests should be somewhere else...
 
