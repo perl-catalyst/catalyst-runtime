@@ -1100,7 +1100,6 @@ EOF
     # modifiers work correctly in MyApp (as you have to call setup _before_
     # applying modifiers).
     Scope::Upper::reap(sub {
-        die $@ if $@; # This does not appear to do what you think it does.
         my $meta = Class::MOP::get_metaclass_by_name($class);
         if ( $meta->is_immutable && ! { $meta->immutable_options }->{inline_constructor} ) {
             die "You made your application class ($class) immutable, "
