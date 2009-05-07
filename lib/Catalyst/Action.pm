@@ -99,9 +99,9 @@ Returns the private path for this action.
 
 returns the sub name of this action.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Matt S. Trout
 
 =head1 COPYRIGHT
 

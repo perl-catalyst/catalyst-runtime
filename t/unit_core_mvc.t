@@ -1,4 +1,4 @@
-use Test::More tests => 44;
+use Test::More tests => 37;
 use strict;
 use warnings;
 
@@ -107,23 +107,6 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
     is_deeply( [ MyApp->view( qr{^V[ie]+w$} ) ], [ 'MyApp::V::View' ], 'regexp view ok' );
     is_deeply( [ MyApp->controller( qr{Dummy\::Model$} ) ], [ 'MyApp::Controller::Model::Dummy::Model' ], 'regexp controller ok' );
     is_deeply( [ MyApp->model( qr{Dum{2}y} ) ], [ 'MyApp::Model::Dummy::Model' ], 'regexp model ok' );
-    
-    # object w/ qr{}
-    is_deeply( [ MyApp->model( qr{Test} ) ], [ MyApp->components->{'MyApp::Model::Test::Object'} ], 'Object returned' );
-
-    {
-        my $warnings = 0;
-        no warnings 'redefine';
-        local *Catalyst::Log::warn = sub { $warnings++ };
-
-        # object w/ regexp fallback
-        is_deeply( [ MyApp->model( 'Test' ) ], [ MyApp->components->{'MyApp::Model::Test::Object'} ], 'Object returned' );
-        ok( $warnings, 'regexp fallback warnings' );
-    }
-
-    is_deeply( [ MyApp->view('MyApp::V::View$') ], [ 'MyApp::V::View' ], 'Explicit return ok');
-    is_deeply( [ MyApp->controller('MyApp::C::Controller$') ], [ 'MyApp::C::Controller' ], 'Explicit return ok');
-    is_deeply( [ MyApp->model('MyApp::M::Model$') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
 }
 
 {
@@ -147,20 +130,14 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
 }
 
 #checking @args passed to ACCEPT_CONTEXT
+my $args;
 {
-    my $args;
-
     no warnings; 
     *MyApp::Model::M::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
     *MyApp::View::V::ACCEPT_CONTEXT = sub { my ($self, $c, @args) = @_; $args= \@args};
+} 
+MyApp->model('M', qw/foo bar/);
+is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
+MyApp->view('V', qw/baz moo/);
+is_deeply($args, [qw/baz moo/], '$c->view args passed to ACCEPT_CONTEXT ok');
 
-    MyApp->model('M', qw/foo bar/);
-    is_deeply($args, [qw/foo bar/], '$c->model args passed to ACCEPT_CONTEXT ok');
-
-    my $x = MyApp->view('V', qw/foo2 bar2/);
-    is_deeply($args, [qw/foo2 bar2/], '$c->view args passed to ACCEPT_CONTEXT ok');
-
-    # regexp fallback
-    MyApp->view('::View::V', qw/foo3 bar3/);
-    is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
-}

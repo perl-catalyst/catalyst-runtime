@@ -354,11 +354,11 @@ We've added some compatability methods to handle this scenario:
 
 =head1 SEE ALSO
 
-L<Catalyst>
+L<Catalyst>.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Jon Schutz
 
 =head1 COPYRIGHT
 

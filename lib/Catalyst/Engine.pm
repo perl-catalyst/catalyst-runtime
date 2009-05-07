@@ -670,7 +670,9 @@ sub unescape_uri {
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, <sri@cpan.org>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 COPYRIGHT
 

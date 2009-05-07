@@ -64,7 +64,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.7099_03';
+our $VERSION = '5.7014';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -452,16 +452,10 @@ sub _comp_search_prefixes {
 
     # regexp fallback
     $query  = qr/$name/i;
-    @result = map { $c->components->{ $_ } } grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
-
-    # no results? try against full names
-    if( !@result ) {
-        @result = map { $c->components->{ $_ } } grep { m{$query} } keys %eligible;
-    }
+    @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
 
     # don't warn if we didn't find any results, it just might not exist
     if( @result ) {
-        $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
         $c->log->warn( 'Relying on the regexp fallback behavior for component resolution is unreliable and unsafe.' );
         $c->log->warn( 'If you really want to search, pass in a regexp as the argument.' );
     }
@@ -531,7 +525,7 @@ Gets a L<Catalyst::Model> instance by name.
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
 If the name is omitted, it will look for 
- - a model object in $c->stash->{current_model_instance}, then
+ - a model object in $c->stash{current_model_instance}, then
  - a model name in $c->stash->{current_model}, then
  - a config setting 'default_model', or
  - check if there is only one model, and return it if that's the case.
@@ -584,7 +578,7 @@ Gets a L<Catalyst::View> instance by name.
 Any extra arguments are directly passed to ACCEPT_CONTEXT.
 
 If the name is omitted, it will look for 
- - a view object in $c->stash->{current_view_instance}, then
+ - a view object in $c->stash{current_view_instance}, then
  - a view name in $c->stash->{current_view}, then
  - a config setting 'default_view', or
  - check if there is only one view, and return it if that's the case.
@@ -683,13 +677,11 @@ sub component {
 
         if( !ref $name ) {
             # is it the exact name?
-            return $c->_filter_component( $comps->{ $name }, @args )
-                       if exists $comps->{ $name };
+            return $comps->{ $name } if exists $comps->{ $name };
 
             # perhaps we just omitted "MyApp"?
             my $composed = ( ref $c || $c ) . "::${name}";
-            return $c->_filter_component( $comps->{ $composed }, @args )
-                       if exists $comps->{ $composed };
+            return $comps->{ $composed } if exists $comps->{ $composed };
 
             # search all of the models, views and controllers
             my( $comp ) = $c->_comp_search_prefixes( $name, qw/Model M Controller C View V/ );
@@ -700,13 +692,12 @@ sub component {
         my $query = ref $name ? $name : qr{$name}i;
 
         my @result = grep { m{$query} } keys %{ $c->components };
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return @result if ref $name;
 
         if( $result[ 0 ] ) {
-            $c->log->warn( qq(Found results for "${name}" using regexp fallback.) );
             $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
             $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-            return $c->_filter_component( $result[ 0 ], @args );
+            return $result[ 0 ];
         }
 
         # I would expect to return an empty list here, but that breaks back-compat
@@ -1915,11 +1906,6 @@ search paths, specify a key named C<search_extra> as an array
 reference. Items in the array beginning with C<::> will have the
 application class name prepended to them.
 
-All components found will also have any 
-L<Devel::InnerPackage|inner packages> loaded and set up as components.
-Note, that modules which are B<not> an I<inner package> of the main
-file namespace loaded will not be instantiated as components.
-
 =cut
 
 sub setup_components {
@@ -2425,15 +2411,13 @@ Wiki:
 
 =head2 L<Catalyst::Test> - The test suite.
 
-=head1 PROJECT FOUNDER
+=head1 CREDITS
 
-sri: Sebastian Riedel <sri@cpan.org>
+Andy Grundman
 
-=head1 CONTRIBUTORS
+Andy Wardley
 
-abw: Andy Wardley
-
-acme: Leon Brocard <leon@astray.com>
+Andreas Marienborg
 
 Andrew Bramble
 
@@ -2441,67 +2425,65 @@ Andrew Ford
 
 Andrew Ruthven
 
-andyg: Andy Grundman <andy@hybridized.org>
+Arthur Bergman
 
-audreyt: Audrey Tang
+Autrijus Tang
 
-bricas: Brian Cassidy <bricas@cpan.org>
+Brian Cassidy
 
-chansen: Christian Hansen
+Carl Franks
 
-chicks: Christopher Hicks
+Christian Hansen
 
-dkubb: Dan Kubb <dan.kubb-cpan@onautopilot.com>
+Christopher Hicks
+
+Dan Sully
+
+Danijel Milicevic
+
+David Kamholz
+
+David Naughton
 
 Drew Taylor
-
-esskar: Sascha Kiefer
-
-fireartist: Carl Franks <cfranks@cpan.org>
-
-gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
 Geoff Richards
 
-jcamacho: Juan Camacho
+Jesse Sheidlower
+
+Jesse Vincent
 
 Jody Belka
 
 Johan Lindstrom
 
-jon: Jon Schutz <jjschutz@cpan.org>
+Juan Camacho
 
-marcus: Marcus Ramberg <mramberg@cpan.org>
+Leon Brocard
 
-miyagawa: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+Marcus Ramberg
 
-mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
+Matt S Trout
 
-mugwump: Sam Vilain
+Robert Sedlacek
 
-naughton: David Naughton
+Sam Vilain
 
-ningu: David Kamholz <dkamholz@cpan.org>
+Sascha Kiefer
 
-nothingmuch: Yuval Kogman <nothingmuch@woobling.org>
+Sebastian Willert
 
-numa: Dan Sully <daniel@cpan.org>
-
-obra: Jesse Vincent
-
-omega: Andreas Marienborg
-
-phaylon: Robert Sedlacek <phaylon@dunkelheit.at>
-
-sky: Arthur Bergman
-
-the_jester: Jesse Sheidlower
+Tatsuhiko Miyagawa
 
 Ulf Edvinsson
 
-willert: Sebastian Willert <willert@cpan.org>
+Yuval Kogman
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 LICENSE
 

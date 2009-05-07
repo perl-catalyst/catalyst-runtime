@@ -567,9 +567,10 @@ sub _load_dispatch_types {
     return @loaded;
 }
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
+Matt S Trout, C<mst@shadowcatsystems.co.uk>
 
 =head1 COPYRIGHT
 

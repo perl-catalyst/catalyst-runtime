@@ -20,9 +20,9 @@ Catalyst Model base class.
 Implements the same methods as other Catalyst components, see
 L<Catalyst::Component>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@oook.de>
 
 =head1 COPYRIGHT
 

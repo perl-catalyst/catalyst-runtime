@@ -78,9 +78,9 @@ Accessor to the actions hashref, containing all actions in this container.
 Accessor to the path part this container resolves to. Also what the container
 stringifies to.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Matt S. Trout 
 
 =head1 COPYRIGHT
 

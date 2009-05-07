@@ -533,11 +533,17 @@ sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine>
+L<Catalyst>, L<Catalyst::Engine>.
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, <sri@cpan.org>
+
+Dan Kubb, <dan.kubb-cpan@onautopilot.com>
+
+Sascha Kiefer, <esskar@cpan.org>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 THANKS
 

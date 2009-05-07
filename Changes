@@ -1,18 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.7099_03 2008-07-20 10:10:00
-        - Fix regressions for regexp fallback in model(), view() and controller()
-        - Added the supplied argument to the regexp fallback warning for easier
-          debugging
-        - Ensure ACCEPT_CONTEXT is called for results from component()
-
-5.7099_02 2008-07-16 19:10:00
-        - Added PathPrefix attribute
-        - Removed Catalyst::Build; we've long since moved to Module::Install
-        - Updated Catalyst::Test docs to mention the use of HTTP::Request
-          objects (Rafael Kitover)
-
-5.7099_01 2008-06-25 22:36:00
+5.7xxx  xxx
         - Refactored component resolution (component(), models(), model(), et al). We now
           throw warnings for two reasons:
           1) model() or view() was called with no arguments, and two results are returned
@@ -28,8 +16,6 @@
         - Fix Catalyst::Utils::home() when application .pm is in the current dir (RT #34437)
         - Added the ability to remove parameters in req->uri_with() by passing in
           an undef value (RT #34782)
-        - Added $c->go, to do an internal redispatch to another action, while retaining the
-          contents of the stash
 
 5.7014  2008-05-25 15:26:00
         - Addition of .conf in restart regex in Catalyst::Engine::HTTP::Restarter::Watcher

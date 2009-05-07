@@ -55,9 +55,9 @@ sub uri_for_action {
     return "/".$action->namespace;
 }
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
 
 =head1 COPYRIGHT
 

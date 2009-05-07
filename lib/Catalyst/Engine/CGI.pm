@@ -239,11 +239,15 @@ sub run { shift; shift->handle_request(@_) }
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::Engine>
+L<Catalyst> L<Catalyst::Engine>.
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, <sri@cpan.org>
+
+Christian Hansen, <ch@ngmedia.com>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 COPYRIGHT
 

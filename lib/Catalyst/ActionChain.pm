@@ -79,9 +79,11 @@ actions in order.
 Takes a list of Catalyst::Action objects and constructs and returns a
 Catalyst::ActionChain object representing a chain of these actions
 
-=head1 AUTHORS
+=cut
 
-Catalyst Contributors, see Catalyst.pm
+=head1 AUTHOR
+
+Matt S. Trout
 
 =head1 COPYRIGHT
 
