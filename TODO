@@ -1,25 +1,23 @@
 Known Bugs:
-   - Moose bug causes issues if you use Moose in your application, but want to
-     use base classes which have not been converted to Moose yet.
-
-     Tests in Moose for this are: http://tinyurl.com/c2k85c
-
-     Note: This issue _does not affect_ components which have been converted to
-           Moose, or applications which do not use Moose, and causes a 
-           compile-time error if present.
 
    - Bug ->go or ->visit causes actions which have Args or CaptureArgs caled
      twice when called via ->go or ->visit.
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
 
+
    - Certain errors in your application to do with using other code which does
      not exist can cause an 'Unknown error' issue.
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-unknown-error/tree/master
+     < rafl> 21:13:03 < vincent> hah, Class::MOP::Method::Generated->_eval_closure
+     < rafl> 21:13:40 < vincent> right, shove a local $@ in there
+     < rafl> i can do that and add tests in an hour or two
+
 
    - -restarter.t will fail if you don't have ::StashChange installed, and
       also quite often at other times.
+
 
    - Catalyst::Test - bugs with Moosification (Khisanth/kane)
 
