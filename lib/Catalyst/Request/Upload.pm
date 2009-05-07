@@ -160,7 +160,9 @@ Returns the client-supplied Content-Type.
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
+
+Christian Hansen, C<ch@ngmedia.com>
 
 =head1 COPYRIGHT
 

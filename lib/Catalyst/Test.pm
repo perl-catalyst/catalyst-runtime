@@ -21,12 +21,6 @@ Catalyst::Test - Test Catalyst Applications
     request('index.html');
     get('index.html');
 
-    use HTTP::Request::Common;
-    my $response = request POST '/foo', [
-        bar => 'baz',
-        something => 'else'
-    ];
-
     # Run tests against a remote server
     CATALYST_SERVER='http://localhost:3000/' prove -r -l lib/ t/
 
@@ -51,13 +45,7 @@ Catalyst::Test - Test Catalyst Applications
 
 =head1 DESCRIPTION
 
-This module allows you to make requests to a Catalyst application either without
-a server, by simulating the environment of an HTTP request using
-L<HTTP::Request::AsCGI> or remotely if you define the CATALYST_SERVER
-environment variable.
-
-The </get> and </request> functions take either a URI or an L<HTTP::Request>
-object.
+Test Catalyst Applications.
 
 =head2 METHODS
 
@@ -115,8 +103,6 @@ sub import {
 }
 
 =head2 local_request
-
-Simulate a request using L<HTTP::Request::AsCGI>.
 
 =cut
 
@@ -197,12 +183,11 @@ sub remote_request {
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Test::WWW::Mechanize::Catalyst>,
-L<Test::WWW::Selenium::Catalyst>, L<Test::More>, L<HTTP::Request::Common>
+L<Catalyst>.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
 
 =head1 COPYRIGHT
 

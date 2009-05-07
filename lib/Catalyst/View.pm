@@ -52,9 +52,10 @@ Merges two hashes together recursively, giving right-hand precedence.
 
 =cut
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@oook.de>
+Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 

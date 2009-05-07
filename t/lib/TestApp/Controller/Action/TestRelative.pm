@@ -17,13 +17,4 @@ sub relative_two : Local {
     $c->forward( 'TestApp::Controller::Action::Forward', 'one' );
 }
 
-sub relative_go : Local {
-    my ( $self, $c ) = @_;
-    $c->go('/action/go/one');
-}
-
-sub relative_go_two : Local {
-    my ( $self, $c ) = @_;
-    $c->go( 'TestApp::Controller::Action::Go', 'one' );
-}
 1;

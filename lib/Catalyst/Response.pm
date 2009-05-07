@@ -106,8 +106,7 @@ Alias for $res->body.
 
 =head2 $res->redirect( $url, $status )
 
-Causes the response to redirect to the specified URL. The default status is
-C<302>.
+Causes the response to redirect to the specified URL.
 
     $c->response->redirect( 'http://slashdot.org' );
     $c->response->redirect( 'http://slashdot.org', 307 );
@@ -144,7 +143,9 @@ sub write { shift->{_context}->write(@_); }
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
+
+Marcus Ramberg, C<mramberg@cpan.org>
 
 =head1 COPYRIGHT
 

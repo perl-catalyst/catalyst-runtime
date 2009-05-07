@@ -20,9 +20,11 @@ remains here for compability reasons.
 
 L<Catalyst>, L<Catalyst::Controller>.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
+Marcus Ramberg, C<mramberg@cpan.org>
+Matt S Trout, C<mst@shadowcatsystems.co.uk>
 
 =head1 COPYRIGHT
 

@@ -188,7 +188,9 @@ L<Catalyst>, L<Catalyst::Engine::HTTP::Restarter>, L<File::Modified>
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, <sri@cpan.org>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 THANKS
 

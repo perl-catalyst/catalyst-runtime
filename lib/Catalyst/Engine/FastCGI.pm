@@ -399,7 +399,11 @@ L<Catalyst>, L<FCGI>.
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, <sri@cpan.org>
+
+Christian Hansen, <ch@ngmedia.com>
+
+Andy Grundman, <andy@hybridized.org>
 
 =head1 THANKS
 

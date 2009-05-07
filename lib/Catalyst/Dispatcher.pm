@@ -127,15 +127,17 @@ sub dispatch {
     }
 }
 
-# $self->_command2action( $c, $command [, \@arguments ] )
-# Search for an action, from the command and returns C<($action, $args)> on
-# success. Returns C<(0)> on error.
+=head2 $self->forward( $c, $command [, \@arguments ] )
 
-sub _command2action {
+Documented in L<Catalyst>
+
+=cut
+
+sub forward {
     my ( $self, $c, $command, @extra_params ) = @_;
 
     unless ($command) {
-        $c->log->debug('Nothing to go to') if $c->debug;
+        $c->log->debug('Nothing to forward to') if $c->debug;
         return 0;
     }
 
@@ -144,65 +146,21 @@ sub _command2action {
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
         @args = @{ pop @extra_params }
     } else {
-        # this is a copy, it may take some abuse from
-        # ->_invoke_as_path if the path had trailing parts
+        # this is a copy, it may take some abuse from ->_invoke_as_path if the path had trailing parts
         @args = @{ $c->request->arguments };
     }
 
     my $action;
 
-    # go to a string path ("/foo/bar/gorch")
-    # or action object which stringifies to that
+    # forward to a string path ("/foo/bar/gorch") or action object which stringifies to that
     $action = $self->_invoke_as_path( $c, "$command", \@args );
 
-    # go to a component ( "MyApp::*::Foo" or $c->component("...")
-    # - a path or an object)
+    # forward to a component ( "MyApp::*::Foo" or $c->component("...") - a path or an object)
     unless ($action) {
         my $method = @extra_params ? $extra_params[0] : "process";
         $action = $self->_invoke_as_component( $c, $command, $method );
     }
 
-    return $action, \@args;
-}
-
-=head2 $self->go( $c, $command [, \@arguments ] )
-
-Documented in L<Catalyst>
-
-=cut
-
-sub go {
-    my $self = shift;
-    my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
-
-    unless ($action) {
-        my $error =
-            qq/Couldn't go to command "$command": /
-          . qq/Invalid action or component./;
-        $c->error($error);
-        $c->log->debug($error) if $c->debug;
-        return 0;
-    }
-
-    local $c->request->{arguments} = $args;
-    $c->namespace($action->namespace);
-    $c->action($action);
-    $self->dispatch($c);
-
-    die $Catalyst::GO;
-}
-
-=head2 $self->forward( $c, $command [, \@arguments ] )
-
-Documented in L<Catalyst>
-
-=cut
-
-sub forward {
-    my $self = shift;
-    my ( $c, $command ) = @_;
-    my ( $action, $args ) = $self->_command2action(@_);
 
     unless ($action) {
         my $error =
@@ -213,7 +171,9 @@ sub forward {
         return 0;
     }
 
-    local $c->request->{arguments} = $args;
+    #push @$args, @_;
+
+    local $c->request->{arguments} = \@args;
     $action->dispatch( $c );
 
     return $c->state;
@@ -567,9 +527,10 @@ sub _load_dispatch_types {
     return @loaded;
 }
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+Sebastian Riedel, C<sri@cpan.org>
+Matt S Trout, C<mst@shadowcatsystems.co.uk>
 
 =head1 COPYRIGHT
 
