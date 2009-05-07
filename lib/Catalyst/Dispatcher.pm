@@ -707,7 +707,6 @@ foreach my $public_method_name (qw/
         my %package_hash; # Only warn once per method, per package. These are infrequent enough that
                           # I haven't provided a way to disable them, patches welcome.
         $meta->add_before_method_modifier($public_method_name, sub {
-            my $class = blessed(shift);
             my $class = caller(2);
             chomp($class);
             $package_hash{$class}++ || do {
