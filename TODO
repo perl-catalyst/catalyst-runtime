@@ -29,7 +29,8 @@ Compatibility warnings to add:
 Proposed functionality / feature additions:
 
     - Log setup needs to be less lame, so Catalyst::Plugin::Log::* can die
-      in a fire. Having $c->log_class would be a good start.
+      in a fire. Having $c->log_class would be a good start. kane volunteered
+      to do some of this.
 
       Simple example: Catalyst::Plugin::Log::Colorful should just be a
       subclass of Catalyst::Log, no ::Plugin:: needed.
