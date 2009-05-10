@@ -127,7 +127,7 @@ sub list {
             push(@rows, [ '', $name ]);
         }
         push(@rows, [ '', (@rows ? "=> " : '')."/${endpoint}" ]);
-        $rows[0][0] = join('/', '', @parts);
+        $rows[0][0] = join('/', '', @parts) || '/';
         $paths->row(@$_) for @rows;
     }
 
