@@ -1,8 +1,6 @@
 package TestAppWithMeta::Controller::Root;
-use Moose;
-use namespace::clean -except => 'meta';
-
-BEGIN { extends 'Catalyst::Controller' }
+use base qw/Catalyst::Controller/; # N.B. Do not convert to Moose, so we do not
+                                   #      have a metaclass instance!
 
 __PACKAGE__->config( namespace => '' );
 
