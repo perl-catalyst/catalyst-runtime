@@ -148,7 +148,7 @@ sub uri_for_action {
             $re =~ s/^\^//;
             $re =~ s/\$$//;
             my $final = '/';
-            my @captures = @$captures;
+            my @captures =  map { s/([^A-Za-z0-9\-_.!~*'()])/$URI::Escape::escapes{$1}/go; $_; } @$captures;
             while (my ($front, $rest) = split(/\(/, $re, 2)) {
                 last unless defined $rest;
                 ($rest, $re) =

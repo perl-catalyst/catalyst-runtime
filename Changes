@@ -8,6 +8,8 @@
           (Phil Mitchell)
         - Add 'use Catalyst' to documentation for a Moose MyApp class as
           noted by dmaki. (t0m)
+        - Fix so that / (and other special characters) are URL encoded when
+          passed into $c->uri_for as Args/CaptureArgs (t0m)
 
 5.80003 2009-04-29 16:23:53
         - Various POD tweaks. (hdp, dandv)
