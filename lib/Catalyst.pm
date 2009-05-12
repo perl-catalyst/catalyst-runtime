@@ -4,7 +4,7 @@ use Moose;
 extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
 use bytes;
-use Scope::Upper ();
+use B::Hooks::EndOfScope ();
 use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Request;
@@ -1099,7 +1099,7 @@ EOF
     # Note however that we have to do the work on scope end, so that method
     # modifiers work correctly in MyApp (as you have to call setup _before_
     # applying modifiers).
-    Scope::Upper::reap(sub {
+    B::Hooks::EndOfScope::on_scope_end {
         my $meta = Class::MOP::get_metaclass_by_name($class);
         if ( $meta->is_immutable && ! { $meta->immutable_options }->{inline_constructor} ) {
             die "You made your application class ($class) immutable, "
@@ -1108,7 +1108,7 @@ EOF
                 . "(replace_constructor => 1) when making your class immutable.\n";
         }
         $meta->make_immutable(replace_constructor => 1) unless $meta->is_immutable;
-    }, Scope::Upper::SCOPE(1));
+    };
 
     $class->setup_finalize;
 }
