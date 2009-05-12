@@ -23,6 +23,9 @@ Known Bugs:
 
    - Attribute called 'actions' in controllers - needs to be renamed to _actions.
 
+   - before finalize causes you to miserably fail to call plugins finalize
+     method (dmaki)
+
 Compatibility warnings to add:
 
    - $self->config should warn as config should only ever be called as a
