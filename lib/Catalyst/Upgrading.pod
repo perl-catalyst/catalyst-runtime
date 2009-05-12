@@ -126,7 +126,11 @@ etc) then the correct technique is:
 
     package MyApp;
     use Moose;
+    use Catalyst;
+
     extends 'Catalyst';
+
+    __PACKAGE__->config( name => 'MyApp' );
     __PACKAGE__->setup(qw/
         ConfigLoader
     /);

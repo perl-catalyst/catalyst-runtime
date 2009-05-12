@@ -6,6 +6,8 @@
           to the class actually calling the deprecated method. RT#45741 (t0m)
         - Clarify limitations of $request->base and $request->secure.
           (Phil Mitchell)
+        - Add 'use Catalyst' to documentation for a Moose MyApp class as
+          noted by dmaki. (t0m)
 
 5.80003 2009-04-29 16:23:53
         - Various POD tweaks. (hdp, dandv)
