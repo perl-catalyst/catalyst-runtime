@@ -388,7 +388,7 @@ sub _handler {
             # this far out, but then again it's only the dev server anyway.
             local $SIG{CHLD} = 'DEFAULT';
 
-            $class->handle_request;
+            $class->handle_request( env => \%ENV );
         }
     
         DEBUG && warn "Request done\n";
