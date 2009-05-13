@@ -9,11 +9,17 @@ Known Bugs:
    - Certain errors in your application to do with using other code which does
      not exist can cause an 'Unknown error' issue.
 
-     Test app: http://github.com/bobtfish/catalyst-app-bug-unknown-error/tree/master
-     < rafl> 21:13:03 < vincent> hah, Class::MOP::Method::Generated->_eval_closure
-     < rafl> 21:13:40 < vincent> right, shove a local $@ in there
-     < rafl> i can do that and add tests in an hour or two
+     This is now fixed, by moving back to B::Hooks::EndOfScope, but this (used
+     to) cause issues with the following modules:
 
+     - Catalyst-Plugin-Session-State-Cookie
+     - Catalyst-Plugin-Session-Store-FastMmap
+     - Catalyst-Plugin-Session-PerUser
+     - Catalyst-Plugin-Session-Store-File
+     - Catalyst-Authentication-Credential-HTTP
+     - Catalyst-Plugin-SmartURI
+
+     according to comments in r8991. Retest these before shipping anything..
 
    - -restarter.t will fail if you don't have ::StashChange installed, and
       also quite often at other times.
