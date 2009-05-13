@@ -6,8 +6,6 @@ Pre 0004:
      This is now fixed, by moving back to B::Hooks::EndOfScope, but this (used
      to) cause issues with the following modules:
 
-     - Catalyst-Plugin-Session-State-Cookie
-     - Catalyst-Plugin-Session-Store-FastMmap
      - Catalyst-Plugin-Session-PerUser
      - Catalyst-Plugin-Session-Store-File
      - Catalyst-Authentication-Credential-HTTP

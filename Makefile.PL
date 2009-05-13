@@ -106,6 +106,9 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Plugin::Session' => '0.21',
+    'Catalyst::Plugin::Session::State::Cookie' => '0.10',
+    'Catalyst-Plugin-Session-Store-FastMmap' => '0.09',
     'Catalyst::Controller::AllowDisable' => '0.03',
     'Reaction' => '0.001999',
     'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
