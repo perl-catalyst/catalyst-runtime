@@ -6,12 +6,9 @@ Pre 0004:
      This is now fixed, by moving back to B::Hooks::EndOfScope, but this (used
      to) cause issues with the following modules:
 
-     - Catalyst-Plugin-Session-PerUser
-     - Catalyst-Plugin-Session-Store-File
      - Catalyst-Authentication-Credential-HTTP
-     - Catalyst-Plugin-SmartURI
-
-     according to comments in r8991. Retest these before shipping anything..
+     
+      according to comments in r8991. Retest these before shipping anything..
 
      - Document method modifiers called on things before setup not working in your app class.
 

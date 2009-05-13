@@ -9,7 +9,7 @@ requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
 requires 'Class::MOP' => '0.83';
-requires 'Moose' => '0.76';
+requires 'Moose' => '0.78';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.09';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
@@ -106,16 +106,17 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Plugin::Session::Store::File' => '0.16',
     'Catalyst::Plugin::Session' => '0.21',
     'Catalyst::Plugin::Session::State::Cookie' => '0.10',
-    'Catalyst-Plugin-Session-Store-FastMmap' => '0.09',
+    'Catalyst::Plugin::Session::Store::FastMmap' => '0.09',
     'Catalyst::Controller::AllowDisable' => '0.03',
     'Reaction' => '0.001999',
     'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
     'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
     'Catalyst::Devel'                  => '0.09',
-    'Catalyst::Plugin::SmartURI'       => '0.029',
+    'Catalyst::Plugin::SmartURI'       => '0.032',
     'CatalystX::CRUD'                  => '0.37',
     'Catalyst::Action::RenderView'     => '0.07',
     'Catalyst::Plugin::DebugCookie'    => '0.999002',
