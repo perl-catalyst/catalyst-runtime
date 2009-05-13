@@ -106,6 +106,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Authentication::Credential::HTTP' => '1.009';
     'Catalyst::Plugin::Session::Store::File' => '0.16',
     'Catalyst::Plugin::Session' => '0.21',
     'Catalyst::Plugin::Session::State::Cookie' => '0.10',

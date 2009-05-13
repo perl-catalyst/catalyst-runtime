@@ -1,15 +1,5 @@
 Pre 0004:
 
-   - Certain errors in your application to do with using other code which does
-     not exist can cause an 'Unknown error' issue.
-
-     This is now fixed, by moving back to B::Hooks::EndOfScope, but this (used
-     to) cause issues with the following modules:
-
-     - Catalyst-Authentication-Credential-HTTP
-     
-      according to comments in r8991. Retest these before shipping anything..
-
      - Document method modifiers called on things before setup not working in your app class.
 
 Known Bugs:

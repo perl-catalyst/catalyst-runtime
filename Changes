@@ -18,6 +18,8 @@
         - Require MooseX::MethodAttributes 0.10 and use
           Moose::Meta::Class->initialize rather than Moose->init_meta to fix
           bugs related to having a 'meta' method in your controller (t0m)
+        - Fix cases where your application failing to complie could cause perl to
+          report 'Unknown Error' (t0m)
 
 5.80003 2009-04-29 16:23:53
         - Various POD tweaks. (hdp, dandv)
