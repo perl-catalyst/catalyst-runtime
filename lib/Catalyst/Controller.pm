@@ -17,7 +17,7 @@ has path_prefix =>
     (
      is => 'rw',
      isa => 'Str',
-     init_arg => 'path',
+     init_arg => 'path', # 5.7 compat
      predicate => 'has_path_prefix',
     );
 
@@ -25,7 +25,7 @@ has action_namespace =>
     (
      is => 'rw',
      isa => 'Str',
-     init_arg => 'namespace',
+     init_arg => 'namespace', # 5.7 compat
      predicate => 'has_action_namespace',
     );
 
@@ -33,16 +33,18 @@ has _controller_actions =>
     (
      is => 'rw',
      isa => 'HashRef',
-     init_arg => undef,
+     init_arg => 'action', # 5.7 compat
     );
 
-sub BUILD {
-    my ($self, $args) = @_;
+around BUILDARGS => sub { # Icky 5.7 compat
+    my $orig = shift;
+    my $self = shift;
+    my $args = $self->$orig(@_);
     my $action  = delete $args->{action}  || {};
     my $actions = delete $args->{actions} || {};
-    my $attr_value = $self->merge_config_hashes($actions, $action);
-    $self->_controller_actions($attr_value);
-}
+    $args->{action} = $self->merge_config_hashes($actions, $action);
+    return $args;
+};
 
 =head1 NAME
 
