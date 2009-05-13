@@ -18,7 +18,32 @@ or warnings which are now emitted is included below to help if you have problems
 If you think you have found an upgrade related issue which is not covered in
 this document, then please email the Catalyst list to discuss the problem.
 
+=head1 Moose features
+
+=head2 Application class roles.
+
+You can only apply method modifiers after the applications C<< ->setup >>
+method has been called. This means that modifiers will not work with methods
+which run during the call to C<< ->setup >>.
+
+=head2 Controller actions in Moose roles
+
+Is known to not work.
+
 =head1 Known backwards compatibility breakages.
+
+=head2 Applications in a single file.
+
+Applications must be in their own file, and loaded at compile time. This
+issue generally only affects the tests of cpan distributions. Defining an
+application inline in a block, and using plugins which supply a C< new >
+method, then using that application latter in tests, within the same file
+will cause your application to fail.
+
+This is due to the fact that Catalyst is inlining a new method on your
+application class allowing it to be compatible with Moose. The method used
+to do this changed in 5.80004 to avoid the possibility of reporting
+'Unknown Error' if your application failed to compile.
 
 =head2 Issues with Class::C3
 
