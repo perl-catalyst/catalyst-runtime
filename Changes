@@ -15,6 +15,9 @@
         - Fix development server so that $c->engine->env returns the correct
           environment (t0m)
         - Require Moose 0.78 to fix metaclass incompatibility issues (t0m)
+        - Require MooseX::MethodAttributes 0.10 and use
+          Moose::Meta::Class->initialize rather than Moose->init_meta to fix
+          bugs related to having a 'meta' method in your controller (t0m)
 
 5.80003 2009-04-29 16:23:53
         - Various POD tweaks. (hdp, dandv)

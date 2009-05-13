@@ -1,6 +1,7 @@
 package Catalyst::ClassData;
 
 use Moose::Role;
+use Moose::Meta::Class ();
 use Class::MOP;
 use Moose::Util ();
 
@@ -13,7 +14,7 @@ sub mk_classdata {
   my $accessor =  sub {
     my $pkg = ref $_[0] || $_[0];
     my $meta = Moose::Util::find_meta($pkg) 
-        || Moose->init_meta( for_class => $pkg );
+        || Moose::Meta::Class->initialize( $pkg );
     if (@_ > 1) {
       $meta->namespace->{$attribute} = \$_[1];
       return $_[1];
