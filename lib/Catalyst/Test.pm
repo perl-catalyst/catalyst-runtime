@@ -134,20 +134,6 @@ Catalyst::Test - Test Catalyst Applications
     # Run tests against a remote server
     CATALYST_SERVER='http://localhost:3000/' prove -r -l lib/ t/
 
-    # Tests with inline apps need to use Catalyst::Engine::Test
-    package TestApp;
-
-    use Catalyst;
-
-    sub foo : Global {
-            my ( $self, $c ) = @_;
-            $c->res->output('bar');
-    }
-
-    __PACKAGE__->setup();
-
-    package main;
-
     use Catalyst::Test 'TestApp';
     use Test::More tests => 1;
 
@@ -172,6 +158,24 @@ specific testing methods as displayed in the method section.
 
 The L<get> and L<request> functions take either a URI or an L<HTTP::Request>
 object.
+
+=head1 INLINE TESTS WILL NO LONGER WORK
+
+While it used to be possible to inline a whole testapp into a C<.t> file for a
+distribution, this will no longer work.
+
+The convention is to place your L<Catalyst> test apps into C<t/lib> in your
+distribution. E.g.: C<t/lib/TestApp.pm>, C<t/lib/TestApp/Controller/Root.pm>,
+etc..  Multiple test apps can be used in this way.
+
+Then write your C<.t> files like so:
+
+    use strict;
+    use warnings;
+    use FindBin '$Bin';
+    use lib "$Bin/lib";
+    use Test::More tests => 6;
+    use Catalyst::Test 'TestApp';
 
 =head1 METHODS
 
