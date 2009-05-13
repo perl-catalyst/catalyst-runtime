@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Rename the actions attribute in Catalyt::Controller to _controller_actions to
+          avoid name clashes with application controller naming. (random)
         - Test for using Moose in components which have a non-Moose base class
           Fixed by 349cda in Moose 0.78 (t0m)
         - Fix deprecation message for Catalyst::Dispatcher to refer

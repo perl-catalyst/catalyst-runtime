@@ -2748,6 +2748,8 @@ phaylon: Robert Sedlacek <phaylon@dunkelheit.at>
 
 rafl: Florian Ragwitz <rafl@debian.org>
 
+random: Roland Lammel <lammel@cpan.org>
+
 sky: Arthur Bergman
 
 the_jester: Jesse Sheidlower

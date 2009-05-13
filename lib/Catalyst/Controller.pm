@@ -29,7 +29,7 @@ has action_namespace =>
      predicate => 'has_action_namespace',
     );
 
-has actions =>
+has _controller_actions =>
     (
      is => 'rw',
      isa => 'HashRef',
@@ -41,7 +41,7 @@ sub BUILD {
     my $action  = delete $args->{action}  || {};
     my $actions = delete $args->{actions} || {};
     my $attr_value = $self->merge_config_hashes($actions, $action);
-    $self->actions($attr_value);
+    $self->_controller_actions($attr_value);
 }
 
 =head1 NAME
@@ -260,7 +260,7 @@ sub _parse_attrs {
     # superior while mantaining really high degree of compat
     my $actions;
     if( ref($self) ) {
-        $actions = $self->actions;
+        $actions = $self->_controller_actions;
     } else {
         my $cfg = $self->config;
         $actions = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
