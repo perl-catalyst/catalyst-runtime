@@ -8,13 +8,17 @@
 # that plugins don't get it wrong for us.
 
 # Also tests method modifiers and etc in MyApp.pm still work as expected.
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Test::Exception;
+use Moose::Util qw/find_meta/;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use Catalyst::Test qw/TestAppPluginWithConstructor/;
-ok request('/foo')->is_success;
+ok find_meta('TestAppPluginWithConstructor')->is_immutable,
+    'Am immutable after use';
+
+ok request('/foo')->is_success, 'Can get /foo';
 is $TestAppPluginWithConstructor::MODIFIER_FIRED, 1, 'Before modifier was fired correctly.';
 
 throws_ok {
