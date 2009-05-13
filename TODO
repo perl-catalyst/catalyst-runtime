@@ -25,8 +25,6 @@ Known Bugs:
       also quite often at other times.
 
 
-   - Catalyst::Test - bugs with Moosification (Khisanth/kane)
-
    - Attribute called 'actions' in controllers - needs to be renamed to _actions.
 
    - before finalize causes you to miserably fail to call plugins finalize
