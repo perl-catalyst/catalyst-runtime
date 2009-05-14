@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 8;
+use Test::More tests => 12;
 use Catalyst::Test 'TestAppOnDemand';
 
 use Catalyst::Request;
@@ -18,19 +18,19 @@ use HTTP::Request::Common;
 SKIP:
 {
     if ( $ENV{CATALYST_SERVER} ) {
-        skip "Using remote server", 8;
+        skip "Using remote server", 12;
     }
-    
+
     {
         my $params;
 
         my $request = POST(
-            'http://localhost/body/params',
+            'http://localhost/body/query_params?wibble=wobble',
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Content'      => 'foo=bar&baz=quux'
         );
-    
-        my $expected = { foo => 'bar', baz => 'quux' };
+
+        my $expected = { wibble => 'wobble' };
 
         ok( my $response = request($request), 'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
@@ -43,7 +43,32 @@ SKIP:
             );
         }
 
-        is_deeply( $params, $expected, 'Catalyst::Request body parameters' );
+        is_deeply( $params, $expected, 'Catalyst::Request query parameters' );
+    }
+
+    {
+        my $params;
+
+        my $request = POST(
+            'http://localhost/body/params?wibble=wobble',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Content'      => 'foo=bar&baz=quux'
+        );
+    
+        my $expected = { foo => 'bar', baz => 'quux', wibble => 'wobble' };
+
+        ok( my $response = request($request), 'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+
+        {
+            no strict 'refs';
+            ok(
+                eval '$params = ' . $response->content,
+                'Unserialize params'
+            );
+        }
+
+        is_deeply( $params, $expected, 'Catalyst::Request body and query parameters' );
     }
 
     # Test reading chunks of the request body using $c->read

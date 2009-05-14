@@ -5,10 +5,22 @@ use base 'Catalyst::Controller';
 
 use Data::Dump ();
 
-sub params : Local {
+sub body_params : Local {
     my ( $self, $c ) = @_;
 
     $c->res->body( Data::Dump::dump( $c->req->body_parameters ) );
+}
+
+sub query_params : Local {
+    my ( $self, $c ) = @_;
+
+    $c->res->body( Data::Dump::dump( $c->req->query_parameters ) );
+}
+
+sub params : Local {
+    my ( $self, $c ) = @_;
+
+    $c->res->body( Data::Dump::dump( $c->req->parameters ) );
 }
 
 sub read : Local {
