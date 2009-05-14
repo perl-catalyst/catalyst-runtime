@@ -8,6 +8,7 @@ use Catalyst qw/
     Test::Inline
     +TestApp::Plugin::FullyQualified
     +TestApp::Plugin::AddDispatchTypes
+    +TestApp::Role
 /;
 use Catalyst::Utils;
 

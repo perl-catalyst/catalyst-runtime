@@ -2479,9 +2479,6 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        # no ignore_loaded here, the plugin may already have been
-        # defined in memory and we don't want to error on "no file" if so
-
         Class::MOP::load_class( $plugin );
 
         $proto->_plugins->{$plugin} = 1;
@@ -2502,14 +2499,27 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 
         $class->_plugins( {} ) unless $class->_plugins;
         $plugins ||= [];
-        for my $plugin ( reverse @$plugins ) {
 
-            unless ( $plugin =~ s/\A\+// ) {
-                $plugin = "Catalyst::Plugin::$plugin";
-            }
+        my @plugins = map { s/\A\+// ? $_ : "Catalyst::Plugin::$_" } @$plugins;
+        
+        Class::MOP::load_class($_) for @plugins;
+        
+        for my $plugin ( reverse @plugins ) {
+            my $meta = find_meta($plugin);
+            next if $meta && $meta->isa('Moose::Meta::Role');
 
             $class->_register_plugin($plugin);
         }
+
+        my @roles =
+            map { $_->name }
+            grep { $_ && blessed($_) && $_->isa('Moose::Meta::Role') }
+            map { find_meta($_) }
+            @plugins;
+         
+        Moose::Util::apply_all_roles(
+            $class => @roles
+        ) if @roles;
     }
 }
 
