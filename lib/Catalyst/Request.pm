@@ -36,14 +36,6 @@ has headers => (
   lazy => 1,
 );
 
-# Moose TODO:
-# - Can we lose the before modifiers which just call prepare_body ?
-#   they are wasteful, slow us down and feel cluttery.
-# Can we call prepare_body at BUILD time?
-# Can we make _body an attribute, have the rest of 
-# these lazy build from there and kill all the direct hash access
-# in Catalyst.pm and Engine.pm?
-
 has _context => (
   is => 'rw',
   weak_ref => 1,
@@ -58,11 +50,6 @@ has body_parameters => (
   default => sub { {} },
 );
 
-before body_parameters => sub {
-  my ($self) = @_;
-  $self->_context->prepare_body();
-};
-
 has uploads => (
   is => 'rw',
   required => 1,
@@ -75,6 +62,20 @@ has parameters => (
   lazy => 1,
   default => sub { {} },
 );
+
+# TODO:
+# - Can we lose the before modifiers which just call prepare_body ?
+#   they are wasteful, slow us down and feel cluttery.
+
+#  Can we make _body an attribute, have the rest of
+#  these lazy build from there and kill all the direct hash access
+#  in Catalyst.pm and Engine.pm?
+
+before $_ => sub {
+    my ($self) = @_;
+    my $context = $self->_context || return;
+    $context->prepare_body;
+} for qw/parameters body_parameters/;
 
 around parameters => sub {
     my ($orig, $self, $params) = @_;

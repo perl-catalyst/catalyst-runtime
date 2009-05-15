@@ -23,6 +23,8 @@
           to report 'Unknown Error' (t0m)
         - Support adding Moose::Roles to the plugin list. These are applied to
           MyApp after plugins have been pushed onto @ISA (t0m)
+        - Fix calling $c->req->parameters as the first thing you do when
+          parse_on_demand is on (t0m)
 
 5.80003 2009-04-29 16:23:53
         - Various POD tweaks. (hdp, dandv)
