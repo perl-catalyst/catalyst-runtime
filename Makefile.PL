@@ -38,7 +38,9 @@ requires 'MRO::Compat';
 recommends 'B::Hooks::OP::Check::StashChange';
 
 test_requires 'Class::Data::Inheritable';
-test_requires 'Test::MockObject';
+test_requires 'Test::MockObject' => '1.07'; # Newish (hah, 2006!) version to
+                                            # hopefully avoid broken distro
+                                            # packages (RT#46104)
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate is available
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Aggregate', '0.34_01')) {
