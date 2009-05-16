@@ -26,9 +26,12 @@ You can only apply method modifiers after the applications C<< ->setup >>
 method has been called. This means that modifiers will not work with methods
 which run during the call to C<< ->setup >>.
 
+See L<Catalyst::Manual::ExtendingCatalyst> for more information about using
+L<Moose> in your applications.
+
 =head2 Controller actions in Moose roles
 
-Is known to not work.
+Currently having actions declared in Roles is unsupported.
 
 =head1 Known backwards compatibility breakages.
 
