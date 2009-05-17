@@ -6,23 +6,24 @@ Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
 Most applications and plugins should run unaltered on Catalyst 5.80.
 
-However as a lot of refactoring work has taken place, and several changes have
+However, a lot of refactoring work has taken place, and several changes have
 been made which could cause incompatibilities. If your application or plugin
-is using deprecated code, or relying on side-effects, then you could have
+is using deprecated code, or relying on side effects, then you could have
 issues upgrading to this release.
 
-Most issues found with pre-existing components have been easy to solve, and a
-complete description of behaviour changes which may cause compatibility issues,
-or warnings which are now emitted is included below to help if you have problems.
+Most issues found with pre-existing components have been easy to
+solve. This document provides a complete description of behavior changes
+which may cause compatibility issues, and of new Catalyst warnings which
+be unclear.
 
-If you think you have found an upgrade related issue which is not covered in
-this document, then please email the Catalyst list to discuss the problem.
+If you think you have found an upgrade-related issue which is not covered in
+this document, please email the Catalyst list to discuss the problem.
 
 =head1 Moose features
 
-=head2 Application class roles.
+=head2 Application class roles
 
-You can only apply method modifiers after the applications C<< ->setup >>
+You can only apply method modifiers after the application's C<< ->setup >>
 method has been called. This means that modifiers will not work with methods
 which run during the call to C<< ->setup >>.
 
@@ -31,38 +32,39 @@ L<Moose> in your applications.
 
 =head2 Controller actions in Moose roles
 
-Currently having actions declared in Roles is unsupported.
+Declaring actions in Roles is currently unsupported.
 
-=head1 Known backwards compatibility breakages.
+=head1 Known backwards compatibility breakages
 
-=head2 Applications in a single file.
+=head2 Applications in a single file
 
 Applications must be in their own file, and loaded at compile time. This
-issue generally only affects the tests of cpan distributions. Defining an
-application inline in a block, and using plugins which supply a C< new >
-method, then using that application latter in tests, within the same file
-will cause your application to fail.
+issue generally only affects the tests of CPAN distributions. Your
+application will fail if you try to define an application inline in a
+block, and use plugins which supply a C< new > method, then use that
+application latter in tests within the same file.
 
 This is due to the fact that Catalyst is inlining a new method on your
-application class allowing it to be compatible with Moose. The method used
-to do this changed in 5.80004 to avoid the possibility of reporting
-'Unknown Error' if your application failed to compile.
+application class allowing it to be compatible with Moose. The method
+used to do this changed in 5.80004 to avoid the possibility of reporting
+an 'Unknown Error' if your application failed to compile.
 
 =head2 Issues with Class::C3
 
-Catalyst 5.80 uses L<Algorithm::C3> method dispatch order. This is built into
-perl 5.10, and comes via L<Class::C3> for perl 5.8. This replaces L<NEXT>
-with L<Class::C3::Adopt::NEXT>, forcing all components to resolve methods using
-C3, rather than the unpredictable dispatch order of L<NEXT>.
+Catalyst 5.80 uses the L<Algorithm::C3> method dispatch order. This is
+built into Perl 5.10, and comes via L<Class::C3> for Perl 5.8. This
+replaces L<NEXT> with L<Class::C3::Adopt::NEXT>, forcing all components
+to resolve methods using C3, rather than the unpredictable dispatch
+order of L<NEXT>.
 
 This issue is characterised by your application failing to start due to an
 error message about having a non-linear @ISA.
 
-The Catalyst plugin most often causing this, is
-L<Catalyst::Plugin::Session::Store::FastMmap> - if you are using this plugin
-and see issues, then please upgrade - and please try upgrading your plugins
-if you have this issue, as it has been fixed. Note that Makefile.PL in the
-distribution will warn about known incompatible components.
+The Catalyst plugin most often causing this is
+L<Catalyst::Plugin::Session::Store::FastMmap> - if you are using this
+plugin and see issues, then please upgrade your plugins, as it has been
+fixed. Note that Makefile.PL in the distribution will warn about known
+incompatible components.
 
 This issue can, however, be found in your own application - the only solution is
 to go through each base class of the class the error was reported against, until
@@ -78,7 +80,7 @@ Most common is the case of:
     package Component1; # Note, this is the common case
     use base qw/Class::Accessor::Fast Class::Data::Inheritable/;
 
-    package Component2; # Accidentally saying it this way round causes fail.
+    package Component2; # Accidentally saying it this way causes a failure
     use base qw/Class::Data::Inheritable Class::Accessor::Fast/;
 
     package GoesBang;
@@ -86,7 +88,7 @@ Most common is the case of:
 
 Any situation like this will cause your application to fail to start.
 
-Please see additional documentation about this issue, and how to resolve it in
+For additional documentation about this issue, and how to resolve it, see
 L<Class::C3::Adopt::NEXT>.
 
 =head2 Components which inherit from Moose::Object before Catalyst::Component
@@ -97,7 +99,7 @@ Moose components which say:
     use Moose;
     extends qw/Moose::Object Catalyst::Component/;
 
-to use the constructor provided by Moose, whilst working (if you do some hacks
+to use the constructor provided by Moose, while working (if you do some hacks
 with the C< BUILDARGS > method), will not work with Catalyst 5.80 as
 C<Catalyst::Component> inherits from C<Moose::Object>, and so C< @ISA > fails
 to linearize.
@@ -106,7 +108,7 @@ The fix for this is to not inherit directly from C<Moose::Object>
 yourself. Having components which do not inherit their constructor from
 C<Catalyst::Component> is B<unsupported>, and has never been recommended,
 therefore you're on your own if you're using this technique. You'll need
-to detect the version of Catalyst your application is running with and deal
+to detect the version of Catalyst your application is running, and deal
 with it appropriately.
 
 You will also see this issue if you do the following:
@@ -150,7 +152,7 @@ Similar to the above, this will also fail:
     __PACKAGE__->setup;
 
 If you need to use Moose in your application class (e.g. for method modifiers
-etc) then the correct technique is:
+etc.) then the correct technique is:
 
     package MyApp;
     use Moose;
@@ -178,8 +180,8 @@ to use L<Sub::Name> to name the subroutine. Example:
     my $full_method_name = join('::',$package_name, $method_name);
     *$full_method_name = subname $full_method_name, sub { ... };
 
-Additionally, you can take advantage of Catalysts use of L<Class::MOP> and
-install the closure using the appropriate meta class. Example:
+Additionally, you can take advantage of Catalyst's use of L<Class::MOP> and
+install the closure using the appropriate metaclass. Example:
 
     use Class::MOP;
     my $metaclass = Moose::Meta::Class->initialize($package_name);
@@ -187,7 +189,7 @@ install the closure using the appropriate meta class. Example:
 
 =head2 Hooking into application setup
 
-To execute code during application start-up the following snippet in MyApp.pm
+To execute code during application start-up, the following snippet in MyApp.pm
 used to work:
 
     sub setup {
@@ -196,10 +198,10 @@ used to work:
         ... # things to do after the actual setup
     }
 
-With Catalyst 5.80 this won't work anymore. Due to the fact that Catalyst is
-no longer using NEXT.pm for method resolution, this no longer works. The
-functionality was only ever originally operational as L<NEXT> remembers what
-methods have already been called, and will not call them again.
+With Catalyst 5.80 this won't work anymore, because Catalyst no longer
+uses NEXT.pm for method resolution. The functionality was only ever
+originally operational as L<NEXT> remembers what methods have already
+been called, and will not call them again.
 
 Using this now causes infinite recursion between MyApp::setup and
 Catalyst::setup, due to other backwards compatibility issues related to how
@@ -217,13 +219,13 @@ The setup_finalize hook was introduced as a way to avoid this issue.
 =head2 Components with a new method which returns false
 
 Previously, if you had a component which inherited from Catalyst::COMPONENT,
-but overrode the new method to return false, then your class' configuration
+but overrode the new method to return false, then your class's configuration
 would be blessed into a hash on your behalf, and this would be returned from
 the COMPONENT method.
 
-This behaviour makes no sense, and so has been removed. Implementing your own
-C< new > method in components is B<highly> discouraged, instead, you should
-inherit the new method from Catalyst::Component, and use Mooses BUILD
+This behavior makes no sense, and so has been removed. Implementing your own
+C< new > method in components is B<highly> discouraged. Instead, you should
+inherit the new method from Catalyst::Component, and use Moose's BUILD
 functionality and/or Moose attributes to perform any construction work
 necessary for your class.
 
@@ -237,10 +239,10 @@ inside Moose.
 Previously, writing to a class data accessor would copy the accessor method
 down into your package.
 
-This behaviour has been removed. Whilst the class data is still stored
+This behavior has been removed. While the class data is still stored
 per-class, it is stored on the metaclass of the class defining the accessor.
 
-Therefore anything relying on the side-effect of the accessor being copied down
+Therefore anything relying on the side effect of the accessor being copied down
 will be broken.
 
 The following test demonstrates the problem:
@@ -262,21 +264,21 @@ The following test demonstrates the problem:
     use Test::More;
     isnt(BaseClass->can('foo'), Child->can('foo'));
 
-=head2 Extending Catalyst::Request or other classes in an ad-hoc manor using mk_accessors
+=head2 Extending Catalyst::Request or other classes in an ad-hoc manner using mk_accessors
 
 Previously, it was possible to add additional accessors to Catalyst::Request
 (or other classes) by calling the mk_accessors class method.
 
-This is no longer supported - users should make a sub-class of the class whose
-behaviour they would like to change, rather than globally polluting the
+This is no longer supported - users should make a subclass of the class whose
+behavior they would like to change, rather than globally polluting the
 Catalyst objects.
 
 =head2 Confused multiple inheritance with Catalyst::Component::COMPONENT
 
-Previously, Catalyst's COMPONENT method would delegate to the method on the
-right hand side, which could then delegate back again with NEXT. This (as it
-is insane AND makes no sense with C3 method dispatch order), and is therefore
-no longer supported.
+Previously, Catalyst's COMPONENT method would delegate to the method on
+the right hand side, which could then delegate back again with
+NEXT. This is poor practice, and in addition, makes no sense with C3
+method dispatch order, and is therefore no longer supported.
 
 If a COMPONENT method is detected in the inheritance hierarchy to the right
 hand side of Catalyst::Component::COMPONENT, then the following warning
@@ -285,7 +287,7 @@ message will be emitted:
     There is a COMPONENT method resolving after Catalyst::Component
     in ${next_package}.
 
-The correct fix is to re-arrange your class' inheritance hierarchy so that the
+The correct fix is to re-arrange your class's inheritance hierarchy so that the
 COMPONENT method you would like to inherit is the first (left-hand most)
 COMPONENT method in your @ISA.
 
@@ -293,13 +295,13 @@ COMPONENT method in your @ISA.
 
 =head2 Catalyst::Base
 
-Any code using L<Catalyst::Base> will now warn, and this module will be removed
-in a future release.
+Any code using L<Catalyst::Base> will now emit a warning; this
+module will be removed in a future release.
 
 =head2 Methods in Catalyst::Dispatcher
 
-The following methods in Catalyst::Dispatcher are both an implementation
-detail, which may change in the 5.8X release series, and therefore their use
+The following methods in Catalyst::Dispatcher are implementation
+details, which may change in the 5.8X release series, and therefore their use
 is highly deprecated.
 
 =over
@@ -325,9 +327,9 @@ The first time one of these methods is called, a warning will be emitted:
 
 You should B<NEVER> be calling any of these methods from application code.
 
-Plugins authors and maintainers whose plugins currently call these methods
+Plugin authors and maintainers whose plugins currently call these methods
 should change to using the public API, or, if you do not feel the public API
-adequately supports your use-case, please email the development list to
+adequately supports your use case, please email the development list to
 discuss what API features you need so that you can be appropriately supported.
 
 =head2 Class files with names that don't correspond to the packages they define
@@ -338,11 +340,11 @@ warning will be issued:
 
     require $class was successful but the package is not defined.
 
-This is to protect against confusing bugs caused by mis-typing package names,
+This is to protect against confusing bugs caused by mistyping package names,
 and will become a fatal error in a future version.
 
 Please note that 'inner packages' (via L<Devel::InnerPackage>) are still fully
-supported, this warning is only issued when component file naming does not map
+supported; this warning is only issued when component file naming does not map
 to B<any> of the packages defined within that component.
 
 =head2 $c->plugin method
