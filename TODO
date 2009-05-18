@@ -1,7 +1,3 @@
-Pre 0004:
-
-     - Document method modifiers called on things before setup not working in your app class.
-
 Known Bugs:
 
    - Bug ->go or ->visit causes actions which have Args or CaptureArgs caled
