@@ -1,6 +1,6 @@
 Known Bugs:
 
-   - Bug ->go or ->visit causes actions which have Args or CaptureArgs caled
+   - Bug ->go or ->visit causes actions which have Args or CaptureArgs called
      twice when called via ->go or ->visit.
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
