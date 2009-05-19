@@ -20,7 +20,7 @@
         - Require MooseX::MethodAttributes 0.10 and use
           Moose::Meta::Class->initialize rather than Moose->init_meta to fix
           bugs related to having a 'meta' method in your controller (t0m)
-        - Fix cases where your application failing to complie could cause perl
+        - Fix cases where your application failing to compile could cause perl
           to report 'Unknown Error' (t0m)
         - Support adding Moose::Roles to the plugin list. These are applied to
           MyApp after plugins have been pushed onto @ISA (t0m)
@@ -187,15 +187,15 @@
         - Added ru/ua translations to error page
         - Improve the clarity and verbosity of the warning when component
           resolution uses regex fallback. (jhannah)
-        - Handle leading CRLF in HTTP requests sometimes sent by IE6 in 
+        - Handle leading CRLF in HTTP requests sometimes sent by IE6 in
           keep-alive requests. (andyg)
         - Fixes for FastCGI with IIS 6.0 (janus)
         - Passing request method exported by Catalyst::Test an extra
           parameter used to be ignored, but started breaking if the parameter
           was not a hash in 5.8000_04. Extra parameter is now ignored if
           it isn't a hashref (t0m)
-        - Fix request argumentss getting corrupted if you override the 
-          dispatcher and call an action which detaches (for 
+        - Fix request argumentss getting corrupted if you override the
+          dispatcher and call an action which detaches (for
           Catalyst::Plugin::Authorization::ACL) (t0m)
         - Fix calling use Catalyst::Test 'MyApp' 'foo' which used to work,
           but stopped as the 2nd parameter can be an options hash now (t0m)
@@ -206,12 +206,12 @@
         - Bump version of MooseX::Emulate::Class::Accessor::Fast (t0m)
         - Stop using MooseX::Adopt::Class::Accessor::Fast by default, to stop
           breaking other packages which use Class::Accessor::Fast
-        - Remove unused action_container_class attribute from 
+        - Remove unused action_container_class attribute from
           Catalyst::Dispatcher (t0m)
         - Replace {_body} instance access with calls to _body accessors (t0m)
-        - Add backwards compatibility alias methods for private attributes on 
-          Catalyst::Dispatcher which used to be public. Needed by 
-          Catalyst::Plugin::Server and  Catalyst::Plugin::Authorization::ACL 
+        - Add backwards compatibility alias methods for private attributes on
+          Catalyst::Dispatcher which used to be public. Needed by
+          Catalyst::Plugin::Server and  Catalyst::Plugin::Authorization::ACL
           (t0m)
         - Fix return value of $c->req->body, which delegates to the body
           method on the requests HTTP::Body instance (t0m)
@@ -220,10 +220,10 @@
           method in a plugin, as used by Catalyst::Plugin::Server (t0m)
           - Test for this (t0m)
         - Fix assignment to Catalyst::Dispatcher's preload_dispatch_types and
-          postload_dispatch_types attributes - assigning a list should later 
+          postload_dispatch_types attributes - assigning a list should later
           return a listref. Fixes Catalyst::Plugin::Server. (t0m)
           - Tests for this (t0m)
-        - Change streaming test to serve itself rather than 01use.t, making 
+        - Change streaming test to serve itself rather than 01use.t, making
           test sync for engines easier (t0m)
         - Refactor capturing of $app from Catalyst::Controller into
           Catalyst::Component::ApplicationAttribute for easier reuse in other
@@ -232,7 +232,7 @@
         - Make debug output show class name for the engine and dispatcher
           rather than the stringified ref. (t0m)
         - Make MyApp immutable at the end of the scope after the setup
-          method is called, fixing issues with plugins which have their 
+          method is called, fixing issues with plugins which have their
           own new methods by inlining a constructor on MyApp (t0m)
           - Test for this and method modifiers in MyApp (t0m)
         - Fix bug causing Catalyst::Request::Upload's basename method
@@ -248,7 +248,7 @@
           Sewn together by t0m from two patches provided by David E. Wheeler
         - Switch an around 'new' in Catalyst::Controller to a BUILDARGS
           method as it's much neater and more obvious what is going on (t0m)
-        - Add a clearer method on request and response _context 
+        - Add a clearer method on request and response _context
           attributes, and use if from ::Engine rather than deleting
           the key from the instance hash (t0m)
         - Use handles on tree attribute of Catalyst::Stats to replace
@@ -260,28 +260,28 @@
           Catalyst::Request: _path
           Catalyst::Stats: tree
           (t0m)
-        - Fix issues in Catalyst::Controller::WrapCGI 
-          and any other components which import (or define) their 
+        - Fix issues in Catalyst::Controller::WrapCGI
+          and any other components which import (or define) their
           own meta method by always explicitly calling
           Class::MOP::Object->meta inside Catalyst (t0m)
           - Add test for this (t0m)
-        - Add test case for the bug which is causing the 
+        - Add test case for the bug which is causing the
           Catalyst::Plugin::Authentication tests to fail (t0m)
         - Fix a bug in uri_for which could cause it to generate paths
           with multiple slashes in them. (t0m)
           - Add test for this (t0m)
         - Fix SKIP block name in t/optional_http-server-restart.t,
-          stopping 'Label not found for "last SKIP"' error from 
+          stopping 'Label not found for "last SKIP"' error from
           Test::More (t0m)
         - Workaround max_redirect 0 bug in LWP (andyg)
         - Move live_engine_response_print into aggregate (andyg)
         - Fix dependency bug, s/parent/base/ in new test (rafl)
-        - Fix optional tests to run the live tests in the aggregate 
+        - Fix optional tests to run the live tests in the aggregate
           dir (andyg)
         - Fix Catalyst->go error in remote tests (andyg)
-        - Fix upload test to work with remote servers, don't check for 
+        - Fix upload test to work with remote servers, don't check for
           deleted files (andyg)
-        - Fix engine_request_uri tests to work on remote server with 
+        - Fix engine_request_uri tests to work on remote server with
           different URI (andyg)
 
 5.8000_04  2008-12-05 12:15:00
@@ -294,8 +294,8 @@
           method is overridden by a plugin, and calls the base method,
           for example Catalyst::Plugin::SmartURI (t0m)
           - Test for this (caelum)
-        - Compose the MooseX::Emulate::Class::Accessor::Fast role to 
-          Catalyst::Action, Catalyst::Request, and all other modules which 
+        - Compose the MooseX::Emulate::Class::Accessor::Fast role to
+          Catalyst::Action, Catalyst::Request, and all other modules which
           inherit from Class::Accessor::Fast in 5.70.
           This fixes:
             - Catalyst::Controller::HTML::FormFu (zamolxes)
@@ -311,7 +311,7 @@
         - Fix list address in documentation (zarquon)
         - Fix ACCEPT_CONTEXT on MyApp, called as a class method (marcus)
            - Test for this (marcus)
-        - Bump MooseX::Emulate::Class::Accessor::Fast version requirement to 
+        - Bump MooseX::Emulate::Class::Accessor::Fast version requirement to
           get more back compatibility (t0m)
         - Improve documentation for $req->captures (caelum)
         - Fix a bug in Catalyst::Stats, stopping garbage being inserted into
@@ -322,7 +322,7 @@
         - Change Catalyst::ClassData to tweak the symbol table inline for
           performance after profiling (mst)
         - Fix POD typo in finalize_error (jhannah)
-        - Add tests to ensure that we delete the temp files created by 
+        - Add tests to ensure that we delete the temp files created by
           HTTP::Body's OctetStream parser (t0m)
 
 5.8000_03 2008-10-14 14:13:00
@@ -341,7 +341,7 @@
         - Added test for component instances getting $self->{value} from config.
         - Add Catalyst::Response->print() method (ilmari)
         - Optionally aggregate tests using Test::Aggregate (Florian Ragwitz).
-        - Additional docs for uri_for to mention how to use $c->action and 
+        - Additional docs for uri_for to mention how to use $c->action and
           $c->req->captures (jhannah)
         - List unattached chained actions in Debug mode (Florian Ragwitz).
         - Pod formatting fix for Engine::FastCGI (Oleg Kostyuk).
@@ -374,7 +374,7 @@
           1) model() or view() was called with no arguments, and two results are returned
              -- set default_(model|view), current_(model|view) or current_(model|view)_instance
              instead
-          2) you call a component resolution method with a string, and it resorts to a regexp 
+          2) you call a component resolution method with a string, and it resorts to a regexp
              fallback wherein a result is returned -- if you really want to search, call the
              method with a regex as the argument
         - remove 0-length query string components so warnings aren't thrown (RT #36428)
@@ -389,9 +389,9 @@
 
 5.7014  2008-05-25 15:26:00
         - Addition of .conf in restart regex in Catalyst::Engine::HTTP::Restarter::Watcher
-        - Fix regression for relative uri_for arguments after a forward()   
-          introduced in 5.7013 (Peter Karman)  
-        - Fix regression for "sub foo : Path {}" in the root controller which 
+        - Fix regression for relative uri_for arguments after a forward()
+          introduced in 5.7013 (Peter Karman)
+        - Fix regression for "sub foo : Path {}" in the root controller which
           was introduced when attempting to allow "0" as a Path.
 
 5.7013  2008-05-16 18:20:00
@@ -440,7 +440,7 @@
         - Resource forks in 5.7009
 
 5.7009  2007-08-22 00:14:00
-        - Moved Manual.pod to Manual.pm and clarified status of 
+        - Moved Manual.pod to Manual.pm and clarified status of
           Catalyst-Manual dist
         - Doc patches to Catalyst::Controller
         - remove ignore_loaded from plugin load, commenting why
@@ -491,7 +491,7 @@
 5.7006   2006-11-15 14.18
         - Updated manifest
         - Fix Slurp dependency
-        - Updated HTTP::Body dependency to 0.6, 0.5 can break on large POST 
+        - Updated HTTP::Body dependency to 0.6, 0.5 can break on large POST
           requests.
         - Skip utf8 fix for undef values in uri_with() and uri_for()
 
@@ -510,9 +510,9 @@
         - Allow use of Catalyst::Test without app name (Ton Voon, Altinity)
         - Catalyst::Manual moved to its own package
         - Add option to FastCGI engine to send errors to stdout, not the web server
-        - Use Module::Install's auto_install to install prerequisite modules 
+        - Use Module::Install's auto_install to install prerequisite modules
         - various documentation fixes and improvements
-        
+
 5.7003   2006-09-21 16:29:45
         - Additions and updates to tutorial
 
@@ -532,7 +532,7 @@
         - bumped inc::Module::Install to 0.63 in Makefile.PL
         - fixes to uri_for_action for DispatchType::Chained
         - Further doc work.
-        - Minor code cleanups 
+        - Minor code cleanups
         - Changed catalyst.pl to depend on Catalyst::Devel
 
 5.70_03  2006-06-28 16:42:00
@@ -580,7 +580,7 @@
         - Remove tarballs and OSX metadata files.
 
 5.6901  2006-05-03 11.17:00
-        - Module::Install didn't overwrite META.yml. 
+        - Module::Install didn't overwrite META.yml.
 
 5.6900  2006-05-03 11.17:00
         - Stupid pause indexer can't count.
@@ -588,12 +588,12 @@
         - more tests.
 
 5.682   2006-04-27 13:51:00
-        - Damn OSX attributes again :( 
+        - Damn OSX attributes again :(
 
 5.681   2006-04-27 08:47:00
         - Updated manifest.
         - Add basename to core . (Deprecates Catalyst::Plugin::Basename)
-    
+
 5.68    2006-04-26 12:23:00
         - ConfigLoader: Updated to version 0.06
         - fixed undef warnings in uri_for() and uri_with()
@@ -772,7 +772,7 @@
         - Added multi process external FastCGI support
           (see myapp_fastcgi.pl -help) (Sam Vilain)
         - Restarter process in HTTP engine now properly exits when the
-          parent app is shut down.  
+          parent app is shut down.
         - Improved performance of restarter loop while watching for
           changed files.
         - Restarter will now detect new files added to an app on systems
@@ -781,7 +781,7 @@
           application.
         - Fixed memory leak in TestApp.
 
-5.49_02 2005-10-26 12:39:00 
+5.49_02 2005-10-26 12:39:00
         - Whole new dispatcher!
         - Added index action
         - Added path_to method
@@ -803,7 +803,7 @@
         - Fixed bug in uri_for method when base has no path.
         - Added automated tests for HTTP, CGI, and FastCGI servers.
 
-5.49_01 2005-10-10 10:15:00 
+5.49_01 2005-10-10 10:15:00
         - Refactored all internals, should be 99% compatible to previous
           versions.
         - *IMPORTANT* The Apache engines have been moved to a separate package
@@ -858,8 +858,8 @@
 
 5.30  2005-06-04 12:35:00
 
-        - Fixed a bug where it was not possible to $c->forward to a 
-          component 
+        - Fixed a bug where it was not possible to $c->forward to a
+          component
           that was not inheriting from Catalyst::Base.
         - Fix for inheritance bug.
         - Allow forward with arguments.
@@ -937,17 +937,17 @@
         - added plugin() method for instant plugins
         - FCGI is no more considered experimental
 
-5.02  2005-04-18 10:00:00 
+5.02  2005-04-18 10:00:00
         - fixed manifest
 
-5.01  2005-04-17 23:00:00 
+5.01  2005-04-17 23:00:00
         - some documentation bugs fixed
         - added Catalyst::Utils
         - fixed regexp bug (Matt S Trout)
         - fixed upload bug with MP19
         - added $c->req->body
         - aliased $c->res->output to $c->res->body
-        - Read AUTHOR from passwd or $ENV{AUTHOR} when 
+        - Read AUTHOR from passwd or $ENV{AUTHOR} when
           generating code.
         - extended attribute handling
         - added global config for components
@@ -994,7 +994,7 @@
         - previous release was borked!
           fixed that, but you have to regenerate the scripts again :(
 
-4.30  2005-03-21 23:00:00 
+4.30  2005-03-21 23:00:00
         - more documentation (Andrew Ford)
         - added connection informations (Christian Hansen)
         - HTTP::Request support in Catalyst::Test (Christian Hansen)
@@ -1029,9 +1029,9 @@
         - improved cgi engine docs (Christoper Hicks)
 
 4.24  2005-03-12 01:00:00
-        - updated cookbook example  
+        - updated cookbook example
         - fixed base for apache and https (Andrew Ruthven)
-        
+
 4.23  2005-03-09 20:00:00
         - no more regex actions in forward
         - added support for test directories t/m, t/v and t/c
@@ -1090,12 +1090,12 @@
         - removed roles management from Catalyst::Engine
           and added it to Catalyst::Plugin::Authentication::CDBI
 
-3.04  2005-02-17 21:00:00 
+3.04  2005-02-17 21:00:00
         - error reporting for app class
         - no more engine debug messages
         - class->method forwards get resolved now
 
-3.03  2005-02-16 23:00:00 
+3.03  2005-02-16 23:00:00
         - friendlier statistics
 
 3.02  2005-02-16 22:00:00
