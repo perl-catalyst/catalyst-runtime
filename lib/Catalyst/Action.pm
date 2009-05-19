@@ -10,7 +10,7 @@ Catalyst::Action - Catalyst Action
 
 =head1 DESCRIPTION
 
-This class represents a Catalyst Action. You can access the object for the 
+This class represents a Catalyst Action. You can access the object for the
 currently dispatched action via $c->action. See the L<Catalyst::Dispatcher>
 for more information on how actions are dispatched. Actions are defined in
 L<Catalyst::Controller> subclasses.
@@ -62,7 +62,7 @@ sub execute {
 sub match {
     my ( $self, $c ) = @_;
     #would it be unreasonable to store the number of arguments
-    #the action has as it's own attribute?
+    #the action has as its own attribute?
     #it would basically eliminate the code below.  ehhh. small fish
     return 1 unless exists $self->attributes->{Args};
     my $args = $self->attributes->{Args}[0];

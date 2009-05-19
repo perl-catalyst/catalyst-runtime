@@ -42,7 +42,7 @@ foreach my $method qw(HEAD GET) {
         # method name is echo'd back in content-body, which
         # accounts for difference in content length.  In normal
         # cases the Content-Length should be the same regardless
-        # of if its a GET or HEAD request.
+        # of whether it's a GET or HEAD request.
         SKIP:
         {
             if ( $ENV{CATALYST_SERVER} ) {

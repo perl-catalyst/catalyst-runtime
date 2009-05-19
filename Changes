@@ -852,7 +852,7 @@
         - helpers now create .new files where files already exist and differ
         - fixed $Data::Dumper::Terse (Robin Berjon)
         - added arguments for detach
-        - new credits section in pod
+        - new credits section in POD
         - fixed detach to allow relative action names (Matt and Robert)
         - added the ability to have whitespaces in Path( '' ) and Regex( '' )
 
