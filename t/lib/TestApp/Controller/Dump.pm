@@ -10,7 +10,7 @@ sub default : Action Private {
 
 sub env : Action Relative {
     my ( $self, $c ) = @_;
-    $c->forward('TestApp::View::Dump', [\%ENV]);
+    $c->forward('TestApp::View::Dump::Env');
 }
 
 sub request : Action Relative {
