@@ -220,6 +220,12 @@ sub _fix_env
     my $self = shift;
     my $env = shift;
 
+    # we are gonna add variables from current system environment %ENV to %env 
+    # that contains at this moment just variables taken from FastCGI request
+    foreach my $k (keys(%ENV)) {
+      $env->{$k} = $ENV{$k} unless defined($env->{$k});
+    }
+
     return unless ( $env->{SERVER_SOFTWARE} );
 
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME

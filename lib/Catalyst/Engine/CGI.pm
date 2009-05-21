@@ -233,7 +233,7 @@ sub read_chunk { shift; shift; *STDIN->sysread(@_); }
 
 =cut
 
-sub run { shift; shift->handle_request(@_) }
+sub run { shift; shift->handle_request( env => \%ENV ) }
 
 =head1 SEE ALSO
 
