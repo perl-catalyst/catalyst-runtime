@@ -676,6 +676,18 @@ sub unescape_uri {
 
 <obsolete>, see finalize_body
 
+=head2 $self->env
+
+Hash containing enviroment variables including many special variables inserted
+by WWW server - like SERVER_*, REMOTE_*, HTTP_* ...
+
+Before accesing enviroment variables consider whether the same information is
+not directly available via Catalyst objects $c->request, $c->engine ...
+
+BEWARE: If you really need to access some enviroment variable from your Catalyst
+application you should use $c->engine->env->{VARNAME} instead of $ENV{VARNAME},
+as in some enviroments the %ENV hash does not contain what you would expect.
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
