@@ -31,8 +31,8 @@ use HTTP::Request::Common;
         'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
-    ok( eval '$env = ' . $response->content, 'Unserialize Catalyst::Request' );
-    is ref($env), 'HASH';
+    ok( eval '$env = TestApp->engine->env', 'engine->env is defined' );
+    is( ref($env), 'HASH', 'engine->env is a hash' );
     ok exists($env->{PATH}), 'Have a PATH env var';
 
     SKIP:
