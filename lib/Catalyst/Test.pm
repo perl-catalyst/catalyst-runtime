@@ -226,7 +226,7 @@ sub local_request {
     _customize_request($request, @_);
     my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
 
-    $class->handle_request;
+    $class->handle_request( env => \%ENV );
 
     return $cgi->restore->response;
 }
