@@ -34,6 +34,17 @@ L<Moose> in your applications.
 
 Declaring actions in Roles is currently unsupported.
 
+=head2 Using Moose in Components
+
+The correct way to use Moose in a component in a both forward and backwards
+compatible way is:
+
+    package TestApp::Controller::Root;
+    use Moose;
+    BEGIN { extends 'Catalyst::Component' }; # Or ::Controller, or whatever
+
+See L<Components which inherit from Moose::Object before Catalyst::Component>.
+
 =head1 Known backwards compatibility breakages
 
 =head2 Applications in a single file
@@ -104,21 +115,6 @@ with the C< BUILDARGS > method), will not work with Catalyst 5.80 as
 C<Catalyst::Component> inherits from C<Moose::Object>, and so C< @ISA > fails
 to linearize.
 
-The fix for this is to not inherit directly from C<Moose::Object>
-yourself. Having components which do not inherit their constructor from
-C<Catalyst::Component> is B<unsupported>, and has never been recommended,
-therefore you're on your own if you're using this technique. You'll need
-to detect the version of Catalyst your application is running, and deal
-with it appropriately.
-
-You will also see this issue if you do the following:
-
-    package TestApp::Controller::Example;
-    use Moose;
-    use base 'Catalyst::Controller';
-
-as C< use base > appends to @ISA.
-
 The correct way to use Moose in a component in a both forward and backwards
 compatible way is:
 
@@ -128,6 +124,13 @@ compatible way is:
 
 Note that the C< extends > declaration needs to occur in a begin block for
 L<attributes> to operate correctly.
+
+This way you do not inherit directly from C<Moose::Object>
+yourself. Having components which do not inherit their constructor from
+C<Catalyst::Component> is B<unsupported>, and has never been recommended,
+therefore you're on your own if you're using this technique. You'll need
+to detect the version of Catalyst your application is running, and deal
+with it appropriately.
 
 You also don't get the L<Moose::Object> constructor, and therefore attribute
 initialization will not work as normally expected. If you want to use Moose
@@ -139,6 +142,14 @@ attributes work as expected, and the BUILD method is called normally
 (although BUILDARGS is not).
 
 If you depend on Catalyst 5.8, then B<all> Moose features work as expected.
+
+You will also see this issue if you do the following:
+
+    package TestApp::Controller::Example;
+    use Moose;
+    use base 'Catalyst::Controller';
+
+as C< use base > appends to @ISA.
 
 =head3 use Moose in MyApp
 

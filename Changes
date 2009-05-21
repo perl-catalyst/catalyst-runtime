@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Clarify correct techniques for Moose controllers (domm)
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
 
 5.80004 2009-05-18 17:03:23
