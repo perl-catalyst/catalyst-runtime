@@ -3,7 +3,6 @@ package Catalyst::Engine::CGI;
 use Moose;
 extends 'Catalyst::Engine';
 
-has env => (is => 'rw');
 has _header_buf => (is => 'rw', clearer => '_clear_header_buf', predicate => '_has_header_buf');
 
 =head1 NAME

@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+        - Further change pushing 'env' attribute down into Catalyst::Engine
+          to make $c->engine->env work in all cases (kmx)
         - Clarify correct techniques for Moose controllers (domm)
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
 

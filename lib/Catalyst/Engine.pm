@@ -13,6 +13,8 @@ use URI::QueryParam;
 
 use namespace::clean -except => 'meta';
 
+has env => (is => 'rw');
+
 # input position and length
 has read_length => (is => 'rw');
 has read_position => (is => 'rw');
