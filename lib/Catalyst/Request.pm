@@ -26,7 +26,7 @@ has query_parameters  => (is => 'rw', default => sub { {} });
 has secure => (is => 'rw', default => 0);
 has captures => (is => 'rw', default => sub { [] });
 has uri => (is => 'rw', predicate => 'has_uri');
-has user => (is => 'rw');
+has remote_user => (is => 'rw');
 has headers => (
   is      => 'rw',
   isa     => 'HTTP::Headers',
@@ -125,6 +125,10 @@ has hostname => (
 );
 
 has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
+
+# XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
+# to confusion between Engines and Plugin::Authentication. Remove in 5.8100?
+has user => (is => 'rw');
 
 sub args            { shift->arguments(@_) }
 sub body_params     { shift->body_parameters(@_) }
@@ -587,8 +591,12 @@ sub uri_with {
 
 =head2 $req->user
 
-Returns the currently logged in user. Deprecated. The method recommended for
-newer plugins is $c->user.
+Returns the currently logged in user. B<Highly deprecated>, do not call,
+this will be removed in version 5.81.
+
+=head2 $req->remote_user
+
+Returns the value of the C<REMOTE_USER> environment variable.
 
 =head2 $req->user_agent
 

@@ -2712,6 +2712,8 @@ dkubb: Dan Kubb <dan.kubb-cpan@onautopilot.com>
 
 Drew Taylor
 
+dwc: Daniel Westermann-Clark <danieltwc@cpan.org>
+
 esskar: Sascha Kiefer
 
 fireartist: Carl Franks <cfranks@cpan.org>

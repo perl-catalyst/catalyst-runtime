@@ -10,4 +10,9 @@ sub index : Private {
     $c->res->body('root index');
 }
 
+sub req_user : Local {
+    my ( $self, $c ) = @_;
+    $c->res->body('REMOTE_USER = ' . $c->req->user);
+}
+
 1;

@@ -72,7 +72,8 @@ sub prepare_connection {
 
     $request->hostname( $ENV{REMOTE_HOST} ) if exists $ENV{REMOTE_HOST};
     $request->protocol( $ENV{SERVER_PROTOCOL} );
-    $request->user( $ENV{REMOTE_USER} );
+    $request->user( $ENV{REMOTE_USER} );  # XXX: Deprecated. See Catalyst::Request for removal information
+    $request->remote_user( $ENV{REMOTE_USER} );
     $request->method( $ENV{REQUEST_METHOD} );
 
     if ( $ENV{HTTPS} && uc( $ENV{HTTPS} ) eq 'ON' ) {
