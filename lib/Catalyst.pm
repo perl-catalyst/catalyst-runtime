@@ -904,7 +904,9 @@ Returns the engine instance. See L<Catalyst::Engine>.
 =head2 $c->path_to(@path)
 
 Merges C<@path> with C<< $c->config->{home} >> and returns a
-L<Path::Class::Dir> object.
+L<Path::Class::Dir> object. Note you can usually use this object as
+a filename, but sometimes you will have to explicitly stringify it
+yourself by calling the C<<->stringify>> method.
 
 For example:
 
