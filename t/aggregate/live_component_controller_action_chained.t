@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 145*$iters;
+use Test::More tests => 147*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -1011,4 +1011,11 @@ sub run_tests {
             'request with URI-encoded arg' );
         like( $content, qr{foo/bar;\z}, 'args decoded' );
     }
+    {
+        ok( my $content =
+            get('http://localhost/chained/return_arg_decoded/foo%2Fbar%3B'),
+            'request with URI-encoded arg' );
+        like( $content, qr{foo/bar;\z}, 'args decoded' );
+    }
 }
+
