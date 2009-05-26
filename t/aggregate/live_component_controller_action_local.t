@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 32*$iters;
+use Test::More tests => 34*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -134,5 +134,12 @@ sub run_tests {
             qr~arguments => \[\s*'foo/bar'\s*\]~,
             "Parameters don't split on %2F"
         );
+    }
+
+    {
+        ok( my $content = get('http://locahost/action/local/five/foo%2Fbar%3B'),
+            'request with URI-encoded arg');
+        # this is the CURRENT behavior
+        like( $content, qr{'foo/bar;'}, 'args for Local actions URI-decoded' );
     }
 }

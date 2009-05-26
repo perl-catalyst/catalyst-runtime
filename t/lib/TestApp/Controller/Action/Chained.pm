@@ -195,6 +195,8 @@ sub view : Chained('/') PathPart('chained') CaptureArgs(1) {}
 sub star_search : Chained('view') PathPart('search') Args(0) { }
 sub doc_star : Chained('/') PathPart('chained/doc') Args(1) {}
 
+sub return_arg : Chained('/') PathPart('chained/return_arg') Args(1) {}
+
 sub end :Private {
   my ($self, $c) = @_;
   return if $c->stash->{no_end};

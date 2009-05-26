@@ -23,4 +23,9 @@ sub four : Action Path('four/five/six') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub five : Action Local Args(1) {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;
