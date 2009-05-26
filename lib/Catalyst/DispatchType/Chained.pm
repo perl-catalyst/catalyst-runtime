@@ -151,7 +151,13 @@ sub match {
     my @parts = split('/', $path);
 
     my ($chain, $captures, $parts) = $self->recurse_match($c, '/', \@parts);
-    push @{$request->args}, @$parts if $parts && @$parts;
+
+    if ($parts && @$parts) {
+        for my $arg (@$parts) {
+            $arg =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+            push @{$request->args}, $arg;
+        }
+    }
 
     return 0 unless $chain;
 
