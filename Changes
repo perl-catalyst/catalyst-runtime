@@ -1,10 +1,19 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Behaviour changes:
+        - Arguments ($c->req->args) in Chained dispatch are now automatically
+          URL decoded to be consistent with Local/Path dispatch (Caelum)
+
+  Documentation:
+        - Clarify correct techniques for Moose controllers (domm)
+
+  Bug fixes:
         - Further change pushing 'env' attribute down into Catalyst::Engine
           to make $c->engine->env work in all cases (kmx)
         - Also fix $c->engine->env in Catalyst::Test tests (kmx)
           - Tests for this (t0m)
-        - Clarify correct techniques for Moose controllers (domm)
+
+   New features:      
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
 
 5.80004 2009-05-18 17:03:23
