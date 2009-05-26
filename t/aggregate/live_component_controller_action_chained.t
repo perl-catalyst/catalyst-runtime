@@ -1009,7 +1009,6 @@ sub run_tests {
         ok( my $content =
             get('http://localhost/chained/return_arg/foo%2Fbar%3B'),
             'request with URI-encoded arg' );
-        # this is the CURRENT behavior
-        like( $content, qr{foo%2Fbar%3B\z}, 'args NOT decoded' );
+        like( $content, qr{foo/bar;\z}, 'args decoded' );
     }
 }
