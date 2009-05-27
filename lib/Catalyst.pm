@@ -1163,7 +1163,7 @@ using C<< $c->req->captures >>.
   $c->uri_for($c->action, $c->req->captures);
 
   # For the Foo action in the Bar controller
-  $c->uri_for($c->controller->('Bar')->action_for('Foo'), $c->req->captures);
+  $c->uri_for($c->controller('Bar')->action_for('Foo'), $c->req->captures);
 
 =back
 
