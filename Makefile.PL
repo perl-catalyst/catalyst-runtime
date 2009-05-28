@@ -110,7 +110,7 @@ EOF
 my %conflicts = (
     'Catalyst::Plugin::ENV' => '9999', # This plugin is just stupid, full stop
                                        # should have been a core fix.
-    'Catalyst::Plugin::Unicode::Encoding' => '0.1',
+    'Catalyst::Plugin::Unicode::Encoding' => '0.2',
     'Catalyst::Authentication::Credential::HTTP' => '1.009',
     'Catalyst::Plugin::Session::Store::File' => '0.16',
     'Catalyst::Plugin::Session' => '0.21',
