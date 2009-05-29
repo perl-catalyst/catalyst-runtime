@@ -12,6 +12,9 @@
           to make $c->engine->env work in all cases (kmx)
         - Also fix $c->engine->env in Catalyst::Test tests (kmx)
           - Tests for this (t0m)
+        - Fix Catalyst failing to start if any plugin changed $_ whilst
+          loading (t0m)
+          - Tests for this
 
    New features:
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
