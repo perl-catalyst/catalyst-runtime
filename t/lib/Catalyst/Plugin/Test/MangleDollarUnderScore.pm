@@ -1,4 +1,4 @@
-package Catalyst::Plugin::MangleDollarUnderScore;
+package Catalyst::Plugin::Test::MangleDollarUnderScore;
 use strict;
 use warnings;
 

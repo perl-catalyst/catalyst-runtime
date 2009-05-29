@@ -42,10 +42,10 @@ is( $warnings, 1, '1 warning' );
 
 use_ok 'TestApp';
 my @expected = qw(
-  Catalyst::Plugin::MangleDollarUnderScore
   Catalyst::Plugin::Test::Errors
   Catalyst::Plugin::Test::Headers
   Catalyst::Plugin::Test::Inline
+  Catalyst::Plugin::Test::MangleDollarUnderScore
   Catalyst::Plugin::Test::Plugin
   TestApp::Plugin::AddDispatchTypes
   TestApp::Plugin::FullyQualified

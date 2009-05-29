@@ -2,7 +2,7 @@ package TestApp;
 
 use strict;
 use Catalyst qw/
-    MangleDollarUnderScore
+    Test::MangleDollarUnderScore
     Test::Errors 
     Test::Headers 
     Test::Plugin
