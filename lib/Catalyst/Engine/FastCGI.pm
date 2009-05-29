@@ -234,8 +234,8 @@ sub _fix_env
     if ( $env->{SERVER_SOFTWARE} =~ /lighttpd/ ) {
         $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
     }
-    # Fix the environment variables PATH_INFO and SCRIPT_NAME when running under IIS 6.0
-    elsif ( $env->{SERVER_SOFTWARE} =~ /IIS\/6.0/ ) {
+    # Fix the environment variables PATH_INFO and SCRIPT_NAME when running under IIS
+    elsif ( $env->{SERVER_SOFTWARE} =~ /IIS\/[67].0/ ) {
         my @script_name = split(m!/!, $env->{PATH_INFO});
         my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
         my @path_info;
