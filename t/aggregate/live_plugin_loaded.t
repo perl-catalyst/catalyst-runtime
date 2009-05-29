@@ -10,6 +10,7 @@ use Test::More tests => 5;
 use Catalyst::Test 'TestApp';
 
 my @expected = qw[
+  Catalyst::Plugin::MangleDollarUnderScore
   Catalyst::Plugin::Test::Errors
   Catalyst::Plugin::Test::Headers
   Catalyst::Plugin::Test::Inline
