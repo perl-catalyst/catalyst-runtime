@@ -451,20 +451,22 @@ Let us assume that our server has the following layout:
 
 =head3 Setup IIS 6.0 (Windows 2003)
 
-=item * B<Install FastCGI extension for IIS 6.0> 
+=over 4
+
+=item Install FastCGI extension for IIS 6.0
 
 FastCGI is not a standard part of IIS 6 - you have to install it separately. For
 more info and download go to L<http://www.iis.net/extensions/FastCGI>. Choose
 approptiate version (32-bit/64-bit), installation is quite simple 
 (in fact no questions, no options).
 
-=item * B<Create a new website>
+=item Create a new website
 
 Open "Control Panel" > "Administrative Tools" > "Internet Information Services Manager". 
 Click "Action" > "New" > "Web Site". After you finish the installation wizard
 you need to go to the new website's properties. 
 
-=item * B<Set website properties>
+=item Set website properties
 
 On tab "Web site" set proper values for: 
 Site Description, IP Address, TCP Port, SSL Port etc.
@@ -483,7 +485,7 @@ the wildcard application mapping and in the next dialog set:
 
 Close all dialogs with "OK".
 
-=item * B<Edit fcgiext.ini>
+=item Edit fcgiext.ini
 
 Put the following lines into c:\windows\system32\inetsrv\fcgiext.ini (on 64-bit 
 system c:\windows\syswow64\inetsrv\fcgiext.ini):
@@ -513,19 +515,23 @@ system c:\windows\syswow64\inetsrv\fcgiext.ini):
     ;that does not work and use "IgnoreDirectories" instead
     IgnoreDirectories=1
 
+=back
+
 =head3 Setup IIS 7.0 (Windows 2008 and Vista)
 
 Microsoft IIS 7.0 has built-in support for FastCGI so you do not have to install
 any addons.
 
-=item * B<Necessary steps during IIS7 installation>
+=over 4
+
+=item Necessary steps during IIS7 installation
 
 During IIS7 installation after you have added role "Web Server (IIS)"
 you need to check to install role feature "CGI" (do not be nervous that it is 
 not FastCGI). If you already have IIS7 installed you can add "CGI" role feature 
 through "Control panel" > "Programs and Features". 
 
-=item * B<Create a new website>
+=item Create a new website
 
 Open "Control Panel" > "Administrative Tools" > "Internet Information Services Manager" 
 > "Add Web Site".
@@ -534,21 +540,27 @@ Open "Control Panel" > "Administrative Tools" > "Internet Information Services M
     content directory: "d:\WWW\WebApp\root" 
     binding: set proper IP address, port etc.
 
-=item * B<Configure FastCGI>
+=item Configure FastCGI
 
 You can configure FastCGI extension using commandline utility 
 "c:\windows\system32\inetsrv\appcmd.exe"
 
-B<Configuring section "fastCgi" (it is a global setting)>
+=over 4
 
-I<appcmd.exe set config -section:system.webServer/fastCgi /+"[fullPath='d:\strawberry\perl\bin\perl.exe',arguments='d:\www\WebApp\script\webapp_fastcgi.pl -e',maxInstances='4',idleTimeout='300',activityTimeout='30',requestTimeout='90',instanceMaxRequests='1000',protocol='NamedPipe',flushNamedPipe='False']" /commit:apphost>
+=item Configuring section "fastCgi" (it is a global setting)
 
-B<Configuring proper handler (it is a site related setting)>
+  appcmd.exe set config -section:system.webServer/fastCgi /+"[fullPath='d:\strawberry\perl\bin\perl.exe',arguments='d:\www\WebApp\script\webapp_fastcgi.pl -e',maxInstances='4',idleTimeout='300',activityTimeout='30',requestTimeout='90',instanceMaxRequests='1000',protocol='NamedPipe',flushNamedPipe='False']" /commit:apphost
 
-I<appcmd.exe set config "CatalystSite" -section:system.webServer/handlers /+"[name='CatalystFastCGI',path='*',verb='GET,HEAD,POST',modules='FastCgiModule',scriptProcessor='d:\strawberry\perl\bin\perl.exe|d:\www\WebApp\script\webapp_fastcgi.pl -e',resourceType='Unspecified',requireAccess='Script']" /commit:apphost>
+=item Configuring proper handler (it is a site related setting)
+
+  appcmd.exe set config "CatalystSite" -section:system.webServer/handlers /+"[name='CatalystFastCGI',path='*',verb='GET,HEAD,POST',modules='FastCgiModule',scriptProcessor='d:\strawberry\perl\bin\perl.exe|d:\www\WebApp\script\webapp_fastcgi.pl -e',resourceType='Unspecified',requireAccess='Script']" /commit:apphost
 
 Note: before launching the commands above do not forget to change site 
 name and paths to values relevant for your server setup.
+
+=back
+
+=back
 
 =head1 SEE ALSO
 
