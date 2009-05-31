@@ -115,6 +115,8 @@ Possible parameters are:
 
 =item secure
 
+=item httponly
+
 =back
 
 =head2 $res->header
