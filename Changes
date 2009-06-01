@@ -20,6 +20,8 @@
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
         - Require MooseX::MethodAttributes 0.12 so that action methods
           (with attributes) can be used in / composed from Moose roles.
+        - Allow the generation of cookies with the HTTPOnly flag set
+          in Catalyst::Engine (kmx)
 
 5.80004 2009-05-18 17:03:23
         - Rename the actions attribute in Catalyt::Controller to
