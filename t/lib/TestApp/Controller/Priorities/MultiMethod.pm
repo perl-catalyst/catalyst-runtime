@@ -16,4 +16,6 @@ sub one :Path :Args(1) { }
 
 sub two :Path :Args(2) { }
 
+sub not_def : Path { }
+
 1;
