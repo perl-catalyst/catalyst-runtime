@@ -15,6 +15,10 @@
         - Fix Catalyst failing to start if any plugin changed $_ whilst
           loading (t0m)
           - Tests for this
+        - Be stricter about arguments to Args attributes for Chained actions,
+          so that they blow up on load instead of causing undefined behavior
+          later on (hdp)
+          - Tests for this
 
    New features:
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
