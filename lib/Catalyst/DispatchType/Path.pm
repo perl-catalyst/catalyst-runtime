@@ -74,7 +74,12 @@ sub match {
 
     $path = '/' if !defined $path || !length $path;
 
-    foreach my $action ( @{ $self->_paths->{$path} || [] } ) {
+    # sort from least args to most
+    my @actions = sort { ($b->attributes->{Args}||0) <=>
+                      ($a->attributes->{Args}||0) }
+            @{ $self->_paths->{$path} || [] };
+
+    foreach my $action ( @actions ) {
         next unless $action->match($c);
         $c->req->action($path);
         $c->req->match($path);
