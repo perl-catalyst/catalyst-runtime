@@ -19,6 +19,9 @@
           so that they blow up on load instead of causing undefined behavior
           later on (hdp)
           - Tests for this
+        - Prefer Path actions with a smaller (or set) number of Args (caelum)
+          Bug reported here: http://stackoverflow.com/questions/931653/catalyst-action-that-matches-a-single-file-in-the-root-directory/933181#933181
+          - Tests for this
 
    New features:
         - Add $c->req->remote_user to disambiguate from $c->req->user (dwc)
