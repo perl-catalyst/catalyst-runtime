@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80005 2009-06-06 14:40:00
+
   Behaviour changes:
         - Arguments ($c->req->args) in Chained dispatch are now automatically
           URL decoded to be consistent with Local/Path dispatch (Caelum)
