@@ -2,7 +2,7 @@ TODO for brach namespace_handling_refactor:
 
 - refactor code in 
   * Catalyst::Dispatcher::get_containers           # No Idea
-  * Catalyst::Dispatcher::get_containers           # No Idea
+  * Catalyst::Dispatcher::dispatch_type            # DONE
 
   * Catalyst::Controller::_parse_ActionClass_attr  # DONE
   * Catalyst::Dispatcher::_load_dispatch_types     # DONE
