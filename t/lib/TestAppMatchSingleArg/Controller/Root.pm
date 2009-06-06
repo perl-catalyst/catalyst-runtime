@@ -16,4 +16,9 @@ sub match_other : Path {
     $c->res->body('Path');
 }
 
+sub match_two : Path Args(2) {
+    my ($self, $c) = @_;
+    $c->res->body('Path Args(2)');
+}
+
 1;

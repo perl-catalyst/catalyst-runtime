@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 2*$iters;
+use Test::More tests => 3*$iters;
 use Catalyst::Test 'TestAppMatchSingleArg';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -25,7 +25,8 @@ else {
 
 sub run_tests {
     {
-        is(get('/foo/bar'), 'Path', 'multiple args matched :Path');
+        is(get('/foo/bar/baz'), 'Path', 'multiple args matched :Path');
         is(get('/foo'), 'Path Args(1)', 'single arg matched :Path Args(1)');
+        is(get('/foo/bar'), 'Path Args(2)', 'two args matched :Path Args(2)');
     }
 }
