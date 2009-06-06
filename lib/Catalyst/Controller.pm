@@ -376,9 +376,7 @@ sub _parse_PathPrefix_attr {
 
 sub _parse_ActionClass_attr {
     my ( $self, $c, $name, $value ) = @_;
-    unless ( $value =~ s/^\+// ) {
-      $value = join('::', $self->_action_class, $value );
-    }
+    $value = Catalyst::Utils::resolve_namespace($self->_action_class, $value);
     return ( 'ActionClass', $value );
 }
 

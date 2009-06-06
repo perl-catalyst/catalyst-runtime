@@ -1,25 +1,10 @@
-Known Bugs:
+TODO for brach namespace_handling_refactor:
 
-   - Bug ->go or ->visit causes actions which have Args or CaptureArgs called
-     twice when called via ->go or ->visit.
+- refactor code in 
+  * Catalyst::Dispatcher::get_containers           # No Idea
+  * Catalyst::Dispatcher::get_containers           # No Idea
 
-     Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
-
-Compatibility warnings to add:
-
-   - $self->config should warn as config should only ever be called as a
-     class method.
-
-Proposed functionality / feature additions:
-
-    - Log setup needs to be less lame, so Catalyst::Plugin::Log::* can die
-      in a fire. Having $c->log_class would be a good start. kane volunteered
-      to do some of this.
-
-      Simple example: Catalyst::Plugin::Log::Colorful should just be a
-      subclass of Catalyst::Log, no ::Plugin:: needed.
-
-      See also: Catalyst::Plugin::Log::Dispatch and
-      http://github.com/willert/catalyst-plugin-log4perl-simple/tree
-
-
+  * Catalyst::Controller::_parse_ActionClass_attr  # DONE
+  * Catalyst::Dispatcher::_load_dispatch_types     # DONE
+  * Catalyst::setup_plugins                        # DONE
+  to use the same namespacing method
