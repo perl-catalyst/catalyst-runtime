@@ -43,13 +43,17 @@ sub process {
         $c->res->headers->content_type('text/plain');
         $c->res->output($output);
 
-        # Repair context
-        $reference->{_context} = $context;
-        weaken( $reference->{_context} );
+        if ($context) {
+            # Repair context
+            $reference->{_context} = $context;
+            weaken( $reference->{_context} );
+        }
 
-        # Repair body
-        delete $reference->{__body_type};
-        $reference->{_body} = $body;
+        if ($body) {
+            # Repair body
+            delete $reference->{__body_type};
+            $reference->{_body} = $body;
+        }
 
         return 1;
     }
