@@ -8,3 +8,5 @@ TODO for brach namespace_handling_refactor:
   * Catalyst::Dispatcher::_load_dispatch_types     # DONE
   * Catalyst::setup_plugins                        # DONE
   to use the same namespacing method
+
+- Ok, so can you add tests for ->config(actions => { foo => { ActionClass => '+Bar' }});
