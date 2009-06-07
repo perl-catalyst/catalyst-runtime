@@ -1,6 +1,6 @@
 TODO for brach namespace_handling_refactor:
 
-- refactor code in 
+- refactor code in
   * Catalyst::Dispatcher::get_containers           # No Idea
   * Catalyst::Dispatcher::dispatch_type            # DONE
 

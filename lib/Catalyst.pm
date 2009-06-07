@@ -2502,8 +2502,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 
         $class->_plugins( {} ) unless $class->_plugins;
         $plugins ||= [];
-        
-        my @plugins = Catalyst::Utils::resolve_namespace('Catalyst::Plugin', @$plugins);
+                
+        my @plugins = Catalyst::Utils::resolve_namespace($class . '::Plugin', 'Catalyst::Plugin', @$plugins);
         
         for my $plugin ( reverse @plugins ) {
             Class::MOP::load_class($plugin);

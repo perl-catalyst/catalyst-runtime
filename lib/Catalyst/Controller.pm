@@ -390,7 +390,8 @@ sub _parse_PathPrefix_attr {
 
 sub _parse_ActionClass_attr {
     my ( $self, $c, $name, $value ) = @_;
-    $value = Catalyst::Utils::resolve_namespace($self->_action_class, $value);
+    my $appname = $self->_application;
+    $value = Catalyst::Utils::resolve_namespace($appname . '::Action', $self->_action_class, $value);
     return ( 'ActionClass', $value );
 }
 

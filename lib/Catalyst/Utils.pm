@@ -392,10 +392,11 @@ Method which adds the namespace for plugins and actions.
 
 
 sub resolve_namespace {
+    my $appnamespace = shift;
     my $namespace = shift;
     my @classes = @_;
     return String::RewritePrefix->rewrite(
-        { '' => $namespace.'::', '+' => '' }, @classes,
+        { '' => $namespace.'::', '+' => '', '~' => $appnamespace . '::' }, @classes,
       );
 }
 
