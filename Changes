@@ -1,7 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-        - Use ~ as prefix for plugins or action classes which are located in MyApp::Plugin / MyApp::Action 
-
+        - Use ~ as prefix for plugins or action classes which are located in 
+          MyApp::Plugin / MyApp::Action (mo)
+        - Controller methods without attributes are now considered actions if 
+          they are specified in config->{action(s)} (mo)
 
 5.80005 2009-06-06 14:40:00
 
