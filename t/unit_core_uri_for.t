@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 use URI;
 
 use_ok('Catalyst');
@@ -51,6 +51,11 @@ is( Catalyst::uri_for( $context, qw/bar wibble?/, 'with space' )->as_string,
     'http://127.0.0.1/foo/yada/bar/wibble%3F/with%20space', 'Space gets encoded'
 );
 
+is(
+    Catalyst::uri_for( $context, '/bar', 'with+plus', { 'also' => 'with+plus' })->as_string,
+    'http://127.0.0.1/foo/bar/with+plus?also=with%2Bplus',
+    'Plus is not encoded'
+);
 
 # test with utf-8
 is(

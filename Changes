@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+        - Stop encoding plus signs in uri_for args
+
 5.80005 2009-06-06 14:40:00
 
   Behaviour changes:

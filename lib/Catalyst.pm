@@ -1192,7 +1192,7 @@ sub uri_for {
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
-    s/([^A-Za-z0-9\-_.!~*'()])/$URI::Escape::escapes{$1}/go for @args;
+    s/([^A-Za-z0-9\-_.!~*'()+])/$URI::Escape::escapes{$1}/go for @args;
 
     unshift(@args, $path);
 
