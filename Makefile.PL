@@ -109,6 +109,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Component::ACCEPT_CONTEXT' => '0.06',
     'Catalyst::Plugin::ENV' => '9999', # This plugin is just stupid, full stop
                                        # should have been a core fix.
     'Catalyst::Plugin::Unicode::Encoding' => '0.2',
