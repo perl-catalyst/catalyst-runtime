@@ -576,7 +576,7 @@ Bill Moseley, for documentation updates and testing.
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

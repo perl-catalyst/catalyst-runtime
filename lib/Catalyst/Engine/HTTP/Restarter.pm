@@ -129,7 +129,7 @@ Many parts are ripped out of C<HTTP::Server::Simple> by Jesse Vincent.
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
