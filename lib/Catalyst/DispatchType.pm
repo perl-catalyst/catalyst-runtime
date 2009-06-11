@@ -44,7 +44,7 @@ sub match { die "Abstract method!" }
 =head2 $self->register( $c, $action )
 
 abstract method, to be implemented by dispatchtypes. Takes a
-context object and a L<Catalyst::Action> object. 
+context object and a L<Catalyst::Action> object.
 
 Should return true if it registers something, or false otherwise.
 

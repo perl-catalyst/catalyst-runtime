@@ -27,8 +27,8 @@ around run => sub {
             if !Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
-            directory => ( 
-                $options->{restart_directory} || 
+            directory => (
+                $options->{restart_directory} ||
                 File::Spec->catdir( $FindBin::Bin, '..' )
             ),
             follow_symlinks => $options->{follow_symlinks},

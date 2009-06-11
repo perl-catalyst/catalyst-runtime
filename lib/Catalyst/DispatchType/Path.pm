@@ -49,7 +49,7 @@ Debug output for Path dispatch points
 sub list {
     my ( $self, $c ) = @_;
     my $column_width = Catalyst::Utils::term_width() - 35 - 9;
-    my $paths = Text::SimpleTable->new( 
+    my $paths = Text::SimpleTable->new(
        [ 35, 'Path' ], [ $column_width, 'Private' ]
     );
     foreach my $path ( sort keys %{ $self->_paths } ) {

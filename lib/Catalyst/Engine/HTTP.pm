@@ -72,8 +72,8 @@ sub finalize_headers {
 
     # Should we keep the connection open?
     my $connection = $c->request->header('Connection');
-    if (   $self->options->{keepalive} 
-        && $connection 
+    if (   $self->options->{keepalive}
+        && $connection
         && $connection =~ /^keep-alive$/i
     ) {
         $res_headers->header( Connection => 'keep-alive' );
@@ -116,7 +116,7 @@ before prepare_read => sub {
 sub read_chunk {
     my $self = shift;
     my $c    = shift;
-    
+
     # If we have any remaining data in the input buffer, send it back first
     if ( $_[0] = delete $self->{inputbuf} ) {
         my $read = length( $_[0] );
@@ -359,11 +359,11 @@ sub _handler {
 
     my $sel = IO::Select->new;
     $sel->add( \*STDIN );
-    
+
     REQUEST:
     while (1) {
         my ( $path, $query_string ) = split /\?/, $uri, 2;
-        
+
         # Initialize CGI environment
         local %ENV = (
             PATH_INFO       => $path         || '',
@@ -390,38 +390,38 @@ sub _handler {
 
             $class->handle_request( env => \%ENV );
         }
-    
+
         DEBUG && warn "Request done\n";
-    
+
         # Allow keepalive requests, this is a hack but we'll support it until
         # the next major release.
         if ( $self->_is_keepalive ) {
             $self->_clear_keepalive;
-            
+
             DEBUG && warn "Reusing previous connection for keep-alive request\n";
-            
-            if ( $sel->can_read(1) ) {            
+
+            if ( $sel->can_read(1) ) {
                 if ( !$self->_read_headers ) {
                     # Error reading, give up
                     last REQUEST;
                 }
 
                 ( $method, $uri, $protocol ) = $self->_parse_request_line;
-                
+
                 DEBUG && warn "Parsed request: $method $uri $protocol\n";
-                
+
                 # Force HTTP/1.0
                 $protocol = '1.0';
-                
+
                 next REQUEST;
             }
-            
+
             DEBUG && warn "No keep-alive request within 1 second\n";
         }
-        
+
         last REQUEST;
     }
-    
+
     DEBUG && warn "Closing connection\n";
 
     close Remote;
@@ -493,19 +493,19 @@ sub _parse_headers {
         }
     }
     $headers->push_header( $key, $val ) if $key;
-    
+
     DEBUG && warn "Parsed headers: " . dump($headers) . "\n";
 
     # Convert headers into ENV vars
     $headers->scan( sub {
         my ( $key, $val ) = @_;
-        
+
         $key = uc $key;
         $key = 'COOKIE' if $key eq 'COOKIES';
         $key =~ tr/-/_/;
         $key = 'HTTP_' . $key
             unless $key =~ m/\A(?:CONTENT_(?:LENGTH|TYPE)|COOKIE)\z/;
-            
+
         if ( exists $ENV{$key} ) {
             $ENV{$key} .= ", $val";
         }
@@ -519,16 +519,16 @@ sub _socket_data {
     my ( $self, $handle ) = @_;
 
     my $remote_sockaddr       = getpeername($handle);
-    my ( undef, $iaddr )      = $remote_sockaddr 
-        ? sockaddr_in($remote_sockaddr) 
+    my ( undef, $iaddr )      = $remote_sockaddr
+        ? sockaddr_in($remote_sockaddr)
         : (undef, undef);
-        
+
     my $local_sockaddr        = getsockname($handle);
     my ( undef, $localiaddr ) = sockaddr_in($local_sockaddr);
 
     # This mess is necessary to keep IE from crashing the server
     my $data = {
-        peeraddr  => $iaddr 
+        peeraddr  => $iaddr
             ? ( inet_ntoa($iaddr) || '127.0.0.1' )
             : '127.0.0.1',
         localname => gethostbyaddr( $localiaddr, AF_INET ) || 'localhost',

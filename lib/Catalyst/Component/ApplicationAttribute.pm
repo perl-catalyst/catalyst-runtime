@@ -31,9 +31,9 @@ Catalyst::Component::ApplicationAttribute - Moose Role for components which capt
     use Moose;
     extends 'Catalyst::Component';
     with 'Catalyst::Component::ApplicationAttribute';
-    
+
     # Your code here
-    
+
     1;
 
 =head1 DESCRIPTION

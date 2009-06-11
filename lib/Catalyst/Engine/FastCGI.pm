@@ -20,7 +20,7 @@ This is the FastCGI engine.
 This class overloads some methods from C<Catalyst::Engine::CGI>.
 
 =head2 $self->run($c, $listen, { option => value, ... })
- 
+
 Starts the FastCGI server.  If C<$listen> is set, then it specifies a
 location to listen for FastCGI requests;
 
@@ -64,7 +64,7 @@ Specify a filename for the pid file
 
 Specify a FCGI::ProcManager sub-class
 
-=item detach          
+=item detach
 
 Detach from console
 
@@ -161,11 +161,11 @@ sub write {
         $self->prepare_write($c);
         $self->_prepared_write(1);
     }
-    
+
     # XXX: We can't use Engine's write() method because syswrite
     # appears to return bogus values instead of the number of bytes
     # written: http://www.fastcgi.com/om_archive/mail-archive/0128.html
-    
+
     # Prepend the headers if they have not yet been sent
     if ( $self->_has_header_buf ) {
         $buffer = $self->_clear_header_buf . $buffer;
@@ -220,7 +220,7 @@ sub _fix_env
     my $self = shift;
     my $env = shift;
 
-    # we are gonna add variables from current system environment %ENV to %env 
+    # we are gonna add variables from current system environment %ENV to %env
     # that contains at this moment just variables taken from FastCGI request
     foreach my $k (keys(%ENV)) {
       $env->{$k} = $ENV{$k} unless defined($env->{$k});
@@ -259,7 +259,7 @@ __END__
 
 =head2 Standalone FastCGI Server
 
-In server mode the application runs as a standalone server and accepts 
+In server mode the application runs as a standalone server and accepts
 connections from a web server.  The application can be on the same machine as
 the web server, on a remote machine, or even on multiple remote machines.
 Advantages of this method include running the Catalyst application as a
@@ -270,14 +270,14 @@ To start your application in server mode, install the FCGI::ProcManager
 module and then use the included fastcgi.pl script.
 
     $ script/myapp_fastcgi.pl -l /tmp/myapp.socket -n 5
-    
+
 Command line options for fastcgi.pl include:
 
     -d -daemon     Daemonize the server.
     -p -pidfile    Write a pidfile with the pid of the process manager.
     -l -listen     Listen on a socket path, hostname:port, or :port.
     -n -nproc      The number of processes started to handle requests.
-    
+
 See below for the specific web server configurations for using the external
 server.
 
@@ -286,20 +286,20 @@ server.
 Apache requires the mod_fastcgi module.  The same module supports both
 Apache 1 and 2.
 
-There are three ways to run your application under FastCGI on Apache: server, 
+There are three ways to run your application under FastCGI on Apache: server,
 static, and dynamic.
 
 =head3 Standalone server mode
 
     FastCgiExternalServer /tmp/myapp.fcgi -socket /tmp/myapp.socket
     Alias /myapp/ /tmp/myapp/myapp.fcgi/
-    
+
     # Or, run at the root
     Alias / /tmp/myapp.fcgi/
-    
+
     # Optionally, rewrite the path when accessed without a trailing slash
     RewriteRule ^/myapp$ myapp/ [R]
-    
+
 
 The FastCgiExternalServer directive tells Apache that when serving
 /tmp/myapp to use the FastCGI application listenting on the socket
@@ -308,7 +308,7 @@ it's a virtual file name.  With some versions of C<mod_fastcgi> or
 C<mod_fcgid>, you can use any name you like, but some require that the
 virtual filename end in C<.fcgi>.
 
-It's likely that Apache is not configured to serve files in /tmp, so the 
+It's likely that Apache is not configured to serve files in /tmp, so the
 Alias directive maps the url path /myapp/ to the (virtual) file that runs the
 FastCGI application. The trailing slashes are important as their use will
 correctly set the PATH_INFO environment variable used by Catalyst to
@@ -326,14 +326,14 @@ FastCGI script to run your application.
 
     FastCgiServer /path/to/myapp/script/myapp_fastcgi.pl -processes 3
     Alias /myapp/ /path/to/myapp/script/myapp_fastcgi.pl/
-    
+
 FastCgiServer tells Apache to start three processes of your application at
 startup.  The Alias command maps a path to the FastCGI application. Again,
 the trailing slashes are important.
-    
+
 =head3 Dynamic mode
 
-In FastCGI dynamic mode, Apache will run your application on demand, 
+In FastCGI dynamic mode, Apache will run your application on demand,
 typically by requesting a file with a specific extension (e.g. .fcgi).  ISPs
 often use this type of setup to provide FastCGI support to many customers.
 
@@ -365,7 +365,7 @@ Here is a complete example:
 
 Then a request for /script/myapp_fastcgi.pl will run the
 application.
-    
+
 For more information on using FastCGI under Apache, visit
 L<http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html>
 
@@ -399,7 +399,7 @@ These configurations were tested with Lighttpd 1.4.7.
 =head3 Static mode
 
     server.document-root = "/var/www/MyApp/root"
-    
+
     fastcgi.server = (
         "" => (
             "MyApp" => (
@@ -412,12 +412,12 @@ These configurations were tested with Lighttpd 1.4.7.
             )
         )
     )
-    
+
 Note that in newer versions of lighttpd, the min-procs and idle-timeout
 values are disabled.  The above example would start 5 processes.
 
 =head3 Non-root configuration
-    
+
 You can also run your application at any non-root location with either of the
 above modes.  Note the required mod_rewrite rule.
 
@@ -435,11 +435,11 @@ L<http://www.lighttpd.net/documentation/fastcgi.html>
 
 =head2 Microsoft IIS
 
-It is possible to run Catalyst under IIS with FastCGI, but only on IIS 6.0 
+It is possible to run Catalyst under IIS with FastCGI, but only on IIS 6.0
 (Microsoft Windows 2003), IIS 7.0 (Microsoft Windows 2008 and Vista) and
 hopefully its successors.
 
-Even if it is declared that FastCGI is supported on IIS 5.1 (Windows XP) it 
+Even if it is declared that FastCGI is supported on IIS 5.1 (Windows XP) it
 does not support some features (specifically: wildcard mappings) that prevents
 running Catalyst application.
 
@@ -457,18 +457,18 @@ Let us assume that our server has the following layout:
 
 FastCGI is not a standard part of IIS 6 - you have to install it separately. For
 more info and download go to L<http://www.iis.net/extensions/FastCGI>. Choose
-approptiate version (32-bit/64-bit), installation is quite simple 
+approptiate version (32-bit/64-bit), installation is quite simple
 (in fact no questions, no options).
 
 =item Create a new website
 
-Open "Control Panel" > "Administrative Tools" > "Internet Information Services Manager". 
+Open "Control Panel" > "Administrative Tools" > "Internet Information Services Manager".
 Click "Action" > "New" > "Web Site". After you finish the installation wizard
-you need to go to the new website's properties. 
+you need to go to the new website's properties.
 
 =item Set website properties
 
-On tab "Web site" set proper values for: 
+On tab "Web site" set proper values for:
 Site Description, IP Address, TCP Port, SSL Port etc.
 
 On tab "Home Directory" set the following:
@@ -477,7 +477,7 @@ On tab "Home Directory" set the following:
     Local path permission flags: check only "Read" + "Log visits"
     Execute permitions: "Scripts only"
 
-Click "Configuration" button (still on Home Directory tab) then click "Insert" 
+Click "Configuration" button (still on Home Directory tab) then click "Insert"
 the wildcard application mapping and in the next dialog set:
 
     Executable: "c:\windows\system32\inetsrv\fcgiext.dll"
@@ -487,7 +487,7 @@ Close all dialogs with "OK".
 
 =item Edit fcgiext.ini
 
-Put the following lines into c:\windows\system32\inetsrv\fcgiext.ini (on 64-bit 
+Put the following lines into c:\windows\system32\inetsrv\fcgiext.ini (on 64-bit
 system c:\windows\syswow64\inetsrv\fcgiext.ini):
 
     [Types]
@@ -498,19 +498,19 @@ system c:\windows\syswow64\inetsrv\fcgiext.ini):
     ;   to list websites:   "cscript adsutil.vbs ENUM /P /W3SVC"
     ;   to get site name:   "cscript adsutil.vbs GET /W3SVC/<number>/ServerComment"
     ;   to get all details: "cscript adsutil.vbs GET /W3SVC/<number>"
-    ; - or look where are the logs located: 
-    ;   c:\WINDOWS\SYSTEM32\Logfiles\W3SVC7\whatever.log 
+    ; - or look where are the logs located:
+    ;   c:\WINDOWS\SYSTEM32\Logfiles\W3SVC7\whatever.log
     ;   means that the corresponding number is "7"
-    ;if you are running just one website using FastCGI you can use '*=CatalystApp'    
+    ;if you are running just one website using FastCGI you can use '*=CatalystApp'
 
     [CatalystApp]
     ExePath=d:\strawberry\perl\bin\perl.exe
     Arguments="d:\WWW\WebApp\script\webapp_fastcgi.pl -e"
 
-    ;by setting this you can instruct IIS to serve Catalyst static files 
+    ;by setting this you can instruct IIS to serve Catalyst static files
     ;directly not via FastCGI (in case of any problems try 1)
     IgnoreExistingFiles=0
-        
+
     ;do not be fooled by Microsoft doc talking about "IgnoreExistingDirectories"
     ;that does not work and use "IgnoreDirectories" instead
     IgnoreDirectories=1
@@ -527,22 +527,22 @@ any addons.
 =item Necessary steps during IIS7 installation
 
 During IIS7 installation after you have added role "Web Server (IIS)"
-you need to check to install role feature "CGI" (do not be nervous that it is 
-not FastCGI). If you already have IIS7 installed you can add "CGI" role feature 
-through "Control panel" > "Programs and Features". 
+you need to check to install role feature "CGI" (do not be nervous that it is
+not FastCGI). If you already have IIS7 installed you can add "CGI" role feature
+through "Control panel" > "Programs and Features".
 
 =item Create a new website
 
-Open "Control Panel" > "Administrative Tools" > "Internet Information Services Manager" 
+Open "Control Panel" > "Administrative Tools" > "Internet Information Services Manager"
 > "Add Web Site".
 
     site name: "CatalystSite"
-    content directory: "d:\WWW\WebApp\root" 
+    content directory: "d:\WWW\WebApp\root"
     binding: set proper IP address, port etc.
 
 =item Configure FastCGI
 
-You can configure FastCGI extension using commandline utility 
+You can configure FastCGI extension using commandline utility
 "c:\windows\system32\inetsrv\appcmd.exe"
 
 =over 4
@@ -555,7 +555,7 @@ You can configure FastCGI extension using commandline utility
 
   appcmd.exe set config "CatalystSite" -section:system.webServer/handlers /+"[name='CatalystFastCGI',path='*',verb='GET,HEAD,POST',modules='FastCgiModule',scriptProcessor='d:\strawberry\perl\bin\perl.exe|d:\www\WebApp\script\webapp_fastcgi.pl -e',resourceType='Unspecified',requireAccess='Script']" /commit:apphost
 
-Note: before launching the commands above do not forget to change site 
+Note: before launching the commands above do not forget to change site
 name and paths to values relevant for your server setup.
 
 =back

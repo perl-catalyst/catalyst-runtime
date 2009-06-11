@@ -45,7 +45,7 @@ sub watch {
 
     my @changes;
     my @changed_files;
-    
+
     my $delay = ( defined $self->delay ) ? $self->delay : 1;
 
     sleep $delay if $delay > 0;
@@ -177,7 +177,7 @@ files
         regex     => '\.yml$|\.yaml$|\.conf|\.pm$',
         delay     => 1,
     );
-    
+
     while (1) {
         my @changed_files = $watcher->watch();
     }

@@ -248,7 +248,7 @@ EOF
         }
         /* from http://users.tkk.fi/~tkarvine/linux/doc/pre-wrap/pre-wrap-css3-mozilla-opera-ie.html */
         /* Browser specific (not valid) styles to make preformatted text wrap */
-        pre { 
+        pre {
             white-space: pre-wrap;       /* css-3 */
             white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
             white-space: -pre-wrap;      /* Opera 4-6 */
@@ -323,7 +323,7 @@ sub prepare_body {
             $request->_body->tmpdir( $c->config->{uploadtmp} )
               if exists $c->config->{uploadtmp};
         }
-        
+
         while ( my $buffer = $self->read($c) ) {
             $c->prepare_body_chunk($buffer);
         }
@@ -356,15 +356,15 @@ sub prepare_body_chunk {
 
 =head2 $self->prepare_body_parameters($c)
 
-Sets up parameters from body. 
+Sets up parameters from body.
 
 =cut
 
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
-    
+
     return unless $c->request->_body;
-    
+
     $c->request->body_parameters( $c->request->_body->param );
 }
 
@@ -444,7 +444,7 @@ process the query string and extract query parameters.
 
 sub prepare_query_parameters {
     my ( $self, $c, $query_string ) = @_;
-    
+
     # Check for keywords (no = signs)
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
@@ -456,17 +456,17 @@ sub prepare_query_parameters {
 
     # replace semi-colons
     $query_string =~ s/;/&/g;
-    
+
     my @params = grep { length $_ } split /&/, $query_string;
 
     for my $item ( @params ) {
-        
-        my ($param, $value) 
+
+        my ($param, $value)
             = map { $self->unescape_uri($_) }
               split( /=/, $item, 2 );
-          
+
         $param = $self->unescape_uri($item) unless defined $param;
-        
+
         if ( exists $query{$param} ) {
             if ( ref $query{$param} ) {
                 push @{ $query{$param} }, $value;
@@ -494,7 +494,7 @@ sub prepare_read {
 
     # Initialize the read position
     $self->read_position(0);
-    
+
     # Initialize the amount of data we think we need to read
     $self->read_length( $c->request->header('Content-Length') || 0 );
 }
@@ -628,17 +628,17 @@ sub write {
         $self->prepare_write($c);
         $self->_prepared_write(1);
     }
-    
+
     return 0 if !defined $buffer;
-    
+
     my $len   = length($buffer);
     my $wrote = syswrite STDOUT, $buffer;
-    
+
     if ( !defined $wrote && $! == EWOULDBLOCK ) {
         # Unable to write on the first try, will retry in the loop below
         $wrote = 0;
     }
-    
+
     if ( defined $wrote && $wrote < $len ) {
         # We didn't write the whole buffer
         while (1) {
@@ -650,11 +650,11 @@ sub write {
                 next if $! == EWOULDBLOCK;
                 return;
             }
-            
+
             last if $wrote >= $len;
         }
     }
-    
+
     return $wrote;
 }
 
