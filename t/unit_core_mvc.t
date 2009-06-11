@@ -1,4 +1,4 @@
-use Test::More tests => 45;
+use Test::More tests => 46;
 use strict;
 use warnings;
 
@@ -8,9 +8,6 @@ my @complist =
   map { "MyApp::$_"; }
   qw/C::Controller M::Model V::View Controller::C Model::M View::V Controller::Model::Dummy::Model Model::Dummy::Model/;
 
-my $thingie={};
-bless $thingie,'MyApp::Model::Test::Object';
-push @complist,$thingie;
 {
 
     package MyApp;
@@ -18,6 +15,10 @@ push @complist,$thingie;
     use base qw/Catalyst/;
 
     __PACKAGE__->components( { map { ( ref($_)||$_ , $_ ) } @complist } );
+
+    my $thingie={};
+    bless $thingie, 'Some::Test::Object';
+    __PACKAGE__->components->{'MyApp::Model::Test::Object'} = $thingie;
 
     # allow $c->log->warn to work
     __PACKAGE__->setup_log;
@@ -32,7 +33,7 @@ is( MyApp->model('Model'), 'MyApp::M::Model', 'M::Model ok' );
 
 is( MyApp->model('Dummy::Model'), 'MyApp::Model::Dummy::Model', 'Model::Dummy::Model ok' );
 
-isa_ok( MyApp->model('Test::Object'), 'MyApp::Model::Test::Object', 'Test::Object ok' );
+isa_ok( MyApp->model('Test::Object'), 'Some::Test::Object', 'Test::Object ok' );
 
 is( MyApp->controller('Model::Dummy::Model'), 'MyApp::Controller::Model::Dummy::Model', 'Controller::Model::Dummy::Model ok' );
 
@@ -81,7 +82,12 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyApp::V::Vie
     no warnings 'redefine';
     local *Catalyst::Log::warn = sub { $warnings++ };
 
-    like (MyApp->model , qr/^MyApp\::(M|Model)\::/ , 'model() with no defaults returns *something*');
+    ok( my $model = MyApp->model );
+
+    ok( (($model =~ /^MyApp\::(M|Model)\::/) ||
+        $model->isa('Some::Test::Object')),
+        'model() with no defaults returns *something*' );
+
     ok( $warnings, 'model() w/o a default is random, warnings thrown' );
 }
 

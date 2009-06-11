@@ -25,9 +25,11 @@ else {
 
 sub run_tests {
     {
-        is(get('/view_by_name?view=Dummy'), 'TestAppOneView::View::Dummy',
+        is(get('/view_by_name?view=Dummy'), 'AClass',
             '$c->view("name") returns blessed instance');
-        is(get('/view_no_args'), 'TestAppOneView::View::Dummy',
+        is(get('/view_by_regex?view=Dummy'), 'AClass',
+            '$c->view(qr/name/) returns blessed instance');
+        is(get('/view_no_args'), 'AClass',
             '$c->view() returns blessed instance');
     }
 }

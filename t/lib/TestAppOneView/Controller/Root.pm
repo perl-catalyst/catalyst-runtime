@@ -21,4 +21,14 @@ sub view_by_name : Local {
     $c->res->body(Scalar::Util::blessed($v));
 }
 
+sub view_by_regex : Local {
+    my ( $self, $c ) = @_;
+
+    my $v_name = $c->req->param('view');
+
+    my ($v) = $c->view(qr/$v_name/);
+
+    $c->res->body(Scalar::Util::blessed($v));
+}
+
 1;

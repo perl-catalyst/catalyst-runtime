@@ -493,8 +493,13 @@ sub clear_errors {
     $c->error(0);
 }
 
-# search components given a name and some prefixes
 sub _comp_search_prefixes {
+    my $c = shift;
+    return map $c->components->{ $_ }, $c->_comp_names_search_prefixes(@_);
+}
+
+# search components given a name and some prefixes
+sub _comp_names_search_prefixes {
     my ( $c, $name, @prefixes ) = @_;
     my $appclass = ref $c || $c;
     my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
@@ -510,18 +515,18 @@ sub _comp_search_prefixes {
     my $query  = ref $name ? $name : qr/^$name$/i;
     my @result = grep { $eligible{$_} =~ m{$query} } keys %eligible;
 
-    return map { $c->components->{ $_ } } @result if @result;
+    return @result if @result;
 
     # if we were given a regexp to search against, we're done.
     return if ref $name;
 
     # regexp fallback
     $query  = qr/$name/i;
-    @result = map { $c->components->{ $_ } } grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
+    @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
 
     # no results? try against full names
     if( !@result ) {
-        @result = map { $c->components->{ $_ } } grep { m{$query} } keys %eligible;
+        @result = grep { m{$query} } keys %eligible;
     }
 
     # don't warn if we didn't find any results, it just might not exist
@@ -558,7 +563,9 @@ sub _comp_names {
 
     my $filter = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
 
-    my @names = map { s{$filter}{}; $_; } $c->_comp_search_prefixes( undef, @prefixes );
+    my @names = map { s{$filter}{}; $_; }
+        $c->_comp_names_search_prefixes( undef, @prefixes );
+
     return @names;
 }
 
