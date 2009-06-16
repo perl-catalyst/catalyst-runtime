@@ -359,6 +359,21 @@ C<quxx>. Previously this would have added C<bar> as another value to C<foo>
 (creating it if it didn't exist before), and C<quxx> as another value for
 C<gorch>.
 
+B<NOTE> this is considered a legacy interface and care should be taken when
+using it. C<< scalar $c->req->param( 'foo' ) >> will return only the first
+C<foo> param even if multiple are present; C<< $c->req->param( 'foo' ) >> will
+return a list of as many are present, which can have unexpected consequences
+when writing code of the form:
+
+    $foo->bar(
+        a => 'b',
+        baz => $c->req->param( 'baz' ),
+    );
+
+If multiple C<baz> parameters are provided this code might corrupt data or
+cause a hash initialization error. For a more straightforward interface see
+C<< $c->req->parameters >>.
+
 =cut
 
 sub param {
