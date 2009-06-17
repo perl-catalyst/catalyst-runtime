@@ -108,3 +108,18 @@ is( Catalyst::uri_for( $context, qw| / foo bar | )->as_string,
     'http://127.0.0.1/foo/bar', 'uri is /foo/bar, not //foo/bar'
 );
 
+if ( 0 ) {
+    # Test rfc3986 reserved characters.  These characters should all be escaped
+    # according to the RFC, but it is a very big feature change so I've removed it
+    is( 
+        Catalyst::uri_for( $context, qw|! * ' ( ) ; : @ & = $ , / ? % # [ ]| )->as_string,
+        'http://127.0.0.1/%21/%2A/%27/%2B/%29/%3B/%3A/%40/%26/%3D/%24/%2C/%2F/%3F/%25/%23/%5B/%5D',
+        'rfc 3986 reserved characters'
+    );
+}
+
+is( 
+    Catalyst::uri_for( $context, qw|{1} {2}| )->as_string,
+    'http://127.0.0.1/{1}/{2}',
+    'not-escaping unreserved characters'
+);
