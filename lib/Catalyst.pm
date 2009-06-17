@@ -1199,7 +1199,7 @@ sub uri_for {
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
-    s/([^A-Za-z0-9\-_.!~*'()+])/$URI::Escape::escapes{$1}/go for @args;
+    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
 
     unshift(@args, $path);
 
@@ -1233,7 +1233,7 @@ sub uri_for {
               $_ = "$_";
               utf8::encode( $_ ) if utf8::is_utf8($_);
               # using the URI::Escape pattern here so utf8 chars survive
-              s/([^A-Za-z0-9\-_.!~*'()])/$URI::Escape::escapes{$1}/go;
+              s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               s/ /+/g;
               "${key}=$_"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
       } @keys);

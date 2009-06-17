@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 33;
+plan tests => 30;
 
 use_ok('TestApp');
 
@@ -53,10 +53,6 @@ ok(!defined($dispatcher->uri_for_action($regex_action, [ 1, 2, 3 ])),
 is($dispatcher->uri_for_action($regex_action, [ 'foo', 123 ]),
    "/action/regexp/foo/123",
    "Regex action interpolates captures correctly");
-
-is($dispatcher->uri_for_action($regex_action, [ 'foo/bar', 123 ]),
-   "/action/regexp/foo%2Fbar/123",
-   "Regex action interpolates captures correctly and url encodes /");
 
 #
 #   Index Action
@@ -108,10 +104,6 @@ is($context->uri_for($path_action),
 is($context->uri_for($path_action, qw/one two/, { q => 1 }),
    "http://127.0.0.1/foo/action/relative/relative/one/two?q=1",
    "uri_for correct for path action with args and query");
-
-is($context->uri_for($path_action, qw|one/quux two|),
-   "http://127.0.0.1/foo/action/relative/relative/one%2Fquux/two",
-   "uri_for correctly url encoded for path action with args containing /");
 
 ok(!defined($context->uri_for($path_action, [ 'blah' ])),
    "no URI returned by uri_for for Path action with snippets");
@@ -169,12 +161,8 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
         'uri_for_action returns uri with empty arg on undef last argument' );
 
     is( $context->uri_for_action($action_needs_two, [ 'foo' , 'bar/baz' ], (3,4)),
-        'http://127.0.0.1/foo/chained/foo2/foo/bar%2Fbaz/end2/3/4',
-        'uri_for_action works correctly when CaptureArg contains /' );
-
-    is( $context->uri_for_action($action_needs_two, [ 'foo' , 'bar' ], ('3/baz',4)),
-        'http://127.0.0.1/foo/chained/foo2/foo/bar/end2/3%2Fbaz/4',
-        'uri_for_action works correctly when Args contains /' );
+        'http://127.0.0.1/foo/chained/foo2/foo/bar%2Fbaz/end2/3/',
+        'uri_for_action returns uri with empty arg on undef last argument' );
 
     my $complex_chained = '/action/chained/empty_chain_f';
     is( $context->uri_for_action( $complex_chained, [23], (13), {q => 3} ),
