@@ -160,7 +160,7 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/',
         'uri_for_action returns uri with empty arg on undef last argument' );
 
-    is( $context->uri_for_action($action_needs_two, [ 'foo' , 'bar/baz' ], (3,4)),
+    is( $context->uri_for_action($action_needs_two, [ 'foo' , 'bar/baz' ], (3,'')),
         'http://127.0.0.1/foo/chained/foo2/foo/bar%2Fbaz/end2/3/',
         'uri_for_action returns uri with empty arg on undef last argument' );
 
