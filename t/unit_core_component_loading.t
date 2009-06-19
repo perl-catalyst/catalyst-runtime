@@ -9,8 +9,6 @@ use warnings;
 use File::Spec;
 use File::Path;
 
-use Test::MockObject;
-
 my $libdir = 'test_trash';
 unshift(@INC, $libdir);
 
@@ -85,15 +83,7 @@ foreach my $component (@components) {
 }
 
 my $shut_up_deprecated_warnings = q{
-    use Test::MockObject;
-    my $old_logger = __PACKAGE__->log;
-    my $logger = Test::MockObject->new;
-    $logger->mock('warn', sub { 
-        my $self = shift;
-        return if $_[0] =~ /deprecated/;
-        $old_logger->warn(@_);
-    });
-    __PACKAGE__->log($logger);
+    __PACKAGE__->log(Catalyst::Log->new('fatal'));
 };
 
 eval "package $appclass; use Catalyst; $shut_up_deprecated_warnings __PACKAGE__->setup";
