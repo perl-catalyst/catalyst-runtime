@@ -1,4 +1,4 @@
-package TestAppIndexDefault::Controller::IndexChained;
+package TestAppIndexActionName::Controller::IndexChained;
 
 use base 'Catalyst::Controller';
 

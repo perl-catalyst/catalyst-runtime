@@ -531,9 +531,29 @@ sub register {
         }
     }
 
+    my @dtypes = @{ $self->_dispatch_types };
+    my @normal_dtypes;
+    my @low_precedence_dtypes;
+
+    while (my $type = shift @dtypes) {
+        if ($type->isa('Catalyst::DispatchType::Index') ||  
+            $type->isa('Catalyst::DispatchType::Default')) {
+            push @low_precedence_dtypes, $type;
+        } else {
+            push @normal_dtypes, $type;
+        }
+    }
+
     # Pass the action to our dispatch types so they can register it if reqd.
-    foreach my $type ( @{ $self->_dispatch_types } ) {
-        $type->register( $c, $action );
+    my $was_registered = 0;
+    foreach my $type ( @normal_dtypes ) {
+        $was_registered = 1 if $type->register( $c, $action );
+    }
+
+    if (not $was_registered) {
+        foreach my $type ( @low_precedence_dtypes ) {
+            $type->register( $c, $action );
+        }
     }
 
     my $namespace = $action->namespace;

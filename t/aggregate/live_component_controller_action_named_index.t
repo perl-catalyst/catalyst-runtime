@@ -12,7 +12,7 @@ BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
 use Test::More tests => 1*$iters;
 
-use Catalyst::Test 'TestAppIndexDefault';
+use Catalyst::Test 'TestAppIndexActionName';
 
 if ( $ENV{CAT_BENCHMARK} ) {
     require Benchmark;
