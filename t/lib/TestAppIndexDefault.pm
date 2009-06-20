@@ -1,4 +1,4 @@
-package TestAppIndexActionName;
+package TestAppIndexDefault;
 use strict;
 use warnings;
 use Catalyst;

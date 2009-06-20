@@ -10,9 +10,9 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 1*$iters;
+use Test::More tests => 3*$iters;
 
-use Catalyst::Test 'TestAppIndexActionName';
+use Catalyst::Test 'TestAppIndexDefault';
 
 if ( $ENV{CAT_BENCHMARK} ) {
     require Benchmark;
@@ -26,4 +26,7 @@ else {
 
 sub run_tests {
     is(get('/indexchained'), 'index_chained', ':Chained overrides index');
+    is(get('/indexprivate'), 'index_private', 'index : Private still works');
+    is(get('/defaultandpath/path_one_arg'), 'path_one_arg',
+        'Path overrides default');
 }
