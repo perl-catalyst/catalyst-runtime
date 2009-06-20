@@ -535,7 +535,7 @@ sub register {
     my @normal_dtypes;
     my @low_precedence_dtypes;
 
-    while (my $type = shift @dtypes) {
+    for my $type ( @dtypes ) {
         if ($type->isa('Catalyst::DispatchType::Index') ||  
             $type->isa('Catalyst::DispatchType::Default')) {
             push @low_precedence_dtypes, $type;
