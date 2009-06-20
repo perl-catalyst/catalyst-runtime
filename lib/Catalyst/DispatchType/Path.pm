@@ -74,7 +74,9 @@ sub match {
 
     $path = '/' if !defined $path || !length $path;
 
-    foreach my $action ( @{ $self->_paths->{$path} || [] } ) {
+    my @actions = @{ $self->_paths->{$path} || [] };
+
+    foreach my $action ( @actions ) {
         next unless $action->match($c);
         $c->req->action($path);
         $c->req->match($path);
@@ -115,9 +117,9 @@ sub register_path {
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
 
-    unshift( @{ $self->_paths->{$path} ||= [] }, $action);
-
-    $self->_paths->{$path} = [ sort @{ $self->_paths->{$path} } ];
+    $self->_paths->{$path} = [
+        sort { $a <=> $b } ($action, @{ $self->_paths->{$path} || [] })
+    ];
 
     return 1;
 }

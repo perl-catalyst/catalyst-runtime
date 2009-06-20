@@ -124,6 +124,14 @@ context and arguments
 Check Args attribute, and makes sure number of args matches the setting.
 Always returns true if Args is omitted.
 
+=head2 sort_order
+
+Returns the value of the C<Args> attribute, or C<~0> if it has no value.
+
+=head2 compare
+
+Returns C<< $a->sort_order <=> $b->sort_order >> .
+
 =head2 namespace
 
 Returns the private namespace this action lives in.

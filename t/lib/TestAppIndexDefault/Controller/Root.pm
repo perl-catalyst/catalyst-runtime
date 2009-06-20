@@ -1,6 +1,8 @@
-package TestAppIndexDefault::Controller::DefaultAndPath;
+package TestAppIndexDefault::Controller::Root;
 
 use base 'Catalyst::Controller';
+
+__PACKAGE__->config->{namespace} = '';
 
 sub default : Private {
     my ($self, $c) = @_;
