@@ -370,9 +370,7 @@ sub prepare_action {
 
   DESCEND: while (@path) {
         $path = join '/', @path;
-        $path =~ s#^/##;
-
-        $path = '' if $path eq '/';    # Root action
+        $path =~ s#^/+##;
 
         # Check out dispatch types to see if any will handle the path at
         # this level
@@ -459,9 +457,6 @@ sub get_containers {
     }
 
     return reverse grep { defined } @containers, $self->_container_hash->{''};
-
-    #return (split '/', $namespace); # isnt this more clear?
-    my @parts = split '/', $namespace;
 }
 
 =head2 $self->uri_for_action($action, \@captures)

@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 3*$iters;
+use Test::More tests => 6*$iters;
 
 use Catalyst::Test 'TestAppIndexDefault';
 
@@ -27,5 +27,14 @@ else {
 sub run_tests {
     is(get('/indexchained'), 'index_chained', ':Chained overrides index');
     is(get('/indexprivate'), 'index_private', 'index : Private still works');
+
+# test :Path overriding default
     is(get('/one_arg'), 'path_one_arg', ':Path overrides default');
+    is(get('/one_arg/foo/bar'), 'default', 'default still works');
+
+# now the same thing with a namespace, and a trailing / on the :Path
+    is(get('/default/one_arg'), 'default_path_one_arg',
+        ':Path overrides default');
+    is(get('/default/one_arg/foo/bar'), 'default_default',
+        'default still works');
 }

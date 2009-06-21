@@ -116,6 +116,7 @@ sub register_path {
     $path =~ s!^/!!;
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
+    $path =~ s{(?<=[^/])/+\z}{};
 
     $self->_paths->{$path} = [
         sort { $a <=> $b } ($action, @{ $self->_paths->{$path} || [] })

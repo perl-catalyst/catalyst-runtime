@@ -41,7 +41,7 @@ other possibilities have been exhausted.
 
 sub match {
     my ( $self, $c, $path ) = @_;
-    return if $path =~ m!/!;    # Not at root yet, wait for it ...
+    return if $path ne '';    # Not at root yet, wait for it ...
     my $result = ( $c->get_actions( 'default', $c->req->path ) )[-1];
 
     # Find default on namespace or super
