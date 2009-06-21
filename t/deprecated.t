@@ -5,7 +5,6 @@ use warnings;
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 use Test::More tests => 4;
-use Test::MockObject;
 
 my $warnings;
 BEGIN { # Do this at compile time in case we generate a warning when use
@@ -15,8 +14,17 @@ BEGIN { # Do this at compile time in case we generate a warning when use
 use Catalyst; # Cause catalyst to be used so I can fiddle with the logging.
 my $mvc_warnings;
 BEGIN {
-    my $logger = Test::MockObject->new;
-    $logger->mock('warn', sub { $mvc_warnings++ if $_[1] =~ /switch your class names/ });
+    my $logger = Class::MOP::Class->create_anon_class(
+    methods => {
+        warn => sub {
+            if ($_[1] =~ /switch your class names/) {
+               $mvc_warnings++;
+                return;
+            }
+            die "Caught unexpected warning: " . $_[1];
+        },
+    },
+)->new_object;
     Catalyst->log($logger);
 }
 

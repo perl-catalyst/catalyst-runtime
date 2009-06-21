@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 use URI;
 
 use_ok('Catalyst');
@@ -51,6 +51,11 @@ is( Catalyst::uri_for( $context, qw/bar wibble?/, 'with space' )->as_string,
     'http://127.0.0.1/foo/yada/bar/wibble%3F/with%20space', 'Space gets encoded'
 );
 
+is(
+    Catalyst::uri_for( $context, '/bar', 'with+plus', { 'also' => 'with+plus' })->as_string,
+    'http://127.0.0.1/foo/bar/with+plus?also=with%2Bplus',
+    'Plus is not encoded'
+);
 
 # test with utf-8
 is(
@@ -118,12 +123,13 @@ TODO: {
         'http://127.0.0.1/%21/%2A/%27/%2B/%29/%3B/%3A/%40/%26/%3D/%24/%2C/%2F/%3F/%25/%23/%5B/%5D',
         'rfc 3986 reserved characters'
     );
-}
 
-# jshirley bug t0m fucked in r10097
-is(
-    Catalyst::uri_for( $context, qw|{1} {2}| )->as_string,
-    'http://127.0.0.1/{1}/{2}',
-    'not-escaping unreserved characters'
-);
+    # jshirley bug - why the hell does only one of these get encoded
+    #                has been like this forever however.
+    is(
+        Catalyst::uri_for( $context, qw|{1} {2}| )->as_string,
+        'http://127.0.0.1/{1}/{2}',
+        'not-escaping unreserved characters'
+    );
+}
 

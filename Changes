@@ -4,6 +4,8 @@
         -  Revert change to URL encode things passed into $c->uri_for
            Args and CaptureArgs as this causes breakage to pre-existing
            applications.
+        -  Remove use of Test::MockObject as it doesn't install from CPAN
+           in some environments.
 
 5.80005 2009-06-06 14:40:00
 

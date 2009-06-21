@@ -2,18 +2,22 @@ use strict;
 use warnings;
 
 use Test::More tests => 5;
-use Test::MockObject;
+use Class::MOP::Class;
 
 use Catalyst ();
 
 my %log_messages; # TODO - Test log messages as expected.
-my $mock_log = Test::MockObject->new;
-foreach my $level (qw/debug info warn error fatal/) {
-    $mock_log->mock($level, sub { 
-        $log_messages{$level} ||= [];
-        push(@{ $log_messages{$level} }, $_[1]);
-    });
-}
+my $mock_log = Class::MOP::Class->create_anon_class(
+    methods => {
+        map { my $level = $_;
+            $level => sub {
+                $log_messages{$level} ||= [];
+                push(@{ $log_messages{$level} }, $_[1]);
+            },
+        }
+        qw/debug info warn error fatal/,
+    },
+)->new_object;
 
 sub mock_app {
     my $name = shift;
