@@ -6,6 +6,10 @@
            applications.
         -  Remove use of Test::MockObject as it doesn't install from CPAN
            in some environments.
+        -  Remove use of dclone to deep copy configs and replace with
+           Catalyst::Utils::merge_hashes which has the same effect, of
+           ensuring child classes don't inherit their parent's config,
+           except works correctly with closures.
 
 5.80005 2009-06-06 14:40:00
 

@@ -8,7 +8,6 @@ use Class::C3::Adopt::NEXT;
 use MRO::Compat;
 use mro 'c3';
 use Scalar::Util 'blessed';
-use Storable 'dclone';
 use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
@@ -117,7 +116,9 @@ sub config {
         my $class = blessed($self) || $self;
         my $meta = Class::MOP::get_metaclass_by_name($class);
         unless ($meta->has_package_symbol('$_config')) {
-            $self->_config( dclone $config );
+            # Call merge_hashes to ensure we deep copy the parent
+            # config onto the subclass
+            $self->_config( Catalyst::Utils::merge_hashes($config, {}) );
         }
     }
     return $self->_config;
