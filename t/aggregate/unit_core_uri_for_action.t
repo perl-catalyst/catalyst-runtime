@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 30;
+plan tests => 29;
 
 use_ok('TestApp');
 
@@ -158,10 +158,6 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
 
     is( $context->uri_for_action($action_needs_two, [1,2], (3,'')),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/',
-        'uri_for_action returns uri with empty arg on undef last argument' );
-
-    is( $context->uri_for_action($action_needs_two, [ 'foo' , 'bar/baz' ], (3,'')),
-        'http://127.0.0.1/foo/chained/foo2/foo/bar%2Fbaz/end2/3/',
         'uri_for_action returns uri with empty arg on undef last argument' );
 
     my $complex_chained = '/action/chained/empty_chain_f';
