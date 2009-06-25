@@ -8,7 +8,11 @@ use File::Spec;
 use lib "$Bin/TestApp/lib";
 use TestApp;
 use Test::WWW::Mechanize;
-
+BEGIN { 
+    $ENV{CATALYST_ENGINE} ||= 'HTTP';
+    $ENV{CATALYST_SCRIPT_GEN} = 31;
+    require Catalyst::Engine::HTTP;
+} 
 my $dir = tempdir(); # CLEANUP => 1 );
 my $devnull = File::Spec->devnull;
 
