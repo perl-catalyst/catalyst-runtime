@@ -89,6 +89,8 @@ sub uri_for_action {
     return "/".$action->namespace;
 }
 
+sub _is_low_precedence { 1 }
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
