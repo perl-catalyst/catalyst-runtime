@@ -1,94 +1,12 @@
-package TestApp::Script::Server;
+#!/usr/bin/env perl
 
-use Catalyst::Engine::HTTP;
-use TestApp;
-use Moose;
+use FindBin qw/$Bin/;
 
-with 'MooseX::GetOpt';
+## because this is a test
+use lib "$Bin/../../../lib";
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('Catalyst','Server');
 
-has argv => ( isa => 'ArrayRef', is => 'ro', required => 1 );
-has [qw/ fork background keepalive /] => ( isa => 'Bool', is => 'ro', required => 1, default => 0 );
-has pidfile => ( isa => 'Str', required => 0, is => 'ro' );
-
-sub run {
-    my $self = shift;
-    TestApp->run(
-        $port, $host,
-        {
-            argv       => $self->argv,
-            'fork'     => $self->fork,
-            keepalive  => $self->keepalive,
-            background => $self->background,
-            pidfile    => $self->pidfile,
-        }
-    );
-}
-
-pod2usage(1) if $help;
-
-if ( $debug ) {
-    $ENV{CATALYST_DEBUG} = 1;
-}
-
-# If we load this here, then in the case of a restarter, it does not
-# need to be reloaded for each restart.
-require Catalyst;
-
-# If this isn't done, then the Catalyst::Devel tests for the restarter
-# fail.
-$| = 1 if $ENV{HARNESS_ACTIVE};
-
-my $runner = sub {
-    # This is require instead of use so that the above environment
-    # variables can be set at runtime.
-    require TestApp;
-
-    TestApp->run(
-        $port, $host,
-        {
-            argv       => \@argv,
-            'fork'     => $fork,
-            keepalive  => $keepalive,
-            background => $background,
-            pidfile    => $pidfile,
-        }
-    );
-};
-
-if ( $restart ) {
-    die "Cannot run in the background and also watch for changed files.\n"
-        if $background;
-
-    require Catalyst::Restarter;
-
-    my $subclass = Catalyst::Restarter->pick_subclass;
-
-    my %args;
-    $args{follow_symlinks} = 1
-        if $follow_symlinks;
-    $args{directories} = $watch_directory
-        if defined $watch_directory;
-    $args{sleep_interval} = $check_interval
-        if defined $check_interval;
-    $args{filter} = qr/$file_regex/
-        if defined $file_regex;
-
-    my $restarter = $subclass->new(
-        %args,
-        start_sub => $runner,
-    );
-
-    $restarter->run_and_watch;
-}
-else {
-    $runner->();
-}
-
-__PACKAGE__->new_with_options->run;
-
-
-
-1;
 
 =head1 NAME
 
