@@ -25,7 +25,7 @@ sub run {
     pod2usage() if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);
-    $app->new(
+    $app->run(
         $self->listen,
         {  
             nproc   => $self->nproc,
