@@ -1,20 +1,10 @@
 #!/usr/bin/env perl
+use FindBin qw/$Bin/;
 
-use strict;
-use warnings;
-use Getopt::Long;
-use Pod::Usage;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use Catalyst::Test 'TestApp';
-
-my $help = 0;
-
-GetOptions( 'help|?' => \$help );
-
-pod2usage(1) if ( $help || !$ARGV[0] );
-
-print request($ARGV[0])->content . "\n";
+## because this is a test
+use lib "$Bin/../../../lib";
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('Catalyst','Test');
 
 1;
 

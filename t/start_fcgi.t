@@ -9,6 +9,7 @@ use File::Spec;
 use lib "$Bin/TestApp/lib";
 use TestApp;
 use Test::WWW::Mechanize;
+use Catalyst::Test 'TestApp';
 
 my $dir = tempdir(); # CLEANUP => 1 );
 my $devnull = File::Spec->devnull;
