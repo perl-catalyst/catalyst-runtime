@@ -34,6 +34,7 @@ requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
+requires 'MooseX::Getopt';
 
 recommends 'B::Hooks::OP::Check::StashChange';
 
