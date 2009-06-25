@@ -6,7 +6,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../../../lib";
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('Catalyst','FastCGI');
-
+1;
 =head1 NAME
 
 testapp_fastcgi.pl - Catalyst FastCGI

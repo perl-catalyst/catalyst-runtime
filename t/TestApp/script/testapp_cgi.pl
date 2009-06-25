@@ -1,14 +1,11 @@
 #!/usr/bin/env perl
 
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
+use FindBin qw/$Bin/;
 
-use strict;
-use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use TestApp;
-
-TestApp->run;
+## because this is a test
+use lib "$Bin/../../../lib";
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('Catalyst','CGI');
 
 1;
 
