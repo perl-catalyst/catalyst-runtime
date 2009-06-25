@@ -1,7 +1,7 @@
-package testapp::Script::Server;
+package TestApp::Script::Server;
 
 use Catalyst::Engine::HTTP;
-use testapp;
+use TestApp;
 use Moose;
 
 with 'MooseX::GetOpt';
@@ -12,7 +12,7 @@ has pidfile => ( isa => 'Str', required => 0, is => 'ro' );
 
 sub run {
     my $self = shift;
-    testapp->run(
+    TestApp->run(
         $port, $host,
         {
             argv       => $self->argv,
