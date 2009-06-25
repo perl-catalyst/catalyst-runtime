@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use Test::MockObject::Extends;
 
 use Test::More tests => 24;
 
@@ -20,15 +19,18 @@ use lib 't/lib';
 my $warnings = 0;
 
 use PluginTestApp;
-my $logger = Test::MockObject::Extends->new(PluginTestApp->log);
-$logger->mock('warn', sub {
-    if ($_[1] =~ /plugin method is deprecated/) {
-        $warnings++;
-        return;
-    }
-    die "Caught unexpected warning: " . $_[1];
-});
-#PluginTestApp->log($logger);
+my $logger = Class::MOP::Class->create_anon_class(
+    methods => {
+        warn => sub {
+            if ($_[1] =~ /plugin method is deprecated/) {
+               $warnings++;
+                return;
+            }
+            die "Caught unexpected warning: " . $_[1];
+        },
+    },
+)->new_object;
+PluginTestApp->log($logger);
 
 use Catalyst::Test qw/PluginTestApp/;
 

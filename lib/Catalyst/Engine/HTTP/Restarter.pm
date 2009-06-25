@@ -27,8 +27,8 @@ around run => sub {
             if !Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION;
 
         my $watcher = Catalyst::Engine::HTTP::Restarter::Watcher->new(
-            directory => ( 
-                $options->{restart_directory} || 
+            directory => (
+                $options->{restart_directory} ||
                 File::Spec->catdir( $FindBin::Bin, '..' )
             ),
             follow_symlinks => $options->{follow_symlinks},
@@ -129,7 +129,7 @@ Many parts are ripped out of C<HTTP::Server::Simple> by Jesse Vincent.
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

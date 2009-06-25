@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 19;
 use URI;
 
 use_ok('Catalyst');
@@ -51,6 +51,11 @@ is( Catalyst::uri_for( $context, qw/bar wibble?/, 'with space' )->as_string,
     'http://127.0.0.1/foo/yada/bar/wibble%3F/with%20space', 'Space gets encoded'
 );
 
+is(
+    Catalyst::uri_for( $context, '/bar', 'with+plus', { 'also' => 'with+plus' })->as_string,
+    'http://127.0.0.1/foo/bar/with+plus?also=with%2Bplus',
+    'Plus is not encoded'
+);
 
 # test with utf-8
 is(
@@ -107,4 +112,24 @@ is(
 is( Catalyst::uri_for( $context, qw| / foo bar | )->as_string,
     'http://127.0.0.1/foo/bar', 'uri is /foo/bar, not //foo/bar'
 );
+
+TODO: {
+    local $TODO = 'RFCs are for people who, erm - fix this test..';
+    # Test rfc3986 reserved characters.  These characters should all be escaped
+    # according to the RFC, but it is a very big feature change so I've removed it
+    no warnings; # Yes, everything in qw is sane
+    is(
+        Catalyst::uri_for( $context, qw|! * ' ( ) ; : @ & = $ / ? % # [ ] ,|, )->as_string,
+        'http://127.0.0.1/%21/%2A/%27/%2B/%29/%3B/%3A/%40/%26/%3D/%24/%2C/%2F/%3F/%25/%23/%5B/%5D',
+        'rfc 3986 reserved characters'
+    );
+
+    # jshirley bug - why the hell does only one of these get encoded
+    #                has been like this forever however.
+    is(
+        Catalyst::uri_for( $context, qw|{1} {2}| )->as_string,
+        'http://127.0.0.1/{1}/{2}',
+        'not-escaping unreserved characters'
+    );
+}
 

@@ -61,7 +61,7 @@ application based on the attributes you set.
 
 =head1 METHODS
 
-=head2 new 
+=head2 new
 
 Construct a new dispatcher.
 
@@ -411,7 +411,7 @@ sub get_action {
     return $self->_action_hash->{"${namespace}/${name}"};
 }
 
-=head2 $self->get_action_by_path( $path ); 
+=head2 $self->get_action_by_path( $path );
 
 Returns the named action by its full private path.
 
@@ -660,7 +660,7 @@ sub _load_dispatch_types {
 
 Get the DispatchType object of the relevant type, i.e. passing C<$type> of
 C<Chained> would return a L<Catalyst::DispatchType::Chained> object (assuming
-of course it's being used.) 
+of course it's being used.)
 
 =cut
 
@@ -690,12 +690,12 @@ use Moose;
 # See also t/lib/TestApp/Plugin/AddDispatchTypes.pm
 
 # Alias _method_name to method_name, add a before modifier to warn..
-foreach my $public_method_name (qw/ 
-        tree 
-        dispatch_types 
-        registered_dispatch_types 
-        method_action_class  
-        action_hash 
+foreach my $public_method_name (qw/
+        tree
+        dispatch_types
+        registered_dispatch_types
+        method_action_class
+        action_hash
         container_hash
     /) {
     my $private_method_name = '_' . $public_method_name;
@@ -729,7 +729,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

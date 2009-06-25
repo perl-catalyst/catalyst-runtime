@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Class::MOP::Class;
 use Catalyst::Runtime;
 
 use Test::More tests => 29;
@@ -67,13 +68,13 @@ local %ENV; # Don't allow env variables to mess us up.
     ok $log->is_debug, 'Debugging should be enabled';
     ok !$c->debug, 'Catalyst debugging turned off';
 }
+my $log_meta = Class::MOP::Class->create_anon_class(
+    methods => { map { $_ => sub { 0 } } qw/debug error fatal info warn/ },
+);
 {
     package MyTestAppWithOwnLogger;
     use base qw/Catalyst/;
-    use Test::MockObject;
-    my $log = Test::MockObject->new;
-    $log->set_false(qw/debug error fatal info warn/);
-    __PACKAGE__->log($log);
+    __PACKAGE__->log($log_meta->new_object);
     __PACKAGE__->setup('-Debug');
 }
 

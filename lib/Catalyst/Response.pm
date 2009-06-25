@@ -103,7 +103,7 @@ The keys of the hash reference on the right correspond to the L<CGI::Cookie>
 parameters of the same name, except they are used without a leading dash.
 Possible parameters are:
 
-=over 
+=over
 
 =item value
 
@@ -173,7 +173,7 @@ Sets or returns the HTTP status.
     $c->response->status(404);
 
 $res->code is an alias for this, to match HTTP::Response->code.
-    
+
 =head2 $res->write( $data )
 
 Writes $data to the output stream.
@@ -199,7 +199,7 @@ sub print {
         defined $self->write($,) or return;
         defined $self->write($_) or return;
     }
-    
+
     return 1;
 }
 
@@ -209,7 +209,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify 
+This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

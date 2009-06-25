@@ -49,7 +49,7 @@ Debug output for Path dispatch points
 sub list {
     my ( $self, $c ) = @_;
     my $column_width = Catalyst::Utils::term_width() - 35 - 9;
-    my $paths = Text::SimpleTable->new( 
+    my $paths = Text::SimpleTable->new(
        [ 35, 'Path' ], [ $column_width, 'Private' ]
     );
     foreach my $path ( sort keys %{ $self->_paths } ) {
@@ -165,7 +165,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

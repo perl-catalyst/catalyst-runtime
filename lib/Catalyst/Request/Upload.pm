@@ -108,7 +108,7 @@ Returns an L<HTTP::Headers> object for the request.
 
 =head2 $upload->link_to
 
-Creates a hard link to the temporary file. Returns true for success, 
+Creates a hard link to the temporary file. Returns true for success,
 false for failure.
 
     $upload->link_to('/path/to/target');
@@ -171,7 +171,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify
+This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

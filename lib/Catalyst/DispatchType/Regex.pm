@@ -148,7 +148,7 @@ sub uri_for_action {
             $re =~ s/^\^//;
             $re =~ s/\$$//;
             my $final = '/';
-            my @captures =  map { s/([^A-Za-z0-9\-_.!~*'()])/$URI::Escape::escapes{$1}/go; $_; } @$captures;
+            my @captures = @$captures;
             while (my ($front, $rest) = split(/\(/, $re, 2)) {
                 last unless defined $rest;
                 ($rest, $re) =
@@ -170,7 +170,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

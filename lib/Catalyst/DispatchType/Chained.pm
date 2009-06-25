@@ -238,7 +238,7 @@ sub recurse_match {
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
                 #    And therefore is a better match
-                # OR No parts and this expects 0 
+                # OR No parts and this expects 0
                 #    The current best action might also be Args(0),
                 #    but we couldn't chose between then anyway so we'll take the last seen
 
@@ -353,9 +353,7 @@ sub uri_for_action {
         if (my $cap = $curr->attributes->{CaptureArgs}) {
             return undef unless @captures >= $cap->[0]; # not enough captures
             if ($cap->[0]) {
-                unshift(@parts,
-                    map { s/([^A-Za-z0-9\-_.!~*'()])/$URI::Escape::escapes{$1}/go; $_; }
-                    splice(@captures, -$cap->[0]));
+                unshift(@parts, splice(@captures, -$cap->[0]));
             }
         }
         if (my $pp = $curr->attributes->{PartPath}) {
@@ -376,7 +374,7 @@ sub uri_for_action {
 
 =head2 $c->expand_action($action)
 
-Return a list of actions that represents a chained action. See 
+Return a list of actions that represents a chained action. See
 L<Catalyst::Dispatcher> for more info. You probably want to
 use the expand_action it provides rather than this directly.
 
@@ -559,7 +557,7 @@ this debugging output:
   '-----------------------+------------------------------'
   ...
 
-Here's a more detailed specification of the attributes belonging to 
+Here's a more detailed specification of the attributes belonging to
 C<:Chained>:
 
 =head2 Attributes
@@ -675,7 +673,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

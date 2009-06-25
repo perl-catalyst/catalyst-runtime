@@ -121,7 +121,7 @@ sub _get_uid {
     $visitor->searchForUID($uid);
     $self->accept($visitor);
     return $visitor->getResult;
-} 
+}
 
 sub addChild {
     my $self = shift;
@@ -206,7 +206,7 @@ be like this:
     $c->stats->profile("completed second part of critical bit");
     # more code
     ...
-    $c->stats->profile(end => "mysub"); 
+    $c->stats->profile(end => "mysub");
   }
 
 Supposing mysub was called from the action "process" inside a Catalyst
@@ -233,7 +233,7 @@ part 0.111s.
 
 =head2 new
 
-Constructor. 
+Constructor.
 
     $stats = Catalyst::Stats->new;
 
@@ -252,7 +252,7 @@ Enable or disable stats collection.  By default, stats are enabled after object 
 
 Marks a profiling point.  These can appear in pairs, to time the block of code
 between the begin/end pairs, or by themselves, in which case the time of
-execution to the previous profiling point will be reported.  
+execution to the previous profiling point will be reported.
 
 The argument may be either a single comment string or a list of name-value
 pairs.  Thus the following are equivalent:
@@ -350,7 +350,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify
+This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

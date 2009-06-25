@@ -31,9 +31,9 @@ Catalyst::Component::ApplicationAttribute - Moose Role for components which capt
     use Moose;
     extends 'Catalyst::Component';
     with 'Catalyst::Component::ApplicationAttribute';
-    
+
     # Your code here
-    
+
     1;
 
 =head1 DESCRIPTION
@@ -67,7 +67,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

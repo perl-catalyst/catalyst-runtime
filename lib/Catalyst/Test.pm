@@ -55,7 +55,7 @@ my $build_exports = sub {
             $c = shift;
         });
         $meta->make_immutable;
-        
+
         ### do the request; C::T::request will know about the class name, and
         ### we've already stopped it from doing remote requests above.
         my $res = $request->( @_ );
@@ -153,8 +153,8 @@ Catalyst::Test - Test Catalyst Applications
 This module allows you to make requests to a Catalyst application either without
 a server, by simulating the environment of an HTTP request using
 L<HTTP::Request::AsCGI> or remotely if you define the CATALYST_SERVER
-environment variable. This module also adds a few catalyst
-specific testing methods as displayed in the method section.
+environment variable. This module also adds a few Catalyst-specific
+testing methods as displayed in the method section.
 
 The L<get> and L<request> functions take either a URI or an L<HTTP::Request>
 object.
@@ -198,7 +198,7 @@ method and the L<request> method below:
 
 =head2 $res = request( ... );
 
-Returns a L<HTTP::Response> object. Accepts an optional hashref for request
+Returns an L<HTTP::Response> object. Accepts an optional hashref for request
 header configuration; currently only supports setting 'host' value.
 
     my $res = request('foo/bar?test=1');
@@ -260,7 +260,7 @@ sub remote_request {
         # If request path is '/', we have to add a trailing slash to the
         # final request URI
         my $add_trailing = $request->uri->path eq '/';
-        
+
         my @sp = split '/', $server->path;
         my @rp = split '/', $request->uri->path;
         shift @sp;shift @rp; # leading /
@@ -270,7 +270,7 @@ sub remote_request {
             }
         }
         $request->uri->path(join '/', @rp);
-        
+
         if ( $add_trailing ) {
             $request->uri->path( $request->uri->path . '/' );
         }
@@ -287,7 +287,7 @@ sub remote_request {
             keep_alive   => 1,
             max_redirect => 0,
             timeout      => 60,
-            
+
             # work around newer LWP max_redirect 0 bug
             # http://rt.cpan.org/Ticket/Display.html?id=40260
             requests_redirectable => [],
@@ -310,23 +310,23 @@ sub _customize_request {
 
 =head2 action_ok
 
-Fetches the given URL and check that the request was successful
+Fetches the given URL and checks that the request was successful.
 
 =head2 action_redirect
 
-Fetches the given URL and check that the request was a redirect
+Fetches the given URL and checks that the request was a redirect.
 
 =head2 action_notfound
 
-Fetches the given URL and check that the request was not found
+Fetches the given URL and checks that the request was not found.
 
-=head2 content_like
+=head2 content_like( $url, $regexp [, $test_name] )
 
-Fetches the given URL and matches the content against it.
+Fetches the given URL and returns whether the content matches the regexp.
 
-=head2 contenttype_is 
-    
-Check for given MIME type
+=head2 contenttype_is
+
+Check for given MIME type.
 
 =head1 SEE ALSO
 
@@ -339,7 +339,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
+This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

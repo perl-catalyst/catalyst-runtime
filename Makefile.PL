@@ -39,9 +39,6 @@ requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespac
 recommends 'B::Hooks::OP::Check::StashChange';
 
 test_requires 'Class::Data::Inheritable';
-test_requires 'Test::MockObject' => '1.07'; # Newish (hah, 2006!) version to
-                                            # hopefully avoid broken distro
-                                            # packages (RT#46104)
 test_requires 'Test::Exception';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate is available
@@ -110,6 +107,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Component::ACCEPT_CONTEXT' => '0.06',
     'Catalyst::Plugin::ENV' => '9999', # This plugin is just stupid, full stop
                                        # should have been a core fix.
     'Catalyst::Plugin::Unicode::Encoding' => '0.2',

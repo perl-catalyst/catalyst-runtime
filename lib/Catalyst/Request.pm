@@ -106,7 +106,7 @@ has _body => (
   is => 'rw', clearer => '_clear_body', predicate => '_has_body',
 );
 # Eugh, ugly. Should just be able to rename accessor methods to 'body'
-#             and provide a custom reader.. 
+#             and provide a custom reader..
 sub body {
   my $self = shift;
   $self->_context->prepare_body();
@@ -327,7 +327,7 @@ Contains the keywords portion of a query string, when no '=' signs are
 present.
 
     http://localhost/path?some+keywords
-    
+
     $c->request->query_keywords will contain 'some keywords'
 
 =head2 $req->match
@@ -342,7 +342,7 @@ Contains the request method (C<GET>, C<POST>, C<HEAD>, etc).
 
 =head2 $req->param
 
-Returns GET and POST parameters with a CGI.pm-compatible param method. This 
+Returns GET and POST parameters with a CGI.pm-compatible param method. This
 is an alternative method for accessing parameters in $c->req->parameters.
 
     $value  = $c->request->param( 'foo' );
@@ -358,6 +358,21 @@ will set the parameter C<foo> to the multiple values C<bar>, C<gorch> and
 C<quxx>. Previously this would have added C<bar> as another value to C<foo>
 (creating it if it didn't exist before), and C<quxx> as another value for
 C<gorch>.
+
+B<NOTE> this is considered a legacy interface and care should be taken when
+using it. C<< scalar $c->req->param( 'foo' ) >> will return only the first
+C<foo> param even if multiple are present; C<< $c->req->param( 'foo' ) >> will
+return a list of as many are present, which can have unexpected consequences
+when writing code of the form:
+
+    $foo->bar(
+        a => 'b',
+        baz => $c->req->param( 'baz' ),
+    );
+
+If multiple C<baz> parameters are provided this code might corrupt data or
+cause a hash initialization error. For a more straightforward interface see
+C<< $c->req->parameters >>.
 
 =cut
 
@@ -451,7 +466,7 @@ be either a scalar or an arrayref containing scalars.
 
     print $c->request->query_parameters->{field};
     print $c->request->query_parameters->{field}->[0];
-    
+
 =head2 $req->read( [$maxlength] )
 
 Reads a chunk of data from the request body. This method is intended to be
@@ -546,7 +561,7 @@ sub upload {
 =head2 $req->uploads
 
 Returns a reference to a hash containing uploads. Values can be either a
-L<Catalyst::Request::Upload> object, or an arrayref of 
+L<Catalyst::Request::Upload> object, or an arrayref of
 L<Catalyst::Request::Upload> objects.
 
     my $upload = $c->request->uploads->{field};
@@ -567,7 +582,7 @@ preserved.
 
 sub uri_with {
     my( $self, $args ) = @_;
-    
+
     carp( 'No arguments passed to uri_with()' ) unless $args;
 
     foreach my $value ( values %$args ) {
@@ -577,7 +592,7 @@ sub uri_with {
             utf8::encode( $_ ) if utf8::is_utf8($_);
         }
     };
-    
+
     my $uri   = $self->uri->clone;
     my %query = ( %{ $uri->query_form_hash }, %$args );
 
@@ -612,7 +627,7 @@ Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify
+This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
