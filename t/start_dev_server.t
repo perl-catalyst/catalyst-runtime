@@ -7,6 +7,8 @@ use FindBin qw/$Bin/;
 use File::Spec;
 use lib "$Bin/TestApp/lib";
 use TestApp;
+use Catalyst::Test 'TestApp', {default_host => 'default.com'};
+use Catalyst::Request;
 use Test::WWW::Mechanize;
 BEGIN { 
     $ENV{CATALYST_ENGINE} ||= 'HTTP';
@@ -23,7 +25,7 @@ my $childpid = fork();
 die "fork() error, cannot continue" unless defined($childpid);
 
 if ($childpid == 0) {
-  system("$^X $server_path -p $port > $devnull 2>&1");
+  system("$^X $server_path --listen $port > $devnull 2>&1");
   exit; # just for sure; we should never got here
 }
 
