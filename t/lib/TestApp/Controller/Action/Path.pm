@@ -7,6 +7,7 @@ __PACKAGE__->config(
     actions => {
       'one' => { 'Path' => [ 'a path with spaces' ] },
       'two' => { 'Path' => "åäö" },
+      'six' => { 'Local' => undef },
     },
 );
 
@@ -31,6 +32,11 @@ sub four : Path( 'spaces_near_parens_singleq' ) {
 }
 
 sub five : Path( "spaces_near_parens_doubleq" ) {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
+sub six {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }

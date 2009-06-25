@@ -654,12 +654,11 @@ sub _load_dispatch_types {
     my ( $self, @types ) = @_;
 
     my @loaded;
-
     # Preload action types
     for my $type (@types) {
-        my $class =
-          ( $type =~ /^\+(.*)$/ ) ? $1 : "Catalyst::DispatchType::${type}";
-
+        # first param is undef because we cannot get the appclass
+        my $class = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $type);
+        
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
@@ -681,10 +680,9 @@ of course it's being used.)
 
 sub dispatch_type {
     my ($self, $name) = @_;
-
-    unless ($name =~ s/^\+//) {
-        $name = "Catalyst::DispatchType::" . $name;
-    }
+    
+    # first param is undef because we cannot get the appclass
+    $name = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $name);
 
     for (@{ $self->_dispatch_types }) {
         return $_ if ref($_) eq $name;
