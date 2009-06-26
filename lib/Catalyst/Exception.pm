@@ -39,6 +39,13 @@ has message => (
     isa => 'Str',
 );
 
+use overload q{""} => \&as_string;
+
+sub as_string {
+    my ($self) = @_;
+    return $self->message;
+}
+
 sub throw {
     my $class  = shift;
     my %params = @_ == 1 ? ( error => $_[0] ) : @_;
