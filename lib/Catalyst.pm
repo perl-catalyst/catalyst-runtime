@@ -1511,10 +1511,10 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-        if ( ref($error) and $error eq $DETACH ) {
+        if ( blessed($error) and $error->isa('Catalyst::Exception::Detach') ) {
             die $DETACH if($c->depth > 1);
         }
-        elsif ( ref($error) and $error eq $GO ) {
+        elsif ( blessed($error) and $error->isa('Catalyst::Exception::Go') ) {
             die $GO if($c->depth > 0);
         }
         else {
