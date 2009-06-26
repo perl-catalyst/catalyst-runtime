@@ -39,7 +39,9 @@ has message => (
     isa => 'Str',
 );
 
-use overload q{""} => \&as_string;
+use overload
+    q{""}    => \&as_string,
+    fallback => 1;
 
 sub as_string {
     my ($self) = @_;
