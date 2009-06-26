@@ -50,11 +50,12 @@ sub throw {
     my $class  = shift;
     my %params = @_ == 1 ? ( error => $_[0] ) : @_;
 
-    my $message = $params{message} || $params{error} || $! || '';
+    $params{message} = $params{message} || $params{error} || $! || '';
+    my $error = $class->new(%params);
 
     local $Carp::CarpLevel = 1;
 
-    croak($message);
+    croak($error);
 }
 
 =head2 meta
