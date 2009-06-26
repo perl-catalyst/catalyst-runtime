@@ -106,7 +106,7 @@ sub run_tests {
             'Content is a serialized Catalyst::Request'
         );
     }
-    
+
     {
         ok( my $response = request('http://localhost/action_action_five'),
             'Request' );
@@ -126,7 +126,6 @@ sub run_tests {
             'Content is a serialized Catalyst::Request'
         );
     }
-    
 
     {
         ok( my $response = request('http://localhost/action_action_six'),

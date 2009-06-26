@@ -385,7 +385,7 @@ sub term_width {
 Method which adds the namespace for plugins and actions.
 
   __PACKAGE__->setup(qw(MyPlugin));
-  
+
   # will load Catalyst::Plugin::MyPlugin
 
 =cut
@@ -395,9 +395,14 @@ sub resolve_namespace {
     my $appnamespace = shift;
     my $namespace = shift;
     my @classes = @_;
-    return String::RewritePrefix->rewrite(
-        { '' => $namespace.'::', '+' => '', '~' => $appnamespace . '::' }, @classes,
-      );
+    return String::RewritePrefix->rewrite({
+        q[]  => qq[${namespace}::],
+        q[+] => q[],
+        (defined $appnamespace
+            ? (q[~] => qq[${appnamespace}::])
+            : ()
+        ),
+    }, @classes);
 }
 
 

@@ -680,7 +680,7 @@ of course it's being used.)
 
 sub dispatch_type {
     my ($self, $name) = @_;
-    
+
     # first param is undef because we cannot get the appclass
     $name = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $name);
 
