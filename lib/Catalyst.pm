@@ -1512,10 +1512,10 @@ sub execute {
 
     if ( my $error = $@ ) {
         if ( blessed($error) and $error->isa('Catalyst::Exception::Detach') ) {
-            die $DETACH if($c->depth > 1);
+            $error->rethrow if $c->depth > 1;
         }
         elsif ( blessed($error) and $error->isa('Catalyst::Exception::Go') ) {
-            die $GO if($c->depth > 0);
+            $error->rethrow if $c->depth > 0;
         }
         else {
             unless ( ref $error ) {

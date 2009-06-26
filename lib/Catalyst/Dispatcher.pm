@@ -225,7 +225,7 @@ Documented in L<Catalyst>
 sub go {
     my $self = shift;
     $self->_do_visit('go', @_);
-    die $Catalyst::GO;
+    Catalyst::Exception::Go->throw;
 }
 
 =head2 $self->forward( $c, $command [, \@arguments ] )
@@ -271,7 +271,7 @@ Documented in L<Catalyst>
 sub detach {
     my ( $self, $c, $command, @args ) = @_;
     $self->_do_forward(detach => $c, $command, @args ) if $command;
-    die $Catalyst::DETACH;
+    Catalyst::Exception::Detach->throw;
 }
 
 sub _action_rel2abs {
