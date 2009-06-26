@@ -5,7 +5,8 @@ package Catalyst::Exception;
 package Catalyst::Exception::Base;
 
 use Moose;
-use Carp ();
+use Carp;
+use namespace::clean -except => 'meta';
 
 =head1 NAME
 
@@ -41,7 +42,7 @@ sub throw {
 
     local $Carp::CarpLevel = 1;
 
-    Carp::croak($message);
+    croak($message);
 }
 
 =head2 meta
@@ -64,13 +65,14 @@ Catalyst::Exception::Base->meta->make_immutable;
 package Catalyst::Exception;
 
 use Moose;
+use namespace::clean -except => 'meta';
+
 use vars qw[$CATALYST_EXCEPTION_CLASS];
 
 BEGIN {
     extends($CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base');
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
