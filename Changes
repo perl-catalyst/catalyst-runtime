@@ -20,6 +20,16 @@
           references, that close over the context, without creating leaks
           (Florian Ragwitz).
 
+  Things t0m needs to move into an actual changelog section, after he introduced that shit:
+        - Clean namespaces in Catalyst::Exception* (Florian Ragwitz).
+        - Turn Catalyst::Exception into an actual class and make the throw
+          method create instances of it. They can still be used as normal
+          strings, as before, as they are overloaded to stringify to their
+          error message (Florian Ragwitz).
+        - Add a rethrow method to Catalyst::Exception (Florian Ragwitz).
+        - Add Catalyst::Exception::Detach and ::Go, and refactor detach() and
+          go() to use them instead of magic, global strings (Florian Ragwitz).
+
 5.80005 2009-06-06 14:40:00
 
   Behaviour changes:
