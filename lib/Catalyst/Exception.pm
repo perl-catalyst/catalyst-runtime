@@ -34,6 +34,11 @@ Throws a fatal exception.
 
 =cut
 
+has message => (
+    is  => 'ro',
+    isa => 'Str',
+);
+
 sub throw {
     my $class  = shift;
     my %params = @_ == 1 ? ( error => $_[0] ) : @_;
