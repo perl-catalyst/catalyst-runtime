@@ -5,6 +5,7 @@ perl_version '5.008001';
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
+requires 'namespace::autoclean';
 requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
@@ -32,6 +33,7 @@ requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'URI' => '1.35';
+requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
