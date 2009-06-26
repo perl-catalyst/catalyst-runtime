@@ -7,6 +7,8 @@ use Moose::Util qw/find_meta/;
 use bytes;
 use B::Hooks::EndOfScope ();
 use Catalyst::Exception;
+use Catalyst::Exception::Detach;
+use Catalyst::Exception::Go;
 use Catalyst::Log;
 use Catalyst::Request;
 use Catalyst::Request::Upload;
@@ -58,8 +60,8 @@ sub finalize_output { shift->finalize_body(@_) };
 our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
-our $DETACH    = "catalyst_detach\n";
-our $GO        = "catalyst_go\n";
+our $DETACH    = Catalyst::Exception::Detach->new;
+our $GO        = Catalyst::Exception::Go->new;
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
@@ -1509,10 +1511,10 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-        if ( !ref($error) and $error eq $DETACH ) {
+        if ( ref($error) and $error eq $DETACH ) {
             die $DETACH if($c->depth > 1);
         }
-        elsif ( !ref($error) and $error eq $GO ) {
+        elsif ( ref($error) and $error eq $GO ) {
             die $GO if($c->depth > 0);
         }
         else {
