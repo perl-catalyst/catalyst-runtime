@@ -12,3 +12,11 @@ has '+message' => (
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=head1 NAME
+
+Catalyst::Exception::Go - Exception for redispatching using $ctx->go()
+
+=cut
