@@ -1,21 +1,24 @@
 # This file documents the revision history for Perl extension Catalyst.
 
   Bug fixes:
-        -  Revert change to URL encode things passed into $c->uri_for
-           Args and CaptureArgs as this causes breakage to pre-existing
-           applications.
-        -  Remove use of Test::MockObject as it doesn't install from CPAN
-           in some environments.
-        -  Remove use of dclone to deep copy configs and replace with
-           Catalyst::Utils::merge_hashes which has the same effect, of
-           ensuring child classes don't inherit their parent's config,
-           except works correctly with closures.
+        - Revert change to URL encode things passed into $c->uri_for
+          Args and CaptureArgs as this causes breakage to pre-existing
+          applications.
+        - Remove use of Test::MockObject as it doesn't install from CPAN
+          in some environments.
+        - Remove use of dclone to deep copy configs and replace with
+          Catalyst::Utils::merge_hashes which has the same effect, of
+          ensuring child classes don't inherit their parent's config,
+          except works correctly with closures.
 
   New features:
-        -  Use ~ as prefix for plugins or action classes which are located in 
-           MyApp::Plugin / MyApp::Action (mo)
-        -  Controller methods without attributes are now considered actions if 
-           they are specified in config->{action(s)} (mo)
+        - Use ~ as prefix for plugins or action classes which are located in
+          MyApp::Plugin / MyApp::Action (mo)
+        - Controller methods without attributes are now considered actions if
+          they are specified in config->{action(s)} (mo)
+        - Add Catalyst::Component::ContextClosure as an easy way to create code
+          references, that close over the context, without creating leaks
+          (Florian Ragwitz).
 
 5.80005 2009-06-06 14:40:00
 
