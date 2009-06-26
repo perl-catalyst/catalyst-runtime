@@ -57,7 +57,12 @@ sub throw {
 
     local $Carp::CarpLevel = 1;
 
-    croak($error);
+    croak $error;
+}
+
+sub rethrow {
+    my ($self) = @_;
+    croak $self;
 }
 
 =head2 meta
