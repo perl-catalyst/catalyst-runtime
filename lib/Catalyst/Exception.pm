@@ -35,8 +35,9 @@ Throws a fatal exception.
 =cut
 
 has message => (
-    is  => 'ro',
-    isa => 'Str',
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub { $! || '' },
 );
 
 use overload
@@ -48,15 +49,23 @@ sub as_string {
     return $self->message;
 }
 
+around BUILDARGS => sub {
+    my ($next, $class, @args) = @_;
+    if (@args == 1 && !ref $args[0]) {
+        @args = (message => $args[0]);
+    }
+
+    my $args = $class->$next(@args);
+    $args->{message} ||= $args->{error}
+        if exists $args->{error};
+
+    return $args;
+};
+
 sub throw {
-    my $class  = shift;
-    my %params = @_ == 1 ? ( error => $_[0] ) : @_;
-
-    $params{message} = $params{message} || $params{error} || $! || '';
-    my $error = $class->new(%params);
-
+    my $class = shift;
+    my $error = $class->new(@_);
     local $Carp::CarpLevel = 1;
-
     croak $error;
 }
 
