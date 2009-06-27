@@ -24,7 +24,7 @@ my %Meth    = (
 );
 
 ### make sure we're not trying to connect to a remote host -- these are local tests
-local $ENV{CATALYST_SERVER};                
+local $ENV{CATALYST_SERVER};
 
 use_ok( $Class );
 
@@ -38,7 +38,7 @@ use_ok( $Class );
 
     while( my($class, $meths) = each %Meth ) {
         for my $meth ( @$meths ) { SKIP: {
-            
+
             ### method available?
             can_ok( $class,     $meth );
 
@@ -48,39 +48,39 @@ use_ok( $Class );
             ### check error conditions
             eval { $class->can($meth)->( $Url ) };
             ok( $@,             "   $meth without app gives error" );
-            like( $@, qr/$Class/, 
+            like( $@, qr/$Class/,
                                 "       Error filled with expected content for '$meth'" );
-        } }       
+        } }
     }
-}    
- 
-### simple tests for exported methods 
+}
+
+### simple tests for exported methods
 {   ### turn of redefine warnings, we'll get new subs exported
     ### XXX 'no warnings' and 'local $^W' wont work as warnings are turned on in
     ### test.pm, so trap them for now --kane
     {   local $SIG{__WARN__} = sub {};
-        ok( $Class->import( $App ), 
+        ok( $Class->import( $App ),
                                 "Loading $Class for App $App" );
     }
-    
+
     ### test exported methods again
     for my $meth ( @{ $Meth{$Pkg} } ) { SKIP: {
 
         ### do a call, we should get a result and perhaps a $c if it's 'ctx_request';
         my ($res, $c) = eval { $Pkg->can($meth)->( $Url ) };
-        
+
         ok( 1,                  "   Called $Pkg->$meth( $Url )" );
         ok( !$@,                "       No critical error $@" );
         ok( $res,               "       Result obtained" );
-        
+
         ### get the content as a string, to make sure we got what we expected
         my $res_as_string = $meth eq 'get' ? $res : $res->content;
         is( $res_as_string, $Content,
-                                "           Content as expected: $res_as_string" );    
-        
+                                "           Content as expected: $res_as_string" );
+
         ### some tests for 'ctx_request'
         skip "Context tests skipped for '$meth'", 6 unless $meth eq 'ctx_request';
-        
+
         ok( $c,                 "           Context object returned" );
         isa_ok( $c, $App,       "               Object" );
         is( $c->request->uri, $Url,
@@ -92,7 +92,7 @@ use_ok( $Class );
     } }
 }
 
-### perl5.8.8 + cat 5.80's Cat::Test->ctx_request didn't return $c the 2nd 
+### perl5.8.8 + cat 5.80's Cat::Test->ctx_request didn't return $c the 2nd
 ### time it was invoked. Without tracking the bug down all the way, it was
 ### clearly related to the Moose'ification of Cat::Test and a scoping issue
 ### with a 'my'd variable. Since the same code works fine in 5.10, a bug in
@@ -102,7 +102,7 @@ use_ok( $Class );
         my($res, $c) = ctx_request( $Url );
         ok( $c,                 "   Call $_: Context object returned" );
     }
-}    
+}
 
 # FIXME - These vhosts in tests tests should be somewhere else...
 

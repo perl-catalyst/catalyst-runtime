@@ -31,7 +31,7 @@ my $build_exports = sub {
     my $get = sub { $request->(@_)->content };
 
     my $ctx_request = sub {
-        my $me      = ref $self || $self;
+        my $me = ref $self || $self;
 
         ### throw an exception if ctx_request is being used against a remote
         ### server
@@ -49,7 +49,7 @@ my $build_exports = sub {
         ### hook into 'dispatch' -- the function gets called after all plugins
         ### have done their work, and it's an easy place to capture $c.
 
-        my $meta = Catalyst->meta;
+        my $meta = $class->meta;
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
             $c = shift;
