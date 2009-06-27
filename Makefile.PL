@@ -43,9 +43,10 @@ recommends 'B::Hooks::OP::Check::StashChange';
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
 
-# aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate is available
-if ($ENV{AGGREGATE_TESTS} && can_use('Test::Aggregate', '0.34_01')) {
-    test_requires('Test::Aggregate', '0.34_01');
+# aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
+if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.35_05')) {
+    test_requires('Test::Aggregate', '0.35_05');
+    test_requires('Test::Simple', '0.88');
 }
 else {
     tests join q{ },
