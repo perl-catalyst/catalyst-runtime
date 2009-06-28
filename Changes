@@ -3,13 +3,17 @@
   Bug fixes:
         - Revert change to URL encode things passed into $c->uri_for
           Args and CaptureArgs as this causes breakage to pre-existing
-          applications.
+          applications (t0m).
         - Remove use of Test::MockObject as it doesn't install from CPAN
-          in some environments.
+          in some environments (t0m).
         - Remove use of dclone to deep copy configs and replace with
           Catalyst::Utils::merge_hashes which has the same effect, of
           ensuring child classes don't inherit their parent's config,
-          except works correctly with closures.
+          except works correctly with closures (t0m).
+        - Add Class::C3::reinitialize into Catalyst::Test to avoid weird
+          bugs in ctx_request (bokutin in RT#46459)
+        - Fix issues with _parse_PathPrefix_attr method in Catalyst::Controller
+          (jasonk in RT#42816)
 
   New features:
         - Use ~ as prefix for plugins or action classes which are located in
@@ -20,7 +24,7 @@
           references, that close over the context, without creating leaks
           (Florian Ragwitz).
 
-  Things t0m needs to move into an actual changelog section, after he introduced that shit:
+   Refactoring / cleanups:
         - Clean namespaces in Catalyst::Exception* (Florian Ragwitz).
         - Turn Catalyst::Exception into an actual class and make the throw
           method create instances of it. They can still be used as normal
@@ -29,6 +33,9 @@
         - Add a rethrow method to Catalyst::Exception (Florian Ragwitz).
         - Add Catalyst::Exception::Detach and ::Go, and refactor detach() and
           go() to use them instead of magic, global strings (Florian Ragwitz).
+          Fixes RT#47366
+        - Clean up getting metaclass instance and making app class immutable
+          again in Catalyst::Test (t0m)
 
 5.80005 2009-06-06 14:40:00
 

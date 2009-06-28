@@ -49,13 +49,13 @@ my $build_exports = sub {
         ### hook into 'dispatch' -- the function gets called after all plugins
         ### have done their work, and it's an easy place to capture $c.
 
-        my $meta = $class->meta;
+        my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
             $c = shift;
         });
-        $meta->make_immutable;
-
+        $meta->make_immutable( replace_constructor => 1 );
+        Class::C3::reinitialize();
         ### do the request; C::T::request will know about the class name, and
         ### we've already stopped it from doing remote requests above.
         my $res = $request->( @_ );
