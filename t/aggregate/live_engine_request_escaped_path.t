@@ -46,7 +46,7 @@ Index: lib/Catalyst/Engine/CGI.pm
     my $request = Catalyst::Utils::request( 'http://localhost/args/params/one/two' );
     my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
 
-    TestApp->handle_request;
+    TestApp->handle_request( env => \%ENV );
 
     ok( my $response = $cgi->restore->response );
     ok( $response->is_success, 'Response Successful 2xx' );
@@ -64,7 +64,7 @@ TODO: {
     $ENV{PATH_INFO} = '/args/param%73/one/two';
 
 
-    TestApp->handle_request;
+    TestApp->handle_request( env => \%ENV );
 
     ok( my $response = $cgi->restore->response );
     ok( $response->is_success, 'Response Successful 2xx' );
