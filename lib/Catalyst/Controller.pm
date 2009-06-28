@@ -384,8 +384,8 @@ sub _parse_ChainedParent_attr {
 }
 
 sub _parse_PathPrefix_attr {
-    my $self = shift;
-    return PathPart => $self->path_prefix;
+    my ( $self, $c ) = @_;
+    return PathPart => $self->path_prefix($c);
 }
 
 sub _parse_ActionClass_attr {
