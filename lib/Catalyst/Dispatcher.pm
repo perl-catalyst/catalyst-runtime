@@ -34,17 +34,14 @@ has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required =
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
-has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
 
-has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
-
-# Wrap accessors so you can assign a list and it will capture a list ref.
-around qw/preload_dispatch_types postload_dispatch_types/ => sub {
-    my $orig = shift;
-    my $self = shift;
-    return $self->$orig([@_]) if (scalar @_ && ref $_[0] ne 'ARRAY');
-    return $self->$orig(@_);
-};
+my %dispatch_types = ( pre => \@PRELOAD, post => \@POSTLOAD );
+foreach my $type (keys %dispatch_types) {
+    has $type . "load_dispatch_types" => (
+        is => 'rw', required => 1, lazy => 1, default => sub { $dispatch_types{$type} },
+        traits => ['MooseX::Emulate::Class::Accessor::Fast::Meta::Role::Attribute'], # List assignment is CAF style
+    );
+}
 
 =head1 NAME
 
