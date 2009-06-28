@@ -2716,6 +2716,8 @@ chicks: Christopher Hicks
 
 David E. Wheeler
 
+dhoss: Devin Austin <dhoss@cpan.org>
+
 dkubb: Dan Kubb <dan.kubb-cpan@onautopilot.com>
 
 Drew Taylor
