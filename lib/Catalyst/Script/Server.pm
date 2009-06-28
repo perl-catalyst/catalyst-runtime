@@ -42,7 +42,7 @@ sub run {
            restart           => $self->restart,
            restart_delay     => $self->restart_delay,
            restart_regex     => qr/$self->restart_regex/,
-           restart_directory => $self->restart_directory,
+# FIXME    restart_directory => $self->restart_directory,
            follow_symlinks   => $self->follow_symlinks,
         }  
     );
