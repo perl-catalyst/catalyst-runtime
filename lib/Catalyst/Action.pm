@@ -124,6 +124,8 @@ Always returns true if Args is omitted.
 Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
 having the highest precedence.
 
+C<< <=> >> is overloaded to use this method.
+
 =head2 namespace
 
 Returns the private namespace this action lives in.
