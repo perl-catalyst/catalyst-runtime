@@ -37,9 +37,6 @@ use overload (
     # Codulate to execute to invoke the encapsulated action coderef
     '&{}' => sub { my $self = shift; sub { $self->execute(@_); }; },
 
-    # Which action takes precedence
-    '<=>' => 'compare',
-
     # Make general $stuff still work
     fallback => 1,
 
@@ -123,8 +120,6 @@ Always returns true if Args is omitted.
 
 Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
 having the highest precedence.
-
-C<< <=> >> is overloaded to use this method.
 
 =head2 namespace
 

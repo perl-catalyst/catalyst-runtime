@@ -119,7 +119,7 @@ sub register_path {
     $path =~ s{(?<=[^/])/+\z}{};
 
     $self->_paths->{$path} = [
-        sort { $a <=> $b } ($action, @{ $self->_paths->{$path} || [] })
+        sort { $a->compare($b) } ($action, @{ $self->_paths->{$path} || [] })
     ];
 
     return 1;
