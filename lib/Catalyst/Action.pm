@@ -38,7 +38,6 @@ use overload (
     '&{}' => sub { my $self = shift; sub { $self->execute(@_); }; },
 
     # Which action takes precedence
-    'cmp' => 'compare',
     '<=>' => 'compare',
 
     # Make general $stuff still work
