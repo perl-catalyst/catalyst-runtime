@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+       - Don't mangle query parameters passed to uri_for
+         - Tests for this (t0m + Byron Young + Amir Sadoughi)
+
 5.80006 2009-06-29 23:37:47
 
   Bug fixes:

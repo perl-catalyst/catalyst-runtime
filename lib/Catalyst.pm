@@ -1232,12 +1232,12 @@ sub uri_for {
           my $key = $_;
           $val = '' unless defined $val;
           (map {
-              $_ = "$_";
-              utf8::encode( $_ ) if utf8::is_utf8($_);
+              my $param = "$_";
+              utf8::encode( $param ) if utf8::is_utf8($param);
               # using the URI::Escape pattern here so utf8 chars survive
-              s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
-              s/ /+/g;
-              "${key}=$_"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
+              $param =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+              $param =~ s/ /+/g;
+              "${key}=$param"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
       } @keys);
     }
 
