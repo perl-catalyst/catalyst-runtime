@@ -18,6 +18,7 @@ sub normal_closure : Local {
 sub context_closure : Local {
     my ($self, $ctx) = @_;
     $ctx->stash(closure => $self->make_context_closure(sub {
+        my ($ctx) = @_;
         $ctx->response->body('from context closure');
     }, $ctx));
     $ctx->response->body('stashed context closure');
