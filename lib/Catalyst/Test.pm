@@ -55,7 +55,7 @@ my $build_exports = sub {
             $c = shift;
         });
         $meta->make_immutable( replace_constructor => 1 );
-        Class::C3::reinitialize();
+        Class::C3::reinitialize(); # Fixes RT#46459, I've failed to write a test for how/why, but it does.
         ### do the request; C::T::request will know about the class name, and
         ### we've already stopped it from doing remote requests above.
         my $res = $request->( @_ );
