@@ -73,20 +73,16 @@ sub match {
     return scalar( @{ $c->req->args } ) == $args;
 }
 
-sub sort_order {
-    my $self = shift;
-
-    my ($args) = @{ $self->attributes->{Args} || [] };
-
-    return $args if looks_like_number($args);
-
-    return ~0;
-}
-
 sub compare {
     my ($a1, $a2) = @_;
 
-    return $a1->sort_order <=> $a2->sort_order;
+    my ($a1_args) = @{ $a1->attributes->{Args} || [] };
+    my ($a2_args) = @{ $a2->attributes->{Args} || [] };
+
+    $_ = looks_like_number($_) ? $_ : ~0 
+        for $a1_args, $a2_args;
+
+    return $a1_args <=> $a2_args;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -124,13 +120,10 @@ context and arguments
 Check Args attribute, and makes sure number of args matches the setting.
 Always returns true if Args is omitted.
 
-=head2 sort_order
-
-Returns the value of the C<Args> attribute, or C<~0> if it has no value.
-
 =head2 compare
 
-Returns C<< $a->sort_order <=> $b->sort_order >> .
+Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
+having the highest precedence.
 
 =head2 namespace
 
