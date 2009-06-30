@@ -103,12 +103,13 @@ sub import {
     }
 
     my $meta = Moose::Meta::Class->initialize($caller);
-    #Moose->import({ into => $caller }); #do we want to do this?
-
     unless ( $caller->isa('Catalyst') ) {
         my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller');
         $meta->superclasses(@superclasses);
     }
+    # Avoid possible C3 issues if 'Moose::Object' is already on RHS of MyApp
+    $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
+
     unless( $meta->has_method('meta') ){
         $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
     }
