@@ -2,28 +2,28 @@
 
   Bug fixes:
        - Don't mangle query parameters passed to uri_for
-         - Tests for this (t0m + Byron Young + Amir Sadoughi)
-       - Inherited controller methods can now be specified in config->{action(s)}
-         (edenc)
+         - Tests for this (Byron Young + Amir Sadoughi)
+       - Inherited controller methods can now be specified in
+         config->{action(s)}
 
   New features:
        - Add optional second argument to uri_with which appends to existing
          params rather than replacing them. (foo=1 becomes foo=1&foo=2 when
          uri_with({ foo => 2 }, { mode => 'append' }) is called on a foo=1
-         URI. (gphat)
+         URI.
 
 5.80006 2009-06-29 23:37:47
 
   Bug fixes:
         - Revert change to URL encode things passed into $c->uri_for
           Args and CaptureArgs as this causes breakage to pre-existing
-          applications (t0m).
+          applications.
         - Remove use of Test::MockObject as it doesn't install from CPAN
-          in some environments (t0m).
+          in some environments.
         - Remove use of dclone to deep copy configs and replace with
           Catalyst::Utils::merge_hashes which has the same effect, of
           ensuring child classes don't inherit their parent's config,
-          except works correctly with closures (t0m).
+          except works correctly with closures.
         - Add Class::C3::reinitialize into Catalyst::Test to avoid weird
           bugs in ctx_request (bokutin in RT#46459)
         - Fix issues with _parse_PathPrefix_attr method in Catalyst::Controller
@@ -35,27 +35,26 @@
         - Controller methods without attributes are now considered actions if
           they are specified in config->{action(s)} (mo)
         - Add Catalyst::Component::ContextClosure as an easy way to create code
-          references, that close over the context, without creating leaks
-          (Florian Ragwitz).
+          references, that close over the context, without creating leaks.
 
    Refactoring / cleanups:
-        - Clean namespaces in Catalyst::Exception* (Florian Ragwitz).
+        - Clean namespaces in Catalyst::Exception*.
         - Turn Catalyst::Exception into an actual class and make the throw
           method create instances of it. They can still be used as normal
           strings, as before, as they are overloaded to stringify to their
-          error message (Florian Ragwitz).
-        - Add a rethrow method to Catalyst::Exception (Florian Ragwitz).
+          error message.
+        - Add a rethrow method to Catalyst::Exception.
         - Add Catalyst::Exception::Detach and ::Go, and refactor detach() and
-          go() to use them instead of magic, global strings (Florian Ragwitz).
+          go() to use them instead of magic, global strings.
           Fixes RT#47366
         - Clean up getting metaclass instance and making app class immutable
-          again in Catalyst::Test (t0m)
+          again in Catalyst::Test
 
 5.80005 2009-06-06 14:40:00
 
   Behaviour changes:
         - Arguments ($c->req->args) in Chained dispatch are now automatically
-          URL decoded to be consistent with Local/Path dispatch (Caelum)
+          URL decoded to be consistent with Local/Path dispatch
 
   Documentation:
         - Clarify correct techniques for Moose controllers (domm)
@@ -64,13 +63,13 @@
         - Further change pushing 'env' attribute down into Catalyst::Engine
           to make $c->engine->env work in all cases (kmx)
         - Also fix $c->engine->env in Catalyst::Test tests (kmx)
-          - Tests for this (t0m)
+          - Tests for this
         - Fix Catalyst failing to start if any plugin changed $_ whilst
-          loading (t0m)
+          loading
           - Tests for this
         - Be stricter about arguments to Args attributes for Chained actions,
           so that they blow up on load instead of causing undefined behavior
-          later on (hdp)
+          later on
           - Tests for this
         - Prefer Path actions with a smaller (or set) number of Args (caelum)
           Bug reported here: http://stackoverflow.com/questions/931653/catalyst-action-that-matches-a-single-file-in-the-root-directory/933181#933181
@@ -88,56 +87,56 @@
           _controller_actions to avoid name clashes with application
           controller naming. (random)
         - Test for using Moose in components which have a non-Moose base class
-          Fixed by 349cda in Moose 0.78 (t0m)
+          Fixed by 349cda in Moose 0.78
         - Fix deprecation message for Catalyst::Dispatcher to refer
-          to the class actually calling the deprecated method. RT#45741 (t0m)
+          to the class actually calling the deprecated method. RT#45741
         - Clarify limitations of $request->base and $request->secure.
           (Phil Mitchell)
         - Add 'use Catalyst' to documentation for a Moose MyApp class as
-          noted by dmaki. (t0m)
+          noted by dmaki.
         - Fix so that / (and other special characters) are URL encoded when
-          passed into $c->uri_for as Args/CaptureArgs (t0m)
+          passed into $c->uri_for as Args/CaptureArgs
         - Fix development server so that $c->engine->env returns the correct
-          environment (t0m)
-        - Require Moose 0.78 to fix metaclass incompatibility issues (t0m)
+          environment
+        - Require Moose 0.78 to fix metaclass incompatibility issues
         - Require MooseX::MethodAttributes 0.10 and use
           Moose::Meta::Class->initialize rather than Moose->init_meta to fix
-          bugs related to having a 'meta' method in your controller (t0m)
+          bugs related to having a 'meta' method in your controller
         - Fix cases where your application failing to compile could cause perl
-          to report 'Unknown Error' (t0m)
+          to report 'Unknown Error'
         - Support adding Moose::Roles to the plugin list. These are applied to
-          MyApp after plugins have been pushed onto @ISA (t0m)
+          MyApp after plugins have been pushed onto @ISA
         - Fix calling $c->req->parameters as the first thing you do when
-          parse_on_demand is on (t0m)
+          parse_on_demand is on
 
 5.80003 2009-04-29 16:23:53
         - Various POD tweaks. (hdp, dandv)
-        - Fix formatting error in the regex fallback warning. (rafl)
+        - Fix formatting error in the regex fallback warning.
         - Convert the dispatcher's and restarter engine's BUILD method to
           attribute builders to not override the BUILD method from
-          MooseX::Emulate::Class::Accessor::Fast. (rafl)
+          MooseX::Emulate::Class::Accessor::Fast.
         - Fix classes without metaclasses restarting, when not using
-          B::Hooks::OP::Check::StashChange (t0m)
+          B::Hooks::OP::Check::StashChange
         - Fix the unattached chain debug table for endpoints with no
-          parents at all. (rafl)
+          parents at all.
         - Turn of test aggregation by default. Only aggregate if the
           AGGREGATE_TESTS environment variable is set and a recent
-          Test::Aggregate is available. (rafl)
+          Test::Aggregate is available.
         - Bump to MooseX::MethodAttributes 0.09, to gain the
           get_nearest_methods_with_attributes method allowing methods without
           attributes in a subclass to override those with attributes in a
           superclass. This fixes CatalystX::CRUD's method of overriding /
-          disabling functionality from base controllers. (t0m)
-        - Bump HTTP::Request::AsCGI dependency to avoid broken version (t0m)
+          disabling functionality from base controllers.
+        - Bump HTTP::Request::AsCGI dependency to avoid broken version
         - Bump Moose dependency to latest version to fix metaclass
-          incompatibility issues in some cases. (t0m)
-        - Additional tests for setup_stats method. (t0m)
-        - Fix log levels in Catalyst::Log to be properly additive. (t0m)
-        - Fix RT#43375 by sorting results before testing them (t0m)
+          incompatibility issues in some cases.
+        - Additional tests for setup_stats method.
+        - Fix log levels in Catalyst::Log to be properly additive.
+        - Fix RT#43375 by sorting results before testing them
         - Fixes for uri_for_action when using Catalyst::DispatchType::Regex
           + tests from RT#39369 (norbi)
         - Partial rewrite and reoganisation of the C3 docs in
-          Catalyst::Upgrading based on feedback from kiffin (t0m)
+          Catalyst::Upgrading based on feedback from kiffin
         - If you make your application class immutable and turn off
           constructor inlining, Catalyst will die and tell you pass
           the (replace_constructor => 1) argument to
@@ -147,27 +146,27 @@
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
           turning debuging on if defined, rather than if set.
           They now force debugging on or off, taking precedence over
-          configuration in your application. (t0m)
-          - Tests for this (t0m)
+          configuration in your application.
+          - Tests for this
         - pass replace_constructor to the immutable call to ensure
           applications get a Moose constructor rather than a C::A one
         - Fix issues with restarting the application class due to C3 failures
-          on perl 5.10 (t0m)
+          on perl 5.10
         - Work around issues in Moose with initialization order of multiple
-          levels of non-Moose classes inheriting from a Moose class (t0m)
+          levels of non-Moose classes inheriting from a Moose class
           - Test for this
         - Add backwards compatibility method for Catalyst::Log->body, which
-          has been made private (t0m)
+          has been made private
         - Fix so that calling $c->req->parameters(undef) does not flatten
-          the request parameters with undef + test (t0m)
+          the request parameters with undef + test
         - Fix so that width of table of unattached actions for debugging
           ::DispatchType::Chained varies according to your terminal width
           (Oleg Kostyuk)
         - Fix warning message about linearized @ISA in Catalyst::Component
           (Emanuele Zeppieri)
         - Require MX::MethodAttributes 0.06 to avoid issues with saying
-          use base 'Catalyst::Controller'; use Moose; losing actions (t0m)
-        - Fix all of t0m's typos in ::Upgrading and ::Delta (hobbs)
+          use base 'Catalyst::Controller'; use Moose; losing actions
+        - Fix all of's typos in ::Upgrading and ::Delta (hobbs)
 
 5.80001 2009-04-18 22:18
         - Don't inline the constructor for Catalyst::Log to avoid a
@@ -178,89 +177,88 @@
         - Test uri_with clears query params when they are set to undef
           (Ian Wells)
         - Complain about old Catalyst::Devel versions which generated
-          ->setup(qw/-Debug... etc. as this is not recommended (t0m)
+          ->setup(qw/-Debug... etc. as this is not recommended
 
 5.8000_07 2009-04-12 13:37
         - Add the Catalyst::Dispatcher->dispatch_type method (ash)
         - Throw an exception rather than loading an app if an action
-          tries to chain to itself (t0m)
+          tries to chain to itself
           - Tests for this
         - Change the $c->visit and $c->go methods to optionally take
-          CaptureArgs, making them useful to call ActionChains with (t0m)
+          CaptureArgs, making them useful to call ActionChains with
           - Tests for this (radek)
         - Fix _invoke_as_component method to find the proper action instance
           for dispatchable actions so that ->visit or ->going to ActionChains
-          with qw/Class::Name method_name/ works correctly (t0m)
+          with qw/Class::Name method_name/ works correctly
           - Tests for this (radek)
         - Added Catalyst::Test::ctx_request to be able to inspect
           the context object after a request is made (Jos Boumans)
         - debug() POD rewrite (jhannah)
         - Change the warning when you have conflicting components to
-          present a list (t0m)
+          present a list
         - Move NEXT use and testing deprecated features out to its own
           test application so that the main TestApp isn't polluted with
-          spurious warnings (t0m)
-        - Add a warning for the old ::[MVC]:: style naming scheme (t0m)
-          - Test for this (t0m)
+          spurious warnings
+        - Add a warning for the old ::[MVC]:: style naming scheme
+          - Test for this
         - Kill Class::C3::Adopt::NEXT warnings for the Catalyst:: namespace
-          in production versions (t0m)
+          in production versions
         - Tidy up Catalyst::ClassData to ensure that all components get
-          the correct metaclass (t0m)
+          the correct metaclass
         - Make MyApp.pm restartable by unsetting setup_finished in
-          the restarter process (t0m)
+          the restarter process
         - Non-naive implementation of making mutable on restart using
-          B::Hooks::OP::Check::StashChange if installed (t0m)
-          - Tests for this (t0m)
+          B::Hooks::OP::Check::StashChange if installed
+          - Tests for this
         - Naive implementation of making all components mutable in the
           forked restart watcher process so native Moose apps using
-          immutable restart correctly. (t0m)
-          - Tests for this (t0m)
+          immutable restart correctly.
+          - Tests for this
         - Bump Moose dependency to 0.70 so that we avoid nasty surprises
-          with is_class_loaded and perl 5.80 when you Moosify MyApp.pm (t0m)
+          with is_class_loaded and perl 5.80 when you Moosify MyApp.pm
         - Clarify that request arguments aren't unescaped automatically
           (Simon Bertrang) (Closes RT#41153)
-        - Don't require C3 for the MRO test (rafl)
-        - Bump MX::Emulate::CAF prereq to support list assignment (rafl)
-        - Remove useless column in chained action debug table. (rafl)
-        - namespace::clean related cleanups (rafl)
-        - Import related cleanups and consistency fixes (rafl)
-        - Fix test suite TestApp /dump/env action (t0m)
-        - Add $res->code as alias for $res->status (hdp)
+        - Don't require C3 for the MRO test
+        - Bump MX::Emulate::CAF prereq to support list assignment
+        - Remove useless column in chained action debug table.
+        - namespace::clean related cleanups
+        - Import related cleanups and consistency fixes
+        - Fix test suite TestApp /dump/env action
+        - Add $res->code as alias for $res->status
         - Make Catalyst::ClassData compatible with the latest Class::MOP::Class
-          changes. Also depend on the latest Class::MOP. (rafl)
-        - Add $c->uri_for_action method. (hdp)
-        - Don't stringify the meta method. Use its name instead. (rafl)
+          changes. Also depend on the latest Class::MOP.
+        - Add $c->uri_for_action method.
+        - Don't stringify the meta method. Use its name instead.
         - Use MooseX::MethodAttributes::Inheritable to contain action
           attributes. This means that attributes are now represented in the MOP,
-          allowing method modifiers on actions to work as expected. (rafl)
+          allowing method modifiers on actions to work as expected.
         - Provide a reasonable API in Catalyst::Controller for working with
           and registering actions, allowing a controller sub-class to replace
           subroutine attributes for action declerations with an alternate
-          syntax. (rafl/hdp)
+          syntax.
         - Instantiate correct sub-class of Moose::Meta::Class for non-Moose
           components where Catalyst forces the creation of a metaclass instance.
           This is more correct, and avoids metaclass incompatibility in complex
-          cases (t0m)
-          - Tests for this (t0m)
-        - Use of deprecated Catalyst::Base now warns. (t0m)
-        - Add uri_with tests (gphat)
+          cases
+          - Tests for this
+        - Use of deprecated Catalyst::Base now warns.
+        - Add uri_with tests
 
 5.8000_06 2009-02-04 21:00
-        - Disallow writing to config after setup (rafl)
-        - Disallow calling setup more than once (rafl)
+        - Disallow writing to config after setup
+        - Disallow calling setup more than once
         - Documentation fix regarding overloading of Engine and Dispatcher
-          instances (rafl)
-        - Several documentation typo fixes (rafl)
+          instances
+        - Several documentation typo fixes
         - Stop Makefile.PL from warning about versions that fixed a conflict
-          (t0m)
-        - Improved upgrading documentation (t0m, rafl)
+        - Improved upgrading documentation
         - Seed the RNG in each FastCGI child process (Andrew Rodland)
-        - Properly report dynamic bind port for the development server (rafl)
+        - Properly report dynamic bind port for the development server
           (Closes RT#38544)
         - Use the way documented by IO::Socket::INET to get the error message
-          after trying to create a listening socket (rafl) (Closes RT#41828)
+          after trying to create a listening socket (Closes RT#41828)
         - Don't ignore SIGCHLD while handling requests with the dev server
-          (rafl) (Closes RT#42962)
+          (Closes RT#42962)
 
 5.8000_05 2008-29-01 00:00
         - Text::SimpleTable's go as wide as $ENV{COLUMNS} (jhannah)
@@ -271,131 +269,129 @@
         - Improve the clarity and verbosity of the warning when component
           resolution uses regex fallback. (jhannah)
         - Handle leading CRLF in HTTP requests sometimes sent by IE6 in
-          keep-alive requests. (andyg)
+          keep-alive requests.
         - Fixes for FastCGI with IIS 6.0 (janus)
         - Passing request method exported by Catalyst::Test an extra
           parameter used to be ignored, but started breaking if the parameter
           was not a hash in 5.8000_04. Extra parameter is now ignored if
-          it isn't a hashref (t0m)
+          it isn't a hashref
         - Fix request argumentss getting corrupted if you override the
           dispatcher and call an action which detaches (for
-          Catalyst::Plugin::Authorization::ACL) (t0m)
+          Catalyst::Plugin::Authorization::ACL)
         - Fix calling use Catalyst::Test 'MyApp' 'foo' which used to work,
-          but stopped as the 2nd parameter can be an options hash now (t0m)
-        - Bump Moose dependency to fix make_immutable bug (t0m)
-        - Use compile time extends in Catalyst::Controller (t0m)
+          but stopped as the 2nd parameter can be an options hash now
+        - Bump Moose dependency to fix make_immutable bug
+        - Use compile time extends in Catalyst::Controller
         - Make Catalyst::Request::uploads attribute non-lazy, to fix
-          test for Catalyst-Engine-Apache (t0m)
-        - Bump version of MooseX::Emulate::Class::Accessor::Fast (t0m)
+          test for Catalyst-Engine-Apache
+        - Bump version of MooseX::Emulate::Class::Accessor::Fast
         - Stop using MooseX::Adopt::Class::Accessor::Fast by default, to stop
           breaking other packages which use Class::Accessor::Fast
         - Remove unused action_container_class attribute from
-          Catalyst::Dispatcher (t0m)
-        - Replace {_body} instance access with calls to _body accessors (t0m)
+          Catalyst::Dispatcher
+        - Replace {_body} instance access with calls to _body accessors
         - Add backwards compatibility alias methods for private attributes on
           Catalyst::Dispatcher which used to be public. Needed by
           Catalyst::Plugin::Server and  Catalyst::Plugin::Authorization::ACL
-          (t0m)
         - Fix return value of $c->req->body, which delegates to the body
-          method on the requests HTTP::Body instance (t0m)
-          - Test for this (t0m)
+          method on the requests HTTP::Body instance
+          - Test for this
         - Fix calling $c->req->body from inside an overridden prepare_action
-          method in a plugin, as used by Catalyst::Plugin::Server (t0m)
-          - Test for this (t0m)
+          method in a plugin, as used by Catalyst::Plugin::Server
+          - Test for this
         - Fix assignment to Catalyst::Dispatcher's preload_dispatch_types and
           postload_dispatch_types attributes - assigning a list should later
-          return a listref. Fixes Catalyst::Plugin::Server. (t0m)
-          - Tests for this (t0m)
+          return a listref. Fixes Catalyst::Plugin::Server.
+          - Tests for this
         - Change streaming test to serve itself rather than 01use.t, making
-          test sync for engines easier (t0m)
+          test sync for engines easier
         - Refactor capturing of $app from Catalyst::Controller into
           Catalyst::Component::ApplicationAttribute for easier reuse in other
-          components (Florian Ragwitz)
-        - Make the test suites YAML dependency optional (Florian Ragwitz)
+          components
+        - Make the test suites YAML dependency optional
         - Make debug output show class name for the engine and dispatcher
-          rather than the stringified ref. (t0m)
+          rather than the stringified ref.
         - Make MyApp immutable at the end of the scope after the setup
           method is called, fixing issues with plugins which have their
-          own new methods by inlining a constructor on MyApp (t0m)
-          - Test for this and method modifiers in MyApp (t0m)
+          own new methods by inlining a constructor on MyApp
+          - Test for this and method modifiers in MyApp
         - Fix bug causing Catalyst::Request::Upload's basename method
-          to return undef (t0m)
+          to return undef
           - Test for this (Carl Franks)
         - Fix loading of classes which do not define any symbols to not
-          die, as it didn't in 5.70 (t0m)
-          - Test for this (t0m)
+          die, as it didn't in 5.70
+          - Test for this
         - Bump MooseX::Emulate::Class::Accessor::Fast dependency
-          to force new version which fixes a lot of plugins (t0m)
+          to force new version which fixes a lot of plugins
         - Make log levels additive, and add documentation and tests
           for the setup_log method, which previously had none.
-          Sewn together by t0m from two patches provided by David E. Wheeler
+          Sewn together by from two patches provided by David E. Wheeler
         - Switch an around 'new' in Catalyst::Controller to a BUILDARGS
-          method as it's much neater and more obvious what is going on (t0m)
+          method as it's much neater and more obvious what is going on
         - Add a clearer method on request and response _context
           attributes, and use if from ::Engine rather than deleting
-          the key from the instance hash (t0m)
+          the key from the instance hash
         - Use handles on tree attribute of Catalyst::Stats to replace
-          trivial delegation methods (t0m)
+          trivial delegation methods
         - Change the following direct hash accesses into attributes:
           Catalyst::Engine: _prepared_write
           Catalyst::Engine::CGI: _header_buf
           Catalyst::Engine::HTTP: options, _keepalive, _write_error
           Catalyst::Request: _path
           Catalyst::Stats: tree
-          (t0m)
         - Fix issues in Catalyst::Controller::WrapCGI
           and any other components which import (or define) their
           own meta method by always explicitly calling
-          Class::MOP::Object->meta inside Catalyst (t0m)
-          - Add test for this (t0m)
+          Class::MOP::Object->meta inside Catalyst
+          - Add test for this
         - Add test case for the bug which is causing the
-          Catalyst::Plugin::Authentication tests to fail (t0m)
+          Catalyst::Plugin::Authentication tests to fail
         - Fix a bug in uri_for which could cause it to generate paths
-          with multiple slashes in them. (t0m)
-          - Add test for this (t0m)
+          with multiple slashes in them.
+          - Add test for this
         - Fix SKIP block name in t/optional_http-server-restart.t,
           stopping 'Label not found for "last SKIP"' error from
-          Test::More (t0m)
-        - Workaround max_redirect 0 bug in LWP (andyg)
-        - Move live_engine_response_print into aggregate (andyg)
-        - Fix dependency bug, s/parent/base/ in new test (rafl)
+          Test::More
+        - Workaround max_redirect 0 bug in LWP
+        - Move live_engine_response_print into aggregate
+        - Fix dependency bug, s/parent/base/ in new test
         - Fix optional tests to run the live tests in the aggregate
-          dir (andyg)
-        - Fix Catalyst->go error in remote tests (andyg)
+          dir
+        - Fix Catalyst->go error in remote tests
         - Fix upload test to work with remote servers, don't check for
-          deleted files (andyg)
+          deleted files
         - Fix engine_request_uri tests to work on remote server with
-          different URI (andyg)
+          different URI
 
 5.8000_04  2008-12-05 12:15:00
-        - Silence Class::C3::Adopt::NEXT warnings in the test suite (rafl)
-        - Fix loads of 'used once, possible typo' warnings (rafl)
-        - Additional tests to ensure upload temp files are deleted (andyg)
+        - Silence Class::C3::Adopt::NEXT warnings in the test suite
+        - Fix loads of 'used once, possible typo' warnings
+        - Additional tests to ensure upload temp files are deleted
         - Remove use of NEXT from the test suite, except for one case
-          which tests if Class::C3::Adopt::NEXT is working (t0m)
+          which tests if Class::C3::Adopt::NEXT is working
         - Use a predicate to avoid recursion in cases where the uri
           method is overridden by a plugin, and calls the base method,
-          for example Catalyst::Plugin::SmartURI (t0m)
+          for example Catalyst::Plugin::SmartURI
           - Test for this (caelum)
         - Compose the MooseX::Emulate::Class::Accessor::Fast role to
           Catalyst::Action, Catalyst::Request, and all other modules which
           inherit from Class::Accessor::Fast in 5.70.
           This fixes:
             - Catalyst::Controller::HTML::FormFu (zamolxes)
-            - Catalyst::Request::REST (t0m)
-          - Test for this (t0m)
+            - Catalyst::Request::REST
+          - Test for this
         - Make hostname resolution lazy (Marc Mims)
         - Support mocking virtualhosts in test suite (Jason Gottshall)
-        - Add README (marcus)
-        - Fix TODO list (t0m)
-        - Use Class::C3::Adopt::NEXT (rafl)
-        - Ignore C3 warnings on 5.10 when testing ensure_class_loaded (rafl)
+        - Add README
+        - Fix TODO list
+        - Use Class::C3::Adopt::NEXT
+        - Ignore C3 warnings on 5.10 when testing ensure_class_loaded
         - Add TODO test for chained bug (gbjk)
         - Fix list address in documentation (zarquon)
-        - Fix ACCEPT_CONTEXT on MyApp, called as a class method (marcus)
-           - Test for this (marcus)
+        - Fix ACCEPT_CONTEXT on MyApp, called as a class method
+           - Test for this
         - Bump MooseX::Emulate::Class::Accessor::Fast version requirement to
-          get more back compatibility (t0m)
+          get more back compatibility
         - Improve documentation for $req->captures (caelum)
         - Fix a bug in Catalyst::Stats, stopping garbage being inserted into
           the stats if a user calls begin => but no end => (jhannah)
@@ -403,16 +399,16 @@
         - Trim lines sooner in stats to avoid ugly Text::SimpleTable wrapping
           (jhannah)
         - Change Catalyst::ClassData to tweak the symbol table inline for
-          performance after profiling (mst)
+          performance after profiling
         - Fix POD typo in finalize_error (jhannah)
         - Add tests to ensure that we delete the temp files created by
-          HTTP::Body's OctetStream parser (t0m)
+          HTTP::Body's OctetStream parser
 
 5.8000_03 2008-10-14 14:13:00
-        - Fix forwarding to Catalyst::Action objects (Rafael Kitover).
+        - Fix forwarding to Catalyst::Action objects.
         - Fix links to the mailing lists (RT #39754 and Florian Ragwitz).
-        - Use Class::MOP instead of Class::Inspector (Florian Ragwitz).
-        - Change Catalyst::Test to use Sub::Exporter (Florian Ragwitz).
+        - Use Class::MOP instead of Class::Inspector.
+        - Change Catalyst::Test to use Sub::Exporter.
         - Fixed typo in Engine::HTTP::Restarter::Watcher causing -r to complain.
 
 5.8000_02 2008-10-14 07:59:00
@@ -422,11 +418,11 @@
         - Port to Moose
         - Added test for action stringify
         - Added test for component instances getting $self->{value} from config.
-        - Add Catalyst::Response->print() method (ilmari)
-        - Optionally aggregate tests using Test::Aggregate (Florian Ragwitz).
+        - Add Catalyst::Response->print() method
+        - Optionally aggregate tests using Test::Aggregate.
         - Additional docs for uri_for to mention how to use $c->action and
           $c->req->captures (jhannah)
-        - List unattached chained actions in Debug mode (Florian Ragwitz).
+        - List unattached chained actions in Debug mode.
         - Pod formatting fix for Engine::FastCGI (Oleg Kostyuk).
         - Add visit, a returning ->go
 
@@ -435,7 +431,7 @@
         - Back out go() since that feature's been pushed to 5.80
         - Fix some Win32 test failures
         - Add pt translation of error message (wreis)
-        - Make :Chained('../action') work (Florian Ragwitz)
+        - Make :Chained('../action') work
         - Add test actions
         - Chained doc improvements (rev 8326-8328)
 
@@ -449,7 +445,7 @@
         - Added PathPrefix attribute
         - Removed Catalyst::Build; we've long since moved to Module::Install
         - Updated Catalyst::Test docs to mention the use of HTTP::Request
-          objects (Rafael Kitover)
+          objects
 
 5.7099_01 2008-06-25 22:36:00
         - Refactored component resolution (component(), models(), model(), et al). We now
@@ -488,8 +484,8 @@
         - Fix grammar on welcome page (RT #33236)
         - Fix for Path('0') handling (RT #29334)
         - Workaround for Win32 and c3_mro.t (RT #26452, tested by Kenichi Ishigaki)
-        - Fix for encoding query parameters (edenc)
-        - Fix Chained multiple test (t0m)
+        - Fix for encoding query parameters
+        - Fix Chained multiple test
 
 5.7012  2007-12-16 23:44:00
         - Fix uri_for()'s and uri_with()'s handling of multibyte chars
@@ -928,7 +924,7 @@
         - Now with updated manifest.
 
 5.32  2005-08-10 15:10:00
-        - Dispatcher might fail if object returns false. (Florian Ragwitz)
+        - Dispatcher might fail if object returns false.
 
 5.31  2005-06-04 12:35:00 (never released to CPAN)
 
