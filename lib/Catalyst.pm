@@ -117,6 +117,8 @@ sub import {
     $caller->setup_home;
 }
 
+sub _application { $_[0] }
+
 =head1 NAME
 
 Catalyst - The Elegant MVC Web Application Framework
