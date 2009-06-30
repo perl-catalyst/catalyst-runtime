@@ -3,6 +3,8 @@
   Bug fixes:
        - Don't mangle query parameters passed to uri_for
          - Tests for this (t0m + Byron Young + Amir Sadoughi)
+       - Inherited controller methods can now be specified in config->{action(s)}
+         (edenc)
 
 5.80006 2009-06-29 23:37:47
 
