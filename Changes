@@ -5,6 +5,7 @@
          - Tests for this (Byron Young + Amir Sadoughi)
        - Inherited controller methods can now be specified in
          config->{action(s)}
+       - Assigning an undef response body no longer produces warnings
 
   New features:
        - Add optional second argument to uri_with which appends to existing

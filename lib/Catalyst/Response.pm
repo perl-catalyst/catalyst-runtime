@@ -6,7 +6,14 @@ use HTTP::Headers;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has cookies   => (is => 'rw', default => sub { {} });
-has body      => (is => 'rw', default => '', lazy => 1, predicate => 'has_body');
+has body      => (is => 'rw', default => '', lazy => 1, predicate => 'has_body',
+    clearer => '_clear_body'
+);
+after 'body' => sub { # If someone assigned undef, clear the body so we get ''
+    if (scalar(@_) == 2 && !defined($_[1])) {
+         $_[0]->_clear_body;
+    }
+};
 has location  => (is => 'rw');
 has status    => (is => 'rw', default => 200);
 has finalized_headers => (is => 'rw', default => 0);
