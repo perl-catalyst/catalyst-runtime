@@ -1,5 +1,10 @@
 package Catalyst::Script::Server;
 
+BEGIN {
+    $ENV{CATALYST_ENGINE} ||= 'HTTP';
+    $ENV{CATALYST_SCRIPT_GEN} = 31;
+    require Catalyst::Engine::HTTP;
+}
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
