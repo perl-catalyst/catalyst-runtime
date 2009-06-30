@@ -6,6 +6,10 @@
        - Inherited controller methods can now be specified in
          config->{action(s)}
        - Assigning an undef response body no longer produces warnings
+       - Make Catalyst.pm implement the Component::ApplicationAttribute
+         interface so defining actions in MyApp.pm works again, if the
+         actions have attributes that cause $self->_application to be used
+         (like ActionClass).
 
   New features:
        - Add optional second argument to uri_with which appends to existing
