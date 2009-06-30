@@ -189,7 +189,7 @@ sub get_action_methods {
     push(
         @methods,
         map {
-            $meta->get_method($_)
+            $meta->find_method_by_name($_)
               || confess( 'Action "' 
                   . $_
                   . '" is not available from controller '

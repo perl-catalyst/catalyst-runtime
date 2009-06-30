@@ -70,5 +70,17 @@ sub end : Private {
     my ( $self, $c ) = @_;
 }
 
+package TestApp::Controller::Action::Inheritance::B;
+
+use strict;
+use base 'TestApp::Controller::Action';
+
+# check configuration for an inherited action
+__PACKAGE__->config(
+    action => {
+        begin => {}
+    }
+);
+
 1;
 
