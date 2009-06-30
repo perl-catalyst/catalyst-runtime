@@ -35,6 +35,9 @@
           bugs in ctx_request (bokutin in RT#46459)
         - Fix issues with _parse_PathPrefix_attr method in Catalyst::Controller
           (jasonk in RT#42816)
+        - Fix bugs with action sorting:
+          - Path actions sorted so that the most specific wins.
+          - Action methods named default and index fixed.
 
   New features:
         - Use ~ as prefix for plugins or action classes which are located in
