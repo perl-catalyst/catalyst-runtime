@@ -10,7 +10,7 @@
        - Add optional second argument to uri_with which appends to existing
          params rather than replacing them. (foo=1 becomes foo=1&foo=2 when
          uri_with({ foo => 2 }, { mode => 'append' }) is called on a foo=1
-         URI.
+         URI. (gphat)
 
 5.80006 2009-06-29 23:37:47
 
