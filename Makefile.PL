@@ -140,5 +140,5 @@ sub darwin_check_no_resource_forks {
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
                                           qq{ echo "You must set the ENV variable $attr to true,"; }.
                                           ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
-        }
+    }
 }
