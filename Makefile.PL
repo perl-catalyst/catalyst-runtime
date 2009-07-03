@@ -45,8 +45,8 @@ test_requires 'Test::Exception';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.35_05')) {
-    test_requires('Test::Aggregate', '0.35_05');
-    test_requires('Test::Simple', '0.88');
+    author_requires('Test::Aggregate', '0.35_05');
+    author_requires('Test::Simple', '0.88');
 }
 else {
     tests join q{ },
@@ -54,7 +54,7 @@ else {
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
 
-my @force_build_requires_if_author = qw(
+author_requires($_) for qw(
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
@@ -62,9 +62,6 @@ my @force_build_requires_if_author = qw(
 );
 
 if ($Module::Install::AUTHOR) {
-    foreach my $module (@force_build_requires_if_author) {
-        build_requires $module;
-    }
     darwin_check_no_resource_forks();
 }
 
@@ -73,11 +70,6 @@ auto_install;
 WriteAll;
 
 if ($Module::Install::AUTHOR) {
-
-  # Strip out the author only build_requires from META.yml
-  # Need to do this _after_ WriteAll else it looses track of them
-  strip_author_only_build_requires(@force_build_requires_if_author, 'Test::Aggregate');
-
   Meta->{values}{resources} = [
     [ 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
     [ 'IRC'         => 'irc://irc.perl.org/#catalyst' ],
@@ -153,20 +145,6 @@ sub darwin_check_no_resource_forks {
                                           qq{ echo "You must set the ENV variable $attr to true,"; }.
                                           ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
         }
-}
-
-sub strip_author_only_build_requires {
-    my @build_requires_to_strip = @_;
-    Meta->{values}{build_requires} = [ grep {
-      my $ok = 1;
-      foreach my $module (@build_requires_to_strip) {
-        if ($_->[0] =~ /$module/) {
-          $ok = 0;
-          last;
-        }
-      }
-      $ok;
-    } @{Meta->{values}{build_requires}} ];
 }
 
 sub check_conflicts {
