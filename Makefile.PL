@@ -93,7 +93,7 @@ print <<"EOF";
         perl -MCPANPLUS -e 'install Catalyst::Devel' # or
         perl -MCPAN -e 'install Catalyst::Devel'
 
-    To get some commonly used plugins, as well as the TT view and DBIC 
+    To get some commonly used plugins, as well as the TT view and DBIC
     model, install Task::Catalyst in the same way.
 
  Have fun!
@@ -145,44 +145,4 @@ sub darwin_check_no_resource_forks {
                                           qq{ echo "You must set the ENV variable $attr to true,"; }.
                                           ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
         }
-}
-
-sub check_conflicts {
-    my %conflicts = @_;
-
-    my %conflicts_found;
-    for my $mod ( sort keys %conflicts ) {
-        eval "require($mod)";
-        next if $@;
-
-        my $installed = $mod->VERSION();
-        $conflicts_found{$mod} = $installed if ( $installed le $conflicts{$mod} );
-    }
-
-    return unless scalar keys %conflicts_found;
-
-    print <<"EOF";
-
- WARNING:
-
-    This version of Catalyst conflicts with the versions of
-    some components you have installed.
-
-    You will need to upgrade these modules after installing
-    this version of Catalyst.
-
-    List of the conflicting components and their installed versions:
-
-EOF
-
-    foreach my $mod (keys %conflicts_found) {
-        print sprintf("    %s => %s\n", $mod, $conflicts_found{$mod});
-    }
-    print "\n";
-
-    # More or less copied from Module::Build, via Moose
-    return if $ENV{PERL_MM_USE_DEFAULT};
-    return unless -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
-
-    sleep 4;
 }
