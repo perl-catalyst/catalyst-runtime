@@ -65,21 +65,17 @@ if ($Module::Install::AUTHOR) {
     darwin_check_no_resource_forks();
 }
 
+resources(
+    'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst',
+    'IRC'         => 'irc://irc.perl.org/#catalyst',
+    'license',    => 'http://dev.perl.org/licenses/',
+    'homepage',   => 'http://dev.catalyst.perl.org/',
+    'repository', => 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/',
+);
+
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
-
-if ($Module::Install::AUTHOR) {
-  Meta->{values}{resources} = [
-    [ 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
-    [ 'IRC'         => 'irc://irc.perl.org/#catalyst' ],
-    [ 'license',    => 'http://dev.perl.org/licenses/' ],
-    [ 'homepage',   => 'http://dev.catalyst.perl.org/'],
-    [ 'repository', => 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/' ],
-  ];
-
-  Meta->write;
-}
 
 print <<"EOF";
 
