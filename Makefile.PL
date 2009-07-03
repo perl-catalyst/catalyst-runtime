@@ -54,12 +54,12 @@ else {
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
 
-author_requires($_) for qw(
+author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
   Pod::Coverage
-);
+));
 
 if ($Module::Install::AUTHOR) {
     darwin_check_no_resource_forks();
