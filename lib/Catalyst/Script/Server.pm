@@ -15,12 +15,20 @@ use namespace::clean -except => [ qw(meta) ];
 
 with 'MooseX::Getopt';
 
-has help            => ( isa => 'Bool',   is => 'ro', required => 0, default => sub { 0 } );
-has host            => ( isa => 'Str',    is => 'ro', required => 0, default => sub { "localhost" } );
+has help => ( 
+    traits => [qw(Getopt)],
+    isa => 'Bool',   
+    is => 'ro', 
+    required => 0, 
+    default => 0,
+    cmd_aliases => 'h',  
+);
+
+has host            => ( isa => 'Str',    is => 'ro', required => 0, default =>  "localhost" );
 has fork            => ( isa => 'Bool',   is => 'ro', required => 0 );
-has listen          => ( isa => 'Int',    is => 'ro', required => 0, default => sub{ 3000 } );
+has listen          => ( isa => 'Int',    is => 'ro', required => 0, default => "3000" );
 has pidfile         => ( isa => 'Str',    is => 'ro', required => 0 );
-has keepalive       => ( isa => 'Bool',   is => 'ro', required => 0, default => sub { 0 } );
+has keepalive       => ( isa => 'Bool',   is => 'ro', required => 0, default => 0 );
 has background      => ( isa => 'Bool',   is => 'ro', required => 0 );
 has app             => ( isa => 'Str',    is => 'ro', required => 1 );
 has restart         => ( isa => 'Bool',   is => 'ro', required => 0 );
@@ -56,3 +64,53 @@ sub run {
 
 
 1;
+
+=head1 NAME
+
+[% appprefix %]_server.pl - Catalyst Testserver
+
+=head1 SYNOPSIS
+
+[% appprefix %]_server.pl [options]
+
+ Options:
+   -d -debug          force debug mode
+   -f -fork           handle each request in a new process
+                      (defaults to false)
+   -? -help           display this help and exits
+      -host           host (defaults to all)
+   -p -port           port (defaults to 3000)
+   -k -keepalive      enable keep-alive connections
+   -r -restart        restart when files get modified
+                      (defaults to false)
+   -rd -restartdelay  delay between file checks
+                      (ignored if you have Linux::Inotify2 installed)
+   -rr -restartregex  regex match files that trigger
+                      a restart when modified
+                      (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
+   -restartdirectory  the directory to search for
+                      modified files, can be set mulitple times
+                      (defaults to '[SCRIPT_DIR]/..')
+   -follow_symlinks   follow symlinks in search directories
+                      (defaults to false. this is a no-op on Win32)
+   -background        run the process in the background
+   -pidfile           specify filename for pid file
+
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
+=head1 DESCRIPTION
+
+Run a Catalyst Testserver for this application.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
