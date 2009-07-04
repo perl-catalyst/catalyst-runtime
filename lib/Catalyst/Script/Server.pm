@@ -65,7 +65,14 @@ has keepalive => (
     default => 0 
 );
 
-has background      => ( isa => 'Bool',   is => 'ro', required => 0 );
+has background => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'bg',
+    isa => 'Bool',   
+    is => 'ro', 
+    required => 0 
+);
+
 has app             => ( isa => 'Str',    is => 'ro', required => 1 ); # THIS IS FUCKING RETARDED HALP PLZ
 has restart         => ( isa => 'Bool',   is => 'ro', required => 0 );
 has restart_delay   => ( isa => 'Int',    is => 'ro', required => 0 );
