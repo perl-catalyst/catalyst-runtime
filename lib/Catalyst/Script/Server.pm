@@ -73,7 +73,13 @@ has background => (
     required => 0 
 );
 
-has app => ( isa => 'Str',    is => 'ro', required => 1 ); # THIS IS FUCKING RETARDED HALP PLZ
+has app => ( 
+    traits => [qw(NoGetopt)],
+    isa => 'Str',    
+    is => 'ro', 
+    required => 1,
+); 
+
 has restart => (
     traits => [qw(Getopt)],
     cmd_aliases => 'r', 
@@ -117,10 +123,10 @@ sub run {
     $app->run(
         $self->listen, $self->host,
         {  
-           'fork'     => $self->fork,
-           keepalive  => $self->keepalive,
-           background => $self->background,
-           pidfile    => $self->pidfile,
+           'fork'            => $self->fork,
+           keepalive         => $self->keepalive,
+           background        => $self->background,
+           pidfile           => $self->pidfile,
            keepalive         => $self->keepalive,
            restart           => $self->restart,
            restart_delay     => $self->restart_delay,
@@ -144,27 +150,27 @@ sub run {
 [% appprefix %]_server.pl [options]
 
  Options:
-   -d -debug          force debug mode
-   -f -fork           handle each request in a new process
+   -d     --debug          force debug mode
+   -f     --fork           handle each request in a new process
                       (defaults to false)
-   -? -help           display this help and exits
-      -host           host (defaults to all)
-   -p -port           port (defaults to 3000)
-   -k -keepalive      enable keep-alive connections
-   -r -restart        restart when files get modified
-                      (defaults to false)
-   -rd -restartdelay  delay between file checks
+   -h     --help           display this help and exits
+          --host           host (defaults to all)
+   -p     --port           port (defaults to 3000)
+   -k     --keepalive      enable keep-alive connections
+   -r     --restart        restart when files get modified
+                       (defaults to false)
+   --rd   --restartdelay  delay between file checks
                       (ignored if you have Linux::Inotify2 installed)
-   -rr -restartregex  regex match files that trigger
+   --rr   --restartregex  regex match files that trigger
                       a restart when modified
                       (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
-   -restartdirectory  the directory to search for
+   --rdir --restartdirectory  the directory to search for
                       modified files, can be set mulitple times
                       (defaults to '[SCRIPT_DIR]/..')
-   -follow_symlinks   follow symlinks in search directories
+   --sym  --follow_symlinks   follow symlinks in search directories
                       (defaults to false. this is a no-op on Win32)
-   -background        run the process in the background
-   -pidfile           specify filename for pid file
+   --bg   --background        run the process in the background
+   --pid  --pidfile           specify filename for pid file
 
  See also:
    perldoc Catalyst::Manual
