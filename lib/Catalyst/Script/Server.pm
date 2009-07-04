@@ -10,8 +10,8 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use Pod::Usage;
 use Moose;
-use Catalyst::Engine::HTTP;
-use namespace::clean -except => [ qw(meta) ];
+#use Catalyst::Engine::HTTP;
+use namespace::autoclean -except => [ qw(meta) ];
 
 with 'MooseX::Getopt';
 
@@ -70,9 +70,11 @@ has background => (
     cmd_aliases => 'bg',
     isa => 'Bool',   
     is => 'ro', 
-    required => 0 
+    required => 0
 );
 
+
+## broken now, WHY?!
 has app => ( 
     traits => [qw(NoGetopt)],
     isa => 'Str',    
@@ -118,6 +120,7 @@ sub run {
     my $self = shift;
     
     pod2usage() if $self->help;
+    warn "app is undef!" unless defined $self->app;
     my $app = $self->app;
     Class::MOP::load_class($app);
     $app->run(

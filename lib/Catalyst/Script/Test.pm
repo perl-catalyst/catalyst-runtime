@@ -4,7 +4,7 @@ use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 with 'MooseX::Getopt';
-use namespace::clean -except => [ qw(meta) ];
+use namespace::autoclean -except => [ qw(meta) ];
 
 has app  => ( isa => 'Str',    is => 'ro', required => 1 );
 has help => ( isa => 'Bool',   is => 'ro', required => 0, default => sub { 0 } );

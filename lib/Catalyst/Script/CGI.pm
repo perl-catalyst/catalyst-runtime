@@ -6,7 +6,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use Pod::Usage;
 use Moose;
-use namespace::clean -except => [ qw(meta) ];
+use namespace::autoclean -except => [ qw(meta) ];
 
 with 'MooseX::Getopt';
 
