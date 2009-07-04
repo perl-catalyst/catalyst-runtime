@@ -56,9 +56,17 @@ has pidfile => (
     required => 0 
 );
 
-has keepalive       => ( isa => 'Bool',   is => 'ro', required => 0, default => 0 );
+has keepalive => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'k',
+    isa => 'Bool',   
+    is => 'ro', 
+    required => 0, 
+    default => 0 
+);
+
 has background      => ( isa => 'Bool',   is => 'ro', required => 0 );
-has app             => ( isa => 'Str',    is => 'ro', required => 1 );
+has app             => ( isa => 'Str',    is => 'ro', required => 1 ); # THIS IS FUCKING RETARDED HALP PLZ
 has restart         => ( isa => 'Bool',   is => 'ro', required => 0 );
 has restart_delay   => ( isa => 'Int',    is => 'ro', required => 0 );
 has restart_regex   => ( isa => 'Str',    is => 'ro', required => 0 );
