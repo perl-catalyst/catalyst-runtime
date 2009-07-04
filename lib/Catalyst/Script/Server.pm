@@ -82,7 +82,14 @@ has restart => (
     required => 0 
 );
 
-has restart_delay   => ( isa => 'Int',    is => 'ro', required => 0 );
+has restart_delay => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'rdel',
+    isa => 'Int',    
+    is => 'ro', 
+    required => 0 
+);
+
 has restart_regex   => ( isa => 'Str',    is => 'ro', required => 0 );
 has follow_symlinks => ( isa => 'Bool',   is => 'ro', required => 0 );
 
