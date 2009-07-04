@@ -1122,7 +1122,7 @@ EOF
     };
 
     $class->setup_finalize;
-    warn "Setup called";
+    #warn "Setup called";
 }
 
 
