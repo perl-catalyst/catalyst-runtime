@@ -90,7 +90,14 @@ has restart_delay => (
     required => 0 
 );
 
-has restart_regex   => ( isa => 'Str',    is => 'ro', required => 0 );
+has restart_regex => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'rxp',
+    isa => 'Str',    
+    is => 'ro', 
+    required => 0 
+);
+
 has follow_symlinks => ( isa => 'Bool',   is => 'ro', required => 0 );
 
 my @argv = @ARGV;
