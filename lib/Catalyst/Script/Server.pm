@@ -24,7 +24,12 @@ has help => (
     default => 0,  
 );
 
-has host            => ( isa => 'Str',    is => 'ro', required => 0, default =>  "localhost" );
+has host => ( 
+    isa => 'Str',    
+    is => 'ro', 
+    required => 0, 
+    default =>  "localhost" 
+);
 
 has fork => ( 
     traits => [qw(Getopt)],
@@ -43,7 +48,14 @@ has listen => (
     default => "3000" 
 );
 
-has pidfile         => ( isa => 'Str',    is => 'ro', required => 0 );
+has pidfile => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'pf',
+    isa => 'Str',    
+    is => 'ro', 
+    required => 0 
+);
+
 has keepalive       => ( isa => 'Bool',   is => 'ro', required => 0, default => 0 );
 has background      => ( isa => 'Bool',   is => 'ro', required => 0 );
 has app             => ( isa => 'Str',    is => 'ro', required => 1 );
