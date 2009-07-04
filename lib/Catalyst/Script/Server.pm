@@ -50,7 +50,7 @@ has listen => (
 
 has pidfile => ( 
     traits => [qw(Getopt)],
-    cmd_aliases => 'pf',
+    cmd_aliases => 'pid',
     isa => 'Str',    
     is => 'ro', 
     required => 0 
