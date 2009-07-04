@@ -34,7 +34,15 @@ has fork => (
     required => 0 
 );
 
-has listen          => ( isa => 'Int',    is => 'ro', required => 0, default => "3000" );
+has listen => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'l',
+    isa => 'Int',
+    is => 'ro', 
+    required => 0, 
+    default => "3000" 
+);
+
 has pidfile         => ( isa => 'Str',    is => 'ro', required => 0 );
 has keepalive       => ( isa => 'Bool',   is => 'ro', required => 0, default => 0 );
 has background      => ( isa => 'Bool',   is => 'ro', required => 0 );
