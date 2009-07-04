@@ -17,15 +17,23 @@ with 'MooseX::Getopt';
 
 has help => ( 
     traits => [qw(Getopt)],
+    cmd_aliases => 'h',
     isa => 'Bool',   
     is => 'ro', 
     required => 0, 
-    default => 0,
-    cmd_aliases => 'h',  
+    default => 0,  
 );
 
 has host            => ( isa => 'Str',    is => 'ro', required => 0, default =>  "localhost" );
-has fork            => ( isa => 'Bool',   is => 'ro', required => 0 );
+
+has fork => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'f',
+    isa => 'Bool',
+    is => 'ro', 
+    required => 0 
+);
+
 has listen          => ( isa => 'Int',    is => 'ro', required => 0, default => "3000" );
 has pidfile         => ( isa => 'Str',    is => 'ro', required => 0 );
 has keepalive       => ( isa => 'Bool',   is => 'ro', required => 0, default => 0 );
