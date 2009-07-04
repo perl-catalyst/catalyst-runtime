@@ -98,7 +98,13 @@ has restart_regex => (
     required => 0 
 );
 
-has follow_symlinks => ( isa => 'Bool',   is => 'ro', required => 0 );
+has follow_symlinks => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'sym',
+    isa => 'Bool',   
+    is => 'ro', 
+    required => 0 
+);
 
 my @argv = @ARGV;
 
