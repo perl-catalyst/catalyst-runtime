@@ -1109,21 +1109,25 @@ EOF
     $class->log->_flush() if $class->log->can('_flush');
 
     # Make sure that the application class becomes immutable at this point,
-    # which ensures that it gets an inlined constructor. This means that it
-    # works even if the user has added a plugin which contains a new method.
-    # Note however that we have to do the work on scope end, so that method
-    # modifiers work correctly in MyApp (as you have to call setup _before_
-    # applying modifiers).
     B::Hooks::EndOfScope::on_scope_end {
         return if $@;
         my $meta = Class::MOP::get_metaclass_by_name($class);
-        if ( $meta->is_immutable && ! { $meta->immutable_options }->{inline_constructor} ) {
+        if (
+            $meta->is_immutable
+            && ! { $meta->immutable_options }->{replace_constructor}
+            && (
+                   $class->isa('Class::Accessor::Fast')
+                || $class->isa('Class::Accessor')
+            )
+        ) {
             warn "You made your application class ($class) immutable, "
-                . "but did not inline the constructor.\n"
-                . "This will break catalyst, please pass "
-                . "(replace_constructor => 1) when making your class immutable.\n";
+                . "but did not inline the\nconstructor. "
+                . "This will break catalyst, as your app \@ISA "
+                . "Class::Accessor(::Fast)?\nPlease pass "
+                . "(replace_constructor => 1)\nwhen making your class immutable.\n";
         }
-        $meta->make_immutable(replace_constructor => 1) unless $meta->is_immutable;
+        $meta->make_immutable(replace_constructor => 1)
+            unless $meta->is_immutable;
     };
 
     $class->setup_finalize;

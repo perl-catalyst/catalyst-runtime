@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+       - Fix replace_constructor warning to actually work if you make your
+         application class immutable without that option.
+
 5.80007 2009-06-30 23:54:34
 
   Bug fixes:
