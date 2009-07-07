@@ -3,7 +3,7 @@ package Catalyst::Exception::Detach;
 use Moose;
 use namespace::clean -except => 'meta';
 
-extends 'Catalyst::Exception';
+with 'Catalyst::Exception::Basic';
 
 has '+message' => (
     default => "catalyst_detach\n",
