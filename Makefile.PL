@@ -16,7 +16,6 @@ requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
-requires 'File::Modified';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
 requires 'HTTP::Headers' => '1.64';

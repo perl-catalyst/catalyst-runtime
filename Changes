@@ -4,6 +4,10 @@
        - Fix replace_constructor warning to actually work if you make your
          application class immutable without that option.
 
+  Refactoring / cleanups:
+       - Deleted the Restarter engine and its Watcher code. Use the
+         new Catalyst::Restarter in a recent Catalyst::Devel instead.
+
 5.80007 2009-06-30 23:54:34
 
   Bug fixes:
@@ -53,7 +57,7 @@
         - Add Catalyst::Component::ContextClosure as an easy way to create code
           references, that close over the context, without creating leaks.
 
-   Refactoring / cleanups:
+  Refactoring / cleanups:
         - Clean namespaces in Catalyst::Exception*.
         - Turn Catalyst::Exception into an actual class and make the throw
           method create instances of it. They can still be used as normal
