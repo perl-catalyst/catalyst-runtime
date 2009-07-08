@@ -157,9 +157,10 @@ If this method is present (as it is on all Catalyst::Component subclasses,
 it is called by Catalyst during setup_components with the application class
 as $c and any config entry on the application for this component (for example,
 in the case of MyApp::Controller::Foo this would be
-MyApp->config->{'Controller::Foo'}). The arguments are expected to be a
-hashref and are merged with the __PACKAGE__->config hashref before calling
-->new to instantiate the component.
+C<< MyApp->config('Controller::Foo' => \%conf >>).
+The arguments are expected to be a hashref and are merged with the
+C<< __PACKAGE__->config >> hashref before calling C<< ->new >>
+to instantiate the component.
 
 You can override it in your components to do custom instantiation, using
 something like this:

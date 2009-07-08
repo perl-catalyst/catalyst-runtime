@@ -473,7 +473,7 @@ Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
-You have to set MyApp->config->{parse_on_demand} to use this directly.
+You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 
 =head2 $req->referer
 
@@ -649,7 +649,7 @@ You may also pass an optional second parameter that puts C<uri_with> into
 append mode:
 
   $req->uri_with( { key => 'value' }, { mode => 'append' } );
-  
+
 See C<mangle_params> for an explanation of this behavior.
 
 =cut
