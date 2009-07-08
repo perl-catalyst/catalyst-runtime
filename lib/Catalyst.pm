@@ -659,7 +659,7 @@ sub model {
 
     if( $rest ) {
         $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
-        $c->log->warn( '* $c->config->{default_model} # the name of the default model to use' );
+        $c->log->warn( '* $c->config(default_model => "the name of the default model to use")' );
         $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
         $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
@@ -712,7 +712,7 @@ sub view {
 
     if( $rest ) {
         $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
-        $c->log->warn( '* $c->config->{default_view} # the name of the default view to use' );
+        $c->log->warn( '* $c->config(default_view => "the name of the default view to use")' );
         $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
         $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
@@ -2090,7 +2090,7 @@ Reads a chunk of data from the request body. This method is designed to
 be used in a while loop, reading C<$maxlength> bytes on every call.
 C<$maxlength> defaults to the size of the request if not specified.
 
-You have to set C<< MyApp->config->{parse_on_demand} >> to use this
+You have to set C<< MyApp->config(parse_on_demand => 1) >> to use this
 directly.
 
 Warning: If you use read(), Catalyst will not process the body,
@@ -2596,7 +2596,7 @@ Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,
 C<_ACTION>, and C<_END>. These are by default not shown in the private
 action table, but you can make them visible with a config parameter.
 
-    MyApp->config->{show_internal_actions} = 1;
+    MyApp->config(show_internal_actions => 1);
 
 =head1 CASE SENSITIVITY
 
@@ -2604,7 +2604,7 @@ By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
 mapped to C</foo/bar>. You can activate case sensitivity with a config
 parameter.
 
-    MyApp->config->{case_sensitive} = 1;
+    MyApp->config(case_sensitive => 1);
 
 This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
 
@@ -2614,7 +2614,7 @@ The request body is usually parsed at the beginning of a request,
 but if you want to handle input yourself, you can enable on-demand
 parsing with a config parameter.
 
-    MyApp->config->{parse_on_demand} = 1;
+    MyApp->config(parse_on_demand => 1);
 
 =head1 PROXY SUPPORT
 
@@ -2642,11 +2642,11 @@ frontend proxy server(s) on different machines, you will need to set a
 configuration option to tell Catalyst to read the proxied data from the
 headers.
 
-    MyApp->config->{using_frontend_proxy} = 1;
+    MyApp->config(using_frontend_proxy => 1);
 
 If you do not wish to use the proxy support at all, you may set:
 
-    MyApp->config->{ignore_frontend_proxy} = 1;
+    MyApp->config(ignore_frontend_proxy => 1);
 
 =head1 THREAD SAFETY
 
