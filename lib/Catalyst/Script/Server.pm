@@ -11,7 +11,7 @@ use lib "$Bin/../lib";
 use Pod::Usage;
 use Moose;
 #use Catalyst::Engine::HTTP;
-use namespace::autoclean -except => [ qw(meta) ];
+use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
@@ -76,7 +76,7 @@ has background => (
 
 ## broken now, WHY?!
 has app => ( 
-    traits => [qw(NoGetopt)],
+    #traits => [qw(NoGetopt)],
     isa => 'Str',    
     is => 'ro', 
     required => 1,
@@ -120,7 +120,6 @@ sub run {
     my $self = shift;
     
     pod2usage() if $self->help;
-    warn "app is undef!" unless defined $self->app;
     my $app = $self->app;
     Class::MOP::load_class($app);
     $app->run(
