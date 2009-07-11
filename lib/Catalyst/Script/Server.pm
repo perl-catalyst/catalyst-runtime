@@ -20,14 +20,14 @@ has help => (
     cmd_aliases => 'h',
     isa => 'Bool',   
     is => 'ro', 
-    required => 0, 
+    , 
     default => 0,  
 );
 
 has host => ( 
     isa => 'Str',    
     is => 'ro', 
-    required => 0, 
+    , 
     default =>  "localhost" 
 );
 
@@ -36,7 +36,7 @@ has fork => (
     cmd_aliases => 'f',
     isa => 'Bool',
     is => 'ro', 
-    required => 0 
+     
 );
 
 has listen => ( 
@@ -44,7 +44,7 @@ has listen => (
     cmd_aliases => 'l',
     isa => 'Int',
     is => 'ro', 
-    required => 0, 
+    , 
     default => "3000" 
 );
 
@@ -53,7 +53,7 @@ has pidfile => (
     cmd_aliases => 'pid',
     isa => 'Str',    
     is => 'ro', 
-    required => 0 
+     
 );
 
 has keepalive => ( 
@@ -61,7 +61,7 @@ has keepalive => (
     cmd_aliases => 'k',
     isa => 'Bool',   
     is => 'ro', 
-    required => 0, 
+    , 
     default => 0 
 );
 
@@ -70,7 +70,6 @@ has background => (
     cmd_aliases => 'bg',
     isa => 'Bool',   
     is => 'ro', 
-    required => 0
 );
 
 
@@ -81,7 +80,6 @@ has _app => (
     traits => [qw(NoGetopt)],
     isa => 'Str',    
     is => 'ro', 
-    required => 0,
 ); 
 
 has restart => (
@@ -89,7 +87,7 @@ has restart => (
     cmd_aliases => 'r', 
     isa => 'Bool',   
     is => 'ro', 
-    required => 0 
+     
 );
 
 has restart_delay => ( 
@@ -97,7 +95,7 @@ has restart_delay => (
     cmd_aliases => 'rdel',
     isa => 'Int',    
     is => 'ro', 
-    required => 0 
+     
 );
 
 has restart_regex => ( 
@@ -105,7 +103,7 @@ has restart_regex => (
     cmd_aliases => 'rxp',
     isa => 'Str',    
     is => 'ro', 
-    required => 0 
+     
 );
 
 has follow_symlinks => ( 
@@ -113,7 +111,7 @@ has follow_symlinks => (
     cmd_aliases => 'sym',
     isa => 'Bool',   
     is => 'ro', 
-    required => 0 
+     
 );
 
 my @argv = @ARGV;
