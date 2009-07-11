@@ -655,7 +655,7 @@ sub _load_dispatch_types {
     for my $type (@types) {
         # first param is undef because we cannot get the appclass
         my $class = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $type);
-        
+
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
@@ -694,10 +694,26 @@ use Moose;
 # Various plugins (e.g. Plugin::Server and Plugin::Authorization::ACL)
 # need the methods here which *should* be private..
 
-# However we can't really take them away until there is a sane API for
-# building actions and configuring / introspecting the dispatcher.
-# In 5.90, we should build that infrastructure, port the plugins which
-# use it, and then take the crap below away.
+# You should be able to use get_actions or get_containers appropriately
+# instead of relying on these methods which expose implementation details
+# of the dispatcher..
+#
+# IRC backlog included below, please come ask if this doesn't work for you.
+#
+# <@t0m> 5.80, the state of. There are things in the dispatcher which have
+#        been deprecated, that we yell at anyone for using, which there isn't
+#        a good alternative for yet..
+# <@mst> er, get_actions/get_containers provides that doesn't it?
+# <@mst> DispatchTypes are loaded on demand anyway
+# <@t0m> I'm thinking of things like _tree which is aliased to 'tree' with
+#        warnings otherwise shit breaks.. We're issuing warnings about the
+#        correct set of things which you shouldn't be calling..
+# <@mst> right
+# <@mst> basically, I don't see there's a need for a replacement for anything
+# <@mst> it was never a good idea to call ->tree
+# <@mst> nothingmuch was the only one who did AFAIK
+# <@mst> and he admitted it was a hack ;)
+
 # See also t/lib/TestApp/Plugin/AddDispatchTypes.pm
 
 # Alias _method_name to method_name, add a before modifier to warn..
