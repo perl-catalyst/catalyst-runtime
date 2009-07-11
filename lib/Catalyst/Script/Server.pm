@@ -10,6 +10,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use Pod::Usage;
 use Moose;
+use Catalyst::Restarter;
 #use Catalyst::Engine::HTTP;
 use namespace::autoclean;
 
@@ -99,6 +100,13 @@ has restart => (
     isa => 'Bool',   
     is => 'ro', 
      
+); 
+
+has restart_directory => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'rdir',
+    isa => 'Str',
+    is  => 'ro',
 );
 
 has restart_delay => ( 
@@ -138,8 +146,62 @@ sub run {
     my $self = shift;
     
     $self->usage if $self->help;
+    
+    if ( $self->debug ) {
+        $ENV{CATALYST_DEBUG} = 1;
+    }
+
+    if ( $self->restart ) {
+        die "Cannot run in the background and also watch for changed files.\n"
+            if $self->background;
+
+        require Catalyst::Restarter;
+
+        my $subclass = Catalyst::Restarter->pick_subclass;
+
+        my %args;
+        $args{follow_symlinks} = 1
+            if $self->follow_symlinks;
+        $args{directories}     = $self->restart_directory;
+        $args{sleep_interval}  = $self->restart_delay;
+        $args{filter} = qr/$self->restart_regex/;
+
+        my $restarter = $subclass->new(
+            %args,
+            start_sub => $self->runner,
+            argv      => $self->ARGV,
+        );
+
+        $restarter->run_and_watch;
+    }
+    else {
+        $self->runner;
+    }
+
+
+}    
+ 
+sub runner {
+    my ($self) = shift;
+    
+    # If we load this here, then in the case of a restarter, it does not
+    # need to be reloaded for each restart.
+    require Catalyst;
+
+    # If this isn't done, then the Catalyst::Devel tests for the restarter
+    # fail.
+    $| = 1 if $ENV{HARNESS_ACTIVE};
+    
+    
+    $self->usage if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);
+
+    if ( $self->debug ) {
+        $ENV{CATALYST_DEBUG} = 1;
+    }
+
+    
     $app->run(
         $self->listen, $self->host,
         {  
@@ -151,12 +213,12 @@ sub run {
            restart           => $self->restart,
            restart_delay     => $self->restart_delay,
            restart_regex     => qr/$self->restart_regex/,
-# FIXME    restart_directory => $self->restart_directory,
+           restart_directory => $self->restart_directory,
            follow_symlinks   => $self->follow_symlinks,
         }  
     );
-
 }
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
