@@ -105,8 +105,9 @@ has restart => (
 has restart_directory => (
     traits => [qw(Getopt)],
     cmd_aliases => 'rdir',
-    isa => 'Str',
+    isa => 'ArrayRef[Str]',
     is  => 'ro',
+    predicate => '_has_restart_directory',
 );
 
 has restart_delay => (
@@ -114,7 +115,7 @@ has restart_delay => (
     cmd_aliases => 'rdel',
     isa => 'Int',
     is => 'ro',
-
+    predicate => '_has_restart_delay',
 );
 
 has restart_regex => (
@@ -122,7 +123,7 @@ has restart_regex => (
     cmd_aliases => 'rxp',
     isa => 'Str',
     is => 'ro',
-
+    predicate => '_has_restart_regex',
 );
 
 has follow_symlinks => (
@@ -130,6 +131,7 @@ has follow_symlinks => (
     cmd_aliases => 'sym',
     isa => 'Bool',
     is => 'ro',
+    predicate => '_has_follow_symlinks',
 
 );
 
@@ -151,6 +153,14 @@ sub run {
         $ENV{CATALYST_DEBUG} = 1;
     }
 
+    # If we load this here, then in the case of a restarter, it does not
+    # need to be reloaded for each restart.
+    require Catalyst;
+
+    # If this isn't done, then the Catalyst::Devel tests for the restarter
+    # fail.
+    $| = 1 if $ENV{HARNESS_ACTIVE};
+
     if ( $self->restart ) {
         die "Cannot run in the background and also watch for changed files.\n"
             if $self->background;
@@ -160,46 +170,35 @@ sub run {
         my $subclass = Catalyst::Restarter->pick_subclass;
 
         my %args;
-        $args{follow_symlinks} = $self->follow_symlinks;
-        $args{directories}     = $self->restart_directory;
-        $args{sleep_interval}  = $self->restart_delay;
-        $args{filter} = qr/$self->restart_regex/;
+        $args{follow_symlinks} = $self->follow_symlinks
+            if $self->_has_follow_symlinks;
+        $args{directories}     = $self->restart_directory
+            if $self->_has_restart_directory;
+        $args{sleep_interval}  = $self->restart_delay
+            if $self->_has_restart_delay;
+        $args{filter} = qr/$self->restart_regex/
+            if $self->_has_restart_regex;
 
         my $restarter = $subclass->new(
             %args,
-            start_sub => $self->runner,
+            start_sub => sub { $self->_run },
             argv      => $self->ARGV,
         );
 
         $restarter->run_and_watch;
     }
     else {
-        $self->runner;
+        $self->_run;
     }
 
 
 }
 
-sub runner {
+sub _run {
     my ($self) = shift;
 
-    # If we load this here, then in the case of a restarter, it does not
-    # need to be reloaded for each restart.
-    require Catalyst;
-
-    # If this isn't done, then the Catalyst::Devel tests for the restarter
-    # fail.
-    $| = 1 if $ENV{HARNESS_ACTIVE};
-
-
-    $self->usage if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);
-
-    if ( $self->debug ) {
-        $ENV{CATALYST_DEBUG} = 1;
-    }
-
 
     $app->run(
         $self->listen, $self->host,
