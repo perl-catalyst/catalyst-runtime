@@ -160,8 +160,7 @@ sub run {
         my $subclass = Catalyst::Restarter->pick_subclass;
 
         my %args;
-        $args{follow_symlinks} = 1
-            if $self->follow_symlinks;
+        $args{follow_symlinks} = $self->follow_symlinks;
         $args{directories}     = $self->restart_directory;
         $args{sleep_interval}  = $self->restart_delay;
         $args{filter} = qr/$self->restart_regex/;
