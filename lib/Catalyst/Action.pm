@@ -8,6 +8,8 @@ Catalyst::Action - Catalyst Action
 
     <form action="[%c.uri_for(c.action)%]">
 
+    $c->forward( $action->private_path );
+
 =head1 DESCRIPTION
 
 This class represents a Catalyst Action. You can access the object for the
@@ -28,6 +30,13 @@ has 'reverse' => (is => 'rw');
 has attributes => (is => 'rw');
 has name => (is => 'rw');
 has code => (is => 'rw');
+has private_path => (
+  reader => 'private_path',
+  isa => 'Str',
+  lazy => 1,
+  required => 1,
+  default => sub { '/'.shift->reverse },
+);
 
 use overload (
 
@@ -128,6 +137,11 @@ Returns the private namespace this action lives in.
 =head2 reverse
 
 Returns the private path for this action.
+
+=head2 private_path
+
+Returns absolute private path for this action. Unlike C<reverse>, the
+C<private_path> of an action is always suitable for passing to C<forward>.
 
 =head2 name
 

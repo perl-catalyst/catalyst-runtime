@@ -9,6 +9,10 @@
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the
          new Catalyst::Restarter in a recent Catalyst::Devel instead.
+       - New unit test for Catalyst::Action 'unit_core_action.t' (groditi)
+
+  New features:
+       - private_path method for Catalyst::Action + docs + tests (groditi)
 
 5.80007 2009-06-30 23:54:34
 
