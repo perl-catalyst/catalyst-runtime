@@ -39,6 +39,12 @@ sub default :Path {
     $c->response->status(404);
 }
 
+sub test : Local {
+  my ($self, $c) = @_;
+  
+  $c->res->body("herro!!");
+}
+
 =head2 end
 
 Attempt to render a view, if needed.
