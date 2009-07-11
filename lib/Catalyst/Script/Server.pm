@@ -120,7 +120,6 @@ sub run {
     
     pod2usage() if $self->help;
     my $app = $self->app;
-    warn "App is $app";
     Class::MOP::load_class($app);
     $app->run(
         $self->listen, $self->host,
