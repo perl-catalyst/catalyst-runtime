@@ -75,11 +75,13 @@ has background => (
 
 
 ## broken now, WHY?!
-has app => ( 
-    #traits => [qw(NoGetopt)],
+has _app => ( 
+    reader   => 'app', 
+    init_arg => 'app',
+    traits => [qw(NoGetopt)],
     isa => 'Str',    
     is => 'ro', 
-    required => 1,
+    required => 0,
 ); 
 
 has restart => (
@@ -121,6 +123,7 @@ sub run {
     
     pod2usage() if $self->help;
     my $app = $self->app;
+    warn "App is $app";
     Class::MOP::load_class($app);
     $app->run(
         $self->listen, $self->host,

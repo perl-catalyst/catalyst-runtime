@@ -10,4 +10,4 @@ BEGIN {
 ## because this is a test
 use lib "$Bin/../../../lib";
 use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('Catalyst','Server');
+Catalyst::ScriptRunner->run('TestApp','Server');
