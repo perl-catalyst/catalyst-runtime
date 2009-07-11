@@ -19,88 +19,88 @@ with 'MooseX::Getopt';
 has debug => (
     traits => [qw(Getopt)],
     cmd_aliases => 'd',
-    isa => 'Bool', 
+    isa => 'Bool',
     is => 'ro',
     documentation => qq{
-    -d --debug force debug mode    
+    -d --debug force debug mode
     }
 
 );
 
-has help => ( 
+has help => (
     traits => [qw(Getopt)],
     cmd_aliases => 'h',
-    isa => 'Bool',   
-    is => 'ro', 
+    isa => 'Bool',
+    is => 'ro',
     documentation => qq{
-    -h --help display this help and exits    
-    },  
+    -h --help display this help and exits
+    },
 );
 
-has host => ( 
-    isa => 'Str',    
-    is => 'ro', 
-    , 
-    default =>  "localhost" 
+has host => (
+    isa => 'Str',
+    is => 'ro',
+    ,
+    default =>  "localhost"
 );
 
-has fork => ( 
+has fork => (
     traits => [qw(Getopt)],
     cmd_aliases => 'f',
     isa => 'Bool',
-    is => 'ro', 
-     
+    is => 'ro',
+
 );
 
-has listen => ( 
+has listen => (
     traits => [qw(Getopt)],
     cmd_aliases => 'l',
     isa => 'Int',
-    is => 'ro', 
-    , 
-    default => "3000" 
+    is => 'ro',
+    ,
+    default => "3000"
 );
 
-has pidfile => ( 
+has pidfile => (
     traits => [qw(Getopt)],
     cmd_aliases => 'pid',
-    isa => 'Str',    
-    is => 'ro', 
-     
+    isa => 'Str',
+    is => 'ro',
+
 );
 
-has keepalive => ( 
+has keepalive => (
     traits => [qw(Getopt)],
     cmd_aliases => 'k',
-    isa => 'Bool',   
-    is => 'ro', 
-    , 
-     
+    isa => 'Bool',
+    is => 'ro',
+    ,
+
 );
 
-has background => ( 
+has background => (
     traits => [qw(Getopt)],
     cmd_aliases => 'bg',
-    isa => 'Bool',   
-    is => 'ro', 
+    isa => 'Bool',
+    is => 'ro',
 );
 
 
-has _app => ( 
-    reader   => 'app', 
+has _app => (
+    reader   => 'app',
     init_arg => 'app',
     traits => [qw(NoGetopt)],
-    isa => 'Str',    
-    is => 'ro', 
-); 
+    isa => 'Str',
+    is => 'ro',
+);
 
 has restart => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'r', 
-    isa => 'Bool',   
-    is => 'ro', 
-     
-); 
+    cmd_aliases => 'r',
+    isa => 'Bool',
+    is => 'ro',
+
+);
 
 has restart_directory => (
     traits => [qw(Getopt)],
@@ -109,33 +109,33 @@ has restart_directory => (
     is  => 'ro',
 );
 
-has restart_delay => ( 
+has restart_delay => (
     traits => [qw(Getopt)],
     cmd_aliases => 'rdel',
-    isa => 'Int',    
-    is => 'ro', 
-     
+    isa => 'Int',
+    is => 'ro',
+
 );
 
-has restart_regex => ( 
+has restart_regex => (
     traits => [qw(Getopt)],
     cmd_aliases => 'rxp',
-    isa => 'Str',    
-    is => 'ro', 
-     
+    isa => 'Str',
+    is => 'ro',
+
 );
 
-has follow_symlinks => ( 
+has follow_symlinks => (
     traits => [qw(Getopt)],
     cmd_aliases => 'sym',
-    isa => 'Bool',   
-    is => 'ro', 
-     
+    isa => 'Bool',
+    is => 'ro',
+
 );
 
 sub usage {
     my ($self) = shift;
-    
+
     return pod2usage();
 
 }
@@ -144,9 +144,9 @@ my @argv = @ARGV;
 
 sub run {
     my $self = shift;
-    
+
     $self->usage if $self->help;
-    
+
     if ( $self->debug ) {
         $ENV{CATALYST_DEBUG} = 1;
     }
@@ -178,11 +178,11 @@ sub run {
     }
 
 
-}    
- 
+}
+
 sub runner {
     my ($self) = shift;
-    
+
     # If we load this here, then in the case of a restarter, it does not
     # need to be reloaded for each restart.
     require Catalyst;
@@ -190,8 +190,8 @@ sub runner {
     # If this isn't done, then the Catalyst::Devel tests for the restarter
     # fail.
     $| = 1 if $ENV{HARNESS_ACTIVE};
-    
-    
+
+
     $self->usage if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);
@@ -200,17 +200,17 @@ sub runner {
         $ENV{CATALYST_DEBUG} = 1;
     }
 
-    
+
     $app->run(
         $self->listen, $self->host,
-        {  
+        {
            'fork'            => $self->fork,
            keepalive         => $self->keepalive,
            background        => $self->background,
            pidfile           => $self->pidfile,
            keepalive         => $self->keepalive,
            follow_symlinks   => $self->follow_symlinks,
-        }  
+        }
     );
 }
 

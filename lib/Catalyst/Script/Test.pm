@@ -15,10 +15,10 @@ sub run {
 
     Class::MOP::load_class("Catalyst::Test");
     Catalyst::Test->import($self->app);
-    
+
     pod2usage(1) if ( $self->help || !$ARGV[1] );
     print request($ARGV[1])->content  . "\n";
-        
+
 }
 
 1;

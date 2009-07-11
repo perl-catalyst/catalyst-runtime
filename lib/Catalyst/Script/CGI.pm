@@ -15,7 +15,7 @@ has help => ( isa => 'Bool',   is => 'ro', required => 0, default => sub { 0 } )
 
 sub run {
     my $self = shift;
-    
+
     pod2usage() if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);

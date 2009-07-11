@@ -21,19 +21,19 @@ has app         => ( isa => 'Str',    is => 'ro', required => 1 );
 
 sub run {
     my $self = shift;
-    
+
     pod2usage() if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);
     $app->run(
         $self->listen,
-        {  
+        {
             nproc   => $self->nproc,
             pidfile => $self->pidfile,
             manager => $self->manager,
             detach  => $self->detach,
             keep_stderr => $self->keep_stderr,
-        }  
+        }
     );
 
 }
