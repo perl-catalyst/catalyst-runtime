@@ -20,6 +20,9 @@ has debug => (
     cmd_aliases => 'd',
     isa => 'Bool', 
     is => 'ro',
+    documentation => qq{
+    -d --debug force debug mode    
+    }
 
 );
 
@@ -28,7 +31,9 @@ has help => (
     cmd_aliases => 'h',
     isa => 'Bool',   
     is => 'ro', 
-    ,  
+    documentation => qq{
+    -h --help display this help and exits    
+    },  
 );
 
 has host => ( 
@@ -153,6 +158,8 @@ sub run {
 
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
 
