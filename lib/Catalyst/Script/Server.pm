@@ -15,6 +15,14 @@ use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
+has debug => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'd',
+    isa => 'Bool', 
+    is => 'ro',
+
+);
+
 has help => ( 
     traits => [qw(Getopt)],
     cmd_aliases => 'h',
