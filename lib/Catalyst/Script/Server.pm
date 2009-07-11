@@ -20,8 +20,7 @@ has help => (
     cmd_aliases => 'h',
     isa => 'Bool',   
     is => 'ro', 
-    , 
-    default => 0,  
+    ,  
 );
 
 has host => ( 
@@ -62,7 +61,7 @@ has keepalive => (
     isa => 'Bool',   
     is => 'ro', 
     , 
-    default => 0 
+     
 );
 
 has background => ( 
@@ -113,12 +112,19 @@ has follow_symlinks => (
      
 );
 
+sub usage {
+    my ($self) = shift;
+    
+    return pod2usage();
+
+}
+
 my @argv = @ARGV;
 
 sub run {
     my $self = shift;
     
-    pod2usage() if $self->help;
+    $self->usage if $self->help;
     my $app = $self->app;
     Class::MOP::load_class($app);
     $app->run(
