@@ -73,7 +73,6 @@ has background => (
 );
 
 
-## broken now, WHY?!
 has _app => ( 
     reader   => 'app', 
     init_arg => 'app',
