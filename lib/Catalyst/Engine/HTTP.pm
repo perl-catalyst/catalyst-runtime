@@ -158,11 +158,16 @@ around write => sub {
 
     # Prepend the headers if they have not yet been sent
     if ( $self->_has_header_buf ) {
-        $buffer = $self->_clear_header_buf . $buffer;
+        $self->_warn_on_write_error(
+            $self->$orig($self->_clear_header_buf)
+        );
     }
 
-    my $ret = $self->$orig($c, $buffer);
+    $self->_warn_on_write_error($self->$orig($c, $buffer));
+};
 
+sub _warn_on_write_error {
+    my ($self, $ret) = @_;
     if ( !defined $ret ) {
         $self->_write_error($!);
         DEBUG && warn "write: Failed to write response ($!)\n";
@@ -170,9 +175,8 @@ around write => sub {
     else {
         DEBUG && warn "write: Wrote response ($ret bytes)\n";
     }
-
     return $ret;
-};
+}
 
 =head2 run
 
