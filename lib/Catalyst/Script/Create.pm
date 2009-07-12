@@ -1,15 +1,17 @@
 package Catalyst::Script::Create;
 use Moose;
-use strict;
-use warnings;
 use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
+use MooseX::Types::Moose qw/Str/;
+use namespace::autoclean;
 
-sub new_with_options { shift->new }
+has app => (isa => Str, is => 'ro', required => 1);
+
+sub new_with_options { shift->new(@_) }
 
 sub run {
-    my ($appname) = @_;
+    my ($self) = @_;
 my $force = 0;
 my $mech  = 0;
 my $help  = 0;
@@ -24,7 +26,7 @@ pod2usage(1) if ( $help || !$ARGV[0] );
 
 my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
 
-pod2usage(1) unless $helper->mk_component( $appname, @ARGV );
+pod2usage(1) unless $helper->mk_component( $self->app, @ARGV );
 
 }
 
