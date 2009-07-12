@@ -6,6 +6,10 @@ use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
 
+sub new_with_options { shift->new }
+
+sub run {
+    my ($appname) = @_;
 my $force = 0;
 my $mech  = 0;
 my $help  = 0;
@@ -20,7 +24,9 @@ pod2usage(1) if ( $help || !$ARGV[0] );
 
 my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
 
-pod2usage(1) unless $helper->mk_component( 'BoyosPlace', @ARGV );
+pod2usage(1) unless $helper->mk_component( $appname, @ARGV );
+
+}
 
 1;
 
