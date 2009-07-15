@@ -42,7 +42,7 @@ sub default :Path {
 sub test : Local {
   my ($self, $c) = @_;
   
-  $c->res->body("herro!!");
+  $c->res->body("herro!");
 }
 
 =head2 end

@@ -11,7 +11,6 @@ use lib "$Bin/../lib";
 use Pod::Usage;
 use Moose;
 use Catalyst::Restarter;
-#use Catalyst::Engine::HTTP;
 use namespace::autoclean;
 
 with 'MooseX::Getopt';
@@ -142,10 +141,9 @@ sub usage {
 
 }
 
-my @argv = @ARGV;
 
 sub run {
-    my $self = shift;
+    my ($self) = shift;
 
     $self->usage if $self->help;
 
@@ -182,7 +180,7 @@ sub run {
         my $restarter = $subclass->new(
             %args,
             start_sub => sub { $self->_run },
-            argv      => $self->ARGV,
+            argv      => \$self->ARGV,
         );
 
         $restarter->run_and_watch;

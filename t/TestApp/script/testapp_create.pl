@@ -1,38 +1,12 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-use Getopt::Long;
-use Pod::Usage;
-eval "use Catalyst::Helper;";
+use FindBin qw/$Bin/;
 
-if ($@) {
-  die <<END;
-To use the Catalyst development tools including catalyst.pl and the
-generated script/myapp_create.pl you need Catalyst::Helper, which is
-part of the Catalyst-Devel distribution. Please install this via a
-vendor package or by running one of -
+## because this is a test
+use lib "$Bin/../../../lib";
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('TestApp','Create');
 
-  perl -MCPAN -e 'install Catalyst::Devel'
-  perl -MCPANPLUS -e 'install Catalyst::Devel'
-END
-}
-
-my $force = 0;
-my $mech  = 0;
-my $help  = 0;
-
-GetOptions(
-    'nonew|force'    => \$force,
-    'mech|mechanize' => \$mech,
-    'help|?'         => \$help
- );
-
-pod2usage(1) if ( $help || !$ARGV[0] );
-
-my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
-
-pod2usage(1) unless $helper->mk_component( 'TestApp', @ARGV );
 
 1;
 
