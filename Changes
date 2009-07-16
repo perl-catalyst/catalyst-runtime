@@ -10,6 +10,8 @@
        - Deleted the Restarter engine and its Watcher code. Use the
          new Catalyst::Restarter in a recent Catalyst::Devel instead.
        - New unit test for Catalyst::Action 'unit_core_action.t' (groditi)
+       - Components being anonymous classes at runtime is now correctly dealt with
+         by class2appclass to support CatalystX::Component::Traits
 
   New features:
        - private_path method for Catalyst::Action + docs + tests (groditi)
