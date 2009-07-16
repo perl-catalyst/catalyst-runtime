@@ -22,15 +22,28 @@ Proposed functionality / feature additions:
       See also: Catalyst::Plugin::Log::Dispatch and
       http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
-TODO for brach namespace_handling_refactor:
+  Fixes to component interfaces to deal with anon classes:
 
-- refactor code in
-  * Catalyst::Dispatcher::get_containers           # No Idea
-  * Catalyst::Dispatcher::dispatch_type            # DONE
-
-  * Catalyst::Controller::_parse_ActionClass_attr  # DONE
-  * Catalyst::Dispatcher::_load_dispatch_types     # DONE
-  * Catalyst::setup_plugins                        # DONE
-  to use the same namespacing method
-
-- Ok, so can you add tests for ->config(actions => { foo => { ActionClass => '+Bar' }});
+22:16 <@mst> t0m: explain what breaks
+22:16 <@mst> I'm not 100% sure we have the same problem in mind
+22:17 <@t0m> well, various shit in Catalyst utils to resolve app from MyApp::Controller::Foo breaks
+22:17 <@mst> Caelum: http://scsys.co.uk:8001/31240
+22:17 <@mst> t0m: the trick would be to not need to do that
+22:17 <@mst> t0m: $self->_application should be fine
+22:18 <@t0m> $action->class can't be fed back into $c->component() 
+22:18 <@t0m> which breaks ::REST
+22:18 <@mst> right
+22:18 <@mst> we need to
+22:19 <@mst> (a) add an ->_component_name or similar method to controllers
+22:19 <@mst> (b) pass action objects either that or the controller
+22:20 <@t0m> do you have a controller calling $action->dispatch? Course you must, the action lives in a controller..
+22:21 <@mst> and that doesn't matter anyway
+22:21 <@mst> dispatch has $c
+22:21 <@mst> it needs to do
+22:21 <@mst> $c->component($self->_component_name)
+22:21 <@mst> and that _component_name needs to come from the controller at register_actions time
+22:22 <@t0m> confound: Oi, please to be releasing my Action::REST fixes, I'm about to do more..
+22:22 <@t0m> mst: right, gotcha
+22:22 <@mst> note that needs to happen in core
+22:22 <@mst> then actions can use that instead of $self->class
+22:22 <@mst> and shit will work
