@@ -822,7 +822,7 @@ You can also use a C<YAML>, C<XML> or C<Config::General> config file
 like myapp.conf in your applications home directory. See
 L<Catalyst::Plugin::ConfigLoader>.
 
-=head3 Cascading configuration.
+=head3 Cascading configuration
 
 The config method is present on all Catalyst components, and configuration
 will be merged when an application is started. Configuration loaded with
