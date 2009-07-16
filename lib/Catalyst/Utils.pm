@@ -8,8 +8,8 @@ use Path::Class;
 use URI;
 use Carp qw/croak/;
 use Cwd;
+
 use String::RewritePrefix;
-use Moose::Util qw/find_meta/;
 
 use namespace::clean;
 
@@ -49,19 +49,6 @@ sub appprefix {
 
 sub class2appclass {
     my $class = shift || '';
-
-    # Special move to deal with components which are anon classes.
-    # Specifically, CX::Component::Traits c072fb2
-    my $meta = find_meta($class);
-    if ($meta) {
-        while ($meta->is_anon_class) {
-            my @superclasses = $meta->superclasses;
-            return if scalar(@superclasses) > 1; # Fail silently, MI, can't deal..
-            $class = $superclasses[0];
-            $meta = find_meta($class);
-        }
-    }
-
     my $appname = '';
     if ( $class =~ /^(.+?)::([MVC]|Model|View|Controller)::.+$/ ) {
         $appname = $1;
