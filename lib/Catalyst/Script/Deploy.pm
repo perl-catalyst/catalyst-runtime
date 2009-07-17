@@ -4,6 +4,7 @@ use Moose;
 use namespace::autoclean;
 
 with 'MooseX::Getopt';
+use MooseX::Types::Moose qw/Str/;
 use Config::General;
 use FindBin;
 use lib "$FindBin::Bin/../lib";

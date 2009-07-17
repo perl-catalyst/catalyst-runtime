@@ -3,7 +3,7 @@ use Moose;
 use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
-use MooseX::Types::Moose qw/Str/;
+use MooseX::Types::Moose qw/Str Bool/;
 use namespace::autoclean;
 
 has app => (isa => Str, is => 'ro', required => 1);

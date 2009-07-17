@@ -5,6 +5,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use Pod::Usage;
 use Moose;
+use MooseX::Types::Moose qw/Str Bool Int/;
 use namespace::autoclean;
 
 with 'MooseX::Getopt';

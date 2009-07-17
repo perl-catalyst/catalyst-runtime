@@ -4,6 +4,7 @@ use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 with 'MooseX::Getopt';
+use MooseX::Types::Moose qw/Str Bool/;
 use namespace::autoclean;
 
 has _app => (
