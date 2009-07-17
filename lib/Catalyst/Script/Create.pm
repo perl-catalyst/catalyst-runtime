@@ -30,6 +30,8 @@ pod2usage(1) unless $helper->mk_component( $self->app, @ARGV );
 
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 1;
 
 =head1 NAME

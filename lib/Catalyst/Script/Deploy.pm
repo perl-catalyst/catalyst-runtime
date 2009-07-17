@@ -21,6 +21,7 @@ has conf => (
     isa => 'Str',
     traits => [qw(Getopt)],
     cmd_alias => 'c',
+    documentation => qq{ specify a configuration file to read from }
 );
 
 
@@ -29,7 +30,7 @@ has conf => (
 
 sub usage {
 
-   print "usage: perl script/boyosplace_deploy_schema.pl boyosplace.conf\n";
+   print "usage: perl script/myapp_deploy_schema.pl myapp.conf\n";
    exit;
 
 }
