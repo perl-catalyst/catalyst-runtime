@@ -156,7 +156,7 @@ around action_namespace => sub {
         }
     }
 
-    my $namespace = Catalyst::Utils::class2prefix(ref($self) || $self, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix(ref($self) ? $self->_component_name : $self, $case_s) || '';
     $self->$orig($namespace) if ref($self);
     return $namespace;
 };
@@ -190,7 +190,7 @@ sub get_action_methods {
         @methods,
         map {
             $meta->find_method_by_name($_)
-              || confess( 'Action "' 
+              || confess( 'Action "'
                   . $_
                   . '" is not available from controller '
                   . ( ref $self ) )
@@ -207,7 +207,7 @@ sub register_actions {
 
 sub register_action_methods {
     my ( $self, $c, @methods ) = @_;
-    my $class = ref $self || $self;
+    my $class = blessed($self) ? $self->_component_name : $self;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
 
