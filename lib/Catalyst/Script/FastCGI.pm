@@ -9,14 +9,71 @@ use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
-has help        => ( isa => 'Bool',   is => 'ro', required => 0 );
-has listen      => ( isa => 'Int',    is => 'ro', required => 1 );
-has pidfile     => ( isa => 'Str',    is => 'ro', required => 0 );
-has daemon      => ( isa => 'Bool',   is => 'ro', required => 0 );
-has manager     => ( isa => 'Str',    is => 'ro', required => 0 );
-has keep_stderr => ( isa => 'Bool',   is => 'ro', required => 0 );
-has nproc       => ( isa => 'Int',    is => 'ro', required => 0 );
-has detach      => ( isa => 'Bool',   is => 'ro', required => 0 );
+has help => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'h',
+    isa => 'Bool',
+    is => 'ro',
+    documentation => qq{ display this help and exits },
+);
+
+has listen => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'l',
+    isa => 'Int',
+    is => 'ro',
+    default => "3000",
+    documentation => qq{ specify a different listening port }
+);
+
+has pidfile => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'pid',
+    isa => 'Str',
+    is => 'ro',
+    documentation => qq{ specify a pidfile }
+);
+
+has daemon => ( 
+    isa => 'Bool',   
+    is => 'ro', 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'd', 
+    documentation => qq{ daemonize }
+);
+
+has manager => ( 
+    isa => 'Str',    
+    is => 'ro',
+    traits => [qw(Getopt)],
+    cmd_aliases => 'm',
+    documentation => qq{ use a different FastCGI manager } 
+);
+
+has keep_stderr => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'std', 
+    isa => 'Bool',   
+    is => 'ro',  
+    documentation => qq{ log STDERR }
+);
+
+has nproc => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'np',  
+    isa => 'Int',
+    is => 'ro',  
+    documentation => qq{ specify an nproc }
+);
+
+has detach => ( 
+    traits => [qw(Getopt)],
+    cmd_aliases => 'det', 
+    isa => 'Bool',   
+    is => 'ro',  
+    documentation => qq{ detach this FastCGI process }
+);
+
 has _app => (
     reader   => 'app',
     init_arg => 'app',
