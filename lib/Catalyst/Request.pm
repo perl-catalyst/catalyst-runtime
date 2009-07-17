@@ -223,7 +223,7 @@ Arguments get automatically URI-unescaped for you.
 
 =head2 $req->args
 
-Shortcut for arguments.
+Shortcut for L</arguments>.
 
 =head2 $req->base
 
