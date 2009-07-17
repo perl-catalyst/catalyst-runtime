@@ -4,10 +4,23 @@ use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 with 'MooseX::Getopt';
-use namespace::autoclean -except => [ qw(meta) ];
+use namespace::autoclean;
 
-has app  => ( isa => 'Str',    is => 'ro', required => 1 );
-has help => ( isa => 'Bool',   is => 'ro', required => 0, default => sub { 0 } );
+has _app => (
+    reader   => 'app',
+    init_arg => 'app',
+    traits => [qw(NoGetopt)],
+    isa => 'Str',
+    is => 'ro',
+);
+
+has help => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'h',
+    isa => 'Bool',
+    is => 'ro',
+    documentation => qq{ display this help and exits },
+);
 
 
 sub run {
