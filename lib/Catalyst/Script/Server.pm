@@ -20,9 +20,7 @@ has debug => (
     cmd_aliases => 'd',
     isa => 'Bool',
     is => 'ro',
-    documentation => qq{
-    -d --debug force debug mode
-    }
+    documentation => qq{ force debug mode }
 
 );
 
@@ -31,16 +29,14 @@ has help => (
     cmd_aliases => 'h',
     isa => 'Bool',
     is => 'ro',
-    documentation => qq{
-    -h --help display this help and exits
-    },
+    documentation => qq{ display this help and exits },
 );
 
 has host => (
     isa => 'Str',
     is => 'ro',
-    ,
-    default =>  "localhost"
+    default =>  "localhost",
+    documentation => qq{ specify a host for the server to run on }
 );
 
 has fork => (
@@ -48,7 +44,7 @@ has fork => (
     cmd_aliases => 'f',
     isa => 'Bool',
     is => 'ro',
-
+    documentation => qq{ fork the server }
 );
 
 has listen => (
@@ -56,8 +52,8 @@ has listen => (
     cmd_aliases => 'l',
     isa => 'Int',
     is => 'ro',
-    ,
-    default => "3000"
+    default => "3000",
+    documentation => qq{ specify a different listening port }
 );
 
 has pidfile => (
@@ -65,7 +61,7 @@ has pidfile => (
     cmd_aliases => 'pid',
     isa => 'Str',
     is => 'ro',
-
+    documentation => qq{ specify a pidfile }
 );
 
 has keepalive => (
@@ -73,7 +69,7 @@ has keepalive => (
     cmd_aliases => 'k',
     isa => 'Bool',
     is => 'ro',
-    ,
+    documentation => qq{ server keepalive },
 
 );
 
@@ -82,6 +78,7 @@ has background => (
     cmd_aliases => 'bg',
     isa => 'Bool',
     is => 'ro',
+    documentation => qq{ run in the background }
 );
 
 
@@ -98,7 +95,7 @@ has restart => (
     cmd_aliases => 'r',
     isa => 'Bool',
     is => 'ro',
-
+    documentation => qq{ use Catalyst::Restarter to detect code changes }
 );
 
 has restart_directory => (
@@ -107,6 +104,7 @@ has restart_directory => (
     isa => 'ArrayRef[Str]',
     is  => 'ro',
     predicate => '_has_restart_directory',
+    documentation => qq{ restarter directory to watch }
 );
 
 has restart_delay => (
@@ -115,6 +113,7 @@ has restart_delay => (
     isa => 'Int',
     is => 'ro',
     predicate => '_has_restart_delay',
+    documentation => qq{ set a restart delay }
 );
 
 has restart_regex => (
@@ -123,6 +122,7 @@ has restart_regex => (
     isa => 'Str',
     is => 'ro',
     predicate => '_has_restart_regex',
+    documentation => qq{ restart regex }
 );
 
 has follow_symlinks => (
@@ -131,6 +131,7 @@ has follow_symlinks => (
     isa => 'Bool',
     is => 'ro',
     predicate => '_has_follow_symlinks',
+    documentation => qq{ follow symbolic links }
 
 );
 
