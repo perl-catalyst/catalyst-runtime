@@ -13,21 +13,17 @@ has _app => (
     reader   => 'app',
     init_arg => 'app',
     traits => [qw(NoGetopt)],
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
 );
 
 has conf => ( 
     is  => 'ro', 
-    isa => 'Str',
+    isa => Str,
     traits => [qw(Getopt)],
     cmd_alias => 'c',
     documentation => qq{ specify a configuration file to read from }
 );
-
-
-
-
 
 sub usage {
 
@@ -57,7 +53,6 @@ sub run {
 
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

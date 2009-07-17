@@ -13,7 +13,7 @@ with 'MooseX::Getopt';
 has help => (
     traits => [qw(Getopt)],
     cmd_aliases => 'h',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ display this help and exits },
 );
@@ -21,7 +21,7 @@ has help => (
 has listen => (
     traits => [qw(Getopt)],
     cmd_aliases => 'l',
-    isa => 'Int',
+    isa => Int,
     is => 'ro',
     default => "3000",
     documentation => qq{ specify a different listening port }
@@ -30,13 +30,13 @@ has listen => (
 has pidfile => (
     traits => [qw(Getopt)],
     cmd_aliases => 'pid',
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
     documentation => qq{ specify a pidfile }
 );
 
 has daemon => ( 
-    isa => 'Bool',   
+    isa => Bool,   
     is => 'ro', 
     traits => [qw(Getopt)],
     cmd_aliases => 'd', 
@@ -44,7 +44,7 @@ has daemon => (
 );
 
 has manager => ( 
-    isa => 'Str',    
+    isa => Str,    
     is => 'ro',
     traits => [qw(Getopt)],
     cmd_aliases => 'm',
@@ -54,7 +54,7 @@ has manager => (
 has keep_stderr => ( 
     traits => [qw(Getopt)],
     cmd_aliases => 'std', 
-    isa => 'Bool',   
+    isa => Bool,   
     is => 'ro',  
     documentation => qq{ log STDERR }
 );
@@ -62,7 +62,7 @@ has keep_stderr => (
 has nproc => (
     traits => [qw(Getopt)],
     cmd_aliases => 'np',  
-    isa => 'Int',
+    isa => Int,
     is => 'ro',  
     documentation => qq{ specify an nproc }
 );
@@ -70,7 +70,7 @@ has nproc => (
 has detach => ( 
     traits => [qw(Getopt)],
     cmd_aliases => 'det', 
-    isa => 'Bool',   
+    isa => Bool,   
     is => 'ro',  
     documentation => qq{ detach this FastCGI process }
 );
@@ -79,7 +79,7 @@ has _app => (
     reader   => 'app',
     init_arg => 'app',
     traits => [qw(NoGetopt)],
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
 );
 
@@ -101,5 +101,7 @@ sub run {
     );
 
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;

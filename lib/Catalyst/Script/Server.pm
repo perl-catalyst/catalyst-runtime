@@ -19,22 +19,21 @@ with 'MooseX::Getopt';
 has debug => (
     traits => [qw(Getopt)],
     cmd_aliases => 'd',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ force debug mode }
-
 );
 
 has help => (
     traits => [qw(Getopt)],
     cmd_aliases => 'h',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ display this help and exits },
 );
 
 has host => (
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
     default =>  "localhost",
     documentation => qq{ specify a host for the server to run on }
@@ -43,7 +42,7 @@ has host => (
 has fork => (
     traits => [qw(Getopt)],
     cmd_aliases => 'f',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ fork the server }
 );
@@ -51,7 +50,7 @@ has fork => (
 has listen => (
     traits => [qw(Getopt)],
     cmd_aliases => 'l',
-    isa => 'Int',
+    isa => Int,
     is => 'ro',
     default => "3000",
     documentation => qq{ specify a different listening port }
@@ -60,7 +59,7 @@ has listen => (
 has pidfile => (
     traits => [qw(Getopt)],
     cmd_aliases => 'pid',
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
     documentation => qq{ specify a pidfile }
 );
@@ -68,7 +67,7 @@ has pidfile => (
 has keepalive => (
     traits => [qw(Getopt)],
     cmd_aliases => 'k',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ server keepalive },
 
@@ -77,7 +76,7 @@ has keepalive => (
 has background => (
     traits => [qw(Getopt)],
     cmd_aliases => 'bg',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ run in the background }
 );
@@ -87,14 +86,14 @@ has _app => (
     reader   => 'app',
     init_arg => 'app',
     traits => [qw(NoGetopt)],
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
 );
 
 has restart => (
     traits => [qw(Getopt)],
     cmd_aliases => 'r',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ use Catalyst::Restarter to detect code changes }
 );
@@ -111,7 +110,7 @@ has restart_directory => (
 has restart_delay => (
     traits => [qw(Getopt)],
     cmd_aliases => 'rdel',
-    isa => 'Int',
+    isa => Int,
     is => 'ro',
     predicate => '_has_restart_delay',
     documentation => qq{ set a restart delay }
@@ -120,7 +119,7 @@ has restart_delay => (
 has restart_regex => (
     traits => [qw(Getopt)],
     cmd_aliases => 'rxp',
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
     predicate => '_has_restart_regex',
     documentation => qq{ restart regex }
@@ -129,7 +128,7 @@ has restart_regex => (
 has follow_symlinks => (
     traits => [qw(Getopt)],
     cmd_aliases => 'sym',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     predicate => '_has_follow_symlinks',
     documentation => qq{ follow symbolic links }
@@ -214,7 +213,6 @@ sub _run {
 }
 
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

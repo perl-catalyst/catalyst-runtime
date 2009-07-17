@@ -11,14 +11,14 @@ has _app => (
     reader   => 'app',
     init_arg => 'app',
     traits => [qw(NoGetopt)],
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
 );
 
 has help => (
     traits => [qw(Getopt)],
     cmd_aliases => 'h',
-    isa => 'Bool',
+    isa => Bool,
     is => 'ro',
     documentation => qq{ display this help and exits },
 );
@@ -35,6 +35,6 @@ sub run {
 
 }
 
-no Moose;
+
 __PACKAGE__->meta->make_immutable;
 1;

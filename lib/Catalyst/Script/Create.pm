@@ -6,31 +6,60 @@ use Catalyst::Helper;
 use MooseX::Types::Moose qw/Str Bool/;
 use namespace::autoclean;
 
-has app => (isa => Str, is => 'ro', required => 1);
+with "MooseX::Getopt";
 
-sub new_with_options { shift->new(@_) }
+has _app => (
+    reader   => 'app',
+    init_arg => 'app',
+    traits => [qw(NoGetopt)],
+    isa => Str,
+    is => 'ro',
+);
+
+has force => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'nonew',
+    isa => Bool,
+    is => 'ro',
+    documentation => qq{ force new scripts }
+);
+
+has help => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'h',
+    isa => Bool,
+    is => 'ro',
+    documentation => qq{ display this help and exits },
+);
+
+has debug => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'd',
+    isa => Bool,
+    is => 'ro',
+    documentation => qq{ force debug mode }
+);
+
+has mechanize => (
+    traits => [qw(Getopt)],
+    cmd_aliases => 'mech',
+    isa => Bool,
+    is => 'ro',
+    documentation => qq{ use WWW::Mechanize },
+);
 
 sub run {
     my ($self) = @_;
-my $force = 0;
-my $mech  = 0;
-my $help  = 0;
 
-GetOptions(
-    'nonew|force'    => \$force,
-    'mech|mechanize' => \$mech,
-    'help|?'         => \$help
- );
 
-pod2usage(1) if ( $help || !$ARGV[0] );
+    pod2usage(1) if ( $self->help || !$ARGV[0] );
 
-my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
+    my $helper = Catalyst::Helper->new( { '.newfiles' => !$self->force, mech => $self->mech } );
 
-pod2usage(1) unless $helper->mk_component( $self->app, @ARGV );
+    pod2usage(1) unless $helper->mk_component( $self->app, @ARGV );
 
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
