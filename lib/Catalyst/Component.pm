@@ -172,6 +172,14 @@ something like this:
       return $class->new($app, $args);
   }
 
+=head2 _component_class
+
+The class name of the component within an application. This is used to
+pass the component's class name to actions generated (becoming
+C<< $action->class >>). This is needed so that the L</COMPONENT> method can
+return an instance of a different class (e.g. a L<Class::MOP> anonymous class),
+and should be used to retrieve a component instead of C<< ref($self) >>.
+
 =head2 $c->config
 
 =head2 $c->config($hashref)
