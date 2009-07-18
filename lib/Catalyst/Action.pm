@@ -103,8 +103,8 @@ and so on. This determines how the action is dispatched to.
 
 =head2 class
 
-Returns the class name of the component where this action is defined.
-Derived by calling the L<Catalyst::Component/_component_class|_component_class>
+Returns the name of the component where this action is defined.
+Derived by calling the L<Catalyst::Component/_component_name|_component_name>
 method on each component.
 
 =head2 code
