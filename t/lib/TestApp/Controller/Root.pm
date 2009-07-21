@@ -21,8 +21,9 @@ sub localregex : LocalRegex('^localregex$') {
 }
 
 # For contextual uri_for
-sub lang : Chained(/)    PathPart('') CaptureArgs(1) {}
-sub base : Chained(lang)              CaptureArgs(1) {}
-sub test : Chained(base) Args {}
+sub just_one_arg     : Chained(/) Args(1) {}
+sub leading_capture  : Chained(/) PathPart('') CaptureArgs(1) {}
+sub midpoint_capture : Chained(leading_capture) CaptureArgs(1) {}
+sub slurpy_endpoint  : Chained(midpoint_capture) Args {}
 
 1;
