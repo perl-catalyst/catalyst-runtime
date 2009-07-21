@@ -20,10 +20,4 @@ sub localregex : LocalRegex('^localregex$') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
-# For contextual uri_for
-sub just_one_arg     : Chained(/) Args(1) {}
-sub leading_capture  : Chained(/) PathPart('') CaptureArgs(1) {}
-sub midpoint_capture : Chained(leading_capture) CaptureArgs(1) {}
-sub slurpy_endpoint  : Chained(midpoint_capture) Args {}
-
 1;
