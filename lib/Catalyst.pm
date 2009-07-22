@@ -1662,6 +1662,8 @@ sub finalize {
         $c->finalize_body;
     }
 
+	$c->log_response;
+
     if ($c->use_stats) {
         my $elapsed = sprintf '%f', $c->stats->elapsed;
         my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
@@ -1886,8 +1888,7 @@ sub prepare {
     $path       = '/' unless length $path;
     my $address = $c->req->address || '';
 
-    $c->log->debug(qq/"$method" request for "$path" from "$address"/)
-      if $c->debug;
+    $c->log_request;
 
     $c->prepare_action;
 
@@ -1917,17 +1918,6 @@ sub prepare_body {
     $c->engine->prepare_body( $c, @_ );
     $c->prepare_parameters;
     $c->prepare_uploads;
-
-    if ( $c->debug && keys %{ $c->req->body_parameters } ) {
-        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ 36, 'Value' ] );
-        for my $key ( sort keys %{ $c->req->body_parameters } ) {
-            my $param = $c->req->body_parameters->{$key};
-            my $value = defined($param) ? $param : '';
-            $t->row( $key,
-                ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
-        }
-        $c->log->debug( "Body Parameters are:\n" . $t->draw );
-    }
 }
 
 =head2 $c->prepare_body_chunk( $chunk )
@@ -2011,17 +2001,406 @@ sub prepare_query_parameters {
     my $c = shift;
 
     $c->engine->prepare_query_parameters( $c, @_ );
+}
 
-    if ( $c->debug && keys %{ $c->request->query_parameters } ) {
-        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ 36, 'Value' ] );
-        for my $key ( sort keys %{ $c->req->query_parameters } ) {
-            my $param = $c->req->query_parameters->{$key};
-            my $value = defined($param) ? $param : '';
-            $t->row( $key,
-                ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
-        }
-        $c->log->debug( "Query Parameters are:\n" . $t->draw );
+=head2 $c->apply_parameter_debug_filters($params)
+
+=cut
+
+sub _apply_parameter_debug_filters {
+    my $c      = shift;
+    my $type   = shift;
+    my $params = shift;
+
+    # take a copy since we don't want to modify the original
+    my $filtered_params = {%$params};
+
+    my @filters;
+
+    my $filter_param_config = $c->config->{Debug}->{param_filters};
+    if ( ref($filter_param_config) eq 'HASH' ) {
+
+        # filters broken out by parameter type (i.e. body, query, all)
+        my $type_filters = $filter_param_config->{$type} || [];
+        $type_filters = [$type_filters] if ref $type_filters ne 'ARRAY';
+
+        my $all_filters = $filter_param_config->{'all'} || [];
+        $all_filters = [$all_filters] if ref $all_filters ne 'ARRAY';
+
+        @filters = $c->_normalize_debug_filters( [ @$type_filters, @$all_filters ] );
+    } elsif ($filter_param_config) {
+        @filters = $c->_normalize_debug_filters($filter_param_config);
     }
+
+    # allow callback to modify each parameter
+    foreach my $k ( keys %$filtered_params ) {
+
+        # apply filters to each param
+        foreach my $f (@filters) {
+
+            # take a copy of the key to avoid the callback inadvertantly
+            # modifying things
+            my $copy_key = $k;
+
+            my $returned = $f->( $copy_key => $filtered_params->{$k} );
+
+            if ( defined $returned ) {
+
+                # if no value is returned, we assume the filter chose not to modify anything
+                # otherwise, the returned value is the logged value
+                $filtered_params->{$k} = $returned;
+
+                last;    # skip the rest of the filters since this one matched
+            }
+        }
+    }
+    return $filtered_params;
+}
+
+# turn debug filters into a list of CodeRef's
+sub _normalize_debug_filters {
+    my $c = shift;
+
+    my @filters = ref( $_[0] ) eq 'ARRAY' ? @{ $_[0] } : grep { defined $_ } @_;
+
+    my @normalized = map { _make_filter_callback($_) } @filters;
+
+    return @normalized;
+}
+
+sub _make_filter_callback {
+    my $filter = shift;
+
+    my $filter_str = '[FILTERED]';
+    if ( ref($filter) eq 'Regexp' ) {
+        return sub { return $_[0] =~ $filter ? $filter_str  : undef };
+    } elsif ( ref($filter) eq 'CODE' ) {
+        return $filter;
+    } else {
+        return sub { return $_[0] eq $filter ? $filter_str : undef };
+    }
+}
+
+=head2 $c->log_request
+
+Writes information about the request to the debug logs.  This includes:
+
+=over 4
+
+=item * Request method, path and remote IP
+
+=item * Query keywords (see L<Catalyst::Request/query_keywords>)
+
+=item * Request parameters (see L</log_request_parameters>)
+
+=item * File uploads
+
+=back
+
+=cut
+
+sub log_request {
+    my $c = shift;
+
+    return unless $c->debug;
+
+    my ( $method, $path, $address ) = ( $c->req->method, $c->req->path, $c->req->address );
+    $method ||= '';
+    $path = '/' unless length $path;
+    $address ||= '';
+    $c->log->debug(qq/"$method" request for "$path" from "$address"/);
+
+    if ( my $keywords = $c->req->query_keywords ) {
+        $c->log->debug("Query keywords are: $keywords");
+    }
+
+    $c->log_request_parameters( query => $c->req->query_parameters, body => $c->req->body_parameters );
+
+    $c->log_request_uploads;
+}
+
+=head2 $c->log_response
+
+Writes information about the response to the debug logs.  This includes:
+
+=over 4
+
+=item * Response status code
+
+=item * Response headers (see L</log_headers>)
+
+=back
+
+This logging is not enabled by default.  To enable, you must set a flag in your Catalyst config:
+
+	__PACKAGE__->config( Debug => { log_response => 1 } );
+
+=cut
+
+sub log_response {
+    my $c = shift;
+
+    return unless $c->debug && $c->config->{Debug}->{log_response};
+
+    $c->log->debug('Response Status: ' . $c->response->status);
+    $c->log_headers('response', $c->response->headers);
+}
+
+=head2 $c->log_request_parameters( query => {}, body => {} )
+
+Logs request parameters to debug logs
+
+If you have sensitive data that you do not want written to the Catalyst
+debug logs, you can set options in your config to filter those values out.
+There are a few different ways you can set these up depending on what
+exactly you need to filter.
+
+=head3 Filtering parameters by name
+
+The most basic means of filtering is to add an entry into your config
+as shown below.  You can have a simple scalar to just filter a
+single parameter or an ARRAY ref to filter out multiple params.
+
+    # filters a single param
+    __PACKAGE__->config( Debug => { param_filters => 'param_name' } );
+
+    # filters multiple params
+    __PACKAGE__->config( Debug => { param_filters => [qw(param1 param2)] } );
+
+When the debug logs are generated for a given request, any parameters
+(query or body) that exactly match the specified value(s) will have
+their values replaced with '[FILTERED]'.  For instance:
+
+    [debug] Query Parameters are:
+    .-------------------------------------+--------------------------------------.
+    | Parameter                           | Value                                |
+    +-------------------------------------+--------------------------------------+
+    | param_name                          | [FILTERED]                           |
+    .-------------------------------------+--------------------------------------.
+
+=head3 Filtering parameters by regular expression
+
+If you have a set of parameters you need to filter, you can specify a
+regular expression that will be used to match against parameter names.
+
+    # filters parameters starting with "private."
+    __PACKAGE__->config( Debug => { param_filters => qr/^private\./ } );
+
+    # filters parameters named "param1" or starting with "private." or "secret."
+    __PACKAGE__->config( Debug => { param_filters => [ 'param1', qr/^private\./, qr/^secret\./ ] } );
+
+Notice on the second example, the ARRAY ref contains a string as well
+as two regular expressions.  This should DWIM and filter parameters that
+match any of the filters specified.
+
+=head3 Filtering parameters by callback
+
+If you want even more flexible filtering, you can specify an anonymous
+subroutine.  The subroutine is given the parameter name and value and
+is expected to return the new value that will be show in the debug log.
+An C<undef> return value indicates that no change should be made to
+the value.
+
+    # transform any "password" param to "********"
+    __PACKAGE__->config(
+        Debug => {
+            param_filters => sub { my ( $k, $v ) = @_; return unless $k eq 'password'; return '*' x 8; }
+        }
+    );
+
+    # combine with other filtering methods
+    __PACKAGE__->config(
+        Debug => {
+            param_filters => [
+                'simple_param_name',
+                qr/^private\./,
+                sub { my ( $k, $v ) = @_; return unless $k eq 'password'; return '*' x 8; },
+            ]
+        }
+    );
+
+An example of the debug log for a request with 
+C<password=secret&some_other_param=some_other_value> would be:
+
+    [debug] Body Parameters are:
+    .-------------------------------------+--------------------------------------.
+    | Parameter                           | Value                                |
+    +-------------------------------------+--------------------------------------+
+    | some_other_param                    | some_other_value                     |
+    | password                            | ********                             |
+    .-------------------------------------+--------------------------------------.
+
+=head3 Filtering by parameter location
+
+If you have a different set of filters based on how they were passed
+(query vs. body vs. all), you can specify a HASH ref with different sets of
+filters:
+
+    # filters all body parameters
+    __PACKAGE__->config( Debug => { param_filters => { body => qr// } } );
+
+    # filters query parameters starting with "private."
+    __PACKAGE__->config( Debug => { param_filters => { query => qr/^private\./ } } );
+
+    # filters all parameters (query or body) through the specified callback
+    __PACKAGE__->config(
+        Debug => {
+            param_filters => {
+                all => sub { return unless $_[0] eq 'fizzbuzz'; return 'FIZZBUZZ FILTER' }
+            }
+        }
+    );
+
+Of course, you can use any of the above filtering methods with these
+"location-specific" filters:
+
+    # body parameter filters
+    __PACKAGE__->config(
+        Debug => {
+            param_filters => {
+                body => [
+                    'some_param',
+                    qr/^private\./,
+                    sub { return 'XXX' if shift eq 'other_param' }
+                ]
+            }
+        }
+    );
+
+    # query parameter filters
+    __PACKAGE__->config(
+        Debug => {
+            param_filters => {
+                body => [
+                    'some_param',
+                    qr/^private\./,
+                    sub { return 'XXX' if shift eq 'other_param' }
+                ]
+            }
+        }
+    );
+
+    # query parameter filters
+    __PACKAGE__->config( Debug => { param_filters => { all => [qw(foo bar)] } } );
+
+=cut
+
+sub log_request_parameters {
+    my $c          = shift;
+    my %all_params = @_;
+
+    my $column_width = Catalyst::Utils::term_width() - 44;
+    foreach my $type (qw(query body)) {
+        my $filtered_params = $c->_apply_parameter_debug_filters( $type, $all_params{$type} || {} );
+        next unless keys %$filtered_params;
+        my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ $column_width, 'Value' ] );
+        for my $key ( sort keys %$filtered_params ) {
+            my $param = $filtered_params->{$key};
+            my $value = defined($param) ? $param : '';
+            $t->row( $key, ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
+        }
+        $c->log->debug( ucfirst($type) . " Parameters are:\n" . $t->draw );
+    }
+}
+
+=head2 $c->log_request_uploads
+
+Logs file uploads included in the request to the debug logs.
+The parameter name, filename, file type and size are all included in
+the debug logs.
+
+=cut
+
+sub log_request_uploads {
+    my $c = shift;
+    my $uploads = $c->req->uploads;
+    if ( keys %$uploads ) {
+        my $t = Text::SimpleTable->new(
+            [ 12, 'Parameter' ],
+            [ 26, 'Filename' ],
+            [ 18, 'Type' ],
+            [ 9,  'Size' ]
+        );
+        for my $key ( sort keys %$uploads ) {
+            my $upload = $uploads->{$key};
+            for my $u ( ref $upload eq 'ARRAY' ? @{$upload} : ($upload) ) {
+                $t->row( $key, $u->filename, $u->type, $u->size );
+            }
+        }
+        $c->log->debug( "File Uploads are:\n" . $t->draw );
+    }
+}
+
+=head2 $c->log_headers($type => $headers)
+
+Writes HTTP::Headers to debug logs, applying filters as configured.
+
+Similarly to how L</log_request_parameters> is configured, you can
+configure Catalyst to filter response header values to avoid writing
+sensitive data to your logs (i.e. cookie values, etc).  Take a look at
+the examples in L</log_request_parameters> as this configuration works
+virtually the same way.  Here are a few examples:
+
+    # filters all "Set-Cookie" headers from response logging
+    __PACKAGE__->config(Debug => { response_header_filters => 'Set-Cookie' } );
+
+    # filters only the value of the cookie (and leaves the name, path, expiration)
+    __PACKAGE__->config(
+        Debug => {
+            response_header_filters => sub {
+                my ( $n, $v ) = @_;
+                return unless $n eq 'Set-Cookie';
+                $v =~ s/^.*?;//;
+                return $v;
+            },
+        }
+    );
+
+=cut
+
+sub log_headers {
+    my $c       = shift;
+    my $type    = shift;
+    my $headers = shift;    # an HTTP::Headers instance
+
+    my $filtered = $c->_apply_header_debug_filters( $type, $headers );
+
+    my $t = Text::SimpleTable->new( [ 35, 'Header Name' ], [ 40, 'Value' ] );
+    $filtered->scan(
+        sub {
+            my ( $name, $value ) = @_;
+            $t->row( $name, $value );
+        }
+    );
+    $c->log->debug( ucfirst($type) . " Headers:\n" . $t->draw );
+}
+
+# Applies debug filters to $headers and returns a new HTTP::Headers object which has (potentially) filtered values.
+sub _apply_header_debug_filters {
+    my $c    = shift;
+    my $type    = shift;
+    my $headers = shift;
+
+    my @header_filters   = $c->_normalize_debug_filters( $c->config->{Debug}->{ $type . '_header_filters' } );
+    my $filtered_headers = HTTP::Headers->new();
+    foreach my $name ( $headers->header_field_names ) {
+        my @values = $headers->header($name);
+
+        # headers can be multi-valued
+        foreach my $value (@values) {
+            foreach my $f (@header_filters) {
+                my $new_value = $f->( $name, $value );
+
+                # if a defined value is returned, we use that
+                if ( defined $new_value ) {
+                    $value = $new_value;
+                    last;    # skip the rest of the filters
+                }
+            }
+            $filtered_headers->push_header( $name, $value );
+        }
+    }
+    return $filtered_headers;
 }
 
 =head2 $c->prepare_read
@@ -2050,22 +2429,6 @@ sub prepare_uploads {
     my $c = shift;
 
     $c->engine->prepare_uploads( $c, @_ );
-
-    if ( $c->debug && keys %{ $c->request->uploads } ) {
-        my $t = Text::SimpleTable->new(
-            [ 12, 'Parameter' ],
-            [ 26, 'Filename' ],
-            [ 18, 'Type' ],
-            [ 9,  'Size' ]
-        );
-        for my $key ( sort keys %{ $c->request->uploads } ) {
-            my $upload = $c->request->uploads->{$key};
-            for my $u ( ref $upload eq 'ARRAY' ? @{$upload} : ($upload) ) {
-                $t->row( $key, $u->filename, $u->type, $u->size );
-            }
-        }
-        $c->log->debug( "File Uploads are:\n" . $t->draw );
-    }
 }
 
 =head2 $c->prepare_write
