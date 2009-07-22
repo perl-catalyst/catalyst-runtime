@@ -419,6 +419,83 @@ sub get_action_by_path {
     $self->_action_hash->{$path};
 }
 
+=head2 $self->get_action_by_type( @args )
+
+Returns the action object for the specified args if one exists, otherwise
+returns C<undef>. Calls L</get_action_with_defaults> and if that does not
+return an action, calls L</get_action_by_controller>
+
+=cut
+
+sub get_action_by_type {
+    # Return an action object or undef
+    my ($self, $c, $car, $cdr) = @_; my $action;
+
+    return $action if ($action = $car and blessed( $car ));
+    return $action if ($action = $self->get_action_with_defaults( $c, $car ));
+    return $action
+       if ($action = $self->get_action_by_controller( $c, $car, $cdr ));
+    return;
+}
+
+=head2 $self->get_action_by_controller( qw(Controller::Class method_name) );
+
+Returns the action associated with the given controller and method. Provides
+a default for the method name if one is not supplied
+
+=cut
+
+sub get_action_by_controller {
+   # Return an action object if parameters are a controller class and method
+   my ($self, $c, $cname, $cdr) = @_;
+
+   my ($action, $controller); my $sep = q(/); $cdr ||= [];
+
+   return unless ($cname and $controller = $c->controller( $cname ));
+
+   my $path = $controller->action_namespace.$sep.($cdr->[0] || q());
+
+   $path = q(root) if ($path eq $sep);
+
+   return unless ($action = $self->get_action_with_defaults( $c, $path ));
+
+   shift @{ $cdr }; # Loose the controller method name
+
+   return $action;
+}
+
+=head2 $self->get_action_with_defaults( q(namespace/method_name) );
+
+Returns the action associated with the private action path. Provides
+defaults for namespace and method name. A namespace of I<root>
+is mapped to I</>
+
+=cut
+
+sub get_action_with_defaults {
+    # Return an action object. Provide defaults for a call to get_action
+    my ($self, $c, $path) = @_; my $sep = q(/);
+
+    return unless ($path or $c->config->{dispatcher_defaults_to_action});
+
+    # Normalise the path. It must contain a sep char
+    $path ||= $sep;
+    $path  .= $sep if (0 > index $path, $sep);
+
+    # Extract the action attributes
+    my ($namespace, $name) = split m{ $sep }mx, $path;
+
+    # Default the namespace and expand the root symbol
+    $namespace ||= ($c->action && $c->action->namespace) || $sep;
+    $namespace   = $sep if ($namespace eq q(root));
+
+    # Default the method name if one was not provided
+    $name ||= $c->config->{dispatcher_default_action} || q(default);
+
+    # Return the action for this namespace/name pair
+    return $self->get_action( $name, $namespace );
+}
+
 =head2 $self->get_actions( $c, $action, $namespace )
 
 =cut

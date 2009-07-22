@@ -1186,13 +1186,13 @@ using C<< $c->req->captures >>.
 =cut
 
 sub uri_for {
-    my ( $c, $path, @args ) = @_;
+    my ( $c, $path, @args ) = @_; my $action;
 
-    if ( blessed($path) ) { # action object
+    if ( $action = $c->_get_action_and_flatten_args( $path, \@args ) ) {
+        # Have an action object
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? shift(@args)
                          : [] );
-        my $action = $path;
         $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
             $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
@@ -1250,6 +1250,28 @@ sub uri_for {
 
     my $res = bless(\"${base}${args}${query}", $class);
     $res;
+}
+
+=head2 $c->_get_action_and_flatten_args
+
+=cut
+
+sub _get_action_and_flatten_args {
+    my ($c, $car, $cdr) = @_; my $action;
+
+    unless ($action = $c->dispatcher->get_action_by_type( $c, $car, $cdr )) {
+       return;
+    }
+
+    my $attrs = $action->attributes || {};
+
+    return $action unless ($attrs->{Chained});
+
+    my $captures = $action->splice_captures_from( $c, $cdr );
+
+    unshift @{ $cdr }, $captures if ($captures);
+
+    return $action;
 }
 
 =head2 $c->uri_for_action( $path, \@captures?, @args?, \%query_values? )

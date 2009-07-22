@@ -2,22 +2,21 @@ use strict;
 use warnings;
 use File::Spec::Functions;
 use FindBin qw( $Bin );
-use lib catdir( $Bin, q(lib) );
+use lib catdir( $Bin, updir, q(lib) ), catdir( $Bin, q(lib) );
 
 use English qw( -no_match_vars );
-use Test::More tests => 13;
+use Test::More tests => 11;
 use URI;
 
 use_ok( q(TestApp) );
 
 my $request = Catalyst::Request->new( {
-   base => URI->new( q(http://127.0.0.1) ) } );
+    base => URI->new( q(http://127.0.0.1) ) } );
 
-my $context = TestApp->new( {
-   config  => { uri_for_defaults_to_action => 1,
-                uri_for_default_action     => q(default_endpoint),
-                uri_for_on_error           => q(die) },
-   request => $request } );
+my $context = TestApp->new( { request => $request } );
+
+$context->config( dispatcher_defaults_to_action => 1,
+                  dispatcher_default_action     => q(default_endpoint), );
 
 is( $context->uri_for,
     q(http://127.0.0.1/),
@@ -59,19 +58,7 @@ is( $context->uri_for( q(Chained::ContextualUriFor) ),
     q(http://127.0.0.1/),
     'URI for controller and default method' );
 
-eval { $context->uri_for( qw(root/midpoint_capture en) ) };
-
-like( $EVAL_ERROR,
-      qr(\A Action \s midpoint_capture \s is \s a \s midpoint)msx,
-      'Midpoint detected' );
-
-eval { $context->uri_for( qw(root/slurpy_endpoint en) ) };
-
-like( $EVAL_ERROR,
-      qr(\A Action \s slurpy_endpoint \s insufficient \s args)msx,
-      'Insufficient args' );
-
 # Local Variables:
 # mode: perl
-# tab-width: 3
+# tab-width: 4
 # End:

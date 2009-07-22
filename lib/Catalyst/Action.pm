@@ -90,6 +90,47 @@ sub compare {
     return $a1_args <=> $a2_args;
 }
 
+=head2 $self->splice_cpatures_from( $c, $args )
+
+=cut
+
+sub splice_captures_from {
+    my ($self, $c, $cdr) = @_;
+
+    my @captures = ();
+    my $attrs    = $self->attributes || {};
+    my @chain    = @{ $c->dispatcher->expand_action( $self )->chain };
+    my $params   = $cdr && $cdr->[0] && ref $cdr->[-1] eq q(HASH)
+                 ? pop @{ $cdr } : undef;
+
+    if ($attrs->{CaptureArgs}) {
+        my $error = 'Action '.$self->reverse.' is a midpoint';
+
+        $c->log->debug( $error ) if ($c->debug);
+
+        return;
+    }
+
+    pop @chain;
+
+    # Now start from the root of the chain, populate captures
+    for my $num_caps (map { $_->attributes->{CaptureArgs}->[0] } @chain) {
+        if ($num_caps > scalar @{ $cdr }) {
+            my $error = 'Action '.$self->reverse.' insufficient args';
+
+            $c->log->debug( $error ) if ($c->debug);
+
+            return;
+        }
+
+        push @captures, splice @{ $cdr }, 0, $num_caps;
+    }
+
+    push @{ $cdr }, $params if ($params); # Restore query parameters
+
+    return \@captures;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -150,6 +191,9 @@ returns the sub name of this action.
 =head2 meta
 
 Provided by Moose
+
+=head2 splice_captures_from
+
 
 =head1 AUTHORS
 
