@@ -2087,7 +2087,7 @@ Writes information about the request to the debug logs.  This includes:
 
 =over 4
 
-=item * Request method, path and remote IP
+=item * Request method, path, and remote IP address
 
 =item * Query keywords (see L<Catalyst::Request/query_keywords>)
 
@@ -2131,7 +2131,7 @@ Writes information about the response to the debug logs.  This includes:
 
 =back
 
-This logging is not enabled by default.  To enable, you must set a flag in your Catalyst config:
+This logging is not enabled by default.  To enable it, you must set a flag in your Catalyst config:
 
 	__PACKAGE__->config( Debug => { log_response => 1 } );
 
@@ -2175,7 +2175,7 @@ their values replaced with '[FILTERED]'.  For instance:
     .-------------------------------------+--------------------------------------.
     | Parameter                           | Value                                |
     +-------------------------------------+--------------------------------------+
-    | param_name                          | [FILTERED]                           |
+    | password                            | [FILTERED]                           |
     .-------------------------------------+--------------------------------------.
 
 =head3 Filtering parameters by regular expression
@@ -2189,7 +2189,7 @@ regular expression that will be used to match against parameter names.
     # filters parameters named "param1" or starting with "private." or "secret."
     __PACKAGE__->config( Debug => { param_filters => [ 'param1', qr/^private\./, qr/^secret\./ ] } );
 
-Notice on the second example, the ARRAY ref contains a string as well
+Notice on the second example, the arrayref contains a string as well
 as two regular expressions.  This should DWIM and filter parameters that
 match any of the filters specified.
 
@@ -2197,7 +2197,7 @@ match any of the filters specified.
 
 If you want even more flexible filtering, you can specify an anonymous
 subroutine.  The subroutine is given the parameter name and value and
-is expected to return the new value that will be show in the debug log.
+is expected to return the new value that will be shown in the debug log.
 An C<undef> return value indicates that no change should be made to
 the value.
 
@@ -2208,7 +2208,7 @@ the value.
         }
     );
 
-    # combine with other filtering methods
+    # combine several param filtering methods
     __PACKAGE__->config(
         Debug => {
             param_filters => [
@@ -2232,14 +2232,14 @@ C<password=secret&some_other_param=some_other_value> would be:
 
 =head3 Filtering by parameter location
 
-If you have a different set of filters based on how they were passed
-(query vs. body vs. all), you can specify a HASH ref with different sets of
-filters:
+If you have different filters that depend on whether a param was passed
+as a query or body param (or as either), you can specify a hashref with
+different sets of filters:
 
     # filters all body parameters
     __PACKAGE__->config( Debug => { param_filters => { body => qr// } } );
 
-    # filters query parameters starting with "private."
+    # filters query parameters starting with 'private'.
     __PACKAGE__->config( Debug => { param_filters => { query => qr/^private\./ } } );
 
     # filters all parameters (query or body) through the specified callback
@@ -2306,7 +2306,7 @@ sub log_request_parameters {
 =head2 $c->log_request_uploads
 
 Logs file uploads included in the request to the debug logs.
-The parameter name, filename, file type and size are all included in
+The parameter name, filename, file type, and file size are all included in
 the debug logs.
 
 =cut
@@ -2337,9 +2337,9 @@ Writes HTTP::Headers to debug logs, applying filters as configured.
 
 Similarly to how L</log_request_parameters> is configured, you can
 configure Catalyst to filter response header values to avoid writing
-sensitive data to your logs (i.e. cookie values, etc).  Take a look at
-the examples in L</log_request_parameters> as this configuration works
-virtually the same way.  Here are a few examples:
+sensitive data to your logs (e.g. cookie values, etc.). The configuration
+works in virtually the same way as the examples in
+L</log_request_parameters>.  Here are a few specific examples:
 
     # filters all "Set-Cookie" headers from response logging
     __PACKAGE__->config(Debug => { response_header_filters => 'Set-Cookie' } );
