@@ -2683,7 +2683,7 @@ Wiki:
 
 =head2 L<Catalyst::Manual> - The Catalyst Manual
 
-=head2 L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
+=head2 L<Catalyst::Component>, L<Catalyst::Controller> - Base classes for components
 
 =head2 L<Catalyst::Engine> - Core engine
 
@@ -2745,6 +2745,8 @@ ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
 
+jester: Jesse Sheidlower
+
 jhannah: Jay Hannah <jay@jays.net>
 
 Jody Belka
@@ -2782,8 +2784,6 @@ rafl: Florian Ragwitz <rafl@debian.org>
 random: Roland Lammel <lammel@cpan.org>
 
 sky: Arthur Bergman
-
-the_jester: Jesse Sheidlower
 
 t0m: Tomas Doran <bobtfish@bobtfish.net>
 
