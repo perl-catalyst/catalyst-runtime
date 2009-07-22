@@ -1252,22 +1252,39 @@ sub uri_for {
     $res;
 }
 
-=head2 $c->_get_action_and_flatten_args
+# ' Emacs highlight fix. Remove before commit
+
+=head2 $c->_get_action_and_flatten_args( $c, $action, \@args )
+
+=head2 $c->_get_action_and_flatten_args( $c, $controller_name, \@args )
+
+=head2 $c->_get_action_and_flatten_args( $c, $private_action_path, \@args )
+
+Get an action object from the first one or two supplied args. Splice
+the capture args from the supplied args if required
 
 =cut
 
 sub _get_action_and_flatten_args {
     my ($c, $car, $cdr) = @_; my $action;
 
-    unless ($action = $c->dispatcher->get_action_by_type( $c, $car, $cdr )) {
-       return;
+    return $action if ($action = $car and blessed( $car ));
+
+    return unless ($c->config->{contextual_uri_for});
+
+    $action = $c->dispatcher->get_action_by_controller( $c, $car, $cdr );
+
+    unless ($action) {
+        $action = $c->dispatcher->get_action_by_private_path( $c, $car );
     }
+
+    return unless ($action);
 
     my $attrs = $action->attributes || {};
 
     return $action unless ($attrs->{Chained});
 
-    my $captures = $action->splice_captures_from( $c, $cdr );
+    my $captures = $c->dispatcher->splice_captures_from( $c, $action, $cdr );
 
     unshift @{ $cdr }, $captures if ($captures);
 

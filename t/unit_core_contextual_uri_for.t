@@ -15,8 +15,8 @@ my $request = Catalyst::Request->new( {
 
 my $context = TestApp->new( { request => $request } );
 
-$context->config( dispatcher_defaults_to_action => 1,
-                  dispatcher_default_action     => q(default_endpoint), );
+$context->config( contextual_uri_for        => 1,
+                  dispatcher_default_action => q(default_endpoint), );
 
 is( $context->uri_for,
     q(http://127.0.0.1/),

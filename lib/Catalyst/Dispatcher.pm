@@ -391,6 +391,8 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
+# ' Emacs highlight fix. Remove before commit
+
 =head2 $self->get_action( $action, $namespace )
 
 returns a named action from a given namespace.
@@ -419,25 +421,6 @@ sub get_action_by_path {
     $self->_action_hash->{$path};
 }
 
-=head2 $self->get_action_by_type( @args )
-
-Returns the action object for the specified args if one exists, otherwise
-returns C<undef>. Calls L</get_action_with_defaults> and if that does not
-return an action, calls L</get_action_by_controller>
-
-=cut
-
-sub get_action_by_type {
-    # Return an action object or undef
-    my ($self, $c, $car, $cdr) = @_; my $action;
-
-    return $action if ($action = $car and blessed( $car ));
-    return $action if ($action = $self->get_action_with_defaults( $c, $car ));
-    return $action
-       if ($action = $self->get_action_by_controller( $c, $car, $cdr ));
-    return;
-}
-
 =head2 $self->get_action_by_controller( qw(Controller::Class method_name) );
 
 Returns the action associated with the given controller and method. Provides
@@ -446,37 +429,36 @@ a default for the method name if one is not supplied
 =cut
 
 sub get_action_by_controller {
-   # Return an action object if parameters are a controller class and method
-   my ($self, $c, $cname, $cdr) = @_;
+    # Return an action object if parameters are a controller class and method
+    my ($self, $c, $cname, $cdr) = @_; my ($action, $controller); $cdr ||= [];
 
-   my ($action, $controller); my $sep = q(/); $cdr ||= [];
+    return unless ($cname and $controller = $c->controller( $cname ));
 
-   return unless ($cname and $controller = $c->controller( $cname ));
+    my $sep  = q(/);
+    my $path = $controller->action_namespace.$sep.($cdr->[0] || q());
 
-   my $path = $controller->action_namespace.$sep.($cdr->[0] || q());
+    $path = q(root) if ($path eq $sep);
 
-   $path = q(root) if ($path eq $sep);
+    return unless ($action = $self->get_action_by_private_path( $c, $path ));
 
-   return unless ($action = $self->get_action_with_defaults( $c, $path ));
+    shift @{ $cdr }; # Loose the controller method name
 
-   shift @{ $cdr }; # Loose the controller method name
-
-   return $action;
+    return $action;
 }
 
-=head2 $self->get_action_with_defaults( q(namespace/method_name) );
+=head2 $self->get_action_by_private_path( q(namespace/method_name) );
 
 Returns the action associated with the private action path. Provides
-defaults for namespace and method name. A namespace of I<root>
-is mapped to I</>
+defaults for namespace and method name. The namespace defaults to that
+of the current action, a namespace of I<root> is mapped to I</>.  The
+method name defaults to C<< $c->config->{dispatcher_default_action} >>
+if set, 'default' otherwise
 
 =cut
 
-sub get_action_with_defaults {
+sub get_action_by_private_path {
     # Return an action object. Provide defaults for a call to get_action
     my ($self, $c, $path) = @_; my $sep = q(/);
-
-    return unless ($path or $c->config->{dispatcher_defaults_to_action});
 
     # Normalise the path. It must contain a sep char
     $path ||= $sep;
@@ -494,6 +476,46 @@ sub get_action_with_defaults {
 
     # Return the action for this namespace/name pair
     return $self->get_action( $name, $namespace );
+}
+
+=head2 $self->splice_captures_from( $c, $action, $args )
+
+Gets the action chain for the supplied action. Calculates the number
+of capture args and returns and array ref spliced off the front of the
+supplied args
+
+=cut
+
+sub splice_captures_from {
+    my ($self, $c, $action, $cdr) = @_; my $attrs = $action->attributes || {};
+
+    if ($attrs->{CaptureArgs}) {
+        $c->log->debug( 'Action '.$action->reverse.' is a midpoint' )
+            if ($c->debug);
+
+        return;
+    }
+
+    my @captures = ();
+    my @chain    = @{ $self->expand_action( $action )->chain }; pop @chain;
+    my $params   = $cdr && $cdr->[0] && ref $cdr->[-1] eq q(HASH)
+                 ? pop @{ $cdr } : undef;
+
+    # Now start from the root of the chain, populate captures
+    for my $num_caps (map { $_->attributes->{CaptureArgs}->[0] } @chain) {
+        if ($num_caps > scalar @{ $cdr }) {
+            $c->log->debug( 'Action '.$action->reverse.' insufficient args' )
+                if ($c->debug);
+
+            return;
+        }
+
+        push @captures, splice @{ $cdr }, 0, $num_caps;
+    }
+
+    push @{ $cdr }, $params if ($params); # Restore query parameters
+
+    return \@captures;
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
