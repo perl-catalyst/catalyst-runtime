@@ -1,7 +1,8 @@
 # 2 initial tests, and 6 per component in the loop below
 # (do not forget to update the number of components in test 3 as well)
 # 5 extra tests for the loading options
-use Test::More tests => 2 + 6 * 24 + 5;
+# One test for components in inner packages
+use Test::More tests => 2 + 6 * 24 + 5 + 1;
 
 use strict;
 use warnings;
@@ -198,5 +199,18 @@ EOF
 eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 
 is($@, '', "Didn't load component twice");
+
+$appclass = "InnerComponent";
+
+{
+  package InnerComponent::Controller::Test;
+  use base 'Catalyst::Controller';
+}
+
+$INC{'InnerComponent/Controller/Test.pm'} = 1;
+
+eval "package $appclass; use Catalyst; __PACKAGE__->setup";
+
+isa_ok($appclass->controller('Test'), 'Catalyst::Controller');
 
 rmtree($libdir);

@@ -5,6 +5,9 @@
          application class immutable without that option.
        - Fix POD to refer to ->config(key => $val), rather than
          ->config->{key} = $val, as the latter form is deprecated.
+       - Depend on Module::Pluggable 3.9 to prevent a bug wherein components
+         in inner packages might not be registered. This especially affected
+         tests.
 
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the
