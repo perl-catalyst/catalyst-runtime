@@ -23,7 +23,7 @@ requires 'HTTP::Request';
 requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.8';
 requires 'LWP::UserAgent';
-requires 'Module::Pluggable' => '3.01';
+requires 'Module::Pluggable' => '3.9';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
