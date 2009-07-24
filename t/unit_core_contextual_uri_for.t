@@ -5,18 +5,26 @@ use FindBin qw( $Bin );
 use lib catdir( $Bin, updir, q(lib) ), catdir( $Bin, q(lib) );
 
 use English qw( -no_match_vars );
-use Test::More tests => 11;
+use Test::More tests => 10;
 use URI;
 
-use_ok( q(TestApp) );
+{   package TestApp;
+
+    use Catalyst;
+
+    __PACKAGE__->config
+       ( contextual_uri_for        => 1,
+         dispatcher_default_action => q(default_endpoint), );
+
+    __PACKAGE__->setup;
+
+    1;
+}
 
 my $request = Catalyst::Request->new( {
     base => URI->new( q(http://127.0.0.1) ) } );
 
 my $context = TestApp->new( { request => $request } );
-
-$context->config( contextual_uri_for        => 1,
-                  dispatcher_default_action => q(default_endpoint), );
 
 is( $context->uri_for,
     q(http://127.0.0.1/),
