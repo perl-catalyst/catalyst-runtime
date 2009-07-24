@@ -1252,8 +1252,6 @@ sub uri_for {
     $res;
 }
 
-# ' Emacs highlight fix. Remove before commit
-
 =head2 $c->_get_action_and_flatten_args( $c, $action, \@args )
 
 =head2 $c->_get_action_and_flatten_args( $c, $controller_name, \@args )

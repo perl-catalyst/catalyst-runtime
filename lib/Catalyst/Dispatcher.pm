@@ -391,8 +391,6 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-# ' Emacs highlight fix. Remove before commit
-
 =head2 $self->get_action( $action, $namespace )
 
 returns a named action from a given namespace.
