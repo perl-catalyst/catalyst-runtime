@@ -1606,25 +1606,6 @@ sub _stats_finish_execute {
     $c->stats->profile( end => $info );
 }
 
-=head2 $c->_localize_fields( sub { }, \%keys );
-
-=cut
-
-#Why does this exist? This is no longer safe and WILL NOT WORK.
-# it doesnt seem to be used anywhere. can we remove it?
-sub _localize_fields {
-    my ( $c, $localized, $code ) = ( @_ );
-
-    my $request = delete $localized->{request} || {};
-    my $response = delete $localized->{response} || {};
-
-    local @{ $c }{ keys %$localized } = values %$localized;
-    local @{ $c->request }{ keys %$request } = values %$request;
-    local @{ $c->response }{ keys %$response } = values %$response;
-
-    $code->();
-}
-
 =head2 $c->finalize
 
 Finalizes the request.
