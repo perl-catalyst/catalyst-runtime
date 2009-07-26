@@ -335,9 +335,11 @@ call to forward.
     $c->forward(qw/MyApp::Model::DBIC::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
 
-Note that forward implies an C<<eval { }>> around the call (actually
-C<execute> does), thus de-fatalizing all 'dies' within the called
-action. If you want C<die> to propagate you need to do something like:
+Note that L<< forward|/"$c->forward( $action [, \@arguments ] )" >> implies
+an C<< eval { } >> around the call (actually
+L<< execute|/"$c->execute( $class, $coderef )" >> does), thus de-fatalizing
+all 'dies' within the called action. If you want C<die> to propagate you
+need to do something like:
 
     $c->forward('foo');
     die $c->error if $c->error;
@@ -357,8 +359,8 @@ sub forward { my $c = shift; no warnings 'recursion'; $c->dispatcher->forward( $
 
 =head2 $c->detach()
 
-The same as C<forward>, but doesn't return to the previous action when
-processing is finished.
+The same as L<< forward|/"$c->forward( $action [, \@arguments ] )" >>, but
+doesn't return to the previous action when processing is finished.
 
 When called with no arguments it escapes the processing chain entirely.
 
@@ -370,23 +372,27 @@ sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
 =head2 $c->visit( $class, $method, [, \@captures, \@arguments ] )
 
-Almost the same as C<forward>, but does a full dispatch, instead of just
-calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
-C<auto> and the method you go to are called, just like a new request.
+Almost the same as L<< forward|/"$c->forward( $action [, \@arguments ] )" >>,
+but does a full dispatch, instead of just calling the new C<$action> /
+C<< $class->$method >>. This means that C<begin>, C<auto> and the method
+you go to are called, just like a new request.
 
 In addition both C<< $c->action >> and C<< $c->namespace >> are localized.
-This means, for example, that $c->action methods such as C<name>, C<class> and
-C<reverse> return information for the visited action when they are invoked
-within the visited action.  This is different from the behavior of C<forward>
-which continues to use the $c->action object from the caller action even when
+This means, for example, that C<< $c->action >> methods such as
+L<name|Catalyst::Action/name>, L<class|Catalyst::Action/class> and
+L<reverse|Catalyst::Action/reverse> return information for the visited action
+when they are invoked within the visited action.  This is different from the
+behavior of L<< forward|/"$c->forward( $action [, \@arguments ] )" >>, which
+continues to use the $c->action object from the caller action even when
 invoked from the callee.
 
-C<$c-E<gt>stash> is kept unchanged.
+C<< $c->stash >> is kept unchanged.
 
-In effect, C<visit> allows you to "wrap" another action, just as it
-would have been called by dispatching from a URL, while the analogous
-C<go> allows you to transfer control to another action as if it had
-been reached directly from a URL.
+In effect, L<< visit|/"$c->visit( $action [, \@captures, \@arguments ] )" >>
+allows you to "wrap" another action, just as it would have been called by
+dispatching from a URL, while the analogous
+L<< go|/"$c->go( $action [, \@captures, \@arguments ] )" >> allows you to
+transfer control to another action as if it had been reached directly from a URL.
 
 =cut
 
@@ -396,12 +402,12 @@ sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
 =head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
-Almost the same as C<detach>, but does a full dispatch like C<visit>,
+Almost the same as L<< detach|/"$c->detach( $action [, \@arguments ] )" >>, but does a full dispatch like L</visit>,
 instead of just calling the new C<$action> /
-C<$class-E<gt>$method>. This means that C<begin>, C<auto> and the
+C<< $class->$method >>. This means that C<begin>, C<auto> and the
 method you visit are called, just like a new request.
 
-C<$c-E<gt>stash> is kept unchanged.
+C<< $c->stash >> is kept unchanged.
 
 =cut
 
@@ -818,8 +824,8 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config( { db => 'dsn:SQLite:foo.db' } );
 
-You can also use a C<YAML>, C<XML> or C<Config::General> config file
-like myapp.conf in your applications home directory. See
+You can also use a C<YAML>, C<XML> or L<Config::General> config file
+like C<myapp.conf> in your applications home directory. See
 L<Catalyst::Plugin::ConfigLoader>.
 
 =head3 Cascading configuration
@@ -918,7 +924,7 @@ Returns the engine instance. See L<Catalyst::Engine>.
 Merges C<@path> with C<< $c->config->{home} >> and returns a
 L<Path::Class::Dir> object. Note you can usually use this object as
 a filename, but sometimes you will have to explicitly stringify it
-yourself by calling the C<<->stringify>> method.
+yourself by calling the C<< ->stringify >> method.
 
 For example:
 
@@ -1166,11 +1172,11 @@ sub setup_finalize {
 
 =item $action
 
-A Catalyst::Action object representing the Catalyst action you want to
+A L<Catalyst::Action> object representing the Catalyst action you want to
 create a URI for. To get one for an action in the current controller,
-use C<< $c->action('someactionname') >>. To get one from different
+use C<< $c->action('someactionname') >>. To get one from a different
 controller, fetch the controller using C<< $c->controller() >>, then
-call C<action_for> on it.
+call C<action_for|Catalyst::Controller/"$self->action_for('name')"> on it.
 
 You can maintain the arguments captured by an action (e.g.: Regex, Chained)
 using C<< $c->req->captures >>.
@@ -2115,7 +2121,7 @@ reference. Items in the array beginning with C<::> will have the
 application class name prepended to them.
 
 All components found will also have any
-L<Devel::InnerPackage|inner packages> loaded and set up as components.
+L<inner packages|Devel::InnerPackage> loaded and set up as components.
 Note, that modules which are B<not> an I<inner package> of the main
 file namespace loaded will not be instantiated as components.
 
