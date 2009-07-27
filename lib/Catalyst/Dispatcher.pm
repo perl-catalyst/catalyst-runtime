@@ -391,6 +391,8 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
+# ' Emacs highlight fix. Remove before commit
+
 =head2 $self->get_action( $action, $namespace )
 
 returns a named action from a given namespace.
@@ -428,14 +430,15 @@ a default for the method name if one is not supplied
 
 sub get_action_by_controller {
     # Return an action object if parameters are a controller class and method
-    my ($self, $c, $cname, $cdr) = @_; my ($action, $controller); $cdr ||= [];
+    my ($self, $c, $cname, $cdr) = @_; my ($action, $controller);
 
     return unless ($cname and $controller = $c->controller( $cname ));
 
-    my $sep  = q(/);
-    my $path = $controller->action_namespace.$sep.($cdr->[0] || q());
+    my $sep = q(/); my $path = $controller->action_namespace;
 
     $path = q(root) if ($path eq $sep);
+
+    $cdr ||= []; $path .= $sep.($cdr->[0] || q());
 
     return unless ($action = $self->get_action_by_private_path( $c, $path ));
 
@@ -458,19 +461,26 @@ sub get_action_by_private_path {
     # Return an action object. Provide defaults for a call to get_action
     my ($self, $c, $path) = @_; my $sep = q(/);
 
+    my $default_action = $c->config->{dispatcher_default_action} || q(default);
+
     # Normalise the path. It must contain a sep char
-    $path ||= $sep;
-    $path  .= $sep if (0 > index $path, $sep);
+    $path  = $sep.$default_action unless (defined $path);
+    $path .= $sep.$default_action if     (0 > index $path, $sep);
 
     # Extract the action attributes
-    my ($namespace, $name) = split m{ $sep }mx, $path;
+    my (@parts)   = split m{ $sep }mx, $path;
+    my $name      = pop @parts;
+    my $namespace = join $sep, @parts;
 
-    # Default the namespace and expand the root symbol
-    $namespace ||= ($c->action && $c->action->namespace) || $sep;
-    $namespace   = $sep if ($namespace eq q(root));
+    # Default the namespace
+    $namespace ||= ($c->action && $c->action->namespace) || q(root)
+       unless (length $namespace);
+
+    # Expand the root symbol
+    $namespace = $sep if ($namespace eq q(root));
 
     # Default the method name if one was not provided
-    $name ||= $c->config->{dispatcher_default_action} || q(default);
+    $name ||= $default_action;
 
     # Return the action for this namespace/name pair
     return $self->get_action( $name, $namespace );
