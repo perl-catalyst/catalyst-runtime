@@ -1164,30 +1164,42 @@ sub setup_finalize {
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
-
 =head2 $c->uri_for( $path, @args?, \%query_values? )
 
-=over
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
 
-=item $action
+Constructs an absolute L<URI> object based on the application root, the
+provided path, and the additional arguments and query parameters provided.
+When used as a string, provides a textual URI.
 
-A L<Catalyst::Action> object representing the Catalyst action you want to
-create a URI for. To get one for an action in the current controller,
-use C<< $c->action('someactionname') >>. To get one from a different
-controller, fetch the controller using C<< $c->controller() >>, then
-call C<action_for|Catalyst::Controller/"$self->action_for('name')"> on it.
+If the first argument is a string, it is taken as a public URI path relative
+to C<< $c->namespace >> (if it doesn't begin with a forward slash) or
+relative to the application root (if it does). It is then merged with 
+C<< $c->request->base >>; any C<@args> are appended as additional path
+components; and any C<%query_values> are appended as C<?foo=bar> parameters.
 
-You can maintain the arguments captured by an action (e.g.: Regex, Chained)
-using C<< $c->req->captures >>.
+If the first argument is a L<Catalyst::Action> it represents an action which
+will have its path resolved using C<< $c->dispatcher->uri_for_action >>. The
+optional C<\@captures> argument (an arrayref) allows passing the captured
+variables that are needed to fill in the paths of Chained and Regex actions;
+once the path is resolved, C<uri_for> continues as though a path was
+provided, appending any arguments or parameters and creating an absolute
+URI.
 
-  # For the current action
-  $c->uri_for($c->action, $c->req->captures);
+The captures for the current request can be found in 
+C<< $c->request->captures >>, and actions can be resolved using
+C<< Catalyst::Controller->action_for($name) >>. If you have a private action
+path, use C<< $c->uri_for_action >> instead.
+
+  # Equivalent to $c->req->uri
+  $c->uri_for($c->action, $c->req->captures, 
+      @{ $c->req->args }, $c->req->params);
 
   # For the Foo action in the Bar controller
-  $c->uri_for($c->controller('Bar')->action_for('Foo'), $c->req->captures);
+  $c->uri_for($c->controller('Bar')->action_for('Foo'));
 
-=back
+  # Path to a static resource
+  $c->uri_for('/static/images/logo.png');
 
 =cut
 
