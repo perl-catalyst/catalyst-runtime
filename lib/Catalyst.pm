@@ -2756,6 +2756,8 @@ Johan Lindstrom
 
 jon: Jon Schutz <jjschutz@cpan.org>
 
+konobi: Scott McWhirter <konobi@cpan.org>
+
 marcus: Marcus Ramberg <mramberg@cpan.org>
 
 miyagawa: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
