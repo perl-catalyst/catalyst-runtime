@@ -6,6 +6,9 @@
        - Depend on Module::Pluggable 3.9 to prevent a bug wherein components
          in inner packages might not be registered. This especially affected
          tests.
+       - Catalyst::Engine::FastCGI - relax the check for versions of Microsoft
+         IIS. Provides compatibility with Windows 2008 R2 as well as 
+         (hopefully) future versions.
 
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the
