@@ -3,8 +3,6 @@
   Bug fixes:
        - Fix replace_constructor warning to actually work if you make your
          application class immutable without that option.
-       - Fix POD to refer to ->config(key => $val), rather than
-         ->config->{key} = $val, as the latter form is deprecated.
        - Depend on Module::Pluggable 3.9 to prevent a bug wherein components
          in inner packages might not be registered. This especially affected
          tests.
@@ -16,6 +14,11 @@
 
   New features:
        - private_path method for Catalyst::Action + docs + tests (groditi)
+
+  Documentation:
+       - Fix POD to refer to ->config(key => $val), rather than
+         ->config->{key} = $val, as the latter form is deprecated.
+       - Clearer docs for the 'uri_for' method.
 
 5.80007 2009-06-30 23:54:34
 

@@ -2740,6 +2740,8 @@ Gary Ashton Jones
 
 Geoff Richards
 
+hobbs: Andrew Rodland <andrew@cleverdomain.org>
+
 ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
