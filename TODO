@@ -47,3 +47,10 @@ Proposed functionality / feature additions:
 22:22 <@mst> note that needs to happen in core
 22:22 <@mst> then actions can use that instead of $self->class
 22:22 <@mst> and shit will work
+
+   The horrible hack for plugin setup - replacing it:
+
+15:30 <@mst> t0m: have a look at the Devel::REPL BEFORE_PLUGIN stuff
+15:30 <@mst> I wonder if what we need is that combined with plugins-as-roles
+
+
