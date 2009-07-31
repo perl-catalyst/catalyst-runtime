@@ -60,7 +60,14 @@ component loader with config() support and a process() method placeholder.
 __PACKAGE__->mk_classdata('_plugins');
 __PACKAGE__->mk_classdata('_config');
 
-has _component_name => ( is => 'ro' );
+has _component_name => ( is => 'ro' ); # Cannot be required => 1 as context
+                                       # class @ISA component - HATE
+# Make accessor callable as a class method, as we need to call setup_actions
+# on the application class, which we don't have an instance of, ewwwww
+around _component_name => sub {
+    my ($orig, $self) = (shift, shift);
+    blessed($self) ? $self->$orig(@_) : $self;
+};
 
 sub BUILDARGS {
     my $class = shift;
@@ -171,15 +178,6 @@ something like this:
       $args = $self->merge_config_hashes($self->config, $args);
       return $class->new($app, $args);
   }
-
-=head2 _component_name
-
-The name of the component within an application. This is used to
-pass the component's name to actions generated (becoming
-C<< $action->class >>). This is needed so that the L</COMPONENT> method can
-return an instance of a different class (e.g. a L<Class::MOP> anonymous class),
-(as finding the component name by C<< ref($self) >> will not work correctly in
-such cases).
 
 =head2 $c->config
 
