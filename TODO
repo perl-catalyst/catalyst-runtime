@@ -1,56 +1,63 @@
-Known Bugs:
+# Known Bugs:
 
    - Bug ->go or ->visit causes actions which have Args or CaptureArgs called
      twice when called via ->go or ->visit.
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
 
-Compatibility warnings to add:
+   - Bricas' Exception blog post
 
-   - $self->config should warn as config should only ever be called as a
-     class method.
+     http://bricas.vox.com/library/post/catalyst-exceptionclass.html
 
-Proposed functionality / feature additions:
+     Broken by recent exception refactoring
 
-    - Log setup needs to be less lame, so Catalyst::Plugin::Log::* can die
-      in a fire. Having $c->log_class would be a good start. kane volunteered
-      to do some of this.
+# Compatibility warnings to add:
 
-      Simple example: Catalyst::Plugin::Log::Colorful should just be a
-      subclass of Catalyst::Log, no ::Plugin:: needed.
+  - $self->config should warn as config should only ever be called as a
+    class method.
 
-      See also: Catalyst::Plugin::Log::Dispatch and
-      http://github.com/willert/catalyst-plugin-log4perl-simple/tree
+# Proposed functionality / feature additions:
 
-  Fixes to component interfaces to deal with anon classes:
+## Log setup needs to be less lame
 
-22:16 <@mst> t0m: explain what breaks
-22:16 <@mst> I'm not 100% sure we have the same problem in mind
-22:17 <@t0m> well, various shit in Catalyst utils to resolve app from MyApp::Controller::Foo breaks
-22:17 <@mst> Caelum: http://scsys.co.uk:8001/31240
-22:17 <@mst> t0m: the trick would be to not need to do that
-22:17 <@mst> t0m: $self->_application should be fine
-22:18 <@t0m> $action->class can't be fed back into $c->component() 
-22:18 <@t0m> which breaks ::REST
-22:18 <@mst> right
-22:18 <@mst> we need to
-22:19 <@mst> (a) add an ->_component_name or similar method to controllers
-22:19 <@mst> (b) pass action objects either that or the controller
-22:20 <@t0m> do you have a controller calling $action->dispatch? Course you must, the action lives in a controller..
-22:21 <@mst> and that doesn't matter anyway
-22:21 <@mst> dispatch has $c
-22:21 <@mst> it needs to do
-22:21 <@mst> $c->component($self->_component_name)
-22:21 <@mst> and that _component_name needs to come from the controller at register_actions time
-22:22 <@t0m> confound: Oi, please to be releasing my Action::REST fixes, I'm about to do more..
-22:22 <@t0m> mst: right, gotcha
-22:22 <@mst> note that needs to happen in core
-22:22 <@mst> then actions can use that instead of $self->class
-22:22 <@mst> and shit will work
+So Catalyst::Plugin::Log::* can die
+in a fire. Having $c->log_class would be a good start. kane volunteered
+to do some of this.
 
-   The horrible hack for plugin setup - replacing it:
+Simple example: Catalyst::Plugin::Log::Colorful should just be a
+subclass of Catalyst::Log, no ::Plugin:: needed.
 
-15:30 <@mst> t0m: have a look at the Devel::REPL BEFORE_PLUGIN stuff
-15:30 <@mst> I wonder if what we need is that combined with plugins-as-roles
+See also: Catalyst::Plugin::Log::Dispatch and
+http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
+# REFACTORING
+
+##  The horrible hack for plugin setup - replacing it:
+
+ * Have a look at the Devel::REPL BEFORE_PLUGIN stuff
+   I wonder if what we need is that combined with plugins-as-roles
+
+## App / ctx split:
+
+  NOTE - these are notes that t0m thought up after doing back compat for
+         _component_class, may be inaccurate, wrong or missing things
+         bug mst (at least) to correct before trying more than the first 2
+         steps. Please knock yourself out on the first two however :)
+
+  - Eliminate actions in MyApp from the main test suite
+  - Uncomment warning in C::C::register_action_methods, add tests it works
+    by mocking out the logging..
+  - Remove MyApp @ISA controller (ask metaclass if it has attributes, and if
+                                  so you need back compat :/)
+  - Make Catalyst::Context, move the per request stuff in there, handles from
+    main app class to delegate
+  - Make an instance of the app class which is a global variable
+  - Make new instance of the context class, not the app class per-request
+  - Remove the components as class data, move to instance data on the app
+    class (you probably have to do this for _all_ the class data, good luck!)
+  - Make it possible for users to spin up different instances of the app class
+    (with different config etc each)
+  - Profit! (Things like changing the complete app config per vhost, i.e.
+    writing a config loader / app class role which dispatches per vhost to
+    differently configured apps is piss easy)
 
