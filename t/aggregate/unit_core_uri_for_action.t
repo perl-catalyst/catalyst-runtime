@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 29;
+plan tests => 30;
 
 use_ok('TestApp');
 
@@ -96,6 +96,10 @@ my $context = TestApp->new( {
                 request => $request,
                 namespace => 'yada',
               } );
+
+is($context->uri_for($context->controller('Action')),
+   "http://127.0.0.1/foo/yada/action/",
+   "uri_for a controller");
 
 is($context->uri_for($path_action),
    "http://127.0.0.1/foo/action/relative/relative",

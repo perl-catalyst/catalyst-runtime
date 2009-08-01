@@ -1206,6 +1206,12 @@ path, use C<< $c->uri_for_action >> instead.
 sub uri_for {
     my ( $c, $path, @args ) = @_;
 
+    if (blessed($path) && $path->isa('Catalyst::Controller')) {
+        $path = $path->path_prefix;
+        $path =~ s{/+\z}{};
+        $path .= '/';
+    }
+
     if ( blessed($path) ) { # action object
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? shift(@args)
