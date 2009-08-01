@@ -2215,7 +2215,10 @@ sub setup_component {
 
     my $suffix = Catalyst::Utils::class2classsuffix( $component );
     my $config = $class->config->{ $suffix } || {};
-
+    $config->{_component_name} = $component; # Put this in args here, rather
+                                             # than in COMPONENT as there
+                                             # are lots of custom COMPONENT
+                                             # methods..
     my $instance = eval { $component->COMPONENT( $class, $config ); };
 
     if ( my $error = $@ ) {

@@ -60,6 +60,8 @@ component loader with config() support and a process() method placeholder.
 __PACKAGE__->mk_classdata('_plugins');
 __PACKAGE__->mk_classdata('_config');
 
+has _component_name => ( is => 'ro' );
+
 sub BUILDARGS {
     my $class = shift;
     my $args = {};
@@ -85,19 +87,18 @@ sub BUILDARGS {
 }
 
 sub COMPONENT {
-    my ( $self, $c ) = @_;
+    my ( $class, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-    if( my $next = $self->next::can ){
-      my $class = blessed $self || $self;
+    if ( my $next = $class->next::can ) {
       my ($next_package) = Class::MOP::get_code_info($next);
       warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}.\n";
       warn "This behavior can no longer be supported, and so your application is probably broken.\n";
       warn "Your linearized isa hierarchy is: " . join(', ', @{ mro::get_linear_isa($class) }) . "\n";
       warn "Please see perldoc Catalyst::Upgrading for more information about this issue.\n";
     }
-    return $self->new($c, $arguments);
+    return $class->new($c, $arguments);
 }
 
 sub config {
@@ -170,6 +171,15 @@ something like this:
       $args = $self->merge_config_hashes($self->config, $args);
       return $class->new($app, $args);
   }
+
+=head2 _component_name
+
+The name of the component within an application. This is used to
+pass the component's name to actions generated (becoming
+C<< $action->class >>). This is needed so that the L</COMPONENT> method can
+return an instance of a different class (e.g. a L<Class::MOP> anonymous class),
+(as finding the component name by C<< ref($self) >> will not work correctly in
+such cases).
 
 =head2 $c->config
 
