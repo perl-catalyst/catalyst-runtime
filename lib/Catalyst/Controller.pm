@@ -156,7 +156,7 @@ around action_namespace => sub {
         }
     }
 
-    my $namespace = Catalyst::Utils::class2prefix(ref($self) ? $self->_component_name : $self, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix($self->_component_name, $case_s) || '';
     $self->$orig($namespace) if ref($self);
     return $namespace;
 };
@@ -207,9 +207,14 @@ sub register_actions {
 
 sub register_action_methods {
     my ( $self, $c, @methods ) = @_;
-    my $class = blessed($self) ? $self->_component_name : $self;
+    my $class = $self->_component_name;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
+
+    # Uncomment as soon as you fix the tests :)
+    #if (!blessed($self) && $self eq $c && scalar(@methods)) {
+    #    $c->log->warn("Action methods found defined in your application class, $self. This is deprecated, please move them into a Root controller.");
+    #}
 
     foreach my $method (@methods) {
         my $name = $method->name;
