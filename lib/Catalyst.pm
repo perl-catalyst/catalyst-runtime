@@ -1186,13 +1186,14 @@ using C<< $c->req->captures >>.
 =cut
 
 sub uri_for {
-    my ( $c, $path, @args ) = @_; my $action;
+    my ( $c, $path, @args ) = @_;
 
-    if ( $action = $c->_get_action_and_flatten_args( $path, \@args ) ) {
-        # Have an action object
+    if ( blessed($path) ) { # action object
+        $c->dispatcher->splice_captures_from( $c, $path, \@args );
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? shift(@args)
                          : [] );
+        my $action = $path;
         $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
             $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
@@ -1250,43 +1251,6 @@ sub uri_for {
 
     my $res = bless(\"${base}${args}${query}", $class);
     $res;
-}
-
-=head2 $c->_get_action_and_flatten_args( $c, $action, \@args )
-
-=head2 $c->_get_action_and_flatten_args( $c, $controller_name, \@args )
-
-=head2 $c->_get_action_and_flatten_args( $c, $private_action_path, \@args )
-
-Get an action object from the first one or two supplied args. Splice
-the capture args from the supplied args if required
-
-=cut
-
-sub _get_action_and_flatten_args {
-    my ($c, $car, $cdr) = @_; my $action;
-
-    return $action if ($action = $car and blessed( $car ));
-
-    return unless ($c->config->{contextual_uri_for});
-
-    $action = $c->dispatcher->get_action_by_controller( $c, $car, $cdr );
-
-    unless ($action) {
-        $action = $c->dispatcher->get_action_by_private_path( $c, $car );
-    }
-
-    return unless ($action);
-
-    my $attrs = $action->attributes || {};
-
-    return $action unless ($attrs->{Chained});
-
-    my $captures = $c->dispatcher->splice_captures_from( $c, $action, $cdr );
-
-    unshift @{ $cdr }, $captures if ($captures);
-
-    return $action;
 }
 
 =head2 $c->uri_for_action( $path, \@captures?, @args?, \%query_values? )

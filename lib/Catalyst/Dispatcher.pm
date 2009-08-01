@@ -391,8 +391,6 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-# ' Emacs highlight fix. Remove before commit
-
 =head2 $self->get_action( $action, $namespace )
 
 returns a named action from a given namespace.
@@ -419,111 +417,6 @@ sub get_action_by_path {
     $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
     $self->_action_hash->{$path};
-}
-
-=head2 $self->get_action_by_controller( qw(Controller::Class method_name) );
-
-Returns the action associated with the given controller and method. Provides
-a default for the method name if one is not supplied
-
-=cut
-
-sub get_action_by_controller {
-    # Return an action object if parameters are a controller class and method
-    my ($self, $c, $cname, $cdr) = @_; my ($action, $controller);
-
-    return unless ($cname and $controller = $c->controller( $cname ));
-
-    my $sep = q(/); my $path = $controller->action_namespace;
-
-    $path = q(root) if ($path eq $sep);
-
-    $cdr ||= []; $path .= $sep.($cdr->[0] || q());
-
-    return unless ($action = $self->get_action_by_private_path( $c, $path ));
-
-    shift @{ $cdr }; # Loose the controller method name
-
-    return $action;
-}
-
-=head2 $self->get_action_by_private_path( q(namespace/method_name) );
-
-Returns the action associated with the private action path. Provides
-defaults for namespace and method name. The namespace defaults to that
-of the current action, a namespace of I<root> is mapped to I</>.  The
-method name defaults to C<< $c->config->{dispatcher_default_action} >>
-if set, 'default' otherwise
-
-=cut
-
-sub get_action_by_private_path {
-    # Return an action object. Provide defaults for a call to get_action
-    my ($self, $c, $path) = @_; my $sep = q(/);
-
-    my $default_action = $c->config->{dispatcher_default_action} || q(default);
-
-    # Normalise the path. It must contain a sep char
-    $path  = $sep.$default_action unless (defined $path);
-    $path .= $sep.$default_action if     (0 > index $path, $sep);
-
-    # Extract the action attributes
-    my (@parts)   = split m{ $sep }mx, $path;
-    my $name      = pop @parts;
-    my $namespace = join $sep, @parts;
-
-    # Default the namespace
-    $namespace ||= ($c->action && $c->action->namespace) || q(root)
-       unless (length $namespace);
-
-    # Expand the root symbol
-    $namespace = $sep if ($namespace eq q(root));
-
-    # Default the method name if one was not provided
-    $name ||= $default_action;
-
-    # Return the action for this namespace/name pair
-    return $self->get_action( $name, $namespace );
-}
-
-=head2 $self->splice_captures_from( $c, $action, $args )
-
-Gets the action chain for the supplied action. Calculates the number
-of capture args and returns and array ref spliced off the front of the
-supplied args
-
-=cut
-
-sub splice_captures_from {
-    my ($self, $c, $action, $cdr) = @_; my $attrs = $action->attributes || {};
-
-    if ($attrs->{CaptureArgs}) {
-        $c->log->debug( 'Action '.$action->reverse.' is a midpoint' )
-            if ($c->debug);
-
-        return;
-    }
-
-    my @captures = ();
-    my @chain    = @{ $self->expand_action( $action )->chain }; pop @chain;
-    my $params   = $cdr && $cdr->[0] && ref $cdr->[-1] eq q(HASH)
-                 ? pop @{ $cdr } : undef;
-
-    # Now start from the root of the chain, populate captures
-    for my $num_caps (map { $_->attributes->{CaptureArgs}->[0] } @chain) {
-        if ($num_caps > scalar @{ $cdr }) {
-            $c->log->debug( 'Action '.$action->reverse.' insufficient args' )
-                if ($c->debug);
-
-            return;
-        }
-
-        push @captures, splice @{ $cdr }, 0, $num_caps;
-    }
-
-    push @{ $cdr }, $params if ($params); # Restore query parameters
-
-    return \@captures;
 }
 
 =head2 $self->get_actions( $c, $action, $namespace )
@@ -602,6 +495,31 @@ sub expand_action {
     }
 
     return $action;
+}
+
+=head2 $self->splice_captures_from( $c, $action, $args )
+
+Does nothing if the first element of the list that C<$args> references
+is an array ref. Otherwise calls this method in each dispatch type,
+stopping when the first one returns true
+
+=cut
+
+sub splice_captures_from {
+    my ($self, $c, $action, $args) = @_;
+
+    return if (!$args || (scalar @{ $args } && ref $args->[0] eq 'ARRAY'));
+
+    my $params = scalar @{ $args } && ref $args->[-1] eq 'HASH'
+               ? pop @{ $args } : undef;
+
+    foreach my $dispatch_type ( @{ $self->_dispatch_types } ) {
+        last if ($dispatch_type->splice_captures_from( $c, $action, $args ));
+    }
+
+    push @{ $args }, $params if ($params); # Restore query parameters
+
+    return;
 }
 
 =head2 $self->register( $c, $action )
