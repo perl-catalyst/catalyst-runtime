@@ -1,12 +1,13 @@
 package Catalyst::Script::Create;
 use Moose;
-use Getopt::Long;
 use Pod::Usage;
 use Catalyst::Helper;
 use MooseX::Types::Moose qw/Str Bool/;
 use namespace::autoclean;
 
 with "MooseX::Getopt";
+#extends qw(MooseX::App::Cmd);
+
 
 has _app => (
     reader   => 'app',

@@ -1,5 +1,7 @@
 package Catalyst::ScriptRunner;
 use Moose;
+extends qw(MooseX::App::Cmd::Command);
+
 
 sub run {
     my ($self, $class, $scriptclass) = @_;

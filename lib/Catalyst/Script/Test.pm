@@ -7,6 +7,8 @@ with 'MooseX::Getopt';
 use MooseX::Types::Moose qw/Str Bool/;
 use namespace::autoclean;
 
+#extends qw(MooseX::App::Cmd);
+
 has _app => (
     reader   => 'app',
     init_arg => 'app',

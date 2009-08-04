@@ -15,6 +15,7 @@ use MooseX::Types::Moose qw/Str Bool Int/;
 use namespace::autoclean;
 
 with 'MooseX::Getopt';
+#extends qw(MooseX::App::Cmd);
 
 has debug => (
     traits => [qw(Getopt)],

@@ -9,6 +9,9 @@ use Config::General;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+#extends qw(MooseX::App::Cmd);
+
+
 has _app => (
     reader   => 'app',
     init_arg => 'app',

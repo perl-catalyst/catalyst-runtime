@@ -9,5 +9,5 @@ BEGIN {
 
 ## because this is a test
 use lib "$Bin/../../../lib";
-use Catalyst::ScriptRunner;
-Catalyst::ScriptRunner->run('TestApp','Server');
+use Catalyst::ScriptRunner -run 'TestApp' 'Server';
+
