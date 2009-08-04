@@ -1,6 +1,6 @@
 package Catalyst::ScriptRunner;
 use Moose;
-extends qw(MooseX::App::Cmd::Command);
+#extends qw(MooseX::App::Cmd::Command);
 
 
 sub run {
