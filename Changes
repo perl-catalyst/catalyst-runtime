@@ -14,6 +14,10 @@
        - Deleted the Restarter engine and its Watcher code. Use the
          new Catalyst::Restarter in a recent Catalyst::Devel instead.
        - New unit test for Catalyst::Action 'unit_core_action.t' (groditi)
+       - Bump minimum supported perl version from 5.8.1 to 5.8.6 as there are
+         known issues with 5.8.3, and nobody is prepared to fix / support perl
+         older than 5.8.6 any more. Patches to regain compatibility to older
+         perls would be welcome.
 
   New features:
        - private_path method for Catalyst::Action + docs + tests (groditi)

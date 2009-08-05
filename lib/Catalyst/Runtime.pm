@@ -3,7 +3,7 @@ package Catalyst::Runtime;
 use strict;
 use warnings;
 
-BEGIN { require 5.008001; }
+BEGIN { require 5.008006; }
 
 # Remember to update this in Catalyst as well!
 
