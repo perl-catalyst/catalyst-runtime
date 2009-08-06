@@ -41,16 +41,6 @@ sub count_leaks {
 
 TestApp->setup;
 
-sub index : Private {
-    my ( $self, $c ) = @_;
-    $c->res->body('root index');
-}
-
-sub global_action : Private {
-    my ( $self, $c ) = @_;
-    $c->forward('TestApp::View::Dump::Request');
-}
-
 sub execute {
     my $c      = shift;
     my $class  = ref( $c->component( $_[0] ) ) || $_[0];
@@ -90,24 +80,6 @@ sub finalize_error {
     
     $c->res->status(500);
     $c->res->body( 'FATAL ERROR: ' . join( ', ', @{ $c->error } ) );
-}
-
-sub class_forward_test_method :Private {
-    my ( $self, $c ) = @_;
-    $c->response->headers->header( 'X-Class-Forward-Test-Method' => 1 );
-}
-
-sub loop_test : Local {
-    my ( $self, $c ) = @_;
-
-    for( 1..1001 ) {
-        $c->forward( 'class_forward_test_method' );
-    }
-}
-
-sub recursion_test : Local {
-    my ( $self, $c ) = @_;
-    $c->forward( 'recursion_test' );
 }
 
 {
