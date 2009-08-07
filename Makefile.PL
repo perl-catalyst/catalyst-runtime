@@ -1,5 +1,12 @@
+use strict;
+use warnings;
 use inc::Module::Install 0.87;
-
+BEGIN { # Make it easy for newbies
+    if ($Module::Install::AUTHOR) {
+        require Module::Install::AuthorRequires;
+        require Module::Install::CheckConflicts;
+    }
+}
 perl_version '5.008006';
 
 name 'Catalyst-Runtime';
