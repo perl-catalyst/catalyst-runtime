@@ -235,7 +235,8 @@ sub recurse_match {
                 }
 
                 # Default args is blank, not 0, since Args()
-                my $args_attr = $action->attributes->{Args}->[0] || '';
+                my $args_attr = $action->attributes->{Args}->[0];
+                $args_attr = '' unless defined $args_attr;
 
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
