@@ -233,7 +233,9 @@ sub recurse_match {
                     local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
                     next TRY_ACTION unless $action->match($c);
                 }
-                my $args_attr = $action->attributes->{Args}->[0];
+
+                # Default args is blank, not 0, since Args()
+                my $args_attr = $action->attributes->{Args}->[0] || '';
 
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
