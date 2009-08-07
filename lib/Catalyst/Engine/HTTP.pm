@@ -368,6 +368,9 @@ sub _handler {
     while (1) {
         my ( $path, $query_string ) = split /\?/, $uri, 2;
 
+        # URI is not the same as path. Remove scheme, domain name and port from it
+        $path =~ s{^https?://[^/?#]+}{};
+
         # Initialize CGI environment
         local %ENV = (
             PATH_INFO       => $path         || '',
