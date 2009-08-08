@@ -18,6 +18,8 @@
          known issues with 5.8.3, and nobody is prepared to fix / support perl
          older than 5.8.6 any more. Patches to regain compatibility to older
          perls would be welcome.
+       - Debug output uses dynamic column sizing to create more readable output
+         when using a larger $ENV{COLUMNS} setting. (groditi)
 
   New features:
        - private_path method for Catalyst::Action + docs + tests (groditi)
