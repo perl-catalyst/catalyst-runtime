@@ -7,13 +7,18 @@
          in inner packages might not be registered. This especially affected
          tests.
        - Catalyst::Engine::FastCGI - relax the check for versions of Microsoft
-         IIS. Provides compatibility with Windows 2008 R2 as well as 
+         IIS. Provides compatibility with Windows 2008 R2 as well as
          (hopefully) future versions.
+       - In tests which depend on the values of environment variables, create
+         a mock application which is then thrown away before blanking the
+         environment. This ensures that anything dynamically loaded
+         (e.g. HTML/Parser/Parser.dll) is loaded before the environment is
+         trashed. RT#48555
 
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the
          new Catalyst::Restarter in a recent Catalyst::Devel instead.
-       - New unit test for Catalyst::Action 'unit_core_action.t' (groditi)
+       - New unit test for Catalyst::Action 'unit_core_action.t'
        - Bump minimum supported perl version from 5.8.1 to 5.8.6 as there are
          known issues with 5.8.3, and nobody is prepared to fix / support perl
          older than 5.8.6 any more. Patches to regain compatibility to older
@@ -22,7 +27,9 @@
          when using a larger $ENV{COLUMNS} setting. (groditi)
 
   New features:
-       - private_path method for Catalyst::Action + docs + tests (groditi)
+       - private_path method for Catalyst::Action
+       - allow uri_for($controller_instance) which will produce a URI
+         for the controller namespace
 
   Documentation:
        - Fix POD to refer to ->config(key => $val), rather than
