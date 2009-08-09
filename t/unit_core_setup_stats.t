@@ -29,6 +29,10 @@ sub mock_app {
     return $meta->name;
 }
 
+mock_app('UnusedApp'); # Mock an app before localizing %ENV
+                       # to ensure that anything which is dynamically
+                       # loaded from the enviornment is loaded
+
 local %ENV; # Ensure blank or someone, somewhere will fail..
 
 {

@@ -26,6 +26,10 @@ sub build_test_app_with_setup {
     return $name;
 }
 
+build_test_app_with_setup('UnusedApp'); # Mock an app before localizing %ENV
+                                  # to ensure that anything which is dynamically
+                                  # loaded from the enviornment is loaded
+
 local %ENV; # Don't allow env variables to mess us up.
 
 {
