@@ -26,16 +26,17 @@ sub build_test_app_with_setup {
     return $name;
 }
 
-build_test_app_with_setup('UnusedApp'); # Mock an app before localizing %ENV
-                                  # to ensure that anything which is dynamically
-                                  # loaded from the enviornment is loaded
+local %ENV = %ENV;
 
-local %ENV; # Don't allow env variables to mess us up.
+# Remove all relevant env variables to avoid accidental fail
+foreach my $name (grep { /^(CATALYST|TESTAPP)/ } keys %ENV) {
+    delete $ENV{$name};
+}
 
 {
-    my $app = build_test_app_with_setup('MyTestDebug', '-Debug');
+    my $app = build_test_app_with_setup('TestAppMyTestDebug', '-Debug');
 
-    ok my $c = MyTestDebug->new, 'Get debug app object';
+    ok my $c = $app->new, 'Get debug app object';
     ok my $log = $c->log, 'Get log object';
     isa_ok $log, 'Catalyst::Log', 'It should be a Catalyst::Log object';
     ok $log->is_warn, 'Warnings should be enabled';
@@ -47,7 +48,7 @@ local %ENV; # Don't allow env variables to mess us up.
 }
 
 {
-    my $app = build_test_app_with_setup('MyTestLogParam', '-Log=warn,error,fatal');
+    my $app = build_test_app_with_setup('TestAppMyTestLogParam', '-Log=warn,error,fatal');
 
     ok my $c = $app->new, 'Get log app object';
     ok my $log = $c->log, 'Get log object';
@@ -60,7 +61,7 @@ local %ENV; # Don't allow env variables to mess us up.
     ok !$c->debug, 'Catalyst debugging is off';
 }
 {
-    my $app = build_test_app_with_setup('MyTestNoParams');
+    my $app = build_test_app_with_setup('TestAppMyTestNoParams');
 
     ok my $c = $app->new, 'Get log app object';
     ok my $log = $c->log, 'Get log object';
@@ -76,12 +77,12 @@ my $log_meta = Class::MOP::Class->create_anon_class(
     methods => { map { $_ => sub { 0 } } qw/debug error fatal info warn/ },
 );
 {
-    package MyTestAppWithOwnLogger;
+    package TestAppWithOwnLogger;
     use base qw/Catalyst/;
     __PACKAGE__->log($log_meta->new_object);
     __PACKAGE__->setup('-Debug');
 }
 
-ok my $c = MyTestAppWithOwnLogger->new, 'Get with own logger app object';
+ok my $c = TestAppWithOwnLogger->new, 'Get with own logger app object';
 ok $c->debug, '$c->debug is true';
 

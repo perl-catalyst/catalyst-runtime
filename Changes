@@ -9,11 +9,9 @@
        - Catalyst::Engine::FastCGI - relax the check for versions of Microsoft
          IIS. Provides compatibility with Windows 2008 R2 as well as
          (hopefully) future versions.
-       - In tests which depend on the values of environment variables, create
-         a mock application which is then thrown away before blanking the
-         environment. This ensures that anything dynamically loaded
-         (e.g. HTML/Parser/Parser.dll) is loaded before the environment is
-         trashed. RT#48555
+       - In tests which depend on the values of environment variables,
+         localise the environment, then delete only relevant environment
+         variables (RT#48555)
 
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the
