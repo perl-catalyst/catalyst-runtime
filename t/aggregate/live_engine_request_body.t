@@ -80,13 +80,13 @@ use HTTP::Request::Common;
 # 5.80 regression, see note in Catalyst::Plugin::Test::Plugin
 {
     my $request = GET(
-        'http://localhost/have_req_body_in_prepare_action',
+        'http://localhost/dump/response',
         'Content-Type' => 'text/plain',
         'Content'      => 'x' x 100_000
     );
 
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    like( $response->content, qr/^[1-9]/, 'Has body' );
+    ok( $response->header('X-Have-Request-Body'), 'X-Have-Request-Body set' );
 }
 
