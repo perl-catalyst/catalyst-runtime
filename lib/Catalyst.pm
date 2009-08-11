@@ -2132,34 +2132,27 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 
 =head2 $c->setup_components
 
-Sets up components. Specify a C<setup_components> config option to pass
-additional options directly to L<Module::Pluggable>. To add additional
-search paths, specify a key named C<search_extra> as an array
-reference. Items in the array beginning with C<::> will have the
-application class name prepended to them.
+This method is called internally to set up the application's components.
 
-All components found will also have any
-L<inner packages|Devel::InnerPackage> loaded and set up as components.
-Note, that modules which are B<not> an I<inner package> of the main
-file namespace loaded will not be instantiated as components.
+It finds modules by calling the L<locate_components> method, expands them to
+package names with the L<expand_component_module> method, and then installs
+each component into the application.
+
+The C<setup_components> config option is passed to both of the above methods.
+
+Installation of each component is performed by the L<setup_component> method,
+below.
 
 =cut
 
 sub setup_components {
     my $class = shift;
 
-    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
     my $config  = $class->config->{ setup_components };
-    my $extra   = delete $config->{ search_extra } || [];
 
-    push @paths, @$extra;
+    my @comps = sort { length $a <=> length $b }
+                $class->locate_components($config);
 
-    my $locator = Module::Pluggable::Object->new(
-        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
-        %$config
-    );
-
-    my @comps = sort { length $a <=> length $b } $locator->plugins;
     my %comps = map { $_ => 1 } @comps;
 
     my $deprecated_component_names = grep { /::[CMV]::/ } @comps;
@@ -2176,20 +2169,69 @@ sub setup_components {
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
         #Class::MOP::load_class($component);
 
-        my $module  = $class->setup_component( $component );
+        my @packages = $class->expand_component_module( $component, $config );
+
         my %modules = (
-            $component => $module,
             map {
                 $_ => $class->setup_component( $_ )
             } grep {
-              not exists $comps{$_}
-            } Devel::InnerPackage::list_packages( $component )
+              # we preloaded $component above, so we must allow it here again
+              # -- rjbs, 2009-08-11
+              ($_ eq $component) or (not exists $comps{$_})
+            } @packages
         );
 
         for my $key ( keys %modules ) {
             $class->components->{ $key } = $modules{ $key };
         }
     }
+}
+
+=head2 $c->locate_components( $setup_component_config )
+
+This method is meant to provide a list of component modules that should be
+setup for the application.  By default, it will use L<Module::Pluggable>.
+
+Specify a C<setup_components> config option to pass additional options directly
+to L<Module::Pluggable>. To add additional search paths, specify a key named
+C<search_extra> as an array reference. Items in the array beginning with C<::>
+will have the application class name prepended to them.
+
+=cut
+
+sub locate_components {
+    my $class  = shift;
+    my $config = shift;
+
+    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
+    my $extra   = delete $config->{ search_extra } || [];
+
+    push @paths, @$extra;
+
+    my $locator = Module::Pluggable::Object->new(
+        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
+        %$config
+    );
+
+    my @comps = $locator->plugins;
+
+    return @comps;
+}
+
+=head2 $c->expand_component_module( $component, $setup_component_config )
+
+Components found by C<locate_components> will be passed to this method, which
+is expected to return a list of component (package) names to be set up.
+
+By default, this method will return the component itself as well as any inner
+packages found by L<Devel::InnerPackage>.
+
+=cut
+
+sub expand_component_module {
+    my ($class, $module) = @_;
+    my @inner = Devel::InnerPackage::list_packages( $module );
+    return ($module, @inner);
 }
 
 =head2 $c->setup_component
