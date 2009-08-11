@@ -30,7 +30,7 @@ sub run_tests {
           TestApp::Controller::Action::Begin->begin
           TestApp::Controller::Action::Begin->default
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );

@@ -48,4 +48,8 @@ sub recursion_test : Local {
     $c->forward( 'recursion_test' );
 }
 
+sub end : Private {
+    my ($self,$c) = @_;
+}
+
 1;

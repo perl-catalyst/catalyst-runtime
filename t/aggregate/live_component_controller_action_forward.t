@@ -33,7 +33,7 @@ sub run_tests {
           TestApp::Controller::Action::Forward->four
           TestApp::Controller::Action::Forward->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -81,7 +81,7 @@ sub run_tests {
           TestApp::Controller::Action::Forward->four
           TestApp::Controller::Action::Forward->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -156,7 +156,7 @@ sub run_tests {
           TestApp::Controller::Action::Forward->four
           TestApp::Controller::Action::Forward->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -191,7 +191,7 @@ sub run_tests {
           TestApp::Controller::Action::Forward->four
           TestApp::Controller::Action::Forward->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );
