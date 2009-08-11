@@ -12,6 +12,8 @@
        - In tests which depend on the values of environment variables,
          localise the environment, then delete only relevant environment
          variables (RT#48555)
+       - Fix issue with Engine::HTTP not sending headers properly in some cases
+         (RT#48623)
 
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the

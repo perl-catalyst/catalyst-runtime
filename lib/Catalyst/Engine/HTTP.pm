@@ -159,7 +159,7 @@ around write => sub {
     # Prepend the headers if they have not yet been sent
     if ( $self->_has_header_buf ) {
         $self->_warn_on_write_error(
-            $self->$orig($self->_clear_header_buf)
+            $self->$orig($c, $self->_clear_header_buf)
         );
     }
 
