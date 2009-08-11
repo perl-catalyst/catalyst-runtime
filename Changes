@@ -30,6 +30,8 @@
        - private_path method for Catalyst::Action
        - allow uri_for($controller_instance) which will produce a URI
          for the controller namespace
+       - break setup_components into two more parts: locate_components and
+         expand_component_module (rjbs)
 
   Documentation:
        - Fix POD to refer to ->config(key => $val), rather than
