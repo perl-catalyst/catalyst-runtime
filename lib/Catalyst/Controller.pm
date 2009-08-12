@@ -44,6 +44,8 @@ sub BUILD {
     $self->_controller_actions($attr_value);
 }
 
+
+
 =head1 NAME
 
 Catalyst::Controller - Catalyst Controller base class
@@ -178,7 +180,7 @@ around path_prefix => sub {
 sub get_action_methods {
     my $self = shift;
     my $meta = find_meta($self);
-    confess("Metaclass for "
+    confess("Metaclass "
           . ref($meta) . " for "
           . $meta->name
           . " cannot support register_actions." )
