@@ -27,6 +27,7 @@ use URI::https;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
+use List::MoreUtils qw/uniq/;
 use attributes;
 use utf8;
 use Carp qw/croak carp shortmess/;
@@ -2153,8 +2154,6 @@ sub setup_components {
     my @comps = sort { length $a <=> length $b }
                 $class->locate_components($config);
 
-    my %comps = map { $_ => 1 } @comps;
-
     my $deprecated_component_names = grep { /::[CMV]::/ } @comps;
     $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
         qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
@@ -2167,23 +2166,15 @@ sub setup_components {
         # we know M::P::O found a file on disk so this is safe
 
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
-        #Class::MOP::load_class($component);
 
-        my @packages = $class->expand_component_module( $component, $config );
+        # Needs to be done as soon as the component is loaded, as loading a sub-component
+        # (next time round the loop) can cause us to get the wrong metaclass..
+        $class->_controller_init_base_classes($component);
+    }
 
-        my %modules = (
-            map {
-                $_ => $class->setup_component( $_ )
-            } grep {
-              # we preloaded $component above, so we must allow it here again
-              # -- rjbs, 2009-08-11
-              ($_ eq $component) or (not exists $comps{$_})
-            } @packages
-        );
-
-        for my $key ( keys %modules ) {
-            $class->components->{ $key } = $modules{ $key };
-        }
+    for my $component (uniq map { $class->expand_component_module( $_, $config ) } @comps ) {
+        $class->_controller_init_base_classes($component); # Also cover inner packages
+        $class->components->{ $component } = $class->setup_component($component);
     }
 }
 
@@ -2238,8 +2229,13 @@ sub expand_component_module {
 
 =cut
 
+# FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
+#         nearest to Catalyst::Controller first, no matter what order stuff happens
+#         to be loaded. There are TODO tests in Moose for this, see
+#         f2391d17574eff81d911b97be15ea51080500003
 sub _controller_init_base_classes {
     my ($app_class, $component) = @_;
+    return unless $component->isa('Catalyst::Controller');
     foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
         Moose::Meta::Class->initialize( $class )
             unless find_meta($class);
@@ -2251,14 +2247,6 @@ sub setup_component {
 
     unless ( $component->can( 'COMPONENT' ) ) {
         return $component;
-    }
-
-    # FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
-    #         nearest to Catalyst::Controller first, no matter what order stuff happens
-    #         to be loaded. There are TODO tests in Moose for this, see
-    #         f2391d17574eff81d911b97be15ea51080500003
-    if ($component->isa('Catalyst::Controller')) {
-        $class->_controller_init_base_classes($component);
     }
 
     my $suffix = Catalyst::Utils::class2classsuffix( $component );

@@ -12,6 +12,7 @@ perl_version '5.008006';
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
+requires 'List::MoreUtils';
 requires 'namespace::autoclean';
 requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
