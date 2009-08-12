@@ -300,7 +300,7 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-The cookies in the hash are indexed by name, and the values are L<CGI::Cookie>
+The cookies in the hash are indexed by name, and the values are L<CGI::Simple::Cookie>
 objects.
 
 =head2 $req->header

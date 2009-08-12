@@ -102,11 +102,11 @@ it found, while L<Catalyst::View::TT> defaults to C<text/html>.
 
 Returns a reference to a hash containing cookies to be set. The keys of the
 hash are the cookies' names, and their corresponding values are hash
-references used to construct a L<CGI::Cookie> object.
+references used to construct a L<CGI::Simple::Cookie> object.
 
     $c->response->cookies->{foo} = { value => '123' };
 
-The keys of the hash reference on the right correspond to the L<CGI::Cookie>
+The keys of the hash reference on the right correspond to the L<CGI::Simple::Cookie>
 parameters of the same name, except they are used without a leading dash.
 Possible parameters are:
 

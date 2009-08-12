@@ -37,6 +37,8 @@
        - Fix POD to refer to ->config(key => $val), rather than
          ->config->{key} = $val, as the latter form is deprecated.
        - Clearer docs for the 'uri_for' method.
+       - Fix POD refering to CGI::Cookie. We're using CGI::Simple::Cookie.
+         (Forrest Cahoon)
 
 5.80007 2009-06-30 23:54:34
 
