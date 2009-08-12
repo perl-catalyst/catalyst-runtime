@@ -1,23 +1,12 @@
-use Catalyst ();
+use strict;
+use warnings;
 
-{
-    package TestApp;
-    use base qw/Catalyst/;
-}
-{
-    package TestApp::Controller::Base;
-    use base qw/Catalyst::Controller/;
-}
-{
-    package TestApp::Controller::Other;
-    use base qw/TestApp::Controller::Base/;
-}
-
-TestApp->setup_component('TestApp::Controller::Other');
-TestApp->setup_component('TestApp::Controller::Base');
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 use Test::More tests => 1;
 use Test::Exception;
+use TestAppNonMooseController;
 
 # Metaclass init order causes fail.
 # There are TODO tests in Moose for this, see
@@ -25,6 +14,6 @@ use Test::Exception;
 # after which the evil kludge in core can die in a fire.
 
 lives_ok {
-    TestApp::Controller::Base->get_action_methods
+    TestAppNonMooseController::ControllerBase->get_action_methods
 } 'Base class->get_action_methods ok when sub class initialized first';
 
