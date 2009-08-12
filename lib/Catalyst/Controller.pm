@@ -179,7 +179,7 @@ around path_prefix => sub {
 
 sub get_action_methods {
     my $self = shift;
-    my $meta = find_meta($self);
+    my $meta = find_meta($self) || confess("No metaclass setup for $self");
     confess("Metaclass "
           . ref($meta) . " for "
           . $meta->name
