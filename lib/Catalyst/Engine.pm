@@ -48,10 +48,12 @@ sub finalize_body {
     my $body = $c->response->body;
     no warnings 'uninitialized';
     if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
-        while ( !eof $body ) {
+        my $got;
+        do {
             read $body, my ($buffer), $CHUNKSIZE;
             last unless $self->write( $c, $buffer );
-        }
+        } while $got > 0;
+
         close $body;
     }
     else {
