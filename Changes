@@ -34,7 +34,7 @@
          expand_component_module (rjbs)
        - Allow Components to return anon classed from their COMPONENT method
          correctly, and have action registration work on Controllers returned
-         as such by adding a _component_name accessor for all components
+         as such by adding a catalyst_component_name accessor for all components
          which returns the component instance's name to be used when building
          actions etc.
        - Adding X-Forwarded-Port to allow the frontend proxy to dictate the

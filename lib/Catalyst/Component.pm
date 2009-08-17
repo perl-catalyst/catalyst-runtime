@@ -60,15 +60,15 @@ component loader with config() support and a process() method placeholder.
 __PACKAGE__->mk_classdata('_plugins');
 __PACKAGE__->mk_classdata('_config');
 
-has _component_name => ( is => 'ro' ); # Cannot be required => 1 as context
+has catalyst_component_name => ( is => 'ro' ); # Cannot be required => 1 as context
                                        # class @ISA component - HATE
 # Make accessor callable as a class method, as we need to call setup_actions
 # on the application class, which we don't have an instance of, ewwwww
 # Also, naughty modules like Catalyst::View::JSON try to write to _everything_,
 # so spit a warning, ignore that (and try to do the right thing anyway) here..
-around _component_name => sub {
+around catalyst_component_name => sub {
     my ($orig, $self) = (shift, shift);
-    Carp::cluck("Tried to write to the _component_name accessor - is your component broken or just mad? (Write ignored - using default value.)") if scalar @_;
+    Carp::cluck("Tried to write to the catalyst_component_name accessor - is your component broken or just mad? (Write ignored - using default value.)") if scalar @_;
     blessed($self) ? $self->$orig() || blessed($self) : $self;
 };
 

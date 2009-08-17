@@ -158,7 +158,7 @@ around action_namespace => sub {
         }
     }
 
-    my $namespace = Catalyst::Utils::class2prefix($self->_component_name, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix($self->catalyst_component_name, $case_s) || '';
     $self->$orig($namespace) if ref($self);
     return $namespace;
 };
@@ -209,7 +209,7 @@ sub register_actions {
 
 sub register_action_methods {
     my ( $self, $c, @methods ) = @_;
-    my $class = $self->_component_name;
+    my $class = $self->catalyst_component_name;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
 

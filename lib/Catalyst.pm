@@ -2154,10 +2154,10 @@ sub setup_components {
     my @comps = sort { length $a <=> length $b }
                 $class->locate_components($config);
 
-    my $deprecated_component_names = grep { /::[CMV]::/ } @comps;
+    my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
     $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
         qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
-    ) if $deprecated_component_names;
+    ) if $deprecatedcatalyst_component_names;
 
     for my $component ( @comps ) {
 
@@ -2251,10 +2251,10 @@ sub setup_component {
 
     my $suffix = Catalyst::Utils::class2classsuffix( $component );
     my $config = $class->config->{ $suffix } || {};
-    # Stash _component_name in the config here, so that custom COMPONENT
+    # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it. local to avoid pointlessly shitting in config
     # for the debug screen, as $component is already the key name.
-    local $config->{_component_name} = $component;
+    local $config->{catalyst_component_name} = $component;
 
     my $instance = eval { $component->COMPONENT( $class, $config ); };
 
