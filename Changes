@@ -32,6 +32,11 @@
          for the controller namespace
        - Break setup_components into two more parts: locate_components and
          expand_component_module (rjbs)
+       - Allow Components to return anon classed from their COMPONENT method
+         correctly, and have action registration work on Controllers returned
+         as such by adding a _component_name accessor for all components
+         which returns the component instance's name to be used when building
+         actions etc.
 
   Documentation:
        - Fix POD to refer to ->config(key => $val), rather than
