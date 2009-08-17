@@ -39,6 +39,8 @@
          actions etc.
        - Adding X-Forwarded-Port to allow the frontend proxy to dictate the
          frontend port (jshirley)
+       - Added Catalyst::Stats->created accessor for the time at the start of
+         the request.
 
   Documentation:
        - Fix POD to refer to ->config(key => $val), rather than
