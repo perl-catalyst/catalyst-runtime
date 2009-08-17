@@ -2674,6 +2674,18 @@ changes are made to the request.
     The host value for $c->req->base and $c->req->uri is set to the real
     host, as read from the HTTP X-Forwarded-Host header.
 
+Additionally, you may be running your backend application on an insecure
+connection (port 80) while your frontend proxy is running under SSL.  If there
+is a discrepancy in the ports, use the HTTP header C<X-Forwarded-Port> to
+tell Catalyst what port the frontend listens on.  This will allow all URIs to
+be created properly.
+
+In the case of passing in:
+
+    X-Forwarded-Port: 443
+
+All calls to C<uri_for> will result in an https link, as is expected.
+
 Obviously, your web server must support these headers for this to work.
 
 In a more complex server farm environment where you may have your

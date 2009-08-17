@@ -67,6 +67,9 @@ sub prepare_connection {
         # as 127.0.0.1. Select the most recent upstream IP (last in the list)
         my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
         $request->address($ip);
+        if ( defined $ENV{HTTP_X_FORWARDED_PORT} ) {
+            $ENV{SERVER_PORT} = $ENV{HTTP_X_FORWARDED_PORT};
+        }
     }
 
     $request->hostname( $ENV{REMOTE_HOST} ) if exists $ENV{REMOTE_HOST};
@@ -134,6 +137,9 @@ sub prepare_path {
         # backend could be on any port, so
         # assume frontend is on the default port
         $port = $c->request->secure ? 443 : 80;
+        if ( $ENV{HTTP_X_FORWARDED_PORT} ) {
+            $port = $ENV{HTTP_X_FORWARDED_PORT};
+        }
     }
 
     # set the request URI
