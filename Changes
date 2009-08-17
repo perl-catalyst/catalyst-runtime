@@ -27,10 +27,10 @@
          when using a larger $ENV{COLUMNS} setting. (groditi)
 
   New features:
-       - private_path method for Catalyst::Action
-       - allow uri_for($controller_instance) which will produce a URI
+       - Added private_path method for Catalyst::Action
+       - Allow uri_for($controller_instance) which will produce a URI
          for the controller namespace
-       - break setup_components into two more parts: locate_components and
+       - Break setup_components into two more parts: locate_components and
          expand_component_module (rjbs)
 
   Documentation:
