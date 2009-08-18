@@ -24,9 +24,6 @@ BEGIN {
 
 package TestAppClassExceptionSimpleTest::Exception;
 
-## thank to Brian
-## http://bricas.vox.com/library/post/catalyst-exceptionclass.html
-
 use strict;
 use warnings;
 no warnings 'redefine';
@@ -52,34 +49,6 @@ use Catalyst qw/ -Debug /;
 
 our $VERSION = '0.02';
 
-# Start the application
 __PACKAGE__->setup;
-
-=head1 NAME
-
-TestAppClassExceptionSimpleTest - Catalyst based application
-
-=head1 SYNOPSIS
-
-    script/TestAppClassExceptionSipleTest_server.pl
-
-=head1 DESCRIPTION
-
-[enter your description here]
-
-=head1 SEE ALSO
-
-L<TestAppClassException::Controller::Root>, L<Catalyst>
-
-=head1 AUTHOR
-
-Ferruccio Zamuner
-
-=head1 LICENSE
-
-This library is free software, you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
