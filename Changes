@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80008 2009-08-21 17:47:30
+
   Bug fixes:
        - Fix replace_constructor warning to actually work if you make your
          application class immutable without that option.
@@ -17,7 +19,7 @@
        - Make Catalyst::Engine write at least once when finalizing the response
          body from a filehandle, even if the write is empty. This avoids fail
          when trying to send out an empty response body from a filehandle.
-       - Catalyst::Engine::HTTP - Accept a fully qualified absolute URI in the 
+       - Catalyst::Engine::HTTP - Accept a fully qualified absolute URI in the
          Request-URI of the Request-Line
 
   Refactoring / cleanups:
