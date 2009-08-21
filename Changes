@@ -17,6 +17,8 @@
        - Make Catalyst::Engine write at least once when finalizing the response
          body from a filehandle, even if the write is empty. This avoids fail
          when trying to send out an empty response body from a filehandle.
+       - Catalyst::Engine::HTTP - Accept a fully qualified absolute URI in the 
+         Request-URI of the Request-Line
 
   Refactoring / cleanups:
        - Deleted the Restarter engine and its Watcher code. Use the
