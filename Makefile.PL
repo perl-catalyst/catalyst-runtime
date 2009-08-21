@@ -130,6 +130,7 @@ my %conflicts = (
     'Catalyst::Action::REST'           => '0.67',
     'CatalystX::CRUD'                  => '0.42',
     'CatalystX::CRUD::Model::RDBO'     => '0.20',
+    'Catalyst::View::Mason'            => '0.17',
 );
 check_conflicts(%conflicts);
 
