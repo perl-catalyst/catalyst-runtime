@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.80010
+5.80010 2009-08-21 23:32:15
 
   Bug fixes:
       - Fix and add tests for a regression introduced by 5.80008.

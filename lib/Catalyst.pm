@@ -79,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80009';
+our $VERSION = '5.80010';
 
 {
     my $dev_version = $VERSION =~ /_\d{2}$/;
