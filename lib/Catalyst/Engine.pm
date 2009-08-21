@@ -50,7 +50,7 @@ sub finalize_body {
     if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
         my $got;
         do {
-            read $body, my ($buffer), $CHUNKSIZE;
+            $got = read $body, my ($buffer), $CHUNKSIZE;
             last unless $self->write( $c, $buffer );
         } while $got > 0;
 
