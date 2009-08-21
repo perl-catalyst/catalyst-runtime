@@ -51,7 +51,7 @@ sub finalize_body {
         my $got;
         do {
             $got = read $body, my ($buffer), $CHUNKSIZE;
-            last unless $self->write( $c, $buffer );
+            $got = 0 unless $self->write( $c, $buffer );
         } while $got > 0;
 
         close $body;
