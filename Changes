@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+      - Fix and add tests for generating inner packages inside the COMPONENT
+        method, and those packages being correctly registered as components.
+        This fixes Catalyst::Model::DBIC among others.
+
 5.80008 2009-08-21 17:47:30
 
   Bug fixes:

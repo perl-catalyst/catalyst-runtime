@@ -2,7 +2,7 @@
 # (do not forget to update the number of components in test 3 as well)
 # 5 extra tests for the loading options
 # One test for components in inner packages
-use Test::More tests => 2 + 6 * 24 + 5 + 1;
+use Test::More tests => 2 + 6 * 24 + 7 + 1;
 
 use strict;
 use warnings;
@@ -175,6 +175,9 @@ sub COMPONENT {
     my \$self = shift->next::method(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
+    *${appclass}::Model::TopLevel::GENERATED::ACCEPT_CONTEXT = sub {
+        return bless {}, 'FooBarBazQuux';
+    };
     \$self;
 }
 
@@ -199,6 +202,10 @@ EOF
 eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 
 is($@, '', "Didn't load component twice");
+
+ok($appclass->model('TopLevel::Generated'), 'Have generated model');
+is(ref($appclass->model('TopLevel::Generated')), 'FooBarBazQuux',
+    'ACCEPT_CONTEXT in generated inner package fired as expected');
 
 $appclass = "InnerComponent";
 

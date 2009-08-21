@@ -1175,7 +1175,7 @@ When used as a string, provides a textual URI.
 
 If the first argument is a string, it is taken as a public URI path relative
 to C<< $c->namespace >> (if it doesn't begin with a forward slash) or
-relative to the application root (if it does). It is then merged with 
+relative to the application root (if it does). It is then merged with
 C<< $c->request->base >>; any C<@args> are appended as additional path
 components; and any C<%query_values> are appended as C<?foo=bar> parameters.
 
@@ -1187,13 +1187,13 @@ once the path is resolved, C<uri_for> continues as though a path was
 provided, appending any arguments or parameters and creating an absolute
 URI.
 
-The captures for the current request can be found in 
+The captures for the current request can be found in
 C<< $c->request->captures >>, and actions can be resolved using
 C<< Catalyst::Controller->action_for($name) >>. If you have a private action
 path, use C<< $c->uri_for_action >> instead.
 
   # Equivalent to $c->req->uri
-  $c->uri_for($c->action, $c->req->captures, 
+  $c->uri_for($c->action, $c->req->captures,
       @{ $c->req->args }, $c->req->params);
 
   # For the Foo action in the Bar controller
@@ -2172,9 +2172,12 @@ sub setup_components {
         $class->_controller_init_base_classes($component);
     }
 
-    for my $component (uniq map { $class->expand_component_module( $_, $config ) } @comps ) {
-        $class->_controller_init_base_classes($component); # Also cover inner packages
+    for my $component (@comps) {
         $class->components->{ $component } = $class->setup_component($component);
+        for my $component ($class->expand_component_module( $component, $config )) {
+            $class->_controller_init_base_classes($component); # Also cover inner packages
+            $class->components->{ $component } = $class->setup_component($component);
+        }
     }
 }
 
@@ -2214,15 +2217,11 @@ sub locate_components {
 Components found by C<locate_components> will be passed to this method, which
 is expected to return a list of component (package) names to be set up.
 
-By default, this method will return the component itself as well as any inner
-packages found by L<Devel::InnerPackage>.
-
 =cut
 
 sub expand_component_module {
     my ($class, $module) = @_;
-    my @inner = Devel::InnerPackage::list_packages( $module );
-    return ($module, @inner);
+    Devel::InnerPackage::list_packages( $module );
 }
 
 =head2 $c->setup_component
