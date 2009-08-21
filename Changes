@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80009 2009-08-21 22:21:08
+
   Bug fixes:
       - Fix and add tests for generating inner packages inside the COMPONENT
         method, and those packages being correctly registered as components.

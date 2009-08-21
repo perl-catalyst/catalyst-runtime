@@ -7,7 +7,7 @@ BEGIN { require 5.008006; }
 
 # Remember to update this in Catalyst as well!
 
-our $VERSION='5.80008';
+our $VERSION='5.80009';
 
 $VERSION = eval $VERSION;
 
