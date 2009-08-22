@@ -12,10 +12,6 @@ use Socket;
 use IO::Socket::INET ();
 use IO::Select       ();
 
-# For PAR
-require Catalyst::Engine::HTTP::Restarter;
-require Catalyst::Engine::HTTP::Restarter::Watcher;
-
 use constant CHUNKSIZE => 64 * 1024;
 use constant DEBUG     => $ENV{CATALYST_HTTP_DEBUG} || 0;
 
