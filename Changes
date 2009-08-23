@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80011 2009-08-23 13:48:15
+
   Bug fixes:
       - Remove leftovers of the restarter engine. The removed code caused test
         failures, which weren't apparent for anyone still having an old version
