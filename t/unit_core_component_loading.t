@@ -2,7 +2,7 @@
 # (do not forget to update the number of components in test 3 as well)
 # 5 extra tests for the loading options
 # One test for components in inner packages
-use Test::More tests => 2 + 6 * 24 + 7 + 1;
+use Test::More tests => 2 + 6 * 24 + 8 + 1;
 
 use strict;
 use warnings;
@@ -193,8 +193,10 @@ write_component_file([$libdir, $appclass, 'Model', 'TopLevel'], 'Nested', <<EOF)
 package ${appclass}::Model::TopLevel::Nested;
 use base 'Catalyst::Model';
 
+my \$called=0;
 no warnings 'redefine';
-sub COMPONENT { return shift->next::method(\@_); }
+sub COMPONENT { \$called++;return shift->next::method(\@_); }
+sub called { return \$called };
 1;
 
 EOF
@@ -202,6 +204,7 @@ EOF
 eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 
 is($@, '', "Didn't load component twice");
+is($appclass->model('TopLevel::Nested')->called,1, 'COMPONENT called once');
 
 ok($appclass->model('TopLevel::Generated'), 'Have generated model');
 is(ref($appclass->model('TopLevel::Generated')), 'FooBarBazQuux',
