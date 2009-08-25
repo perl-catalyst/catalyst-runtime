@@ -22,7 +22,6 @@ my $mock_log = Class::MOP::Class->create_anon_class(
 sub mock_app {
     my $name = shift;
     %log_messages = (); # Flatten log messages.
-    diag "Setting up mock application: $name";
     my $meta = Moose->init_meta( for_class => $name );
     $meta->superclasses('Catalyst');
     $meta->add_method('log', sub { $mock_log }); 
