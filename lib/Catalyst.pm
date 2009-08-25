@@ -2153,6 +2153,7 @@ sub setup_components {
 
     my @comps = sort { length $a <=> length $b }
                 $class->locate_components($config);
+    my %comps = map { $_ => 1 } @comps;
 
     my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
     $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
@@ -2175,6 +2176,7 @@ sub setup_components {
     for my $component (@comps) {
         $class->components->{ $component } = $class->setup_component($component);
         for my $component ($class->expand_component_module( $component, $config )) {
+            next if $comps{$component};
             $class->_controller_init_base_classes($component); # Also cover inner packages
             $class->components->{ $component } = $class->setup_component($component);
         }
@@ -2221,7 +2223,7 @@ is expected to return a list of component (package) names to be set up.
 
 sub expand_component_module {
     my ($class, $module) = @_;
-    Devel::InnerPackage::list_packages( $module );
+    return Devel::InnerPackage::list_packages( $module );
 }
 
 =head2 $c->setup_component
