@@ -1,4 +1,5 @@
 package ACLTestApp::Controller::Root;
+use Test::More;
 
 use base 'Catalyst::Controller';
 
