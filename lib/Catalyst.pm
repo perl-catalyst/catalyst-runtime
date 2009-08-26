@@ -2787,6 +2787,8 @@ esskar: Sascha Kiefer
 
 fireartist: Carl Franks <cfranks@cpan.org>
 
+frew: Arthur Axel "fREW" Schmidt <frioux@gmail.com>
+
 gabb: Danijel Milicevic
 
 Gary Ashton Jones
