@@ -31,7 +31,7 @@ sub run_time_plugins : Local {
 # Trick perl into thinking the plugin is already loaded
     $INC{'Faux/Plugin.pm'} = 1;
 
-    __PACKAGE__->plugin( faux => $faux_plugin );
+    ref($c)->plugin( faux => $faux_plugin );
 
     isa_ok $c, 'Catalyst::Plugin::Test::Plugin';
     isa_ok $c, 'TestApp::Plugin::FullyQualified';
