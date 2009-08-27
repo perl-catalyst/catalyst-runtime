@@ -237,8 +237,9 @@ C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
 =head2 $req->body
 
-Returns the message body of the request, unless Content-Type is
-C<application/x-www-form-urlencoded> or C<multipart/form-data>.
+Returns the message body of the request, as returned by L<HTTP::Body>: a string,
+unless Content-Type is C<application/x-www-form-urlencoded>, C<text/xml>, or
+C<multipart/form-data>, in which case a L<File::Temp> object is returned.
 
 =head2 $req->body_parameters
 
