@@ -32,7 +32,7 @@ use attributes;
 use utf8;
 use Carp qw/croak carp shortmess/;
 
-BEGIN { require 5.008001; }
+BEGIN { require 5.008004; }
 
 has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });
