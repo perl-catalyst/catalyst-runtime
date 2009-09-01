@@ -14,7 +14,7 @@
 # Compatibility warnings to add:
 
   - $self->config should warn as config should only ever be called as a
-    class method.
+    class method (TESTS).
 
 # Proposed functionality / feature additions:
 
@@ -40,7 +40,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 ## App / ctx split:
 
   NOTE - these are notes that t0m thought up after doing back compat for
-         _component_class, may be inaccurate, wrong or missing things
+         catalyst_component_class, may be inaccurate, wrong or missing things
          bug mst (at least) to correct before trying more than the first 2
          steps. Please knock yourself out on the first two however :)
 
@@ -60,4 +60,3 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   - Profit! (Things like changing the complete app config per vhost, i.e.
     writing a config loader / app class role which dispatches per vhost to
     differently configured apps is piss easy)
-

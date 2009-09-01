@@ -1,5 +1,17 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+     - Fix t/optional_http-server.t test.
+     - Fix t/optional_http-server-restart.t test.
+
+  Refactoring / cleanups:
+     - Catalyst::Classdata now warns when class methods are called on instances.
+
+  Tests:
+     - Make the optional_http_server.t test an author only test which must be
+       run by authors to stop it being broken again.
+     - Fix recursion warnings in the test suites.
+
 5.80011 2009-08-23 13:48:15
 
   Bug fixes:
