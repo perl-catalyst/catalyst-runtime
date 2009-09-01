@@ -1,1 +1,1 @@
-^(?!script/\w+\.pl$|TODO$|lib/.+(?<!ROADMAP)\.p(m|od)$|inc/|t/aggregate/.*\.t$|t/.*\.(gif|yml|pl|t)$|t/lib/.*\.pm$|t/something/(Makefile.PL|script/foo/bar/for_dist)$|t/conf/extra.conf.in$|Makefile.PL$|README$|MANIFEST$|Changes$|META.yml$)
+^(?!script/\w+\.pl$|TODO$|lib/.+(?<!ROADMAP)\.p(m|od)$|inc/|t/a(uthor|ggregate)/.*\.t$|t/.*\.(gif|yml|pl|t)$|t/lib/.*\.pm$|t/something/(Makefile.PL|script/foo/bar/for_dist)$|t/conf/extra.conf.in$|Makefile.PL$|README$|MANIFEST$|Changes$|META.yml$)
