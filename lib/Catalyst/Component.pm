@@ -113,6 +113,8 @@ sub COMPONENT {
 
 sub config {
     my $self = shift;
+    # Uncomment once sane to do so
+    #Carp::cluck("config method called on instance") if ref $self;
     my $config = $self->_config || {};
     if (@_) {
         my $newconfig = { %{@_ > 1 ? {@_} : $_[0]} };

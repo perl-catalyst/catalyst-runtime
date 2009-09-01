@@ -57,9 +57,9 @@ sub prepare_connection {
 
   PROXY_CHECK:
     {
-        unless ( $c->config->{using_frontend_proxy} ) {
+        unless ( ref($c)->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $ENV{REMOTE_ADDR} ne '127.0.0.1';
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
+            last PROXY_CHECK if ref($c)->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_FOR};
 
@@ -126,9 +126,9 @@ sub prepare_path {
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
     {
-        unless ( $c->config->{using_frontend_proxy} ) {
+        unless ( ref($c)->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $host !~ /localhost|127.0.0.1/;
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
+            last PROXY_CHECK if ref($c)->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_HOST};
 

@@ -112,7 +112,7 @@ sub finalize_error {
     my ( $self, $c ) = @_;
 
     $c->res->content_type('text/html; charset=utf-8');
-    my $name = $c->config->{name} || join(' ', split('::', ref $c));
+    my $name = ref($c)->config->{name} || join(' ', split('::', ref $c));
 
     my ( $title, $error, $infos );
     if ( $c->debug ) {
@@ -317,13 +317,14 @@ sets up the L<Catalyst::Request> object body using L<HTTP::Body>
 sub prepare_body {
     my ( $self, $c ) = @_;
 
+    my $appclass = ref($c) || $c;
     if ( my $length = $self->read_length ) {
         my $request = $c->request;
         unless ( $request->_body ) {
             my $type = $request->header('Content-Type');
             $request->_body(HTTP::Body->new( $type, $length ));
-            $request->_body->tmpdir( $c->config->{uploadtmp} )
-              if exists $c->config->{uploadtmp};
+            $request->_body->tmpdir( $appclass->config->{uploadtmp} )
+              if exists $appclass->config->{uploadtmp};
         }
 
         while ( my $buffer = $self->read($c) ) {

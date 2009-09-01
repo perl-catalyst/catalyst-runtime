@@ -646,7 +646,7 @@ If you want to search for models, pass in a regexp as the argument.
 
 sub model {
     my ( $c, $name, @args ) = @_;
-
+    my $appclass = ref($c) || $c;
     if( $name ) {
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -659,8 +659,8 @@ sub model {
         return $c->model( $c->stash->{current_model} )
           if $c->stash->{current_model};
     }
-    return $c->model( $c->config->{default_model} )
-      if $c->config->{default_model};
+    return $c->model( $appclass->config->{default_model} )
+      if $appclass->config->{default_model};
 
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
@@ -700,6 +700,7 @@ If you want to search for views, pass in a regexp as the argument.
 sub view {
     my ( $c, $name, @args ) = @_;
 
+    my $appclass = ref($c) || $c;
     if( $name ) {
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -712,8 +713,8 @@ sub view {
         return $c->view( $c->stash->{current_view} )
           if $c->stash->{current_view};
     }
-    return $c->view( $c->config->{default_view} )
-      if $c->config->{default_view};
+    return $c->view( $appclass->config->{default_view} )
+      if $appclass->config->{default_view};
 
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
 
@@ -1566,9 +1567,9 @@ sub execute {
 
 sub _stats_start_execute {
     my ( $c, $code ) = @_;
-
+    my $appclass = ref($c) || $c;
     return if ( ( $code->name =~ /^_.*/ )
-        && ( !$c->config->{show_internal_actions} ) );
+        && ( !$appclass->config->{show_internal_actions} ) );
 
     my $action_name = $code->reverse();
     $c->counter->{$action_name}++;
@@ -1882,7 +1883,7 @@ sub prepare {
         $c->prepare_read;
 
         # Parse the body unless the user wants it on-demand
-        unless ( $c->config->{parse_on_demand} ) {
+        unless ( ref($c)->config->{parse_on_demand} ) {
             $c->prepare_body;
         }
     }
@@ -2759,7 +2760,7 @@ acme: Leon Brocard <leon@astray.com>
 
 Andrew Bramble
 
-Andrew Ford
+Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
 
 Andrew Ruthven
 
@@ -2774,6 +2775,14 @@ Caelum: Rafael Kitover <rkitover@io.com>
 chansen: Christian Hansen
 
 chicks: Christopher Hicks
+
+Chisel Wright C<pause@herlpacker.co.uk>
+
+Danijel Milicevic C<me@danijel.de>
+
+David Kamholz E<lt>dkamholz@cpan.orgE<gt>
+
+David Naughton, C<naughton@umn.edu>
 
 David E. Wheeler
 
@@ -2793,6 +2802,8 @@ gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
+Gavin Henry C<ghenry@perl.me.uk>
+
 Geoff Richards
 
 hobbs: Andrew Rodland <andrew@cleverdomain.org>
@@ -2801,7 +2812,7 @@ ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
 
-jester: Jesse Sheidlower
+jester: Jesse Sheidlower C<jester@panix.com>
 
 jhannah: Jay Hannah <jay@jays.net>
 
@@ -2810,6 +2821,10 @@ Jody Belka
 Johan Lindstrom
 
 jon: Jon Schutz <jjschutz@cpan.org>
+
+Jonathan Rockway C<< <jrockway@cpan.org> >>
+
+Kieren Diment C<kd@totaldatasolution.com>
 
 konobi: Scott McWhirter <konobi@cpan.org>
 
@@ -2841,13 +2856,21 @@ rafl: Florian Ragwitz <rafl@debian.org>
 
 random: Roland Lammel <lammel@cpan.org>
 
+Robert Sedlacek C<< <rs@474.at> >>
+
 sky: Arthur Bergman
 
 t0m: Tomas Doran <bobtfish@bobtfish.net>
 
 Ulf Edvinsson
 
+Viljo Marrandi C<vilts@yahoo.com>
+
+Will Hawes C<info@whawes.co.uk>
+
 willert: Sebastian Willert <willert@cpan.org>
+
+Yuval Kogman, C<nothingmuch@woobling.org>
 
 =head1 LICENSE
 
