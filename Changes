@@ -7,7 +7,7 @@
   Refactoring / cleanups:
      - Catalyst::Classdata now warns when class methods are called on instances.
      - Reduce minimum supported perl version from 5.8.6 to 5.8.4 as there are
-       many people still running this version with no known issues.
+       many people still running/testing this version with no known issues.
 
   Tests:
      - Make the optional_http_server.t test an author only test which must be
@@ -62,9 +62,7 @@
          new Catalyst::Restarter in a recent Catalyst::Devel instead.
        - New unit test for Catalyst::Action 'unit_core_action.t'
        - Bump minimum supported perl version from 5.8.1 to 5.8.6 as there are
-         known issues with 5.8.3, and nobody is prepared to fix / support perl
-         older than 5.8.6 any more. Patches to regain compatibility to older
-         perls would be welcome.
+         known issues with 5.8.3.
        - Debug output uses dynamic column sizing to create more readable output
          when using a larger $ENV{COLUMNS} setting. (groditi)
 
