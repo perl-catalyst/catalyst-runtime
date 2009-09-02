@@ -1,30 +1,8 @@
 package Catalyst::Script::Test;
 use Moose;
-use Pod::Usage;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-with 'MooseX::Getopt';
-use MooseX::Types::Moose qw/Str Bool/;
 use namespace::autoclean;
 
-#extends qw(MooseX::App::Cmd);
-
-has _app => (
-    reader   => 'app',
-    init_arg => 'app',
-    traits => [qw(NoGetopt)],
-    isa => Str,
-    is => 'ro',
-);
-
-has help => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'h',
-    isa => Bool,
-    is => 'ro',
-    documentation => qq{ display this help and exits },
-);
-
+with 'Catalyst::ScriptRole';
 
 sub run {
     my $self = shift;
@@ -32,11 +10,32 @@ sub run {
     Class::MOP::load_class("Catalyst::Test");
     Catalyst::Test->import($self->app);
 
-    pod2usage(1) if ( $self->help || !$ARGV[1] );
     print request($ARGV[1])->content  . "\n";
 
 }
 
 
 __PACKAGE__->meta->make_immutable;
-1;
+
+=head1 NAME
+
+Catalyst::Script::Test - Test Catalyst application on the command line
+
+=head1 SYNOPSIS
+
+See L<Catalyst>.
+
+=head1 DESCRIPTION
+
+FIXME
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

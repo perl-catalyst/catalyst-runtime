@@ -2,119 +2,88 @@ package Catalyst::Script::Server;
 
 BEGIN {
     $ENV{CATALYST_ENGINE} ||= 'HTTP';
-    $ENV{CATALYST_SCRIPT_GEN} = 31;
     require Catalyst::Engine::HTTP;
 }
 
-use FindBin qw/$Bin/;
-use lib "$Bin/../lib";
-use Pod::Usage;
 use Moose;
 use Catalyst::Restarter;
-use MooseX::Types::Moose qw/Str Bool Int/;
+use MooseX::Types::Moose qw/ArrayRef Str Bool Int/;
 use namespace::autoclean;
 
-with 'MooseX::Getopt';
-#extends qw(MooseX::App::Cmd);
+with 'Catalyst::ScriptRole';
 
 has debug => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'd',
     isa => Bool,
     is => 'ro',
-    documentation => qq{ force debug mode }
-);
-
-has help => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'h',
-    isa => Bool,
-    is => 'ro',
-    documentation => qq{ display this help and exits },
+    documentation => q{Force debug mode},
 );
 
 has host => (
     isa => Str,
     is => 'ro',
-    default =>  "localhost",
-    documentation => qq{ specify a host for the server to run on }
+    default => 'localhost',
+    documentation => 'Specify a host for the server to run on',
 );
 
 has fork => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'f',
     isa => Bool,
     is => 'ro',
-    documentation => qq{ fork the server }
+    documentation => 'Fork the server',
 );
 
 has listen => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'l',
     isa => Int,
     is => 'ro',
-    default => "3000",
-    documentation => qq{ specify a different listening port }
+    default => 3000,
+    documentation => 'Specify a different listening port',
 );
 
 has pidfile => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'pid',
     isa => Str,
     is => 'ro',
-    documentation => qq{ specify a pidfile }
+    documentation => 'Specify a pidfile',
 );
 
 has keepalive => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'k',
     isa => Bool,
     is => 'ro',
-    documentation => qq{ server keepalive },
+    documentation => 'Server keepalive',
 
 );
 
 has background => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'bg',
     isa => Bool,
     is => 'ro',
-    documentation => qq{ run in the background }
-);
-
-
-has _app => (
-    reader   => 'app',
-    init_arg => 'app',
-    traits => [qw(NoGetopt)],
-    isa => Str,
-    is => 'ro',
+    documentation => 'Run in the background',
 );
 
 has restart => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'r',
     isa => Bool,
     is => 'ro',
-    documentation => qq{ use Catalyst::Restarter to detect code changes }
+    documentation => 'use Catalyst::Restarter to detect code changes',
 );
 
 has restart_directory => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'rdir',
-    isa => 'ArrayRef[Str]',
+    isa => ArrayRef[Str],
     is  => 'ro',
     predicate => '_has_restart_directory',
-    documentation => qq{ restarter directory to watch }
+    documentation => 'Restarter directory to watch',
 );
 
 has restart_delay => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'rdel',
     isa => Int,
     is => 'ro',
     predicate => '_has_restart_delay',
-    documentation => qq{ set a restart delay }
+    documentation => 'Set a restart delay',
 );
 
 has restart_regex => (
@@ -123,7 +92,7 @@ has restart_regex => (
     isa => Str,
     is => 'ro',
     predicate => '_has_restart_regex',
-    documentation => qq{ restart regex }
+    documentation => 'Restart regex',
 );
 
 has follow_symlinks => (
@@ -132,22 +101,12 @@ has follow_symlinks => (
     isa => Bool,
     is => 'ro',
     predicate => '_has_follow_symlinks',
-    documentation => qq{ follow symbolic links }
+    documentation => 'Follow symbolic links',
 
 );
 
-sub usage {
-    my ($self) = shift;
-
-    return pod2usage();
-
-}
-
-
 sub run {
     my ($self) = shift;
-
-    $self->usage if $self->help;
 
     if ( $self->debug ) {
         $ENV{CATALYST_DEBUG} = 1;
@@ -188,31 +147,29 @@ sub run {
         $restarter->run_and_watch;
     }
     else {
-        $self->_run;
+        $self->_run_application;
     }
 
 
 }
 
-sub _run {
+sub _application_args {
     my ($self) = shift;
-
-    my $app = $self->app;
-    Class::MOP::load_class($app);
-
-    $app->run(
-        $self->listen, $self->host,
+    return (
+        $self->listen,
+        $self->host,
         {
-           'fork'            => $self->fork,
-           keepalive         => $self->keepalive,
-           background        => $self->background,
-           pidfile           => $self->pidfile,
-           keepalive         => $self->keepalive,
-           follow_symlinks   => $self->follow_symlinks,
-        }
+           map { $_ => $self->$_ } qw/
+                fork
+                keepalive
+                background
+                pidfile
+                keepalive
+                follow_symlinks
+            /,
+        },
     );
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

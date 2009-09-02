@@ -1,95 +1,64 @@
 package Catalyst::Script::FastCGI;
 
 BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
-use FindBin qw/$Bin/;
-use lib "$Bin/../lib";
-use Pod::Usage;
 use Moose;
 use MooseX::Types::Moose qw/Str Bool Int/;
 use namespace::autoclean;
 
-with 'MooseX::Getopt';
-
-has help => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'h',
-    isa => Bool,
-    is => 'ro',
-    documentation => qq{ display this help and exits },
-);
+with 'Catalyst::ScriptRole';
 
 has listen => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'l',
     isa => Int,
     is => 'ro',
-    default => "3000",
-    documentation => qq{ specify a different listening port }
+    documentation => 'Specify a listening port/socket',
 );
 
 has pidfile => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'pid',
     isa => Str,
     is => 'ro',
-    documentation => qq{ specify a pidfile }
+    documentation => 'Specify a pidfile',
 );
 
 has daemon => ( 
     isa => Bool,   
     is => 'ro', 
-    traits => [qw(Getopt)],
     cmd_aliases => 'd', 
-    documentation => qq{ daemonize }
+    documentation => 'Daemonize',
 );
 
 has manager => ( 
     isa => Str,    
     is => 'ro',
-    traits => [qw(Getopt)],
     cmd_aliases => 'm',
-    documentation => qq{ use a different FastCGI manager } 
+    documentation => 'Use a different FastCGI manager', # FIXME
 );
 
 has keep_stderr => ( 
-    traits => [qw(Getopt)],
     cmd_aliases => 'std', 
     isa => Bool,   
     is => 'ro',  
-    documentation => qq{ log STDERR }
+    documentation => 'Log STDERR',
 );
 
 has nproc => (
-    traits => [qw(Getopt)],
     cmd_aliases => 'np',  
     isa => Int,
     is => 'ro',  
-    documentation => qq{ specify an nproc }
+    documentation => 'Specify an nproc', # FIXME
 );
 
 has detach => ( 
-    traits => [qw(Getopt)],
     cmd_aliases => 'det', 
     isa => Bool,   
     is => 'ro',  
-    documentation => qq{ detach this FastCGI process }
+    documentation => 'Detach this FastCGI process',
 );
 
-has _app => (
-    reader   => 'app',
-    init_arg => 'app',
-    traits => [qw(NoGetopt)],
-    isa => Str,
-    is => 'ro',
-);
-
-sub run {
-    my $self = shift;
-
-    pod2usage() if $self->help;
-    my $app = $self->app;
-    Class::MOP::load_class($app);
-    $app->run(
+sub _application_args {
+    my ($self) = shift;
+    return (
         $self->listen,
         {
             nproc   => $self->nproc,
@@ -99,9 +68,29 @@ sub run {
             keep_stderr => $self->keep_stderr,
         }
     );
-
 }
 
 __PACKAGE__->meta->make_immutable;
 
-1;
+=head1 NAME
+
+Catalyst::Script::FastCGI - The FastCGI Catalyst Script
+
+=head1 SYNOPSIS
+
+See L<Catalyst>.
+
+=head1 DESCRIPTION
+
+FIXME
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

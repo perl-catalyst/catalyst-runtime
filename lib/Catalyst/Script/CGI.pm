@@ -1,39 +1,31 @@
 package Catalyst::Script::CGI;
 use Moose;
-
 BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
-use FindBin qw/$Bin/;
-use lib "$Bin/../lib";
-use Pod::Usage;
-use Moose;
 use namespace::autoclean;
 
-with 'MooseX::Getopt';
+with 'Catalyst::ScriptRole';
 
-has _app => (
-    reader   => 'app',
-    init_arg => 'app',
-    traits => [qw(NoGetopt)],
-    isa => 'Str',
-    is => 'ro',
-);
+__PACKAGE__->meta->make_immutable;
 
-has help => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'h',
-    isa => 'Bool',
-    is => 'ro',
-    documentation => qq{ display this help and exits },
-);
+=head1 NAME
 
+Catalyst::Script::CGI - The CGI Catalyst Script
 
-sub run {
-    my $self = shift;
+=head1 SYNOPSIS
 
-    pod2usage() if $self->help;
-    my $app = $self->app;
-    Class::MOP::load_class($app);
-    $app->run;
+See L<Catalyst>.
 
-}
-1;
+=head1 DESCRIPTION
+
+FIXME
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
