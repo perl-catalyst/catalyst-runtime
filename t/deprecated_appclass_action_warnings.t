@@ -15,4 +15,4 @@ Catalyst->log($logger);
 
 ok( my $response = request('http://localhost/foo'), 'Request' );
 ok( $response->is_success, 'Response Successful 2xx' );
-is( $warnings, 1, 'Get the appclass action warning' );
+is( $DeprecatedActionsInAppClassTestApp::Log::warnings, 1, 'Get the appclass action warning' );

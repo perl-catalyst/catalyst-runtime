@@ -20,6 +20,8 @@ use strict;
 use warnings;
 use base qw/Catalyst::Log/;
 
+our $warnings;
+
 sub warn {
     my ($self, $warning) = @_;
     $warnings++ if $warning =~ /action methods .+ found defined/i;
