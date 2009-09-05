@@ -4,8 +4,6 @@ use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
 use namespace::autoclean;
 
-requires 'run';
-
 with 'MooseX::Getopt';
 
 has application_name => (

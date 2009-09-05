@@ -63,11 +63,6 @@ has detach => (
     documentation => 'Detach this FastCGI process',
 );
 
-sub run {
-    my ($self) = @_;
-    $self->_run_application;
-}
-
 sub _application_args {
     my ($self) = shift;
     return (

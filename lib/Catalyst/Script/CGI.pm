@@ -5,11 +5,6 @@ use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
 
-sub run {
-    my ($self) = @_;
-    $self->_run_application;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
