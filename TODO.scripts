@@ -1,0 +1,5 @@
+* Fix the fucking help to be consistent again!
+* Documentation
+* Proper test of all the options on all the scripts
+* Tests for ScriptRunner
+* Tests for Scripts / Role
