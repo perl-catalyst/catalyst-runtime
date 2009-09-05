@@ -17,7 +17,7 @@ See L<Catalyst>.
 
 =head1 DESCRIPTION
 
-FIXME
+This is a script to run the Catalyst engine specialized for the CGI environment.
 
 =head1 AUTHORS
 

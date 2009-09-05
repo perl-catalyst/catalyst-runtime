@@ -187,11 +187,11 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-[% appprefix %]_server.pl - Catalyst Testserver
+Catalyst::Script::Server - Catalyst test server
 
 =head1 SYNOPSIS
 
-[% appprefix %]_server.pl [options]
+ myapp_server.pl [options]
 
  Options:
    -d     --debug          force debug mode
@@ -222,7 +222,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 DESCRIPTION
 
-Run a Catalyst Testserver for this application.
+Run a Catalyst test server for this application.
 
 =head1 AUTHORS
 

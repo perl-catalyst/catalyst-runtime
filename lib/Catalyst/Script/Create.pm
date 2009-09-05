@@ -50,7 +50,7 @@ Catalyst::Script::Create - Create a new Catalyst Component
 
 =head1 SYNOPSIS
 
-myapp_create.pl [options] model|view|controller name [helper] [options]
+ myapp_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
    -force        don't create a .new file where a file to be created exists
