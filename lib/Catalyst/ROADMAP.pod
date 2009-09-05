@@ -8,11 +8,6 @@ in the the catalyst trunk, currently at
 
 Make sure you get it from there to ensure you have the latest version.
 
-=head2 5.80000 1st Quarter 2009
-
-Next major planned release, ports Catalyst to Moose, and does some refactoring
-to help app/ctx.
-
 =head2 5.81000 
 
 =over
