@@ -44,6 +44,8 @@ sub BUILD {
     $self->_controller_actions($attr_value);
 }
 
+
+
 =head1 NAME
 
 Catalyst::Controller - Catalyst Controller base class
@@ -135,28 +137,30 @@ around action_namespace => sub {
     my $orig = shift;
     my ( $self, $c ) = @_;
 
+    my $class = ref($self) || $self;
+    my $appclass = ref($c) || $c;
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
     } else {
-        return $self->config->{namespace} if exists $self->config->{namespace};
+        return $class->config->{namespace} if exists $class->config->{namespace};
     }
 
     my $case_s;
     if( $c ){
-        $case_s = $c->config->{case_sensitive};
+        $case_s = $appclass->config->{case_sensitive};
     } else {
         if ($self->isa('Catalyst')) {
-            $case_s = $self->config->{case_sensitive};
+            $case_s = $class->config->{case_sensitive};
         } else {
             if (ref $self) {
-                $case_s = $self->_application->config->{case_sensitive};
+                $case_s = ref($self->_application)->config->{case_sensitive};
             } else {
                 confess("Can't figure out case_sensitive setting");
             }
         }
     }
 
-    my $namespace = Catalyst::Utils::class2prefix(ref($self) || $self, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix($self->catalyst_component_name, $case_s) || '';
     $self->$orig($namespace) if ref($self);
     return $namespace;
 };
@@ -177,13 +181,28 @@ around path_prefix => sub {
 
 sub get_action_methods {
     my $self = shift;
-    my $meta = find_meta($self);
-    confess("Metaclass for " . ref($meta) ." for " . $meta->name
-        . " cannot support register_actions.")
-        unless $meta->can('get_nearest_methods_with_attributes');
+    my $meta = find_meta($self) || confess("No metaclass setup for $self");
+    confess("Metaclass "
+          . ref($meta) . " for "
+          . $meta->name
+          . " cannot support register_actions." )
+      unless $meta->can('get_nearest_methods_with_attributes');
     my @methods = $meta->get_nearest_methods_with_attributes;
+
+    # actions specified via config are also action_methods
+    push(
+        @methods,
+        map {
+            $meta->find_method_by_name($_)
+              || confess( 'Action "'
+                  . $_
+                  . '" is not available from controller '
+                  . ( ref $self ) )
+          } keys %{ $self->_controller_actions }
+    ) if ( ref $self );
     return @methods;
 }
+
 
 sub register_actions {
     my ( $self, $c ) = @_;
@@ -192,14 +211,18 @@ sub register_actions {
 
 sub register_action_methods {
     my ( $self, $c, @methods ) = @_;
-    my $class = ref $self || $self;
+    my $class = $self->catalyst_component_name;
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
+
+    # Uncomment as soon as you fix the tests :)
+    #if (!blessed($self) && $self eq $c && scalar(@methods)) {
+    #    $c->log->warn("Action methods found defined in your application class, $self. This is deprecated, please move them into a Root controller.");
+    #}
 
     foreach my $method (@methods) {
         my $name = $method->name;
         my $attributes = $method->attributes;
-        next unless $attributes;
         my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
             $c->log->debug( 'Bad action definition "'
@@ -370,15 +393,14 @@ sub _parse_ChainedParent_attr {
 }
 
 sub _parse_PathPrefix_attr {
-    my $self = shift;
-    return PathPart => $self->path_prefix;
+    my ( $self, $c ) = @_;
+    return PathPart => $self->path_prefix($c);
 }
 
 sub _parse_ActionClass_attr {
     my ( $self, $c, $name, $value ) = @_;
-    unless ( $value =~ s/^\+// ) {
-      $value = join('::', $self->_action_class, $value );
-    }
+    my $appname = $self->_application;
+    $value = Catalyst::Utils::resolve_namespace($appname . '::Action', $self->_action_class, $value);
     return ( 'ActionClass', $value );
 }
 

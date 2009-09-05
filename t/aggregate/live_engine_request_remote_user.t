@@ -37,6 +37,11 @@ use HTTP::Request::Common;
     }
 
     isa_ok( $creq, 'Catalyst::Request' );
-    
-    is( $creq->remote_user, 'dwc', '$c->req->remote_user ok' );
+    SKIP:
+    {
+        if ( $ENV{CATALYST_SERVER} ) {
+            skip 'Using remote server', 1;
+        }
+        is( $creq->remote_user, 'dwc', '$c->req->remote_user ok' );
+    }
 }

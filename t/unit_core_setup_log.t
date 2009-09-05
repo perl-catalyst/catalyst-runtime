@@ -27,10 +27,15 @@ sub test_log_object {
     }
 }
 
-local %ENV; # Ensure blank or someone, somewhere will fail..
+local %ENV = %ENV;
+
+# Remove all relevant env variables to avoid accidental fail
+foreach my $name (grep { /^(CATALYST|TESTAPP)/ } keys %ENV) {
+    delete $ENV{$name};
+}
 
 {
-    my $app = mock_app('TestLogAppParseLevels');
+    my $app = mock_app('TestAppParseLogLevels');
     $app->setup_log('error,warn');
     ok !$app->debug, 'Not in debug mode';
     test_log_object($app->log,
@@ -42,8 +47,9 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     );
 }
 {
-    local %ENV = ( CATALYST_DEBUG => 1 );
-    my $app = mock_app('TestLogAppDebugEnvSet');
+    local %ENV = %ENV;
+    $ENV{CATALYST_DEBUG} = 1;
+    my $app = mock_app('TestAppLogDebugEnvSet');
     $app->setup_log('');
     ok $app->debug, 'In debug mode';
     test_log_object($app->log,
@@ -55,8 +61,9 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     );
 }
 {
-    local %ENV = ( CATALYST_DEBUG => 0 );
-    my $app = mock_app('TestLogAppDebugEnvUnset');
+    local %ENV = %ENV;
+    $ENV{CATALYST_DEBUG} = 0;
+    my $app = mock_app('TestAppLogDebugEnvUnset');
     $app->setup_log('warn');
     ok !$app->debug, 'Not In debug mode';
     test_log_object($app->log,
@@ -68,7 +75,7 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     );
 }
 {
-    my $app = mock_app('TestLogAppEmptyString');
+    my $app = mock_app('TestAppLogEmptyString');
     $app->setup_log('');
     ok !$app->debug, 'Not In debug mode';
     # Note that by default, you get _all_ the log levels turned on
@@ -81,7 +88,7 @@ local %ENV; # Ensure blank or someone, somewhere will fail..
     );
 }
 {
-    my $app = mock_app('TestLogAppDebugOnly');
+    my $app = mock_app('TestAppLogDebugOnly');
     $app->setup_log('debug');
     ok $app->debug, 'In debug mode';
     test_log_object($app->log,

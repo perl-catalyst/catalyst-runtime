@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 use URI;
 
 use_ok('Catalyst');
@@ -133,3 +133,13 @@ TODO: {
     );
 }
 
+# make sure caller's query parameter hash isn't messed up
+{
+    my $query_params_base = {test => "one two",
+                             bar  => ["foo baz", "bar"]};
+    my $query_params_test = {test => "one two",
+                             bar  => ["foo baz", "bar"]};
+    Catalyst::uri_for($context, '/bar/baz', $query_params_test);
+    is_deeply($query_params_base, $query_params_test,
+              "uri_for() doesn't mess up query parameter hash in the caller");
+}

@@ -13,9 +13,31 @@ use Catalyst qw/
 /;
 use Catalyst::Utils;
 
+use Moose;
+use namespace::autoclean;
+
 our $VERSION = '0.01';
 
 TestApp->config( name => 'TestApp', root => '/some/dir' );
+
+if (eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
+    with 'CatalystX::LeakChecker';
+
+    has leaks => (
+        is      => 'ro',
+        default => sub { [] },
+    );
+}
+
+sub found_leaks {
+    my ($ctx, @leaks) = @_;
+    push @{ $ctx->leaks }, @leaks;
+}
+
+sub count_leaks {
+    my ($ctx) = @_;
+    return scalar @{ $ctx->leaks };
+}
 
 TestApp->setup;
 
@@ -55,7 +77,7 @@ sub execute {
             @executed
         );
     }
-
+    no warnings 'recursion';
     return $c->SUPER::execute(@_);
 }
 
@@ -85,6 +107,7 @@ sub loop_test : Local {
 
 sub recursion_test : Local {
     my ( $self, $c ) = @_;
+    no warnings 'recursion';
     $c->forward( 'recursion_test' );
 }
 

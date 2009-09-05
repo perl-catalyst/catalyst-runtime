@@ -223,7 +223,7 @@ Arguments get automatically URI-unescaped for you.
 
 =head2 $req->args
 
-Shortcut for arguments.
+Shortcut for L</arguments>.
 
 =head2 $req->base
 
@@ -237,8 +237,9 @@ C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
 =head2 $req->body
 
-Returns the message body of the request, unless Content-Type is
-C<application/x-www-form-urlencoded> or C<multipart/form-data>.
+Returns the message body of the request, as returned by L<HTTP::Body>: a string,
+unless Content-Type is C<application/x-www-form-urlencoded>, C<text/xml>, or
+C<multipart/form-data>, in which case a L<File::Temp> object is returned.
 
 =head2 $req->body_parameters
 
@@ -300,7 +301,7 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-The cookies in the hash are indexed by name, and the values are L<CGI::Cookie>
+The cookies in the hash are indexed by name, and the values are L<CGI::Simple::Cookie>
 objects.
 
 =head2 $req->header
@@ -473,7 +474,7 @@ Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
-You have to set MyApp->config->{parse_on_demand} to use this directly.
+You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 
 =head2 $req->referer
 
@@ -571,19 +572,35 @@ L<Catalyst::Request::Upload> objects.
 
 Returns a URI object for the current request. Stringifies to the URI text.
 
-=head2 $req->uri_with( { key => 'value' } );
+=head2 $req->mangle_params( { key => 'value' }, $appendmode);
 
-Returns a rewritten URI object for the current request. Key/value pairs
-passed in will override existing parameters. You can remove an existing
-parameter by passing in an undef value. Unmodified pairs will be
-preserved.
+Returns a hashref of parameters stemming from the current request's params,
+plus the ones supplied.  Keys for which no current param exists will be
+added, keys with undefined values will be removed and keys with existing
+params will be replaced.  Note that you can supply a true value as the final
+argument to change behavior with regards to existing parameters, appending
+values rather than replacing them.
+
+A quick example:
+
+  # URI query params foo=1
+  my $hashref = $req->mangle_params({ foo => 2 });
+  # Result is query params of foo=2
+
+versus append mode:
+
+  # URI query params foo=1
+  my $hashref = $req->mangle_params({ foo => 2 }, 1);
+  # Result is query params of foo=1&foo=2
+
+This is the code behind C<uri_with>.
 
 =cut
 
-sub uri_with {
-    my( $self, $args ) = @_;
+sub mangle_params {
+    my ($self, $args, $append) = @_;
 
-    carp( 'No arguments passed to uri_with()' ) unless $args;
+    carp('No arguments passed to mangle_params()') unless $args;
 
     foreach my $value ( values %$args ) {
         next unless defined $value;
@@ -593,13 +610,66 @@ sub uri_with {
         }
     };
 
-    my $uri   = $self->uri->clone;
-    my %query = ( %{ $uri->query_form_hash }, %$args );
+    my %params = %{ $self->uri->query_form_hash };
+    foreach my $key (keys %{ $args }) {
+        my $val = $args->{$key};
+        if(defined($val)) {
 
-    $uri->query_form( {
-        # remove undef values
-        map { defined $query{ $_ } ? ( $_ => $query{ $_ } ) : () } keys %query
-    } );
+            if($append && exists($params{$key})) {
+
+                # This little bit of heaven handles appending a new value onto
+                # an existing one regardless if the existing value is an array
+                # or not, and regardless if the new value is an array or not
+                $params{$key} = [
+                    ref($params{$key}) eq 'ARRAY' ? @{ $params{$key} } : $params{$key},
+                    ref($val) eq 'ARRAY' ? @{ $val } : $val
+                ];
+
+            } else {
+                $params{$key} = $val;
+            }
+        } else {
+
+            # If the param wasn't defined then we delete it.
+            delete($params{$key});
+        }
+    }
+
+
+    return \%params;
+}
+
+=head2 $req->uri_with( { key => 'value' } );
+
+Returns a rewritten URI object for the current request. Key/value pairs
+passed in will override existing parameters. You can remove an existing
+parameter by passing in an undef value. Unmodified pairs will be
+preserved.
+
+You may also pass an optional second parameter that puts C<uri_with> into
+append mode:
+
+  $req->uri_with( { key => 'value' }, { mode => 'append' } );
+
+See C<mangle_params> for an explanation of this behavior.
+
+=cut
+
+sub uri_with {
+    my( $self, $args, $behavior) = @_;
+
+    carp( 'No arguments passed to uri_with()' ) unless $args;
+
+    my $append = 0;
+    if((ref($behavior) eq 'HASH') && defined($behavior->{mode}) && ($behavior->{mode} eq 'append')) {
+        $append = 1;
+    }
+
+    my $params = $self->mangle_params($args, $append);
+
+    my $uri = $self->uri->clone;
+    $uri->query_form($params);
+
     return $uri;
 }
 

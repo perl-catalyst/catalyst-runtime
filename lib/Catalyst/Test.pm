@@ -31,7 +31,7 @@ my $build_exports = sub {
     my $get = sub { $request->(@_)->content };
 
     my $ctx_request = sub {
-        my $me      = ref $self || $self;
+        my $me = ref $self || $self;
 
         ### throw an exception if ctx_request is being used against a remote
         ### server
@@ -49,13 +49,13 @@ my $build_exports = sub {
         ### hook into 'dispatch' -- the function gets called after all plugins
         ### have done their work, and it's an easy place to capture $c.
 
-        my $meta = Catalyst->meta;
+        my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
             $c = shift;
         });
-        $meta->make_immutable;
-
+        $meta->make_immutable( replace_constructor => 1 );
+        Class::C3::reinitialize(); # Fixes RT#46459, I've failed to write a test for how/why, but it does.
         ### do the request; C::T::request will know about the class name, and
         ### we've already stopped it from doing remote requests above.
         my $res = $request->( @_ );
@@ -156,8 +156,8 @@ L<HTTP::Request::AsCGI> or remotely if you define the CATALYST_SERVER
 environment variable. This module also adds a few Catalyst-specific
 testing methods as displayed in the method section.
 
-The L<get> and L<request> functions take either a URI or an L<HTTP::Request>
-object.
+The L<get|/"$content = get( ... )"> and L<request|/"$res = request( ... );">
+functions take either a URI or an L<HTTP::Request> object.
 
 =head1 INLINE TESTS WILL NO LONGER WORK
 
@@ -187,7 +187,7 @@ Returns the content.
 
 Note that this method doesn't follow redirects, so to test for a
 correctly redirecting page you'll need to use a combination of this
-method and the L<request> method below:
+method and the L<request|/"$res = request( ... );"> method below:
 
     my $res = request('/'); # redirects to /y
     warn $res->header('location');
@@ -208,7 +208,7 @@ header configuration; currently only supports setting 'host' value.
 
 =head2 ($res, $c) = ctx_request( ... );
 
-Works exactly like L<request>, except it also returns the Catalyst context object,
+Works exactly like L<request|/"$res = request( ... );">, except it also returns the Catalyst context object,
 C<$c>. Note that this only works for local requests.
 
 =head2 $res = Catalyst::Test::local_request( $AppClass, $url );

@@ -73,6 +73,8 @@ about expand_action.
 
 sub expand_action { }
 
+sub _is_low_precedence { 0 }
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

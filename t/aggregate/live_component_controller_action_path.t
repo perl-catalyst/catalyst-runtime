@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 36*$iters;
+use Test::More tests => 42*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -134,6 +134,24 @@ sub run_tests {
         is(
             $response->header('X-Test-Class'),
             'TestApp::Controller::Root',
+            'Test Class'
+        );
+        like(
+            $response->content,
+            qr/^bless\( .* 'Catalyst::Request' \)$/s,
+            'Content is a serialized Catalyst::Request'
+        );
+    }
+
+    {
+        ok( my $response = request('http://localhost/action/path/six'), 'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            'action/path/six', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Path',
             'Test Class'
         );
         like(

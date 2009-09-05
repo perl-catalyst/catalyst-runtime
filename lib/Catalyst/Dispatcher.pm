@@ -34,17 +34,14 @@ has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required =
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
 has _container_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
-has preload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@PRELOAD] });
 
-has postload_dispatch_types => (is => 'rw', required => 1, lazy => 1, default => sub { [@POSTLOAD] });
-
-# Wrap accessors so you can assign a list and it will capture a list ref.
-around qw/preload_dispatch_types postload_dispatch_types/ => sub {
-    my $orig = shift;
-    my $self = shift;
-    return $self->$orig([@_]) if (scalar @_ && ref $_[0] ne 'ARRAY');
-    return $self->$orig(@_);
-};
+my %dispatch_types = ( pre => \@PRELOAD, post => \@POSTLOAD );
+foreach my $type (keys %dispatch_types) {
+    has $type . "load_dispatch_types" => (
+        is => 'rw', required => 1, lazy => 1, default => sub { $dispatch_types{$type} },
+        traits => ['MooseX::Emulate::Class::Accessor::Fast::Meta::Role::Attribute'], # List assignment is CAF style
+    );
+}
 
 =head1 NAME
 
@@ -225,7 +222,7 @@ Documented in L<Catalyst>
 sub go {
     my $self = shift;
     $self->_do_visit('go', @_);
-    die $Catalyst::GO;
+    Catalyst::Exception::Go->throw;
 }
 
 =head2 $self->forward( $c, $command [, \@arguments ] )
@@ -271,7 +268,7 @@ Documented in L<Catalyst>
 sub detach {
     my ( $self, $c, $command, @args ) = @_;
     $self->_do_forward(detach => $c, $command, @args ) if $command;
-    die $Catalyst::DETACH;
+    Catalyst::Exception::Detach->throw;
 }
 
 sub _action_rel2abs {
@@ -338,7 +335,7 @@ sub _invoke_as_component {
                 reverse   => "$component_class->$method",
                 class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $component_class, $c->config->{case_sensitive}
+                    $component_class, ref($c)->config->{case_sensitive}
                 ),
             }
         );
@@ -370,9 +367,7 @@ sub prepare_action {
 
   DESCEND: while (@path) {
         $path = join '/', @path;
-        $path =~ s#^/##;
-
-        $path = '' if $path eq '/';    # Root action
+        $path =~ s#^/+##;
 
         # Check out dispatch types to see if any will handle the path at
         # this level
@@ -459,9 +454,6 @@ sub get_containers {
     }
 
     return reverse grep { defined } @containers, $self->_container_hash->{''};
-
-    #return (split '/', $namespace); # isnt this more clear?
-    my @parts = split '/', $namespace;
 }
 
 =head2 $self->uri_for_action($action, \@captures)
@@ -531,9 +523,28 @@ sub register {
         }
     }
 
+    my @dtypes = @{ $self->_dispatch_types };
+    my @normal_dtypes;
+    my @low_precedence_dtypes;
+
+    for my $type ( @dtypes ) {
+        if ($type->_is_low_precedence) {
+            push @low_precedence_dtypes, $type;
+        } else {
+            push @normal_dtypes, $type;
+        }
+    }
+
     # Pass the action to our dispatch types so they can register it if reqd.
-    foreach my $type ( @{ $self->_dispatch_types } ) {
-        $type->register( $c, $action );
+    my $was_registered = 0;
+    foreach my $type ( @normal_dtypes ) {
+        $was_registered = 1 if $type->register( $c, $action );
+    }
+
+    if (not $was_registered) {
+        foreach my $type ( @low_precedence_dtypes ) {
+            $type->register( $c, $action );
+        }
     }
 
     my $namespace = $action->namespace;
@@ -604,9 +615,12 @@ sub setup_actions {
 sub _display_action_tables {
     my ($self, $c) = @_;
 
-    my $column_width = Catalyst::Utils::term_width() - 20 - 36 - 12;
+    my $avail_width = Catalyst::Utils::term_width() - 12;
+    my $col1_width = ($avail_width * .25) < 20 ? 20 : int($avail_width * .25);
+    my $col2_width = ($avail_width * .50) < 36 ? 36 : int($avail_width * .50);
+    my $col3_width =  $avail_width - $col1_width - $col2_width;
     my $privates = Text::SimpleTable->new(
-        [ 20, 'Private' ], [ 36, 'Class' ], [ $column_width, 'Method' ]
+        [ $col1_width, 'Private' ], [ $col2_width, 'Class' ], [ $col3_width, 'Method' ]
     );
 
     my $has_private = 0;
@@ -640,11 +654,10 @@ sub _load_dispatch_types {
     my ( $self, @types ) = @_;
 
     my @loaded;
-
     # Preload action types
     for my $type (@types) {
-        my $class =
-          ( $type =~ /^\+(.*)$/ ) ? $1 : "Catalyst::DispatchType::${type}";
+        # first param is undef because we cannot get the appclass
+        my $class = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $type);
 
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
@@ -668,9 +681,8 @@ of course it's being used.)
 sub dispatch_type {
     my ($self, $name) = @_;
 
-    unless ($name =~ s/^\+//) {
-        $name = "Catalyst::DispatchType::" . $name;
-    }
+    # first param is undef because we cannot get the appclass
+    $name = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $name);
 
     for (@{ $self->_dispatch_types }) {
         return $_ if ref($_) eq $name;
@@ -685,10 +697,26 @@ use Moose;
 # Various plugins (e.g. Plugin::Server and Plugin::Authorization::ACL)
 # need the methods here which *should* be private..
 
-# However we can't really take them away until there is a sane API for
-# building actions and configuring / introspecting the dispatcher.
-# In 5.90, we should build that infrastructure, port the plugins which
-# use it, and then take the crap below away.
+# You should be able to use get_actions or get_containers appropriately
+# instead of relying on these methods which expose implementation details
+# of the dispatcher..
+#
+# IRC backlog included below, please come ask if this doesn't work for you.
+#
+# <@t0m> 5.80, the state of. There are things in the dispatcher which have
+#        been deprecated, that we yell at anyone for using, which there isn't
+#        a good alternative for yet..
+# <@mst> er, get_actions/get_containers provides that doesn't it?
+# <@mst> DispatchTypes are loaded on demand anyway
+# <@t0m> I'm thinking of things like _tree which is aliased to 'tree' with
+#        warnings otherwise shit breaks.. We're issuing warnings about the
+#        correct set of things which you shouldn't be calling..
+# <@mst> right
+# <@mst> basically, I don't see there's a need for a replacement for anything
+# <@mst> it was never a good idea to call ->tree
+# <@mst> nothingmuch was the only one who did AFAIK
+# <@mst> and he admitted it was a hack ;)
+
 # See also t/lib/TestApp/Plugin/AddDispatchTypes.pm
 
 # Alias _method_name to method_name, add a before modifier to warn..

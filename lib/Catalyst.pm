@@ -7,6 +7,8 @@ use Moose::Util qw/find_meta/;
 use bytes;
 use B::Hooks::EndOfScope ();
 use Catalyst::Exception;
+use Catalyst::Exception::Detach;
+use Catalyst::Exception::Go;
 use Catalyst::Log;
 use Catalyst::Request;
 use Catalyst::Request::Upload;
@@ -25,11 +27,12 @@ use URI::https;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
+use List::MoreUtils qw/uniq/;
 use attributes;
 use utf8;
 use Carp qw/croak carp shortmess/;
 
-BEGIN { require 5.008001; }
+BEGIN { require 5.008004; }
 
 has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });
@@ -58,8 +61,8 @@ sub finalize_output { shift->finalize_body(@_) };
 our $COUNT     = 1;
 our $START     = time;
 our $RECURSION = 1000;
-our $DETACH    = "catalyst_detach\n";
-our $GO        = "catalyst_go\n";
+our $DETACH    = Catalyst::Exception::Detach->new;
+our $GO        = Catalyst::Exception::Go->new;
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
@@ -76,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80005';
+our $VERSION = '5.80011';
 
 {
     my $dev_version = $VERSION =~ /_\d{2}$/;
@@ -101,12 +104,13 @@ sub import {
     }
 
     my $meta = Moose::Meta::Class->initialize($caller);
-    #Moose->import({ into => $caller }); #do we want to do this?
-
     unless ( $caller->isa('Catalyst') ) {
         my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller');
         $meta->superclasses(@superclasses);
     }
+    # Avoid possible C3 issues if 'Moose::Object' is already on RHS of MyApp
+    $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
+
     unless( $meta->has_method('meta') ){
         $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
     }
@@ -114,6 +118,8 @@ sub import {
     $caller->arguments( [@arguments] );
     $caller->setup_home;
 }
+
+sub _application { $_[0] }
 
 =head1 NAME
 
@@ -330,9 +336,11 @@ call to forward.
     $c->forward(qw/MyApp::Model::DBIC::Foo do_stuff/);
     $c->forward('MyApp::View::TT');
 
-Note that forward implies an C<<eval { }>> around the call (actually
-C<execute> does), thus de-fatalizing all 'dies' within the called
-action. If you want C<die> to propagate you need to do something like:
+Note that L<< forward|/"$c->forward( $action [, \@arguments ] )" >> implies
+an C<< eval { } >> around the call (actually
+L<< execute|/"$c->execute( $class, $coderef )" >> does), thus de-fatalizing
+all 'dies' within the called action. If you want C<die> to propagate you
+need to do something like:
 
     $c->forward('foo');
     die $c->error if $c->error;
@@ -352,8 +360,8 @@ sub forward { my $c = shift; no warnings 'recursion'; $c->dispatcher->forward( $
 
 =head2 $c->detach()
 
-The same as C<forward>, but doesn't return to the previous action when
-processing is finished.
+The same as L<< forward|/"$c->forward( $action [, \@arguments ] )" >>, but
+doesn't return to the previous action when processing is finished.
 
 When called with no arguments it escapes the processing chain entirely.
 
@@ -365,23 +373,27 @@ sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
 =head2 $c->visit( $class, $method, [, \@captures, \@arguments ] )
 
-Almost the same as C<forward>, but does a full dispatch, instead of just
-calling the new C<$action> / C<$class-E<gt>$method>. This means that C<begin>,
-C<auto> and the method you go to are called, just like a new request.
+Almost the same as L<< forward|/"$c->forward( $action [, \@arguments ] )" >>,
+but does a full dispatch, instead of just calling the new C<$action> /
+C<< $class->$method >>. This means that C<begin>, C<auto> and the method
+you go to are called, just like a new request.
 
 In addition both C<< $c->action >> and C<< $c->namespace >> are localized.
-This means, for example, that $c->action methods such as C<name>, C<class> and
-C<reverse> return information for the visited action when they are invoked
-within the visited action.  This is different from the behavior of C<forward>
-which continues to use the $c->action object from the caller action even when
+This means, for example, that C<< $c->action >> methods such as
+L<name|Catalyst::Action/name>, L<class|Catalyst::Action/class> and
+L<reverse|Catalyst::Action/reverse> return information for the visited action
+when they are invoked within the visited action.  This is different from the
+behavior of L<< forward|/"$c->forward( $action [, \@arguments ] )" >>, which
+continues to use the $c->action object from the caller action even when
 invoked from the callee.
 
-C<$c-E<gt>stash> is kept unchanged.
+C<< $c->stash >> is kept unchanged.
 
-In effect, C<visit> allows you to "wrap" another action, just as it
-would have been called by dispatching from a URL, while the analogous
-C<go> allows you to transfer control to another action as if it had
-been reached directly from a URL.
+In effect, L<< visit|/"$c->visit( $action [, \@captures, \@arguments ] )" >>
+allows you to "wrap" another action, just as it would have been called by
+dispatching from a URL, while the analogous
+L<< go|/"$c->go( $action [, \@captures, \@arguments ] )" >> allows you to
+transfer control to another action as if it had been reached directly from a URL.
 
 =cut
 
@@ -391,12 +403,12 @@ sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
 =head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
-Almost the same as C<detach>, but does a full dispatch like C<visit>,
+Almost the same as L<< detach|/"$c->detach( $action [, \@arguments ] )" >>, but does a full dispatch like L</visit>,
 instead of just calling the new C<$action> /
-C<$class-E<gt>$method>. This means that C<begin>, C<auto> and the
+C<< $class->$method >>. This means that C<begin>, C<auto> and the
 method you visit are called, just like a new request.
 
-C<$c-E<gt>stash> is kept unchanged.
+C<< $c->stash >> is kept unchanged.
 
 =cut
 
@@ -634,7 +646,7 @@ If you want to search for models, pass in a regexp as the argument.
 
 sub model {
     my ( $c, $name, @args ) = @_;
-
+    my $appclass = ref($c) || $c;
     if( $name ) {
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -647,14 +659,14 @@ sub model {
         return $c->model( $c->stash->{current_model} )
           if $c->stash->{current_model};
     }
-    return $c->model( $c->config->{default_model} )
-      if $c->config->{default_model};
+    return $c->model( $appclass->config->{default_model} )
+      if $appclass->config->{default_model};
 
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
     if( $rest ) {
         $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
-        $c->log->warn( '* $c->config->{default_model} # the name of the default model to use' );
+        $c->log->warn( '* $c->config(default_model => "the name of the default model to use")' );
         $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
         $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
@@ -688,6 +700,7 @@ If you want to search for views, pass in a regexp as the argument.
 sub view {
     my ( $c, $name, @args ) = @_;
 
+    my $appclass = ref($c) || $c;
     if( $name ) {
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -700,14 +713,14 @@ sub view {
         return $c->view( $c->stash->{current_view} )
           if $c->stash->{current_view};
     }
-    return $c->view( $c->config->{default_view} )
-      if $c->config->{default_view};
+    return $c->view( $appclass->config->{default_view} )
+      if $appclass->config->{default_view};
 
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
 
     if( $rest ) {
         $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
-        $c->log->warn( '* $c->config->{default_view} # the name of the default view to use' );
+        $c->log->warn( '* $c->config(default_view => "the name of the default view to use")' );
         $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
         $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
@@ -813,11 +826,11 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config( { db => 'dsn:SQLite:foo.db' } );
 
-You can also use a C<YAML>, C<XML> or C<Config::General> config file
-like myapp.conf in your applications home directory. See
+You can also use a C<YAML>, C<XML> or L<Config::General> config file
+like C<myapp.conf> in your applications home directory. See
 L<Catalyst::Plugin::ConfigLoader>.
 
-=head3 Cascading configuration.
+=head3 Cascading configuration
 
 The config method is present on all Catalyst components, and configuration
 will be merged when an application is started. Configuration loaded with
@@ -913,7 +926,7 @@ Returns the engine instance. See L<Catalyst::Engine>.
 Merges C<@path> with C<< $c->config->{home} >> and returns a
 L<Path::Class::Dir> object. Note you can usually use this object as
 a filename, but sometimes you will have to explicitly stringify it
-yourself by calling the C<<->stringify>> method.
+yourself by calling the C<< ->stringify >> method.
 
 For example:
 
@@ -1104,21 +1117,25 @@ EOF
     $class->log->_flush() if $class->log->can('_flush');
 
     # Make sure that the application class becomes immutable at this point,
-    # which ensures that it gets an inlined constructor. This means that it
-    # works even if the user has added a plugin which contains a new method.
-    # Note however that we have to do the work on scope end, so that method
-    # modifiers work correctly in MyApp (as you have to call setup _before_
-    # applying modifiers).
     B::Hooks::EndOfScope::on_scope_end {
         return if $@;
         my $meta = Class::MOP::get_metaclass_by_name($class);
-        if ( $meta->is_immutable && ! { $meta->immutable_options }->{inline_constructor} ) {
+        if (
+            $meta->is_immutable
+            && ! { $meta->immutable_options }->{replace_constructor}
+            && (
+                   $class->isa('Class::Accessor::Fast')
+                || $class->isa('Class::Accessor')
+            )
+        ) {
             warn "You made your application class ($class) immutable, "
-                . "but did not inline the constructor.\n"
-                . "This will break catalyst, please pass "
-                . "(replace_constructor => 1) when making your class immutable.\n";
+                . "but did not inline the\nconstructor. "
+                . "This will break catalyst, as your app \@ISA "
+                . "Class::Accessor(::Fast)?\nPlease pass "
+                . "(replace_constructor => 1)\nwhen making your class immutable.\n";
         }
-        $meta->make_immutable(replace_constructor => 1) unless $meta->is_immutable;
+        $meta->make_immutable(replace_constructor => 1)
+            unless $meta->is_immutable;
     };
 
     $class->setup_finalize;
@@ -1149,35 +1166,53 @@ sub setup_finalize {
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
-
 =head2 $c->uri_for( $path, @args?, \%query_values? )
 
-=over
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
 
-=item $action
+Constructs an absolute L<URI> object based on the application root, the
+provided path, and the additional arguments and query parameters provided.
+When used as a string, provides a textual URI.
 
-A Catalyst::Action object representing the Catalyst action you want to
-create a URI for. To get one for an action in the current controller,
-use C<< $c->action('someactionname') >>. To get one from different
-controller, fetch the controller using C<< $c->controller() >>, then
-call C<action_for> on it.
+If the first argument is a string, it is taken as a public URI path relative
+to C<< $c->namespace >> (if it doesn't begin with a forward slash) or
+relative to the application root (if it does). It is then merged with
+C<< $c->request->base >>; any C<@args> are appended as additional path
+components; and any C<%query_values> are appended as C<?foo=bar> parameters.
 
-You can maintain the arguments captured by an action (e.g.: Regex, Chained)
-using C<< $c->req->captures >>.
+If the first argument is a L<Catalyst::Action> it represents an action which
+will have its path resolved using C<< $c->dispatcher->uri_for_action >>. The
+optional C<\@captures> argument (an arrayref) allows passing the captured
+variables that are needed to fill in the paths of Chained and Regex actions;
+once the path is resolved, C<uri_for> continues as though a path was
+provided, appending any arguments or parameters and creating an absolute
+URI.
 
-  # For the current action
-  $c->uri_for($c->action, $c->req->captures);
+The captures for the current request can be found in
+C<< $c->request->captures >>, and actions can be resolved using
+C<< Catalyst::Controller->action_for($name) >>. If you have a private action
+path, use C<< $c->uri_for_action >> instead.
+
+  # Equivalent to $c->req->uri
+  $c->uri_for($c->action, $c->req->captures,
+      @{ $c->req->args }, $c->req->params);
 
   # For the Foo action in the Bar controller
-  $c->uri_for($c->controller('Bar')->action_for('Foo'), $c->req->captures);
+  $c->uri_for($c->controller('Bar')->action_for('Foo'));
 
-=back
+  # Path to a static resource
+  $c->uri_for('/static/images/logo.png');
 
 =cut
 
 sub uri_for {
     my ( $c, $path, @args ) = @_;
+
+    if (blessed($path) && $path->isa('Catalyst::Controller')) {
+        $path = $path->path_prefix;
+        $path =~ s{/+\z}{};
+        $path .= '/';
+    }
 
     if ( blessed($path) ) { # action object
         my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
@@ -1230,12 +1265,12 @@ sub uri_for {
           my $key = $_;
           $val = '' unless defined $val;
           (map {
-              $_ = "$_";
-              utf8::encode( $_ ) if utf8::is_utf8($_);
+              my $param = "$_";
+              utf8::encode( $param ) if utf8::is_utf8($param);
               # using the URI::Escape pattern here so utf8 chars survive
-              s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
-              s/ /+/g;
-              "${key}=$_"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
+              $param =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+              $param =~ s/ /+/g;
+              "${key}=$param"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
       } @keys);
     }
 
@@ -1509,11 +1544,11 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
-        if ( !ref($error) and $error eq $DETACH ) {
-            die $DETACH if($c->depth > 1);
+        if ( blessed($error) and $error->isa('Catalyst::Exception::Detach') ) {
+            $error->rethrow if $c->depth > 1;
         }
-        elsif ( !ref($error) and $error eq $GO ) {
-            die $GO if($c->depth > 0);
+        elsif ( blessed($error) and $error->isa('Catalyst::Exception::Go') ) {
+            $error->rethrow if $c->depth > 0;
         }
         else {
             unless ( ref $error ) {
@@ -1532,9 +1567,9 @@ sub execute {
 
 sub _stats_start_execute {
     my ( $c, $code ) = @_;
-
+    my $appclass = ref($c) || $c;
     return if ( ( $code->name =~ /^_.*/ )
-        && ( !$c->config->{show_internal_actions} ) );
+        && ( !$appclass->config->{show_internal_actions} ) );
 
     my $action_name = $code->reverse();
     $c->counter->{$action_name}++;
@@ -1595,25 +1630,6 @@ sub _stats_start_execute {
 sub _stats_finish_execute {
     my ( $c, $info ) = @_;
     $c->stats->profile( end => $info );
-}
-
-=head2 $c->_localize_fields( sub { }, \%keys );
-
-=cut
-
-#Why does this exist? This is no longer safe and WILL NOT WORK.
-# it doesnt seem to be used anywhere. can we remove it?
-sub _localize_fields {
-    my ( $c, $localized, $code ) = ( @_ );
-
-    my $request = delete $localized->{request} || {};
-    my $response = delete $localized->{response} || {};
-
-    local @{ $c }{ keys %$localized } = values %$localized;
-    local @{ $c->request }{ keys %$request } = values %$request;
-    local @{ $c->response }{ keys %$response } = values %$response;
-
-    $code->();
 }
 
 =head2 $c->finalize
@@ -1867,7 +1883,7 @@ sub prepare {
         $c->prepare_read;
 
         # Parse the body unless the user wants it on-demand
-        unless ( $c->config->{parse_on_demand} ) {
+        unless ( ref($c)->config->{parse_on_demand} ) {
             $c->prepare_body;
         }
     }
@@ -2081,7 +2097,7 @@ Reads a chunk of data from the request body. This method is designed to
 be used in a while loop, reading C<$maxlength> bytes on every call.
 C<$maxlength> defaults to the size of the request if not specified.
 
-You have to set C<< MyApp->config->{parse_on_demand} >> to use this
+You have to set C<< MyApp->config(parse_on_demand => 1) >> to use this
 directly.
 
 Warning: If you use read(), Catalyst will not process the body,
@@ -2118,24 +2134,73 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 
 =head2 $c->setup_components
 
-Sets up components. Specify a C<setup_components> config option to pass
-additional options directly to L<Module::Pluggable>. To add additional
-search paths, specify a key named C<search_extra> as an array
-reference. Items in the array beginning with C<::> will have the
-application class name prepended to them.
+This method is called internally to set up the application's components.
 
-All components found will also have any
-L<Devel::InnerPackage|inner packages> loaded and set up as components.
-Note, that modules which are B<not> an I<inner package> of the main
-file namespace loaded will not be instantiated as components.
+It finds modules by calling the L<locate_components> method, expands them to
+package names with the L<expand_component_module> method, and then installs
+each component into the application.
+
+The C<setup_components> config option is passed to both of the above methods.
+
+Installation of each component is performed by the L<setup_component> method,
+below.
 
 =cut
 
 sub setup_components {
     my $class = shift;
 
-    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
     my $config  = $class->config->{ setup_components };
+
+    my @comps = sort { length $a <=> length $b }
+                $class->locate_components($config);
+    my %comps = map { $_ => 1 } @comps;
+
+    my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
+    $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
+        qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
+    ) if $deprecatedcatalyst_component_names;
+
+    for my $component ( @comps ) {
+
+        # We pass ignore_loaded here so that overlay files for (e.g.)
+        # Model::DBI::Schema sub-classes are loaded - if it's in @comps
+        # we know M::P::O found a file on disk so this is safe
+
+        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+
+        # Needs to be done as soon as the component is loaded, as loading a sub-component
+        # (next time round the loop) can cause us to get the wrong metaclass..
+        $class->_controller_init_base_classes($component);
+    }
+
+    for my $component (@comps) {
+        $class->components->{ $component } = $class->setup_component($component);
+        for my $component ($class->expand_component_module( $component, $config )) {
+            next if $comps{$component};
+            $class->_controller_init_base_classes($component); # Also cover inner packages
+            $class->components->{ $component } = $class->setup_component($component);
+        }
+    }
+}
+
+=head2 $c->locate_components( $setup_component_config )
+
+This method is meant to provide a list of component modules that should be
+setup for the application.  By default, it will use L<Module::Pluggable>.
+
+Specify a C<setup_components> config option to pass additional options directly
+to L<Module::Pluggable>. To add additional search paths, specify a key named
+C<search_extra> as an array reference. Items in the array beginning with C<::>
+will have the application class name prepended to them.
+
+=cut
+
+sub locate_components {
+    my $class  = shift;
+    my $config = shift;
+
+    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
     my $extra   = delete $config->{ search_extra } || [];
 
     push @paths, @$extra;
@@ -2145,45 +2210,34 @@ sub setup_components {
         %$config
     );
 
-    my @comps = sort { length $a <=> length $b } $locator->plugins;
-    my %comps = map { $_ => 1 } @comps;
+    my @comps = $locator->plugins;
 
-    my $deprecated_component_names = grep { /::[CMV]::/ } @comps;
-    $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
-        qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
-    ) if $deprecated_component_names;
+    return @comps;
+}
 
-    for my $component ( @comps ) {
+=head2 $c->expand_component_module( $component, $setup_component_config )
 
-        # We pass ignore_loaded here so that overlay files for (e.g.)
-        # Model::DBI::Schema sub-classes are loaded - if it's in @comps
-        # we know M::P::O found a file on disk so this is safe
+Components found by C<locate_components> will be passed to this method, which
+is expected to return a list of component (package) names to be set up.
 
-        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
-        #Class::MOP::load_class($component);
+=cut
 
-        my $module  = $class->setup_component( $component );
-        my %modules = (
-            $component => $module,
-            map {
-                $_ => $class->setup_component( $_ )
-            } grep {
-              not exists $comps{$_}
-            } Devel::InnerPackage::list_packages( $component )
-        );
-
-        for my $key ( keys %modules ) {
-            $class->components->{ $key } = $modules{ $key };
-        }
-    }
+sub expand_component_module {
+    my ($class, $module) = @_;
+    return Devel::InnerPackage::list_packages( $module );
 }
 
 =head2 $c->setup_component
 
 =cut
 
+# FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
+#         nearest to Catalyst::Controller first, no matter what order stuff happens
+#         to be loaded. There are TODO tests in Moose for this, see
+#         f2391d17574eff81d911b97be15ea51080500003
 sub _controller_init_base_classes {
     my ($app_class, $component) = @_;
+    return unless $component->isa('Catalyst::Controller');
     foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
         Moose::Meta::Class->initialize( $class )
             unless find_meta($class);
@@ -2197,16 +2251,12 @@ sub setup_component {
         return $component;
     }
 
-    # FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
-    #         nearest to Catalyst::Controller first, no matter what order stuff happens
-    #         to be loaded. There are TODO tests in Moose for this, see
-    #         f2391d17574eff81d911b97be15ea51080500003
-    if ($component->isa('Catalyst::Controller')) {
-        $class->_controller_init_base_classes($component);
-    }
-
     my $suffix = Catalyst::Utils::class2classsuffix( $component );
     my $config = $class->config->{ $suffix } || {};
+    # Stash catalyst_component_name in the config here, so that custom COMPONENT
+    # methods also pass it. local to avoid pointlessly shitting in config
+    # for the debug screen, as $component is already the key name.
+    local $config->{catalyst_component_name} = $component;
 
     my $instance = eval { $component->COMPONENT( $class, $config ); };
 
@@ -2510,7 +2560,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         $class->_plugins( {} ) unless $class->_plugins;
         $plugins ||= [];
 
-        my @plugins = map { s/\A\+// ? $_ : "Catalyst::Plugin::$_" } @$plugins;
+        my @plugins = Catalyst::Utils::resolve_namespace($class . '::Plugin', 'Catalyst::Plugin', @$plugins);
 
         for my $plugin ( reverse @plugins ) {
             Class::MOP::load_class($plugin);
@@ -2587,7 +2637,7 @@ Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,
 C<_ACTION>, and C<_END>. These are by default not shown in the private
 action table, but you can make them visible with a config parameter.
 
-    MyApp->config->{show_internal_actions} = 1;
+    MyApp->config(show_internal_actions => 1);
 
 =head1 CASE SENSITIVITY
 
@@ -2595,7 +2645,7 @@ By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
 mapped to C</foo/bar>. You can activate case sensitivity with a config
 parameter.
 
-    MyApp->config->{case_sensitive} = 1;
+    MyApp->config(case_sensitive => 1);
 
 This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
 
@@ -2605,7 +2655,7 @@ The request body is usually parsed at the beginning of a request,
 but if you want to handle input yourself, you can enable on-demand
 parsing with a config parameter.
 
-    MyApp->config->{parse_on_demand} = 1;
+    MyApp->config(parse_on_demand => 1);
 
 =head1 PROXY SUPPORT
 
@@ -2626,6 +2676,18 @@ changes are made to the request.
     The host value for $c->req->base and $c->req->uri is set to the real
     host, as read from the HTTP X-Forwarded-Host header.
 
+Additionally, you may be running your backend application on an insecure
+connection (port 80) while your frontend proxy is running under SSL.  If there
+is a discrepancy in the ports, use the HTTP header C<X-Forwarded-Port> to
+tell Catalyst what port the frontend listens on.  This will allow all URIs to
+be created properly.
+
+In the case of passing in:
+
+    X-Forwarded-Port: 443
+
+All calls to C<uri_for> will result in an https link, as is expected.
+
 Obviously, your web server must support these headers for this to work.
 
 In a more complex server farm environment where you may have your
@@ -2633,11 +2695,11 @@ frontend proxy server(s) on different machines, you will need to set a
 configuration option to tell Catalyst to read the proxied data from the
 headers.
 
-    MyApp->config->{using_frontend_proxy} = 1;
+    MyApp->config(using_frontend_proxy => 1);
 
 If you do not wish to use the proxy support at all, you may set:
 
-    MyApp->config->{ignore_frontend_proxy} = 1;
+    MyApp->config(ignore_frontend_proxy => 1);
 
 =head1 THREAD SAFETY
 
@@ -2674,7 +2736,7 @@ Wiki:
 
 =head2 L<Catalyst::Manual> - The Catalyst Manual
 
-=head2 L<Catalyst::Component>, L<Catalyst::Base> - Base classes for components
+=head2 L<Catalyst::Component>, L<Catalyst::Controller> - Base classes for components
 
 =head2 L<Catalyst::Engine> - Core engine
 
@@ -2698,7 +2760,7 @@ acme: Leon Brocard <leon@astray.com>
 
 Andrew Bramble
 
-Andrew Ford
+Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
 
 Andrew Ruthven
 
@@ -2714,6 +2776,14 @@ chansen: Christian Hansen
 
 chicks: Christopher Hicks
 
+Chisel Wright C<pause@herlpacker.co.uk>
+
+Danijel Milicevic C<me@danijel.de>
+
+David Kamholz E<lt>dkamholz@cpan.orgE<gt>
+
+David Naughton, C<naughton@umn.edu>
+
 David E. Wheeler
 
 dhoss: Devin Austin <dhoss@cpan.org>
@@ -2728,15 +2798,23 @@ esskar: Sascha Kiefer
 
 fireartist: Carl Franks <cfranks@cpan.org>
 
+frew: Arthur Axel "fREW" Schmidt <frioux@gmail.com>
+
 gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
+Gavin Henry C<ghenry@perl.me.uk>
+
 Geoff Richards
+
+hobbs: Andrew Rodland <andrew@cleverdomain.org>
 
 ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
+
+jester: Jesse Sheidlower C<jester@panix.com>
 
 jhannah: Jay Hannah <jay@jays.net>
 
@@ -2745,6 +2823,12 @@ Jody Belka
 Johan Lindstrom
 
 jon: Jon Schutz <jjschutz@cpan.org>
+
+Jonathan Rockway C<< <jrockway@cpan.org> >>
+
+Kieren Diment C<kd@totaldatasolution.com>
+
+konobi: Scott McWhirter <konobi@cpan.org>
 
 marcus: Marcus Ramberg <mramberg@cpan.org>
 
@@ -2774,15 +2858,21 @@ rafl: Florian Ragwitz <rafl@debian.org>
 
 random: Roland Lammel <lammel@cpan.org>
 
-sky: Arthur Bergman
+Robert Sedlacek C<< <rs@474.at> >>
 
-the_jester: Jesse Sheidlower
+sky: Arthur Bergman
 
 t0m: Tomas Doran <bobtfish@bobtfish.net>
 
 Ulf Edvinsson
 
+Viljo Marrandi C<vilts@yahoo.com>
+
+Will Hawes C<info@whawes.co.uk>
+
 willert: Sebastian Willert <willert@cpan.org>
+
+Yuval Kogman, C<nothingmuch@woobling.org>
 
 =head1 LICENSE
 

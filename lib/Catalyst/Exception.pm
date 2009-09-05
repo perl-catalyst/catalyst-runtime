@@ -5,7 +5,8 @@ package Catalyst::Exception;
 package Catalyst::Exception::Base;
 
 use Moose;
-use Carp ();
+use Carp;
+use namespace::clean -except => 'meta';
 
 =head1 NAME
 
@@ -33,15 +34,44 @@ Throws a fatal exception.
 
 =cut
 
+has message => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub { $! || '' },
+);
+
+use overload
+    q{""}    => \&as_string,
+    fallback => 1;
+
+sub as_string {
+    my ($self) = @_;
+    return $self->message;
+}
+
+around BUILDARGS => sub {
+    my ($next, $class, @args) = @_;
+    if (@args == 1 && !ref $args[0]) {
+        @args = (message => $args[0]);
+    }
+
+    my $args = $class->$next(@args);
+    $args->{message} ||= $args->{error}
+        if exists $args->{error};
+
+    return $args;
+};
+
 sub throw {
-    my $class  = shift;
-    my %params = @_ == 1 ? ( error => $_[0] ) : @_;
-
-    my $message = $params{message} || $params{error} || $! || '';
-
+    my $class = shift;
+    my $error = $class->new(@_);
     local $Carp::CarpLevel = 1;
+    croak $error;
+}
 
-    Carp::croak($message);
+sub rethrow {
+    my ($self) = @_;
+    croak $self;
 }
 
 =head2 meta
@@ -64,13 +94,14 @@ Catalyst::Exception::Base->meta->make_immutable;
 package Catalyst::Exception;
 
 use Moose;
+use namespace::clean -except => 'meta';
+
 use vars qw[$CATALYST_EXCEPTION_CLASS];
 
 BEGIN {
     extends($CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base');
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

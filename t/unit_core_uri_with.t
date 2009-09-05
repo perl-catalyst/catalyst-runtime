@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 10;
 use URI;
 
 use_ok('Catalyst::Request');
@@ -48,3 +48,22 @@ is(
     'http://127.0.0.1/foo/bar/baz?bar=snort',
     'URI changes param'
 );
+
+is(
+    $request2->uri_with({ bar => [ 'snort', 'ewok' ] }),
+    'http://127.0.0.1/foo/bar/baz?bar=snort&bar=ewok',
+    'overwrite mode URI appends arrayref param'
+);
+
+is(
+    $request2->uri_with({ bar => 'snort' }, { mode => 'append' }),
+    'http://127.0.0.1/foo/bar/baz?bar=gorch&bar=snort',
+    'append mode URI appends param'
+);
+
+is(
+    $request2->uri_with({ bar => [ 'snort', 'ewok' ] }, { mode => 'append' }),
+    'http://127.0.0.1/foo/bar/baz?bar=gorch&bar=snort&bar=ewok',
+    'append mode URI appends arrayref param'
+);
+

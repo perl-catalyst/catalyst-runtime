@@ -6,7 +6,6 @@ extends 'Catalyst::DispatchType';
 use Text::SimpleTable;
 use Catalyst::Utils;
 use URI;
-use Scalar::Util ();
 
 has _paths => (
                is => 'rw',
@@ -48,9 +47,11 @@ Debug output for Path dispatch points
 
 sub list {
     my ( $self, $c ) = @_;
-    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $avail_width = Catalyst::Utils::term_width() - 9;
+    my $col1_width = ($avail_width * .50) < 35 ? 35 : int($avail_width * .50);
+    my $col2_width = $avail_width - $col1_width;
     my $paths = Text::SimpleTable->new(
-       [ 35, 'Path' ], [ $column_width, 'Private' ]
+       [ $col1_width, 'Path' ], [ $col2_width, 'Private' ]
     );
     foreach my $path ( sort keys %{ $self->_paths } ) {
         my $display_path = $path eq '/' ? $path : "/$path";
@@ -60,16 +61,6 @@ sub list {
     }
     $c->log->debug( "Loaded Path actions:\n" . $paths->draw . "\n" )
       if ( keys %{ $self->_paths } );
-}
-
-sub _action_args_sort_order {
-    my ( $self, $action ) = @_;
-
-    my ($args) = @{ $action->attributes->{Args} || [] };
-
-    return $args if Scalar::Util::looks_like_number($args);
-
-    return ~0;
 }
 
 =head2 $self->match( $c, $path )
@@ -85,10 +76,7 @@ sub match {
 
     $path = '/' if !defined $path || !length $path;
 
-    # sort from least args to most
-    my @actions = sort { $self->_action_args_sort_order($a) <=>
-                         $self->_action_args_sort_order($b) }
-            @{ $self->_paths->{$path} || [] };
+    my @actions = @{ $self->_paths->{$path} || [] };
 
     foreach my $action ( @actions ) {
         next unless $action->match($c);
@@ -130,8 +118,11 @@ sub register_path {
     $path =~ s!^/!!;
     $path = '/' unless length $path;
     $path = URI->new($path)->canonical;
+    $path =~ s{(?<=[^/])/+\z}{};
 
-    unshift( @{ $self->_paths->{$path} ||= [] }, $action);
+    $self->_paths->{$path} = [
+        sort { $a->compare($b) } ($action, @{ $self->_paths->{$path} || [] })
+    ];
 
     return 1;
 }

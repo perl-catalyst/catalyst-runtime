@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 10*$iters;
+use Test::More tests => 15*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -68,5 +68,15 @@ EOF
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->content_length, -s $file, 'Response Content-Length' );
         is( $response->content, $buffer, 'Content is read from filehandle' );
+    }
+
+    {
+        my $size = 128 * 1024; # more than one read with the default chunksize
+
+        ok( my $response = request('http://localhost/action/streaming/body_large'), 'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->content_length, $size, 'Response Content-Length' );
+        is( $response->content, "\0" x $size, 'Content is read from filehandle' );
     }
 }

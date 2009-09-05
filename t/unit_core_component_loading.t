@@ -1,7 +1,8 @@
 # 2 initial tests, and 6 per component in the loop below
 # (do not forget to update the number of components in test 3 as well)
 # 5 extra tests for the loading options
-use Test::More tests => 2 + 6 * 24 + 5;
+# One test for components in inner packages
+use Test::More tests => 2 + 6 * 24 + 8 + 1;
 
 use strict;
 use warnings;
@@ -174,6 +175,9 @@ sub COMPONENT {
     my \$self = shift->next::method(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
+    *${appclass}::Model::TopLevel::GENERATED::ACCEPT_CONTEXT = sub {
+        return bless {}, 'FooBarBazQuux';
+    };
     \$self;
 }
 
@@ -189,8 +193,10 @@ write_component_file([$libdir, $appclass, 'Model', 'TopLevel'], 'Nested', <<EOF)
 package ${appclass}::Model::TopLevel::Nested;
 use base 'Catalyst::Model';
 
+my \$called=0;
 no warnings 'redefine';
-sub COMPONENT { return shift->next::method(\@_); }
+sub COMPONENT { \$called++;return shift->next::method(\@_); }
+sub called { return \$called };
 1;
 
 EOF
@@ -198,5 +204,23 @@ EOF
 eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 
 is($@, '', "Didn't load component twice");
+is($appclass->model('TopLevel::Nested')->called,1, 'COMPONENT called once');
+
+ok($appclass->model('TopLevel::Generated'), 'Have generated model');
+is(ref($appclass->model('TopLevel::Generated')), 'FooBarBazQuux',
+    'ACCEPT_CONTEXT in generated inner package fired as expected');
+
+$appclass = "InnerComponent";
+
+{
+  package InnerComponent::Controller::Test;
+  use base 'Catalyst::Controller';
+}
+
+$INC{'InnerComponent/Controller/Test.pm'} = 1;
+
+eval "package $appclass; use Catalyst; __PACKAGE__->setup";
+
+isa_ok($appclass->controller('Test'), 'Catalyst::Controller');
 
 rmtree($libdir);

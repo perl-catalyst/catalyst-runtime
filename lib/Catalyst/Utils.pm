@@ -9,6 +9,8 @@ use URI;
 use Carp qw/croak/;
 use Cwd;
 
+use String::RewritePrefix;
+
 use namespace::clean;
 
 =head1 NAME
@@ -376,6 +378,33 @@ sub term_width {
     $width = 80 unless ($width && $width >= 80);
     return $_term_width = $width;
 }
+
+
+=head2 resolve_namespace
+
+Method which adds the namespace for plugins and actions.
+
+  __PACKAGE__->setup(qw(MyPlugin));
+
+  # will load Catalyst::Plugin::MyPlugin
+
+=cut
+
+
+sub resolve_namespace {
+    my $appnamespace = shift;
+    my $namespace = shift;
+    my @classes = @_;
+    return String::RewritePrefix->rewrite({
+        q[]  => qq[${namespace}::],
+        q[+] => q[],
+        (defined $appnamespace
+            ? (q[~] => qq[${appnamespace}::])
+            : ()
+        ),
+    }, @classes);
+}
+
 
 =head1 AUTHORS
 
