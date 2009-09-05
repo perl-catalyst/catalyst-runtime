@@ -8,6 +8,7 @@ use namespace::autoclean;
 with 'Catalyst::ScriptRole';
 
 has listen => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'l',
     isa => Int,
     is => 'ro',
@@ -15,27 +16,31 @@ has listen => (
 );
 
 has pidfile => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'pid',
     isa => Str,
     is => 'ro',
     documentation => 'Specify a pidfile',
 );
 
-has daemon => ( 
+has daemon => (
+    traits => [qw(Getopt)],
     isa => Bool,   
     is => 'ro', 
     cmd_aliases => 'd', 
     documentation => 'Daemonize',
 );
 
-has manager => ( 
+has manager => (
+    traits => [qw(Getopt)],
     isa => Str,    
     is => 'ro',
     cmd_aliases => 'm',
     documentation => 'Use a different FastCGI manager', # FIXME
 );
 
-has keep_stderr => ( 
+has keep_stderr => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'std', 
     isa => Bool,   
     is => 'ro',  
@@ -43,13 +48,15 @@ has keep_stderr => (
 );
 
 has nproc => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'np',  
     isa => Int,
     is => 'ro',  
     documentation => 'Specify an nproc', # FIXME
 );
 
-has detach => ( 
+has detach => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'det', 
     isa => Bool,   
     is => 'ro',  

@@ -13,6 +13,7 @@ use namespace::autoclean;
 with 'Catalyst::ScriptRole';
 
 has debug => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'd',
     isa => Bool,
     is => 'ro',
@@ -20,6 +21,7 @@ has debug => (
 );
 
 has host => (
+    traits => [qw(Getopt)],
     isa => Str,
     is => 'ro',
     default => 'localhost',
@@ -27,6 +29,7 @@ has host => (
 );
 
 has fork => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'f',
     isa => Bool,
     is => 'ro',
@@ -34,6 +37,7 @@ has fork => (
 );
 
 has listen => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'l',
     isa => Int,
     is => 'ro',
@@ -42,6 +46,7 @@ has listen => (
 );
 
 has pidfile => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'pid',
     isa => Str,
     is => 'ro',
@@ -49,6 +54,7 @@ has pidfile => (
 );
 
 has keepalive => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'k',
     isa => Bool,
     is => 'ro',
@@ -57,6 +63,7 @@ has keepalive => (
 );
 
 has background => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'bg',
     isa => Bool,
     is => 'ro',
@@ -64,6 +71,7 @@ has background => (
 );
 
 has restart => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'r',
     isa => Bool,
     is => 'ro',
@@ -71,6 +79,7 @@ has restart => (
 );
 
 has restart_directory => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'rdir',
     isa => ArrayRef[Str],
     is  => 'ro',
@@ -79,6 +88,7 @@ has restart_directory => (
 );
 
 has restart_delay => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'rdel',
     isa => Int,
     is => 'ro',

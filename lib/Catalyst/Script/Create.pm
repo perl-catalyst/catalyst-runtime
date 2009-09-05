@@ -7,6 +7,7 @@ use namespace::autoclean;
 with 'Catalyst::ScriptRole';
 
 has force => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'nonew',
     isa => Bool,
     is => 'ro',
@@ -14,6 +15,7 @@ has force => (
 );
 
 has debug => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'd',
     isa => Bool,
     is => 'ro',
@@ -21,6 +23,7 @@ has debug => (
 );
 
 has mechanize => (
+    traits => [qw(Getopt)],
     cmd_aliases => 'mech',
     isa => Bool,
     is => 'ro',

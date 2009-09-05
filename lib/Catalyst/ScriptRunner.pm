@@ -13,7 +13,7 @@ sub run {
         $classtoload = "Catalyst::Script::$scriptclass";
         Class::MOP::load_class($classtoload);
     }
-    $classtoload->new_with_options( app => $class )->run;
+    $classtoload->new_with_options( application_name => $class )->run;
 }
 
 __PACKAGE__->meta->make_immutable;
