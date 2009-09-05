@@ -1,10 +1,15 @@
 package Catalyst::ScriptRunner;
 use Moose;
+use FindBin;
+use lib;
+use File::Spec;
 use namespace::autoclean;
 
 sub run {
     my ($self, $class, $scriptclass) = @_;
     my $classtoload = "${class}::Script::$scriptclass";
+
+    lib->import(File::Spec->catdir($FindBin::Bin, '..', 'lib'));
 
     # FIXME - Error handling / reporting
     if ( eval { Class::MOP::load_class($classtoload) } ) {
