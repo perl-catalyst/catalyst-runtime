@@ -25,11 +25,13 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-Catalyst::ScriptRunner - The Catalyst Framework Script runner
+Catalyst::ScriptRunner - The Catalyst Framework script runner
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+    # Will run MyApp::Script::Server if it exists, otherwise
+    # will run Catalyst::Script::Server.
+    Catalyst::ScriptRunner->run('MyApp', 'Server');
 
 =head1 DESCRIPTION
 

@@ -49,3 +49,27 @@ sub _run_application {
 }
 
 1;
+
+=head1 NAME
+
+Catalyst::ScriptRole - Common functionality for Catalyst scripts.
+
+=head1 SYNOPSIS
+
+    FIXME
+    
+=head1 DESCRIPTION
+
+    FIXME    
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+    
