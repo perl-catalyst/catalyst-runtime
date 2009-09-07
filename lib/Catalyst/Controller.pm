@@ -29,9 +29,9 @@ has action_namespace =>
      predicate => 'has_action_namespace',
     );
 
-has _controller_actions =>
+has actions =>
     (
-     is => 'rw',
+     accessor => '_controller_actions',
      isa => 'HashRef',
      init_arg => undef,
     );
