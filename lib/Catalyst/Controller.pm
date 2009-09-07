@@ -29,9 +29,9 @@ has action_namespace =>
      predicate => 'has_action_namespace',
     );
 
-has _controller_actions =>
+has actions =>
     (
-     is => 'rw',
+     accessor => '_controller_actions',
      isa => 'HashRef',
      init_arg => undef,
     );
@@ -187,23 +187,20 @@ sub get_action_methods {
           . $meta->name
           . " cannot support register_actions." )
       unless $meta->can('get_nearest_methods_with_attributes');
+    my @methods = $meta->get_nearest_methods_with_attributes;
 
-    # Find (and de-dup) action methods from attributes and those from config.
-    my %methods = (
-        map({ $_->name => 1 } $meta->get_nearest_methods_with_attributes),
-        %{ $self->_controller_actions }
-    );
-
-    if (ref $self) {
-        foreach (keys %methods) {
+    # actions specified via config are also action_methods
+    push(
+        @methods,
+        map {
             $meta->find_method_by_name($_)
               || confess( 'Action "'
                   . $_
                   . '" is not available from controller '
-                  . ( ref $self ) );
-        }
-    }
-    return keys %methods;
+                  . ( ref $self ) )
+          } keys %{ $self->_controller_actions }
+    ) if ( ref $self );
+    return @methods;
 }
 
 
