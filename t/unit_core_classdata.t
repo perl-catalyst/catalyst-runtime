@@ -100,3 +100,7 @@ is(refaddr(ClassDataTest->_hashref), refaddr($hashref3));
 is(refaddr(ClassDataTest->_scalarref), refaddr($scalarref3));
 is(refaddr(ClassDataTest->_coderef), refaddr($coderef3));
 is(ClassDataTest->_scalar, $scalar3);
+
+my $i = bless {}, 'ClassDataTest';
+$i->_scalar('foo');
+

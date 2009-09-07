@@ -335,7 +335,7 @@ sub _invoke_as_component {
                 reverse   => "$component_class->$method",
                 class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $component_class, $c->config->{case_sensitive}
+                    $component_class, ref($c)->config->{case_sensitive}
                 ),
             }
         );
@@ -615,9 +615,12 @@ sub setup_actions {
 sub _display_action_tables {
     my ($self, $c) = @_;
 
-    my $column_width = Catalyst::Utils::term_width() - 20 - 36 - 12;
+    my $avail_width = Catalyst::Utils::term_width() - 12;
+    my $col1_width = ($avail_width * .25) < 20 ? 20 : int($avail_width * .25);
+    my $col2_width = ($avail_width * .50) < 36 ? 36 : int($avail_width * .50);
+    my $col3_width =  $avail_width - $col1_width - $col2_width;
     my $privates = Text::SimpleTable->new(
-        [ 20, 'Private' ], [ 36, 'Class' ], [ $column_width, 'Method' ]
+        [ $col1_width, 'Private' ], [ $col2_width, 'Class' ], [ $col3_width, 'Method' ]
     );
 
     my $has_private = 0;

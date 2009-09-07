@@ -67,7 +67,7 @@ sub execute {
             @executed
         );
     }
-
+    no warnings 'recursion';
     return $c->SUPER::execute(@_);
 }
 

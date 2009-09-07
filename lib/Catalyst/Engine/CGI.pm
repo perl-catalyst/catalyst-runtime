@@ -57,9 +57,9 @@ sub prepare_connection {
 
   PROXY_CHECK:
     {
-        unless ( $c->config->{using_frontend_proxy} ) {
+        unless ( ref($c)->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $ENV{REMOTE_ADDR} ne '127.0.0.1';
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
+            last PROXY_CHECK if ref($c)->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_FOR};
 
@@ -67,6 +67,9 @@ sub prepare_connection {
         # as 127.0.0.1. Select the most recent upstream IP (last in the list)
         my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
         $request->address($ip);
+        if ( defined $ENV{HTTP_X_FORWARDED_PORT} ) {
+            $ENV{SERVER_PORT} = $ENV{HTTP_X_FORWARDED_PORT};
+        }
     }
 
     $request->hostname( $ENV{REMOTE_HOST} ) if exists $ENV{REMOTE_HOST};
@@ -123,9 +126,9 @@ sub prepare_path {
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
     {
-        unless ( $c->config->{using_frontend_proxy} ) {
+        unless ( ref($c)->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $host !~ /localhost|127.0.0.1/;
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
+            last PROXY_CHECK if ref($c)->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_HOST};
 
@@ -134,6 +137,9 @@ sub prepare_path {
         # backend could be on any port, so
         # assume frontend is on the default port
         $port = $c->request->secure ? 443 : 80;
+        if ( $ENV{HTTP_X_FORWARDED_PORT} ) {
+            $port = $ENV{HTTP_X_FORWARDED_PORT};
+        }
     }
 
     # set the request URI

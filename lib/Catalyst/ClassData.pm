@@ -6,7 +6,7 @@ use Class::MOP;
 use Moose::Util ();
 
 sub mk_classdata {
-  my ($class, $attribute) = @_;
+  my ($class, $attribute, $warn_on_instance) = @_;
   confess("mk_classdata() is a class method, not an object method")
     if blessed $class;
 

@@ -32,7 +32,7 @@ sub COMPONENT { # Don't do this yourself, use CatalystX::Component::Traits!
 
 sub test : Local ActionClass('+TestApp::Action::TestMyAction') {
     my ($self, $c) = @_;
-    $c->res->header('X-Component-Name-Controller', $self->_component_name);
+    $c->res->header('X-Component-Name-Controller', $self->catalyst_component_name);
     $c->res->body('It works');
 }
 

@@ -1,17 +1,26 @@
+use strict;
+use warnings;
 use inc::Module::Install 0.87;
-
-perl_version '5.008001';
+BEGIN { # Make it easy for newbies
+    if ($Module::Install::AUTHOR) {
+        require Module::Install::AuthorRequires;
+        require Module::Install::CheckConflicts;
+        require Module::Install::AuthorTests;
+    }
+}
+perl_version '5.008004';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
+requires 'List::MoreUtils';
 requires 'namespace::autoclean';
 requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
 requires 'Class::MOP' => '0.83';
 requires 'Moose' => '0.78';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.14';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.15';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
@@ -53,6 +62,7 @@ else {
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
 
+author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
@@ -111,7 +121,7 @@ my %conflicts = (
     'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
     'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
-    'Catalyst::Devel'                  => '0.09',
+    'Catalyst::Devel'                  => '1.19',
     'Catalyst::Plugin::SmartURI'       => '0.032',
     'CatalystX::CRUD'                  => '0.37',
     'Catalyst::Action::RenderView'     => '0.07',
@@ -122,6 +132,7 @@ my %conflicts = (
     'Catalyst::Action::REST'           => '0.67',
     'CatalystX::CRUD'                  => '0.42',
     'CatalystX::CRUD::Model::RDBO'     => '0.20',
+    'Catalyst::View::Mason'            => '0.17',
 );
 check_conflicts(%conflicts);
 
