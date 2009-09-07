@@ -2,7 +2,7 @@ package Catalyst::Controller;
 
 use Moose;
 use Moose::Util qw/find_meta/;
-
+use List::MoreUtils qw/uniq/;
 use namespace::clean -except => 'meta';
 
 BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
@@ -200,7 +200,7 @@ sub get_action_methods {
                   . ( ref $self ) )
           } keys %{ $self->_controller_actions }
     ) if ( ref $self );
-    return @methods;
+    return uniq @methods;
 }
 
 

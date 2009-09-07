@@ -5,6 +5,10 @@
      - Fix t/optional_http-server-restart.t test.
      - Fix duplicate components being loaded at setup time, each component is
        now loaded at most once + tests.
+     - Fix backward compatibility - hash key configured actions are stored in
+       is returned to 'actions'.
+     - Fix get_action_methods returning duplicate methods when a method is both
+       decorated with method attributes and set as an action in config.
 
   Refactoring / cleanups:
      - Reduce minimum supported perl version from 5.8.6 to 5.8.4 as there are
