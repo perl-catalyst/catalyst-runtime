@@ -2806,6 +2806,8 @@ Gavin Henry C<ghenry@perl.me.uk>
 
 Geoff Richards
 
+groditi: Guillermo Roditi <groditi@gmail.com>
+
 hobbs: Andrew Rodland <andrew@cleverdomain.org>
 
 ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
