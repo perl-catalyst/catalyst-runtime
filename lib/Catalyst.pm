@@ -403,12 +403,15 @@ sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
 =head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
-Almost the same as L<< detach|/"$c->detach( $action [, \@arguments ] )" >>, but does a full dispatch like L</visit>,
-instead of just calling the new C<$action> /
-C<< $class->$method >>. This means that C<begin>, C<auto> and the
-method you visit are called, just like a new request.
-
-C<< $c->stash >> is kept unchanged.
+The relationship between C<go> and 
+L<< visit|/"$c->visit( $action [, \@captures, \@arguments ] )" >> is the same as
+the relationship between 
+L<< forward|/"$c->forward( $class, $method, [, \@arguments ] )" >> and
+L<< detach|/"$c->detach( $action [, \@arguments ] )" >>. Like C<< $c->visit >>,
+C<< $c->go >> will perform a full dispatch on the specified action or method,
+with localized C<< $c->action >> and C<< $c->namespace >>. Like C<detach>,
+C<go> escapes the processing of the current request chain on completion, and
+does not return to its caller.
 
 =cut
 
