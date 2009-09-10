@@ -215,8 +215,12 @@ sub register_action_methods {
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
 
+    # FIXME - fugly
     if (!blessed($self) && $self eq $c && scalar(@methods)) {
-        $c->log->warn("Action methods found defined in your application class, $self. This is deprecated, please move them into a Root controller.");
+        my @really_bad_methods = grep { ! /^_(DISPATCH|BEGIN|AUTO|ACTION|END)$/ } map { $_->name } @methods;
+        if (scalar(@really_bad_methods)) {
+            $c->log->warn("Action methods (" . join(', ', @really_bad_methods) . ") found defined in your application class, $self. This is deprecated, please move them into a Root controller.");
+        }
     }
 
     foreach my $method (@methods) {
