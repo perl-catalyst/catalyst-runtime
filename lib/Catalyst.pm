@@ -1134,8 +1134,10 @@ EOF
                 . "Class::Accessor(::Fast)?\nPlease pass "
                 . "(replace_constructor => 1)\nwhen making your class immutable.\n";
         }
-        $meta->make_immutable(replace_constructor => 1)
-            unless $meta->is_immutable;
+        $meta->make_immutable(
+            replace_constructor => 1,
+            allow_mutable_ancestors => 1,
+        ) unless $meta->is_immutable;
     };
 
     $class->setup_finalize;
