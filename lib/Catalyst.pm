@@ -79,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80011';
+our $VERSION = '5.80012';
 
 {
     my $dev_version = $VERSION =~ /_\d{2}$/;
@@ -1134,8 +1134,10 @@ EOF
                 . "Class::Accessor(::Fast)?\nPlease pass "
                 . "(replace_constructor => 1)\nwhen making your class immutable.\n";
         }
-        $meta->make_immutable(replace_constructor => 1)
-            unless $meta->is_immutable;
+        $meta->make_immutable(
+            replace_constructor => 1,
+            allow_mutable_ancestors => 1,
+        ) unless $meta->is_immutable;
     };
 
     $class->setup_finalize;
@@ -2805,6 +2807,8 @@ Gary Ashton Jones
 Gavin Henry C<ghenry@perl.me.uk>
 
 Geoff Richards
+
+groditi: Guillermo Roditi <groditi@gmail.com>
 
 hobbs: Andrew Rodland <andrew@cleverdomain.org>
 
