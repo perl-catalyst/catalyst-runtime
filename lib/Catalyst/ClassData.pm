@@ -49,7 +49,8 @@ sub mk_classdata {
     unless $meta->isa('Class::MOP::Class');
 
   my $was_immutable = $meta->is_immutable;
-  my %immutable_options = $meta->immutable_options;
+  # Need to save immutable_options if they're available from Moose 0.89_02
+  my %immutable_options = $meta->can('immutable_options') ? $meta->immutable_options : ();
 
   $meta->make_mutable if $was_immutable;
 
