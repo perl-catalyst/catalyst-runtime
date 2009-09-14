@@ -1139,7 +1139,6 @@ EOF
         }
         $meta->make_immutable(
             replace_constructor => 1,
-            allow_mutable_ancestors => 1,
         ) unless $meta->is_immutable;
     };
 
