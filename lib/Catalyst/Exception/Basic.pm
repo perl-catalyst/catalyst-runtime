@@ -1,6 +1,6 @@
 package Catalyst::Exception::Basic;
 
-use Moose::Role;
+use MooseX::Role::WithOverloading;
 use Carp;
 use namespace::clean -except => 'meta';
 
@@ -11,10 +11,6 @@ has message => (
     isa     => 'Str',
     default => sub { $! || '' },
 );
-
-use overload
-    q{""}    => \&as_string,
-    fallback => 1;
 
 sub as_string {
     my ($self) = @_;
