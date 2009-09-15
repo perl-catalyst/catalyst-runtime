@@ -14,13 +14,13 @@ name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'List::MoreUtils';
-requires 'namespace::autoclean';
+requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
-requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
+requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.83';
-requires 'Moose' => '0.78';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.15';
+requires 'Moose' => '0.90';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.16';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
