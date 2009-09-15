@@ -47,9 +47,11 @@ Debug output for Path dispatch points
 
 sub list {
     my ( $self, $c ) = @_;
-    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $avail_width = Catalyst::Utils::term_width() - 9;
+    my $col1_width = ($avail_width * .50) < 35 ? 35 : int($avail_width * .50);
+    my $col2_width = $avail_width - $col1_width;
     my $paths = Text::SimpleTable->new(
-       [ 35, 'Path' ], [ $column_width, 'Private' ]
+       [ $col1_width, 'Path' ], [ $col2_width, 'Private' ]
     );
     foreach my $path ( sort keys %{ $self->_paths } ) {
         my $display_path = $path eq '/' ? $path : "/$path";

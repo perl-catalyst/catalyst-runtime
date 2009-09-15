@@ -815,7 +815,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Chained::Root->rootsub
           TestApp::Controller::Action::Chained::Root->endpointsub
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );

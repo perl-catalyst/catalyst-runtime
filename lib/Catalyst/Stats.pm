@@ -84,6 +84,10 @@ sub profile {
     return $node->getUID;
 }
 
+sub created {
+    return @{ shift->{tree}->getNodeValue->{t} };
+}
+
 sub elapsed {
     return tv_interval(shift->{tree}->getNodeValue->{t});
 }
@@ -296,6 +300,13 @@ The profiling point will be ignored if the UID has not been previously defined.
 
 Returns the UID of the current point in the profile tree.  The UID is
 automatically assigned if not explicitly given.
+
+=head2 created
+
+    ($seconds, $microseconds) = $stats->created;
+
+Returns the time the object was created, in C<gettimeofday> format, with
+Unix epoch seconds followed by microseconds.
 
 =head2 elapsed
 

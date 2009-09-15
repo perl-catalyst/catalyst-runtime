@@ -32,9 +32,9 @@ sub run_tests {
         
         {
             my @expected = qw[
-                TestAppDoubleAutoBug->auto
-                TestAppDoubleAutoBug->default
-                TestAppDoubleAutoBug->end
+                TestAppDoubleAutoBug::Controller::Root->auto
+                TestAppDoubleAutoBug::Controller::Root->default
+                TestAppDoubleAutoBug::Controller::Root->end
             ];
     
             my $expected = join( ", ", @expected );

@@ -47,8 +47,12 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
-    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ $column_width, 'Private' ] );
+    my $avail_width = Catalyst::Utils::term_width() - 9;
+    my $col1_width = ($avail_width * .50) < 35 ? 35 : int($avail_width * .50);
+    my $col2_width = $avail_width - $col1_width;
+    my $re = Text::SimpleTable->new(
+        [ $col1_width, 'Regex' ], [ $col2_width, 'Private' ]
+    );
     for my $regex ( @{ $self->_compiled } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );

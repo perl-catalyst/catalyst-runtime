@@ -80,14 +80,16 @@ sub list {
 
     return unless $self->_endpoints;
 
-    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $avail_width = Catalyst::Utils::term_width() - 9;
+    my $col1_width = ($avail_width * .50) < 35 ? 35 : int($avail_width * .50);
+    my $col2_width = $avail_width - $col1_width;
     my $paths = Text::SimpleTable->new(
-       [ 35, 'Path Spec' ], [ $column_width, 'Private' ],
+        [ $col1_width, 'Path Spec' ], [ $col2_width, 'Private' ],
     );
 
     my $has_unattached_actions;
     my $unattached_actions = Text::SimpleTable->new(
-        [ 35, 'Private' ], [ $column_width, 'Missing parent' ],
+        [ $col1_width, 'Private' ], [ $col2_width, 'Missing parent' ],
     );
 
     ENDPOINT: foreach my $endpoint (

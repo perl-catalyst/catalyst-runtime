@@ -12,7 +12,6 @@ my @modules = qw/
     Catalyst::Component
     Catalyst::Dispatcher
     Catalyst::DispatchType
-    Catalyst::Engine::HTTP::Restarter::Watcher
     Catalyst::Engine
     Catalyst::Log
     Catalyst::Request::Upload

@@ -16,6 +16,8 @@ my $mvc_warnings;
 BEGIN {
     my $logger = Class::MOP::Class->create_anon_class(
     methods => {
+        debug => sub {0},
+        info  => sub {0},
         warn => sub {
             if ($_[1] =~ /switch your class names/) {
                $mvc_warnings++;

@@ -223,7 +223,7 @@ Arguments get automatically URI-unescaped for you.
 
 =head2 $req->args
 
-Shortcut for arguments.
+Shortcut for L</arguments>.
 
 =head2 $req->base
 
@@ -237,8 +237,9 @@ C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
 =head2 $req->body
 
-Returns the message body of the request, unless Content-Type is
-C<application/x-www-form-urlencoded> or C<multipart/form-data>.
+Returns the message body of the request, as returned by L<HTTP::Body>: a string,
+unless Content-Type is C<application/x-www-form-urlencoded>, C<text/xml>, or
+C<multipart/form-data>, in which case a L<File::Temp> object is returned.
 
 =head2 $req->body_parameters
 
@@ -300,7 +301,7 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-The cookies in the hash are indexed by name, and the values are L<CGI::Cookie>
+The cookies in the hash are indexed by name, and the values are L<CGI::Simple::Cookie>
 objects.
 
 =head2 $req->header
@@ -473,7 +474,7 @@ Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
-You have to set MyApp->config->{parse_on_demand} to use this directly.
+You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 
 =head2 $req->referer
 
@@ -649,7 +650,7 @@ You may also pass an optional second parameter that puts C<uri_with> into
 append mode:
 
   $req->uri_with( { key => 'value' }, { mode => 'append' } );
-  
+
 See C<mangle_params> for an explanation of this behavior.
 
 =cut

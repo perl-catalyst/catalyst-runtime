@@ -156,8 +156,8 @@ L<HTTP::Request::AsCGI> or remotely if you define the CATALYST_SERVER
 environment variable. This module also adds a few Catalyst-specific
 testing methods as displayed in the method section.
 
-The L<get> and L<request> functions take either a URI or an L<HTTP::Request>
-object.
+The L<get|/"$content = get( ... )"> and L<request|/"$res = request( ... );">
+functions take either a URI or an L<HTTP::Request> object.
 
 =head1 INLINE TESTS WILL NO LONGER WORK
 
@@ -187,7 +187,7 @@ Returns the content.
 
 Note that this method doesn't follow redirects, so to test for a
 correctly redirecting page you'll need to use a combination of this
-method and the L<request> method below:
+method and the L<request|/"$res = request( ... );"> method below:
 
     my $res = request('/'); # redirects to /y
     warn $res->header('location');
@@ -208,7 +208,7 @@ header configuration; currently only supports setting 'host' value.
 
 =head2 ($res, $c) = ctx_request( ... );
 
-Works exactly like L<request>, except it also returns the Catalyst context object,
+Works exactly like L<request|/"$res = request( ... );">, except it also returns the Catalyst context object,
 C<$c>. Note that this only works for local requests.
 
 =head2 $res = Catalyst::Test::local_request( $AppClass, $url );

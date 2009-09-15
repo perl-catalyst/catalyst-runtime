@@ -1,22 +1,30 @@
+use strict;
+use warnings;
 use inc::Module::Install 0.87;
-
-perl_version '5.008001';
+BEGIN { # Make it easy for newbies
+    if ($Module::Install::AUTHOR) {
+        require Module::Install::AuthorRequires;
+        require Module::Install::CheckConflicts;
+        require Module::Install::AuthorTests;
+    }
+}
+perl_version '5.008004';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
+requires 'List::MoreUtils';
 requires 'namespace::autoclean';
 requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
 requires 'Class::MOP' => '0.83';
 requires 'Moose' => '0.78';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.12';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.15';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
 requires 'Data::Dump';
-requires 'File::Modified';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
 requires 'HTTP::Headers' => '1.64';
@@ -24,7 +32,7 @@ requires 'HTTP::Request';
 requires 'HTTP::Response';
 requires 'HTTP::Request::AsCGI' => '0.8';
 requires 'LWP::UserAgent';
-requires 'Module::Pluggable' => '3.01';
+requires 'Module::Pluggable' => '3.9';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
@@ -54,6 +62,7 @@ else {
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
 
+author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
@@ -112,7 +121,7 @@ my %conflicts = (
     'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
     'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
-    'Catalyst::Devel'                  => '0.09',
+    'Catalyst::Devel'                  => '1.19',
     'Catalyst::Plugin::SmartURI'       => '0.032',
     'CatalystX::CRUD'                  => '0.37',
     'Catalyst::Action::RenderView'     => '0.07',
@@ -123,6 +132,7 @@ my %conflicts = (
     'Catalyst::Action::REST'           => '0.67',
     'CatalystX::CRUD'                  => '0.42',
     'CatalystX::CRUD::Model::RDBO'     => '0.20',
+    'Catalyst::View::Mason'            => '0.17',
 );
 check_conflicts(%conflicts);
 
@@ -135,7 +145,8 @@ sub darwin_check_no_resource_forks {
 
         # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
         # On 10.5 (Leopard) it wants COPYFILE_DISABLE
-        my $attr = $osx_ver eq '10.5' ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+        die("Oh, you got Snow Lepoard, snazzy. Please read the man page for tar to find out if Apple renamed COPYFILE_DISABLE again and fix this Makefile.PL please?\n") if $osx_ver =~ /^10.6/;
+        my $attr = $osx_ver =~ /^10.5/ ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
                                           qq{ echo "You must set the ENV variable $attr to true,"; }.

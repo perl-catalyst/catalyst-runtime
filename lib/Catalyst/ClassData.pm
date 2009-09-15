@@ -6,7 +6,7 @@ use Class::MOP;
 use Moose::Util ();
 
 sub mk_classdata {
-  my ($class, $attribute) = @_;
+  my ($class, $attribute, $warn_on_instance) = @_;
   confess("mk_classdata() is a class method, not an object method")
     if blessed $class;
 
@@ -49,13 +49,16 @@ sub mk_classdata {
     unless $meta->isa('Class::MOP::Class');
 
   my $was_immutable = $meta->is_immutable;
+  # Need to save immutable_options if they're available from Moose 0.89_02
+  my %immutable_options = $meta->can('immutable_options') ? $meta->immutable_options : ();
+
   $meta->make_mutable if $was_immutable;
 
   my $alias = "_${attribute}_accessor";
   $meta->add_method($alias, $accessor);
   $meta->add_method($attribute, $accessor);
 
-  $meta->make_immutable if $was_immutable;
+  $meta->make_immutable(%immutable_options) if $was_immutable;
 
   $class->$attribute($_[2]) if(@_ > 2);
   return $accessor;
