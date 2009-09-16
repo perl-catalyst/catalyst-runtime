@@ -1,8 +1,18 @@
 # This file documents the revision history for Perl extension Catalyst.
 #
 
-  - Require new Moose version and new versions of various dependencies
-    to avoid warnings from newest Moose release.
+  Bug fixes:
+    - Preserve immutable_options when temporarily making a class mutable in
+      Catalyst::ClassData as this is needed by new Class::MOP;
+    - Require new Moose version and new versions of various dependencies
+      to avoid warnings from newest Moose release.
+
+  Documentation:
+    - Rework the $c->go documentation to make it more clear.
+
+  Refactoring / cleanups:
+    - Action methods in the application class are deprecated and applications
+      using them will now generate a warning at startup.
 
 5.80012 2009-09-09 19:09:09
 
