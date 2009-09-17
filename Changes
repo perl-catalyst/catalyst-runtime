@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80013 2009-09-17 11:07:04
+
    Bug fixes:
      - Preserve immutable_options when temporarily making a class mutable in
        Catalyst::ClassData as this is needed by new Class::MOP.
@@ -19,7 +21,7 @@
        using them will now generate a warning at startup.
      - The -short option has been removed from catalyst.pl, stopping new
        applications from being generated using the ::[MVC]:: naming scheme as
-       this is deprecated and generates warnings. RT#49771 
+       this is deprecated and generates warnings. RT#49771
 
 5.80012 2009-09-09 19:09:09
 
