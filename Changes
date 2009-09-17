@@ -1,18 +1,25 @@
 # This file documents the revision history for Perl extension Catalyst.
-#
 
-  Bug fixes:
-    - Preserve immutable_options when temporarily making a class mutable in
-      Catalyst::ClassData as this is needed by new Class::MOP;
-    - Require new Moose version and new versions of various dependencies
-      to avoid warnings from newest Moose release.
+   Bug fixes:
+     - Preserve immutable_options when temporarily making a class mutable in
+       Catalyst::ClassData as this is needed by new Class::MOP.
+       This could have potentially caused issues when using the deprecated runtime
+       plugins feature in an application with plugins which define their own new
+       method.
+     - Require new Moose version and new versions of various dependencies
+       to avoid warnings from newest Moose release.
 
   Documentation:
-    - Rework the $c->go documentation to make it more clear.
+     - Rework the $c->go documentation to make it more clear.
+     - Additional documentation in Catalyst::Upgrading covering more deprecation
+       warnings.
 
   Refactoring / cleanups:
-    - Action methods in the application class are deprecated and applications
-      using them will now generate a warning at startup.
+     - Action methods in the application class are deprecated and applications
+       using them will now generate a warning at startup.
+     - The -short option has been removed from catalyst.pl, stopping new
+       applications from being generated using the ::[MVC]:: naming scheme as
+       this is deprecated and generates warnings. RT#49771 
 
 5.80012 2009-09-09 19:09:09
 
@@ -29,9 +36,6 @@
   Refactoring / cleanups:
      - Reduce minimum supported perl version from 5.8.6 to 5.8.4 as there are
        many people still running/testing this version with no known issues.
-     - The -short option has been removed from catalyst.pl, stopping new
-       applications from being generated using the ::[MVC]:: naming scheme as
-       this is deprecated and generates warnings. RT#49771
 
   Tests:
      - Make the optional_http_server.t test an author only test which must be
