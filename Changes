@@ -29,6 +29,9 @@
   Refactoring / cleanups:
      - Reduce minimum supported perl version from 5.8.6 to 5.8.4 as there are
        many people still running/testing this version with no known issues.
+     - The -short option has been removed from catalyst.pl, stopping new
+       applications from being generated using the ::[MVC]:: naming scheme as
+       this is deprecated and generates warnings. RT#49771
 
   Tests:
      - Make the optional_http_server.t test an author only test which must be
