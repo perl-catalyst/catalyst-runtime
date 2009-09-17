@@ -1,12 +1,12 @@
 package TestAppToTestScripts;
 use strict;
 use warnings;
+use Carp;
 
-our %RUN_ARGS;
+our @RUN_ARGS;
 
 sub run {
-    my ($class, %opts) = @_;
-    %RUN_ARGS = %opts;
+    @RUN_ARGS = @_;
     1; # Does this work?
 }
 
