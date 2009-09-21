@@ -349,6 +349,21 @@ Or make sure to always return true values from your actions and write
 your code like this:
 
     $c->forward('foo') || return;
+    
+Another note is that C<< $c->forward >> always returns a scalar because it
+actually returns $c->state which operates in a scalar context.
+Thus, something like:
+
+    return @array;
+    
+in an action that is forwarded to is going to return a scalar, 
+i.e. how many items are in that array, which is probably not what you want.
+If you need to return an array then return a reference to it, 
+or stash it like so:
+
+    $c->stash->{array} = \@array;
+
+and access it from the stash.
 
 =cut
 
@@ -490,7 +505,9 @@ sub error {
 
 =head2 $c->state
 
-Contains the return value of the last executed action.
+Contains the return value of the last executed action.   
+Note that << $c->state >> operates in a scalar context which means that all
+values it returns are scalar.
 
 =head2 $c->clear_errors
 
