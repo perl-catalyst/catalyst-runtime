@@ -10,6 +10,7 @@
        method.
      - Require new Moose version and new versions of various dependencies
        to avoid warnings from newest Moose release.
+     - Fix go / visit expecting captures and arguments in reverse order.
 
   Documentation:
      - Rework the $c->go documentation to make it more clear.

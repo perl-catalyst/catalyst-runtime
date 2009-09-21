@@ -131,7 +131,7 @@ sub _command2action {
     my (@args, @captures);
 
     if ( ref( $extra_params[-2] ) eq 'ARRAY' ) {
-        @captures = @{ pop @extra_params };
+        @captures = @{ splice @extra_params, -2, 1 };
     }
 
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {

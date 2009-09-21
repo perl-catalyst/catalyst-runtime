@@ -262,7 +262,7 @@ sub run_tests {
         ok( my $response = request('http://localhost/action/go/go_chained'), 'go to chained + subcontroller endpoint' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'arg1, arg2; captureme', 'Content OK' );
+        is( $response->content, 'captureme; arg1, arg2', 'Content OK' );
     }
 
 }

@@ -276,7 +276,7 @@ sub run_tests {
                 "visit to chained + subcontroller endpoint for $i" );
             is( $response->header('X-Catalyst-Executed'),
                 $expected, "Executed actions for $i" );
-            is( $response->content, "arg1, arg2; becomescapture",
+            is( $response->content, "becomescapture; arg1, arg2",
                 "Content OK for $i" );
         }
     }
