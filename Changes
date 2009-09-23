@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+   Bug fixes:
+    - Require MooseX::MethodAttributes 0.17. This in turn requires new
+      MooseX::Types to stop warnings in Moose 0.91, and correctly supports
+      role combination of roles containing attributed methods.
+
 5.80013 2009-09-17 11:07:04
 
    Bug fixes:

@@ -20,7 +20,7 @@ requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.83';
 requires 'Moose' => '0.90';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.16';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.17';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
