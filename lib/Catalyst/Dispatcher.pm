@@ -29,7 +29,7 @@ our @POSTLOAD = qw/Default/;
 
 # Note - see back-compat methods at end of file.
 has _tree => (is => 'rw', builder => '_build__tree');
-has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
+has dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
 has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
@@ -722,7 +722,6 @@ use Moose;
 # Alias _method_name to method_name, add a before modifier to warn..
 foreach my $public_method_name (qw/
         tree
-        dispatch_types
         registered_dispatch_types
         method_action_class
         action_hash

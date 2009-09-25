@@ -4,6 +4,8 @@
     - Require MooseX::MethodAttributes 0.17. This in turn requires new
       MooseX::Types to stop warnings in Moose 0.91, and correctly supports
       role combination of roles containing attributed methods.
+    - Catalyst::Dispatcher::dispatch_types no longer throws deprecated warnings
+      as there is no recommended alternative.
 
 5.80013 2009-09-17 11:07:04
 
