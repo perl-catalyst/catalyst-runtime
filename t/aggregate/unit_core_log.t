@@ -6,8 +6,7 @@ use Test::More tests => 23;
 use Catalyst::Log;
 
 local *Catalyst::Log::_send_to_log;
-
-my @MESSAGES;
+local our @MESSAGES;
 {
     no warnings 'redefine';
     *Catalyst::Log::_send_to_log = sub {

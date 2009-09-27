@@ -6,7 +6,7 @@ use Class::MOP::Class;
 
 use Catalyst ();
 
-my %log_messages; # TODO - Test log messages as expected.
+local our %log_messages; # TODO - Test log messages as expected.
 my $mock_log = Class::MOP::Class->create_anon_class(
     methods => {
         map { my $level = $_;
@@ -21,6 +21,7 @@ my $mock_log = Class::MOP::Class->create_anon_class(
 
 sub mock_app {
     my $name = shift;
+    my $mock_log = shift;
     %log_messages = (); # Flatten log messages.
     my $meta = Moose->init_meta( for_class => $name );
     $meta->superclasses('Catalyst');
@@ -36,17 +37,17 @@ foreach my $name (grep { /^(CATALYST|TESTAPP)/ } keys %ENV) {
 }
 
 {
-    my $app = mock_app('TestAppNoStats');
+    my $app = mock_app('TestAppNoStats', $mock_log);
     $app->setup_stats();
     ok !$app->use_stats, 'stats off by default';
 }
 {
-    my $app = mock_app('TestAppStats');
+    my $app = mock_app('TestAppStats', $mock_log);
     $app->setup_stats(1);
     ok $app->use_stats, 'stats on if you say >setup_stats(1)';
 }
 {
-    my $app = mock_app('TestAppStatsDebugTurnsStatsOn');
+    my $app = mock_app('TestAppStatsDebugTurnsStatsOn', $mock_log);
     $app->meta->add_method('debug' => sub { 1 });
     $app->setup_stats();
     ok $app->use_stats, 'debug on turns stats on';
@@ -54,14 +55,14 @@ foreach my $name (grep { /^(CATALYST|TESTAPP)/ } keys %ENV) {
 {
     local %ENV = %ENV;
     $ENV{CATALYST_STATS} = 1;
-    my $app = mock_app('TestAppStatsEnvSet');
+    my $app = mock_app('TestAppStatsEnvSet', $mock_log);
     $app->setup_stats();
     ok $app->use_stats, 'ENV turns stats on';
 }
 {
     local %ENV = %ENV;
     $ENV{CATALYST_STATS} = 0;
-    my $app = mock_app('TestAppStatsEnvUnset');
+    my $app = mock_app('TestAppStatsEnvUnset', $mock_log);
     $app->meta->add_method('debug' => sub { 1 });
     $app->setup_stats(1);
     ok !$app->use_stats, 'ENV turns stats off, even when debug on and ->setup_stats(1)';

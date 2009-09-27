@@ -11,6 +11,7 @@ use File::Spec;
 use File::Path;
 
 my $libdir = 'test_trash';
+local @INC = @INC;
 unshift(@INC, $libdir);
 
 my $appclass = 'TestComponents';
@@ -54,7 +55,7 @@ sub write_component_file {
 }
 
 sub make_component_file {
-    my ($type, $prefix, $name) = @_;
+    my ($libdir, $appclass, $type, $prefix, $name) = @_;
 
     my $compbase = "Catalyst::${type}";
     my $fullname = "${appclass}::${prefix}::${name}";
@@ -78,9 +79,13 @@ EOF
 }
 
 foreach my $component (@components) {
-    make_component_file($component->{type},
-                        $component->{prefix},
-                        $component->{name});
+    make_component_file(
+        $libdir,
+        $appclass,
+        $component->{type},
+        $component->{prefix},
+        $component->{name},
+    );
 }
 
 my $shut_up_deprecated_warnings = q{
@@ -138,9 +143,13 @@ $appclass = 'ExtraOptions';
 push @components, { type => 'View', prefix => 'Extra', name => 'Foo' };
 
 foreach my $component (@components) {
-    make_component_file($component->{type},
-                        $component->{prefix},
-                        $component->{name});
+    make_component_file(
+        $libdir,
+        $appclass,
+        $component->{type},
+        $component->{prefix},
+        $component->{name},
+    );
 }
 
 eval qq(
