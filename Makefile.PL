@@ -61,6 +61,7 @@ else {
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
+author_requires 'CatalystX::LeakChecker', '0.03'; # Skipped if this isn't installed
 
 author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(
