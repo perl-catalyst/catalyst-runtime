@@ -14,7 +14,7 @@
 use strict;
 use warnings;
 use FindBin qw/$Bin/;
-use lib "$Bin/lib";
+use lib "$Bin/../lib";
 use Catalyst::Test 'ACLTestApp';
 use Test::More tests => 1;
 

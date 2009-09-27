@@ -7,7 +7,7 @@ use FindBin;
 use lib         "$FindBin::Bin/lib";
 use Test::More  tests => 59;
 use FindBin qw/$Bin/;
-use lib "$Bin/lib";
+use lib "$Bin/../lib";
 use Catalyst::Utils;
 use HTTP::Request::Common;
 use Test::Exception;
