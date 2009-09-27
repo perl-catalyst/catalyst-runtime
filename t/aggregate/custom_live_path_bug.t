@@ -22,14 +22,14 @@ else {
         run_tests();
     }
 }
-    
+
 sub run_tests {
     SKIP:
     {
         if ( $ENV{CATALYST_SERVER} ) {
             skip 'Using remote server', 2;
         }
-        
+
         {
             my $expected = 'This is the foo method.';
             ok( my $response = request('http://localhost/'), 'response ok' );
