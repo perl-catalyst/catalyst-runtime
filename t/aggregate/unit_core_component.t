@@ -89,5 +89,5 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 
     $c->component('Mode', qw/foo3 bar3/);
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
-} 
+}
 

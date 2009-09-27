@@ -24,7 +24,7 @@ sub mock_app {
     %log_messages = (); # Flatten log messages.
     my $meta = Moose->init_meta( for_class => $name );
     $meta->superclasses('Catalyst');
-    $meta->add_method('log', sub { $mock_log }); 
+    $meta->add_method('log', sub { $mock_log });
     return $meta->name;
 }
 

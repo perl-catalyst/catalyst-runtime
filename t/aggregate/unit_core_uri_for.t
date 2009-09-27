@@ -46,7 +46,7 @@ is(
 is (Catalyst::uri_for( $context, '/bar/wibble?' )->as_string,
    'http://127.0.0.1/foo/bar/wibble%3F', 'Question Mark gets encoded'
 );
-   
+
 is( Catalyst::uri_for( $context, qw/bar wibble?/, 'with space' )->as_string,
     'http://127.0.0.1/foo/yada/bar/wibble%3F/with%20space', 'Space gets encoded'
 );
