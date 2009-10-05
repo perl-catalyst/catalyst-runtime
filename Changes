@@ -6,6 +6,12 @@
       role combination of roles containing attributed methods.
     - Catalyst::Dispatcher::dispatch_types no longer throws deprecated warnings
       as there is no recommended alternative.
+    - Improved the suggested fix warning when component resolution uses regex
+      fallback for fully qualified component names. (abraxxa)
+  
+  New features:
+    - Added disable_component_resolution_regex_fallback config option to
+      switch off regex fallback for component resolution. (abraxxa)
 
 5.80013 2009-09-17 11:07:04
 

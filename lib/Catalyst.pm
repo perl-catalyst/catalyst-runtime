@@ -552,6 +552,10 @@ sub _comp_names_search_prefixes {
     # if we were given a regexp to search against, we're done.
     return if ref $name;
 
+    # skip regexp fallback if configured
+    return
+        if $appclass->config->{disable_component_resolution_regex_fallback};
+
     # regexp fallback
     $query  = qr/$name/i;
     @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
@@ -569,7 +573,8 @@ sub _comp_names_search_prefixes {
            (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
            "component resolution is unreliable and unsafe.";
         my $short = $result[0];
-        $short =~ s/.*?Model:://;
+        # remove the component namespace prefix
+        $short =~ s/.*?(Model|Controller|View):://;
         my $shortmess = Carp::shortmess('');
         if ($shortmess =~ m#Catalyst/Plugin#) {
            $msg .= " You probably need to set '$short' instead of '${name}' in this " .
@@ -578,7 +583,7 @@ sub _comp_names_search_prefixes {
            $msg .= " You probably need to set '$short' instead of '${name}' in this " .
               "component's config";
         } else {
-           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}({'${name}'}), " .
+           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}('${name}'), " .
               "but if you really wanted to search, pass in a regexp as the argument " .
               "like so: \$c->${warn_for}(qr/${name}/)";
         }
@@ -794,6 +799,12 @@ should be used instead.
 
 If C<$name> is a regexp, a list of components matched against the full
 component name will be returned.
+
+If Catalyst can't find a component by name, it will fallback to regex
+matching by default. To disable this behaviour set
+disable_component_resolution_regex_fallback to a true value.
+    
+    __PACKAGE__->config( { disable_component_resolution_regex_fallback => 1 } );
 
 =cut
 
