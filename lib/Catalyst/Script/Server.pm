@@ -150,8 +150,8 @@ sub run {
 
         my $restarter = $subclass->new(
             %args,
-            start_sub => sub { $self->_run },
-            argv      => \$self->ARGV,
+            start_sub => sub { $self->_run_application },
+            argv      => $self->ARGV,
         );
 
         $restarter->run_and_watch;
