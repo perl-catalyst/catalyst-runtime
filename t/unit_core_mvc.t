@@ -1,4 +1,4 @@
-use Test::More tests => 46;
+use Test::More tests => 51;
 use strict;
 use warnings;
 
@@ -180,4 +180,48 @@ is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 
 
+}
+
+{
+    my $warn = '';
+    no warnings 'redefine';
+    local *Catalyst::Log::warn = sub { $warn .= $_[1] };
+
+    is_deeply (MyApp->controller('MyApp::Controller::C'),
+        MyApp->components->{'MyApp::Controller::C'},
+        'controller by fully qualified name ok');
+
+    # You probably meant $c->controller('C') instead of $c->controller({'MyApp::Controller::C'})
+    my ($suggested_comp_name, $orig_comp_name) = $warn =~ /You probably meant (.*) instead of (.*) /;
+    isnt($suggested_comp_name, $orig_comp_name, 'suggested fix in warning for fully qualified component names makes sense' );
+}
+
+{
+    package MyApp::WithoutRegexFallback;
+
+    use base qw/Catalyst/;
+
+    __PACKAGE__->config( { disable_component_resolution_regex_fallback => 1 } );
+
+    __PACKAGE__->components( { map { ( ref($_)||$_ , $_ ) }
+        qw/MyApp::WithoutRegexFallback::Controller::Another::Foo/ } );
+
+    # allow $c->log->warn to work
+    __PACKAGE__->setup_log;
+}
+
+{
+    # test if non-regex component retrieval still works
+    is( MyApp::WithoutRegexFallback->controller('Another::Foo'),
+        'MyApp::WithoutRegexFallback::Controller::Another::Foo', 'controller Another::Foo found');
+}
+
+{
+    my $warnings = 0;
+    no warnings 'redefine';
+    local *Catalyst::Log::warn = sub { $warnings++ };
+
+    # try to get nonexisting object w/o regexp fallback
+    is( MyApp::WithoutRegexFallback->controller('Foo'), undef, 'no controller Foo found');
+    ok( !$warnings, 'no regexp fallback warnings' );
 }
