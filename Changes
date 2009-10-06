@@ -8,6 +8,7 @@
       as there is no recommended alternative.
     - Improved the suggested fix warning when component resolution uses regex
       fallback for fully qualified component names.
+    - Catalyst::Test::local_request sets ->request on the response.
 
   New features:
     - Added disable_component_resolution_regex_fallback config option to
