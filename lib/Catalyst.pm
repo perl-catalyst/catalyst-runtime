@@ -2663,6 +2663,10 @@ messages in template systems.
 
 sub version { return $Catalyst::VERSION }
 
+=head1 CONFIGURATION
+
+    # TODO include things like 'current_view' and maybe reiterate things like 'name' too
+
 =head1 INTERNAL ACTIONS
 
 Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,
