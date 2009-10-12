@@ -1,13 +1,15 @@
 use strict;
 use warnings;
 use inc::Module::Install 0.87;
-BEGIN { # Make it easy for newbies
-    if ($Module::Install::AUTHOR) {
-        require Module::Install::AuthorRequires;
-        require Module::Install::CheckConflicts;
-        require Module::Install::AuthorTests;
-    }
+{   # Ensure that these get used - yes, M::I loads them for us, but if you're
+    # in author mode and don't have them installed, then the error is tres
+    # cryptic.
+    no warnings 'redefine';
+    use Module::Install::AuthorRequires;
+    use Module::Install::CheckConflicts;
+    use Module::Install::AuthorTests;
 }
+
 perl_version '5.008004';
 
 name 'Catalyst-Runtime';
