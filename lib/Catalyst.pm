@@ -1634,7 +1634,7 @@ sub _stats_start_execute {
         if ( my $parent = $c->stack->[-1] ) {
             $c->stats->profile(
                 begin  => $action,
-                parent => "$parent" . $c->counter->{"$parent"},
+                parent => "$parent" . ($c->counter->{"$parent"} || ''),
                 uid    => $uid,
             );
         }
