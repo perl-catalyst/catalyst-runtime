@@ -1629,12 +1629,13 @@ sub _stats_start_execute {
 
     # is this a root-level call or a forwarded call?
     if ( $callsub =~ /forward$/ ) {
+        my $parent = $c->stack->[-1];
 
         # forward, locate the caller
-        if ( my $parent = $c->stack->[-1] ) {
+        if ( exists $c->counter->{"$parent"} ) {
             $c->stats->profile(
                 begin  => $action,
-                parent => "$parent" . ($c->counter->{"$parent"} || 0),
+                parent => "$parent" . $c->counter->{"$parent"},
                 uid    => $uid,
             );
         }
