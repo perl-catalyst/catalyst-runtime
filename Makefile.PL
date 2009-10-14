@@ -149,7 +149,7 @@ sub darwin_check_no_resource_forks {
 
         # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
         # On 10.5 (Leopard) it wants COPYFILE_DISABLE
-         die("Oh, you got Lion, snazzy. Please read the man page for tar to find out if Apple renamed COPYFILE_DISABLE again and fix this Makefile.PL please?\n") if $osx_ver =~ /^10.7/;
+         die("Oh, you got Lion, snazzy. Please read the man page for tar or Google to find out if Apple renamed COPYFILE_DISABLE (it was COPY_EXTENDED_ATTRIBUTES_DISABLE originally) again and fix this Makefile.PL please?\n") if $osx_ver =~ /^10.7/;
         my $attr = $osx_ver =~ /^10.(5|6)/  ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
