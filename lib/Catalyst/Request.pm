@@ -676,7 +676,10 @@ sub uri_with {
 =head2 $req->user
 
 Returns the currently logged in user. B<Highly deprecated>, do not call,
-this will be removed in version 5.81.
+this will be removed in version 5.81. To retrieve the currently authenticated
+user, see C<< $c->user >> and C<< $c->user_exists >> in 
+L<Catalyst::Plugin::Authentication>. For the C<REMOTE_USER> provided by the
+webserver, see C<< $req->remote_user >> below.
 
 =head2 $req->remote_user
 
