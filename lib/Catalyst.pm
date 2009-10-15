@@ -804,7 +804,7 @@ If Catalyst can't find a component by name, it will fallback to regex
 matching by default. To disable this behaviour set
 disable_component_resolution_regex_fallback to a true value.
     
-    __PACKAGE__->config( { disable_component_resolution_regex_fallback => 1 } );
+    __PACKAGE__->config( disable_component_resolution_regex_fallback => 1 );
 
 =cut
 
@@ -2666,7 +2666,74 @@ sub version { return $Catalyst::VERSION }
 
 =head1 CONFIGURATION
 
-    # TODO include things like 'current_view' and maybe reiterate things like 'name' too
+There are a number of 'base' config variables which can be set:
+
+=over
+
+=item *
+
+C<case_sensitive> - Makes private paths case sensitive. See L</CASE SENSITIVITY>.
+
+=item *
+
+C<default_model> - The default model picked if you say C<< $c->model >>. See L</$c->model($name)>.
+
+=item *
+
+C<default_view> - The default view to be rendered or returned when C<< $c->view >>. See L</$c->view($name)>.
+is called.
+
+=item *
+
+C<disable_component_resolution_regex_fallback> - Turns
+off the deprecated component resolution functionality so
+that if any of the component methods (e.g. C<< $c->controller('Foo') >>)
+are called then regex search will not be attempted on string values and
+instead C<undef> will be returned.
+
+=item *
+
+C<home> - The application home directory. In an uninstalled application,
+this is the top level application directory. In an installed application,
+this will be the directory containing C<< MyApp.pm >>.
+
+=item *
+
+C<ignore_frontend_proxy> - See L</PROXY SUPPORT>
+
+=item *
+
+C<name> - The name of the application in debug messages and the debug and
+welcome screens
+
+=item *
+
+C<parse_on_demand> - The request body (for example file uploads) will not be parsed
+until it is accessed. This allows you to (for example) check authentication (and reject
+the upload) before actually recieving all the data. See L</ON-DEMAND PARSER>
+
+=item *
+
+C<root> - The root directory for templates. Usually this is just a
+subdirectory of the home directory, but you can set it to change the
+templates to a different directory.
+
+=item *
+
+C<search_extra> - Array reference passed to Module::Pluggable to for additional
+namespaces from which components will be loaded (and constructed and stored in
+C<< $c->components >>).
+
+=item *
+
+C<show_internal_actions> - If true, causes internal actions such as C<< _DISPATCH >>
+to be shown in hit debug tables in the test server.
+
+=item *
+
+C<using_frontend_proxy> - See L</PROXY SUPPORT>.
+
+=back
 
 =head1 INTERNAL ACTIONS
 
