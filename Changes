@@ -13,6 +13,8 @@
   New features:
     - Added disable_component_resolution_regex_fallback config option to
       switch off (deprecated) regex fallback for component resolution.
+    - Added an nginx-specific behavior to the FastCGI engine to allow
+      proper PATH_INFO and SCRIPT_NAME processing for non-root applications
 
 5.80013 2009-09-17 11:07:04
 
