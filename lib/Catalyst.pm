@@ -1247,9 +1247,10 @@ sub uri_for {
     }
 
     if ( blessed($path) ) { # action object
-        my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
-                         ? shift(@args)
-                         : [] );
+        my $captures = [ map { URI::Escape::uri_escape($_) }
+                        ( scalar @args && ref $args[0] eq 'ARRAY'
+                         ? @{ shift(@args) }
+                         : ()) ];
         my $action = $path;
         $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
