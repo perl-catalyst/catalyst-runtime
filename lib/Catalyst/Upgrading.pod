@@ -316,19 +316,19 @@ This warning, also affects tests. You should move actions in your test,
 creating a myTest::Controller::Root, like the following example:
 
     package MyTest::Controller::Root;
-    
+
     use strict;
     use warnings;
-    
+
     use parent 'Catalyst::Controller';
-    
+
     __PACKAGE__->config(namespace => '');
-    
+
     sub action : Local {
         my ( $self, $c ) = @_;
         $c->do_something; 
     }
-    
+
     1;
 
 =head2 ::[MVC]:: naming scheme
@@ -401,7 +401,7 @@ to B<any> of the packages defined within that component.
 Calling the plugin method is deprecated, and calling it at run time is B<highly
 deprecated>.
 
-Instead you are recommended to use L< Catalyst::Model::Adaptor > or similar to
+Instead you are recommended to use L<Catalyst::Model::Adaptor> or similar to
 compose the functionality you need outside of the main application name space.
 
 Calling the plugin method will not be supported past Catalyst 5.81.
