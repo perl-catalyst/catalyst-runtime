@@ -32,7 +32,8 @@ L<Moose> in your applications.
 
 =head2 Controller actions in Moose roles
 
-Declaring actions in Roles is currently unsupported.
+You can use L<MooseX::MethodAttributes::Role> if you want to declare actions
+inside Moose roles.
 
 =head2 Using Moose in Components
 
