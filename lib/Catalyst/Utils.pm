@@ -172,8 +172,9 @@ sub home {
             # pop off /lib and /blib if they're there
             $home = $home->parent while $home =~ /b?lib$/;
 
-            # only return the dir if it has a Makefile.PL or Build.PL
-            if (-f $home->file("Makefile.PL") or -f $home->file("Build.PL")) {
+            # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
+            if (-f $home->file("Makefile.PL") or -f $home->file("Build.PL")
+                or -f $home->file("dist.ini")) {
 
                 # clean up relative path:
                 # MyApp/script/.. -> MyApp
