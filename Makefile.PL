@@ -30,8 +30,8 @@ requires 'Data::Dump';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
 requires 'HTTP::Headers' => '1.64';
-requires 'HTTP::Request';
-requires 'HTTP::Response';
+requires 'HTTP::Request' => '5.814';
+requires 'HTTP::Response' => '5.813';
 requires 'HTTP::Request::AsCGI' => '0.8';
 requires 'LWP::UserAgent';
 requires 'Module::Pluggable' => '3.9';
