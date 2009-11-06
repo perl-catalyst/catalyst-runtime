@@ -1198,13 +1198,18 @@ sub setup_finalize {
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $path, @args?, \%query_values? )
+=head2 $c->uri_for( $path?, @args?, \%query_values? )
 
 =head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
 
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
 When used as a string, provides a textual URI.
+
+If no arguments are provided, the URI for the current action is returned.
+To return the current action and also provide @args, use
+C<< $c->uri_for( $c->action, @args ) >>. Don't do 
+C<< $c->uri_for( undef, @args ) >>.
 
 If the first argument is a string, it is taken as a public URI path relative
 to C<< $c->namespace >> (if it doesn't begin with a forward slash) or

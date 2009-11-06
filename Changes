@@ -12,6 +12,9 @@
     - Require HTTP::Request 5.814 and HTTP::Response 5.813 from LWP 5.814
       to avoid test fails.
 
+  Documentation:
+    - Document no-args call to $c->uri_for.
+
   New features:
     - Added disable_component_resolution_regex_fallback config option to
       switch off (deprecated) regex fallback for component resolution.
