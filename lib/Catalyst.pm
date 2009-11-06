@@ -1208,8 +1208,7 @@ When used as a string, provides a textual URI.
 
 If no arguments are provided, the URI for the current action is returned.
 To return the current action and also provide @args, use
-C<< $c->uri_for( $c->action, @args ) >>. Don't do 
-C<< $c->uri_for( undef, @args ) >>.
+C<< $c->uri_for( $c->action, @args ) >>. 
 
 If the first argument is a string, it is taken as a public URI path relative
 to C<< $c->namespace >> (if it doesn't begin with a forward slash) or
