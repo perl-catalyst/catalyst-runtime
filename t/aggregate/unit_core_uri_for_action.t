@@ -93,8 +93,10 @@ my $request = Catalyst::Request->new( {
               } );
 
 my $context = TestApp->new( {
-                request => $request,
-                namespace => 'yada',
+                context => Catalyst::Context->new(
+                    request => $request,
+                    namespace => 'yada',
+                ),
               } );
 
 is($context->uri_for($context->controller('Action')),

@@ -69,12 +69,12 @@ is_deeply( [ sort MyApp->models ],
     ok( $warnings, 'view() w/o a default is random, warnings thrown' );
 }
 
-is ( bless ({stash=>{current_view=>'V'}}, 'MyApp')->view , 'MyApp::View::V', 'current_view ok');
+is ( bless ( { context => Catalyst::Context->new(stash=>{current_view=>'V'}) }, 'MyApp')->view , 'MyApp::View::V', 'current_view ok');
 
 my $view = bless {} , 'MyApp::View::V'; 
-is ( bless ({stash=>{current_view_instance=> $view }}, 'MyApp')->view , $view, 'current_view_instance ok');
+is ( bless ({ context => Catalyst::Context->new(stash=>{current_view_instance=> $view })}, 'MyApp')->view , $view, 'current_view_instance ok');
 
-is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyApp::V::View' }}, 'MyApp')->view , $view, 
+is ( bless ({ context => Catalyst::Context->new(stash=>{current_view_instance=> $view, current_view=>'MyApp::V::View' })}, 'MyApp')->view , $view, 
   'current_view_instance precedes current_view ok');
 
 {
@@ -91,20 +91,20 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyApp::V::Vie
     ok( $warnings, 'model() w/o a default is random, warnings thrown' );
 }
 
-is ( bless ({stash=>{current_model=>'M'}}, 'MyApp')->model , 'MyApp::Model::M', 'current_model ok');
+is ( bless({ context => Catalyst::Context->new({stash=>{current_model=>'M'}})}, 'MyApp')->model , 'MyApp::Model::M', 'current_model ok');
 
 my $model = bless {} , 'MyApp::Model::M'; 
-is ( bless ({stash=>{current_model_instance=> $model }}, 'MyApp')->model , $model, 'current_model_instance ok');
+is ( bless ({context => Catalyst::Context->new(stash=>{current_model_instance=> $model })}, 'MyApp')->model , $model, 'current_model_instance ok');
 
-is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyApp::M::Model' }}, 'MyApp')->model , $model, 
+is ( bless ({context => Catalyst::Context->new(stash=>{current_model_instance=> $model, current_model=>'MyApp::M::Model' })}, 'MyApp')->model , $model, 
   'current_model_instance precedes current_model ok');
 
 MyApp->config->{default_view} = 'V';
-is ( bless ({stash=>{}}, 'MyApp')->view , 'MyApp::View::V', 'default_view ok');
+is ( bless ({context => Catalyst::Context->new(stash=>{})}, 'MyApp')->view , 'MyApp::View::V', 'default_view ok');
 is ( MyApp->view , 'MyApp::View::V', 'default_view in class method ok');
 
 MyApp->config->{default_model} = 'M';
-is ( bless ({stash=>{}}, 'MyApp')->model , 'MyApp::Model::M', 'default_model ok');
+is ( bless ({context => Catalyst::Context->new(stash=>{})}, 'MyApp')->model , 'MyApp::Model::M', 'default_model ok');
 is ( MyApp->model , 'MyApp::Model::M', 'default_model in class method ok');
 
 # regexp behavior tests

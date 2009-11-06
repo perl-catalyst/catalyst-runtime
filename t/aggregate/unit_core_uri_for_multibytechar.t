@@ -15,8 +15,8 @@ my $request = Catalyst::Request->new({
     uri  => URI->new("$base/"),
 });
 
-my $context = TestApp->new({
-    request => $request,
+my $context = TestApp->new({ 
+    context => Catalyst::Context->new( request => $request, )
 });
 
 

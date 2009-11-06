@@ -6,6 +6,7 @@ extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
 use bytes;
 use B::Hooks::EndOfScope ();
+use Catalyst::Context;
 use Catalyst::Exception;
 use Catalyst::Exception::Detach;
 use Catalyst::Exception::Go;
@@ -34,15 +35,13 @@ use Carp qw/croak carp shortmess/;
 
 BEGIN { require 5.008004; }
 
-has stack => (is => 'ro', default => sub { [] });
-has stash => (is => 'rw', default => sub { {} });
-has state => (is => 'rw', default => 0);
-has stats => (is => 'rw');
-has action => (is => 'rw');
-has counter => (is => 'rw', default => sub { {} });
-has request => (is => 'rw', default => sub { $_[0]->request_class->new({}) }, required => 1, lazy => 1);
-has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
-has namespace => (is => 'rw');
+has 'context' => (
+    isa       => 'Catalyst::Context',
+    is        => 'rw',
+    handles   => [
+        qw/ action counter namespace request response stack stash state stats /,
+    ],
+);
 
 sub depth { scalar @{ shift->stack || [] }; }
 sub comp { shift->component(@_) }
@@ -1886,7 +1885,8 @@ sub prepare {
     # into the application.
     $class->context_class( ref $class || $class ) unless $class->context_class;
 
-    my $c = $class->context_class->new({});
+    my $context = Catalyst::Context->new();
+    my $c = $class->context_class->new({ context => $context });
 
     # For on-demand data
     $c->request->_context($c);

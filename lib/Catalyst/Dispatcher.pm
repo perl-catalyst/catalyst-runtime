@@ -205,11 +205,10 @@ sub _do_visit {
 
     $action = $self->expand_action($action);
 
-    local $c->request->{arguments} = $args;
-    local $c->request->{captures}  = $captures;
-    local $c->{namespace} = $action->{'namespace'};
-    local $c->{action} = $action;
-
+    local $c->context->request->{arguments} = $args;
+    local $c->context->request->{captures}  = $captures;
+    local $c->context->{namespace} = $action->{'namespace'};
+    local $c->context->{action} = $action;
     $self->dispatch($c);
 }
 

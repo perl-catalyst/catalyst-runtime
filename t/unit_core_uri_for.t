@@ -11,8 +11,7 @@ my $request = Catalyst::Request->new( {
               } );
 
 my $context = Catalyst->new( {
-                request => $request,
-                namespace => 'yada',
+                context => Catalyst::Context->new( request => $request, namespace => 'yada' ),
               } );
 
 is(
