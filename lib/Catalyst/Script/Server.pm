@@ -36,9 +36,9 @@ has fork => (
     documentation => 'Fork the server',
 );
 
-has listen => (
+has port => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'l',
+    cmd_aliases => 'p',
     isa => Int,
     is => 'ro',
     default => 3000,
@@ -166,7 +166,7 @@ sub run {
 sub _application_args {
     my ($self) = shift;
     return (
-        $self->listen,
+        $self->port,
         $self->host,
         {
            map { $_ => $self->$_ } qw/
