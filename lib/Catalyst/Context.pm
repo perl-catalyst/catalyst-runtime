@@ -2,8 +2,6 @@ package Catalyst::Context;
 
 use Moose;
 
-BEGIN { require 5.008004; }
-
 has action => (is => 'rw');
 has counter => (is => 'rw', default => sub { {} });
 has namespace => (is => 'rw');
@@ -15,17 +13,6 @@ has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });
 has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');
-
-# Remember to update this in Catalyst::Runtime as well!
-
-our $VERSION = '5.80013';
-
-{
-    my $dev_version = $VERSION =~ /_\d{2}$/;
-    *_IS_DEVELOPMENT_VERSION = sub () { $dev_version };
-}
-
-$VERSION = eval $VERSION;
 
 no Moose;
 

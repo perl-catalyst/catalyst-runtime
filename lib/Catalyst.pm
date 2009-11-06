@@ -37,7 +37,7 @@ BEGIN { require 5.008004; }
 
 has 'context' => (
     isa       => 'Catalyst::Context',
-    is        => 'rw',
+    is        => 'ro',
     handles   => [
         qw/ action counter namespace request response stack stash state stats /,
     ],
@@ -70,6 +70,7 @@ __PACKAGE__->mk_classdata($_)
   engine_class context_class request_class response_class stats_class
   setup_finished/;
 
+__PACKAGE__->context_class('Catalyst::Context');
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1885,8 +1886,7 @@ sub prepare {
     # into the application.
     $class->context_class( ref $class || $class ) unless $class->context_class;
 
-    my $context = Catalyst::Context->new();
-    my $c = $class->context_class->new({ context => $context });
+    my $c = $class->new({ context => $class->context_class->new() });
 
     # For on-demand data
     $c->request->_context($c);
