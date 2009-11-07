@@ -147,7 +147,7 @@ around action_namespace => sub {
 
     my $case_s;
     if( $c ){
-        $case_s = $appclass->config->{case_sensitive};
+        $case_s = $c->config->{case_sensitive};
     } else {
         if ($self->isa('Catalyst')) {
             $case_s = $class->config->{case_sensitive};

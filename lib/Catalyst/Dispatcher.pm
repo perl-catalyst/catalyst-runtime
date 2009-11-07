@@ -122,7 +122,6 @@ sub dispatch {
 
 sub _command2action {
     my ( $self, $c, $command, @extra_params ) = @_;
-
     unless ($command) {
         $c->log->debug('Nothing to go to') if $c->debug;
         return 0;
@@ -143,7 +142,6 @@ sub _command2action {
     }
 
     my $action;
-
     # go to a string path ("/foo/bar/gorch")
     # or action object
     if (blessed($command) && $command->isa('Catalyst::Action')) {
@@ -152,7 +150,6 @@ sub _command2action {
     else {
         $action = $self->_invoke_as_path( $c, "$command", \@args );
     }
-
     # go to a component ( "MyApp::*::Foo" or $c->component("...")
     # - a path or an object)
     unless ($action) {
@@ -205,10 +202,10 @@ sub _do_visit {
 
     $action = $self->expand_action($action);
 
-    local $c->context->request->{arguments} = $args;
-    local $c->context->request->{captures}  = $captures;
-    local $c->context->{namespace} = $action->{'namespace'};
-    local $c->context->{action} = $action;
+    local $c->request->{arguments} = $args;
+    local $c->request->{captures}  = $captures;
+    local $c->{namespace} = $action->{'namespace'};
+    local $c->{action} = $action;
     $self->dispatch($c);
 }
 
@@ -284,9 +281,7 @@ sub _action_rel2abs {
 
 sub _invoke_as_path {
     my ( $self, $c, $rel_path, $args ) = @_;
-
     my $path = $self->_action_rel2abs( $c, $rel_path );
-
     my ( $tail, @extra_args );
     while ( ( $path, $tail ) = ( $path =~ m#^(?:(.*)/)?(\w+)?$# ) )
     {                           # allow $path to be empty
@@ -307,9 +302,6 @@ sub _invoke_as_path {
 sub _find_component {
     my ( $self, $c, $component ) = @_;
 
-    # fugly, why doesn't ->component('MyApp') work?
-    return $c if ($component eq blessed($c));
-
     return blessed($component)
         ? $component
         : $c->component($component);
@@ -317,15 +309,16 @@ sub _find_component {
 
 sub _invoke_as_component {
     my ( $self, $c, $component_or_class, $method ) = @_;
-
+    if( $component_or_class eq blessed($c->application) ){
+        my $possible_action = $c->application->action_for($method);
+        return $possible_action if $possible_action;
+    }
     my $component = $self->_find_component($c, $component_or_class);
     my $component_class = blessed $component || return 0;
-
     if (my $code = $component_class->can('action_for')) {
         my $possible_action = $component->$code($method);
         return $possible_action if $possible_action;
     }
-
     if ( my $code = $component_class->can($method) ) {
         return $self->_method_action_class->new(
             {
@@ -334,7 +327,7 @@ sub _invoke_as_component {
                 reverse   => "$component_class->$method",
                 class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $component_class, ref($c)->config->{case_sensitive}
+                    $component_class, $c->config->{case_sensitive}
                 ),
             }
         );
