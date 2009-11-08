@@ -82,7 +82,7 @@ use_ok( $Class );
         skip "Context tests skipped for '$meth'", 6 unless $meth eq 'ctx_request';
 
         ok( $c,                 "           Context object returned" );
-        isa_ok( $c, $App,       "               Object" );
+        isa_ok( $c, $App->context_class,       "               Object" );
         is( $c->request->uri, $Url,
                                 "               Url recorded in request" );
         is( $c->response->body, $Content,
