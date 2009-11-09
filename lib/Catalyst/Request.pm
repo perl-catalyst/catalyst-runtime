@@ -110,7 +110,7 @@ has _body => (
 sub body {
   my $self = shift;
   $self->_context->prepare_body();
-  $self->_body(@_) if scalar @_;
+  croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
 
