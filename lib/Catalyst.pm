@@ -1145,7 +1145,6 @@ EOF
         my $name = $class->config->{name} || 'Application';
         $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
-    $class->log->_flush() if $class->log->can('_flush');
 
     # Make sure that the application class becomes immutable at this point,
     B::Hooks::EndOfScope::on_scope_end {
@@ -1170,7 +1169,15 @@ EOF
         ) unless $meta->is_immutable;
     };
 
+    if ($class->config->{case_sensitive}) {
+        $class->log->warn($class . "->config->{case_sensitive} is set.");
+        $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
+    }
+
     $class->setup_finalize;
+    # Should be the last thing we do so that user things hooking
+    # setup_finalize can log..
+    $class->log->_flush() if $class->log->can('_flush');
 }
 
 
@@ -2676,10 +2683,6 @@ There are a number of 'base' config variables which can be set:
 
 =item *
 
-C<case_sensitive> - Makes private paths case sensitive. See L</CASE SENSITIVITY>.
-
-=item *
-
 C<default_model> - The default model picked if you say C<< $c->model >>. See L</$c->model($name)>.
 
 =item *
@@ -2746,16 +2749,6 @@ C<_ACTION>, and C<_END>. These are by default not shown in the private
 action table, but you can make them visible with a config parameter.
 
     MyApp->config(show_internal_actions => 1);
-
-=head1 CASE SENSITIVITY
-
-By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
-mapped to C</foo/bar>. You can activate case sensitivity with a config
-parameter.
-
-    MyApp->config(case_sensitive => 1);
-
-This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
 
 =head1 ON-DEMAND PARSER
 
