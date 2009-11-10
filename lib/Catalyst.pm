@@ -1636,10 +1636,6 @@ There are a number of 'base' config variables which can be set:
 
 =item *
 
-C<case_sensitive> - Makes private paths case sensitive. See L</CASE SENSITIVITY>.
-
-=item *
-
 C<default_model> - The default model picked if you say C<< $c->model >>. See L</$c->model($name)>.
 
 =item *
@@ -1709,13 +1705,8 @@ action table, but you can make them visible with a config parameter.
 
 =head1 CASE SENSITIVITY
 
-By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
-mapped to C</foo/bar>. You can activate case sensitivity with a config
-parameter.
-
-    MyApp->config(case_sensitive => 1);
-
-This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
+Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
+mapped to C</foo/bar>.
 
 =head1 ON-DEMAND PARSER
 

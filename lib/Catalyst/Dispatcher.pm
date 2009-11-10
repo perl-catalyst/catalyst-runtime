@@ -320,7 +320,7 @@ sub _invoke_as_component {
                     reverse   => "$component_or_class->$method",
                     class     => $component_or_class,
                     namespace => Catalyst::Utils::class2prefix(
-                        $component_or_class, $c->config->{case_sensitive}
+                        $component_or_class,
                     ),
                 }
             );
@@ -340,7 +340,7 @@ sub _invoke_as_component {
                 reverse   => "$component_class->$method",
                 class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $component_class, $c->config->{case_sensitive}
+                    $component_class,
                 ),
             }
         );

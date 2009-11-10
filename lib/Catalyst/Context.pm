@@ -43,7 +43,7 @@ has 'application' => (
         models 
         views 
         component 
-        around config
+        config
         log
         debug
         dispatcher
@@ -58,7 +58,6 @@ has 'application' => (
         prepare 
         engine_class
         setup_actions
-        case_sensitive
         search_extra
         root
         parse_on_demand

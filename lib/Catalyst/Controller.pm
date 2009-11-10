@@ -138,29 +138,13 @@ around action_namespace => sub {
     my ( $self, $c ) = @_;
 
     my $class = ref($self) || $self;
-    my $appclass = ref($c) || $c;
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
     } else {
         return $class->config->{namespace} if exists $class->config->{namespace};
     }
 
-    my $case_s;
-    if( $c ){
-        $case_s = $c->config->{case_sensitive};
-    } else {
-        if ($self->isa('Catalyst')) {
-            $case_s = $class->config->{case_sensitive};
-        } else {
-            if (ref $self) {
-                $case_s = ref($self->_application)->config->{case_sensitive};
-            } else {
-                confess("Can't figure out case_sensitive setting");
-            }
-        }
-    }
-
-    my $namespace = Catalyst::Utils::class2prefix($self->catalyst_component_name, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix($self->catalyst_component_name) || '';
     $self->$orig($namespace) if ref($self);
     return $namespace;
 };
