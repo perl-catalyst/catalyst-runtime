@@ -21,3 +21,6 @@ use base qw/Catalyst::Log/;
 
 sub info { push(@TestAppStats::log_messages, @_); }
 sub debug { push(@TestAppStats::log_messages, @_); }
+
+1;
+
