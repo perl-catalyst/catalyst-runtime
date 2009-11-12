@@ -18,6 +18,10 @@
     - Stop warnings when actions are forwarded to during dispatch.
     - Remove warnings for using Catalyst::Dispatcher->dispatch_types as this is a
       valid method to publicly call on the dispatcher.
+    - Args ($c->request->args) and CaptureArgs ($c->request->captrues)
+      passed to $c->uri_for with an action object ($c->action) will now
+      correctly round-trip when args or captures contain / as it is now
+      correctly uri encoded to %2F.
 
   Documentation:
     - Document no-args call to $c->uri_for.
