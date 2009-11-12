@@ -37,8 +37,6 @@
       proper PATH_INFO and SCRIPT_NAME processing for non-root applications
     - Enable Catalyst::Utils::home() to find home within Dist::Zilla built
       distributions
-    - Enable Catalyst::Utils::home() to find home within Dist::Zilla built
-      dists
 
   Refactoring / cleanups:
     - Remove documentation for the case_sensitive setting
