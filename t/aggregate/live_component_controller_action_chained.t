@@ -1030,15 +1030,17 @@ sub run_tests {
         ['foo%2Fbar', 'baz%2Fquux', { foo => 'bar', 'baz' => 'quux%2Ffrood'}],
         ['foo%2Fbar', 'baz%2Fquux', { foo => 'bar', 'baz%2Ffnoo' => 'quux%2Ffrood'}],
     ) {
-        my $uri = 'http://localhost/chained/roundtrip_urifor/' .
+        my $path = '/chained/roundtrip_urifor/' .
             $thing->[0] . '/' . $thing->[1];
-        $uri .= '?' . join('&',
+        $path .= '?' . join('&',
             map { $_ .'='. $thing->[2]->{$_}}
             sort keys %{$thing->[2]}) if $thing->[2];
         ok( my $content =
-            get($uri),
-            'request ' . $uri . ' ok');
-        is( $content, $uri, 'uri can round trip through uri_for' );
+            get('http://localhost/' . $path),
+            'request ' . $path . ' ok');
+        # Just check that the path matches, as who the hell knows or cares
+        # where the app is based (live tests etc)
+        ok( index($content, $path) > 1, 'uri can round trip through uri_for' );
     }
 }
 
