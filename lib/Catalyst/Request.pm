@@ -110,7 +110,7 @@ has _body => (
 sub body {
   my $self = shift;
   $self->_context->prepare_body();
-  $self->_body(@_) if scalar @_;
+  croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
 
@@ -570,7 +570,7 @@ L<Catalyst::Request::Upload> objects.
 
 =head2 $req->uri
 
-Returns a URI object for the current request. Stringifies to the URI text.
+Returns a L<URI> object for the current request. Stringifies to the URI text.
 
 =head2 $req->mangle_params( { key => 'value' }, $appendmode);
 
@@ -677,7 +677,7 @@ sub uri_with {
 
 Returns the currently logged in user. B<Highly deprecated>, do not call,
 this will be removed in version 5.81. To retrieve the currently authenticated
-user, see C<< $c->user >> and C<< $c->user_exists >> in 
+user, see C<< $c->user >> and C<< $c->user_exists >> in
 L<Catalyst::Plugin::Authentication>. For the C<REMOTE_USER> provided by the
 webserver, see C<< $req->remote_user >> below.
 

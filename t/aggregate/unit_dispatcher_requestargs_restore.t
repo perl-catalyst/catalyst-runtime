@@ -1,6 +1,6 @@
 # Insane test case for the behavior needed by Plugin::Auhorization::ACL
 
-# We have to localise $c->request->{arguments} in 
+# We have to localise $c->request->{arguments} in
 # Catalyst::Dispatcher::_do_forward, rather than using save and restore,
 # as otherwise, the calling $c->detach on an action which says
 # die $Catalyst:DETACH causes the request arguments to not get restored,
@@ -14,7 +14,7 @@
 use strict;
 use warnings;
 use FindBin qw/$Bin/;
-use lib "$Bin/lib";
+use lib "$Bin/../lib";
 use Catalyst::Test 'ACLTestApp';
 use Test::More tests => 1;
 

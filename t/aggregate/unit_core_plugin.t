@@ -11,9 +11,8 @@ use lib 't/lib';
 
     package Faux::Plugin;
 
-    sub new { bless {}, shift }
-    my $count = 1;
-    sub count { $count++ }
+    sub new { bless { count => 1 }, shift }
+    sub count { shift->{count}++ }
 }
 
 my $warnings = 0;

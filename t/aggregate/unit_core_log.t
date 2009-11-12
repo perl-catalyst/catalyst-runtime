@@ -1,17 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 22;
 
-my $LOG;
+use Catalyst::Log;
 
-BEGIN {
-    chdir 't' if -d 't';
-    use lib '../lib';
-    $LOG = 'Catalyst::Log';
-    use_ok $LOG or die;
-}
-my @MESSAGES;
+local *Catalyst::Log::_send_to_log;
+local our @MESSAGES;
 {
     no warnings 'redefine';
     *Catalyst::Log::_send_to_log = sub {
@@ -19,6 +14,8 @@ my @MESSAGES;
         push @MESSAGES, @_;
     };
 }
+
+my $LOG = 'Catalyst::Log';
 
 can_ok $LOG, 'new';
 ok my $log = $LOG->new, '... and creating a new log object should succeed';
