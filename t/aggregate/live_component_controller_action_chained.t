@@ -1020,10 +1020,8 @@ sub run_tests {
     }
 
     # Test round tripping, specifically the / character %2F in uri_for:
-    # not being able to feed it back action + captureargs and args into uri for and result in the original
-    # request uri is a major piece of suck ;)
-    # FIXME - what about people who have code to hack around this and manually uri encode args and captures
-    #         themselves, erk!
+    # not being able to feed it back action + captureargs and args into uri for
+    # and result in the original request uri is a major piece of suck ;)
     foreach my $thing (
         ['foo', 'bar'],
         ['foo%2Fbar', 'baz'],
@@ -1032,8 +1030,11 @@ sub run_tests {
         ['foo%2Fbar', 'baz%2Fquux', { foo => 'bar', 'baz' => 'quux%2Ffrood'}],
         ['foo%2Fbar', 'baz%2Fquux', { foo => 'bar', 'baz%2Ffnoo' => 'quux%2Ffrood'}],
     ) {
-        my $uri = 'http://localhost/chained/roundtrip_urifor/' . $thing->[0] . '/' . $thing->[1];
-        $uri .= '?' . join('&', map { $_ .'='. $thing->[2]->{$_}} sort keys %{$thing->[2]}) if $thing->[2];
+        my $uri = 'http://localhost/chained/roundtrip_urifor/' .
+            $thing->[0] . '/' . $thing->[1];
+        $uri .= '?' . join('&',
+            map { $_ .'='. $thing->[2]->{$_}}
+            sort keys %{$thing->[2]}) if $thing->[2];
         ok( my $content =
             get($uri),
             'request ' . $uri . ' ok');
@@ -1042,3 +1043,4 @@ sub run_tests {
 }
 
 done_testing;
+
