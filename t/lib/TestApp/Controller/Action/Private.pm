@@ -8,27 +8,27 @@ sub default : Private {
     $c->res->output('access denied');
 }
 
-sub one : Private { 
+sub one : Private {
     my ( $self, $c ) = @_;
     $c->res->output('access allowed');
 }
 
-sub two : Private Relative {
+sub two : Private {
     my ( $self, $c ) = @_;
     $c->res->output('access allowed');
 }
 
-sub three : Private Absolute {
+sub three : Private {
     my ( $self, $c ) = @_;
     $c->res->output('access allowed');
 }
 
-sub four : Private Path('/action/private/four') {
+sub four : Private {
     my ( $self, $c ) = @_;
     $c->res->output('access allowed');
 }
 
-sub five : Private Path('five') {
+sub five : Private {
     my ( $self, $c ) = @_;
     $c->res->output('access allowed');
 }

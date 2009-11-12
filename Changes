@@ -6,6 +6,48 @@
       role combination of roles containing attributed methods.
     - Catalyst::Dispatcher::dispatch_types no longer throws deprecated warnings
       as there is no recommended alternative.
+    - Improved the suggested fix warning when component resolution uses regex
+      fallback for fully qualified component names.
+    - Catalyst::Test::local_request sets ->request on the response.
+    - Require HTTP::Request 5.814 and HTTP::Response 5.813 from LWP 5.814
+      to avoid test fails.
+    - Log flush moved to the end of setup so that roles and plugins which
+      hook setup_finalize can log things and have them appear in application
+      startup, rather than with the first hit.
+    - Require a newer version of LWP to avoid failing tests.
+    - Stop warnings when actions are forwarded to during dispatch.
+    - Remove warnings for using Catalyst::Dispatcher->dispatch_types as this is a
+      valid method to publicly call on the dispatcher.
+
+  Documentation:
+    - Document no-args call to $c->uri_for.
+    - Document all top level application configuration parameters.
+    - Clarify how to fix actions in your application class (which is
+      deprecated and causes warnings).
+    - Pod fixes for ContextClosure.
+    - Fix documentation for go/visit to reference captures and arguments
+      in the correct order.
+    - Update $c->forward and $c->state documentation to address scalar
+      context.
+
+  New features:
+    - Added disable_component_resolution_regex_fallback config option to
+      switch off (deprecated) regex fallback for component resolution.
+    - Added an nginx-specific behavior to the FastCGI engine to allow
+      proper PATH_INFO and SCRIPT_NAME processing for non-root applications
+    - Enable Catalyst::Utils::home() to find home within Dist::Zilla built
+      distributions
+    - Enable Catalyst::Utils::home() to find home within Dist::Zilla built
+      dists
+
+  Refactoring / cleanups:
+    - Remove documentation for the case_sensitive setting
+    - Warning is now emitted at application startup if the case_sensitive
+      setting is turned on. This setting is not used by anyone, not
+      believed to be useful and adds unnecessary complexity to controllers
+      and the dispatcher. If you are using this setting and have good reasons
+      why it should stay then you need to be shouting, now.
+    - Writing to $c->req->body now fails as doing this never makes sense.
 
 5.80013 2009-09-17 11:07:04
 

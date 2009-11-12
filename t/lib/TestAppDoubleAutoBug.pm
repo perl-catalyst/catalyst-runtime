@@ -44,3 +44,6 @@ sub execute {
 
     return $c->SUPER::execute(@_);
 }
+
+1;
+

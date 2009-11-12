@@ -3,7 +3,7 @@ package TestApp::Controller::Dump;
 use strict;
 use base 'Catalyst::Controller';
 
-sub default : Action Private {
+sub default : Action {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump');
 }
