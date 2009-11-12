@@ -1018,12 +1018,12 @@ sub run_tests {
             'request with URI-encoded arg' );
         like( $content, qr{foo/bar;\z}, 'args decoded' );
     }
-    
+
     # Test round tripping, specifically the / character %2F in uri_for:
     # not being able to feed it back action + captureargs and args into uri for and result in the original
     # request uri is a major piece of suck ;)
     # FIXME - what about people who have code to hack around this and manually uri encode args and captures
-    #         themselves, erk! 
+    #         themselves, erk!
     foreach my $thing (
         ['foo', 'bar'],
         ['foo%2Fbar', 'baz'],
