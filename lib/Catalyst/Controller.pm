@@ -255,9 +255,15 @@ sub create_action {
     my $class = (exists $args{attributes}{ActionClass}
                     ? $args{attributes}{ActionClass}[0]
                     : $self->_action_class);
-
     Class::MOP::load_class($class);
-    return $class->new( \%args );
+
+    my $action_args = $self->config->{action_args};
+    my %extra_args = (
+        %{ $action_args->{'*'}           || {} },
+        %{ $action_args->{ $args{name} } || {} },
+    );
+
+    return $class->new({ %extra_args, %args });
 }
 
 sub _parse_attrs {
