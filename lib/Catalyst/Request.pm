@@ -210,7 +210,7 @@ Returns a reference to an array containing the arguments.
 
 For example, if your action was
 
-    package MyApp::C::Foo;
+    package MyApp::Controller::Foo;
 
     sub moose : Local {
         ...

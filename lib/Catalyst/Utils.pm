@@ -124,7 +124,7 @@ sub class2prefix {
 Returns a tempdir for a class. If create is true it will try to create the path.
 
     My::App becomes /tmp/my/app
-    My::App::C::Foo::Bar becomes /tmp/my/app/c/foo/bar
+    My::App::Controller::Foo::Bar becomes /tmp/my/app/c/foo/bar
 
 =cut
 
