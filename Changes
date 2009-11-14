@@ -33,6 +33,7 @@
       in the correct order.
     - Update $c->forward and $c->state documentation to address scalar
       context.
+    - Pod fix in Catalyst::Request (RT#51490)
 
   New features:
     - Added disable_component_resolution_regex_fallback config option to

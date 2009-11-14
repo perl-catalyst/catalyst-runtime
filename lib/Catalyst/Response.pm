@@ -65,7 +65,7 @@ will turn the Catalyst::Response into a HTTP Response and return it to the clien
 
 =head1 METHODS
 
-=head2 $res->body(<$text|$fh|$iohandle_object)
+=head2 $res->body( $text | $fh | $iohandle_object )
 
     $c->response->body('Catalyst rocks!');
 
