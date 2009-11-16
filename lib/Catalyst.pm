@@ -1169,11 +1169,6 @@ EOF
         ) unless $meta->is_immutable;
     };
 
-    if ($class->config->{case_sensitive}) {
-        $class->log->warn($class . "->config->{case_sensitive} is set.");
-        $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
-    }
-
     $class->setup_finalize;
     # Should be the last thing we do so that user things hooking
     # setup_finalize can log..

@@ -100,9 +100,9 @@ sub class2env {
     return uc($class);
 }
 
-=head2 class2prefix( $class, $case );
+=head2 class2prefix( $class );
 
-Returns the uri prefix for a class. If case is false the prefix is converted to lowercase.
+Returns the uri prefix for a class. The prefix is converted to lowercase.
 
     My::App::Controller::Foo::Bar becomes foo/bar
 
@@ -110,10 +110,9 @@ Returns the uri prefix for a class. If case is false the prefix is converted to 
 
 sub class2prefix {
     my $class = shift || '';
-    my $case  = shift || 0;
     my $prefix;
     if ( $class =~ /^.+?::([MVC]|Model|View|Controller)::(.+)$/ ) {
-        $prefix = $case ? $2 : lc $2;
+        $prefix = lc $2;
         $prefix =~ s{::}{/}g;
     }
     return $prefix;
