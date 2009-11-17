@@ -1,6 +1,7 @@
 package TestApp::Context;
 use Moose;
 extends 'Catalyst::Context'; 
+with 'Catalyst::TraitFor::Context::TestHeaders';
 
 if (eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
     with 'CatalystX::LeakChecker';
@@ -50,11 +51,6 @@ sub execute {
     no warnings 'recursion';
     return $c->SUPER::execute(@_);
 }
-
-after prepare_action => sub{
-    my $c = shift;
-    $c->res->header( 'X-Catalyst-Action' => $c->req->action );
-};
 
 1;
 
