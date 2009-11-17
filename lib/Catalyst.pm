@@ -52,6 +52,8 @@ $VERSION = eval $VERSION;
 
 our $COUNT     = 1;
 our $START     = time;
+our $DETACH    = Catalyst::Exception::Detach->new;
+our $GO        = Catalyst::Exception::Go->new;
 
 sub import {
     my ( $class, @arguments ) = @_;

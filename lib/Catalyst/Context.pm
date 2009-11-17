@@ -89,8 +89,6 @@ sub finalize_output { shift->finalize_body(@_) };
 
 # For statistics
 our $RECURSION = 1000;
-our $DETACH    = Catalyst::Exception::Detach->new;
-our $GO        = Catalyst::Exception::Go->new;
 
 =head1 METHODS
 
