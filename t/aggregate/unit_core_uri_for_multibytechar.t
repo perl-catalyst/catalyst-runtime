@@ -15,10 +15,7 @@ my $request = Catalyst::Request->new({
     uri  => URI->new("$base/"),
 });
 
-my $context = TestApp->new({
-    request => $request,
-});
-
+my $context = Catalyst::Context->new( request => $request, application => TestApp->new ); 
 
 my $uri_with_multibyte = URI->new($base);
 $uri_with_multibyte->path('/');
