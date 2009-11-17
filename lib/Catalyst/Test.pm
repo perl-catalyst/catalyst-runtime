@@ -51,8 +51,10 @@ my $build_exports = sub {
 
         my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
-        $meta->add_after_method_modifier( "dispatch", sub {
-            $c = shift;
+        $meta->add_around_method_modifier( "prepare", sub { 
+            my $orig = shift; 
+            my $self = shift; 
+            $c = $self->$orig(@_);
         });
         $meta->make_immutable( replace_constructor => 1 );
         Class::C3::reinitialize(); # Fixes RT#46459, I've failed to write a test for how/why, but it does.
