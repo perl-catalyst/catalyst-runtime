@@ -9,6 +9,7 @@ use Catalyst::Exception;
 use Catalyst::Log;
 use Catalyst::Utils;
 use Catalyst::Controller;
+use Catalyst::Context;
 use Devel::InnerPackage ();
 use Module::Pluggable::Object ();
 use Text::SimpleTable ();
@@ -31,6 +32,7 @@ __PACKAGE__->mk_classdata($_)
   engine_class context_class request_class response_class stats_class
   setup_finished/;
 
+__PACKAGE__->context_class('Catalyst::Context');
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1019,7 +1021,8 @@ sub prepare {
     # into the application.
     $class->context_class( ref $class || $class ) unless $class->context_class;
 
-    my $c = $class->context_class->new({});
+    my $app = $class->new({});
+    my $c = $class->context_class->new( application => $app );
 
     # For on-demand data
     $c->request->_context($c);
@@ -1049,7 +1052,7 @@ sub prepare {
         $c->prepare_read;
 
         # Parse the body unless the user wants it on-demand
-        unless ( ref($c)->config->{parse_on_demand} ) {
+        unless ( $app->config->{parse_on_demand} ) {
             $c->prepare_body;
         }
     }

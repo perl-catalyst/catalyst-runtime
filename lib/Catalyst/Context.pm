@@ -3,6 +3,7 @@ package Catalyst::Context;
 use Moose;
 use bytes;
 use B::Hooks::EndOfScope ();
+use Catalyst;
 use Catalyst::Exception::Detach;
 use Catalyst::Exception::Go;
 use Catalyst::Request;
@@ -42,6 +43,7 @@ has 'application' => (
         debug
         dispatcher_class
         request_class
+        response_class
         dispatcher
         prepare 
         engine_class
@@ -51,7 +53,8 @@ has 'application' => (
         setup_finalize 
         welcome_message 
         components
-        context_class        setup_actions
+        context_class
+        setup_actions
         search_extra
         root
         parse_on_demand
