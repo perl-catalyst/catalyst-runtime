@@ -12,6 +12,7 @@ use Catalyst qw/
     +TestApp::Role
 /;
 use Catalyst::Utils;
+use TestApp::Context;
 
 use Moose;
 use namespace::autoclean;
@@ -20,25 +21,7 @@ our $VERSION = '0.01';
 
 TestApp->config( name => 'TestApp', root => '/some/dir' );
 
-if (eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
-    with 'CatalystX::LeakChecker';
-
-    has leaks => (
-        is      => 'ro',
-        default => sub { [] },
-    );
-}
-
-sub found_leaks {
-    my ($ctx, @leaks) = @_;
-    push @{ $ctx->leaks }, @leaks;
-}
-
-sub count_leaks {
-    my ($ctx) = @_;
-    return scalar @{ $ctx->leaks };
-}
-
+TestApp->context_class( 'TestApp::Context' );
 TestApp->setup;
 
 sub execute {
