@@ -92,10 +92,12 @@ my $request = Catalyst::Request->new( {
                 base => URI->new('http://127.0.0.1/foo')
               } );
 
-my $context = TestApp->new( {
+my $application = TestApp->new;
+my $context = Catalyst::Context->new( 
+                application => $application,
                 request => $request,
                 namespace => 'yada',
-              } );
+              );
 
 is($context->uri_for($context->controller('Action')),
    "http://127.0.0.1/foo/yada/action/",
