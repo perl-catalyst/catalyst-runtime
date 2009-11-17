@@ -707,9 +707,8 @@ sub execute {
 
 sub _stats_start_execute {
     my ( $c, $code ) = @_;
-    my $appclass = ref($c) || $c;
     return if ( ( $code->name =~ /^_.*/ )
-        && ( !$appclass->config->{show_internal_actions} ) );
+        && ( !$c->config->{show_internal_actions} ) );
 
     my $action_name = $code->reverse();
     $c->counter->{$action_name}++;
