@@ -10,6 +10,8 @@ use Catalyst::Log;
 use Catalyst::Utils;
 use Catalyst::Controller;
 use Catalyst::Context;
+use Catalyst::Exception::Detach;
+use Catalyst::Exception::Go;
 use Devel::InnerPackage ();
 use Module::Pluggable::Object ();
 use Text::SimpleTable ();
@@ -71,9 +73,9 @@ sub import {
     }
 
     my $meta = Moose::Meta::Class->initialize($caller);
+    # Make the caller inherit from Catalyst
     unless ( $caller->isa('Catalyst') ) {
-        my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller');
-        $meta->superclasses(@superclasses);
+        $meta->superclasses($meta->superclasses, 'Catalyst');
     }
     # Avoid possible C3 issues if 'Moose::Object' is already on RHS of MyApp
     $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
@@ -824,11 +826,6 @@ EOF
         }
         $class->log->debug( "Loaded components:\n" . $t->draw . "\n" )
           if ( keys %{ $class->components } );
-    }
-
-    # Add our self to components, since we are also a component
-    if( $class->isa('Catalyst::Controller') ){
-      $class->components->{$class} = $class;
     }
 
     $class->setup_actions;
