@@ -1,6 +1,6 @@
-* Fix the fucking help to be consistent again!
 * Documentation
-* Proper test of all the options on all the scripts
+  * Catalyst::ScriptRole needs proper docs
+* $ARGV[0] has slipped to $ARGV[1] in ::Test
 * ScriptRunner tests for MyApp::Script::DoesNotCompile
-
-* Tests for Scripts / Role
+* Tests for ScriptRole
+* Sort out help discrepancy between the help you get if you --help, and the help you get if you mess an option up.

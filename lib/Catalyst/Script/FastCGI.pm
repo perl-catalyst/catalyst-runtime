@@ -10,7 +10,7 @@ with 'Catalyst::ScriptRole';
 has listen => (
     traits => [qw(Getopt)],
     cmd_aliases => 'l',
-    isa => Int,
+    isa => Str,
     is => 'ro',
     documentation => 'Specify a listening port/socket',
 );
@@ -28,20 +28,20 @@ has daemon => (
     isa => Bool,   
     is => 'ro', 
     cmd_aliases => 'd', 
-    documentation => 'Daemonize',
+    documentation => 'Daemonize (go into the background)',
 );
 
 has manager => (
     traits => [qw(Getopt)],
     isa => Str,    
     is => 'ro',
-    cmd_aliases => 'm',
-    documentation => 'Use a different FastCGI manager', # FIXME
+    cmd_aliases => 'M',
+    documentation => 'Use a different FastCGI process manager class',
 );
 
-has keep_stderr => (
+has keeperr => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'std', 
+    cmd_aliases => 'e', 
     isa => Bool,   
     is => 'ro',  
     documentation => 'Log STDERR',
@@ -49,10 +49,10 @@ has keep_stderr => (
 
 has nproc => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'np',  
+    cmd_aliases => 'n',  
     isa => Int,
     is => 'ro',  
-    documentation => 'Specify an nproc', # FIXME
+    documentation => 'Specify a number of child processes',
 );
 
 has detach => (
@@ -72,7 +72,7 @@ sub _application_args {
             pidfile => $self->pidfile,
             manager => $self->manager,
             detach  => $self->detach,
-            keep_stderr => $self->keep_stderr,
+            keep_stderr => $self->keeperr,
         }
     );
 }
@@ -85,11 +85,29 @@ Catalyst::Script::FastCGI - The FastCGI Catalyst Script
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+  myapp_fastcgi.pl [options]
+
+ Options:
+   -? -help      display this help and exits
+   -l -listen    Socket path to listen on
+                 (defaults to standard input)
+                 can be HOST:PORT, :PORT or a
+                 filesystem path
+   -n -nproc     specify number of processes to keep
+                 to serve requests (defaults to 1,
+                 requires -listen)
+   -p -pidfile   specify filename for pid file
+                 (requires -listen)
+   -d -daemon    daemonize (requires -listen)
+   -M -manager   specify alternate process manager
+                 (FCGI::ProcManager sub-class)
+                 or empty string to disable
+   -e -keeperr   send error messages to STDOUT, not
+                 to the webserver
 
 =head1 DESCRIPTION
 
-FIXME
+Run a Catalyst application as fastcgi.
 
 =head1 AUTHORS
 

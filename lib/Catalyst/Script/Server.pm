@@ -6,7 +6,6 @@ BEGIN {
 }
 
 use Moose;
-use Catalyst::Restarter;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int/;
 use namespace::autoclean;
 
@@ -22,10 +21,11 @@ has debug => (
 
 has host => (
     traits => [qw(Getopt)],
+    cmd_aliases => 'h',
     isa => Str,
     is => 'ro',
     default => 'localhost',
-    documentation => 'Specify a host for the server to run on',
+    documentation => 'Specify an IP on this host for the server to bind to',
 );
 
 has fork => (
@@ -33,7 +33,8 @@ has fork => (
     cmd_aliases => 'f',
     isa => Bool,
     is => 'ro',
-    documentation => 'Fork the server',
+    default => 0,
+    documentation => 'Fork the server to be able to serve multiple requests at once',
 );
 
 has port => (
@@ -42,7 +43,7 @@ has port => (
     isa => Int,
     is => 'ro',
     default => 3000,
-    documentation => 'Specify a different listening port',
+    documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
 has pidfile => (
@@ -58,8 +59,8 @@ has keepalive => (
     cmd_aliases => 'k',
     isa => Bool,
     is => 'ro',
-    documentation => 'Server keepalive',
-
+    default => 0,
+    documentation => 'Support keepalive',
 );
 
 has background => (
@@ -67,6 +68,7 @@ has background => (
     cmd_aliases => 'bg',
     isa => Bool,
     is => 'ro',
+    default => 0,
     documentation => 'Run in the background',
 );
 
@@ -75,7 +77,8 @@ has restart => (
     cmd_aliases => 'r',
     isa => Bool,
     is => 'ro',
-    documentation => 'use Catalyst::Restarter to detect code changes',
+    default => 0,
+    documentation => 'use Catalyst::Restarter to detect code changes and restart the application',
 );
 
 has restart_directory => (
@@ -83,26 +86,26 @@ has restart_directory => (
     cmd_aliases => 'rdir',
     isa => ArrayRef[Str],
     is  => 'ro',
-    predicate => '_has_restart_directory',
     documentation => 'Restarter directory to watch',
+    predicate => '_has_restart_directory',
 );
 
 has restart_delay => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'rdel',
+    cmd_aliases => 'rd',
     isa => Int,
     is => 'ro',
-    predicate => '_has_restart_delay',
     documentation => 'Set a restart delay',
+    predicate => '_has_restart_delay',
 );
 
 has restart_regex => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'rxp',
+    cmd_aliases => 'rr',
     isa => Str,
     is => 'ro',
-    predicate => '_has_restart_regex',
     documentation => 'Restart regex',
+    predicate => '_has_restart_regex',
 );
 
 has follow_symlinks => (
@@ -110,29 +113,27 @@ has follow_symlinks => (
     cmd_aliases => 'sym',
     isa => Bool,
     is => 'ro',
-    predicate => '_has_follow_symlinks',
+    default => 0,
     documentation => 'Follow symbolic links',
-
 );
 
 sub run {
     my ($self) = shift;
 
-    if ( $self->debug ) {
-        $ENV{CATALYST_DEBUG} = 1;
-    }
-
-    # If we load this here, then in the case of a restarter, it does not
-    # need to be reloaded for each restart.
-    require Catalyst;
-
-    # If this isn't done, then the Catalyst::Devel tests for the restarter
-    # fail.
-    $| = 1 if $ENV{HARNESS_ACTIVE};
+    local $ENV{CATALYST_DEBUG} = 1
+        if $self->debug;
 
     if ( $self->restart ) {
         die "Cannot run in the background and also watch for changed files.\n"
             if $self->background;
+
+        # If we load this here, then in the case of a restarter, it does not
+        # need to be reloaded for each restart.
+        require Catalyst;
+
+        # If this isn't done, then the Catalyst::Devel tests for the restarter
+        # fail.
+        $| = 1 if $ENV{HARNESS_ACTIVE};
 
         require Catalyst::Restarter;
 
@@ -140,7 +141,7 @@ sub run {
 
         my %args;
         $args{follow_symlinks} = $self->follow_symlinks
-            if $self->_has_follow_symlinks;
+            if $self->follow_symlinks;
         $args{directories}     = $self->restart_directory
             if $self->_has_restart_directory;
         $args{sleep_interval}  = $self->restart_delay

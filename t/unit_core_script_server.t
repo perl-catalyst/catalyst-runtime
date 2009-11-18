@@ -52,7 +52,7 @@ testOption( [ qw/--follow_symlinks/ ], ['3000', 'localhost', $testopts] );
 $testopts = opthash();
 $testopts->{background} = 1;
 testOption( [ qw/--background/ ], ['3000', 'localhost', $testopts] );
-    
+
 # Restart stuff requires a threaded perl, apparently.
 # restart        -r -restart --restart     -R --restart
 # restart dly    -rd -restartdelay         --rdel --restart_delay
@@ -81,9 +81,9 @@ sub testOption {
 # Returns the hash expected when no flags are passed
 sub opthash {
     return { 'pidfile' => undef,
-             'fork' => undef,
-             'follow_symlinks' => undef,
-             'background' => undef,
-             'keepalive' => undef,
+             'fork' => 0,
+             'follow_symlinks' => 0,
+             'background' => 0,
+             'keepalive' => 0,
          }
 }
