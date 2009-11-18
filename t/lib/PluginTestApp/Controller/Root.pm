@@ -13,8 +13,8 @@ __PACKAGE__->config->{namespace} = '';
 sub compile_time_plugins : Local {
     my ( $self, $c ) = @_;
 
-    isa_ok $c, 'Catalyst::Plugin::Test::Plugin';
-    isa_ok $c, 'TestApp::Plugin::FullyQualified';
+    isa_ok $c->application, 'Catalyst::Plugin::Test::Plugin';
+    isa_ok $c->application, 'TestApp::Plugin::FullyQualified';
 
     can_ok $c, 'registered_plugins';
     $c->_test_plugins;
