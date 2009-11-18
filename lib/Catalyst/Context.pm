@@ -35,6 +35,7 @@ has 'application' => (
     handles   => [
         qw/
         controllers 
+        controller
         models 
         views 
         component 
@@ -344,18 +345,6 @@ If you want to search for controllers, pass in a regexp as the argument.
 
 
 =cut
-
-sub controller {
-    my ( $c, $name, @args ) = @_;
-
-    if( $name ) {
-        my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
-    }
-
-    return $c->component( $c->action->class );
-}
 
 =head2 $c->model($name)
 

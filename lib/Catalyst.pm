@@ -262,6 +262,35 @@ e.g.
 
 =cut
 
+=head2 $c->controller($name)
+
+Gets a L<Catalyst::Controller> instance by name.
+
+    $c->controller('Foo')->do_stuff;
+
+If the name is omitted, will return the controller for the dispatched
+action.
+
+If you want to search for controllers, pass in a regexp as the argument.
+
+    # find all controllers that start with Foo
+    my @foo_controllers = $c->controller(qr{^Foo});
+
+
+=cut
+
+sub controller {
+    my ( $c, $name, @args ) = @_;
+
+    if( $name ) {
+        my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
+        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return $c->_filter_component( $result[ 0 ], @args );
+    }
+
+    return $c->component( $c->action->class );
+}
+
 sub _comp_search_prefixes {
     my $c = shift;
     return map $c->components->{ $_ }, $c->_comp_names_search_prefixes(@_);
