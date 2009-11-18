@@ -10,9 +10,11 @@ use mro 'c3';
 use Scalar::Util 'blessed';
 use namespace::clean -except => 'meta';
 
-with 'MooseX::Emulate::Class::Accessor::Fast';
-with 'Catalyst::ClassData';
-
+with qw/
+    MooseX::Emulate::Class::Accessor::Fast
+    Catalyst::Config
+    Catalyst::ClassData
+/;
 
 =head1 NAME
 

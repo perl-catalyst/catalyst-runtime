@@ -3,6 +3,11 @@ package Catalyst;
 use Moose;
 use Moose::Meta::Class ();
 extends 'Catalyst::Component';
+with qw/
+    MooseX::Emulate::Class::Accessor::Fast
+    Catalyst::Config
+    Catalyst::ClassData
+/;
 use Moose::Util qw/find_meta/;
 use B::Hooks::EndOfScope ();
 use Catalyst::Exception;
@@ -523,6 +528,7 @@ sub component {
             return $c->_filter_component( $comp, @args ) if $comp;
         }
 
+        return if $c->config->{disable_component_resolution_regex_fallback};
         # This is here so $c->comp( '::M::' ) works
         my $query = ref $name ? $name : qr{$name}i;
 

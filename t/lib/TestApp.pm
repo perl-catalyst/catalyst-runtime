@@ -19,7 +19,10 @@ use namespace::autoclean;
 
 our $VERSION = '0.01';
 
-TestApp->config( name => 'TestApp', root => '/some/dir' );
+TestApp->config(
+    name => 'TestApp', root => '/some/dir',
+    disable_component_resolution_regex_fallback => 1,
+);
 
 TestApp->context_class( 'TestApp::Context' );
 TestApp->setup;
