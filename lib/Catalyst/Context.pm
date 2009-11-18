@@ -67,6 +67,7 @@ has 'application' => (
         use_stats
         stats_class
         set_action
+        registered_plugins
 
         ran_setup
         _comp_search_prefixes
@@ -433,7 +434,6 @@ If you want to search for views, pass in a regexp as the argument.
 sub view {
     my ( $c, $name, @args ) = @_;
 
-    my $appclass = ref($c) || $c;
     if( $name ) {
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -446,9 +446,8 @@ sub view {
         return $c->view( $c->stash->{current_view} )
           if $c->stash->{current_view};
     }
-    return $c->view( $appclass->config->{default_view} )
-      if $appclass->config->{default_view};
-
+    return $c->view( $c->config->{default_view} )
+      if $c->config->{default_view};
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
 
     if( $rest ) {
