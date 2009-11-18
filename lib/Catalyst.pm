@@ -291,6 +291,12 @@ sub controller {
     return $c->component( $c->action->class );
 }
 
+=head2 $c->view($name)
+
+Gets a L<Catalyst::View> instance by name.
+
+=cut
+
 sub view {
     my ( $c, $name, @args ) = @_;
 
@@ -314,6 +320,12 @@ sub view {
 
     return $c->_filter_component( $comp );
 }
+
+=head2 $c->model($name)
+
+Gets a L<Catalyst::Model> instance by name.
+
+=cut
 
 sub model {
     my ( $c, $name, @args ) = @_;

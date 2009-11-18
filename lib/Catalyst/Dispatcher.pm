@@ -323,18 +323,15 @@ sub _invoke_as_component {
         my $possible_action = $c->application->action_for($method); 
         return $possible_action if $possible_action; 
         if( my $code = $c->application->can($method) ){ 
-  return $self->_method_action_class->new( 
-  { 
-  name => $method, 
-  code => $code, 
-  reverse => "$component_or_class->$method", 
-  class => $component_or_class, 
-  namespace => Catalyst::Utils::class2prefix( 
-  $component_or_class
-  ), 
-  } 
-  ); 
-  } 
+            return $self->_method_action_class->new( { 
+                    name => $method, 
+                    code => $code, 
+                    reverse => "$component_or_class->$method", 
+                    class => $component_or_class, 
+                    namespace => Catalyst::Utils::class2prefix( $component_or_class ), 
+                } 
+            ); 
+        } 
     } 
     my $component = $self->_find_component($c, $component_or_class);
     my $component_class = blessed $component || return 0;
