@@ -1,8 +1,9 @@
 package TestApp::Context;
 use Moose;
 extends 'Catalyst::Context'; 
-with 'Catalyst::TraitFor::Context::TestHeaders';
-with 'Catalyst::TraitFor::Context::TestErrors';
+with 'Catalyst::TraitFor::Context::TestHeaders',
+     'Catalyst::TraitFor::Context::TestErrors',
+     'Catalyst::TraitFor::Context::TestPluginServer';
 
 if (eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
     with 'CatalystX::LeakChecker';

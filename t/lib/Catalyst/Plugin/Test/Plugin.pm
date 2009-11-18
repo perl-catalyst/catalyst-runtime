@@ -22,14 +22,5 @@ sub prepare {
     return $c;
 }
 
-# Note: Catalyst::Plugin::Server forces the body to
-#       be parsed, by calling the $c->req->body method in prepare_action.
-#       We need to test this, as this was broken by 5.80. See also
-#       t/aggregate/live_engine_request_body.t.
-sub prepare_action {
-    my $c = shift;
-    $c->res->header('X-Have-Request-Body', 1) if $c->req->body;
-    $c->next::method(@_);
-}
 
 1;
