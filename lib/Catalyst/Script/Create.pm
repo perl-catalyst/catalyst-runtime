@@ -33,7 +33,7 @@ has mechanize => (
 sub run {
     my ($self) = @_;
 
-    $self->_display_help if ( !$ARGV[0] );
+    $self->_exit_with_usage if !$ARGV[0];
 
     my $helper = Catalyst::Helper->new( { '.newfiles' => !$self->force, mech => $self->mech } );
 
@@ -42,7 +42,6 @@ sub run {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
 =head1 NAME
 
@@ -92,3 +91,4 @@ This library is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
