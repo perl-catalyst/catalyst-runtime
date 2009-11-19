@@ -27,31 +27,24 @@ testOption( [ qw/-p 3001/ ], ['3001', 'localhost', opthash()] );
 testOption( [ qw/--port 3001/ ], ['3001', 'localhost', opthash()] );
 
 # fork           -f -fork --fork           -f --fork
-$testopts = opthash();
-$testopts->{fork} = 1;
-testOption( [ qw/--fork/ ], ['3000', 'localhost', $testopts] );
-testOption( [ qw/-f/ ], ['3000', 'localhost', $testopts] );
+testOption( [ qw/--fork/ ], ['3000', 'localhost', opthash(fork => 1)] );
+testOption( [ qw/-f/ ], ['3000', 'localhost', opthash(fork => 1)] );
 
 # pidfile        -pidfile                  --pid --pidfile
-$testopts = opthash();
-$testopts->{pidfile} = "cat.pid";
-testOption( [ qw/--pidfile cat.pid/ ], ['3000', 'localhost', $testopts] );
+testOption( [ qw/--pidfile cat.pid/ ], ['3000', 'localhost', opthash(pidfile => "cat.pid")] );
+testOption( [ qw/--pid cat.pid/ ], ['3000', 'localhost', opthash(pidfile => "cat.pid")] );
 
 # keepalive      -k -keepalive --keepalive -k --keepalive
-$testopts = opthash();
-$testopts->{keepalive} = 1;
-testOption( [ qw/-k/ ], ['3000', 'localhost', $testopts] );
-testOption( [ qw/--keepalive/ ], ['3000', 'localhost', $testopts] );
+testOption( [ qw/-k/ ], ['3000', 'localhost', opthash(keepalive => 1)] );
+testOption( [ qw/--keepalive/ ], ['3000', 'localhost', opthash(keepalive => 1)] );
 
 # symlinks       -follow_symlinks          --sym --follow_symlinks
-$testopts = opthash();
-$testopts->{follow_symlinks} = 1;
-testOption( [ qw/--follow_symlinks/ ], ['3000', 'localhost', $testopts] );
+testOption( [ qw/--follow_symlinks/ ], ['3000', 'localhost', opthash(follow_symlinks => 1)] );
+testOption( [ qw/--sym/ ], ['3000', 'localhost', opthash(follow_symlinks => 1)] );
 
 # background     -background               --bg --background
-$testopts = opthash();
-$testopts->{background} = 1;
-testOption( [ qw/--background/ ], ['3000', 'localhost', $testopts] );
+testOption( [ qw/--background/ ], ['3000', 'localhost', opthash(background => 1)] );
+testOption( [ qw/--bg/ ], ['3000', 'localhost', opthash(background => 1)] );
 
 # Restart stuff requires a threaded perl, apparently.
 # restart        -r -restart --restart     -R --restart
@@ -80,10 +73,12 @@ sub testOption {
 
 # Returns the hash expected when no flags are passed
 sub opthash {
-    return { 'pidfile' => undef,
-             'fork' => 0,
-             'follow_symlinks' => 0,
-             'background' => 0,
-             'keepalive' => 0,
-         }
+    return {
+        'pidfile' => undef,
+        'fork' => 0,
+        'follow_symlinks' => 0,
+        'background' => 0,
+        'keepalive' => 0,
+        @_,
+    };
 }
