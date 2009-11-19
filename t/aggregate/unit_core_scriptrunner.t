@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More tests => 5;
 use FindBin qw/$Bin/;
-use lib "$Bin/lib";
+use lib "$Bin/../lib";
 
 use_ok('Catalyst::ScriptRunner');
 
