@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use MRO::Compat;
 
-use base qw/Catalyst::Controller Class::Data::Inheritable/;
+use base qw/Class::Data::Inheritable/;
 
  __PACKAGE__->mk_classdata('ran_setup');
 
