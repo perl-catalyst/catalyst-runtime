@@ -10,3 +10,60 @@ use overload
 requires qw/as_string throw rethrow/;
 
 1;
+
+__END__
+
+=head1 NAME
+
+Catalyst::Exception::Interface - Exception for redispatching using $ctx->detach()
+
+=head1 SYNOPSIS
+
+   package My::Catalyst::Like::Exception;
+   use Moose;
+   use namespace::clean -except => 'meta';
+   
+   # This comprises the required interface.
+   sub as_string { 'the exception text for stringification' }
+   sub die { shift; die @_ }
+   sub die { shift; die @_ }
+   
+   with 'Catalyst::Exception::Interface';
+
+See also L<Catalyst> and L<Catalyst::Exception>.
+
+=head1 DESCRIPTION
+
+This is a role for the required interface for Catalyst exceptions.
+
+It ensures that all exceptions follow the expected interface,
+and adds overloading for stringification when composed onto a
+class.
+
+Note that if you compose this role onto another role, that role
+must use L<MooseX::Role::WithOverloading>.
+
+=head1 REQUIRED METHODS
+
+=head2 as_string
+
+=head2 throw
+
+=head2 rethrow
+
+=head1 METHODS
+
+=head2 meta
+
+Provided by Moose
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
