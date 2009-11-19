@@ -87,7 +87,7 @@ sub embed : Local {
 
 sub class_forward_test_action : Local {
     my ( $self, $c ) = @_;
-    $c->forward(qw/TestApp class_forward_test_method/);
+    $c->forward(qw/TestApp::Controller::Root class_forward_test_method/);
 }
 
 sub forward_to_uri_check : Local {
