@@ -8,12 +8,9 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 6;
+plan tests => 5;
 
 use_ok('TestApp');
-
-is(TestApp->action_for('global_action')->code, TestApp::Controller::Root->can('global_action'),
-   'action_for on appclass ok');
 
 is(TestApp->controller('Args')->action_for('args')->code,
    TestApp::Controller::Args->can('args'),

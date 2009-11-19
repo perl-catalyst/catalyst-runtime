@@ -253,7 +253,7 @@ sub run_tests {
         );
         ok( !$response->is_success, 'Response Fails' );
         is( $response->content,
-            q{FATAL ERROR: Couldn't visit("TestApp"): Action has no namespace: cannot visit() to a plain method or component, must be an :Action of some sort.},
+            q{FATAL ERROR: Couldn't visit("TestApp"): Couldn't visit to command "TestApp": Invalid action or component.},
             "Cannot visit app namespace"
         );
     }
