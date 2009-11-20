@@ -4,7 +4,7 @@ use warnings;
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
-use Test::More 'no_plan';
+use Test::More;
 use Test::Exception;
 
 use Catalyst::Script::Server;
@@ -52,23 +52,19 @@ testOption( [ qw/--bg/ ], ['3000', 'localhost', opthash(background => 1)] );
 # restart dir    -restartdirectory         --rdir --restart_directory
 # restart regex  -rr -restartregex         --rxp --restart_regex
 
+done_testing;
 
 sub testOption {
     my ($argstring, $resultarray) = @_;
 
-    subtest "Test for ARGV: @$argstring" => sub
-        {
-            plan tests => 2;
-            local @ARGV = @$argstring;
-            local @TestAppToTestScripts::RUN_ARGS;
-            lives_ok {
-                Catalyst::Script::Server->new_with_options(application_name => 'TestAppToTestScripts')->run;
-            } "new_with_options";
-            # First element of RUN_ARGS will be the script name, which we don't care about
-            shift @TestAppToTestScripts::RUN_ARGS;
-            is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison";
-            done_testing;
-        };
+    local @ARGV = @$argstring;
+    local @TestAppToTestScripts::RUN_ARGS;
+    lives_ok {
+        Catalyst::Script::Server->new_with_options(application_name => 'TestAppToTestScripts')->run;
+    } "new_with_options";
+    # First element of RUN_ARGS will be the script name, which we don't care about
+    shift @TestAppToTestScripts::RUN_ARGS;
+    is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison";
 }
 
 # Returns the hash expected when no flags are passed
