@@ -75,11 +75,35 @@ Catalyst::ScriptRole - Common functionality for Catalyst scripts.
 
 =head1 SYNOPSIS
 
-    FIXME
+    package MyApp::Script::Foo;
+    use Moose;
+    use namespace::autoclean;
+    
+    with 'Catalyst::Script::Role';
+    
+     sub _application_args { ... }
     
 =head1 DESCRIPTION
 
-    FIXME    
+Role with the common functionality of Catalyst scripts.
+
+=head1 METHODS
+
+=head2 run
+
+The method invoked to run the application.
+
+=head1 ATTRIBUTES
+
+=head2 application_name
+
+The name of the application class, e.g. MyApp
+
+=head1 SEE ALSO
+
+L<Catalyst>
+
+L<MooseX::Getopt>
 
 =head1 AUTHORS
 

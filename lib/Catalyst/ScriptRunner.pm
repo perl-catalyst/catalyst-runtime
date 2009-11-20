@@ -38,6 +38,13 @@ Catalyst::ScriptRunner - The Catalyst Framework script runner
 This class is responsible for running scripts, either in the application specific namespace
 (e.g. C<MyApp::Script::Server>), or the Catalyst namespace (e.g. C<Catalyst::Script::Server>)
 
+=head1 METHODS
+
+=head2 run ($application_class, $scriptclass)
+
+Called with two parameters, the application classs (e.g. MyApp)
+and the script class, (i.e. one of Server/FastCGI/CGI/Create/Test)
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
