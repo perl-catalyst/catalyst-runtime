@@ -38,3 +38,31 @@ sub merge_config_hashes {
 
 1;
 
+__END__
+
+=head1 NAME
+
+Catalyst::Config - Catalyst config role
+
+=head1 METHODS
+
+=head2 $app->config
+
+=head2 $app->merge_config_hashes
+
+=head1 SEE ALSO
+
+L<Catalyst>, 
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+
+
