@@ -8,7 +8,7 @@ sub run {
     my $self = shift;
 
     Class::MOP::load_class("Catalyst::Test");
-    Catalyst::Test->import($self->app);
+    Catalyst::Test->import($self->application_name);
 
     print request($ARGV[1])->content  . "\n";
 
