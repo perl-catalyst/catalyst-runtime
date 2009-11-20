@@ -19,27 +19,26 @@ __END__
 
 Catalyst::Exception::Detach - Exception for redispatching using $ctx->detach()
 
-=head1 SYNOPSIS
-
-   Do not use this class directly, instead you should use the singleton instance
-   found in $Catalyst::DETACH;
- 
-   E.g. die $Catalyst::DETACH
-
-See also L<Catalyst> and L<Catalyst::Exception>.
-
 =head1 DESCRIPTION
 
 This is the class for the Catalyst Exception which is thrown then you call
-C<< $c->detach() >>. There should be a singleton instance of this class in the
-C<< $Catalyst::DETACH >> global variable.
+C<< $c->detach() >>.
 
-Users should never need to know or care about this exception, please just use
-C<< $c->detach >>
+This class is not intended to be used directly by users.
 
 =head2 meta
 
 Provided by Moose
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Catalyst>
+
+=item L<Catalyst::Exception>
+
+=back
 
 =head1 AUTHORS
 
