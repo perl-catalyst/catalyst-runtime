@@ -23,9 +23,9 @@ Catalyst::Exception::Go - Exception for redispatching using $ctx->go()
 
    Do not use this class directly, instead you should use the singleton instance
    found in $Catalyst::GO;
-   
+
    E.g. die $Catalyst::GO;
-   
+
 See also L<Catalyst> and L<Catalyst::Exception>.
 
 =head1 DESCRIPTION

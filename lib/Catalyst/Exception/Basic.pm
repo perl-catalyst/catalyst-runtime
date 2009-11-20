@@ -53,11 +53,11 @@ Catalyst::Exception::Basic - Basic Catalyst Exception Role
    package My::Exception;
    use Moose;
    use namespace::clean -except => 'meta';
-   
+
    with 'Catalyst::Exception::Basic';
-   
+
    # Elsewhere..
-   My::Exception::Basic->throw( qq/Fatal exception/ );
+   My::Exception->throw( qq/Fatal exception/ );
 
 See also L<Catalyst> and L<Catalyst::Exception>.
 
@@ -76,7 +76,7 @@ Holds the exception message.
 
 =head2 as_string
 
-Stringifies the exception's message attribute. 
+Stringifies the exception's message attribute.
 Called when the object is stringified by overloading.
 
 =head2 throw( $message )

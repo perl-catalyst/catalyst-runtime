@@ -23,9 +23,9 @@ Catalyst::Exception::Detach - Exception for redispatching using $ctx->detach()
 
    Do not use this class directly, instead you should use the singleton instance
    found in $Catalyst::DETACH;
-   
+ 
    E.g. die $Catalyst::DETACH
-   
+
 See also L<Catalyst> and L<Catalyst::Exception>.
 
 =head1 DESCRIPTION
