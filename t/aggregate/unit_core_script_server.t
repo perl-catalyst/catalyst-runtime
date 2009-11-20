@@ -16,7 +16,7 @@ testOption( [ qw// ], ['3000', 'localhost', opthash()] );
 
 # Old version supports long format opts with either one or two dashes.  New version only supports two.
 #                Old                       New
-# help           -? -help --help           -h --help
+# help           -? -help --help           -? --help
 # debug          -d -debug --debug         -d --debug
 # host           -host --host              --host
 testOption( [ qw/--host testhost/ ], ['3000', 'testhost', opthash()] );

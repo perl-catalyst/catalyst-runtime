@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
@@ -13,17 +14,22 @@ use lib "$Bin/../lib";
     our $help;
     sub _exit_with_usage { $help++ }
 }
-{
-    local $TestHelpScript::help;
-    local @ARGV = ('-h');
-    TestHelpFromScriptCGI->new_with_options(application_name => 'TestAppToTestScripts')->run;
-    ok $TestHelpFromScriptCGI::help, 1;
+
+test('-h');
+test('--help');
+
+TODO: {
+    local $TODO = 'This is bork';
+    test('-?');
 }
-{
+
+sub test {
     local $TestHelpScript::help;
-    local @ARGV = ('--help');
-    TestHelpFromScriptCGI->new_with_options(application_name => 'TestAppToTestScripts')->run;
-    is $TestHelpFromScriptCGI::help, 2;
+    local @ARGV = (@_);
+    lives_ok {
+        TestHelpScript->new_with_options(application_name => 'TestAppToTestScripts')->run;
+    };
+    ok $TestHelpScript::help;
 }
 
 done_testing;
