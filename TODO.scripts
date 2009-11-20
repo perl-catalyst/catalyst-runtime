@@ -1,6 +1,5 @@
-* Documentation
-  * Catalyst::ScriptRole needs proper docs
 * $ARGV[0] has slipped to $ARGV[1] in ::Test
 * ScriptRunner tests for MyApp::Script::DoesNotCompile
-* Tests for ScriptRole
-* Sort out help discrepancy between the help you get if you --help, and the help you get if you mess an option up.
+* Sort out help so that it shows what you fucked up.
+* Fix horrible hacking around MX::Getopt's help display - probably by fixing MX::Getopt.
+* Tests for ::Create
