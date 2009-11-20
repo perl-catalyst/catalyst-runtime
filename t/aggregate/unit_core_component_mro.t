@@ -17,13 +17,13 @@ use warnings;
 }
 
 my $warn = '';
-{  
+{
   local $SIG{__WARN__} = sub {
-    $warn .= $_[0];  
+    $warn .= $_[0];
   };
   MyApp::MyComponent->COMPONENT('MyApp');
 }
 
-like($warn, qr/after Catalyst::Component in MyApp::Component/, 
+like($warn, qr/after Catalyst::Component in MyApp::Component/,
     'correct warning thrown');
 

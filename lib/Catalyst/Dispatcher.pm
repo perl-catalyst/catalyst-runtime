@@ -29,7 +29,7 @@ our @POSTLOAD = qw/Default/;
 
 # Note - see back-compat methods at end of file.
 has _tree => (is => 'rw', builder => '_build__tree');
-has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
+has dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
 has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
@@ -131,7 +131,7 @@ sub _command2action {
     my (@args, @captures);
 
     if ( ref( $extra_params[-2] ) eq 'ARRAY' ) {
-        @captures = @{ pop @extra_params };
+        @captures = @{ splice @extra_params, -2, 1 };
     }
 
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
@@ -372,7 +372,7 @@ sub prepare_action {
         # Check out dispatch types to see if any will handle the path at
         # this level
 
-        foreach my $type ( @{ $self->_dispatch_types } ) {
+        foreach my $type ( @{ $self->dispatch_types } ) {
             last DESCEND if $type->match( $c, $path );
         }
 
@@ -470,7 +470,7 @@ cannot determine an appropriate URI, this method will return undef.
 sub uri_for_action {
     my ( $self, $action, $captures) = @_;
     $captures ||= [];
-    foreach my $dispatch_type ( @{ $self->_dispatch_types } ) {
+    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
         my $uri = $dispatch_type->uri_for_action( $action, $captures );
         return( $uri eq '' ? '/' : $uri )
             if defined($uri);
@@ -489,7 +489,7 @@ single action.
 sub expand_action {
     my ($self, $action) = @_;
 
-    foreach my $dispatch_type (@{ $self->_dispatch_types }) {
+    foreach my $dispatch_type (@{ $self->dispatch_types }) {
         my $expanded = $dispatch_type->expand_action($action);
         return $expanded if $expanded;
     }
@@ -518,12 +518,12 @@ sub register {
             # FIXME - Some error checking and re-throwing needed here, as
             #         we eat exceptions loading dispatch types.
             eval { Class::MOP::load_class($class) };
-            push( @{ $self->_dispatch_types }, $class->new ) unless $@;
+            push( @{ $self->dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;
         }
     }
 
-    my @dtypes = @{ $self->_dispatch_types };
+    my @dtypes = @{ $self->dispatch_types };
     my @normal_dtypes;
     my @low_precedence_dtypes;
 
@@ -647,7 +647,7 @@ sub _display_action_tables {
       if $has_private;
 
     # List all public actions
-    $_->list($c) for @{ $self->_dispatch_types };
+    $_->list($c) for @{ $self->dispatch_types };
 }
 
 sub _load_dispatch_types {
@@ -662,7 +662,7 @@ sub _load_dispatch_types {
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
-        push @{ $self->_dispatch_types }, $class->new;
+        push @{ $self->dispatch_types }, $class->new;
 
         push @loaded, $class;
     }
@@ -684,7 +684,7 @@ sub dispatch_type {
     # first param is undef because we cannot get the appclass
     $name = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $name);
 
-    for (@{ $self->_dispatch_types }) {
+    for (@{ $self->dispatch_types }) {
         return $_ if ref($_) eq $name;
     }
     return undef;
@@ -722,7 +722,6 @@ use Moose;
 # Alias _method_name to method_name, add a before modifier to warn..
 foreach my $public_method_name (qw/
         tree
-        dispatch_types
         registered_dispatch_types
         method_action_class
         action_hash

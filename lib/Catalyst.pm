@@ -79,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80011';
+our $VERSION = '5.80013';
 
 {
     my $dev_version = $VERSION =~ /_\d{2}$/;
@@ -349,6 +349,21 @@ Or make sure to always return true values from your actions and write
 your code like this:
 
     $c->forward('foo') || return;
+    
+Another note is that C<< $c->forward >> always returns a scalar because it
+actually returns $c->state which operates in a scalar context.
+Thus, something like:
+
+    return @array;
+    
+in an action that is forwarded to is going to return a scalar, 
+i.e. how many items are in that array, which is probably not what you want.
+If you need to return an array then return a reference to it, 
+or stash it like so:
+
+    $c->stash->{array} = \@array;
+
+and access it from the stash.
 
 =cut
 
@@ -403,12 +418,15 @@ sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
 =head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
-Almost the same as L<< detach|/"$c->detach( $action [, \@arguments ] )" >>, but does a full dispatch like L</visit>,
-instead of just calling the new C<$action> /
-C<< $class->$method >>. This means that C<begin>, C<auto> and the
-method you visit are called, just like a new request.
-
-C<< $c->stash >> is kept unchanged.
+The relationship between C<go> and 
+L<< visit|/"$c->visit( $action [, \@captures, \@arguments ] )" >> is the same as
+the relationship between 
+L<< forward|/"$c->forward( $class, $method, [, \@arguments ] )" >> and
+L<< detach|/"$c->detach( $action [, \@arguments ] )" >>. Like C<< $c->visit >>,
+C<< $c->go >> will perform a full dispatch on the specified action or method,
+with localized C<< $c->action >> and C<< $c->namespace >>. Like C<detach>,
+C<go> escapes the processing of the current request chain on completion, and
+does not return to its caller.
 
 =cut
 
@@ -487,7 +505,9 @@ sub error {
 
 =head2 $c->state
 
-Contains the return value of the last executed action.
+Contains the return value of the last executed action.   
+Note that << $c->state >> operates in a scalar context which means that all
+values it returns are scalar.
 
 =head2 $c->clear_errors
 
@@ -532,6 +552,10 @@ sub _comp_names_search_prefixes {
     # if we were given a regexp to search against, we're done.
     return if ref $name;
 
+    # skip regexp fallback if configured
+    return
+        if $appclass->config->{disable_component_resolution_regex_fallback};
+
     # regexp fallback
     $query  = qr/$name/i;
     @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
@@ -549,7 +573,8 @@ sub _comp_names_search_prefixes {
            (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
            "component resolution is unreliable and unsafe.";
         my $short = $result[0];
-        $short =~ s/.*?Model:://;
+        # remove the component namespace prefix
+        $short =~ s/.*?(Model|Controller|View):://;
         my $shortmess = Carp::shortmess('');
         if ($shortmess =~ m#Catalyst/Plugin#) {
            $msg .= " You probably need to set '$short' instead of '${name}' in this " .
@@ -558,7 +583,7 @@ sub _comp_names_search_prefixes {
            $msg .= " You probably need to set '$short' instead of '${name}' in this " .
               "component's config";
         } else {
-           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}({'${name}'}), " .
+           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}('${name}'), " .
               "but if you really wanted to search, pass in a regexp as the argument " .
               "like so: \$c->${warn_for}(qr/${name}/)";
         }
@@ -774,6 +799,12 @@ should be used instead.
 
 If C<$name> is a regexp, a list of components matched against the full
 component name will be returned.
+
+If Catalyst can't find a component by name, it will fallback to regex
+matching by default. To disable this behaviour set
+disable_component_resolution_regex_fallback to a true value.
+    
+    __PACKAGE__->config( disable_component_resolution_regex_fallback => 1 );
 
 =cut
 
@@ -1114,7 +1145,6 @@ EOF
         my $name = $class->config->{name} || 'Application';
         $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
-    $class->log->_flush() if $class->log->can('_flush');
 
     # Make sure that the application class becomes immutable at this point,
     B::Hooks::EndOfScope::on_scope_end {
@@ -1134,11 +1164,21 @@ EOF
                 . "Class::Accessor(::Fast)?\nPlease pass "
                 . "(replace_constructor => 1)\nwhen making your class immutable.\n";
         }
-        $meta->make_immutable(replace_constructor => 1)
-            unless $meta->is_immutable;
+        $meta->make_immutable(
+            replace_constructor => 1,
+        ) unless $meta->is_immutable;
     };
 
+    if ($class->config->{case_sensitive}) {
+        $class->log->warn($class . "->config->{case_sensitive} is set.");
+        $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
+    }
+
     $class->setup_finalize;
+    # Should be the last thing we do so that user things hooking
+    # setup_finalize can log..
+    $class->log->_flush() if $class->log->can('_flush');
+    return 1; # Explicit return true as people have __PACKAGE__->setup as the last thing in their class. HATE.
 }
 
 
@@ -1166,13 +1206,17 @@ sub setup_finalize {
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $path, @args?, \%query_values? )
+=head2 $c->uri_for( $path?, @args?, \%query_values? )
 
 =head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
 
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
 When used as a string, provides a textual URI.
+
+If no arguments are provided, the URI for the current action is returned.
+To return the current action and also provide @args, use
+C<< $c->uri_for( $c->action, @args ) >>. 
 
 If the first argument is a string, it is taken as a public URI path relative
 to C<< $c->namespace >> (if it doesn't begin with a forward slash) or
@@ -1215,9 +1259,10 @@ sub uri_for {
     }
 
     if ( blessed($path) ) { # action object
-        my $captures = ( scalar @args && ref $args[0] eq 'ARRAY'
-                         ? shift(@args)
-                         : [] );
+        my $captures = [ map { s|/|%2F|; $_; }
+                        ( scalar @args && ref $args[0] eq 'ARRAY'
+                         ? @{ shift(@args) }
+                         : ()) ];
         my $action = $path;
         $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
@@ -1235,6 +1280,7 @@ sub uri_for {
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
     s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
+    s|/|%2F| for @args;
 
     unshift(@args, $path);
 
@@ -1597,9 +1643,10 @@ sub _stats_start_execute {
 
     # is this a root-level call or a forwarded call?
     if ( $callsub =~ /forward$/ ) {
+        my $parent = $c->stack->[-1];
 
         # forward, locate the caller
-        if ( my $parent = $c->stack->[-1] ) {
+        if ( exists $c->counter->{"$parent"} ) {
             $c->stats->profile(
                 begin  => $action,
                 parent => "$parent" . $c->counter->{"$parent"},
@@ -2631,6 +2678,73 @@ messages in template systems.
 
 sub version { return $Catalyst::VERSION }
 
+=head1 CONFIGURATION
+
+There are a number of 'base' config variables which can be set:
+
+=over
+
+=item *
+
+C<default_model> - The default model picked if you say C<< $c->model >>. See L</$c->model($name)>.
+
+=item *
+
+C<default_view> - The default view to be rendered or returned when C<< $c->view >>. See L</$c->view($name)>.
+is called.
+
+=item *
+
+C<disable_component_resolution_regex_fallback> - Turns
+off the deprecated component resolution functionality so
+that if any of the component methods (e.g. C<< $c->controller('Foo') >>)
+are called then regex search will not be attempted on string values and
+instead C<undef> will be returned.
+
+=item *
+
+C<home> - The application home directory. In an uninstalled application,
+this is the top level application directory. In an installed application,
+this will be the directory containing C<< MyApp.pm >>.
+
+=item *
+
+C<ignore_frontend_proxy> - See L</PROXY SUPPORT>
+
+=item *
+
+C<name> - The name of the application in debug messages and the debug and
+welcome screens
+
+=item *
+
+C<parse_on_demand> - The request body (for example file uploads) will not be parsed
+until it is accessed. This allows you to (for example) check authentication (and reject
+the upload) before actually recieving all the data. See L</ON-DEMAND PARSER>
+
+=item *
+
+C<root> - The root directory for templates. Usually this is just a
+subdirectory of the home directory, but you can set it to change the
+templates to a different directory.
+
+=item *
+
+C<search_extra> - Array reference passed to Module::Pluggable to for additional
+namespaces from which components will be loaded (and constructed and stored in
+C<< $c->components >>).
+
+=item *
+
+C<show_internal_actions> - If true, causes internal actions such as C<< _DISPATCH >>
+to be shown in hit debug tables in the test server.
+
+=item *
+
+C<using_frontend_proxy> - See L</PROXY SUPPORT>.
+
+=back
+
 =head1 INTERNAL ACTIONS
 
 Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,
@@ -2638,16 +2752,6 @@ C<_ACTION>, and C<_END>. These are by default not shown in the private
 action table, but you can make them visible with a config parameter.
 
     MyApp->config(show_internal_actions => 1);
-
-=head1 CASE SENSITIVITY
-
-By default Catalyst is not case sensitive, so C<MyApp::C::FOO::Bar> is
-mapped to C</foo/bar>. You can activate case sensitivity with a config
-parameter.
-
-    MyApp->config(case_sensitive => 1);
-
-This causes C<MyApp::C::Foo::Bar> to map to C</Foo/Bar>.
 
 =head1 ON-DEMAND PARSER
 
@@ -2758,6 +2862,8 @@ abw: Andy Wardley
 
 acme: Leon Brocard <leon@astray.com>
 
+abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
+
 Andrew Bramble
 
 Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
@@ -2807,6 +2913,8 @@ Gary Ashton Jones
 Gavin Henry C<ghenry@perl.me.uk>
 
 Geoff Richards
+
+groditi: Guillermo Roditi <groditi@gmail.com>
 
 hobbs: Andrew Rodland <andrew@cleverdomain.org>
 

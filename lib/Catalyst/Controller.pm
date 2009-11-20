@@ -2,7 +2,7 @@ package Catalyst::Controller;
 
 use Moose;
 use Moose::Util qw/find_meta/;
-
+use List::MoreUtils qw/uniq/;
 use namespace::clean -except => 'meta';
 
 BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
@@ -29,9 +29,9 @@ has action_namespace =>
      predicate => 'has_action_namespace',
     );
 
-has _controller_actions =>
+has actions =>
     (
-     is => 'rw',
+     accessor => '_controller_actions',
      isa => 'HashRef',
      init_arg => undef,
     );
@@ -200,7 +200,7 @@ sub get_action_methods {
                   . ( ref $self ) )
           } keys %{ $self->_controller_actions }
     ) if ( ref $self );
-    return @methods;
+    return uniq @methods;
 }
 
 
@@ -215,10 +215,13 @@ sub register_action_methods {
     #this is still not correct for some reason.
     my $namespace = $self->action_namespace($c);
 
-    # Uncomment as soon as you fix the tests :)
-    #if (!blessed($self) && $self eq $c && scalar(@methods)) {
-    #    $c->log->warn("Action methods found defined in your application class, $self. This is deprecated, please move them into a Root controller.");
-    #}
+    # FIXME - fugly
+    if (!blessed($self) && $self eq $c && scalar(@methods)) {
+        my @really_bad_methods = grep { ! /^_(DISPATCH|BEGIN|AUTO|ACTION|END)$/ } map { $_->name } @methods;
+        if (scalar(@really_bad_methods)) {
+            $c->log->warn("Action methods (" . join(', ', @really_bad_methods) . ") found defined in your application class, $self. This is deprecated, please move them into a Root controller.");
+        }
+    }
 
     foreach my $method (@methods) {
         my $name = $method->name;

@@ -234,7 +234,12 @@ sub _fix_env
     if ( $env->{SERVER_SOFTWARE} =~ /lighttpd/ ) {
         $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
     }
-    # Fix the environment variables PATH_INFO and SCRIPT_NAME when running under IIS
+    elsif ( $env->{SERVER_SOFTWARE} =~ /^nginx/ ) {
+        my $script_name = $env->{SCRIPT_NAME};
+        $env->{PATH_INFO} =~ s/^$script_name//g;
+    }
+    # Fix the environment variables PATH_INFO and SCRIPT_NAME when running 
+    # under IIS
     elsif ( $env->{SERVER_SOFTWARE} =~ /IIS\/[6-9]\.[0-9]/ ) {
         my @script_name = split(m!/!, $env->{PATH_INFO});
         my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
@@ -432,6 +437,76 @@ above modes.  Note the required mod_rewrite rule.
 
 For more information on using FastCGI under Lighttpd, visit
 L<http://www.lighttpd.net/documentation/fastcgi.html>
+
+=head2 nginx
+
+Catalyst runs under nginx via FastCGI in a similar fashion as the lighttpd
+standalone server as described above.
+
+nginx does not have its own internal FastCGI process manager, so you must run
+the FastCGI service separately.
+
+=head3 Configuration
+
+To configure nginx, you must configure the FastCGI parameters and also the
+socket your FastCGI daemon is listening on.  It can be either a TCP socket
+or a Unix file socket.
+
+The server configuration block should look roughly like:
+
+    server {
+        listen $port;
+
+        location / {
+            fastcgi_param  QUERY_STRING       $query_string;
+            fastcgi_param  REQUEST_METHOD     $request_method;
+            fastcgi_param  CONTENT_TYPE       $content_type;
+            fastcgi_param  CONTENT_LENGTH     $content_length;
+
+            fastcgi_param  PATH_INFO          $fastcgi_script_name;
+            fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+            fastcgi_param  REQUEST_URI        $request_uri;
+            fastcgi_param  DOCUMENT_URI       $document_uri;
+            fastcgi_param  DOCUMENT_ROOT      $document_root;
+            fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+
+            fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+            fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+            fastcgi_param  REMOTE_ADDR        $remote_addr;
+            fastcgi_param  REMOTE_PORT        $remote_port;
+            fastcgi_param  SERVER_ADDR        $server_addr;
+            fastcgi_param  SERVER_PORT        $server_port;
+            fastcgi_param  SERVER_NAME        $server_name;
+        
+            # Adjust the socket for your applications!
+            fastcgi_pass   unix:$docroot/myapp.socket;
+        }
+    }
+
+It is the standard convention of nginx to include the fastcgi_params in a
+separate file (usually something like C</etc/nginx/fastcgi_params>) and
+simply include that file.
+
+=head3  Non-root configuration
+
+If you properly specify the PATH_INFO and SCRIPT_NAME parameters your 
+application will be accessible at any path.  The SCRIPT_NAME variable is the
+prefix of your application, and PATH_INFO would be everything in addition.
+
+As an example, if your application is rooted at /myapp, you would configure:
+
+    fastcgi_param  PATH_INFO /myapp/;
+    fastcgi_param  SCRIPT_NAME $fastcgi_script_name;
+
+C<$fastcgi_script_name> would be "/myapp/path/of/the/action".  Catalyst will
+process this accordingly and setup the application base as expected.
+
+This behavior is somewhat different than Apache and Lighttpd, but is still
+functional.
+
+For more information on nginx, visit:
+L<http://nginx.net>
 
 =head2 Microsoft IIS
 

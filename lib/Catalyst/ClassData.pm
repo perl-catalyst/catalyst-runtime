@@ -49,13 +49,15 @@ sub mk_classdata {
     unless $meta->isa('Class::MOP::Class');
 
   my $was_immutable = $meta->is_immutable;
+  my %immutable_options = $meta->immutable_options;
+
   $meta->make_mutable if $was_immutable;
 
   my $alias = "_${attribute}_accessor";
   $meta->add_method($alias, $accessor);
   $meta->add_method($attribute, $accessor);
 
-  $meta->make_immutable if $was_immutable;
+  $meta->make_immutable(%immutable_options) if $was_immutable;
 
   $class->$attribute($_[2]) if(@_ > 2);
   return $accessor;

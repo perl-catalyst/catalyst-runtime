@@ -45,15 +45,5 @@ sub execute {
     return $c->SUPER::execute(@_);
 }
 
+1;
 
-
-sub auto : Private {
-    my ( $self, $c ) = @_;
-    ++$c->stash->{auto_count};
-    return 1;
-}
-
-sub default : Private {
-    my ( $self, $c ) = @_;
-    $c->res->body( sprintf 'default, auto=%d', $c->stash->{auto_count} );
-}

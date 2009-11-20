@@ -124,7 +124,7 @@ sub class2prefix {
 Returns a tempdir for a class. If create is true it will try to create the path.
 
     My::App becomes /tmp/my/app
-    My::App::C::Foo::Bar becomes /tmp/my/app/c/foo/bar
+    My::App::Controller::Foo::Bar becomes /tmp/my/app/c/foo/bar
 
 =cut
 
@@ -172,8 +172,9 @@ sub home {
             # pop off /lib and /blib if they're there
             $home = $home->parent while $home =~ /b?lib$/;
 
-            # only return the dir if it has a Makefile.PL or Build.PL
-            if (-f $home->file("Makefile.PL") or -f $home->file("Build.PL")) {
+            # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
+            if (-f $home->file("Makefile.PL") or -f $home->file("Build.PL")
+                or -f $home->file("dist.ini")) {
 
                 # clean up relative path:
                 # MyApp/script/.. -> MyApp

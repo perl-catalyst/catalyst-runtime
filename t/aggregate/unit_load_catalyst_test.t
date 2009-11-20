@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib         "$FindBin::Bin/lib";
-use Test::More  tests => 59;
+use lib         "$FindBin::Bin/../lib";
+use Test::More  tests => 61;
 use FindBin qw/$Bin/;
-use lib "$Bin/lib";
+use lib "$Bin/../lib";
 use Catalyst::Utils;
 use HTTP::Request::Common;
 use Test::Exception;
@@ -89,6 +89,9 @@ use_ok( $Class );
                                 "               Content recorded in response" );
         ok( $c->stash,          "               Stash accessible" );
         ok( $c->action,         "               Action object accessible" );
+        ok( $res->request,      "               Response has request object" );
+        lives_and { is( $res->request->uri, $Url) }
+                                "               Request object has correct url";
     } }
 }
 

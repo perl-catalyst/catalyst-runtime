@@ -11,6 +11,7 @@ use File::Spec;
 use File::Path;
 
 my $libdir = 'test_trash';
+local @INC = @INC;
 unshift(@INC, $libdir);
 
 my $appclass = 'TestComponents';
@@ -41,7 +42,7 @@ my @components = (
     { type => 'View', prefix => 'View', name => 'Foo' },
 );
 
-sub write_component_file { 
+sub write_component_file {
   my ($dir_list, $module_name, $content) = @_;
 
   my $dir  = File::Spec->catdir(@$dir_list);
@@ -54,7 +55,7 @@ sub write_component_file {
 }
 
 sub make_component_file {
-    my ($type, $prefix, $name) = @_;
+    my ($libdir, $appclass, $type, $prefix, $name) = @_;
 
     my $compbase = "Catalyst::${type}";
     my $fullname = "${appclass}::${prefix}::${name}";
@@ -78,9 +79,13 @@ EOF
 }
 
 foreach my $component (@components) {
-    make_component_file($component->{type},
-                        $component->{prefix},
-                        $component->{name});
+    make_component_file(
+        $libdir,
+        $appclass,
+        $component->{type},
+        $component->{prefix},
+        $component->{name},
+    );
 }
 
 my $shut_up_deprecated_warnings = q{
@@ -138,9 +143,13 @@ $appclass = 'ExtraOptions';
 push @components, { type => 'View', prefix => 'Extra', name => 'Foo' };
 
 foreach my $component (@components) {
-    make_component_file($component->{type},
-                        $component->{prefix},
-                        $component->{name});
+    make_component_file(
+        $libdir,
+        $appclass,
+        $component->{type},
+        $component->{prefix},
+        $component->{name},
+    );
 }
 
 eval qq(
@@ -171,7 +180,7 @@ write_component_file([$libdir, $appclass, 'Model'], 'TopLevel', <<EOF);
 package ${appclass}::Model::TopLevel;
 use base 'Catalyst::Model';
 sub COMPONENT {
- 
+
     my \$self = shift->next::method(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };

@@ -27,8 +27,8 @@ sub run_tests {
     # test root index
     {
         my @expected = qw[
-          TestApp->index
-          TestApp->end
+          TestApp::Controller::Root->index
+          TestApp::Controller::Root->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -45,7 +45,7 @@ sub run_tests {
     {
         my @expected = qw[
           TestApp::Controller::Index->index
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -66,7 +66,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Index->begin
           TestApp::Controller::Action::Index->index
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
     
         my $expected = join( ", ", @expected );
@@ -87,7 +87,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Index->begin
           TestApp::Controller::Action::Index->default
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
     
         my $expected = join( ", ", @expected );
