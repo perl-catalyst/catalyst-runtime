@@ -99,7 +99,7 @@ can_ok( $appclass, 'components');
 my $complist = $appclass->components;
 
 # the +1 below is for the app class itself
-is(scalar keys %$complist, 24+1, "Correct number of components loaded");
+is(scalar keys %$complist, 24, "Correct number of components loaded");
 
 foreach (keys %$complist) {
 
@@ -167,7 +167,7 @@ can_ok( $appclass, 'components');
 
 $complist = $appclass->components;
 
-is(scalar keys %$complist, 24+1, "Correct number of components loaded");
+is(scalar keys %$complist, 24, "Correct number of components loaded");
 
 ok( !exists $complist->{ "${appclass}::Controller::Foo" }, 'Controller::Foo was skipped' );
 ok( exists $complist->{ "${appclass}::Extra::Foo" }, 'Extra::Foo was loaded' );
