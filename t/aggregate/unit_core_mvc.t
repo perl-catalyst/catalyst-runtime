@@ -69,12 +69,12 @@ is_deeply( [ sort MyMVCTestApp->models ],
     ok( $warnings, 'view() w/o a default is random, warnings thrown' );
 }
 
-is ( bless ({stash=>{current_view=>'V'}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'current_view ok');
+is ( bless ({stash=>{current_view=>'V'}, application => MyMVCTestApp->new()}, 'Catalyst::Context')->view , 'MyMVCTestApp::View::V', 'current_view ok');
 
 my $view = bless {} , 'MyMVCTestApp::View::V';
-is ( bless ({stash=>{current_view_instance=> $view }}, 'MyMVCTestApp')->view , $view, 'current_view_instance ok');
+is ( bless ({stash=>{current_view_instance=> $view, application => MyMVCTestApp->new() }}, 'Catalyst::Context')->view , $view, 'current_view_instance ok');
 
-is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp::V::View' }}, 'MyMVCTestApp')->view , $view,
+is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp::V::View', application => MyMVCTestApp->new() }}, 'Catalyst::Context')->view , $view,
   'current_view_instance precedes current_view ok');
 
 {
@@ -91,12 +91,12 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp:
     ok( $warnings, 'model() w/o a default is random, warnings thrown' );
 }
 
-is ( bless ({stash=>{current_model=>'M'}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'current_model ok');
+is ( bless ({stash=>{current_model=>'M'}, application => MyMVCTestApp->new()}, 'Catalyst::Context')->model , 'MyMVCTestApp::Model::M', 'current_model ok');
 
 my $model = bless {} , 'MyMVCTestApp::Model::M';
-is ( bless ({stash=>{current_model_instance=> $model }}, 'MyMVCTestApp')->model , $model, 'current_model_instance ok');
+is ( bless ({stash=>{current_model_instance=> $model }, application => MyMVCTestApp->new()}, 'Catalyst::Context')->model , $model, 'current_model_instance ok');
 
-is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyMVCTestApp::M::Model' }}, 'MyMVCTestApp')->model , $model,
+is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyMVCTestApp::M::Model', application => MyMVCTestApp->new() }}, 'Catalyst::Context')->model , $model,
   'current_model_instance precedes current_model ok');
 
 MyMVCTestApp->config->{default_view} = 'V';
