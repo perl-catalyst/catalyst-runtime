@@ -42,6 +42,11 @@
       proper PATH_INFO and SCRIPT_NAME processing for non-root applications
     - Enable Catalyst::Utils::home() to find home within Dist::Zilla built
       distributions
+    - Added the Catalyst::Exception::Interface role defining the interface
+      exception classes need to implement.
+    - Added Catalyst::Exception::Basic as a basic implementation of
+      Catalyst::Exception::Interface and made the existing exception classes
+      use it.
 
   Refactoring / cleanups:
     - Remove documentation for the case_sensitive setting
