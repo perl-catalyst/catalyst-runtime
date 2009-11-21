@@ -33,7 +33,7 @@
       context.
     - Pod fix in Catalyst::Request (RT#51490)
     - Pod fixes to refer to ::Controller:: rather than ::C:: as the latter
-      is deprecated (RT#51490)
+      is deprecated (RT#51489)
 
   New features:
     - Added disable_component_resolution_regex_fallback config option to
