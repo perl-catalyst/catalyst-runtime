@@ -85,6 +85,7 @@ sub prepare_connection {
     if ( $ENV{SERVER_PORT} == 443 ) {
         $request->secure(1);
     }
+    binmode(STDOUT); # Ensure we are sending bytes.
 }
 
 =head2 $self->prepare_headers($c)
