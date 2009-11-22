@@ -9,7 +9,10 @@ use Test::More tests => 4;
 my $warnings;
 BEGIN { # Do this at compile time in case we generate a warning when use
         # DeprecatedTestApp
-    $SIG{__WARN__} = sub { $warnings++ if $_[0] =~ /trying to use NEXT/ };
+    $SIG{__WARN__} = sub {
+        $warnings++ if $_[0] =~ /uses NEXT, which is deprecated/;
+        $warnings++ if $_[0} =~ /trying to use NEXT, which is deprecated/;
+    };
 }
 use Catalyst; # Cause catalyst to be used so I can fiddle with the logging.
 my $mvc_warnings;
