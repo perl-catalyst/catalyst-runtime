@@ -156,7 +156,7 @@ sub darwin_check_no_resource_forks {
         my $attr = $osx_ver =~ /^10.(5|6)/  ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
-                                          qq{ echo "You must set the ENV variable $attr to true,"; }.
+                                          qq{ echo "You must set the ENV variable $attr to 'true',"; }.
                                           ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
     }
 }
