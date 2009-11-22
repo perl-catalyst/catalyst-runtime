@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Refactoring / cleanups:
+   - NoTabs and Pod tests moved to t/author so that they're not run
+     (and then skipped) normally.
+
 5.80014_01 2009-11-22 20:01:23
 
   Bug fixes:
