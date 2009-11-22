@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.80014_01 UNRELEASED
+5.80014_01 2009-11-22 20:01:23
 
   Bug fixes:
    - Filehandle now forced to binmode in CGI and FastCGI engines. This appears
