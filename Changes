@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80014_01 UNRELEASED
+
+  Bug fixes:
+   - Filehandle now forced to binmode in CGI and FastCGI engines. This appears
+     to correct some UTF-8 issues, but may break people's code which relies
+     on the old behaviour.
+
+  Refactoring / cleanups:
+   - Plugins which inherit from Catalyst::Controller or Catalyst::Component
+     are deprecated and now issue warnings.
+
 5.80014 2009-11-21 02:51:14
 
    Bug fixes:
