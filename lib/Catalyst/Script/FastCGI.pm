@@ -27,15 +27,15 @@ has pidfile => (
 
 has daemon => (
     traits => [qw(Getopt)],
-    isa => Bool,   
-    is => 'ro', 
-    cmd_aliases => 'd', 
+    isa => Bool,
+    is => 'ro',
+    cmd_aliases => 'd',
     documentation => 'Daemonize (go into the background)',
 );
 
 has manager => (
     traits => [qw(Getopt)],
-    isa => Str,    
+    isa => Str,
     is => 'ro',
     cmd_aliases => 'M',
     documentation => 'Use a different FastCGI process manager class',
@@ -43,25 +43,25 @@ has manager => (
 
 has keeperr => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'e', 
-    isa => Bool,   
-    is => 'ro',  
+    cmd_aliases => 'e',
+    isa => Bool,
+    is => 'ro',
     documentation => 'Log STDERR',
 );
 
 has nproc => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'n',  
+    cmd_aliases => 'n',
     isa => Int,
-    is => 'ro',  
+    is => 'ro',
     documentation => 'Specify a number of child processes',
 );
 
 has detach => (
     traits => [qw(Getopt)],
-    cmd_aliases => 'det', 
-    isa => Bool,   
-    is => 'ro',  
+    cmd_aliases => 'det',
+    isa => Bool,
+    is => 'ro',
     documentation => 'Detach this FastCGI process',
 );
 

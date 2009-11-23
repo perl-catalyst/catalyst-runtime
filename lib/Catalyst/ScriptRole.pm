@@ -77,11 +77,11 @@ Catalyst::ScriptRole - Common functionality for Catalyst scripts.
     package MyApp::Script::Foo;
     use Moose;
     use namespace::autoclean;
-    
+
     with 'Catalyst::Script::Role';
-    
+
      sub _application_args { ... }
-    
+
 =head1 DESCRIPTION
 
 Role with the common functionality of Catalyst scripts.
@@ -114,4 +114,4 @@ This library is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-    
+
