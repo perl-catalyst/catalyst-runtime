@@ -24,7 +24,7 @@ requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.83';
 requires 'Moose' => '0.90';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.17';
-requires 'MooseX::Role::WithOverloading';
+requires 'MooseX::Role::WithOverloading' => '0.03';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
@@ -114,6 +114,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Plugin::SubRequest' => '0.14',
     'Catalyst::Model::Akismet' => '0.02',
     'Catalyst::Component::ACCEPT_CONTEXT' => '0.06',
     'Catalyst::Plugin::ENV' => '9999', # This plugin is just stupid, full stop
@@ -157,7 +158,7 @@ sub darwin_check_no_resource_forks {
         my $attr = $osx_ver =~ /^10.(5|6)/  ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
-                                          qq{ echo "You must set the ENV variable $attr to true,"; }.
+                                          qq{ echo "You must set the ENV variable $attr to 'true',"; }.
                                           ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
     }
 }

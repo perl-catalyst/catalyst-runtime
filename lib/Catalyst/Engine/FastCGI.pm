@@ -144,6 +144,11 @@ sub run {
 
         $self->_fix_env( \%env );
 
+        # hack for perl libraries that use FILENO (e.g. IPC::Run)
+        # trying to patch FCGI.pm, but not got there yet :/
+        local *FCGI::Stream::FILENO = sub { -2 }
+            unless FCGI::Stream->can('FILENO');
+
         $class->handle_request( env => \%env );
 
         $proc_manager && $proc_manager->pm_post_dispatch();

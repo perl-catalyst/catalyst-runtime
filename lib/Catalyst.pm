@@ -4,7 +4,6 @@ use Moose;
 use Moose::Meta::Class ();
 extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
-use bytes;
 use B::Hooks::EndOfScope ();
 use Catalyst::Exception;
 use Catalyst::Exception::Detach;
@@ -79,7 +78,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80013';
+our $VERSION = '5.80014_01';
 
 {
     my $dev_version = $VERSION =~ /_\d{2}$/;
@@ -1793,7 +1792,7 @@ sub finalize_headers {
         }
         else {
             # everything should be bytes at this point, but just in case
-            $response->content_length( bytes::length( $response->body ) );
+            $response->content_length( length( $response->body ) );
         }
     }
 
@@ -2587,7 +2586,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my $class = ref $proto || $proto;
 
         Class::MOP::load_class( $plugin );
-
+        $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is decated and will not work in 5.81" )
+            if $plugin->isa( 'Catalyst::Component' );
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
             no strict 'refs';

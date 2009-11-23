@@ -15,22 +15,20 @@ __END__
 
 =head1 NAME
 
-Catalyst::Exception::Interface - Exception for redispatching using $ctx->detach()
+Catalyst::Exception::Interface - Role defining the interface for Catalyst exceptions
 
 =head1 SYNOPSIS
 
    package My::Catalyst::Like::Exception;
    use Moose;
    use namespace::clean -except => 'meta';
-   
+
+   with 'Catalyst::Exception::Interface';
+
    # This comprises the required interface.
    sub as_string { 'the exception text for stringification' }
    sub die { shift; die @_ }
    sub die { shift; die @_ }
-   
-   with 'Catalyst::Exception::Interface';
-
-See also L<Catalyst> and L<Catalyst::Exception>.
 
 =head1 DESCRIPTION
 
@@ -56,6 +54,16 @@ must use L<MooseX::Role::WithOverloading>.
 =head2 meta
 
 Provided by Moose
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Catalyst>
+
+=item L<Catalyst::Exception>
+
+=back
 
 =head1 AUTHORS
 

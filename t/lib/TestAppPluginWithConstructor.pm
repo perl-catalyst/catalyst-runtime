@@ -4,7 +4,7 @@ use Test::More;
 use Test::Exception;
 use Catalyst qw/+TestPluginWithConstructor/;
 use Moose;
-BEGIN { extends qw/Catalyst Catalyst::Controller/ } # Ewww, FIXME.
+extends qw/Catalyst/;
 
 __PACKAGE__->setup;
 our $MODIFIER_FIRED = 0;
