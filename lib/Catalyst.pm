@@ -4,7 +4,6 @@ use Moose;
 use Moose::Meta::Class ();
 extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
-use bytes;
 use B::Hooks::EndOfScope ();
 use Catalyst::Exception;
 use Catalyst::Exception::Detach;
@@ -1793,7 +1792,7 @@ sub finalize_headers {
         }
         else {
             # everything should be bytes at this point, but just in case
-            $response->content_length( bytes::length( $response->body ) );
+            $response->content_length( length( $response->body ) );
         }
     }
 

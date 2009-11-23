@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+   - Fix reporting the wrong Content-Length if the response body is an
+     upgraded string. Strings mean the same thing whether or not they are
+     upgraded, may get upgraded even after they are encoded, and will
+     produce the same output either way, but bytes::length returns too big
+     values for upgraded strings containing characters >127
+
   Refactoring / cleanups:
    - NoTabs and Pod tests moved to t/author so that they're not run
      (and then skipped) normally.
