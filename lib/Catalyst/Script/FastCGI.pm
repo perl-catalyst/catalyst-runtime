@@ -7,6 +7,8 @@ use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
 
+has '+help' => (cmd_aliases => 'h');
+
 has listen => (
     traits => [qw(Getopt)],
     cmd_aliases => 'l',

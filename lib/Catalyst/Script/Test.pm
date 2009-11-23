@@ -4,6 +4,8 @@ use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
 
+has '+help' => (cmd_aliases => 'h');
+
 sub run {
     my $self = shift;
 

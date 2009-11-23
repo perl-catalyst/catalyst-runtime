@@ -15,7 +15,6 @@ has application_name => (
 
 has help => (
     traits => ['Getopt'],
-    cmd_aliases => 'h',
     isa => Bool,
     is => 'ro',
     documentation => q{Display this help and exit},
