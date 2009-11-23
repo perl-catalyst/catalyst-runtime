@@ -2,6 +2,7 @@ package Catalyst::ScriptRole;
 use Moose::Role;
 use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
+use MooseX::Getopt;
 use namespace::autoclean;
 
 with 'MooseX::Getopt';
