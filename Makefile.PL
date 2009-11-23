@@ -113,6 +113,7 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Plugin::SubRequest' => '0.14',
     'Catalyst::Model::Akismet' => '0.02',
     'Catalyst::Component::ACCEPT_CONTEXT' => '0.06',
     'Catalyst::Plugin::ENV' => '9999', # This plugin is just stupid, full stop
