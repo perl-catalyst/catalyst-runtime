@@ -11,6 +11,7 @@ use lib "$Bin/../lib";
     package TestHelpScript;
     use Moose;
     with 'Catalyst::ScriptRole';
+    __PACKAGE__->meta->get_attribute('help')->cmd_aliases('h');
     our $help;
     sub _exit_with_usage { $help++ }
 }
