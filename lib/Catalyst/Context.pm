@@ -367,12 +367,7 @@ If you want to search for models, pass in a regexp as the argument.
 
 sub model {
     my ( $c, $name, @args ) = @_;
-    my $appclass = ref($c) || $c;
-    if( $name ) {
-        my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
-    }
+    return $c->application->_comp_by_name( 'Model', $name, @args ) if $name;
 
     if (ref $c) {
         return $c->stash->{current_model_instance}
@@ -380,20 +375,7 @@ sub model {
         return $c->model( $c->stash->{current_model} )
           if $c->stash->{current_model};
     }
-    return $c->model( $appclass->config->{default_model} )
-      if $appclass->config->{default_model};
-
-    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
-
-    if( $rest ) {
-        $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
-        $c->log->warn( '* $c->config(default_model => "the name of the default model to use")' );
-        $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
-        $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
-    }
-
-    return $c->_filter_component( $comp );
+    return $c->application->_no_name_comp( 'Model' );
 }
 
 
@@ -421,11 +403,7 @@ If you want to search for views, pass in a regexp as the argument.
 sub view {
     my ( $c, $name, @args ) = @_;
 
-    if( $name ) {
-        my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
-    }
+    return $c->application->_comp_by_name( 'View', $name, @args ) if $name;
 
     if (ref $c) {
         return $c->stash->{current_view_instance}
@@ -433,19 +411,7 @@ sub view {
         return $c->view( $c->stash->{current_view} )
           if $c->stash->{current_view};
     }
-    return $c->view( $c->config->{default_view} )
-      if $c->config->{default_view};
-    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
-
-    if( $rest ) {
-        $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
-        $c->log->warn( '* $c->config(default_view => "the name of the default view to use")' );
-        $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
-        $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
-    }
-
-    return $c->_filter_component( $comp );
+    return $c->application->_no_name_comp( 'View' );
 }
 
 =head2 UTILITY METHODS

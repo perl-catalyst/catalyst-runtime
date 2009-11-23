@@ -306,26 +306,9 @@ Gets a L<Catalyst::View> instance by name.
 
 sub view {
     my ( $c, $name, @args ) = @_;
-
-    if( $name ) {
-        my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
-    }
-
-    return $c->view( $c->config->{default_view} )
-      if $c->config->{default_view};
-    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
-
-    if( $rest ) {
-        $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
-        $c->log->warn( '* $c->config(default_view => "the name of the default view to use")' );
-        $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
-        $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
-    }
-
-    return $c->_filter_component( $comp );
+    
+    return $c->_comp_by_name( 'View', $name, @args ) if $name;
+    return $c->_no_name_comp( 'View' );
 }
 
 =head2 $c->model($name)
@@ -334,24 +317,37 @@ Gets a L<Catalyst::Model> instance by name.
 
 =cut
 
+sub _comp_by_name {
+    my ( $c, $type, $name, @args ) = @_;
+    my $short_type = substr( $type, 0, 1 );
+    my @result = $c->_comp_search_prefixes( $name, $type, $short_type);
+    return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+    return $c->_filter_component( $result[ 0 ], @args );
+}
+
+
 sub model {
     my ( $c, $name, @args ) = @_;
-    if( $name ) {
-        my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
-    }
+    return $c->_comp_by_name( 'Model', $name, @args ) if $name;
+    return $c->_no_name_comp( 'Model' );
+}
 
-    return $c->model( $c->config->{default_model} )
-      if $c->config->{default_model};
+sub _no_name_comp{
+    my ( $c, $type ) = @_;
 
-    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
+    my $lc_type = lc $type;
+    return $c->$lc_type( $c->config->{'default_' . $lc_type} )
+      if $c->config->{'default_' . $lc_type};
+
+    my $short_type = substr( $type, 0, 1 );
+    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, $type, $short_type );
 
     if( $rest ) {
-        $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
-        $c->log->warn( '* $c->config(default_model => "the name of the default model to use")' );
-        $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
-        $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
+
+        $c->log->warn( Carp::shortmess('Calling $c->' . $lc_type . '() will return a random ' . $lc_type . ' unless you specify one of:') );
+        $c->log->warn( '* $c->config(default_' . $lc_type . '}=> "the name of the default ' . $lc_type . ' to use")' );
+        $c->log->warn( '* $c->stash->{current' . $lc_type . '} # the name of the ' . $lc_type . ' to use for this request' );
+        $c->log->warn( '* $c->stash->{current_' . $lc_type . '_instance} # the instance of the ' . $lc_type . ' to use for this request' );
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
