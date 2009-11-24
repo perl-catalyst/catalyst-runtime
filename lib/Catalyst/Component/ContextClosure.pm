@@ -22,7 +22,7 @@ Catalyst::Component::ContextClosure - Moose Role for components which need to cl
 
     package MyApp::Controller::Foo;
     use Moose;
-    use namespace::autoclean;
+    use namespace::clean -except => 'meta';
     BEGIN {
         extends 'Catalyst::Controller';
         with 'Catalyst::Component::ContextClosure';
@@ -33,7 +33,7 @@ Catalyst::Component::ContextClosure - Moose Role for components which need to cl
         $ctx->stash(a_closure => $self->make_context_closure(sub {
             my ($ctx) = @_;
             $ctx->response->body('body set from closure');
-        }, $ctx);
+        }, $ctx));
     }
 
 =head1 DESCRIPTION

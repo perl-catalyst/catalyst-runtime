@@ -1,17 +1,29 @@
+use strict;
+use warnings;
 use inc::Module::Install 0.87;
+{   # Ensure that these get used - yes, M::I loads them for us, but if you're
+    # in author mode and don't have them installed, then the error is tres
+    # cryptic.
+    no warnings 'redefine';
+    use Module::Install::AuthorRequires;
+    use Module::Install::CheckConflicts;
+    use Module::Install::AuthorTests;
+}
 
-perl_version '5.008001';
+perl_version '5.008004';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
-requires 'namespace::autoclean';
+requires 'List::MoreUtils';
+requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean';
 requires 'B::Hooks::EndOfScope' => '0.08';
-requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
+requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.83';
-requires 'Moose' => '0.78';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.12';
+requires 'Moose' => '0.90';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.17';
+requires 'MooseX::Role::WithOverloading' => '0.03';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie';
@@ -19,11 +31,11 @@ requires 'Data::Dump';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
 requires 'HTTP::Headers' => '1.64';
-requires 'HTTP::Request';
-requires 'HTTP::Response';
+requires 'HTTP::Request' => '5.814';
+requires 'HTTP::Response' => '5.813';
 requires 'HTTP::Request::AsCGI' => '0.8';
 requires 'LWP::UserAgent';
-requires 'Module::Pluggable' => '3.01';
+requires 'Module::Pluggable' => '3.9';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
@@ -41,6 +53,7 @@ recommends 'B::Hooks::OP::Check::StashChange';
 
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
+test_requires 'Test::More' => '0.88';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.35_05')) {
@@ -52,7 +65,10 @@ else {
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
+author_requires 'CatalystX::LeakChecker', '0.03'; # Skipped if this isn't installed
+author_requires 'File::Copy::Recursive'; # For http server test
 
+author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
@@ -97,6 +113,8 @@ EOF
 # NOTE - This is the version number of the _incompatible_ code,
 #        not the version number of the fixed version.
 my %conflicts = (
+    'Catalyst::Plugin::SubRequest' => '0.14',
+    'Catalyst::Model::Akismet' => '0.02',
     'Catalyst::Component::ACCEPT_CONTEXT' => '0.06',
     'Catalyst::Plugin::ENV' => '9999', # This plugin is just stupid, full stop
                                        # should have been a core fix.
@@ -111,7 +129,7 @@ my %conflicts = (
     'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
     'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
-    'Catalyst::Devel'                  => '0.09',
+    'Catalyst::Devel'                  => '1.19',
     'Catalyst::Plugin::SmartURI'       => '0.032',
     'CatalystX::CRUD'                  => '0.37',
     'Catalyst::Action::RenderView'     => '0.07',
@@ -122,6 +140,7 @@ my %conflicts = (
     'Catalyst::Action::REST'           => '0.67',
     'CatalystX::CRUD'                  => '0.42',
     'CatalystX::CRUD::Model::RDBO'     => '0.20',
+    'Catalyst::View::Mason'            => '0.17',
 );
 check_conflicts(%conflicts);
 
@@ -134,11 +153,11 @@ sub darwin_check_no_resource_forks {
 
         # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
         # On 10.5 (Leopard) it wants COPYFILE_DISABLE
-        die("Oh, you got Snow Lepoard, snazzy. Please read the man page for tar to find out if Apple renamed COPYFILE_DISABLE again and fix this Makefile.PL please?\n") if $osx_ver =~ /^10.6/;
-        my $attr = $osx_ver =~ /^10.5/ ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+         die("Oh, you got Ceiling Cat, snazzy. Please read the man page for tar or Google to find out if Apple renamed COPYFILE_DISABLE (it was COPY_EXTENDED_ATTRIBUTES_DISABLE originally) again and fix this Makefile.PL please?\n") if $osx_ver =~ /^10.7/;
+        my $attr = $osx_ver =~ /^10.(5|6)/  ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
-                                          qq{ echo "You must set the ENV variable $attr to true,"; }.
+                                          qq{ echo "You must set the ENV variable $attr to 'true',"; }.
                                           ' echo "to avoid getting resource forks in your dist."; exit 255; fi' });
     }
 }

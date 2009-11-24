@@ -204,6 +204,13 @@ sub return_arg_decoded : Chained('/') PathPart('chained/return_arg_decoded') Arg
     $c->req->args([ map { decode_entities($_) } @{ $c->req->args }]);
 }
 
+sub roundtrip_urifor : Chained('/') PathPart('chained/roundtrip_urifor') CaptureArgs(1) {}
+sub roundtrip_urifor_end : Chained('roundtrip_urifor') PathPart('') Args(1) {
+    my ($self, $c) = @_;
+    # This should round-trip, always - i.e. the uri you put in should come back out.
+    $c->res->body($c->uri_for($c->action, $c->req->captures, @{$c->req->args}, $c->req->parameters));
+    $c->stash->{no_end} = 1;
+}
 
 sub end :Private {
   my ($self, $c) = @_;

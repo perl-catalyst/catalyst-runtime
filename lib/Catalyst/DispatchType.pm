@@ -73,15 +73,6 @@ about expand_action.
 
 sub expand_action { }
 
-=head2 $self->splice_captures_from
-
-Default fallback, returns nothing. See L<Catalyst::Dispatcher> for more info
-about splice_captures_from.
-
-=cut
-
-sub splice_captures_from { 0 }
-
 sub _is_low_precedence { 0 }
 
 =head1 AUTHORS

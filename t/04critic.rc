@@ -1,0 +1,5 @@
+include  = CodeLayout::ProhibitHardTabs
+only     = 1
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0

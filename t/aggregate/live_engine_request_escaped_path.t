@@ -54,8 +54,6 @@ Index: lib/Catalyst/Engine/CGI.pm
 }
 
 # test that request with URL-escaped code works.
-TODO: {
-    local $TODO = 'Actions should match when path parts are url encoded';
     my $request = Catalyst::Utils::request( 'http://localhost/args/param%73/one/two' );
     my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
 
@@ -67,6 +65,8 @@ TODO: {
     TestApp->handle_request( env => \%ENV );
 
     ok( my $response = $cgi->restore->response );
+TODO: {
+    local $TODO = 'Actions should match when path parts are url encoded';
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content, 'onetwo' );
 }

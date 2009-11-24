@@ -80,14 +80,16 @@ sub list {
 
     return unless $self->_endpoints;
 
-    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
+    my $avail_width = Catalyst::Utils::term_width() - 9;
+    my $col1_width = ($avail_width * .50) < 35 ? 35 : int($avail_width * .50);
+    my $col2_width = $avail_width - $col1_width;
     my $paths = Text::SimpleTable->new(
-       [ 35, 'Path Spec' ], [ $column_width, 'Private' ],
+        [ $col1_width, 'Path Spec' ], [ $col2_width, 'Private' ],
     );
 
     my $has_unattached_actions;
     my $unattached_actions = Text::SimpleTable->new(
-        [ 35, 'Private' ], [ $column_width, 'Missing parent' ],
+        [ $col1_width, 'Private' ], [ $col2_width, 'Missing parent' ],
     );
 
     ENDPOINT: foreach my $endpoint (
@@ -395,50 +397,6 @@ sub expand_action {
     }
 
     return Catalyst::ActionChain->from_chain([reverse @chain]);
-}
-
-=head2 $self->splice_captures_from( $c, $action, $args )
-
-Calculates the number of capture args for the given action,
-splices off the front of the supplied args, and pushes them back
-on the args list wrapped in an array ref
-
-
-=cut
-
-sub splice_captures_from {
-    my ($self, $c, $action, $args) = @_; my $attrs = $action->attributes;
-
-    return 0 unless ($attrs->{Chained});
-
-    if ($attrs->{CaptureArgs}) {
-        $c->log->debug( 'Action '.$action->reverse.' is a midpoint' )
-            if ($c->debug);
-        return 1;
-    }
-
-    my @captures = ();
-    my @chain    = @{ $self->expand_action( $action )->chain }; pop @chain;
-
-    # Now start from the root of the chain, populate captures
-    for my $num_caps (map { $_->attributes->{CaptureArgs}->[0] } @chain) {
-        if ($num_caps > scalar @{ $args }) {
-            $c->log->debug( 'Action '.$action->reverse.' insufficient args' )
-                if ($c->debug);
-            return 1;
-        }
-
-        push @captures, splice @{ $args }, 0, $num_caps;
-    }
-
-    if (defined $args->[ $attrs->{Args}->[0] ]) {
-        $c->log->debug( 'Action '.$action->reverse.' too many args' )
-            if ($c->debug);
-    }
-
-    unshift @{ $args }, \@captures if (defined $captures[0]);
-
-    return 1;
 }
 
 __PACKAGE__->meta->make_immutable;

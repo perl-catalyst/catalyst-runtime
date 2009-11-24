@@ -12,10 +12,6 @@ use Socket;
 use IO::Socket::INET ();
 use IO::Select       ();
 
-# For PAR
-require Catalyst::Engine::HTTP::Restarter;
-require Catalyst::Engine::HTTP::Restarter::Watcher;
-
 use constant CHUNKSIZE => 64 * 1024;
 use constant DEBUG     => $ENV{CATALYST_HTTP_DEBUG} || 0;
 
@@ -159,7 +155,7 @@ around write => sub {
     # Prepend the headers if they have not yet been sent
     if ( $self->_has_header_buf ) {
         $self->_warn_on_write_error(
-            $self->$orig($self->_clear_header_buf)
+            $self->$orig($c, $self->_clear_header_buf)
         );
     }
 
@@ -367,6 +363,9 @@ sub _handler {
     REQUEST:
     while (1) {
         my ( $path, $query_string ) = split /\?/, $uri, 2;
+
+        # URI is not the same as path. Remove scheme, domain name and port from it
+        $path =~ s{^https?://[^/?#]+}{};
 
         # Initialize CGI environment
         local %ENV = (

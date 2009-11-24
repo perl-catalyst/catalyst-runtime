@@ -1,0 +1,377 @@
+=head1 NAME
+
+Catalyst::Manual::Installation::CentOS4 - Catalyst Installation on CentOS 4
+
+
+
+=head1 DESCRIPTION
+
+This document provides directions on how to install CentOS 4 (a rebuild
+of RedHat Enterprise 4) and then install Catalyst.
+
+If you already have a functioning install of CentOS, RHEL, or a
+comparable Linux OS, you should be able to skip this first section and
+go straight to the C<INSTALL CATALYST> section.
+
+B<NOTE:> You might want to consult the latest version of this document.  It
+is available at:
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Installation/CentOS4.pod>
+
+
+
+=head1 INSTALL CENTOS
+
+These directions are written for CentOS 4.4 on an i386 machine; however,
+you can substitute other versions as they become available.
+
+
+=over 4
+
+=item * 
+
+Go to L<http://isoredirect.centos.org/centos/4/isos/i386/> and click the
+nearest mirror.
+
+=item * 
+
+Download C<CentOS-4.4-i386-bin1of4.iso> (you only need the first disk).
+
+=item * 
+
+Burn the .iso to CD.
+
+=item * 
+
+Insert the CD into your machine and power it up.
+
+=item * 
+
+Hit C<Enter> at the C<boot:> prompt.
+
+=item * 
+
+CD media test: you can either select C<OK> or C<Skip> depending on
+whether or not you trust your burn.
+
+=item * 
+
+The installation GUI should start.  Click next at the "Welcome to
+CentOS-4" screen.
+
+=item * 
+
+Select a language and click C<Next>.
+
+=item * 
+
+Select a keyboard configuration and click C<Next>.
+
+=item * 
+
+Select C<Custom> for the installation type and click C<Next>.
+
+=item * 
+
+Leave C<Automatically partition> selected on the C<Disk Partitioning
+Setup> and click C<Next>.
+
+=item * 
+
+Uncheck C<Review (and modify if needed) the partitions created>, but
+leave the rest of the default settings on the C<Automatic Partitioning>
+screen.  Then click C<Next>.
+
+=item * 
+
+Click C<Yes> at the C<Are you sure you want to do this?> warning.
+
+=item * 
+
+Click C<Next> on the C<Boot Loader Configuration> screen.
+
+=item * 
+
+Update the C<Network Configuration> screen as necessary and click C<Next>.
+
+=item * 
+
+Check C<Remote Login (SSH)> and click C<Next> on the C<Firewall
+Configuration> screen.
+
+=item * 
+
+Select additional languages as necessary.  Click C<Next>.
+
+=item * 
+
+Select the appropriate time zone and click C<Next>.
+
+=item * 
+
+Enter a root password and click C<Next>.
+
+=item * 
+
+Scroll to the bottom of the C<Package Group Selection> screen and check
+C<Minimal> (the last option).  Click C<Next>.
+
+=item * 
+
+Click C<Next> at the C<About to Install> screen.
+
+=item * 
+
+The installation will prepare the hard drive and then install the
+required rpm packages.
+
+=item * 
+
+Once the installation completes, remove the CD and click C<Reboot>.
+
+=item * 
+
+Type C<vi /etc/sysconfig/iptables> and add the following line as the
+third to last line of the file (I<above> the C<-A RH-Firewall-1-INPUT -j
+REJECT --reject-with icmp-host-prohibited> line):
+
+    -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 3000 -j ACCEPT
+
+This will allow Catalyst to make use of port 3000 (the default for the
+development server).
+
+Type C<service iptables restart> to restart the iptables firewall using
+the updated configuration.
+
+=item * 
+
+Type C<yum -y update> to retrieve the latest patches.
+
+=back
+
+
+=head1 INSTALL CATALYST
+
+=over 4
+
+=item * 
+
+Type C<yum -y install gcc expat-devel sqlite3> to install several
+packages used by Catalyst.
+
+=item * 
+
+Type the following:
+
+    $ perl -MCPAN -e shell
+    
+    ...
+    
+    Are you ready for manual configuration? [yes] yes
+    The following questions are intended to help you with the
+    
+    ...
+    
+    cpan shell -- CPAN exploration and modules installation (v1.7601)
+    ReadLine support available (try 'install Bundle::CPAN')
+        
+    cpan> force install Module::Build
+    
+    ...
+    
+    cpan> quit
+
+=item *
+
+B<Note:> You need to have CPAN manually configured prior to running
+cat-install.  As shown above, you should automatically receive
+a prompt for this when you first run C<perl -MCPAN -e shell>.  You
+can re-run the configuration script by typing C<o conf init> at the
+C<cpanE<gt>> prompt.
+
+B<Optional:> The remaining steps of the installation could run 
+significantly faster if you configure a fast mirror that uses HTTP vs. 
+FTP (both transfer data at the same rate once the transfer is in 
+progress, but HTTP connects much more quickly... and a Catalyst 
+installation involves many connections).  If you want to change the 
+selection(s) you made during the "manual configuration" process above, 
+you can manually add a single URL.  To prepend a new URL to the B<front> 
+of the list, use the C<unshift> option to C<o conf>:
+
+    cpan> o conf urllist unshift http://www.perl.com/CPAN/
+
+Where C<http://www.perl.com/CPAN/> is replaced by a nearby, HTTP-based 
+mirror.  You can get a list of all mirrors (including where they are 
+located, their bandwidth, and their update frequency) at 
+L<http://www.perl.com/CPAN/MIRRORED.BY>.
+
+Then, be sure to save your changes (or they will be lost the next
+time you restart the CPAN shell):
+
+    cpan> o conf commit
+
+You can view the current settings with C<o conf urllist> (or just
+C<o conf> to view all settings):
+
+    cpan> o conf urllist
+        urllist           
+            http://www.perl.com/CPAN/
+    Type 'o conf' to view configuration edit options
+ 
+Note that multiple values can be entered for the C<urllist> option (the
+first entry will be used as long as it responds).
+
+=item * 
+
+Review the C<cat-install> documentation from the 
+L<http://www.shadowcatsystems.co.uk> web site:
+    
+    If you want to get started quickly with Catalyst, Shadowcat provides an 
+    installer script that will automate most of the process of installing it 
+    for you. Please bear in mind that this script is currently considered 
+    beta quality; we don't think it will eat your system but we make no 
+    guarantee of that.
+    
+    First, you'll need -
+    
+        * Perl, 5.8.1+ (if you're on windows, get it from Active State)
+        * make of some sort. On unix/linux you should already have one. On 
+            windows get nmake from Microsoft.
+        * A compiler. On unix/linux you should already have one. On windows, 
+            get the latest Dev-C++ beta.
+        * All three of the above in your PATH for whatever shell you're using
+        * A configured CPAN.pm. perl -MCPAN -e shell should get CPAN to walk 
+            you through the configuration process
+        * Module::Build. Active State kindly include this for you.
+    
+    Ok, now that your environment is set up, download the installer from 
+    this link, open a command prompt in the directory you downloaded it to 
+    and run perl cat-install. By the time it exits, you should have a full 
+    Catalyst install.
+    
+    If anything goes wrong, please send the full build log and the output of 
+    perl -V to cat-install (at) shadowcatsystems.co.uk so we can try and 
+    resolve your issue.
+
+
+=item * 
+
+Type C<wget http://www.shadowcatsystems.co.uk/static/cat-install> to
+retrieve a copy of the C<cat-install> script.
+
+=item * 
+
+Type C<vi cat-install> to open the installer script, then insert the
+following lines at the bottom of the file (after the
+C<install('Catalyst');> line):
+
+    install('ExtUtils::ParseXS');
+    install('Digest::SHA1');
+    install('Digest::SHA');
+    install('DBIx::Class');
+    install('DBIx::Class::HTMLWidget');
+    install('Module::ScanDeps');
+    install('Module::CoreList');
+    install('PAR::Dist');
+    install('Archive::Tar');
+    install('Module::Install');
+    install('Catalyst::Devel');
+    install('Catalyst::Plugin::ConfigLoader');
+    install('Catalyst::Plugin::Session');
+    install('Catalyst::Plugin::Session::State::Cookie');
+    install('Catalyst::Plugin::Session::Store::FastMmap');
+    install('Catalyst::Plugin::Authorization::ACL');
+    install('Catalyst::Plugin::Authentication');
+    install('Catalyst::Plugin::Authorization::Roles');
+    install('Catalyst::Plugin::Authentication::Store::DBIC');
+    install('Catalyst::Plugin::DefaultEnd');
+    install('Catalyst::Plugin::StackTrace');
+    install('Catalyst::Plugin::Dumper');
+    install('Catalyst::Plugin::HTML::Widget');
+    install('Catalyst::Model::DBIC::Schema');
+    install('Catalyst::View::TT');
+    install('Test::WWW::Mechanize');
+    install('Test::WWW::Mechanize::Catalyst');
+    install('Test::Pod');
+    install('Test::Pod::Coverage');
+
+=item * 
+
+Type C<perl cat-install>.  It will take a while to complete.
+
+Tip: You may want to enable logging of the output that C<cat-install>
+generates as it runs -- it can be useful if you need to troubleshoot
+a failure.  The log will generate almost 1 MB of output.
+
+Note: Once the C<perl cat-install> is complete, you may want to rerun the 
+command to check the status of the packages listed in <cat-install>. Ideally, 
+everything should return a I<name> C<is up to date> message.  If any packages 
+try to re-install, the you could need to manually install the package with the 
+C<force> option.  Also, look for new optional dependences that C<cat-install> 
+was not able to automatically handle. You can address these by manually 
+installing the dependency and then re-running C<perl cat-install>.  
+
+In some cases you may wish to install an earlier version of a module.  For
+example, say that the latest version of Module::Install is 0.64 and you
+want to install 0.63.  The following command under C<perl -MCPAN -e shell>:
+
+    cpan> install A/AD/ADAMK/Module-Install-0.63.tar.gz
+
+=back
+
+You should now have a functioning Catalyst installation with the modules
+and plugins required to run the Catalyst tutorial.
+
+
+=head1 TESTING THE INSTALLATION
+
+=over 4
+
+=item *
+
+Download the tarball of the final tutorial application:
+
+    $ wget http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/Final_Tarball/MyApp.tgz
+
+=item *
+
+Untar it:
+
+    $ tar zxvf MyApp.tgz
+    $ cd MyApp
+
+=item *
+
+Run the tests:
+
+    $ CATALYST_DEBUG=0 prove --lib lib  t
+    t/02pod...............skipped
+            all skipped: set TEST_POD to enable this test
+    t/03podcoverage.......skipped
+            all skipped: set TEST_POD to enable this test
+    t/01app...............ok                                                     
+    t/controller_Login....ok                                                     
+    t/live_app01..........ok 1/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok 2/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok 15/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok 16/0[debug] ***Root::auto User not found, forwarding to /login
+    t/live_app01..........ok                                                     
+    t/model_MyAppDB.......ok                                                     
+    All tests successful, 2 tests skipped.
+    Files=6, Tests=55, 11 wallclock secs ( 4.68 cusr +  4.84 csys =  9.52 CPU)
+
+You should see C<All tests successful>.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Please report any errors, issues or suggestions to the author.  The
+most recent version of the Catalyst Tutorial can be found at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Runtime/lib/Catalyst/Manual/Tutorial/>.
+
+Copyright 2006, Kennedy Clark, under Creative Commons License
+(L<http://creativecommons.org/licenses/by-nc-sa/2.5/>).

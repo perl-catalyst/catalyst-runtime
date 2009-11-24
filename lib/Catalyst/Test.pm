@@ -228,7 +228,9 @@ sub local_request {
 
     $class->handle_request( env => \%ENV );
 
-    return $cgi->restore->response;
+    my $response = $cgi->restore->response;
+    $response->request( $request );
+    return $response;
 }
 
 my $agent;

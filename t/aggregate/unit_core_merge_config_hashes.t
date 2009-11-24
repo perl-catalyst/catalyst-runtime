@@ -34,10 +34,10 @@ my @tests = (
     },
 );
 
-plan tests => scalar @tests + 1;
+plan tests => scalar @tests;
 
-use_ok('Catalyst');
+use Catalyst::Component;
 
 for my $test ( @ tests ) {
-    is_deeply( Catalyst->merge_config_hashes( @{ $test->{ given } } ), $test->{ expects } );
+    is_deeply( Catalyst::Component->merge_config_hashes( @{ $test->{ given } } ), $test->{ expects } );
 }

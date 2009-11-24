@@ -43,7 +43,7 @@ sub run_tests {
           TestApp::Controller::Action::Go->four
           TestApp::Controller::Action::Go->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -74,7 +74,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Go->go_die
           TestApp::Controller::Action::Go->args
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -165,7 +165,7 @@ sub run_tests {
           TestApp::Controller::Action::Go->four
           TestApp::Controller::Action::Go->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -200,7 +200,7 @@ sub run_tests {
           TestApp::Controller::Action::Go->four
           TestApp::Controller::Action::Go->five
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -262,7 +262,7 @@ sub run_tests {
         ok( my $response = request('http://localhost/action/go/go_chained'), 'go to chained + subcontroller endpoint' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'arg1, arg2; captureme', 'Content OK' );
+        is( $response->content, 'captureme; arg1, arg2', 'Content OK' );
     }
 
 }

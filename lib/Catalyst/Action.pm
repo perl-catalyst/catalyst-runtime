@@ -55,8 +55,6 @@ use overload (
 
 no warnings 'recursion';
 
-#__PACKAGE__->mk_accessors(qw/class namespace reverse attributes name code/);
-
 sub dispatch {    # Execute ourselves against a context
     my ( $self, $c ) = @_;
     return $c->execute( $self->class, $self );
@@ -84,7 +82,7 @@ sub compare {
     my ($a1_args) = @{ $a1->attributes->{Args} || [] };
     my ($a2_args) = @{ $a2->attributes->{Args} || [] };
 
-    $_ = looks_like_number($_) ? $_ : ~0 
+    $_ = looks_like_number($_) ? $_ : ~0
         for $a1_args, $a2_args;
 
     return $a1_args <=> $a2_args;
@@ -105,7 +103,9 @@ and so on. This determines how the action is dispatched to.
 
 =head2 class
 
-Returns the class name where this action is defined.
+Returns the name of the component where this action is defined.
+Derived by calling the L<Catalyst::Component/catalyst_component_name|catalyst_component_name>
+method on each component.
 
 =head2 code
 
@@ -113,7 +113,7 @@ Returns a code reference to this action.
 
 =head2 dispatch( $c )
 
-Dispatch this action against a context
+Dispatch this action against a context.
 
 =head2 execute( $controller, $c, @args )
 
@@ -145,11 +145,11 @@ C<private_path> of an action is always suitable for passing to C<forward>.
 
 =head2 name
 
-returns the sub name of this action.
+Returns the sub name of this action.
 
 =head2 meta
 
-Provided by Moose
+Provided by Moose.
 
 =head1 AUTHORS
 

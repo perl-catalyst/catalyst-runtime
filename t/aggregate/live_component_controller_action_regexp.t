@@ -131,8 +131,10 @@ sub run_tests {
             'TestApp::Controller::Action::Regexp',
             'Test Class'
         );
+        my $location = $response->header('location');
+        $location =~ s/localhost(:\d+)?/localhost/;
         is(
-            $response->header('location'),
+            $location,
             $url,
             'Redirect URI is the same as the request URI'
         );

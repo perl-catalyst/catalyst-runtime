@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 
-use_ok('Catalyst::Utils');
+use Catalyst::Utils;
 
 {
     my $url = "/dump";

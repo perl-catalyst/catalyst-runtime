@@ -47,8 +47,12 @@ Output a table of all regex actions, and their private equivalent.
 
 sub list {
     my ( $self, $c ) = @_;
-    my $column_width = Catalyst::Utils::term_width() - 35 - 9;
-    my $re = Text::SimpleTable->new( [ 35, 'Regex' ], [ $column_width, 'Private' ] );
+    my $avail_width = Catalyst::Utils::term_width() - 9;
+    my $col1_width = ($avail_width * .50) < 35 ? 35 : int($avail_width * .50);
+    my $col2_width = $avail_width - $col1_width;
+    my $re = Text::SimpleTable->new(
+        [ $col1_width, 'Regex' ], [ $col2_width, 'Private' ]
+    );
     for my $regex ( @{ $self->_compiled } ) {
         my $action = $regex->{action};
         $re->row( $regex->{path}, "/$action" );
@@ -162,39 +166,6 @@ sub uri_for_action {
          }
     }
     return undef;
-}
-
-=head2 $self->splice_captures_from( $c, $action, $args )
-
-Iterates over the regular expressions defined for the action. Stops when
-the number of captures equals the number of supplied args. Replaces the
-list of args with a list containing an array ref of args
-
-=cut
-
-sub splice_captures_from {
-    my ($self, $c, $action, $args) = @_; my $regexes;
-
-    return 0 unless ($regexes = $action->attributes->{Regex});
-
-    foreach my $orig (@{ $regexes }) {
-        my $re = "$orig"; $re =~ s/^\^//; $re =~ s/\$$//;
-        my $num_caps = 0;
-
-        while (my ($front, $rest) = split /\(/, $re, 2) {
-            last unless (defined $rest);
-
-            ($rest, $re) = Text::Balanced::extract_bracketed( "(${rest}", '(');
-            $num_caps++;
-        }
-
-        next unless ($num_caps == scalar @{ $args });
-
-        @{ $args } = ( [ @{ $args } ] );
-        return 1;
-    }
-
-    return 1;
 }
 
 =head1 AUTHORS

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 14;
 use URI;
 
 use_ok('Catalyst');
@@ -51,21 +51,11 @@ is( Catalyst::uri_for( $context, qw/bar wibble?/, 'with space' )->as_string,
     'http://127.0.0.1/foo/yada/bar/wibble%3F/with%20space', 'Space gets encoded'
 );
 
-is(
-    Catalyst::uri_for( $context, '/bar', 'with+plus', { 'also' => 'with+plus' })->as_string,
-    'http://127.0.0.1/foo/bar/with+plus?also=with%2Bplus',
-    'Plus is not encoded'
-);
 
 # test with utf-8
 is(
     Catalyst::uri_for( $context, 'quux', { param1 => "\x{2620}" } )->as_string,
     'http://127.0.0.1/foo/yada/quux?param1=%E2%98%A0',
-    'URI for undef action with query params in unicode'
-);
-is(
-    Catalyst::uri_for( $context, 'quux', { 'param:1' => "foo" } )->as_string,
-    'http://127.0.0.1/foo/yada/quux?param%3A1=foo',
     'URI for undef action with query params in unicode'
 );
 
@@ -108,38 +98,3 @@ is(
     is( $warnings, 0, "no warnings emitted" );
 }
 
-# Test with parameters '/', 'foo', 'bar' - should not generate a //
-is( Catalyst::uri_for( $context, qw| / foo bar | )->as_string,
-    'http://127.0.0.1/foo/bar', 'uri is /foo/bar, not //foo/bar'
-);
-
-TODO: {
-    local $TODO = 'RFCs are for people who, erm - fix this test..';
-    # Test rfc3986 reserved characters.  These characters should all be escaped
-    # according to the RFC, but it is a very big feature change so I've removed it
-    no warnings; # Yes, everything in qw is sane
-    is(
-        Catalyst::uri_for( $context, qw|! * ' ( ) ; : @ & = $ / ? % # [ ] ,|, )->as_string,
-        'http://127.0.0.1/%21/%2A/%27/%2B/%29/%3B/%3A/%40/%26/%3D/%24/%2C/%2F/%3F/%25/%23/%5B/%5D',
-        'rfc 3986 reserved characters'
-    );
-
-    # jshirley bug - why the hell does only one of these get encoded
-    #                has been like this forever however.
-    is(
-        Catalyst::uri_for( $context, qw|{1} {2}| )->as_string,
-        'http://127.0.0.1/{1}/{2}',
-        'not-escaping unreserved characters'
-    );
-}
-
-# make sure caller's query parameter hash isn't messed up
-{
-    my $query_params_base = {test => "one two",
-                             bar  => ["foo baz", "bar"]};
-    my $query_params_test = {test => "one two",
-                             bar  => ["foo baz", "bar"]};
-    Catalyst::uri_for($context, '/bar/baz', $query_params_test);
-    is_deeply($query_params_base, $query_params_test,
-              "uri_for() doesn't mess up query parameter hash in the caller");
-}

@@ -63,10 +63,9 @@ sub make_component_file {
 
     write_component_file(\@dir_list, $name_final, <<EOF);
 package $fullname;
-use MRO::Compat;
 use base '$compbase';
 sub COMPONENT {
-    my \$self = shift->next::method(\@_);
+    my \$self = shift->NEXT::COMPONENT(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
     \$self;
@@ -82,11 +81,7 @@ foreach my $component (@components) {
                         $component->{name});
 }
 
-my $shut_up_deprecated_warnings = q{
-    __PACKAGE__->log(Catalyst::Log->new('fatal'));
-};
-
-eval "package $appclass; use Catalyst; $shut_up_deprecated_warnings __PACKAGE__->setup";
+eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 
 can_ok( $appclass, 'components');
 
@@ -145,7 +140,6 @@ foreach my $component (@components) {
 eval qq(
 package $appclass;
 use Catalyst;
-$shut_up_deprecated_warnings
 __PACKAGE__->config->{ setup_components } = {
     search_extra => [ '::Extra' ],
     except       => [ "${appclass}::Controller::Foo" ]
@@ -171,7 +165,7 @@ package ${appclass}::Model::TopLevel;
 use base 'Catalyst::Model';
 sub COMPONENT {
  
-    my \$self = shift->next::method(\@_);
+    my \$self = shift->NEXT::COMPONENT(\@_);
     no strict 'refs';
     *{\__PACKAGE__ . "::whoami"} = sub { return \__PACKAGE__; };
     \$self;
@@ -190,7 +184,7 @@ package ${appclass}::Model::TopLevel::Nested;
 use base 'Catalyst::Model';
 
 no warnings 'redefine';
-sub COMPONENT { return shift->next::method(\@_); }
+sub COMPONENT { return shift->NEXT::COMPONENT(\@_); }
 1;
 
 EOF

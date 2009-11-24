@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 8;
 
 use lib "t/lib";
 
-BEGIN { use_ok("Catalyst::Utils") };
+use Catalyst::Utils;
 
 is( Catalyst::Utils::class2prefix('MyApp::V::Foo::Bar'), 'foo/bar', 'class2prefix works with M/V/C' );
 

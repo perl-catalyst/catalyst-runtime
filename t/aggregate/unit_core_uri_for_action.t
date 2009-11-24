@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 42;
+plan tests => 30;
 
 use_ok('TestApp');
 
@@ -97,6 +97,10 @@ my $context = TestApp->new( {
                 namespace => 'yada',
               } );
 
+is($context->uri_for($context->controller('Action')),
+   "http://127.0.0.1/foo/yada/action/",
+   "uri_for a controller");
+
 is($context->uri_for($path_action),
    "http://127.0.0.1/foo/action/relative/relative",
    "uri_for correct for path action");
@@ -112,17 +116,9 @@ is($context->uri_for($regex_action, [ 'foo', 123 ], qw/bar baz/, { q => 1 }),
    "http://127.0.0.1/foo/action/regexp/foo/123/bar/baz?q=1",
    "uri_for correct for regex with captures, args and query");
 
-is($context->uri_for($regex_action, 'foo', 123, { q => 1 }),
-   "http://127.0.0.1/foo/action/regexp/foo/123?q=1",
-   "uri_for correct for regex no captures with args and query");
-
 is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
    "http://127.0.0.1/foo/chained/foo/1/end/2?q=1",
    "uri_for correct for chained with captures, args and query");
-
-is($context->uri_for($chained_action, 1, 2, { q => 1 }),
-   "http://127.0.0.1/foo/chained/foo/1/end/2?q=1",
-   "uri_for correct for chained no captures with args and query");
 
 #
 #   More Chained with Context Tests
@@ -132,88 +128,46 @@ is($context->uri_for($chained_action, 1, 2, { q => 1 }),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4?x=5',
         'uri_for_action correct for chained with multiple captures and args' );
 
-    is( $context->uri_for_action( '/action/chained/endpoint2', qw(1 2 3 4), { x => 5 } ),
-        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4?x=5',
-        'uri_for_action correct for chained without captures with multiple args' );
-
     is( $context->uri_for_action( '/action/chained/three_end', [1,2,3], (4,5,6) ),
         'http://127.0.0.1/foo/chained/one/1/two/2/3/three/4/5/6',
         'uri_for_action correct for chained with multiple capturing actions' );
 
-    is( $context->uri_for_action( '/action/chained/three_end', qw(1 2 3 4 5 6) ),
-        'http://127.0.0.1/foo/chained/one/1/two/2/3/three/4/5/6',
-        'uri_for_action correct for chained no captures multi capturing actions' );
-
-    ok( ! defined( $context->uri_for_action( '/action/chained/foo2' ) ),
-        'uri_for_action returns undef for chained action midpoints' );
-
     my $action_needs_two = '/action/chained/endpoint2';
-
+    
     ok( ! defined( $context->uri_for_action($action_needs_two, [1],     (2,3)) ),
         'uri_for_action returns undef for not enough captures' );
-
-    ok( ! defined( $context->uri_for_action($action_needs_two, 1) ),
-        'uri_for_action returns undef for not enough captures/args total' );
-
+        
     is( $context->uri_for_action($action_needs_two,            [1,2],   (2,3)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/2/3',
         'uri_for_action returns correct uri for correct captures' );
-
-    is( $context->uri_for_action($action_needs_two,            qw(1 2 2 3)),
-        'http://127.0.0.1/foo/chained/foo2/1/2/end2/2/3',
-        'uri_for_action returns correct uri for correct captures/args total' );
-
+        
     ok( ! defined( $context->uri_for_action($action_needs_two, [1,2,3], (2,3)) ),
         'uri_for_action returns undef for too many captures' );
-
+    
     is( $context->uri_for_action($action_needs_two, [1,2],   (3)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3',
         'uri_for_action returns uri with lesser args than specified on action' );
-
-    is( $context->uri_for_action($action_needs_two, qw(1 2 3)),
-        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3',
-        'uri_for_action returns uri with lesser args and no captures' );
 
     is( $context->uri_for_action($action_needs_two, [1,2],   (3,4,5)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4/5',
         'uri_for_action returns uri with more args than specified on action' );
 
-    is( $context->uri_for_action($action_needs_two, qw(1 2 3 4 5)),
-        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/4/5',
-        'uri_for_action returns uri with more args and no captures' );
-
     is( $context->uri_for_action($action_needs_two, [1,''], (3,4)),
         'http://127.0.0.1/foo/chained/foo2/1//end2/3/4',
         'uri_for_action returns uri with empty capture on undef capture' );
-
-    is( $context->uri_for_action($action_needs_two, 1, '', 3, 4),
-        'http://127.0.0.1/foo/chained/foo2/1//end2/3/4',
-        'uri_for_action returns uri with no captures and empty arg' );
 
     is( $context->uri_for_action($action_needs_two, [1,2], ('',3)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2//3',
         'uri_for_action returns uri with empty arg on undef argument' );
 
-    is( $context->uri_for_action($action_needs_two, 1, 2, '', 3),
-        'http://127.0.0.1/foo/chained/foo2/1/2/end2//3',
-        'uri_for_action returns uri no captures with empty arg on undef argument' );
-
     is( $context->uri_for_action($action_needs_two, [1,2], (3,'')),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/',
         'uri_for_action returns uri with empty arg on undef last argument' );
-
-    is( $context->uri_for_action($action_needs_two, 1, 2, 3, ''),
-        'http://127.0.0.1/foo/chained/foo2/1/2/end2/3/',
-        'uri_for_action returns uri no captures empty arg undef last argument' );
 
     my $complex_chained = '/action/chained/empty_chain_f';
     is( $context->uri_for_action( $complex_chained, [23], (13), {q => 3} ),
         'http://127.0.0.1/foo/chained/empty/23/13?q=3',
         'uri_for_action returns correct uri for chain with many empty path parts' );
-
-    is( $context->uri_for_action( $complex_chained, 23, 13, {q => 3} ),
-        'http://127.0.0.1/foo/chained/empty/23/13?q=3',
-        'uri_for_action returns correct uri for chain no captures empty path parts' );
 
     eval { $context->uri_for_action( '/does/not/exist' ) };
     like $@, qr{^Can't find action for path '/does/not/exist'},

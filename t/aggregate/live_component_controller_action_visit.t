@@ -42,11 +42,11 @@ sub run_tests {
           TestApp::Controller::Action::Visit->four
           TestApp::Controller::Action::Visit->five
           TestApp::View::Dump::Request->process
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -76,8 +76,8 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action::Visit->visit_die
           TestApp::Controller::Action::Visit->args
-          TestApp->end
-          TestApp->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -166,12 +166,12 @@ sub run_tests {
           TestApp::Controller::Action::Visit->four
           TestApp::Controller::Action::Visit->five
           TestApp::View::Dump::Request->process
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -206,12 +206,12 @@ sub run_tests {
           TestApp::Controller::Action::Visit->four
           TestApp::Controller::Action::Visit->five
           TestApp::View::Dump::Request->process
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
-          TestApp->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
+          TestApp::Controller::Root->end
         ];
 
         @expected = map { /Action/ ? (_begin($_), $_) : ($_) } @expected;
@@ -266,7 +266,7 @@ sub run_tests {
           TestApp::Controller::Action::Chained->foo
           TestApp::Controller::Action::Chained::Foo->spoon
           TestApp::Controller::Action::Chained->end
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -276,7 +276,7 @@ sub run_tests {
                 "visit to chained + subcontroller endpoint for $i" );
             is( $response->header('X-Catalyst-Executed'),
                 $expected, "Executed actions for $i" );
-            is( $response->content, "arg1, arg2; becomescapture",
+            is( $response->content, "becomescapture; arg1, arg2",
                 "Content OK for $i" );
         }
     }

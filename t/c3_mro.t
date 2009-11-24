@@ -4,15 +4,13 @@ use warnings;
 use Test::More;
 require Catalyst;
 require Module::Pluggable::Object;
-use MRO::Compat;
+
+eval "require Class::C3";
+plan skip_all => "This test requires Class::C3" if $@;
 
 # Get a list of all Catalyst:: packages in blib via M::P::O
 my @cat_mods;
 {
-  # problem with @INC on win32, see:
-  # http://rt.cpan.org/Ticket/Display.html?id=26452
-  if ($^O eq 'MSWin32') { require Win32; Win32::GetCwd(); }
-
   local @INC = grep {/blib/} @INC;
   @cat_mods = (
     'Catalyst', 
@@ -32,7 +30,7 @@ plan tests => scalar @cat_mods;
 #
 foreach my $cat_mod (@cat_mods) {
   eval " require $cat_mod ";
-  eval { mro::get_linear_isa($cat_mod, 'c3') };
-  ok(!$@, "calculateMRO for $cat_mod: $@");
+  eval { Class::C3::calculateMRO($cat_mod) };
+  ok(!$@, "calculateMRO for $cat_mod");
 }
 

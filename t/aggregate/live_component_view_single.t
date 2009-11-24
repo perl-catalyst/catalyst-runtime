@@ -10,8 +10,12 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 3*$iters;
+use Test::More;
 use Catalyst::Test 'TestAppOneView';
+
+plan 'skip_all' if ( $ENV{CATALYST_SERVER} );
+
+plan tests => 3*$iters;
 
 if ( $ENV{CAT_BENCHMARK} ) {
     require Benchmark;

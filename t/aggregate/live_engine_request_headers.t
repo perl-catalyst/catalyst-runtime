@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -22,6 +22,7 @@ use HTTP::Request::Common;
         'X-Multiple'       => [ 1 .. 5 ],
         'X-Forwarded-Host' => 'frontend.server.com',
         'X-Forwarded-For'  => '192.168.1.1, 1.2.3.4',
+        'X-Forwarded-Port' => 443
     );
  
     ok( my $response = request($request), 'Request' );
@@ -30,6 +31,7 @@ use HTTP::Request::Common;
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     isa_ok( $creq, 'Catalyst::Request' );
+    ok( $creq->secure, 'Forwarded port sets securet' );
     isa_ok( $creq->headers, 'HTTP::Headers', 'Catalyst::Request->headers' );
     is( $creq->header('X-Whats-Cool'), $request->header('X-Whats-Cool'), 'Catalyst::Request->header X-Whats-Cool' );
     
