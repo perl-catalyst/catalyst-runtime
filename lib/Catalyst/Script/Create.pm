@@ -1,6 +1,5 @@
 package Catalyst::Script::Create;
 use Moose;
-use Catalyst::Helper;
 use MooseX::Types::Moose qw/Bool/;
 use namespace::autoclean;
 
@@ -32,14 +31,18 @@ has mechanize => (
     documentation => 'use WWW::Mechanize',
 );
 
+has helper_class => ( isa => 'Str', is => 'ro', default => 'Catalyst::Helper' );
+
 sub run {
     my ($self) = @_;
 
     $self->_exit_with_usage if !$ARGV[0];
 
-    my $helper = Catalyst::Helper->new( { '.newfiles' => !$self->force, mech => $self->mech } );
+    my $helper_class = $self->helper_class;
+    Class::MOP::load_class($helper_class);
+    my $helper = $helper_class->new( { '.newfiles' => !$self->force, mech => $self->mechanize } );
 
-    $self->_display_help unless $helper->mk_component( $self->app, @ARGV );
+    $self->_exit_with_usage unless $helper->mk_component( $self->application_name, @ARGV );
 
 }
 
