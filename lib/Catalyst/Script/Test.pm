@@ -1,5 +1,6 @@
 package Catalyst::Script::Test;
 use Moose;
+use Catalyst::Test ();
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -9,10 +10,9 @@ __PACKAGE__->meta->get_attribute('help')->cmd_aliases('h');
 sub run {
     my $self = shift;
 
-    Class::MOP::load_class("Catalyst::Test");
     Catalyst::Test->import($self->application_name);
 
-    print request($ARGV[1])->content  . "\n";
+    print request($ARGV[0])->content  . "\n";
 
 }
 

@@ -1,3 +1,2 @@
-* $ARGV[0] has slipped to $ARGV[1] in ::Test
 * Sort out help so that it shows what you fucked up.
 * Fix horrible hacking around MX::Getopt's help display - probably by fixing MX::Getopt.
