@@ -1,5 +1,3 @@
 * $ARGV[0] has slipped to $ARGV[1] in ::Test
-* ScriptRunner tests for MyApp::Script::DoesNotCompile
 * Sort out help so that it shows what you fucked up.
 * Fix horrible hacking around MX::Getopt's help display - probably by fixing MX::Getopt.
-* Tests for ::Create

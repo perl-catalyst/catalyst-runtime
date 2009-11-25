@@ -11,10 +11,12 @@ sub run {
 
     lib->import(File::Spec->catdir($FindBin::Bin, '..', 'lib'));
 
+    warn("load $classtoload or Catalyst::Script::$scriptclass");
+
     # FIXME - Error handling / reporting
-    if ( eval { Class::MOP::load_class($classtoload) } ) {
-    }
-    else {
+    unless ( eval { Class::MOP::load_class($classtoload) } ) {
+        warn("Could not load $classtoload - falling back to Catalyst::Script::$scriptclass : $@\n")
+            if $@ !~ /Can't locate/;
         $classtoload = "Catalyst::Script::$scriptclass";
         Class::MOP::load_class($classtoload);
     }
