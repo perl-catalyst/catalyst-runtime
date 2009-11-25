@@ -1258,6 +1258,7 @@ sub uri_for {
     }
 
     if ( blessed($path) ) { # action object
+        $c->dispatcher->splice_captures_from( $c, $path, \@args );
         my $captures = [ map { s|/|%2F|; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? @{ shift(@args) }

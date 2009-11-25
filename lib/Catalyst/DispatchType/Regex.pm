@@ -168,6 +168,39 @@ sub uri_for_action {
     return undef;
 }
 
+=head2 $self->splice_captures_from( $c, $action, $args )
+
+Iterates over the regular expressions defined for the action. Stops when
+the number of captures equals the number of supplied args. Replaces the
+list of args with a list containing an array ref of args
+
+=cut
+
+sub splice_captures_from {
+    my ($self, $c, $action, $args) = @_; my $regexes;
+
+    return 0 unless ($regexes = $action->attributes->{Regex});
+
+    foreach my $orig (@{ $regexes }) {
+        my $re = "$orig"; $re =~ s/^\^//; $re =~ s/\$$//;
+        my $num_caps = 0;
+
+        while (my ($front, $rest) = split /\(/, $re, 2) {
+            last unless (defined $rest);
+
+            ($rest, $re) = Text::Balanced::extract_bracketed( "(${rest}", '(');
+            $num_caps++;
+        }
+
+        next unless ($num_caps == scalar @{ $args });
+
+        @{ $args } = ( [ @{ $args } ] );
+        return 1;
+    }
+
+    return 1;
+}
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

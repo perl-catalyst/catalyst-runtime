@@ -399,6 +399,50 @@ sub expand_action {
     return Catalyst::ActionChain->from_chain([reverse @chain]);
 }
 
+=head2 $self->splice_captures_from( $c, $action, $args )
+
+Calculates the number of capture args for the given action,
+splices off the front of the supplied args, and pushes them back
+on the args list wrapped in an array ref
+
+
+=cut
+
+sub splice_captures_from {
+    my ($self, $c, $action, $args) = @_; my $attrs = $action->attributes;
+
+    return 0 unless ($attrs->{Chained});
+
+    if ($attrs->{CaptureArgs}) {
+        $c->log->debug( 'Action '.$action->reverse.' is a midpoint' )
+            if ($c->debug);
+        return 1;
+    }
+
+    my @captures = ();
+    my @chain    = @{ $self->expand_action( $action )->chain }; pop @chain;
+
+    # Now start from the root of the chain, populate captures
+    for my $num_caps (map { $_->attributes->{CaptureArgs}->[0] } @chain) {
+        if ($num_caps > scalar @{ $args }) {
+            $c->log->debug( 'Action '.$action->reverse.' insufficient args' )
+                if ($c->debug);
+            return 1;
+        }
+
+        push @captures, splice @{ $args }, 0, $num_caps;
+    }
+
+    if (defined $args->[ $attrs->{Args}->[0] ]) {
+        $c->log->debug( 'Action '.$action->reverse.' too many args' )
+            if ($c->debug);
+    }
+
+    unshift @{ $args }, \@captures if (defined $captures[0]);
+
+    return 1;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 USAGE
