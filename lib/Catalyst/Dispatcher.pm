@@ -497,6 +497,31 @@ sub expand_action {
     return $action;
 }
 
+=head2 $self->splice_captures_from( $c, $action, $args )
+
+Does nothing if the first element of the list that C<$args> references
+is an array ref. Otherwise calls this method in each dispatch type,
+stopping when the first one returns true
+
+=cut
+
+sub splice_captures_from {
+    my ($self, $c, $action, $args) = @_;
+
+    return if (!$args || (scalar @{ $args } && ref $args->[0] eq 'ARRAY'));
+
+    my $params = scalar @{ $args } && ref $args->[-1] eq 'HASH'
+               ? pop @{ $args } : undef;
+
+    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
+        last if ($dispatch_type->splice_captures_from( $c, $action, $args ));
+    }
+
+    push @{ $args }, $params if ($params); # Restore query parameters
+
+    return;
+}
+
 =head2 $self->register( $c, $action )
 
 Make sure all required dispatch types for this action are loaded, then
