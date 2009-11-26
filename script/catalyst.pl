@@ -41,9 +41,10 @@ my $helper = Catalyst::Helper->new(
         '.newfiles' => !$force,
         'makefile'  => $makefile,
         'scripts'   => $scripts,
-        'short'     => 0, # FIXME - to be removed.
+        name => $ARGV[0],
     }
 );
+# Pass $ARGV[0] for compatibility with old ::Devel
 pod2usage(1) unless $helper->mk_app( $ARGV[0] );
 
 1;
