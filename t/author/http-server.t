@@ -32,7 +32,7 @@ rmtree '../t/tmp/TestApp/t' or die;
 # spawn the standalone HTTP server
 my $port = 30000 + int rand(1 + 10000);
 my @cmd = ($^X, "-I$FindBin::Bin/../../lib",
-  "$FindBin::Bin/../../t/tmp/TestApp/script/testapp_server.pl", '-port', $port );
+  "$FindBin::Bin/../../t/tmp/TestApp/script/testapp_server.pl", '--port', $port );
 my $pid = open3( undef, my $server, undef, @cmd)
     or die "Unable to spawn standalone HTTP server: $!";
 

@@ -13,7 +13,10 @@ Catalyst::Script::CGI - The CGI Catalyst Script
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+  myapp_cgi.pl [options]
+
+  Options:
+  -h     --help           display this help and exits
 
 =head1 DESCRIPTION
 

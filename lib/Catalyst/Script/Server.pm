@@ -200,8 +200,8 @@ Catalyst::Script::Server - Catalyst test server
    -d     --debug          force debug mode
    -f     --fork           handle each request in a new process
                       (defaults to false)
-   -h     --help           display this help and exits
-          --host           host (defaults to all)
+          --help           display this help and exits
+   -h     --host           host (defaults to all)
    -p     --port           port (defaults to 3000)
    -k     --keepalive      enable keep-alive connections
    -r     --restart        restart when files get modified

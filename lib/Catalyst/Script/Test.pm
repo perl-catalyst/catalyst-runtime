@@ -11,7 +11,6 @@ sub run {
     Catalyst::Test->import($self->application_name);
 
     print request($ARGV[0])->content  . "\n";
-
 }
 
 
@@ -23,11 +22,14 @@ Catalyst::Script::Test - Test Catalyst application on the command line
 
 =head1 SYNOPSIS
 
-See L<Catalyst>.
+  myapp_test.pl [options] /path
+
+  Options:
+  -h     --help           display this help and exits
 
 =head1 DESCRIPTION
 
-FIXME
+Script to perform a test hit against your application and display the output.
 
 =head1 AUTHORS
 
