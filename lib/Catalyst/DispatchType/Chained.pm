@@ -432,7 +432,8 @@ sub splice_captures_from {
         push @captures, splice @{ $args }, 0, $num_caps;
     }
 
-    if (defined $args->[ $attrs->{Args}->[0] ]) {
+    if (    defined $attrs->{Args}->[0]
+        and defined $args->[ $attrs->{Args}->[0] ]) {
         $c->log->debug( 'Action '.$action->reverse.' too many args' )
             if ($c->debug);
     }
