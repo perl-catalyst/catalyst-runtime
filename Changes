@@ -6,8 +6,6 @@
      upgraded, may get upgraded even after they are encoded, and will
      produce the same output either way, but bytes::length returns too big
      values for upgraded strings containing characters >127
-   - Make FastCGI compatible with modules which use the fileno call to
-     determine if a file is open (E.g. IPC::Run)
 
   Refactoring / cleanups:
    - NoTabs and Pod tests moved to t/author so that they're not run
