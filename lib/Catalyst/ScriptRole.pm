@@ -74,7 +74,7 @@ Catalyst::ScriptRole - Common functionality for Catalyst scripts.
     use Moose;
     use namespace::autoclean;
 
-    with 'Catalyst::Script::Role';
+    with 'Catalyst::ScriptRole';
 
      sub _application_args { ... }
 

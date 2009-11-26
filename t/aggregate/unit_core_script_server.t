@@ -46,25 +46,54 @@ testOption( [ qw/--sym/ ], ['3000', 'localhost', opthash(follow_symlinks => 1)] 
 testOption( [ qw/--background/ ], ['3000', 'localhost', opthash(background => 1)] );
 testOption( [ qw/--bg/ ], ['3000', 'localhost', opthash(background => 1)] );
 
-# Restart stuff requires a threaded perl, apparently.
 # restart        -r -restart --restart     -R --restart
-# restart dly    -rd -restartdelay         --rdel --restart_delay
+testRestart( ['-r'], restartopthash() );
+# restart dly    -rd -restartdelay         --rd --restart_delay
+testRestart( ['-r', '--rd', 30], restartopthash(sleep_interval => 30) );
+testRestart( ['-r', '--restart_delay', 30], restartopthash(sleep_interval => 30) );
+
 # restart dir    -restartdirectory         --rdir --restart_directory
-# restart regex  -rr -restartregex         --rxp --restart_regex
+testRestart( ['-r', '--rdir', 'root'], restartopthash(directories => ['root']) );
+testRestart( ['-r', '--rdir', 'root', '--rdir', 'lib'], restartopthash(directories => ['root', 'lib']) );
+testRestart( ['-r', '--restart_directory', 'root'], restartopthash(directories => ['root']) );
+
+# restart regex  -rr -restartregex         --rr --restart_regex
+testRestart( ['-r', '--rr', 'foo'], restartopthash(filter => qr/foo/) );
+testRestart( ['-r', '--restart_regex', 'foo'], restartopthash(filter => qr/foo/) );
 
 done_testing;
 
 sub testOption {
     my ($argstring, $resultarray) = @_;
+    my $app = _build_testapp($argstring);
+    lives_ok {
+        $app->run;
+    };
+    # First element of RUN_ARGS will be the script name, which we don't care about
+    shift @TestAppToTestScripts::RUN_ARGS;
+    is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
+}
+
+sub testRestart {
+    my ($argstring, $resultarray) = @_;
+    my $app = _build_testapp($argstring);
+    my $args = {$app->_restarter_args};
+    is_deeply delete $args->{argv}, $argstring, 'argv is arg string';
+    is ref(delete $args->{start_sub}), 'CODE', 'Closure to start app present';
+    is_deeply $args, $resultarray, "is_deeply comparison of restarter args " . join(' ', @$argstring);
+}
+
+sub _build_testapp {
+    my ($argstring, $resultarray) = @_;
 
     local @ARGV = @$argstring;
     local @TestAppToTestScripts::RUN_ARGS;
+    my $i;
     lives_ok {
-        Catalyst::Script::Server->new_with_options(application_name => 'TestAppToTestScripts')->run;
-    } "new_with_options";
-    # First element of RUN_ARGS will be the script name, which we don't care about
-    shift @TestAppToTestScripts::RUN_ARGS;
-    is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison";
+        $i = Catalyst::Script::Server->new_with_options(application_name => 'TestAppToTestScripts');
+    } "new_with_options " . join(' ', @$argstring);;
+    ok $i;
+    return $i;
 }
 
 # Returns the hash expected when no flags are passed
@@ -75,6 +104,12 @@ sub opthash {
         'follow_symlinks' => 0,
         'background' => 0,
         'keepalive' => 0,
+        @_,
+    };
+}
+
+sub restartopthash {
+    return {
         @_,
     };
 }
