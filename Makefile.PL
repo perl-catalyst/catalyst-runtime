@@ -48,7 +48,7 @@ requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
-requires 'MooseX::Getopt';
+requires 'MooseX::Getopt' => '0.25';
 requires 'MooseX::Types';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
 

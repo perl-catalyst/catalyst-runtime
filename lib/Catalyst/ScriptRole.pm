@@ -5,7 +5,12 @@ use Pod::Usage;
 use MooseX::Getopt;
 use namespace::autoclean;
 
-with 'MooseX::Getopt';
+with 'MooseX::Getopt' => {
+    excludes => [qw/
+        _getopt_spec_warnings
+        _getopt_spec_exception
+    /],
+};
 
 has application_name => (
     traits => ['NoGetopt'],
@@ -20,6 +25,13 @@ has help => (
     is => 'ro',
     documentation => q{Display this help and exit},
 );
+
+sub _getopt_spec_exception {}
+
+sub _getopt_spec_warnings {
+    shift;
+    warn @_;
+}
 
 sub _exit_with_usage {
     my $self = shift;

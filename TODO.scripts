@@ -1,2 +1,2 @@
-* Sort out help so that it shows what you fucked up.
-* Fix horrible hacking around MX::Getopt's help display - probably by fixing MX::Getopt.
+* Fix the horrible hacking that is Catalyst::ScriptRole::Useage
+* Fix TODO tests
