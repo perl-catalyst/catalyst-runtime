@@ -119,8 +119,26 @@ has follow_symlinks => (
     documentation => 'Follow symbolic links',
 );
 
+sub _restarter_args {
+    my $self = shift;
+    my %args;
+    $args{follow_symlinks} = $self->follow_symlinks
+        if $self->follow_symlinks;
+    $args{directories}     = $self->restart_directory
+        if $self->_has_restart_directory;
+    $args{sleep_interval}  = $self->restart_delay
+        if $self->_has_restart_delay;
+    if ($self->_has_restart_regex) {
+        my $regex = $self->restart_regex;
+        $args{filter} = qr/$regex/;
+    }
+    $args{start_sub} = sub { $self->_run_application };
+    $args{argv}      = $self->ARGV;
+    return %args;
+}
+
 sub run {
-    my ($self) = shift;
+    my $self = shift;
 
     local $ENV{CATALYST_DEBUG} = 1
         if $self->debug;
@@ -141,20 +159,9 @@ sub run {
 
         my $subclass = Catalyst::Restarter->pick_subclass;
 
-        my %args;
-        $args{follow_symlinks} = $self->follow_symlinks
-            if $self->follow_symlinks;
-        $args{directories}     = $self->restart_directory
-            if $self->_has_restart_directory;
-        $args{sleep_interval}  = $self->restart_delay
-            if $self->_has_restart_delay;
-        $args{filter} = qr/$self->restart_regex/
-            if $self->_has_restart_regex;
-
+        
         my $restarter = $subclass->new(
-            %args,
-            start_sub => sub { $self->_run_application },
-            argv      => $self->ARGV,
+            $self->_restarter_args()
         );
 
         $restarter->run_and_watch;

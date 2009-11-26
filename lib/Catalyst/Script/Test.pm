@@ -10,7 +10,7 @@ sub run {
 
     Catalyst::Test->import($self->application_name);
 
-    print request($ARGV[0])->content  . "\n";
+    print request($self->ARGV->[0])->content  . "\n";
 }
 
 

@@ -34,7 +34,7 @@ has helper_class => ( isa => 'Str', is => 'ro', default => 'Catalyst::Helper' );
 sub run {
     my ($self) = @_;
 
-    $self->_exit_with_usage if !$ARGV[0];
+    $self->_exit_with_usage if !$self->ARGV->[0];
 
     my $helper_class = $self->helper_class;
     Class::MOP::load_class($helper_class);
