@@ -25,6 +25,7 @@ has help => (
     isa => Bool,
     is => 'ro',
     documentation => q{Display this help and exit},
+    cmd_aliases => ['?', 'h'],
 );
 
 sub _getopt_spec_exception {}

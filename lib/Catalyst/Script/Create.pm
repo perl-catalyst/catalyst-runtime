@@ -5,8 +5,6 @@ use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
 
-__PACKAGE__->meta->get_attribute('help')->cmd_aliases('h');
-
 has force => (
     traits => [qw(Getopt)],
     cmd_aliases => 'nonew',

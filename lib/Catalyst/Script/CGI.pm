@@ -5,8 +5,6 @@ use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
 
-__PACKAGE__->meta->get_attribute('help')->cmd_aliases('h');
-
 __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
