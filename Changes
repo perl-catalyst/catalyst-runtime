@@ -6,6 +6,7 @@
      upgraded, may get upgraded even after they are encoded, and will
      produce the same output either way, but bytes::length returns too big
      values for upgraded strings containing characters >127
+   - Fix t/live_fork.t with bleadperl (RT#52100)
 
   Refactoring / cleanups:
    - NoTabs and Pod tests moved to t/author so that they're not run

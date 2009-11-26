@@ -26,7 +26,6 @@ plan skip_all => 'Skipping fork tests: no /bin/ls'
 plan tests => 13; # otherwise
 
 {
-  system:
     ok(my $result = get('/fork/system/%2Fbin%2Fls'), 'system');
     my @result = split /$/m, $result;
     $result = join q{}, @result[-4..-1];
@@ -37,7 +36,6 @@ plan tests => 13; # otherwise
 }
 
 {
-  backticks:
     ok(my $result = get('/fork/backticks/%2Fbin%2Fls'), '`backticks`');
     my @result = split /$/m, $result;
     $result = join q{}, @result[-4..-1];
@@ -49,7 +47,6 @@ plan tests => 13; # otherwise
     like($result_ref->{result}, qr{\n.*\n}m, 'contains two newlines');
 }
 {
-  fork:
     ok(my $result = get('/fork/fork'), 'fork');
     my @result = split /$/m, $result;
     $result = join q{}, @result[-4..-1];
