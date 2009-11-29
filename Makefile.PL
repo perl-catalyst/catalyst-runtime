@@ -67,7 +67,7 @@ else {
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
-author_requires 'CatalystX::LeakChecker', '0.03'; # Skipped if this isn't installed
+author_requires 'CatalystX::LeakChecker', '0.05'; # Skipped if this isn't installed
 author_requires 'File::Copy::Recursive'; # For http server test
 
 author_tests 't/author';
