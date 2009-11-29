@@ -908,6 +908,26 @@ sub run_tests {
         is( $response->content => 'a; anchor.html', 'Content OK' );
     }
 
+    # CaptureArgs(1) PathPart('...') should win over CaptureArgs(2) PathPart('')
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::CaptureArgs->base
+          TestApp::Controller::Action::Chained::CaptureArgs->one_arg
+          TestApp::Controller::Action::Chained::CaptureArgs->edit_one_arg
+          TestApp::Controller::Action::Chained::CaptureArgs->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        # should dispatch to /base/one_args/edit_one_arg
+        ok( my $response = request('http://localhost/captureargs/one/edit'),
+            'Correct arg order ran' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'base; one_arg; edit_one_arg', 'Content OK' );
+    }
+
     #
     #   Args(0) should win over Args() if we actually have no arguments.
     {
