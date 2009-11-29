@@ -134,7 +134,7 @@ has follow_symlinks => (
 sub _restarter_args {
     my $self = shift;
 
-    my %args = (
+    return (
         argv => $self->ARGV,
         start_sub => sub { $self->_run_application },
         ($self->_has_follow_symlinks   ? (follow_symlinks => $self->follow_symlinks)   : ()),
@@ -142,8 +142,6 @@ sub _restarter_args {
         ($self->_has_restart_directory ? (directories     => $self->restart_directory) : ()),
         ($self->_has_restart_regex     ? (filter          => $self->restart_regex)     : ()),
     );
-
-    return %args;
 }
 
 sub run {
