@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use Moose;
+use MooseX::Types::Common::Numeric qw/PositiveInt/;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use namespace::autoclean;
 
@@ -42,7 +43,7 @@ has fork => (
 has port => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'p',
-    isa           => Int,
+    isa           => PositiveInt,
     is            => 'ro',
     default       => 3000,
     documentation => 'Specify a different listening port (to the default port 3000)',
