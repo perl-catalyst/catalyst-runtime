@@ -14,18 +14,18 @@ with 'MooseX::Getopt' => {
 };
 
 has application_name => (
-    traits => ['NoGetopt'],
-    isa => Str,
-    is => 'ro',
+    traits   => ['NoGetopt'],
+    isa      => Str,
+    is       => 'ro',
     required => 1,
 );
 
 has help => (
-    traits => ['Getopt'],
-    isa => Bool,
-    is => 'ro',
-    documentation => q{Display this help and exit},
-    cmd_aliases => ['?', 'h'],
+    traits        => ['Getopt'],
+    isa           => Bool,
+    is            => 'ro',
+    documentation => 'Display this help and exit',
+    cmd_aliases   => ['?', 'h'],
 );
 
 sub _getopt_spec_exception {}
@@ -76,7 +76,7 @@ Catalyst::ScriptRole - Common functionality for Catalyst scripts.
 
     with 'Catalyst::ScriptRole';
 
-     sub _application_args { ... }
+    sub _application_args { ... }
 
 =head1 DESCRIPTION
 
@@ -110,4 +110,3 @@ This library is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

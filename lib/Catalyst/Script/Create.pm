@@ -1,35 +1,41 @@
 package Catalyst::Script::Create;
 use Moose;
-use MooseX::Types::Moose qw/Bool/;
+use MooseX::Types::Moose qw/Bool Str/;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
 
 has force => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'nonew',
-    isa => Bool,
-    is => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'nonew',
+    isa           => Bool,
+    is            => 'ro',
     documentation => 'Force new scripts',
 );
 
 has debug => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'd',
-    isa => Bool,
-    is => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'd',
+    isa           => Bool,
+    is            => 'ro',
     documentation => 'Force debug mode',
 );
 
 has mechanize => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'mech',
-    isa => Bool,
-    is => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'mech',
+    isa           => Bool,
+    is            => 'ro',
     documentation => 'use WWW::Mechanize',
 );
 
-has helper_class => ( isa => 'Str', is => 'ro', default => 'Catalyst::Helper' );
+has helper_class => (
+    isa     => Str,
+    is      => 'ro',
+    builder => '_build_helper_class',
+);
+
+sub _build_helper_class { 'Catalyst::Helper' }
 
 sub run {
     my ($self) = @_;
@@ -55,9 +61,9 @@ Catalyst::Script::Create - Create a new Catalyst Component
  myapp_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
-   -force        don't create a .new file where a file to be created exists
-   -mechanize    use Test::WWW::Mechanize::Catalyst for tests if available
-   -help         display this help and exits
+   --force        don't create a .new file where a file to be created exists
+   --mechanize    use Test::WWW::Mechanize::Catalyst for tests if available
+   --help         display this help and exits
 
  Examples:
    myapp_create.pl controller My::Controller
@@ -82,7 +88,7 @@ Create a new Catalyst Component.
 
 Existing component files are not overwritten.  If any of the component files
 to be created already exist the file will be written with a '.new' suffix.
-This behavior can be suppressed with the C<-force> option.
+This behavior can be suppressed with the C<--force> option.
 
 =head1 AUTHORS
 
