@@ -14,91 +14,91 @@ with 'Catalyst::ScriptRole';
 __PACKAGE__->meta->get_attribute('help')->cmd_aliases('?');
 
 has debug => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'd',
-    isa => Bool,
-    is => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'd',
+    isa           => Bool,
+    is            => 'ro',
     documentation => q{Force debug mode},
 );
 
 has host => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'h',
-    isa => Str,
-    is => 'ro',
-    default => 'localhost',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'h',
+    isa           => Str,
+    is            => 'ro',
+    default       => 'localhost',
     documentation => 'Specify an IP on this host for the server to bind to',
 );
 
 has fork => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'f',
-    isa => Bool,
-    is => 'ro',
-    default => 0,
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'f',
+    isa           => Bool,
+    is            => 'ro',
+    default       => 0,
     documentation => 'Fork the server to be able to serve multiple requests at once',
 );
 
 has port => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'p',
-    isa => Int,
-    is => 'ro',
-    default => 3000,
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'p',
+    isa           => Int,
+    is            => 'ro',
+    default       => 3000,
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
 has pidfile => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'pid',
-    isa => Str,
-    is => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'pid',
+    isa           => Str,
+    is            => 'ro',
     documentation => 'Specify a pidfile',
 );
 
 has keepalive => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'k',
-    isa => Bool,
-    is => 'ro',
-    default => 0,
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'k',
+    isa           => Bool,
+    is            => 'ro',
+    default       => 0,
     documentation => 'Support keepalive',
 );
 
 has background => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'bg',
-    isa => Bool,
-    is => 'ro',
-    default => 0,
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'bg',
+    isa           => Bool,
+    is            => 'ro',
+    default       => 0,
     documentation => 'Run in the background',
 );
 
 has restart => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'r',
-    isa => Bool,
-    is => 'ro',
-    default => 0,
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'r',
+    isa           => Bool,
+    is            => 'ro',
+    default       => 0,
     documentation => 'use Catalyst::Restarter to detect code changes and restart the application',
 );
 
 has restart_directory => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'rdir',
-    isa => ArrayRef[Str],
-    is  => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'rdir',
+    isa           => ArrayRef[Str],
+    is            => 'ro',
     documentation => 'Restarter directory to watch',
-    predicate => '_has_restart_directory',
+    predicate     => '_has_restart_directory',
 );
 
 has restart_delay => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'rd',
-    isa => Int,
-    is => 'ro',
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'rd',
+    isa           => Int,
+    is            => 'ro',
     documentation => 'Set a restart delay',
-    predicate => '_has_restart_delay',
+    predicate     => '_has_restart_delay',
 );
 
 {
@@ -110,24 +110,24 @@ has restart_delay => (
     MooseX::Getopt::OptionTypeMap->add_option_type_to_map($tc => '=s');
 
     has restart_regex => (
-        traits => [qw(Getopt)],
-        cmd_aliases => 'rr',
-        isa => $tc,
-        coerce => 1,
-        is => 'ro',
+        traits        => [qw(Getopt)],
+        cmd_aliases   => 'rr',
+        isa           => $tc,
+        coerce        => 1,
+        is            => 'ro',
         documentation => 'Restart regex',
-        predicate => '_has_restart_regex',
+        predicate     => '_has_restart_regex',
     );
 }
 
 has follow_symlinks => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'sym',
-    isa => Bool,
-    is => 'ro',
-    default => 0,
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'sym',
+    isa           => Bool,
+    is            => 'ro',
+    default       => 0,
     documentation => 'Follow symbolic links',
-    predicate => '_has_follow_symlinks',
+    predicate     => '_has_follow_symlinks',
 );
 
 sub _restarter_args {
