@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Moose;
-use MooseX::Types::Moose qw/ArrayRef Str Bool Int/;
+use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -101,14 +101,24 @@ has restart_delay => (
     predicate => '_has_restart_delay',
 );
 
-has restart_regex => (
-    traits => [qw(Getopt)],
-    cmd_aliases => 'rr',
-    isa => Str,
-    is => 'ro',
-    documentation => 'Restart regex',
-    predicate => '_has_restart_regex',
-);
+{
+    use Moose::Util::TypeConstraints;
+
+    my $tc = subtype as RegexpRef;
+    coerce $tc, from Str, via { qr/$_/ };
+
+    MooseX::Getopt::OptionTypeMap->add_option_type_to_map($tc => '=s');
+
+    has restart_regex => (
+        traits => [qw(Getopt)],
+        cmd_aliases => 'rr',
+        isa => $tc,
+        coerce => 1,
+        is => 'ro',
+        documentation => 'Restart regex',
+        predicate => '_has_restart_regex',
+    );
+}
 
 has follow_symlinks => (
     traits => [qw(Getopt)],
@@ -129,7 +139,7 @@ sub _restarter_args {
         ($self->_has_follow_symlinks   ? (follow_symlinks => $self->follow_symlinks)   : ()),
         ($self->_has_restart_delay     ? (sleep_interval  => $self->restart_delay)     : ()),
         ($self->_has_restart_directory ? (directories     => $self->restart_directory) : ()),
-        ($self->_has_restart_regex     ? (filter          => qr/${\$self->restart_regex}/) : ()),
+        ($self->_has_restart_regex     ? (filter          => $self->restart_regex)     : ()),
     );
 
     return %args;
