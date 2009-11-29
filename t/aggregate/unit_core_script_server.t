@@ -110,6 +110,7 @@ sub opthash {
 
 sub restartopthash {
     return {
+        follow_symlinks => 0,
         @_,
     };
 }

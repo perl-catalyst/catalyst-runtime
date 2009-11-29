@@ -117,23 +117,21 @@ has follow_symlinks => (
     is => 'ro',
     default => 0,
     documentation => 'Follow symbolic links',
+    predicate => '_has_follow_symlinks',
 );
 
 sub _restarter_args {
     my $self = shift;
-    my %args;
-    $args{follow_symlinks} = $self->follow_symlinks
-        if $self->follow_symlinks;
-    $args{directories}     = $self->restart_directory
-        if $self->_has_restart_directory;
-    $args{sleep_interval}  = $self->restart_delay
-        if $self->_has_restart_delay;
-    if ($self->_has_restart_regex) {
-        my $regex = $self->restart_regex;
-        $args{filter} = qr/$regex/;
-    }
-    $args{start_sub} = sub { $self->_run_application };
-    $args{argv}      = $self->ARGV;
+
+    my %args = (
+        argv => $self->ARGV,
+        start_sub => sub { $self->_run_application },
+        ($self->_has_follow_symlinks   ? (follow_symlinks => $self->follow_symlinks)   : ()),
+        ($self->_has_restart_delay     ? (sleep_interval  => $self->restart_delay)     : ()),
+        ($self->_has_restart_directory ? (directories     => $self->restart_directory) : ()),
+        ($self->_has_restart_regex     ? (filter          => qr/${\$self->restart_regex}/) : ()),
+    );
+
     return %args;
 }
 
