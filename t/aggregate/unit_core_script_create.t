@@ -18,7 +18,7 @@ use lib "$Bin/../lib";
 {
     package TestHelperClass;
     use Moose;
-    
+
     has 'newfiles' => ( is => 'ro', init_arg => '.newfiles' );
     has 'mech' => ( is => 'ro' );
     our @ARGS;

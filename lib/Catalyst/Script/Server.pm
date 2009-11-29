@@ -166,7 +166,6 @@ sub run {
 
         my $subclass = Catalyst::Restarter->pick_subclass;
 
-        
         my $restarter = $subclass->new(
             $self->_restarter_args()
         );
