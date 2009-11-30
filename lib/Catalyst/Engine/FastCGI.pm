@@ -234,9 +234,12 @@ sub _fix_env
     if ( $env->{SERVER_SOFTWARE} =~ /lighttpd/ ) {
         $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
     }
+    elsif ( $env->{SERVER_SOFTWARE} =~ /^nginx/ ) {
+        my $script_name = $env->{SCRIPT_NAME};
+        $env->{PATH_INFO} =~ s/^$script_name//g;
+    }
     # Fix the environment variables PATH_INFO and SCRIPT_NAME when running 
     # under IIS
-    # FIXME - How does this handle %7F?
     elsif ( $env->{SERVER_SOFTWARE} =~ /IIS\/[6-9]\.[0-9]/ ) {
         my @script_name = split(m!/!, $env->{PATH_INFO});
         my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
@@ -460,7 +463,7 @@ The server configuration block should look roughly like:
             fastcgi_param  CONTENT_TYPE       $content_type;
             fastcgi_param  CONTENT_LENGTH     $content_length;
 
-            fastcgi_param  PATH_INFO          $fastcgi_script_name;
+            fastcgi_param  PATH_INFO          /;
             fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
             fastcgi_param  REQUEST_URI        $request_uri;
             fastcgi_param  DOCUMENT_URI       $document_uri;
@@ -487,9 +490,9 @@ simply include that file.
 
 =head3  Non-root configuration
 
-If you properly specify the PATH_INFO and SCRIPT_NAME parameters your 
-application will be accessible at any path.  The SCRIPT_NAME variable is the
-prefix of your application, and PATH_INFO would be everything in addition.
+If you properly specify the PATH_INFO and SCRIPT_NAME parameters your
+application will be accessible at any path.  The PATH_INFO variable is the
+prefix of your application, and SCRIPT_NAME would be everything in addition.
 
 As an example, if your application is rooted at /myapp, you would configure:
 
