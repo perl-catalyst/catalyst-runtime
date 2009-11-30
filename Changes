@@ -11,6 +11,8 @@
      $ENV{SCRIPT_NAME} if possible. This is many web servers always fully
      decode PATH_INFO including URI reserved characters. This allows us to
      tell foo%2cbar from foo%252cbar.. RT#50082
+   - Require new HTTP::Request::AsCGI so that it fully decodes $ENV{PATH_INFO}
+     in non CGI contexts.
 
   Refactoring / cleanups:
    - NoTabs and Pod tests moved to t/author so that they're not run

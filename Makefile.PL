@@ -34,7 +34,7 @@ requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
-requires 'HTTP::Request::AsCGI' => '0.8';
+requires 'HTTP::Request::AsCGI' => '1.0';
 requires 'LWP::UserAgent';
 requires 'Module::Pluggable' => '3.9';
 requires 'Path::Class' => '0.09';
