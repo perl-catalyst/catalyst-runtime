@@ -234,12 +234,9 @@ sub _fix_env
     if ( $env->{SERVER_SOFTWARE} =~ /lighttpd/ ) {
         $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
     }
-    elsif ( $env->{SERVER_SOFTWARE} =~ /^nginx/ ) {
-        my $script_name = $env->{SCRIPT_NAME};
-        $env->{PATH_INFO} =~ s/^$script_name//g;
-    }
     # Fix the environment variables PATH_INFO and SCRIPT_NAME when running 
     # under IIS
+    # FIXME - How does this handle %7F?
     elsif ( $env->{SERVER_SOFTWARE} =~ /IIS\/[6-9]\.[0-9]/ ) {
         my @script_name = split(m!/!, $env->{PATH_INFO});
         my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
