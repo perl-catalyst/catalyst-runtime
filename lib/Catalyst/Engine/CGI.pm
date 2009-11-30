@@ -115,13 +115,16 @@ sub prepare_path {
     my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
     my $port      = $ENV{SERVER_PORT} || 80;
+    my $script_name = $ENV{SCRIPT_NAME};
+    $script_name =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go if $script_name;
+
     my $base_path;
     if ( exists $ENV{REDIRECT_URL} ) {
         $base_path = $ENV{REDIRECT_URL};
         $base_path =~ s/$ENV{PATH_INFO}$//;
     }
     else {
-        $base_path = $ENV{SCRIPT_NAME} || '/';
+        $base_path = $script_name || '/';
     }
 
     # If we are running as a backend proxy, get the true hostname
@@ -143,8 +146,22 @@ sub prepare_path {
         }
     }
 
+    # RFC 3875: "Unlike a URI path, the PATH_INFO is not URL-encoded,
+    # and cannot contain path-segment parameters." This means PATH_INFO
+    # is always decoded, and the script can't distinguish / vs %2F.
+    # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
+    # Here we try to resurrect the original encoded URI from REQUEST_URI.
+    my $path_info   = $ENV{PATH_INFO};
+    if (my $req_uri = $ENV{REQUEST_URI}) {
+        if (defined $script_name) {
+            $req_uri =~ s/^\Q$script_name\E//;
+        }
+        $req_uri =~ s/\?.*$//;
+        $path_info = $req_uri if $req_uri;
+    }
+
     # set the request URI
-    my $path = $base_path . ( $ENV{PATH_INFO} || '' );
+    my $path = $base_path . ( $path_info || '' );
     $path =~ s{^/+}{};
 
     # Using URI directly is way too slow, so we construct the URLs manually

@@ -7,6 +7,10 @@
      produce the same output either way, but bytes::length returns too big
      values for upgraded strings containing characters >127
    - Fix t/live_fork.t with bleadperl (RT#52100)
+   - Set $ENV{PATH_INFO} from $ENV{REQUEST_URI} combined with
+     $ENV{SCRIPT_NAME} if possible. This is many web servers always fully
+     decode PATH_INFO including URI reserved characters. This allows us to
+     tell foo%2cbar from foo%252cbar.. RT#50082
 
   Refactoring / cleanups:
    - NoTabs and Pod tests moved to t/author so that they're not run
