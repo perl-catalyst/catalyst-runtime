@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use inc::Module::Install 0.87;
+use inc::Module::Install 0.91;
 {   # Ensure that these get used - yes, M::I loads them for us, but if you're
     # in author mode and don't have them installed, then the error is tres
     # cryptic.
