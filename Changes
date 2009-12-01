@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80014_02 2009-12-01 00:55:23
   Bug fixes:
    - Fix reporting the wrong Content-Length if the response body is an
      upgraded string. Strings mean the same thing whether or not they are
