@@ -26,14 +26,12 @@ my $force    = 0;
 my $help     = 0;
 my $makefile = 0;
 my $scripts  = 0;
-my $short    = 0;
 
 GetOptions(
     'help|?'      => \$help,
     'force|nonew' => \$force,
     'makefile'    => \$makefile,
     'scripts'     => \$scripts,
-    'short'       => \$short
 );
 
 pod2usage(1) if ( $help || !$ARGV[0] );
@@ -43,9 +41,10 @@ my $helper = Catalyst::Helper->new(
         '.newfiles' => !$force,
         'makefile'  => $makefile,
         'scripts'   => $scripts,
-        'short'     => $short,
+        name => $ARGV[0],
     }
 );
+# Pass $ARGV[0] for compatibility with old ::Devel
 pod2usage(1) unless $helper->mk_app( $ARGV[0] );
 
 1;
@@ -67,7 +66,6 @@ upgrade the skeleton of your old application.
    -help       display this help and exit
    -makefile   only update Makefile.PL
    -scripts    only update helper scripts
-   -short      use short names, M/V/C instead of Model/View/Controller.
 
  application-name must be a valid Perl module name and can include "::", 
  which will be converted to '-' in the project name.

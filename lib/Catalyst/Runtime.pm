@@ -3,11 +3,11 @@ package Catalyst::Runtime;
 use strict;
 use warnings;
 
-BEGIN { require 5.008001; }
+BEGIN { require 5.008004; }
 
 # Remember to update this in Catalyst as well!
 
-our $VERSION='5.80007';
+our $VERSION='5.80014_02';
 
 $VERSION = eval $VERSION;
 

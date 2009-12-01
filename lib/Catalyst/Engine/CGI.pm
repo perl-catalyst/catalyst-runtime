@@ -57,9 +57,9 @@ sub prepare_connection {
 
   PROXY_CHECK:
     {
-        unless ( $c->config->{using_frontend_proxy} ) {
+        unless ( ref($c)->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $ENV{REMOTE_ADDR} ne '127.0.0.1';
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
+            last PROXY_CHECK if ref($c)->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_FOR};
 
@@ -67,6 +67,9 @@ sub prepare_connection {
         # as 127.0.0.1. Select the most recent upstream IP (last in the list)
         my ($ip) = $ENV{HTTP_X_FORWARDED_FOR} =~ /([^,\s]+)$/;
         $request->address($ip);
+        if ( defined $ENV{HTTP_X_FORWARDED_PORT} ) {
+            $ENV{SERVER_PORT} = $ENV{HTTP_X_FORWARDED_PORT};
+        }
     }
 
     $request->hostname( $ENV{REMOTE_HOST} ) if exists $ENV{REMOTE_HOST};
@@ -82,6 +85,7 @@ sub prepare_connection {
     if ( $ENV{SERVER_PORT} == 443 ) {
         $request->secure(1);
     }
+    binmode(STDOUT); # Ensure we are sending bytes.
 }
 
 =head2 $self->prepare_headers($c)
@@ -111,21 +115,24 @@ sub prepare_path {
     my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
     my $port      = $ENV{SERVER_PORT} || 80;
+    my $script_name = $ENV{SCRIPT_NAME};
+    $script_name =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go if $script_name;
+
     my $base_path;
     if ( exists $ENV{REDIRECT_URL} ) {
         $base_path = $ENV{REDIRECT_URL};
         $base_path =~ s/$ENV{PATH_INFO}$//;
     }
     else {
-        $base_path = $ENV{SCRIPT_NAME} || '/';
+        $base_path = $script_name || '/';
     }
 
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
     {
-        unless ( $c->config->{using_frontend_proxy} ) {
+        unless ( ref($c)->config->{using_frontend_proxy} ) {
             last PROXY_CHECK if $host !~ /localhost|127.0.0.1/;
-            last PROXY_CHECK if $c->config->{ignore_frontend_proxy};
+            last PROXY_CHECK if ref($c)->config->{ignore_frontend_proxy};
         }
         last PROXY_CHECK unless $ENV{HTTP_X_FORWARDED_HOST};
 
@@ -134,10 +141,27 @@ sub prepare_path {
         # backend could be on any port, so
         # assume frontend is on the default port
         $port = $c->request->secure ? 443 : 80;
+        if ( $ENV{HTTP_X_FORWARDED_PORT} ) {
+            $port = $ENV{HTTP_X_FORWARDED_PORT};
+        }
+    }
+
+    # RFC 3875: "Unlike a URI path, the PATH_INFO is not URL-encoded,
+    # and cannot contain path-segment parameters." This means PATH_INFO
+    # is always decoded, and the script can't distinguish / vs %2F.
+    # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
+    # Here we try to resurrect the original encoded URI from REQUEST_URI.
+    my $path_info   = $ENV{PATH_INFO};
+    if (my $req_uri = $ENV{REQUEST_URI}) {
+        if (defined $script_name) {
+            $req_uri =~ s/^\Q$script_name\E//;
+        }
+        $req_uri =~ s/\?.*$//;
+        $path_info = $req_uri if $req_uri;
     }
 
     # set the request URI
-    my $path = $base_path . ( $ENV{PATH_INFO} || '' );
+    my $path = $base_path . ( $path_info || '' );
     $path =~ s{^/+}{};
 
     # Using URI directly is way too slow, so we construct the URLs manually

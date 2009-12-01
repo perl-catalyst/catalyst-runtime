@@ -110,7 +110,7 @@ has _body => (
 sub body {
   my $self = shift;
   $self->_context->prepare_body();
-  $self->_body(@_) if scalar @_;
+  croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
 
@@ -210,7 +210,7 @@ Returns a reference to an array containing the arguments.
 
 For example, if your action was
 
-    package MyApp::C::Foo;
+    package MyApp::Controller::Foo;
 
     sub moose : Local {
         ...
@@ -223,7 +223,7 @@ Arguments get automatically URI-unescaped for you.
 
 =head2 $req->args
 
-Shortcut for arguments.
+Shortcut for L</arguments>.
 
 =head2 $req->base
 
@@ -237,8 +237,9 @@ C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 
 =head2 $req->body
 
-Returns the message body of the request, unless Content-Type is
-C<application/x-www-form-urlencoded> or C<multipart/form-data>.
+Returns the message body of the request, as returned by L<HTTP::Body>: a string,
+unless Content-Type is C<application/x-www-form-urlencoded>, C<text/xml>, or
+C<multipart/form-data>, in which case a L<File::Temp> object is returned.
 
 =head2 $req->body_parameters
 
@@ -300,7 +301,7 @@ Returns a reference to a hash containing the cookies.
 
     print $c->request->cookies->{mycookie}->value;
 
-The cookies in the hash are indexed by name, and the values are L<CGI::Cookie>
+The cookies in the hash are indexed by name, and the values are L<CGI::Simple::Cookie>
 objects.
 
 =head2 $req->header
@@ -473,7 +474,7 @@ Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
-You have to set MyApp->config->{parse_on_demand} to use this directly.
+You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 
 =head2 $req->referer
 
@@ -569,7 +570,7 @@ L<Catalyst::Request::Upload> objects.
 
 =head2 $req->uri
 
-Returns a URI object for the current request. Stringifies to the URI text.
+Returns a L<URI> object for the current request. Stringifies to the URI text.
 
 =head2 $req->mangle_params( { key => 'value' }, $appendmode);
 
@@ -649,7 +650,7 @@ You may also pass an optional second parameter that puts C<uri_with> into
 append mode:
 
   $req->uri_with( { key => 'value' }, { mode => 'append' } );
-  
+
 See C<mangle_params> for an explanation of this behavior.
 
 =cut
@@ -675,7 +676,10 @@ sub uri_with {
 =head2 $req->user
 
 Returns the currently logged in user. B<Highly deprecated>, do not call,
-this will be removed in version 5.81.
+this will be removed in version 5.81. To retrieve the currently authenticated
+user, see C<< $c->user >> and C<< $c->user_exists >> in
+L<Catalyst::Plugin::Authentication>. For the C<REMOTE_USER> provided by the
+webserver, see C<< $req->remote_user >> below.
 
 =head2 $req->remote_user
 

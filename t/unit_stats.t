@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Time::HiRes qw/gettimeofday/;
 use Tree::Simple;
 
@@ -18,6 +18,8 @@ BEGIN { use_ok("Catalyst::Stats") };
 {
     my $stats = Catalyst::Stats->new;
     is (ref($stats), "Catalyst::Stats", "new");
+
+    is_deeply([ $stats->created ], [0, 0], "created time");
 
     my @expected; # level, string, time
 

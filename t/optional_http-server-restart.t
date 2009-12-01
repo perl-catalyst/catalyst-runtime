@@ -45,10 +45,11 @@ rmtree 't/tmp/TestApp/t';
 my $port = 30000 + int rand( 1 + 10000 );
 
 my( $server, $pid );
-$pid = open3( undef, $server, undef,
-  $^X, "-I$FindBin::Bin/../lib",
+my @cmd = ($^X, "-I$FindBin::Bin/../lib", "-I$FindBin::Bin/lib",
   "$FindBin::Bin/../t/tmp/TestApp/script/testapp_server.pl", '-port',
-  $port, '-restart' )
+  $port, '-restart');
+
+$pid = open3( undef, $server, undef, @cmd )
     or die "Unable to spawn standalone HTTP server: $!";
 
 # switch to non-blocking reads so we can fail
@@ -67,10 +68,8 @@ my @files = (
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp.pm",
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Action/Begin.pm",
     "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Immutable.pm",
+    "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Immutable/HardToReload.pm",
 );
-
-push(@files, "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Immutable/HardToReload.pm")
-    if Catalyst::Engine::HTTP::Restarter::Watcher::DETECT_PACKAGE_COMPILATION();
 
 # change some files and make sure the server restarts itself
 NON_ERROR_RESTART:
@@ -84,7 +83,6 @@ for ( 1 .. 20 ) {
     # give the server time to notice the change and restart
     my $count = 0;
     my $line;
-
     while ( ( $line || '' ) !~ /can connect/ ) {
         # wait for restart message
         $line = $server->getline;

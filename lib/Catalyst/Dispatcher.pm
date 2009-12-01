@@ -29,7 +29,7 @@ our @POSTLOAD = qw/Default/;
 
 # Note - see back-compat methods at end of file.
 has _tree => (is => 'rw', builder => '_build__tree');
-has _dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
+has dispatch_types => (is => 'rw', default => sub { [] }, required => 1, lazy => 1);
 has _registered_dispatch_types => (is => 'rw', default => sub { {} }, required => 1, lazy => 1);
 has _method_action_class => (is => 'rw', default => 'Catalyst::Action');
 has _action_hash => (is => 'rw', required => 1, lazy => 1, default => sub { {} });
@@ -131,7 +131,7 @@ sub _command2action {
     my (@args, @captures);
 
     if ( ref( $extra_params[-2] ) eq 'ARRAY' ) {
-        @captures = @{ pop @extra_params };
+        @captures = @{ splice @extra_params, -2, 1 };
     }
 
     if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
@@ -335,7 +335,7 @@ sub _invoke_as_component {
                 reverse   => "$component_class->$method",
                 class     => $component_class,
                 namespace => Catalyst::Utils::class2prefix(
-                    $component_class, $c->config->{case_sensitive}
+                    $component_class, ref($c)->config->{case_sensitive}
                 ),
             }
         );
@@ -372,7 +372,7 @@ sub prepare_action {
         # Check out dispatch types to see if any will handle the path at
         # this level
 
-        foreach my $type ( @{ $self->_dispatch_types } ) {
+        foreach my $type ( @{ $self->dispatch_types } ) {
             last DESCEND if $type->match( $c, $path );
         }
 
@@ -470,7 +470,7 @@ cannot determine an appropriate URI, this method will return undef.
 sub uri_for_action {
     my ( $self, $action, $captures) = @_;
     $captures ||= [];
-    foreach my $dispatch_type ( @{ $self->_dispatch_types } ) {
+    foreach my $dispatch_type ( @{ $self->dispatch_types } ) {
         my $uri = $dispatch_type->uri_for_action( $action, $captures );
         return( $uri eq '' ? '/' : $uri )
             if defined($uri);
@@ -489,7 +489,7 @@ single action.
 sub expand_action {
     my ($self, $action) = @_;
 
-    foreach my $dispatch_type (@{ $self->_dispatch_types }) {
+    foreach my $dispatch_type (@{ $self->dispatch_types }) {
         my $expanded = $dispatch_type->expand_action($action);
         return $expanded if $expanded;
     }
@@ -518,12 +518,12 @@ sub register {
             # FIXME - Some error checking and re-throwing needed here, as
             #         we eat exceptions loading dispatch types.
             eval { Class::MOP::load_class($class) };
-            push( @{ $self->_dispatch_types }, $class->new ) unless $@;
+            push( @{ $self->dispatch_types }, $class->new ) unless $@;
             $registered->{$class} = 1;
         }
     }
 
-    my @dtypes = @{ $self->_dispatch_types };
+    my @dtypes = @{ $self->dispatch_types };
     my @normal_dtypes;
     my @low_precedence_dtypes;
 
@@ -615,9 +615,12 @@ sub setup_actions {
 sub _display_action_tables {
     my ($self, $c) = @_;
 
-    my $column_width = Catalyst::Utils::term_width() - 20 - 36 - 12;
+    my $avail_width = Catalyst::Utils::term_width() - 12;
+    my $col1_width = ($avail_width * .25) < 20 ? 20 : int($avail_width * .25);
+    my $col2_width = ($avail_width * .50) < 36 ? 36 : int($avail_width * .50);
+    my $col3_width =  $avail_width - $col1_width - $col2_width;
     my $privates = Text::SimpleTable->new(
-        [ 20, 'Private' ], [ 36, 'Class' ], [ $column_width, 'Method' ]
+        [ $col1_width, 'Private' ], [ $col2_width, 'Class' ], [ $col3_width, 'Method' ]
     );
 
     my $has_private = 0;
@@ -644,7 +647,7 @@ sub _display_action_tables {
       if $has_private;
 
     # List all public actions
-    $_->list($c) for @{ $self->_dispatch_types };
+    $_->list($c) for @{ $self->dispatch_types };
 }
 
 sub _load_dispatch_types {
@@ -655,11 +658,11 @@ sub _load_dispatch_types {
     for my $type (@types) {
         # first param is undef because we cannot get the appclass
         my $class = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $type);
-        
+
         eval { Class::MOP::load_class($class) };
         Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
           if $@;
-        push @{ $self->_dispatch_types }, $class->new;
+        push @{ $self->dispatch_types }, $class->new;
 
         push @loaded, $class;
     }
@@ -681,7 +684,7 @@ sub dispatch_type {
     # first param is undef because we cannot get the appclass
     $name = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $name);
 
-    for (@{ $self->_dispatch_types }) {
+    for (@{ $self->dispatch_types }) {
         return $_ if ref($_) eq $name;
     }
     return undef;
@@ -694,16 +697,31 @@ use Moose;
 # Various plugins (e.g. Plugin::Server and Plugin::Authorization::ACL)
 # need the methods here which *should* be private..
 
-# However we can't really take them away until there is a sane API for
-# building actions and configuring / introspecting the dispatcher.
-# In 5.90, we should build that infrastructure, port the plugins which
-# use it, and then take the crap below away.
+# You should be able to use get_actions or get_containers appropriately
+# instead of relying on these methods which expose implementation details
+# of the dispatcher..
+#
+# IRC backlog included below, please come ask if this doesn't work for you.
+#
+# <@t0m> 5.80, the state of. There are things in the dispatcher which have
+#        been deprecated, that we yell at anyone for using, which there isn't
+#        a good alternative for yet..
+# <@mst> er, get_actions/get_containers provides that doesn't it?
+# <@mst> DispatchTypes are loaded on demand anyway
+# <@t0m> I'm thinking of things like _tree which is aliased to 'tree' with
+#        warnings otherwise shit breaks.. We're issuing warnings about the
+#        correct set of things which you shouldn't be calling..
+# <@mst> right
+# <@mst> basically, I don't see there's a need for a replacement for anything
+# <@mst> it was never a good idea to call ->tree
+# <@mst> nothingmuch was the only one who did AFAIK
+# <@mst> and he admitted it was a hack ;)
+
 # See also t/lib/TestApp/Plugin/AddDispatchTypes.pm
 
 # Alias _method_name to method_name, add a before modifier to warn..
 foreach my $public_method_name (qw/
         tree
-        dispatch_types
         registered_dispatch_types
         method_action_class
         action_hash

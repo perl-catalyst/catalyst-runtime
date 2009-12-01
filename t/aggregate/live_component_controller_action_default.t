@@ -29,7 +29,7 @@ sub run_tests {
           TestApp::Controller::Action::Default->begin
           TestApp::Controller::Action::Default->default
           TestApp::View::Dump::Request->process
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
 
         my $expected = join( ", ", @expected );
@@ -76,7 +76,7 @@ sub run_tests {
         my @expected = qw[
           TestApp::Controller::Action->begin
           TestApp::Controller::Action->default
-          TestApp->end
+          TestApp::Controller::Root->end
         ];
         
         my $expected = join( ", ", @expected );

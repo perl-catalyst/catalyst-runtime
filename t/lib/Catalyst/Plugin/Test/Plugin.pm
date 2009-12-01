@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use MRO::Compat;
 
-use base qw/Catalyst::Controller Class::Data::Inheritable/;
+use base qw/Class::Data::Inheritable/;
 
  __PACKAGE__->mk_classdata('ran_setup');
 
@@ -22,26 +22,14 @@ sub prepare {
     return $c;
 }
 
-# Note: This is horrible, but Catalyst::Plugin::Server forces the body to
+# Note: Catalyst::Plugin::Server forces the body to
 #       be parsed, by calling the $c->req->body method in prepare_action.
 #       We need to test this, as this was broken by 5.80. See also
-#       t/aggregate/live_engine_request_body.t. Better ways to test this
-#       appreciated if you have suggestions :)
-{
-    my $have_req_body = 0;
-    sub prepare_action {
-        my $c = shift;
-        $have_req_body++ if $c->req->body;
-        $c->next::method(@_);
-    }
-    sub have_req_body_in_prepare_action : Local {
-        my ($self, $c) = @_;
-        $c->res->body($have_req_body);
-    }
-}
-
-sub end : Private {
-    my ($self,$c) = @_;
+#       t/aggregate/live_engine_request_body.t.
+sub prepare_action {
+    my $c = shift;
+    $c->res->header('X-Have-Request-Body', 1) if $c->req->body;
+    $c->next::method(@_);
 }
 
 1;

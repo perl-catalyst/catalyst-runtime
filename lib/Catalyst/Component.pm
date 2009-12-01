@@ -60,6 +60,18 @@ component loader with config() support and a process() method placeholder.
 __PACKAGE__->mk_classdata('_plugins');
 __PACKAGE__->mk_classdata('_config');
 
+has catalyst_component_name => ( is => 'ro' ); # Cannot be required => 1 as context
+                                       # class @ISA component - HATE
+# Make accessor callable as a class method, as we need to call setup_actions
+# on the application class, which we don't have an instance of, ewwwww
+# Also, naughty modules like Catalyst::View::JSON try to write to _everything_,
+# so spit a warning, ignore that (and try to do the right thing anyway) here..
+around catalyst_component_name => sub {
+    my ($orig, $self) = (shift, shift);
+    Carp::cluck("Tried to write to the catalyst_component_name accessor - is your component broken or just mad? (Write ignored - using default value.)") if scalar @_;
+    blessed($self) ? $self->$orig() || blessed($self) : $self;
+};
+
 sub BUILDARGS {
     my $class = shift;
     my $args = {};
@@ -85,23 +97,24 @@ sub BUILDARGS {
 }
 
 sub COMPONENT {
-    my ( $self, $c ) = @_;
+    my ( $class, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
     my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
-    if( my $next = $self->next::can ){
-      my $class = blessed $self || $self;
+    if ( my $next = $class->next::can ) {
       my ($next_package) = Class::MOP::get_code_info($next);
       warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}.\n";
       warn "This behavior can no longer be supported, and so your application is probably broken.\n";
       warn "Your linearized isa hierarchy is: " . join(', ', @{ mro::get_linear_isa($class) }) . "\n";
       warn "Please see perldoc Catalyst::Upgrading for more information about this issue.\n";
     }
-    return $self->new($c, $arguments);
+    return $class->new($c, $arguments);
 }
 
 sub config {
     my $self = shift;
+    # Uncomment once sane to do so
+    #Carp::cluck("config method called on instance") if ref $self;
     my $config = $self->_config || {};
     if (@_) {
         my $newconfig = { %{@_ > 1 ? {@_} : $_[0]} };
@@ -157,9 +170,10 @@ If this method is present (as it is on all Catalyst::Component subclasses,
 it is called by Catalyst during setup_components with the application class
 as $c and any config entry on the application for this component (for example,
 in the case of MyApp::Controller::Foo this would be
-MyApp->config->{'Controller::Foo'}). The arguments are expected to be a
-hashref and are merged with the __PACKAGE__->config hashref before calling
-->new to instantiate the component.
+C<< MyApp->config('Controller::Foo' => \%conf >>).
+The arguments are expected to be a hashref and are merged with the
+C<< __PACKAGE__->config >> hashref before calling C<< ->new >>
+to instantiate the component.
 
 You can override it in your components to do custom instantiation, using
 something like this:

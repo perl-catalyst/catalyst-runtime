@@ -13,7 +13,7 @@ use HTTP::Request::AsCGI;
 
 This test exposes a problem in the handling of PATH_INFO in C::Engine::CGI (and
 other engines) where Catalyst does not un-escape the request correctly.
-If a request is URL-encoded then Catalyst fails to decode the request 
+If a request is URL-encoded then Catalyst fails to decode the request
 and thus will try and match actions using the URL-encoded value.
 
 Can NOT use Catalyst::Test as it uses HTTP::Request::AsCGI which does
@@ -31,11 +31,11 @@ Index: lib/Catalyst/Engine/CGI.pm
 @@ -157,6 +157,8 @@
      my $query = $ENV{QUERY_STRING} ? '?' . $ENV{QUERY_STRING} : '';
      my $uri   = $scheme . '://' . $host . '/' . $path . $query;
- 
+
 +    $uri = URI->new( $uri )->canonical;
 +
      $c->request->uri( bless \$uri, $uri_class );
- 
+
      # set the base URI
 
 =cut
@@ -54,8 +54,7 @@ Index: lib/Catalyst/Engine/CGI.pm
 }
 
 # test that request with URL-escaped code works.
-TODO: {
-    local $TODO = 'Actions should match when path parts are url encoded';
+{
     my $request = Catalyst::Utils::request( 'http://localhost/args/param%73/one/two' );
     my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
 

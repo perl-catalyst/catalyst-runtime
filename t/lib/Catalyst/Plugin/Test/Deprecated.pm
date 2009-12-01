@@ -2,7 +2,6 @@ package Catalyst::Plugin::Test::Deprecated;
 
 use strict;
 use warnings;
-use NEXT;
 
 sub prepare {
     my $class = shift;

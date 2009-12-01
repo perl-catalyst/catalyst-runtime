@@ -1,8 +1,219 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80014_02 2009-12-01 00:55:23
+  Bug fixes:
+   - Fix reporting the wrong Content-Length if the response body is an
+     upgraded string. Strings mean the same thing whether or not they are
+     upgraded, may get upgraded even after they are encoded, and will
+     produce the same output either way, but bytes::length returns too big
+     values for upgraded strings containing characters >127
+   - Fix t/live_fork.t with bleadperl (RT#52100)
+   - Set $ENV{PATH_INFO} from $ENV{REQUEST_URI} combined with
+     $ENV{SCRIPT_NAME} if possible. This is many web servers always fully
+     decode PATH_INFO including URI reserved characters. This allows us to
+     tell foo%2cbar from foo%252cbar, and fixes issues with %2F in paths
+     being incorrectly decoded, resulting in too many path parts (rather
+     than 1 path part containing a /, on some web servers (at least nginx).
+     (RT#50082)
+   - Require new HTTP::Request::AsCGI so that it fully decodes $ENV{PATH_INFO}
+     in non CGI contexts. (RT#50082)
+
+  Refactoring / cleanups:
+   - NoTabs and Pod tests moved to t/author so that they're not run
+     (and then skipped) normally.
+
+  Documentation:
+    - Fix Pod nits in Catalyst::Response (RT#51818)
+
+5.80014_01 2009-11-22 20:01:23
+
+  Bug fixes:
+   - Filehandle now forced to binmode in CGI and FastCGI engines. This appears
+     to correct some UTF-8 issues, but may break people's code which relies
+     on the old behaviour.
+
+  Refactoring / cleanups:
+   - Plugins which inherit from Catalyst::Controller or Catalyst::Component
+     are deprecated and now issue warnings.
+
+5.80014 2009-11-21 02:51:14
+
+   Bug fixes:
+    - Require MooseX::MethodAttributes 0.17. This in turn requires new
+      MooseX::Types to stop warnings in Moose 0.91, and correctly supports
+      role combination of roles containing attributed methods.
+    - Catalyst::Dispatcher::dispatch_types no longer throws deprecated warnings
+      as there is no recommended alternative.
+    - Improved the suggested fix warning when component resolution uses regex
+      fallback for fully qualified component names.
+    - Catalyst::Test::local_request sets ->request on the response.
+    - Log flush moved to the end of setup so that roles and plugins which
+      hook setup_finalize can log things and have them appear in application
+      startup, rather than with the first hit.
+    - Require a newer version of LWP to avoid failing tests.
+    - Stop warnings when actions are forwarded to during dispatch.
+    - Remove warnings for using Catalyst::Dispatcher->dispatch_types as this is a
+      valid method to publicly call on the dispatcher.
+    - Args ($c->request->args) and CaptureArgs ($c->request->captrues)
+      passed to $c->uri_for with an action object ($c->action) will now
+      correctly round-trip when args or captures contain / as it is now
+      correctly uri encoded to %2F.
+
+  Documentation:
+    - Document no-args call to $c->uri_for.
+    - Document all top level application configuration parameters.
+    - Clarify how to fix actions in your application class (which is
+      deprecated and causes warnings).
+    - Pod fixes for ContextClosure.
+    - Fix documentation for go/visit to reference captures and arguments
+      in the correct order.
+    - Update $c->forward and $c->state documentation to address scalar
+      context.
+    - Pod fix in Catalyst::Request (RT#51490)
+    - Pod fixes to refer to ::Controller:: rather than ::C:: as the latter
+      is deprecated (RT#51489)
+
+  New features:
+    - Added disable_component_resolution_regex_fallback config option to
+      switch off (deprecated) regex fallback for component resolution.
+    - Added an nginx-specific behavior to the FastCGI engine to allow
+      proper PATH_INFO and SCRIPT_NAME processing for non-root applications
+    - Enable Catalyst::Utils::home() to find home within Dist::Zilla built
+      distributions
+    - Added the Catalyst::Exception::Interface role defining the interface
+      exception classes need to implement.
+    - Added Catalyst::Exception::Basic as a basic implementation of
+      Catalyst::Exception::Interface and made the existing exception classes
+      use it.
+
+  Refactoring / cleanups:
+    - Remove documentation for the case_sensitive setting
+    - Warning is now emitted at application startup if the case_sensitive
+      setting is turned on. This setting is not used by anyone, not
+      believed to be useful and adds unnecessary complexity to controllers
+      and the dispatcher. If you are using this setting and have good reasons
+      why it should stay then you need to be shouting, now.
+    - Writing to $c->req->body now fails as doing this never makes sense.
+
+5.80013 2009-09-17 11:07:04
+
+   Bug fixes:
+     - Preserve immutable_options when temporarily making a class mutable in
+       Catalyst::ClassData as this is needed by new Class::MOP.
+       This could have potentially caused issues when using the deprecated runtime
+       plugins feature in an application with plugins which define their own new
+       method.
+     - Require new Moose version and new versions of various dependencies
+       to avoid warnings from newest Moose release.
+     - Fix go / visit expecting captures and arguments in reverse order.
+
+  Documentation:
+     - Rework the $c->go documentation to make it more clear.
+     - Additional documentation in Catalyst::Upgrading covering more deprecation
+       warnings.
+
+  Refactoring / cleanups:
+     - Action methods in the application class are deprecated and applications
+       using them will now generate a warning at startup.
+     - The -short option has been removed from catalyst.pl, stopping new
+       applications from being generated using the ::[MVC]:: naming scheme as
+       this is deprecated and generates warnings. RT#49771
+
+5.80012 2009-09-09 19:09:09
+
+  Bug fixes:
+     - Fix t/optional_http-server.t test.
+     - Fix t/optional_http-server-restart.t test.
+     - Fix duplicate components being loaded at setup time, each component is
+       now loaded at most once + tests.
+     - Fix backward compatibility - hash key configured actions are stored in
+       is returned to 'actions'.
+     - Fix get_action_methods returning duplicate methods when a method is both
+       decorated with method attributes and set as an action in config.
+
+  Refactoring / cleanups:
+     - Reduce minimum supported perl version from 5.8.6 to 5.8.4 as there are
+       many people still running/testing this version with no known issues.
+
+  Tests:
+     - Make the optional_http_server.t test an author only test which must be
+       run by authors to stop it being broken again.
+     - Fix recursion warnings in the test suites.
+
+5.80011 2009-08-23 13:48:15
+
+  Bug fixes:
+      - Remove leftovers of the restarter engine. The removed code caused test
+        failures, which weren't apparent for anyone still having an old version
+        installed in @INC.
+
+5.80010 2009-08-21 23:32:15
+
+  Bug fixes:
+      - Fix and add tests for a regression introduced by 5.80008.
+        Catalyst::Engine is now able to send out data from filehandles larger
+        than the default chunksize of 64k again.
+
+5.80009 2009-08-21 22:21:08
+
+  Bug fixes:
+      - Fix and add tests for generating inner packages inside the COMPONENT
+        method, and those packages being correctly registered as components.
+        This fixes Catalyst::Model::DBIC among others.
+
+5.80008 2009-08-21 17:47:30
+
   Bug fixes:
        - Fix replace_constructor warning to actually work if you make your
          application class immutable without that option.
+       - Depend on Module::Pluggable 3.9 to prevent a bug wherein components
+         in inner packages might not be registered. This especially affected
+         tests.
+       - Catalyst::Engine::FastCGI - relax the check for versions of Microsoft
+         IIS. Provides compatibility with Windows 2008 R2 as well as
+         (hopefully) future versions.
+       - In tests which depend on the values of environment variables,
+         localise the environment, then delete only relevant environment
+         variables (RT#48555)
+       - Fix issue with Engine::HTTP not sending headers properly in some cases
+         (RT#48623)
+       - Make Catalyst::Engine write at least once when finalizing the response
+         body from a filehandle, even if the write is empty. This avoids fail
+         when trying to send out an empty response body from a filehandle.
+       - Catalyst::Engine::HTTP - Accept a fully qualified absolute URI in the
+         Request-URI of the Request-Line
+
+  Refactoring / cleanups:
+       - Deleted the Restarter engine and its Watcher code. Use the
+         new Catalyst::Restarter in a recent Catalyst::Devel instead.
+       - New unit test for Catalyst::Action 'unit_core_action.t'
+       - Bump minimum supported perl version from 5.8.1 to 5.8.6 as there are
+         known issues with 5.8.3.
+       - Debug output uses dynamic column sizing to create more readable output
+         when using a larger $ENV{COLUMNS} setting. (groditi)
+
+  New features:
+       - Added private_path method for Catalyst::Action
+       - Allow uri_for($controller_instance) which will produce a URI
+         for the controller namespace
+       - Break setup_components into two more parts: locate_components and
+         expand_component_module (rjbs)
+       - Allow Components to return anon classed from their COMPONENT method
+         correctly, and have action registration work on Controllers returned
+         as such by adding a catalyst_component_name accessor for all components
+         which returns the component instance's name to be used when building
+         actions etc.
+       - Adding X-Forwarded-Port to allow the frontend proxy to dictate the
+         frontend port (jshirley)
+       - Added Catalyst::Stats->created accessor for the time at the start of
+         the request.
+
+  Documentation:
+       - Fix POD to refer to ->config(key => $val), rather than
+         ->config->{key} = $val, as the latter form is deprecated.
+       - Clearer docs for the 'uri_for' method.
+       - Fix POD refering to CGI::Cookie. We're using CGI::Simple::Cookie.
+         (Forrest Cahoon)
 
 5.80007 2009-06-30 23:54:34
 
@@ -53,7 +264,7 @@
         - Add Catalyst::Component::ContextClosure as an easy way to create code
           references, that close over the context, without creating leaks.
 
-   Refactoring / cleanups:
+  Refactoring / cleanups:
         - Clean namespaces in Catalyst::Exception*.
         - Turn Catalyst::Exception into an actual class and make the throw
           method create instances of it. They can still be used as normal
