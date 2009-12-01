@@ -463,8 +463,8 @@ The server configuration block should look roughly like:
             fastcgi_param  CONTENT_TYPE       $content_type;
             fastcgi_param  CONTENT_LENGTH     $content_length;
 
-            fastcgi_param  PATH_INFO          /;
-            fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+            fastcgi_param  SCRIPT_NAME        /;
+            fastcgi_param  PATH_INFO          $fastcgi_script_name;
             fastcgi_param  REQUEST_URI        $request_uri;
             fastcgi_param  DOCUMENT_URI       $document_uri;
             fastcgi_param  DOCUMENT_ROOT      $document_root;
@@ -491,13 +491,13 @@ simply include that file.
 =head3  Non-root configuration
 
 If you properly specify the PATH_INFO and SCRIPT_NAME parameters your
-application will be accessible at any path.  The PATH_INFO variable is the
-prefix of your application, and SCRIPT_NAME would be everything in addition.
+application will be accessible at any path. The SCRIPT_NAME variable is the
+prefix of your application, and PATH_INFO would be everything in addition.
 
 As an example, if your application is rooted at /myapp, you would configure:
 
-    fastcgi_param  PATH_INFO /myapp/;
-    fastcgi_param  SCRIPT_NAME $fastcgi_script_name;
+    fastcgi_param  SCRIPT_NAME /myapp/;
+    fastcgi_param  PATH_INFO   $fastcgi_script_name;
 
 C<$fastcgi_script_name> would be "/myapp/path/of/the/action".  Catalyst will
 process this accordingly and setup the application base as expected.

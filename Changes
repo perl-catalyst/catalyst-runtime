@@ -7,6 +7,8 @@
 
   Documentation:
    - Improved documentation on read and read_chunk methods in Catalyst::Engine.
+   - Fix reversal of SCRIPT_NAME and PATH_INFO in previously correct nginx
+     FastCGI documentation introduced in _02.
 
 5.80014_02 2009-12-01 00:55:23
   Bug fixes:
