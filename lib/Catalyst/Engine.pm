@@ -327,7 +327,8 @@ sub prepare_body {
               if exists $appclass->config->{uploadtmp};
         }
 
-        while ( my $buffer = $self->read($c) ) {
+        # Check for definedness as you could read '0'
+        while ( defined ( my $buffer = $self->read($c) ) ) {
             $c->prepare_body_chunk($buffer);
         }
 
@@ -566,6 +567,10 @@ sub prepare_write { }
 
 =head2 $self->read($c, [$maxlength])
 
+Reads from the input stream by calling C<< $self->read_chunk >>.
+
+Maintains the read_length and read_position counters as data is read.
+
 =cut
 
 sub read {
@@ -583,6 +588,11 @@ sub read {
     my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
     my $rc = $self->read_chunk( $c, my $buffer, $readlen );
     if ( defined $rc ) {
+        if (0 == $rc) { # Nothing more to read even though Content-Length
+                        # said there should be. FIXME - Warn in the log here?
+            $self->finalize_read;
+            return;
+        }
         $self->read_position( $self->read_position + $rc );
         return $buffer;
     }
@@ -595,7 +605,8 @@ sub read {
 =head2 $self->read_chunk($c, $buffer, $length)
 
 Each engine implements read_chunk as its preferred way of reading a chunk
-of data.
+of data. Returns the number of bytes read. A return of 0 indicates that
+there is no more data to be read.
 
 =cut
 

@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+   - Fix bug in Catalyst::Engine which would cause a request parsing to end
+     prematurely in the hypothetical case where calling $engine->read returned
+     the single character '0'.
+
+  Documentation:
+   - Improved documentation on read and read_chunk methods in Catalyst::Engine.
+
 5.80014_02 2009-12-01 00:55:23
   Bug fixes:
    - Fix reporting the wrong Content-Length if the response body is an
