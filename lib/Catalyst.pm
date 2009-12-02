@@ -2690,8 +2690,7 @@ C<default_model> - The default model picked if you say C<< $c->model >>. See L<<
 
 =item *
 
-C<default_view> - The default view to be rendered or returned when C<< $c->view >>. See L<< /$c->view($name) >>.
-is called.
+C<default_view> - The default view to be rendered or returned when C<< $c->view >> is called. See L<< /$c->view($name) >>.
 
 =item *
 
