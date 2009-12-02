@@ -931,6 +931,28 @@ sub run_tests {
         }
     }
 
+    #  PathPart('...') Args(1) should win over CaptureArgs(2) PathPart('')
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::CaptureArgs->base
+          TestApp::Controller::Action::Chained::CaptureArgs->test_one_arg
+          TestApp::Controller::Action::Chained::CaptureArgs->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        # should dispatch to /base/test_one_arg
+        ok( my $response = request('http://localhost/captureargs/test/one'),
+            'Correct pathpart/arg ran' );
+        TODO: {
+        local $TODO = 'Known bug';
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'base; test_plus_arg; one;', 'Content OK' );
+        }
+    }
+
     #
     #   Args(0) should win over Args() if we actually have no arguments.
     {
