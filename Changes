@@ -1,9 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80015 2009-12-02 15:13:54
   Bug fixes:
    - Fix bug in Catalyst::Engine which would cause a request parsing to end
      prematurely in the hypothetical case where calling $engine->read returned
      the single character '0'.
+   - Fix failing tests when combined with new HTTP::Request::AsCGI
 
   Documentation:
    - Improved documentation on read and read_chunk methods in Catalyst::Engine.
