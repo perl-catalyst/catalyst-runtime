@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  New features:
+   - The __MOP__ hash element is suppressed from being dumped fully
+     (and instead stringified) when dumping the error screen to be
+     less packed with information of no use.
+
   Documentation:
    - Fix Pod nits (RT#52370)
 

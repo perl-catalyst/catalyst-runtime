@@ -108,6 +108,24 @@ is in debug mode, or a `please come back later` message otherwise.
 
 =cut
 
+sub _dump_error_page_element {
+    my ($self, $i, $element) = @_;
+    my ($name, $val)  = @{ $element };
+
+    # This is fugly, but the metaclass is _HUGE_ and demands waaay too much
+    # scrolling. Suggestions for more pleasant ways to do this welcome.
+    local $val->{'__MOP__'} = "Stringified: "
+        . $val->{'__MOP__'} if exists $val->{'__MOP__'};
+
+    my $text = encode_entities( dump( $val ));
+    sprintf <<"EOF", $name, $text;
+<h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
+<div id="dump_$i">
+    <pre wrap="">%s</pre>
+</div>
+EOF
+}
+
 sub finalize_error {
     my ( $self, $c ) = @_;
 
@@ -138,14 +156,7 @@ sub finalize_error {
         my @infos;
         my $i = 0;
         for my $dump ( $c->dump_these ) {
-            my $name  = $dump->[0];
-            my $value = encode_entities( dump( $dump->[1] ));
-            push @infos, sprintf <<"EOF", $name, $value;
-<h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
-<div id="dump_$i">
-    <pre wrap="">%s</pre>
-</div>
-EOF
+            push @infos, $self->_dump_error_page_element($i, $dump);
             $i++;
         }
         $infos = join "\n", @infos;
