@@ -219,12 +219,12 @@ Catalyst::Script::Server - Catalyst test server
    -k     --keepalive      enable keep-alive connections
    -r     --restart        restart when files get modified
                        (defaults to false)
-   --rd   --restartdelay  delay between file checks
+   --rd   --restart_delay  delay between file checks
                       (ignored if you have Linux::Inotify2 installed)
-   --rr   --restartregex  regex match files that trigger
+   --rr   --restart_regex  regex match files that trigger
                       a restart when modified
                       (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
-   --rdir --restartdirectory  the directory to search for
+   --rdir --restart_directory  the directory to search for
                       modified files, can be set mulitple times
                       (defaults to '[SCRIPT_DIR]/..')
    --sym  --follow_symlinks   follow symlinks in search directories
