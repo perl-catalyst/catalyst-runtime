@@ -3,6 +3,9 @@
   Bug fixes:
    - Fix slurping a file to work correctly with binary on Win32 in the
      encoding test controller.
+   - Skip test for outputting the wrong content length when a string
+     which has been utf-8 upgraded is output on Win32 as there is an
+     off by one error somewhere.
 
   New features:
    - The __MOP__ hash element is suppressed from being dumped fully
