@@ -6,6 +6,8 @@
    - Skip test for outputting the wrong content length when a string
      which has been utf-8 upgraded is output on Win32 as there is an
      off by one error somewhere.
+   - Allow --restartdirectory as an option for the Server script, for
+     backwards compatibility. (Dave Rolsky)
 
   New features:
    - The __MOP__ hash element is suppressed from being dumped fully
