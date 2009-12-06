@@ -20,13 +20,7 @@ my $size = -s $fn;
     is $r->code, 200, '/binary OK';
     is $r->header('Content-Length'), $size, '/binary correct content length';
 }
-SKIP: {
-    # Test that even if what is really binary has been upgraded into character
-    # octets in perl, then when we output it we get the correct content length.
-    # The issue was initially described in the thread 'Avoiding UTF8 in
-    # Catalyst': http://lists.scsys.co.uk/pipermail/catalyst/2009-November/023912.html.
-    # FIXME! (See ml thread re 5.80015 release)
-    skip 'Known not to work on Win32', 2 if ($^O eq 'MSWin32');
+{
     my $r = request('/binary_utf8');
     is $r->code, 200, '/binary_utf8 OK';
     is $r->header('Content-Length'), $size, '/binary_utf8 correct content length';
