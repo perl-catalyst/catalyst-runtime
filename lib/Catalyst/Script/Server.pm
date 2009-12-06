@@ -86,7 +86,7 @@ has restart => (
 
 has restart_directory => (
     traits        => [qw(Getopt)],
-    cmd_aliases   => 'rdir',
+    cmd_aliases   => [ 'rdir', 'restartdirectory' ],
     isa           => ArrayRef[Str],
     is            => 'ro',
     documentation => 'Restarter directory to watch',
