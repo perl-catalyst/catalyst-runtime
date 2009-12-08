@@ -5,6 +5,9 @@
      encoding test controller.
    - Allow --restartdirectory as an option for the Server script, for
      backwards compatibility. (Dave Rolsky)
+   - The --host option for the server script defaulted to localhost, rather
+     than listening on all interfaces, which was the previous default. (Dave
+     Rolsky)
 
   New features:
    - The __MOP__ hash element is suppressed from being dumped fully
