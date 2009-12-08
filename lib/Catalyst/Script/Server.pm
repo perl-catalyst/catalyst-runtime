@@ -27,6 +27,7 @@ has host => (
     cmd_aliases   => 'h',
     isa           => Str,
     is            => 'ro',
+    # N.B. undef (the default) means we bind on all interfaces on the host.
     documentation => 'Specify a hostname or IP on this host for the server to bind to',
 );
 
