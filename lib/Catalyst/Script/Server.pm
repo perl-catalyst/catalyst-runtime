@@ -27,8 +27,7 @@ has host => (
     cmd_aliases   => 'h',
     isa           => Str,
     is            => 'ro',
-    default       => 'localhost',
-    documentation => 'Specify an IP on this host for the server to bind to',
+    documentation => 'Specify a hostname or IP on this host for the server to bind to',
 );
 
 has fork => (
