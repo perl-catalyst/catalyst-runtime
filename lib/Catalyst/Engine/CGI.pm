@@ -108,6 +108,8 @@ sub prepare_headers {
 
 =cut
 
+# Please don't touch this method without adding tests in
+# t/aggregate/unit_core_engine_cgi-prepare_path.t
 sub prepare_path {
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
@@ -153,9 +155,7 @@ sub prepare_path {
     # Here we try to resurrect the original encoded URI from REQUEST_URI.
     my $path_info   = $ENV{PATH_INFO};
     if (my $req_uri = $ENV{REQUEST_URI}) {
-        if (defined $script_name) {
-            $req_uri =~ s/^\Q$script_name\E//;
-        }
+        $req_uri =~ s/^\Q$base_path\E//;
         $req_uri =~ s/\?.*$//;
         $path_info = $req_uri if $req_uri;
     }
