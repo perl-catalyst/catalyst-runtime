@@ -30,6 +30,10 @@ testOption( [ qw/--port 3001/ ], ['3001', undef, opthash()] );
     local $ENV{TESTAPPTOTESTSCRIPTS_PORT} = 5000;
     testOption( [ qw// ], [5000, undef, opthash()] );
 }
+{
+    local $ENV{CATALYST_PORT} = 5000;
+    testOption( [ qw// ], [5000, undef, opthash()] );
+}
 
 # fork           -f -fork --fork           -f --fork
 testOption( [ qw/--fork/ ], ['3000', undef, opthash(fork => 1)] );
@@ -53,6 +57,15 @@ testOption( [ qw/--bg/ ], ['3000', undef, opthash(background => 1)] );
 
 # restart        -r -restart --restart     -R --restart
 testRestart( ['-r'], restartopthash() );
+{
+    local $ENV{TESTAPPTOTESTSCRIPTS_RELOAD} = 1;
+    testRestart( [], restartopthash() );
+}
+{
+    local $ENV{CATALYST_RELOAD} = 1;
+    testRestart( [], restartopthash() );
+}
+
 # restart dly    -rd -restartdelay         --rd --restart_delay
 testRestart( ['-r', '--rd', 30], restartopthash(sleep_interval => 30) );
 testRestart( ['-r', '--restart_delay', 30], restartopthash(sleep_interval => 30) );
@@ -82,6 +95,7 @@ sub testOption {
 sub testRestart {
     my ($argstring, $resultarray) = @_;
     my $app = _build_testapp($argstring);
+    ok $app->restart, 'App is in restart mode';
     my $args = {$app->_restarter_args};
     is_deeply delete $args->{argv}, $argstring, 'argv is arg string';
     is ref(delete $args->{start_sub}), 'CODE', 'Closure to start app present';

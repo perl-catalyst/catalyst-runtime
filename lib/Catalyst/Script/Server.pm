@@ -47,8 +47,7 @@ has port => (
     isa           => PositiveInt,
     is            => 'ro',
     default       => sub {
-        my $self = shift;
-        $ENV{ Catalyst::Utils::class2env($self->application_name . '_PORT')}||3000
+        Catalyst::Utils::env_value(shift->application_name, 'port') || 3000
     },
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
@@ -84,7 +83,9 @@ has restart => (
     cmd_aliases   => 'r',
     isa           => Bool,
     is            => 'ro',
-    default       => 0,
+    default       => sub {
+        Catalyst::Utils::env_value(shift->application_name, 'reload') || 0;
+    },
     documentation => 'use Catalyst::Restarter to detect code changes and restart the application',
 );
 
