@@ -44,9 +44,18 @@ my %template = (
     is ''.$r->uri, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/static/css/blueprint/screen.css';
     is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/';
 }
+# / %2F %252F escaping case.
+{
+    my $r = get_req (
+        PATH_INFO => '/%2F/%2F',
+        SCRIPT_NAME => '/~bobtfish/Gitalist/script/gitalist.cgi',
+        REQUEST_URI => '/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F',
+    );
+    is ''.$r->uri, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F';
+    is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/';
+}
 
 # FIXME - Test proxy logic
-#       - Test encoding/escaping
 #       - Test query string
 #       - Test non standard port numbers
 #       - Test // in PATH_INFO
