@@ -3,21 +3,69 @@ use Moose;
 use FindBin;
 use lib;
 use File::Spec;
-use namespace::autoclean;
+use namespace::autoclean -also => 'subclass_with_traits';
+use Try::Tiny;
+
+sub find_script_class {
+    my ($self, $app, $script) = @_;
+    my $class = "${app}::Script::${script}";
+
+    try {
+        Class::MOP::load_class($class);
+    }
+    catch {
+        confess $_ unless /Can't locate/;
+        $class = "Catalyst::Script::$script";
+    };
+
+    Class::MOP::load_class($class);
+    return $class;
+}
+
+sub find_script_traits {
+    my ($self, @try) = @_;
+
+    my @traits;
+    for my $try (@try) {
+        try {
+            Class::MOP::load_class($try);
+            push @traits, $try;
+        }
+        catch {
+            confess $_ unless /^Can't locate/;
+        };
+    }
+
+    return @traits;
+}
+
+sub subclass_with_traits {
+    my ($base, @traits) = @_;
+
+    my $meta = Class::MOP::class_of($base)->create_anon_class(
+        superclasses => [ $base   ],
+        roles        => [ @traits ],
+        cache        => 1,
+    );
+    $meta->add_method(meta => sub { $meta });
+
+    return $meta->name;
+}
 
 sub run {
-    my ($self, $class, $scriptclass, %args) = @_;
-    my $classtoload = "${class}::Script::$scriptclass";
+    my ($self, $appclass, $scriptclass) = @_;
 
     lib->import(File::Spec->catdir($FindBin::Bin, '..', 'lib'));
 
-    unless ( eval { Class::MOP::load_class($classtoload) } ) {
-        warn("Could not load $classtoload - falling back to Catalyst::Script::$scriptclass : $@\n")
-            if $@ !~ /Can't locate/;
-        $classtoload = "Catalyst::Script::$scriptclass";
-        Class::MOP::load_class($classtoload);
-    }
-    $classtoload->new_with_options( application_name => $class, %args )->run;
+    my $class = $self->find_script_class($appclass, $scriptclass);
+
+    my @possible_traits = ("${appclass}::TraitFor::Script::${scriptclass}", "${appclass}::TraitFor::Script");
+    my @traits = $self->find_script_traits(@possible_traits);
+
+    $class = subclass_with_traits($class, @traits)
+        if @traits;
+
+    $class->new_with_options( application_name => $appclass )->run;
 }
 
 __PACKAGE__->meta->make_immutable;
