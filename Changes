@@ -8,6 +8,7 @@
    - The --host option for the server script defaulted to localhost, rather
      than listening on all interfaces, which was the previous default. (Dave
      Rolsky)
+   - Fix the script environment variables MYAPP_PORT and MYAPP_RELOAD RT#52604
 
   New features:
    - The __MOP__ hash element is suppressed from being dumped fully
