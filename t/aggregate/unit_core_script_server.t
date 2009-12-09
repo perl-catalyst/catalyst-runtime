@@ -26,6 +26,10 @@ testOption( [ qw/-h testhost/ ], ['3000', 'testhost', opthash()] );
 # port           -p -port --port           -l --listen
 testOption( [ qw/-p 3001/ ], ['3001', undef, opthash()] );
 testOption( [ qw/--port 3001/ ], ['3001', undef, opthash()] );
+{
+    local $ENV{TESTAPPTOTESTSCRIPTS_PORT} = 5000;
+    testOption( [ qw// ], [5000, undef, opthash()] );
+}
 
 # fork           -f -fork --fork           -f --fork
 testOption( [ qw/--fork/ ], ['3000', undef, opthash(fork => 1)] );

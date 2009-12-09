@@ -8,6 +8,7 @@ BEGIN {
 use Moose;
 use MooseX::Types::Common::Numeric qw/PositiveInt/;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
+use Catalyst::Utils;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -45,7 +46,10 @@ has port => (
     cmd_aliases   => 'p',
     isa           => PositiveInt,
     is            => 'ro',
-    default       => 3000,
+    default       => sub {
+        my $self = shift;
+        $ENV{ Catalyst::Utils::class2env($self->application_name . '_PORT')}||3000
+    },
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
