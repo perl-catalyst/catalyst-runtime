@@ -12,7 +12,7 @@ use lib "$Bin/../lib";
     use Moose;
     extends 'Catalyst::Script::Create';
     our $help;
-    sub _exit_with_usage { $help++ }
+    sub _getopt_full_usage { $help++ }
 }
 
 {
