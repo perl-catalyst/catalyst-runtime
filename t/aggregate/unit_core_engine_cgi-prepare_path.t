@@ -6,7 +6,7 @@ use lib "$Bin/../lib";
 use TestApp;
 use Catalyst::Engine::CGI;
 
-my %template = (
+our %template = (
     HTTP_HOST => 'www.foo.com',
     PATH_INFO => '/',
 );
