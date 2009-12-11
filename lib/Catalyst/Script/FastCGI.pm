@@ -17,7 +17,7 @@ has listen => (
 
 has pidfile => (
     traits        => [qw(Getopt)],
-    cmd_aliases   => 'pid',
+    cmd_aliases   => [qw/pid p/],
     isa           => Str,
     is            => 'ro',
     documentation => 'Specify a pidfile',

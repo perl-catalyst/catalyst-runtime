@@ -22,9 +22,10 @@ testOption( [ qw/-l 127.0.0.1:3000/ ], ['127.0.0.1:3000', opthash()] );
 testOption( [ qw/-d/ ], [undef, opthash()] );
 testOption( [ qw/--daemon/ ], [undef, opthash()] );
 
-# pidfile        -pidfile                  --pid --pidfile
+# pidfile        -pidfile -p                 --pid --pidfile
 testOption( [ qw/--pidfile cat.pid/ ], [undef, opthash(pidfile => 'cat.pid')] );
 testOption( [ qw/--pid cat.pid/ ], [undef, opthash(pidfile => 'cat.pid')] );
+testOption( [ qw/-p cat.pid/ ], [undef, opthash(pidfile => 'cat.pid')] );
 
 # manager
 testOption( [ qw/--manager foo::bar/ ], [undef, opthash(manager => 'foo::bar')] );
