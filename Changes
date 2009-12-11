@@ -1,8 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80016 2009-12-11 23:23:33
+
   Bug fixes:
+
    - Fix slurping a file to work correctly with binary on Win32 in the
      encoding test controller.
+
+  Bug fixes in the new scripts (for applications which have been upgraded):
+
    - Allow --restartdirectory as an option for the Server script, for
      backwards compatibility. (Dave Rolsky)
    - The --host option for the server script defaulted to localhost, rather
@@ -17,11 +23,13 @@
    - Fix usage display when myapp_create.pl is run with no arguments. RT#52630
 
   New features:
+
    - The __MOP__ hash element is suppressed from being dumped fully
      (and instead stringified) when dumping the error screen to be
      less packed with information of no use.
 
   Documentation:
+
    - Fix Pod nits (RT#52370)
 
 5.80015 2009-12-02 15:13:54
