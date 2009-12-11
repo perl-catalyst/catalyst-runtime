@@ -6,11 +6,6 @@ use lib "$Bin/../lib";
 use TestApp;
 use Catalyst::Engine::CGI;
 
-our %template = (
-    HTTP_HOST => 'www.foo.com',
-    PATH_INFO => '/',
-);
-
 # mod_rewrite to app root for non / based app
 {
     my $r = get_req (
@@ -62,7 +57,13 @@ our %template = (
 #       - Test scheme (secure request on port 80)
 
 sub get_req {
+    my %template = (
+        HTTP_HOST => 'www.foo.com',
+        PATH_INFO => '/',
+    );
+
     local %ENV = (%template, @_);
+
     my $i = TestApp->new;
     $i->engine(Catalyst::Engine::CGI->new);
     $i->engine->prepare_path($i);
