@@ -55,14 +55,6 @@ has nproc => (
     documentation => 'Specify a number of child processes',
 );
 
-has detach => (
-    traits        => [qw(Getopt)],
-    cmd_aliases   => 'det',
-    isa           => Bool,
-    is            => 'ro',
-    documentation => 'Detach this FastCGI process',
-);
-
 sub _application_args {
     my ($self) = shift;
     return (
@@ -71,7 +63,7 @@ sub _application_args {
             nproc   => $self->nproc,
             pidfile => $self->pidfile,
             manager => $self->manager,
-            detach  => $self->detach,
+            detach  => $self->daemon,
             keep_stderr => $self->keeperr,
         }
     );

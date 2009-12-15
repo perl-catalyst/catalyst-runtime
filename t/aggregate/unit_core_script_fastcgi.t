@@ -19,8 +19,8 @@ testOption( [ qw|-l /tmp/foo| ], ['/tmp/foo', opthash()] );
 testOption( [ qw/-l 127.0.0.1:3000/ ], ['127.0.0.1:3000', opthash()] );
 
 #daemonize           -d --daemon
-testOption( [ qw/-d/ ], [undef, opthash()] );
-testOption( [ qw/--daemon/ ], [undef, opthash()] );
+testOption( [ qw/-d/ ], [undef, opthash(detach => 1)] );
+testOption( [ qw/--daemon/ ], [undef, opthash(detach => 1)] );
 
 # pidfile        -pidfile -p                 --pid --pidfile
 testOption( [ qw/--pidfile cat.pid/ ], [undef, opthash(pidfile => 'cat.pid')] );
@@ -38,10 +38,6 @@ testOption( [ qw/-e/ ], [undef, opthash(keep_stderr => 1)] );
 # nproc
 testOption( [ qw/--nproc 6/ ], [undef, opthash(nproc => 6)] );
 testOption( [ qw/--n 6/ ], [undef, opthash(nproc => 6)] );
-
-# detach
-testOption( [ qw/--detach/ ], [undef, opthash(detach => 1)] );
-testOption( [ qw/--det/ ], [undef, opthash(detach => 1)] );
 
 done_testing;
 

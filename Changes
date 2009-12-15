@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+   - Remove the erroneous --detach option from Catalyst::Script::FastCGI
+   - --daemon option to Catalyst::Script::FastCGI is fixed.
+
 5.80016 2009-12-11 23:23:33
 
   Bug fixes:
