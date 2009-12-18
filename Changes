@@ -3,6 +3,8 @@
   Bug fixes:
    - Remove the erroneous --detach option from Catalyst::Script::FastCGI
    - --daemon option to Catalyst::Script::FastCGI is fixed.
+   - Fix the debug dump for applications which use Catalyst::Plugin::Session
+     (RT#52898)
 
 5.80016 2009-12-11 23:23:33
 

@@ -115,7 +115,7 @@ sub _dump_error_page_element {
     # This is fugly, but the metaclass is _HUGE_ and demands waaay too much
     # scrolling. Suggestions for more pleasant ways to do this welcome.
     local $val->{'__MOP__'} = "Stringified: "
-        . $val->{'__MOP__'} if exists $val->{'__MOP__'};
+        . $val->{'__MOP__'} if ref $val eq 'HASH' && exists $val->{'__MOP__'};
 
     my $text = encode_entities( dump( $val ));
     sprintf <<"EOF", $name, $text;
