@@ -157,7 +157,21 @@ sub prepare_path {
     if (my $req_uri = $ENV{REQUEST_URI}) {
         $req_uri =~ s/^\Q$base_path\E//;
         $req_uri =~ s/\?.*$//;
-        $path_info = $req_uri if $req_uri;
+        if ($req_uri) {
+            # Note that if REQUEST_URI doesn't start with a /, then the user
+            # is probably using mod_rewrite or something to rewrite requests
+            # into a sub-path of their application..
+            # This means that REQUEST_URI needs information from PATH_INFO
+            # prepending to it to be useful, otherwise the sub path which is
+            # being redirected to becomes the app base address which is
+            # incorrect.
+            if (substr($req_uri, 0, 1) ne '/') {
+                my ($match) = $req_uri =~ m|^([^/]+)|;
+                my ($path_info_part) = $path_info =~ m|^(.*?$match)|;
+                substr($req_uri, 0, length($match), $path_info_part);
+            }
+            $path_info = $req_uri;
+        }
     }
 
     # set the request URI

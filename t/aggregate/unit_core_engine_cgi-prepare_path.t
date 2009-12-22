@@ -50,6 +50,20 @@ use Catalyst::Engine::CGI;
     is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/';
 }
 
+# Using rewrite rules to ask for a sub-path in your app.
+# E.g. RewriteRule ^(.*)$ /path/to/fastcgi/domainprofi.fcgi/iframeredirect$1 [L,NS]
+{
+    my $r = get_req (
+        PATH_INFO => '/iframeredirect/info',
+        SCRIPT_NAME => '',
+        REQUEST_URI => '/info',
+    );
+    is ''.$r->uri, 'http://www.foo.com/iframeredirect/info';
+    is ''.$r->base, 'http://www.foo.com/';
+}
+
+
+
 # FIXME - Test proxy logic
 #       - Test query string
 #       - Test non standard port numbers

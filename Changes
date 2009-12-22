@@ -5,6 +5,9 @@
    - --daemon option to Catalyst::Script::FastCGI is fixed.
    - Fix the debug dump for applications which use Catalyst::Plugin::Session
      (RT#52898)
+   - Fix regression in the case where mod_rewrite is being used to rewrite
+     requests into a path below your application base introduced with the
+     %2F related fixes in 5.80014_02.
 
 5.80016 2009-12-11 23:23:33
 
