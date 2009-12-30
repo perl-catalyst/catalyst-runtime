@@ -167,7 +167,8 @@ sub prepare_path {
             # incorrect.
             if (substr($req_uri, 0, 1) ne '/') {
                 my ($match) = $req_uri =~ m|^([^/]+)|;
-                my ($path_info_part) = $path_info =~ m|^(.*?$match)|;
+                my $idx = index($path_info, $match) + length($match);
+                my $path_info_part = substr($path_info, 0, $idx);
                 substr($req_uri, 0, length($match), $path_info_part);
             }
             $path_info = $req_uri;
