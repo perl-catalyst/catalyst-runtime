@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Documentation:
+   - Fix docs for ->forward method when passed a class name - this should
+     be a component name (e.g. View::HTML, not a full class name, like
+     MyApp::View::HTML).
+
   Bug fixes:
    - Remove the erroneous --detach option from Catalyst::Script::FastCGI
    - --daemon option to Catalyst::Script::FastCGI is fixed.
