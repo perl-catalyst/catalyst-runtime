@@ -79,12 +79,6 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 # Remember to update this in Catalyst::Runtime as well!
 
 our $VERSION = '5.80016';
-
-{
-    my $dev_version = $VERSION =~ /_\d{2}$/;
-    *_IS_DEVELOPMENT_VERSION = sub () { $dev_version };
-}
-
 $VERSION = eval $VERSION;
 
 sub import {
@@ -96,11 +90,6 @@ sub import {
 
     my $caller = caller();
     return if $caller eq 'main';
-
-    # Kill Adopt::NEXT warnings if we're a non-RC version
-    unless (_IS_DEVELOPMENT_VERSION()) {
-        Class::C3::Adopt::NEXT->unimport(qr/^Catalyst::/);
-    }
 
     my $meta = Moose::Meta::Class->initialize($caller);
     unless ( $caller->isa('Catalyst') ) {
