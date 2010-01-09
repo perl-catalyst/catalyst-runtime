@@ -75,6 +75,8 @@ sub finalize_body {
 
     $self->_writer->close;
 
+    $self->_clear_env;
+
     return;
 }
 
