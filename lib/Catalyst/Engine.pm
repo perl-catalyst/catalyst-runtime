@@ -23,15 +23,17 @@ has read_position => (is => 'rw');
 has _prepared_write => (is => 'rw');
 
 has _response_cb => (
-    is     => 'ro',
-    isa    => 'CodeRef',
-    writer => '_set_response_cb',
+    is      => 'ro',
+    isa     => 'CodeRef',
+    writer  => '_set_response_cb',
+    clearer => '_clear_response_cb',
 );
 
 has _writer => (
-    is     => 'ro',
-    isa    => duck_type([qw(write close)]),
-    writer => '_set_writer',
+    is      => 'ro',
+    isa     => duck_type([qw(write close)]),
+    writer  => '_set_writer',
+    clearer => '_clear_writer',
 );
 
 # Amount of data to read from input on each pass
@@ -74,7 +76,7 @@ sub finalize_body {
     }
 
     $self->_writer->close;
-
+    $self->_clear_writer;
     $self->_clear_env;
 
     return;
@@ -319,6 +321,7 @@ sub finalize_headers {
     $ctx->response->headers->scan(sub { push @headers, @_ });
 
     $self->_set_writer($self->_response_cb->([ $ctx->response->status, \@headers ]));
+    $self->_clear_response_cb;
 
     return;
 }
