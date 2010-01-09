@@ -72,6 +72,10 @@ sub finalize_body {
     else {
         $self->write( $c, $body );
     }
+
+    $self->_writer->close;
+
+    return;
 }
 
 =head2 $self->finalize_cookies($c)

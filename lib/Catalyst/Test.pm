@@ -226,20 +226,6 @@ Simulate a request using L<HTTP::Request::AsCGI>.
 sub local_request {
     my $app = shift;
 
-=for reference
-    require HTTP::Request::AsCGI;
-
-    my $request = Catalyst::Utils::request( shift(@_) );
-    _customize_request($request, @_);
-    my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
-
-    $class->handle_request( env => \%ENV );
-
-    my $response = $cgi->restore->response;
-    $response->request( $request );
-    return $response;
-=cut
-
     my $request = Catalyst::Utils::request(shift);
     _customize_request($request, @_);
 
