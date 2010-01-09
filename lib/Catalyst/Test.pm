@@ -4,10 +4,12 @@ use strict;
 use warnings;
 use Test::More ();
 
+use Plack::Test;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::MOP;
 use Sub::Exporter;
+use Carp;
 
 my $build_exports = sub {
     my ($self, $meth, $args, $defaults) = @_;
@@ -15,17 +17,21 @@ my $build_exports = sub {
     my $request;
     my $class = $args->{class};
 
+    if (!$class) {
+        croak "Must specify a test app: use Catalyst::Test 'TestApp'";
+    }
+
     if ( $ENV{CATALYST_SERVER} ) {
         $request = sub { remote_request(@_) };
-    } elsif (! $class) {
-        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
     } else {
         unless (Class::MOP::is_class_loaded($class)) {
             Class::MOP::load_class($class);
         }
         $class->import;
 
-        $request = sub { local_request( $class, @_ ) };
+        my $app = $class->run;
+
+        $request = sub { local_request( $app, @_ ) };
     }
 
     my $get = sub { $request->(@_)->content };
@@ -218,8 +224,9 @@ Simulate a request using L<HTTP::Request::AsCGI>.
 =cut
 
 sub local_request {
-    my $class = shift;
+    my $app = shift;
 
+=for reference
     require HTTP::Request::AsCGI;
 
     my $request = Catalyst::Utils::request( shift(@_) );
@@ -231,6 +238,15 @@ sub local_request {
     my $response = $cgi->restore->response;
     $response->request( $request );
     return $response;
+=cut
+
+    my $request = Catalyst::Utils::request(shift);
+    _customize_request($request, @_);
+
+    my $ret;
+    test_psgi app => $app, client => sub { $ret = shift->($request) };
+
+    return $ret;
 }
 
 my $agent;
