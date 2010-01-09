@@ -13,6 +13,13 @@
      requests into a path below your application base introduced with the
      %2F related fixes in 5.80014_02.
 
+  Cleanups:
+    - Stop suppressing warnings from Class::C3::Adopt::NEXT now that most plugins
+      have been updated to not use NEXT. If you get warnings then please upgrade
+      your components or log a bug with the component author if an upgrade is
+      not available. The Class::C3::Adopt::NEXT documentation contains information
+      about how to suppress the warnings in your application if you need to.
+
 5.80016 2009-12-11 23:23:33
 
   Bug fixes:
