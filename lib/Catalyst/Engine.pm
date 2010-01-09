@@ -727,7 +727,10 @@ there is no more data to be read.
 
 =cut
 
-sub read_chunk { }
+sub read_chunk {
+    my ($self) = @_;
+    return $self->env->{'psgi.input'}->read(@_);
+}
 
 =head2 $self->read_length
 
