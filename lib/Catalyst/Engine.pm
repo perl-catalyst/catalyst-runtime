@@ -728,7 +728,7 @@ there is no more data to be read.
 =cut
 
 sub read_chunk {
-    my ($self) = @_;
+    my ($self, $ctx) = (shift, shift);
     return $self->env->{'psgi.input'}->read(@_);
 }
 
