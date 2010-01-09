@@ -89,6 +89,8 @@ sub testOption {
     };
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
+    # Mangle argv into the options..
+    $resultarray->[-1]->{argv} = $argstring;
     is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
 }
 

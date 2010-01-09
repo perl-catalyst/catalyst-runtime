@@ -12,6 +12,11 @@
    - Fix regression in the case where mod_rewrite is being used to rewrite
      requests into a path below your application base introduced with the
      %2F related fixes in 5.80014_02.
+   - Do not crash on SIGHUP if Catalyst::Engine::HTTP->run is not passed the
+     argv key in the options hash.
+   - Correctly pass the arguments to Catalyst::Script::Server through to
+     Catalyst::Engine::HTTP->run so that the server can restart itself
+     with the correct options on SIGHUP.
 
   Cleanups:
     - Stop suppressing warnings from Class::C3::Adopt::NEXT now that most plugins
