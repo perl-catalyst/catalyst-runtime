@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 15*$iters;
+use Test::More;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -37,7 +37,8 @@ sub run_tests {
             }
             
             # XXX: Length should be undef here, but HTTP::Request::AsCGI sets it
-            is( $response->content_length, 12, 'Response Content-Length' );
+            ok(!defined $response->content_length, 'No Content-Length for streaming responses');
+            is(length $response->content, 12, 'Response content' );
         }
         
         is( $response->content,, <<'EOF', 'Content is a stream' );
@@ -80,3 +81,5 @@ EOF
         is( $response->content, "\0" x $size, 'Content is read from filehandle' );
     }
 }
+
+done_testing;
