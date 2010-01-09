@@ -1,5 +1,6 @@
 package Catalyst::ScriptRole;
 use Moose::Role;
+use Plack::Runner;
 use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
 use MooseX::Getopt;
@@ -59,7 +60,8 @@ sub _run_application {
     my $self = shift;
     my $app = $self->application_name;
     Class::MOP::load_class($app);
-    $app->run($self->_application_args);
+    my $psgi_app = $app->run($self->_application_args);
+    Plack::Runner->run('--app' => $psgi_app);
 }
 
 1;

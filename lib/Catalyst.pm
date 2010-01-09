@@ -71,7 +71,7 @@ __PACKAGE__->mk_classdata($_)
   setup_finished/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
-__PACKAGE__->engine_class('Catalyst::Engine::CGI');
+__PACKAGE__->engine_class('Catalyst::Engine');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 __PACKAGE__->stats_class('Catalyst::Stats');
@@ -2349,72 +2349,7 @@ Sets up engine.
 =cut
 
 sub setup_engine {
-    my ( $class, $engine ) = @_;
-
-    if ($engine) {
-        $engine = 'Catalyst::Engine::' . $engine;
-    }
-
-    if ( my $env = Catalyst::Utils::env_value( $class, 'ENGINE' ) ) {
-        $engine = 'Catalyst::Engine::' . $env;
-    }
-
-    if ( $ENV{MOD_PERL} ) {
-        my $meta = Class::MOP::get_metaclass_by_name($class);
-
-        # create the apache method
-        $meta->add_method('apache' => sub { shift->engine->apache });
-
-        my ( $software, $version ) =
-          $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
-
-        $version =~ s/_//g;
-        $version =~ s/(\.[^.]+)\./$1/g;
-
-        if ( $software eq 'mod_perl' ) {
-
-            if ( !$engine ) {
-
-                if ( $version >= 1.99922 ) {
-                    $engine = 'Catalyst::Engine::Apache2::MP20';
-                }
-
-                elsif ( $version >= 1.9901 ) {
-                    $engine = 'Catalyst::Engine::Apache2::MP19';
-                }
-
-                elsif ( $version >= 1.24 ) {
-                    $engine = 'Catalyst::Engine::Apache::MP13';
-                }
-
-                else {
-                    Catalyst::Exception->throw( message =>
-                          qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
-                }
-
-            }
-
-            # install the correct mod_perl handler
-            if ( $version >= 1.9901 ) {
-                *handler = sub  : method {
-                    shift->handle_request(@_);
-                };
-            }
-            else {
-                *handler = sub ($$) { shift->handle_request(@_) };
-            }
-
-        }
-
-        elsif ( $software eq 'Zeus-Perl' ) {
-            $engine = 'Catalyst::Engine::Zeus';
-        }
-
-        else {
-            Catalyst::Exception->throw(
-                message => qq/Unsupported mod_perl: $ENV{MOD_PERL}/ );
-        }
-    }
+    my ($class, $engine) = @_;
 
     unless ($engine) {
         $engine = $class->engine_class;

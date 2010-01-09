@@ -10,16 +10,29 @@ use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
+use Moose::Util::TypeConstraints;
 
 use namespace::clean -except => 'meta';
 
-has env => (is => 'rw');
+has env => (is => 'ro', writer => '_set_env', clearer => '_clear_env');
 
 # input position and length
 has read_length => (is => 'rw');
 has read_position => (is => 'rw');
 
 has _prepared_write => (is => 'rw');
+
+has _response_cb => (
+    is     => 'ro',
+    isa    => 'CodeRef',
+    writer => '_set_response_cb',
+);
+
+has _writer => (
+    is     => 'ro',
+    isa    => duck_type([qw(write close)]),
+    writer => '_set_writer',
+);
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
@@ -293,7 +306,16 @@ Abstract method, allows engines to write headers to response
 
 =cut
 
-sub finalize_headers { }
+sub finalize_headers {
+    my ($self, $ctx) = @_;
+
+    my @headers;
+    $ctx->response->headers->scan(sub { push @headers, @_ });
+
+    $self->_set_writer($self->_response_cb->([ $ctx->response->status, \@headers ]));
+
+    return;
+}
 
 =head2 $self->finalize_read($c)
 
@@ -389,7 +411,22 @@ Abstract method implemented in engines.
 
 =cut
 
-sub prepare_connection { }
+sub prepare_connection {
+    my ($self, $ctx) = @_;
+
+    my $env = $self->env;
+    my $request = $ctx->request;
+
+    $request->address( $env->{REMOTE_ADDR} );
+    $request->hostname( $env->{REMOTE_HOST} )
+        if exists $env->{REMOTE_HOST};
+    $request->protocol( $env->{SERVER_PROTOCOL} );
+    $request->remote_user( $env->{REMOTE_USER} );
+    $request->method( $env->{REQUEST_METHOD} );
+    $request->secure( $env->{'psgi.url_scheme'} eq 'https' );
+
+    return;
+}
 
 =head2 $self->prepare_cookies($c)
 
@@ -409,7 +446,19 @@ sub prepare_cookies {
 
 =cut
 
-sub prepare_headers { }
+sub prepare_headers {
+    my ($self, $ctx) = @_;
+
+    my $env = $self->env;
+    my $headers = $ctx->request->headers;
+
+    for my $header (keys %{ $env }) {
+        next unless $header =~ /^(HTTP|CONTENT|COOKIE)/i;
+        (my $field = $header) =~ s/^HTTPS?_//;
+        $field =~ tr/_/-/;
+        $headers->header($field => $env->{$header});
+    }
+}
 
 =head2 $self->prepare_parameters($c)
 
@@ -447,7 +496,51 @@ abstract method, implemented by engines.
 
 =cut
 
-sub prepare_path { }
+sub prepare_path {
+    my ($self, $ctx) = @_;
+
+    my $env = $self->env;
+
+    my $scheme    = $ctx->request->secure ? 'https' : 'http';
+    my $host      = $env->{HTTP_HOST} || $env->{SERVER_NAME};
+    my $port      = $env->{SERVER_PORT} || 80;
+    my $base_path = $env->{SCRIPT_NAME} || "/";
+
+    # set the request URI
+    my $req_uri = $env->{REQUEST_URI};
+    $req_uri =~ s/\?.*$//;
+    my $path = $self->unescape_uri($req_uri);
+    $path =~ s{^/+}{};
+
+    # Using URI directly is way too slow, so we construct the URLs manually
+    my $uri_class = "URI::$scheme";
+
+    # HTTP_HOST will include the port even if it's 80/443
+    $host =~ s/:(?:80|443)$//;
+
+    if ($port !~ /^(?:80|443)$/ && $host !~ /:/) {
+        $host .= ":$port";
+    }
+
+    # Escape the path
+    $path =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+    $path =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
+
+    my $query = $env->{QUERY_STRING} ? '?' . $env->{QUERY_STRING} : '';
+    my $uri   = $scheme . '://' . $host . '/' . $path . $query;
+
+    $ctx->request->uri( bless \$uri, $uri_class );
+
+    # set the base URI
+    # base must end in a slash
+    $base_path .= '/' unless $base_path =~ m{/$};
+
+    my $base_uri = $scheme . '://' . $host . $base_path;
+
+    $ctx->request->base( bless \$base_uri, $uri_class );
+
+    return;
+}
 
 =head2 $self->prepare_request($c)
 
@@ -458,7 +551,11 @@ process the query string and extract query parameters.
 =cut
 
 sub prepare_query_parameters {
-    my ( $self, $c, $query_string ) = @_;
+    my ($self, $c) = @_;
+
+    my $query_string = exists $self->env->{QUERY_STRING}
+        ? $self->env->{QUERY_STRING}
+        : '';
 
     # Check for keywords (no = signs)
     # (yes, index() is faster than a regex :))
@@ -520,7 +617,10 @@ Populate the context object from the request object.
 
 =cut
 
-sub prepare_request { }
+sub prepare_request {
+    my ($self, $ctx, %args) = @_;
+    $self->_set_env($args{env});
+}
 
 =head2 $self->prepare_uploads($c)
 
@@ -638,7 +738,19 @@ Start the engine. Implemented by the various engine classes.
 
 =cut
 
-sub run { }
+sub run {
+    my ($self, $app) = @_;
+
+    return sub {
+        my ($env) = @_;
+
+        return sub {
+            my ($respond) = @_;
+            $self->_set_response_cb($respond);
+            $app->handle_request(env => $env);
+        };
+    };
+}
 
 =head2 $self->write($c, $buffer)
 
@@ -656,31 +768,10 @@ sub write {
 
     return 0 if !defined $buffer;
 
-    my $len   = length($buffer);
-    my $wrote = syswrite STDOUT, $buffer;
+    my $len = length($buffer);
+    $self->_writer->write($buffer);
 
-    if ( !defined $wrote && $! == EWOULDBLOCK ) {
-        # Unable to write on the first try, will retry in the loop below
-        $wrote = 0;
-    }
-
-    if ( defined $wrote && $wrote < $len ) {
-        # We didn't write the whole buffer
-        while (1) {
-            my $ret = syswrite STDOUT, $buffer, $CHUNKSIZE, $wrote;
-            if ( defined $ret ) {
-                $wrote += $ret;
-            }
-            else {
-                next if $! == EWOULDBLOCK;
-                return;
-            }
-
-            last if $wrote >= $len;
-        }
-    }
-
-    return $wrote;
+    return $len;
 }
 
 =head2 $self->unescape_uri($uri)
