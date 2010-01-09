@@ -17,6 +17,8 @@
    - Correctly pass the arguments to Catalyst::Script::Server through to
      Catalyst::Engine::HTTP->run so that the server can restart itself
      with the correct options on SIGHUP.
+   - Require new MooseX::MethodAttributes to be compatible with Moose
+     versions >= 0.93_01
 
   Cleanups:
     - Stop suppressing warnings from Class::C3::Adopt::NEXT now that most plugins
