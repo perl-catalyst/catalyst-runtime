@@ -6,8 +6,7 @@
      MyApp::View::HTML).
 
   Bug fixes:
-   - Remove the erroneous --detach option from Catalyst::Script::FastCGI
-   - --daemon option to Catalyst::Script::FastCGI is fixed.
+   - --daemon and -d options to Catalyst::Script::FastCGI are fixed.
    - Fix the debug dump for applications which use Catalyst::Plugin::Session
      (RT#52898)
    - Fix regression in the case where mod_rewrite is being used to rewrite
