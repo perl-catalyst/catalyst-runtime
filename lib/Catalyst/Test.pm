@@ -17,12 +17,10 @@ my $build_exports = sub {
     my $request;
     my $class = $args->{class};
 
-    if (!$class) {
-        croak "Must specify a test app: use Catalyst::Test 'TestApp'";
-    }
-
     if ( $ENV{CATALYST_SERVER} ) {
         $request = sub { remote_request(@_) };
+    } elsif (!$class) {
+        $request = sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'"; }
     } else {
         unless (Class::MOP::is_class_loaded($class)) {
             Class::MOP::load_class($class);
