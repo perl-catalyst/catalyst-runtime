@@ -706,7 +706,7 @@ sub read {
     my $rc = $self->read_chunk( $c, my $buffer, $readlen );
     if ( defined $rc ) {
         if (0 == $rc) { # Nothing more to read even though Content-Length
-                        # said there should be. FIXME - Warn in the log here?
+                        # said there should be.
             $self->finalize_read;
             return;
         }
