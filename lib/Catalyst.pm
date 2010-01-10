@@ -1900,10 +1900,9 @@ sub prepare {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
-    #XXX reuse coderef from can
     # Allow engine to direct the prepare flow (for POE)
-    if ( $c->engine->can('prepare') ) {
-        $c->engine->prepare( $c, @arguments );
+    if ( my $prepare = $c->engine->can('prepare') ) {
+        $c->engine->$prepare( $c, @arguments );
     }
     else {
         $c->prepare_request(@arguments);
