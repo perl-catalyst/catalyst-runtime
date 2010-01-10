@@ -5,7 +5,6 @@ use warnings;
 use Test::More ();
 
 use Plack::Test;
-use Plack::Middleware::OverrideEnv;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::MOP;
@@ -231,12 +230,8 @@ sub local_request {
 
     my $ret;
     test_psgi
-        app => Plack::Middleware::OverrideEnv->wrap(
-            $app, env_override => \%extra_env,
-        ),
-        client => sub {
-            $ret = shift->($request);
-        };
+        app    => sub { $app->({ %{ $_[0] }, %extra_env }) },
+        client => sub { $ret = shift->($request) };
 
     return $ret;
 }
