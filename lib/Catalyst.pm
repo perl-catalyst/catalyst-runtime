@@ -30,6 +30,7 @@ use List::MoreUtils qw/uniq/;
 use attributes;
 use utf8;
 use Carp qw/croak carp shortmess/;
+use Try::Tiny;
 
 BEGIN { require 5.008004; }
 
@@ -1847,7 +1848,7 @@ sub handle_request {
 
     # Always expect worst case!
     my $status = -1;
-    eval {
+    try {
         if ($class->debug) {
             my $secs = time - $START || 1;
             my $av = sprintf '%.3f', $COUNT / $secs;
@@ -1858,12 +1859,11 @@ sub handle_request {
         my $c = $class->prepare(@arguments);
         $c->dispatch;
         $status = $c->finalize;
-    };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        $class->log->error(qq/Caught exception in engine "$error"/);
     }
+    catch {
+        chomp(my $error = $_);
+        $class->log->error(qq/Caught exception in engine "$error"/);
+    };
 
     $COUNT++;
 
@@ -1900,27 +1900,38 @@ sub prepare {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
-    # Allow engine to direct the prepare flow (for POE)
-    if ( my $prepare = $c->engine->can('prepare') ) {
-        $c->engine->$prepare( $c, @arguments );
-    }
-    else {
-        $c->prepare_request(@arguments);
-        $c->prepare_connection;
-        $c->prepare_query_parameters;
-        $c->prepare_headers;
-        $c->prepare_cookies;
-        $c->prepare_path;
+    try {
+        # Allow engine to direct the prepare flow (for POE)
+        if ( my $prepare = $c->engine->can('prepare') ) {
+            $c->engine->$prepare( $c, @arguments );
+        }
+        else {
+            $c->prepare_request(@arguments);
+            $c->prepare_connection;
+            $c->prepare_query_parameters;
+            $c->prepare_headers;
+            $c->prepare_cookies;
+            $c->prepare_path;
 
-        # Prepare the body for reading, either by prepare_body
-        # or the user, if they are using $c->read
-        $c->prepare_read;
+            # Prepare the body for reading, either by prepare_body
+            # or the user, if they are using $c->read
+            $c->prepare_read;
 
-        # Parse the body unless the user wants it on-demand
-        unless ( ref($c)->config->{parse_on_demand} ) {
-            $c->prepare_body;
+            # Parse the body unless the user wants it on-demand
+            unless ( ref($c)->config->{parse_on_demand} ) {
+                $c->prepare_body;
+            }
         }
     }
+    # VERY ugly and probably shouldn't rely on ->finalize actually working
+    catch {
+        # failed prepare is always due to an invalid request, right?
+        $c->response->status(400);
+        $c->response->content_type('text/plain');
+        $c->response->body('Bad Request');
+        $c->finalize;
+        die $_;
+    };
 
     my $method  = $c->req->method  || '';
     my $path    = $c->req->path;
