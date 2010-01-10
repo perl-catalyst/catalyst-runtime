@@ -45,7 +45,7 @@ use HTTP::Request::Common;
 
     is( $creq->header('User-Agent'), $request->header('User-Agent'), 'Catalyst::Request->header User-Agent' );
 
-    my $host = sprintf( '%s:%d', $request->uri->host, $request->uri->port );
+    my $host = sprintf( '%s:%d', $request->header('X-Forwarded-Host'), $request->header('X-Forwarded-Port') );
     is( $creq->header('Host'), $host, 'Catalyst::Request->header Host' );
 
     SKIP:
