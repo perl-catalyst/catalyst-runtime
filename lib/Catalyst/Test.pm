@@ -5,6 +5,7 @@ use warnings;
 use Test::More ();
 
 use Plack::Test;
+use Plack::Middleware::OverrideEnv;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::MOP;
@@ -225,10 +226,17 @@ sub local_request {
     my $app = shift;
 
     my $request = Catalyst::Utils::request(shift);
-    _customize_request($request, @_);
+    my %extra_env;
+    _customize_request($request, \%extra_env, @_);
 
     my $ret;
-    test_psgi app => $app, client => sub { $ret = shift->($request) };
+    test_psgi
+        app => Plack::Middleware::OverrideEnv->wrap(
+            $app, env_override => \%extra_env,
+        ),
+        client => sub {
+            $ret = shift->($request);
+        };
 
     return $ret;
 }
@@ -303,10 +311,15 @@ sub remote_request {
 
 sub _customize_request {
     my $request = shift;
+    my $extra_env = shift;
     my $opts = pop(@_) || {};
     $opts = {} unless ref($opts) eq 'HASH';
     if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
         $request->header( 'Host' => $host );
+    }
+
+    if (my $extra = $opts->{extra_env}) {
+        @{ $extra_env }{keys %{ $extra }} = values %{ $extra };
     }
 }
 
