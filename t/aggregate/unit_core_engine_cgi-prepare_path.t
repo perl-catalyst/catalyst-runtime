@@ -1,6 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
+
+BEGIN {
+    plan skip_all => 'these tests should probably be moved to plack, or at least ported away from Engine::CGI';
+}
+
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use TestApp;
