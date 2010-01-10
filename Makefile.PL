@@ -54,6 +54,7 @@ requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
 requires 'Plack' => '0.9030';
+requires 'Plack::Middleware::ReverseProxy';
 
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';

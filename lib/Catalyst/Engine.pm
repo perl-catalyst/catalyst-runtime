@@ -12,6 +12,8 @@ use HTTP::Headers;
 use URI::QueryParam;
 use Moose::Util::TypeConstraints;
 use Plack::Loader;
+use Plack::Middleware::Conditional;
+use Plack::Middleware::ReverseProxy;
 
 use namespace::clean -except => 'meta';
 
@@ -756,7 +758,8 @@ sub run {
 
 sub _build_psgi_app {
     my ($self, $app, @args) = @_;
-    return sub {
+
+    my $psgi_app = sub {
         my ($env) = @_;
 
         return sub {
@@ -765,6 +768,18 @@ sub _build_psgi_app {
             $app->handle_request(env => $env);
         };
     };
+
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        condition => sub {
+            my ($env) = @_;
+            return if $app->config->{ignore_frontend_proxy};
+            return $env->{REMOTE_ADDR} eq '127.0.0.1' || $app->config->{using_frontend_proxy};
+        },
+        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
+    );
+
+    return $psgi_app;
 }
 
 sub _run_psgi_app {
