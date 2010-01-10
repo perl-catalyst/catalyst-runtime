@@ -5,7 +5,12 @@ use base qw[TestApp::View::Dump];
 
 sub process {
     my ( $self, $c ) = @_;
-    return $self->SUPER::process( $c, $c->engine->env );
+    my $env = $c->engine->env;
+    return $self->SUPER::process($c, {
+        map { ($_ => $env->{$_}) }
+        grep { $_ ne 'psgi.input' }
+        keys %{ $env },
+    });
 }
 
 1;
