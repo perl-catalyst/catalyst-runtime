@@ -27,7 +27,7 @@ my $build_exports = sub {
         }
         $class->import;
 
-        my $app = $class->run;
+        my $app = $class->engine->_build_psgi_app($class);
 
         $request = sub { local_request( $app, @_ ) };
     }

@@ -11,6 +11,7 @@ use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
 use Moose::Util::TypeConstraints;
+use Plack::Loader;
 
 use namespace::clean -except => 'meta';
 
@@ -747,8 +748,14 @@ Start the engine. Implemented by the various engine classes.
 =cut
 
 sub run {
-    my ($self, $app) = @_;
+    my ($self, $app, @args) = @_;
+    Carp::cluck("Run");
+    # FIXME - Do something sensible with the options we're passed
+    $self->_run_psgi_app($self->_build_psgi_app($app, @args), @args);
+}
 
+sub _build_psgi_app {
+    my ($self, $app, @args) = @_;
     return sub {
         my ($env) = @_;
 
@@ -758,6 +765,12 @@ sub run {
             $app->handle_request(env => $env);
         };
     };
+}
+
+sub _run_psgi_app {
+    my ($self, $psgi_app, @args);
+    # FIXME - Need to be able to specify engine and pass options..
+    Plack::Loader->auto()->run($psgi_app);
 }
 
 =head2 $self->write($c, $buffer)

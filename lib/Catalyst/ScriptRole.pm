@@ -60,8 +60,7 @@ sub _run_application {
     my $self = shift;
     my $app = $self->application_name;
     Class::MOP::load_class($app);
-    my $psgi_app = $app->run($self->_application_args);
-    Plack::Runner->run('--app' => $psgi_app);
+    $app->run($self->_application_args);
 }
 
 1;
