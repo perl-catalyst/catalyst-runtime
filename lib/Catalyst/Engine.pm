@@ -432,7 +432,7 @@ sub prepare_connection {
     $request->protocol( $env->{SERVER_PROTOCOL} );
     $request->remote_user( $env->{REMOTE_USER} );
     $request->method( $env->{REQUEST_METHOD} );
-    $request->secure( $env->{'psgi.url_scheme'} eq 'https' );
+    $request->secure( $env->{'psgi.url_scheme'} eq 'https' ? 1 : 0 );
 
     return;
 }
@@ -518,7 +518,7 @@ sub prepare_path {
     # set the request URI
     my $req_uri = $env->{REQUEST_URI};
     $req_uri =~ s/\?.*$//;
-    my $path = $self->unescape_uri($req_uri);
+    my $path = $req_uri;
     $path =~ s{^/+}{};
 
     # Using URI directly is way too slow, so we construct the URLs manually
@@ -530,10 +530,6 @@ sub prepare_path {
     if ($port !~ /^(?:80|443)$/ && $host !~ /:/) {
         $host .= ":$port";
     }
-
-    # Escape the path
-    $path =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-    $path =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
 
     my $query = $env->{QUERY_STRING} ? '?' . $env->{QUERY_STRING} : '';
     my $uri   = $scheme . '://' . $host . '/' . $path . $query;
