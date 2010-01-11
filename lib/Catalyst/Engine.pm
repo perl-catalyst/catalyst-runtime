@@ -750,9 +750,9 @@ Start the engine. Implemented by the various engine classes.
 =cut
 
 sub run {
-    my ($self, $app, @args) = @_;
+    my ($self, $app, $server, @args) = @_;
     # FIXME - Do something sensible with the options we're passed
-    $self->_run_psgi_app($self->_build_psgi_app($app, @args), @args);
+    $server->run($self->_build_psgi_app($app, @args));
 }
 
 sub _build_psgi_app {
@@ -779,12 +779,6 @@ sub _build_psgi_app {
     );
 
     return $psgi_app;
-}
-
-sub _run_psgi_app {
-    my ($self, $psgi_app, @args) = @_;
-    # FIXME - Need to be able to specify engine and pass options..
-    Plack::Loader->auto(port => $args[0])->run($psgi_app);
 }
 
 =head2 $self->write($c, $buffer)

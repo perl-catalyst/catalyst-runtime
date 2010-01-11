@@ -1,15 +1,11 @@
 package Catalyst::Script::Server;
-
-BEGIN {
-    $ENV{CATALYST_ENGINE} ||= 'HTTP';
-    require Catalyst::Engine::HTTP;
-}
-
 use Moose;
 use MooseX::Types::Common::Numeric qw/PositiveInt/;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use Catalyst::Utils;
 use namespace::autoclean;
+
+sub _plack_engine_name { 'Standalone' }
 
 with 'Catalyst::ScriptRole';
 

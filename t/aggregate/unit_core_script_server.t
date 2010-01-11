@@ -89,6 +89,8 @@ sub testOption {
     };
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
+    my $server = shift @TestAppToTestScripts::RUN_ARGS;
+    like ref($server), qr/^Plack::Server/, 'Is a Plack Server';
     is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
 }
 

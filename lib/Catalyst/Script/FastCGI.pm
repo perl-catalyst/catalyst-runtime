@@ -1,9 +1,9 @@
 package Catalyst::Script::FastCGI;
-
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
 use Moose;
 use MooseX::Types::Moose qw/Str Bool Int/;
 use namespace::autoclean;
+
+sub _plack_engine_name { 'FCGI' }
 
 with 'Catalyst::ScriptRole';
 

@@ -56,11 +56,23 @@ sub _application_args {
     ()
 }
 
+sub _plack_loader_args {
+    my @app_args = shift->_application_args;
+    return (port => $app_args[0]);
+}
+
 sub _run_application {
     my $self = shift;
     my $app = $self->application_name;
     Class::MOP::load_class($app);
-    $app->run($self->_application_args);
+    my $server;
+    if (my $e = $self->can('_plack_engine_name') ) {
+        $server = Plack::Loader->load($self->$e, $self->_plack_loader_args);
+    }
+    else {
+        $server = Plack::Loader->auto($self->_plack_loader_args);
+    }
+    $app->run($server, $self->_application_args);
 }
 
 1;
