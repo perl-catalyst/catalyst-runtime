@@ -537,7 +537,7 @@ sub prepare_path {
     my $query = $env->{QUERY_STRING} ? '?' . $env->{QUERY_STRING} : '';
     my $uri   = $scheme . '://' . $host . '/' . $path . $query;
 
-    $ctx->request->uri( bless \$uri, $uri_class );
+    $ctx->request->uri( (bless \$uri, $uri_class)->canonical );
 
     # set the base URI
     # base must end in a slash

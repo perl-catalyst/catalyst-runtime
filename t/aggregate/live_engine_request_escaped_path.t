@@ -18,11 +18,7 @@ use Catalyst::Test 'TestApp';
 
 # test that request with URL-escaped code works.
 {
-    my $response = request('http://localhost/args/param%73/one/two', {
-        extra_env => { PATH_INFO => '/args/param%73/one/two' },
-    });
-
-    ok( $response );
+    ok( my $response = request('http://localhost/args/param%73/one/two') );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content, 'onetwo' );
 }
