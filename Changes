@@ -3,6 +3,11 @@
   Documentation:
    - Clarify that uri_for_action works on private paths, with example.
 
+  Deprecations:
+   - Saying use Catalyst::Test; (without an application name or () to stop
+     the importer running is now deprecated and will issue a warning.
+     You should be saying use Catalyst::Test ();
+
 5.80017 2010-01-10 02:27:29
 
   Documentation:
