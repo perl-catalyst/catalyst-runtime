@@ -203,7 +203,7 @@ sub prepare_path {
 
     my $base_uri = $scheme . '://' . $host . $base_path;
 
-    $c->request->base( bless(\$base_uri, $uri_class)->canonical );
+    $c->request->base( bless \$base_uri, $uri_class );
 }
 
 =head2 $self->prepare_query_parameters($c)
