@@ -55,6 +55,14 @@ has nproc => (
     documentation => 'Specify a number of child processes',
 );
 
+sub _plack_loader_args {
+    my ($self) = shift;
+    return (
+        map { $_ => $self->$_() }
+        qw/pidfile listen manager nproc detach keep_stderr/
+    );
+}
+
 sub _application_args {
     my ($self) = shift;
     return (

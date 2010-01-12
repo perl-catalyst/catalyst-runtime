@@ -180,6 +180,15 @@ sub run {
 
 }
 
+sub _plack_loader_args {
+    my ($self) = shift;
+    return (
+        port => $self->port,
+        host => $self->host,
+        keepalive => $self->keepalive ? 100 : 1,
+    );
+}
+
 sub _application_args {
     my ($self) = shift;
     return (
