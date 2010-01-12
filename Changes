@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80018 2010-01-12 22:24:20
+
   Bug fixed:
    - Call ->canonical on URI derived from $ENV{REQUEST_URI} to get
      paths correctly decoded. This bug was previously hidden by a bug
