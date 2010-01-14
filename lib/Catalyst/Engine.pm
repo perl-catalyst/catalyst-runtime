@@ -752,10 +752,10 @@ Start the engine. Implemented by the various engine classes.
 sub run {
     my ($self, $app, $server, @args) = @_;
     # FIXME - Do something sensible with the options we're passed
-    $server->run($self->_build_psgi_app($app, @args));
+    $server->run($self->build_psgi_app($app, @args));
 }
 
-sub _build_psgi_app {
+sub build_psgi_app {
     my ($self, $app, @args) = @_;
 
     my $psgi_app = sub {
