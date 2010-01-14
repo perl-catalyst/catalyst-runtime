@@ -436,7 +436,7 @@
           B::Hooks::OP::Check::StashChange
         - Fix the unattached chain debug table for endpoints with no
           parents at all.
-        - Turn of test aggregation by default. Only aggregate if the
+        - Turn off test aggregation by default. Only aggregate if the
           AGGREGATE_TESTS environment variable is set and a recent
           Test::Aggregate is available.
         - Bump to MooseX::MethodAttributes 0.09, to gain the
