@@ -13,6 +13,8 @@ BEGIN {
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
+BEGIN { $::setup_leakchecker = 1 }
+
 use Catalyst::Test 'TestApp';
 
 {
