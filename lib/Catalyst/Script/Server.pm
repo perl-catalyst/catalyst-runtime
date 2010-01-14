@@ -195,6 +195,7 @@ sub _application_args {
         $self->port,
         $self->host,
         {
+           argv => $self->ARGV,
            map { $_ => $self->$_ } qw/
                 fork
                 keepalive

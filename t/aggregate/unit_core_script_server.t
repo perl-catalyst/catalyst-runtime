@@ -91,6 +91,8 @@ sub testOption {
     shift @TestAppToTestScripts::RUN_ARGS;
     my $server = shift @TestAppToTestScripts::RUN_ARGS;
     like ref($server), qr/^Plack::Server/, 'Is a Plack Server';
+    # Mangle argv into the options..
+    $resultarray->[-1]->{argv} = $argstring;
     is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
 }
 

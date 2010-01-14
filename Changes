@@ -1,18 +1,50 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80018 2010-01-12 22:24:20
+
+  Bug fixed:
+   - Call ->canonical on URI derived from $ENV{REQUEST_URI} to get
+     paths correctly decoded. This bug was previously hidden by a bug
+     in HTTP::Request::AsCGI
+
+  Documentation:
+   - Clarify that uri_for_action works on private paths, with example.
+
+  Deprecations:
+   - Saying use Catalyst::Test; (without an application name or () to stop
+     the importer running is now deprecated and will issue a warning.
+     You should be saying use Catalyst::Test ();
+
+5.80017 2010-01-10 02:27:29
+
   Documentation:
    - Fix docs for ->forward method when passed a class name - this should
      be a component name (e.g. View::HTML, not a full class name, like
      MyApp::View::HTML).
 
   Bug fixes:
-   - Remove the erroneous --detach option from Catalyst::Script::FastCGI
-   - --daemon option to Catalyst::Script::FastCGI is fixed.
+   - --daemon and -d options to Catalyst::Script::FastCGI are fixed.
    - Fix the debug dump for applications which use Catalyst::Plugin::Session
      (RT#52898)
    - Fix regression in the case where mod_rewrite is being used to rewrite
      requests into a path below your application base introduced with the
      %2F related fixes in 5.80014_02.
+   - Do not crash on SIGHUP if Catalyst::Engine::HTTP->run is not passed the
+     argv key in the options hash.
+   - Correctly pass the arguments to Catalyst::Script::Server through to
+     Catalyst::Engine::HTTP->run so that the server can restart itself
+     with the correct options on SIGHUP.
+   - Require new MooseX::MethodAttributes to be compatible with Moose
+     versions >= 0.93_01
+   - Require new MooseX::Role::WithOverloading to be compatible with Moose
+     versions >= 0.93_01
+
+  Cleanups:
+    - Stop suppressing warnings from Class::C3::Adopt::NEXT now that most plugins
+      have been updated to not use NEXT. If you get warnings then please upgrade
+      your components or log a bug with the component author if an upgrade is
+      not available. The Class::C3::Adopt::NEXT documentation contains information
+      about how to suppress the warnings in your application if you need to.
 
 5.80016 2009-12-11 23:23:33
 

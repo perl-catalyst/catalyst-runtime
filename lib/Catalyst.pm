@@ -79,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80016';
+our $VERSION = '5.80018';
 $VERSION = eval $VERSION;
 
 sub import {
@@ -1329,6 +1329,20 @@ $c->uri_for >>.
 
 You can also pass in a Catalyst::Action object, in which case it is passed to
 C<< $c->uri_for >>.
+
+Note that although the path looks like a URI that dispatches to the wanted action, it is not a URI, but an internal path to that action.
+
+For example, if the action looks like:
+
+ package MyApp::Controller::Users;
+
+ sub lst : Path('the-list') {}
+
+You can use:
+
+ $c->uri_for_action('/users/lst')
+
+and it will create the URI /users/the-list.
 
 =back
 
@@ -2888,6 +2902,8 @@ nothingmuch: Yuval Kogman <nothingmuch@woobling.org>
 numa: Dan Sully <daniel@cpan.org>
 
 obra: Jesse Vincent
+
+Octavian Rasnita
 
 omega: Andreas Marienborg
 

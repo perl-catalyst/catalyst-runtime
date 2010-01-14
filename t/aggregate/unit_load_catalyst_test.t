@@ -3,9 +3,7 @@
 use strict;
 use warnings;
 
-use FindBin;
-use lib         "$FindBin::Bin/../lib";
-use Test::More  tests => 61;
+use Test::More;
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use Catalyst::Utils;
@@ -26,7 +24,7 @@ my %Meth    = (
 ### make sure we're not trying to connect to a remote host -- these are local tests
 local $ENV{CATALYST_SERVER};
 
-use_ok( $Class );
+use Catalyst::Test ();
 
 ### check available methods
 {   ### turn of redefine warnings, we'll get new subs exported
@@ -155,3 +153,4 @@ lives_ok {
     request(GET('/dummy'), []);
 } 'array additional param to request method ignored';
 
+done_testing;

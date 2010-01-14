@@ -107,6 +107,12 @@ our $default_host;
 
     sub import {
         my ($self, $class, $opts) = @_;
+        Carp::carp(
+qq{Importing Catalyst::Test without an application name is deprecated:\n
+Instead of saying: use Catalyst::Test;
+say: use Catalyst::Test (); # If you don't want to import a test app right now.
+or say: use Catalyst::Test 'MyApp'; # If you do want to import a test app.\n\n})
+        unless $class;
         $import->($self, '-all' => { class => $class });
         $opts = {} unless ref $opts eq 'HASH';
         $default_host = $opts->{default_host} if exists $opts->{default_host};
