@@ -24,6 +24,23 @@ sub binary_utf8 : Local {
     $c->res->body($str);
 }
 
+# called by t/aggregate/catalyst_test_utf8.t
+sub utf8_non_ascii_content : Local {
+    use utf8;
+    my ($self, $c) = @_;
+    
+    my $str = 'ʇsʎlɐʇɐɔ';  # 'catalyst' flipped at http://www.revfad.com/flip.html
+    ok utf8::is_utf8($str), '$str is in UTF8 internally';
+    
+    # encode $str into a sequence of octets and turn off the UTF-8 flag, so that
+    # we don't get the 'Wide character in syswrite' error in Catalyst::Engine
+    utf8::encode($str);
+    ok !utf8::is_utf8($str), '$str is a sequence of octets (byte string)';
+    
+    $c->res->body($str);
+}
+
+
 sub end : Private {
     my ($self,$c) = @_;
 }
