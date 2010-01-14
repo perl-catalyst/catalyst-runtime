@@ -5,12 +5,6 @@
 
      Test app: http://github.com/bobtfish/catalyst-app-bug-go_chain/tree/master
 
-   - Bricas' Exception blog post
-
-     http://bricas.vox.com/library/post/catalyst-exceptionclass.html
-
-     Broken by recent exception refactoring
-
 # Compatibility warnings to add:
 
   - $self->config should warn as config should only ever be called as a
