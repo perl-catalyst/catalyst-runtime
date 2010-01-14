@@ -744,17 +744,27 @@ header.
 
 The amount of input data that has already been read.
 
-=head2 $self->run($c)
+=head2 $self->run($app, $server)
 
-Start the engine. Implemented by the various engine classes.
+Start the engine. Builds a PSGI application and calls the
+run method on the server passed in..
 
 =cut
 
 sub run {
     my ($self, $app, $server, @args) = @_;
+    $server ||= Plack::Loader->auto(); # We're not being called from a script,
+                                       # so auto detect mod_perl or whatever
     # FIXME - Do something sensible with the options we're passed
     $server->run($self->build_psgi_app($app, @args));
 }
+
+=head2 build_psgi_app ($app, @args)
+
+Builds and returns a PSGI application closure, wrapping it in the reverse proxy
+middleware if the using_frontend_proxy config setting is set.
+
+=cut
 
 sub build_psgi_app {
     my ($self, $app, @args) = @_;
