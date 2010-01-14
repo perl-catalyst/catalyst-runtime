@@ -21,6 +21,7 @@ requires 'namespace::clean' => '0.12';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.95';
+requires 'Data::OptList';
 requires 'Moose' => '0.93';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.19';
 requires 'MooseX::Role::WithOverloading' => '0.05';

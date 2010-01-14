@@ -1,6 +1,7 @@
 package Catalyst::Script::FastCGI;
 use Moose;
 use MooseX::Types::Moose qw/Str Bool Int/;
+use Data::OptList;
 use namespace::autoclean;
 
 sub _plack_engine_name { 'FCGI' }
@@ -58,8 +59,11 @@ has nproc => (
 sub _plack_loader_args {
     my ($self) = shift;
     return (
-        map { $_ => $self->$_() }
-        qw/pidfile listen manager nproc detach keep_stderr/
+        map { $_->[0] => $self->${ \($_->[1] ? $_->[1]->[0] : $_->[0]) } }
+        Data::OptList::mkopt([
+            qw/pidfile listen manager nproc keep_stderr/,
+            detach => [ 'daemon'],
+        ])
     );
 }
 
