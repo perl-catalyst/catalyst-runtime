@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More tests => 23;
 use strict;
 use warnings;
 
@@ -91,3 +91,18 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 }
 
+# BUILDARGS logic
+{
+    {
+        package MyController;
+        @MyController::ISA = ('Catalyst::Controller');
+    }
+    my $warning;
+    local $SIG{__WARN__} = sub {
+        $warning = shift;
+        diag($warning);
+    };
+    my $controller = MyController->new('MyApp', undef);
+    like( $warning, qr/uninitialized value in string eq/, "no warning for == comparison");
+
+}
