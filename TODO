@@ -26,6 +26,22 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 # REFACTORING
 
+##  PSGI
+
+  * throw out Catalyst::Test's remote_request in favour of
+    Plack::Test::ExternalServer
+  * properly pass along server arguments
+  * move disabled tests in unit_core_engine_cgi-prepare_path.t into Plack
+  * think about whether or not to generate myapp.psgi and how to configure
+    middleware
+  * make sure we're running under a server that support psgi.streaming - maybe
+    just load the BufferedWrite middleware, although that might break things
+    relying on ->write doing an unbuffered write
+  * throw away the restarter and allow using the restarters Plack provides
+  * remove per-request state from the engine instance
+  * be smarter about how we use PSGI - not every response needs to be delayed
+    and streaming
+
 ##  The horrible hack for plugin setup - replacing it:
 
  * Have a look at the Devel::REPL BEFORE_PLUGIN stuff
