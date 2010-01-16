@@ -754,7 +754,8 @@ run method on the server passed in..
 sub run {
     my ($self, $app, $server, @args) = @_;
     $server ||= Plack::Loader->auto(); # We're not being called from a script,
-                                       # so auto detect mod_perl or whatever
+                                       # so auto detect what backend to run on.
+                                       # This does *NOT* cover mod_perl.
     # FIXME - Do something sensible with the options we're passed
     $server->run($self->build_psgi_app($app, @args));
 }

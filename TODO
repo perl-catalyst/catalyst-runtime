@@ -41,6 +41,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * remove per-request state from the engine instance
   * be smarter about how we use PSGI - not every response needs to be delayed
     and streaming
+  * figure out how to not break existing mod_perl deployments
 
 ##  The horrible hack for plugin setup - replacing it:
 
