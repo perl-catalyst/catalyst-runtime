@@ -448,32 +448,20 @@ Sets 'path_prefix', as described below.
 
 =head2 action_args
 
-Allows you to set instantiation arguments on your custom Actions or ActionRoles.
-You can set args globally (shared across all actions) and specifically (for a
-single action).
-
-    package MyApp::Web::Controller::MyController;
-    use parent 'Catalyst::Controller';    
+Allows you to set constructor arguments on your Actions or ActionRoles.  You can
+set args globally (all actions of the controller) and specifically (for a single
+action).
 
     __PACKAGE__->config({
         action_args => {
             '*' => {globalarg1=>'hello', globalarg2=>'goodbye'},
             'specific_action' => {customarg=>'arg1'},
-        },      
+        },
      });
-    
-    sub specific_action :Path('') ActionClass('CustomActionClass') {}
-    
-    1;
 
-In the case above, your 'CustomActionClass' would get passed the following
-arguments when it is instantiated: (globalarg1=>'hello', globalarg2=>'goodbye',
-'customarg=>'arg1').  Please note that the order the arguments are passed are not
-certain to be in the order declared.
-
-As with all other configuration hashes, you can set values inline with your
-controller (as above) or centrally via a configuration file (such as you might
-use with the ConfigLoader plugin).
+In the case above the action class associated with 'specific_action' would get
+passed the following arguments when it is instantiated: (globalarg1=>'hello',
+globalarg2=>'goodbye', 'customarg=>'arg1').
 
 =head1 METHODS
 
