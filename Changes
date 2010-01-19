@@ -1,11 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  New features:
+   - Allow passing additional arguments to action constructors.
+
 5.80018 2010-01-12 22:24:20
 
   Bug fixed:
    - Call ->canonical on URI derived from $ENV{REQUEST_URI} to get
      paths correctly decoded. This bug was previously hidden by a bug
-     in HTTP::Request::AsCGI
+     in HTTP::Request::AsCGI.
 
   Documentation:
    - Clarify that uri_for_action works on private paths, with example.
