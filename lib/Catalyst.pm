@@ -331,7 +331,7 @@ all 'dies' within the called action. If you want C<die> to propagate you
 need to do something like:
 
     $c->forward('foo');
-    die $c->error if $c->error;
+    die join "\n", @{ $c->error } if @{ $c->error };
 
 Or make sure to always return true values from your actions and write
 your code like this:
