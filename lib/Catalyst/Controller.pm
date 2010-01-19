@@ -448,7 +448,7 @@ Sets 'path_prefix', as described below.
 
 =head2 action_args
 
-Allows you to set constructor arguments on your Actions. You can set arguments
+Allows you to set constructor arguments on your actions. You can set arguments
 globally (for all actions of the controller) and specifically (for a single
 action). This is particularly useful when using C<ActionRole>s
 (L<Catalyst::Controller::ActionRole>) and custom C<ActionClass>es.
