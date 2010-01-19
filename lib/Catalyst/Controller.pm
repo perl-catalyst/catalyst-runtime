@@ -448,20 +448,23 @@ Sets 'path_prefix', as described below.
 
 =head2 action_args
 
-Allows you to set constructor arguments on your Actions or ActionRoles.  You can
-set args globally (all actions of the controller) and specifically (for a single
-action).
+Allows you to set constructor arguments on your Actions. You can set arguments
+globally (for all actions of the controller) and specifically (for a single
+action). This is particularly useful when using C<ActionRole>s
+(L<Catalyst::Controller::ActionRole>) and custom C<ActionClass>es.
 
-    __PACKAGE__->config({
+    __PACKAGE__->config(
         action_args => {
-            '*' => {globalarg1=>'hello', globalarg2=>'goodbye'},
-            'specific_action' => {customarg=>'arg1'},
+            '*' => { globalarg1 => 'hello', globalarg2 => 'goodbye' },
+            'specific_action' => { customarg => 'arg1' },
         },
-     });
+     );
 
-In the case above the action class associated with 'specific_action' would get
-passed the following arguments when it is instantiated: (globalarg1=>'hello',
-globalarg2=>'goodbye', 'customarg=>'arg1').
+In the case above the action class associated with C<specific_action> would get
+passed the following arguments, in addition to the normal action constructor
+arguments, when it is instantiated:
+
+  (globalarg1 => 'hello', globalarg2 => 'goodbye', customarg => 'arg1')
 
 =head1 METHODS
 
