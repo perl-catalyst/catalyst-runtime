@@ -262,6 +262,14 @@ is replaced with the uppercased name of your application, any "::" in
 the name will be replaced with underscores, e.g. MyApp::Web should use
 MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
 
+If none of these are set, Catalyst will attempt to automatically detect the
+home directory. If you are working in a development envirnoment, Catalyst
+will try and find the directory containing either Makefile.PL, Build.PL or
+dist.ini. If the application has been installed into the system (i.e.
+you have done C<make install>), then Catalyst will use the path to your
+application module, without the .pm extension (ie, /foo/MyApp if your
+application was installed at /foo/MyApp.pm)
+
 =head2 -Log
 
     use Catalyst '-Log=warn,fatal,error';
