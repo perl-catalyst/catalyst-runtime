@@ -84,7 +84,7 @@ sub BUILDARGS {
         } elsif (Class::MOP::is_class_loaded($_[0]) &&
                 $_[0]->isa('Catalyst') && ref($_[1]) eq 'HASH') {
             $args = $_[1];
-        } elsif ($_[0] eq $_[1]) {
+        } elsif ($_[0] == $_[1]) {
             $args = $_[1];
         } else {
             $args = +{ @_ };
