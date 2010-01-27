@@ -243,6 +243,9 @@ environment with CATALYST_DEBUG or <MYAPP>_DEBUG. The environment
 settings override the application, with <MYAPP>_DEBUG having the highest
 priority.
 
+This sets the log level to 'debug' and enables full debug output on the
+error screen. If you only want the latter, see L<< $c->debug >>.
+
 =head2 -Engine
 
 Forces Catalyst to use a specific engine. Omit the
@@ -930,6 +933,8 @@ You can enable debug mode in several ways:
 =item By declaring C<sub debug { 1 }> in your MyApp.pm.
 
 =back
+
+The first three also set the log level to 'debug'.
 
 Calling C<< $c->debug(1) >> has no effect.
 

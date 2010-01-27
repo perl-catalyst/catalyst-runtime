@@ -12,6 +12,7 @@
 
   Documentation:
    - Clarify that uri_for_action works on private paths, with example.
+   - Clarify documentation about debug
 
   Deprecations:
    - Saying use Catalyst::Test; (without an application name or () to stop
