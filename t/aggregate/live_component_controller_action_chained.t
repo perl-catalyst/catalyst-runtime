@@ -1085,7 +1085,8 @@ sub run_tests {
             'request ' . $path . ' ok');
         # Just check that the path matches, as who the hell knows or cares
         # where the app is based (live tests etc)
-        ok( index($content, $path) > 1, 'uri can round trip through uri_for' );
+        ok( index($content, $path) > 1, 'uri can round trip through uri_for' )
+            or diag("Expected $path, got $content");
     }
 }
 

@@ -1,16 +1,17 @@
 use strict;
 use warnings;
-
+use FindBin qw/$Bin/;
+use lib "$FindBin::Bin/../lib";
 use Test::More;
 use URI;
 
-use_ok('Catalyst');
+use_ok('TestApp');
 
 my $request = Catalyst::Request->new( {
                 base => URI->new('http://127.0.0.1/foo')
               } );
-
-my $context = Catalyst->new( {
+my $dispatcher = TestApp->dispatcher;
+my $context = TestApp->new( {
                 request => $request,
                 namespace => 'yada',
               } );
@@ -144,12 +145,20 @@ TODO: {
               "uri_for() doesn't mess up query parameter hash in the caller");
 }
 
-# 5.80018 is only encoding the first of the / in the arg. See line 1271.
-is(
-    Catalyst::uri_for( $context, 'controller/action', 'foo/bar/baz' )->as_string,
-    'http://127.0.0.1/controller/action/foo%2Fbar%2Fbaz',
-    'Escape both forward slashes in the arg as %2F'
-);
+
+{
+    my $path_action = $dispatcher->get_action_by_path(
+                       '/action/path/six'
+                     );
+
+    # 5.80018 is only encoding the first of the / in the arg.
+    is(
+        Catalyst::uri_for( $context, $path_action, 'foo/bar/baz' )->as_string,
+        'http://127.0.0.1/action/path/six/foo%2Fbar%2Fbaz',
+        'Escape all forward slashes in args as %2F'
+    );
+}
+
 
 done_testing;
 

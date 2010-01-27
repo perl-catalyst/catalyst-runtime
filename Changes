@@ -1,5 +1,17 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixed:
+   - Calls to $c->uri_for with private paths as strings (e.g.
+     $c->uri_for('controller/action', 'arg1', 'arg2') ) no longer have
+     / encoded to %2F. This is due to $c->uri_for('static', 'css/foo', $bar)
+     which should not be encoded.
+     Calls with an action object (rather than a string), or uri_for action
+     will still encode / in args and captures to %2F
+
+   - The above noted / => %2F encoding in uri_for_action or uri_for with
+     an action object has been fixed to not just encode the first slash in
+     any set of args/captures.
+
   New features:
    - Allow passing additional arguments to action constructors.
 
