@@ -15,6 +15,13 @@
    - nginx and lighttpd FCGI requests with URI encoded sections as the first
      path part have been fixed to operate correctly.
 
+    - Aparantly useless conditional in Catalyst::Component::BUILDARGS
+      has been removed.
+
+  Documentation:
+     - Improve the documentation about -Home and how Catalyst finds the
+       home path for applications.
+
   New features:
    - Allow passing additional arguments to action constructors.
 
