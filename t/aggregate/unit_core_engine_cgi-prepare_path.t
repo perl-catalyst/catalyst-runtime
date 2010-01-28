@@ -62,7 +62,17 @@ use Catalyst::Engine::CGI;
     is ''.$r->base, 'http://www.foo.com/';
 }
 
-
+# nginx example from espent with path /"foo"
+{
+    my $r = get_req (
+        PATH_INFO => '"foo"',
+        SCRIPT_NAME => '/',
+        REQUEST_URI => '/%22foo%22',
+    );
+    is ''.$r->path, '%22foo%22';
+    is ''.$r->uri, 'http://www.foo.com/%22foo%22';
+    is ''.$r->base, 'http://www.foo.com/';
+}
 
 # FIXME - Test proxy logic
 #       - Test query string

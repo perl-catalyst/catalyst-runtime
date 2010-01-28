@@ -12,6 +12,9 @@
      an action object has been fixed to not just encode the first slash in
      any set of args/captures.
 
+   - nginx and lighttpd FCGI requests with URI encoded sections as the first
+     path part have been fixed to operate correctly.
+
   New features:
    - Allow passing additional arguments to action constructors.
 

@@ -168,7 +168,8 @@ sub prepare_path {
             if (substr($req_uri, 0, 1) ne '/') {
                 my ($match) = $req_uri =~ m|^([^/]+)|;
                 my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
-                substr($req_uri, 0, length($match), $path_info_part);
+                substr($req_uri, 0, length($match), $path_info_part)
+                    if $path_info_part;
             }
             $path_info = $req_uri;
         }
