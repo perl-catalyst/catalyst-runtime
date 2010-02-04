@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80020 2010-02-04 06:51:18
+
+  New features:
+    - Allow components to specify additional components to be set up by
+      overriding the expand_modules method. (Oliver Charles)
+
 5.80019 2010-01-29 01:04:09
 
   Bug fixed:
