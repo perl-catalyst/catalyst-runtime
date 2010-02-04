@@ -2239,8 +2239,11 @@ sub setup_components {
     }
 
     for my $component (@comps) {
-        $class->components->{ $component } = $class->setup_component($component);
-        for my $component ($class->expand_component_module( $component, $config )) {
+        my $instance = $class->components->{ $component } = $class->setup_component($component);
+        my @expanded_components = $instance->can('expand_modules')
+            ? $instance->expand_modules( $component, $config )
+            : $class->expand_component_module( $component, $config );
+        for my $component (@expanded_components) {
             next if $comps{$component};
             $class->_controller_init_base_classes($component); # Also cover inner packages
             $class->components->{ $component } = $class->setup_component($component);

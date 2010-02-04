@@ -5,6 +5,7 @@ use Class::MOP;
 use Class::MOP::Object;
 use Catalyst::Utils;
 use Class::C3::Adopt::NEXT;
+use Devel::InnerPackage ();
 use MRO::Compat;
 use mro 'c3';
 use Scalar::Util 'blessed';
@@ -147,6 +148,11 @@ sub process {
           . " did not override Catalyst::Component::process" );
 }
 
+sub expand_modules {
+    my ($class, $component) = @_;
+    return Devel::InnerPackage::list_packages( $component );
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -204,6 +210,13 @@ when you forward to them. The default is an abstract method.
 
 Merges two hashes together recursively, giving right-hand precedence.
 Alias for the method in L<Catalyst::Utils>.
+
+=head2 $c->expand_modules( $setup_component_config )
+
+Return a list of extra components that this component has created. By default,
+it just looks for a list of inner packages of this component
+
+=cut
 
 =head1 OPTIONAL METHODS
 
