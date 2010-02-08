@@ -20,7 +20,7 @@ our $VERSION = '0.01';
 
 TestApp->config( name => 'TestApp', root => '/some/dir' );
 
-if (eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
+if ($::setup_leakchecker && eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
     with 'CatalystX::LeakChecker';
 
     has leaks => (

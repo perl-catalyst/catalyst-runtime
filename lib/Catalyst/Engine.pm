@@ -280,7 +280,8 @@ sub finalize_error {
 </html>
 
 
-    # Trick IE
+    # Trick IE. Old versions of IE would display their own error page instead
+    # of ours if we'd give it less than 512 bytes.
     $c->res->{body} .= ( ' ' x 512 );
 
     # Return 500

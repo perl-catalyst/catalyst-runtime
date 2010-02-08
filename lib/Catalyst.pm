@@ -78,7 +78,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80016';
+our $VERSION = '5.80020';
 $VERSION = eval $VERSION;
 
 sub import {
@@ -243,6 +243,9 @@ environment with CATALYST_DEBUG or <MYAPP>_DEBUG. The environment
 settings override the application, with <MYAPP>_DEBUG having the highest
 priority.
 
+This sets the log level to 'debug' and enables full debug output on the
+error screen. If you only want the latter, see L<< $c->debug >>.
+
 =head2 -Engine
 
 Forces Catalyst to use a specific engine. Omit the
@@ -261,6 +264,14 @@ C<CATALYST_HOME> environment variable or C<MYAPP_HOME>; where C<MYAPP>
 is replaced with the uppercased name of your application, any "::" in
 the name will be replaced with underscores, e.g. MyApp::Web should use
 MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
+
+If none of these are set, Catalyst will attempt to automatically detect the
+home directory. If you are working in a development envirnoment, Catalyst
+will try and find the directory containing either Makefile.PL, Build.PL or
+dist.ini. If the application has been installed into the system (i.e.
+you have done C<make install>), then Catalyst will use the path to your
+application module, without the .pm extension (ie, /foo/MyApp if your
+application was installed at /foo/MyApp.pm)
 
 =head2 -Log
 
@@ -331,7 +342,7 @@ all 'dies' within the called action. If you want C<die> to propagate you
 need to do something like:
 
     $c->forward('foo');
-    die $c->error if $c->error;
+    die join "\n", @{ $c->error } if @{ $c->error };
 
 Or make sure to always return true values from your actions and write
 your code like this:
@@ -923,6 +934,8 @@ You can enable debug mode in several ways:
 
 =back
 
+The first three also set the log level to 'debug'.
+
 Calling C<< $c->debug(1) >> has no effect.
 
 =cut
@@ -1246,8 +1259,19 @@ sub uri_for {
         $path .= '/';
     }
 
+    undef($path) if (defined $path && $path eq '');
+
+    my $params =
+      ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
+
+    carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
+    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
+    if (blessed $path) { # Action object only.
+        s|/|%2F|g for @args;
+    }
+
     if ( blessed($path) ) { # action object
-        my $captures = [ map { s|/|%2F|; $_; }
+        my $captures = [ map { s|/|%2F|g; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? @{ shift(@args) }
                          : ()) ];
@@ -1337,6 +1361,20 @@ $c->uri_for >>.
 
 You can also pass in a Catalyst::Action object, in which case it is passed to
 C<< $c->uri_for >>.
+
+Note that although the path looks like a URI that dispatches to the wanted action, it is not a URI, but an internal path to that action.
+
+For example, if the action looks like:
+
+ package MyApp::Controller::Users;
+
+ sub lst : Path('the-list') {}
+
+You can use:
+
+ $c->uri_for_action('/users/lst')
+
+and it will create the URI /users/the-list.
 
 =back
 
@@ -2219,8 +2257,11 @@ sub setup_components {
     }
 
     for my $component (@comps) {
-        $class->components->{ $component } = $class->setup_component($component);
-        for my $component ($class->expand_component_module( $component, $config )) {
+        my $instance = $class->components->{ $component } = $class->setup_component($component);
+        my @expanded_components = $instance->can('expand_modules')
+            ? $instance->expand_modules( $component, $config )
+            : $class->expand_component_module( $component, $config );
+        for my $component (@expanded_components) {
             next if $comps{$component};
             $class->_controller_init_base_classes($component); # Also cover inner packages
             $class->components->{ $component } = $class->setup_component($component);
@@ -2952,6 +2993,8 @@ nothingmuch: Yuval Kogman <nothingmuch@woobling.org>
 numa: Dan Sully <daniel@cpan.org>
 
 obra: Jesse Vincent
+
+Octavian Rasnita
 
 omega: Andreas Marienborg
 

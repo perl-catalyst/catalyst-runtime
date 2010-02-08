@@ -255,9 +255,15 @@ sub create_action {
     my $class = (exists $args{attributes}{ActionClass}
                     ? $args{attributes}{ActionClass}[0]
                     : $self->_action_class);
-
     Class::MOP::load_class($class);
-    return $class->new( \%args );
+
+    my $action_args = $self->config->{action_args};
+    my %extra_args = (
+        %{ $action_args->{'*'}           || {} },
+        %{ $action_args->{ $args{name} } || {} },
+    );
+
+    return $class->new({ %extra_args, %args });
 }
 
 sub _parse_attrs {
@@ -439,6 +445,26 @@ of setting namespace to '' (the null string).
 =head2 path
 
 Sets 'path_prefix', as described below.
+
+=head2 action_args
+
+Allows you to set constructor arguments on your actions. You can set arguments
+globally (for all actions of the controller) and specifically (for a single
+action). This is particularly useful when using C<ActionRole>s
+(L<Catalyst::Controller::ActionRole>) and custom C<ActionClass>es.
+
+    __PACKAGE__->config(
+        action_args => {
+            '*' => { globalarg1 => 'hello', globalarg2 => 'goodbye' },
+            'specific_action' => { customarg => 'arg1' },
+        },
+     );
+
+In the case above the action class associated with C<specific_action> would get
+passed the following arguments, in addition to the normal action constructor
+arguments, when it is instantiated:
+
+  (globalarg1 => 'hello', globalarg2 => 'goodbye', customarg => 'arg1')
 
 =head1 METHODS
 

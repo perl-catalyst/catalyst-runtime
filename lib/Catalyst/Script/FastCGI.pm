@@ -27,7 +27,7 @@ has daemon => (
     traits        => [qw(Getopt)],
     isa           => Bool,
     is            => 'ro',
-    cmd_aliases   => 'd',
+    cmd_aliases   => [qw/d detach/], # Eww, detach is here as we fucked it up.. Deliberately not documented
     documentation => 'Daemonize (go into the background)',
 );
 

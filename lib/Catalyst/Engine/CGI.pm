@@ -167,9 +167,9 @@ sub prepare_path {
             # incorrect.
             if (substr($req_uri, 0, 1) ne '/') {
                 my ($match) = $req_uri =~ m|^([^/]+)|;
-                my $idx = index($path_info, $match) + length($match);
-                my $path_info_part = substr($path_info, 0, $idx);
-                substr($req_uri, 0, length($match), $path_info_part);
+                my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
+                substr($req_uri, 0, length($match), $path_info_part)
+                    if $path_info_part;
             }
             $path_info = $req_uri;
         }
@@ -196,7 +196,7 @@ sub prepare_path {
     my $query = $ENV{QUERY_STRING} ? '?' . $ENV{QUERY_STRING} : '';
     my $uri   = $scheme . '://' . $host . '/' . $path . $query;
 
-    $c->request->uri( bless \$uri, $uri_class );
+    $c->request->uri( bless(\$uri, $uri_class)->canonical );
 
     # set the base URI
     # base must end in a slash
