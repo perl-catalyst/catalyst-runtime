@@ -1265,6 +1265,9 @@ sub uri_for {
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
+    foreach my $arg (@args) {
+        utf8::encode($arg) if utf8::is_utf8($arg);
+    }
     s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
     if (blessed $path) { # Action object only.
         s|/|%2F|g for @args;
@@ -1292,17 +1295,6 @@ sub uri_for {
     }
 
     undef($path) if (defined $path && $path eq '');
-
-    my $params =
-      ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
-
-    carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
-
-    foreach my $arg (@args) {
-        utf8::encode($arg) if utf8::is_utf8($arg);
-    }
-    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
-    s|/|%2F| for @args;
 
     unshift(@args, $path);
 
