@@ -1182,23 +1182,20 @@ EOF
     return 1; # Explicit return true as people have __PACKAGE__->setup as the last thing in their class. HATE.
 }
 
-
 =head2 $app->setup_finalize
 
-A hook to attach modifiers to.
-Using C<< after setup => sub{}; >> doesn't work, because of quirky things done for plugin setup.
-Also better than C< setup_finished(); >, as that is a getter method.
+A hook to attach modifiers to. This method does not do anything except set the
+C<setup_finished> accessor.
 
-    sub setup_finalize {
+Applying method modifiers to the C<setup> method doesn't work, because of quirky thingsdone for plugin setup.
 
+Example:
+
+    after setup_finalize => sub {
         my $app = shift;
 
-        ## do stuff, i.e., determine a primary key column for sessions stored in a DB
-
-        $app->next::method(@_);
-
-
-    }
+        ## do stuff here..
+    };
 
 =cut
 
