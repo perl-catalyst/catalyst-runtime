@@ -217,7 +217,7 @@ been called, and will not call them again.
 
 Using this now causes infinite recursion between MyApp::setup and
 Catalyst::setup, due to other backwards compatibility issues related to how
-plugin setup works. Moose method modifiers like C<< before|after|around_setup
+plugin setup works. Moose method modifiers like C<< before|after|around setup
 => sub { ... }; >> also will not operate correctly on the setup method.
 
 The right way to do it is this:
