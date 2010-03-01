@@ -1,5 +1,133 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixed:
+   - uri_for will now escape unsafe chars in captures and encode utf8 chars
+
+5.80020 2010-02-04 06:51:18
+
+  New features:
+    - Allow components to specify additional components to be set up by
+      overriding the expand_modules method. (Oliver Charles)
+
+5.80019 2010-01-29 01:04:09
+
+  Bug fixed:
+   - Calls to $c->uri_for with private paths as strings (e.g.
+     $c->uri_for('controller/action', 'arg1', 'arg2') ) no longer have
+     / encoded to %2F. This is due to $c->uri_for('static', 'css/foo', $bar)
+     which should not be encoded.
+     Calls with an action object (rather than a string), or uri_for action
+     will still encode / in args and captures to %2F
+
+   - The above noted / => %2F encoding in uri_for_action or uri_for with
+     an action object has been fixed to not just encode the first slash in
+     any set of args/captures.
+
+   - nginx and lighttpd FCGI requests with URI encoded sections as the first
+     path part have been fixed to operate correctly.
+
+   - A source of bogus warnings in Catalyst::Component::BUILDARGS has been
+     removed.
+
+  Documentation:
+   - Improve the documentation about -Home and how Catalyst finds the home path
+     for applications.
+   - Various minor typo fixes.
+
+  New features:
+   - Allow passing additional arguments to action constructors.
+
+5.80018 2010-01-12 22:24:20
+
+  Bug fixed:
+   - Call ->canonical on URI derived from $ENV{REQUEST_URI} to get
+     paths correctly decoded. This bug was previously hidden by a bug
+     in HTTP::Request::AsCGI.
+
+  Documentation:
+   - Clarify that uri_for_action works on private paths, with example.
+   - Clarify documentation about debug
+
+  Deprecations:
+   - Saying use Catalyst::Test; (without an application name or () to stop
+     the importer running is now deprecated and will issue a warning.
+     You should be saying use Catalyst::Test ();
+
+5.80017 2010-01-10 02:27:29
+
+  Documentation:
+   - Fix docs for ->forward method when passed a class name - this should
+     be a component name (e.g. View::HTML, not a full class name, like
+     MyApp::View::HTML).
+
+  Bug fixes:
+   - --daemon and -d options to Catalyst::Script::FastCGI are fixed.
+   - Fix the debug dump for applications which use Catalyst::Plugin::Session
+     (RT#52898)
+   - Fix regression in the case where mod_rewrite is being used to rewrite
+     requests into a path below your application base introduced with the
+     %2F related fixes in 5.80014_02.
+   - Do not crash on SIGHUP if Catalyst::Engine::HTTP->run is not passed the
+     argv key in the options hash.
+   - Correctly pass the arguments to Catalyst::Script::Server through to
+     Catalyst::Engine::HTTP->run so that the server can restart itself
+     with the correct options on SIGHUP.
+   - Require new MooseX::MethodAttributes to be compatible with Moose
+     versions >= 0.93_01
+   - Require new MooseX::Role::WithOverloading to be compatible with Moose
+     versions >= 0.93_01
+
+  Cleanups:
+    - Stop suppressing warnings from Class::C3::Adopt::NEXT now that most plugins
+      have been updated to not use NEXT. If you get warnings then please upgrade
+      your components or log a bug with the component author if an upgrade is
+      not available. The Class::C3::Adopt::NEXT documentation contains information
+      about how to suppress the warnings in your application if you need to.
+
+5.80016 2009-12-11 23:23:33
+
+  Bug fixes:
+
+   - Fix slurping a file to work correctly with binary on Win32 in the
+     encoding test controller.
+
+  Bug fixes in the new scripts (for applications which have been upgraded):
+
+   - Allow --restartdirectory as an option for the Server script, for
+     backwards compatibility. (Dave Rolsky)
+   - The --host option for the server script defaulted to localhost, rather
+     than listening on all interfaces, which was the previous default. (Dave
+     Rolsky)
+   - Restore -p option for pid file in the FastCGI server script.
+   - Fix the script environment variables MYAPP_PORT and MYAPP_RELOAD RT#52604
+   - Fix aliasing applications under non-root paths with mod_rewrite in
+     some apache versions where %ENV{SCRIPT_NAME} is set to the real name of
+     the script, by using $ENV{REDIRECT_URL} which contains the non-rewritten
+     URI.
+   - Fix usage display when myapp_create.pl is run with no arguments. RT#52630
+
+  New features:
+
+   - The __MOP__ hash element is suppressed from being dumped fully
+     (and instead stringified) when dumping the error screen to be
+     less packed with information of no use.
+
+  Documentation:
+
+   - Fix Pod nits (RT#52370)
+
+5.80015 2009-12-02 15:13:54
+  Bug fixes:
+   - Fix bug in Catalyst::Engine which would cause a request parsing to end
+     prematurely in the hypothetical case where calling $engine->read returned
+     the single character '0'.
+   - Fix failing tests when combined with new HTTP::Request::AsCGI
+
+  Documentation:
+   - Improved documentation on read and read_chunk methods in Catalyst::Engine.
+   - Fix reversal of SCRIPT_NAME and PATH_INFO in previously correct nginx
+     FastCGI documentation introduced in _02.
+
 5.80014_02 2009-12-01 00:55:23
   Bug fixes:
    - Fix reporting the wrong Content-Length if the response body is an
@@ -346,7 +474,7 @@
           B::Hooks::OP::Check::StashChange
         - Fix the unattached chain debug table for endpoints with no
           parents at all.
-        - Turn of test aggregation by default. Only aggregate if the
+        - Turn off test aggregation by default. Only aggregate if the
           AGGREGATE_TESTS environment variable is set and a recent
           Test::Aggregate is available.
         - Bump to MooseX::MethodAttributes 0.09, to gain the

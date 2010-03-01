@@ -17,7 +17,7 @@ has listen => (
 
 has pidfile => (
     traits        => [qw(Getopt)],
-    cmd_aliases   => 'pid',
+    cmd_aliases   => [qw/pid p/],
     isa           => Str,
     is            => 'ro',
     documentation => 'Specify a pidfile',
@@ -27,7 +27,7 @@ has daemon => (
     traits        => [qw(Getopt)],
     isa           => Bool,
     is            => 'ro',
-    cmd_aliases   => 'd',
+    cmd_aliases   => [qw/d detach/], # Eww, detach is here as we fucked it up.. Deliberately not documented
     documentation => 'Daemonize (go into the background)',
 );
 
@@ -55,14 +55,6 @@ has nproc => (
     documentation => 'Specify a number of child processes',
 );
 
-has detach => (
-    traits        => [qw(Getopt)],
-    cmd_aliases   => 'det',
-    isa           => Bool,
-    is            => 'ro',
-    documentation => 'Detach this FastCGI process',
-);
-
 sub _application_args {
     my ($self) = shift;
     return (
@@ -71,7 +63,7 @@ sub _application_args {
             nproc   => $self->nproc,
             pidfile => $self->pidfile,
             manager => $self->manager,
-            detach  => $self->detach,
+            detach  => $self->daemon,
             keep_stderr => $self->keeperr,
         }
     );

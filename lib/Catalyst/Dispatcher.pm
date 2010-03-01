@@ -153,7 +153,7 @@ sub _command2action {
         $action = $self->_invoke_as_path( $c, "$command", \@args );
     }
 
-    # go to a component ( "MyApp::*::Foo" or $c->component("...")
+    # go to a component ( "View::Foo" or $c->component("...")
     # - a path or an object)
     unless ($action) {
         my $method = @extra_params ? $extra_params[0] : "process";

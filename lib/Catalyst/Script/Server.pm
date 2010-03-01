@@ -8,6 +8,7 @@ BEGIN {
 use Moose;
 use MooseX::Types::Common::Numeric qw/PositiveInt/;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
+use Catalyst::Utils;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -27,8 +28,8 @@ has host => (
     cmd_aliases   => 'h',
     isa           => Str,
     is            => 'ro',
-    default       => 'localhost',
-    documentation => 'Specify an IP on this host for the server to bind to',
+    # N.B. undef (the default) means we bind on all interfaces on the host.
+    documentation => 'Specify a hostname or IP on this host for the server to bind to',
 );
 
 has fork => (
@@ -45,7 +46,9 @@ has port => (
     cmd_aliases   => 'p',
     isa           => PositiveInt,
     is            => 'ro',
-    default       => 3000,
+    default       => sub {
+        Catalyst::Utils::env_value(shift->application_name, 'port') || 3000
+    },
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
@@ -80,13 +83,15 @@ has restart => (
     cmd_aliases   => 'r',
     isa           => Bool,
     is            => 'ro',
-    default       => 0,
+    default       => sub {
+        Catalyst::Utils::env_value(shift->application_name, 'reload') || 0;
+    },
     documentation => 'use Catalyst::Restarter to detect code changes and restart the application',
 );
 
 has restart_directory => (
     traits        => [qw(Getopt)],
-    cmd_aliases   => 'rdir',
+    cmd_aliases   => [ 'rdir', 'restartdirectory' ],
     isa           => ArrayRef[Str],
     is            => 'ro',
     documentation => 'Restarter directory to watch',
@@ -185,6 +190,7 @@ sub _application_args {
         $self->port,
         $self->host,
         {
+           argv => $self->ARGV,
            map { $_ => $self->$_ } qw/
                 fork
                 keepalive
@@ -219,12 +225,12 @@ Catalyst::Script::Server - Catalyst test server
    -k     --keepalive      enable keep-alive connections
    -r     --restart        restart when files get modified
                        (defaults to false)
-   --rd   --restartdelay  delay between file checks
+   --rd   --restart_delay  delay between file checks
                       (ignored if you have Linux::Inotify2 installed)
-   --rr   --restartregex  regex match files that trigger
+   --rr   --restart_regex  regex match files that trigger
                       a restart when modified
                       (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
-   --rdir --restartdirectory  the directory to search for
+   --rdir --restart_directory  the directory to search for
                       modified files, can be set mulitple times
                       (defaults to '[SCRIPT_DIR]/..')
    --sym  --follow_symlinks   follow symlinks in search directories

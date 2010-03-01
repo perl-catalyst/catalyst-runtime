@@ -108,6 +108,8 @@ sub prepare_headers {
 
 =cut
 
+# Please don't touch this method without adding tests in
+# t/aggregate/unit_core_engine_cgi-prepare_path.t
 sub prepare_path {
     my ( $self, $c ) = @_;
     local (*ENV) = $self->env || \%ENV;
@@ -153,11 +155,24 @@ sub prepare_path {
     # Here we try to resurrect the original encoded URI from REQUEST_URI.
     my $path_info   = $ENV{PATH_INFO};
     if (my $req_uri = $ENV{REQUEST_URI}) {
-        if (defined $script_name) {
-            $req_uri =~ s/^\Q$script_name\E//;
-        }
+        $req_uri =~ s/^\Q$base_path\E//;
         $req_uri =~ s/\?.*$//;
-        $path_info = $req_uri if $req_uri;
+        if ($req_uri) {
+            # Note that if REQUEST_URI doesn't start with a /, then the user
+            # is probably using mod_rewrite or something to rewrite requests
+            # into a sub-path of their application..
+            # This means that REQUEST_URI needs information from PATH_INFO
+            # prepending to it to be useful, otherwise the sub path which is
+            # being redirected to becomes the app base address which is
+            # incorrect.
+            if (substr($req_uri, 0, 1) ne '/') {
+                my ($match) = $req_uri =~ m|^([^/]+)|;
+                my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
+                substr($req_uri, 0, length($match), $path_info_part)
+                    if $path_info_part;
+            }
+            $path_info = $req_uri;
+        }
     }
 
     # set the request URI
@@ -181,7 +196,7 @@ sub prepare_path {
     my $query = $ENV{QUERY_STRING} ? '?' . $ENV{QUERY_STRING} : '';
     my $uri   = $scheme . '://' . $host . '/' . $path . $query;
 
-    $c->request->uri( bless \$uri, $uri_class );
+    $c->request->uri( bless(\$uri, $uri_class)->canonical );
 
     # set the base URI
     # base must end in a slash

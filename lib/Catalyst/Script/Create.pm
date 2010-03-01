@@ -40,13 +40,13 @@ sub _build_helper_class { 'Catalyst::Helper' }
 sub run {
     my ($self) = @_;
 
-    $self->_exit_with_usage if !$self->ARGV->[0];
+    $self->_getopt_full_usage if !$self->ARGV->[0];
 
     my $helper_class = $self->helper_class;
     Class::MOP::load_class($helper_class);
     my $helper = $helper_class->new( { '.newfiles' => !$self->force, mech => $self->mechanize } );
 
-    $self->_exit_with_usage unless $helper->mk_component( $self->application_name, @ARGV );
+    $self->_getopt_full_usage unless $helper->mk_component( $self->application_name, @ARGV );
 
 }
 

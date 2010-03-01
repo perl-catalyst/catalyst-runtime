@@ -5,15 +5,16 @@ use strict;
 use base qw( Catalyst::Controller );
 
 #
-#   This controller builds two patterns of URI:
+#   This controller build the following patterns of URI:
 #      /captureargs/*/*
 #      /captureargs/*/*/edit
 #      /captureargs/*
 #      /captureargs/*/edit
+#      /captureargs/test/*
 #   It will output the arguments they got passed to @_ after the
 #   context object. 
-#   /captureargs/one/edit should not dispatch to
-#   /captureargs/*/*
+#   /captureargs/one/edit should not dispatch to /captureargs/*/*
+#   /captureargs/test/one should not dispatch to /captureargs/*/*
 
 sub base  :Chained('/') PathPart('captureargs') CaptureArgs(0) {
     my ( $self, $c, $arg ) = @_;
@@ -48,6 +49,11 @@ sub view_two_args :Chained('two_args') PathPart('') Args(0) {
 sub view_one_arg :Chained('one_arg') PathPart('') Args(0) {
     my ( $self, $c ) = @_;
     push @{ $c->stash->{ passed_args } }, 'view_one_arg';
+}
+
+sub test_plus_arg :Chained('base') PathPart('test') Args(1) {
+    my ( $self, $c, $arg ) = @_;
+    push @{ $c->stash->{ passed_args } }, 'test_plus_arg', $arg;
 }
 
 

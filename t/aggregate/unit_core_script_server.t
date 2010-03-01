@@ -12,7 +12,8 @@ use Catalyst::Script::Server;
 my $testopts;
 
 # Test default (no opts/args behaviour)
-testOption( [ qw// ], ['3000', 'localhost', opthash()] );
+# Note undef for host means we bind to all interfaces.
+testOption( [ qw// ], ['3000', undef, opthash()] );
 
 # Old version supports long format opts with either one or two dashes.  New version only supports two.
 #                Old                       New
@@ -23,31 +24,48 @@ testOption( [ qw/--host testhost/ ], ['3000', 'testhost', opthash()] );
 testOption( [ qw/-h testhost/ ], ['3000', 'testhost', opthash()] );
 
 # port           -p -port --port           -l --listen
-testOption( [ qw/-p 3001/ ], ['3001', 'localhost', opthash()] );
-testOption( [ qw/--port 3001/ ], ['3001', 'localhost', opthash()] );
+testOption( [ qw/-p 3001/ ], ['3001', undef, opthash()] );
+testOption( [ qw/--port 3001/ ], ['3001', undef, opthash()] );
+{
+    local $ENV{TESTAPPTOTESTSCRIPTS_PORT} = 5000;
+    testOption( [ qw// ], [5000, undef, opthash()] );
+}
+{
+    local $ENV{CATALYST_PORT} = 5000;
+    testOption( [ qw// ], [5000, undef, opthash()] );
+}
 
 # fork           -f -fork --fork           -f --fork
-testOption( [ qw/--fork/ ], ['3000', 'localhost', opthash(fork => 1)] );
-testOption( [ qw/-f/ ], ['3000', 'localhost', opthash(fork => 1)] );
+testOption( [ qw/--fork/ ], ['3000', undef, opthash(fork => 1)] );
+testOption( [ qw/-f/ ], ['3000', undef, opthash(fork => 1)] );
 
 # pidfile        -pidfile                  --pid --pidfile
-testOption( [ qw/--pidfile cat.pid/ ], ['3000', 'localhost', opthash(pidfile => "cat.pid")] );
-testOption( [ qw/--pid cat.pid/ ], ['3000', 'localhost', opthash(pidfile => "cat.pid")] );
+testOption( [ qw/--pidfile cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
+testOption( [ qw/--pid cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
 
 # keepalive      -k -keepalive --keepalive -k --keepalive
-testOption( [ qw/-k/ ], ['3000', 'localhost', opthash(keepalive => 1)] );
-testOption( [ qw/--keepalive/ ], ['3000', 'localhost', opthash(keepalive => 1)] );
+testOption( [ qw/-k/ ], ['3000', undef, opthash(keepalive => 1)] );
+testOption( [ qw/--keepalive/ ], ['3000', undef, opthash(keepalive => 1)] );
 
 # symlinks       -follow_symlinks          --sym --follow_symlinks
-testOption( [ qw/--follow_symlinks/ ], ['3000', 'localhost', opthash(follow_symlinks => 1)] );
-testOption( [ qw/--sym/ ], ['3000', 'localhost', opthash(follow_symlinks => 1)] );
+testOption( [ qw/--follow_symlinks/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
+testOption( [ qw/--sym/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
 
 # background     -background               --bg --background
-testOption( [ qw/--background/ ], ['3000', 'localhost', opthash(background => 1)] );
-testOption( [ qw/--bg/ ], ['3000', 'localhost', opthash(background => 1)] );
+testOption( [ qw/--background/ ], ['3000', undef, opthash(background => 1)] );
+testOption( [ qw/--bg/ ], ['3000', undef, opthash(background => 1)] );
 
 # restart        -r -restart --restart     -R --restart
 testRestart( ['-r'], restartopthash() );
+{
+    local $ENV{TESTAPPTOTESTSCRIPTS_RELOAD} = 1;
+    testRestart( [], restartopthash() );
+}
+{
+    local $ENV{CATALYST_RELOAD} = 1;
+    testRestart( [], restartopthash() );
+}
+
 # restart dly    -rd -restartdelay         --rd --restart_delay
 testRestart( ['-r', '--rd', 30], restartopthash(sleep_interval => 30) );
 testRestart( ['-r', '--restart_delay', 30], restartopthash(sleep_interval => 30) );
@@ -71,12 +89,15 @@ sub testOption {
     };
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
+    # Mangle argv into the options..
+    $resultarray->[-1]->{argv} = $argstring;
     is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
 }
 
 sub testRestart {
     my ($argstring, $resultarray) = @_;
     my $app = _build_testapp($argstring);
+    ok $app->restart, 'App is in restart mode';
     my $args = {$app->_restarter_args};
     is_deeply delete $args->{argv}, $argstring, 'argv is arg string';
     is ref(delete $args->{start_sub}), 'CODE', 'Closure to start app present';

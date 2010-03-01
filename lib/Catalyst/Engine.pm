@@ -108,6 +108,24 @@ is in debug mode, or a `please come back later` message otherwise.
 
 =cut
 
+sub _dump_error_page_element {
+    my ($self, $i, $element) = @_;
+    my ($name, $val)  = @{ $element };
+
+    # This is fugly, but the metaclass is _HUGE_ and demands waaay too much
+    # scrolling. Suggestions for more pleasant ways to do this welcome.
+    local $val->{'__MOP__'} = "Stringified: "
+        . $val->{'__MOP__'} if ref $val eq 'HASH' && exists $val->{'__MOP__'};
+
+    my $text = encode_entities( dump( $val ));
+    sprintf <<"EOF", $name, $text;
+<h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
+<div id="dump_$i">
+    <pre wrap="">%s</pre>
+</div>
+EOF
+}
+
 sub finalize_error {
     my ( $self, $c ) = @_;
 
@@ -138,14 +156,7 @@ sub finalize_error {
         my @infos;
         my $i = 0;
         for my $dump ( $c->dump_these ) {
-            my $name  = $dump->[0];
-            my $value = encode_entities( dump( $dump->[1] ));
-            push @infos, sprintf <<"EOF", $name, $value;
-<h2><a href="#" onclick="toggleDump('dump_$i'); return false">%s</a></h2>
-<div id="dump_$i">
-    <pre wrap="">%s</pre>
-</div>
-EOF
+            push @infos, $self->_dump_error_page_element($i, $dump);
             $i++;
         }
         $infos = join "\n", @infos;
@@ -269,7 +280,8 @@ EOF
 </html>
 
 
-    # Trick IE
+    # Trick IE. Old versions of IE would display their own error page instead
+    # of ours if we'd give it less than 512 bytes.
     $c->res->{body} .= ( ' ' x 512 );
 
     # Return 500
@@ -327,7 +339,8 @@ sub prepare_body {
               if exists $appclass->config->{uploadtmp};
         }
 
-        while ( my $buffer = $self->read($c) ) {
+        # Check for definedness as you could read '0'
+        while ( defined ( my $buffer = $self->read($c) ) ) {
             $c->prepare_body_chunk($buffer);
         }
 
@@ -566,6 +579,10 @@ sub prepare_write { }
 
 =head2 $self->read($c, [$maxlength])
 
+Reads from the input stream by calling C<< $self->read_chunk >>.
+
+Maintains the read_length and read_position counters as data is read.
+
 =cut
 
 sub read {
@@ -583,6 +600,11 @@ sub read {
     my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
     my $rc = $self->read_chunk( $c, my $buffer, $readlen );
     if ( defined $rc ) {
+        if (0 == $rc) { # Nothing more to read even though Content-Length
+                        # said there should be. FIXME - Warn in the log here?
+            $self->finalize_read;
+            return;
+        }
         $self->read_position( $self->read_position + $rc );
         return $buffer;
     }
@@ -595,7 +617,8 @@ sub read {
 =head2 $self->read_chunk($c, $buffer, $length)
 
 Each engine implements read_chunk as its preferred way of reading a chunk
-of data.
+of data. Returns the number of bytes read. A return of 0 indicates that
+there is no more data to be read.
 
 =cut
 

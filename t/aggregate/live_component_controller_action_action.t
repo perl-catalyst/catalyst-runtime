@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 42 * $iters;
+use Test::More;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -147,4 +147,25 @@ sub run_tests {
         );
     }
 
+    {
+        ok( my $response = request('http://localhost/action_action_seven'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            'action_action_seven', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Action',
+            'Test Class'
+        );
+        is( $response->header('X-TestExtraArgsAction'), '42,23', 'Extra args get passed to action contstructor' );
+        like(
+            $response->content,
+            qr/^bless\( .* 'Catalyst::Request' \)$/s,
+            'Content is a serialized Catalyst::Request'
+        );
+    }
 }
+
+done_testing;

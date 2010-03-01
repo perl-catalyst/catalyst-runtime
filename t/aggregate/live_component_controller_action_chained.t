@@ -931,6 +931,28 @@ sub run_tests {
         }
     }
 
+    #  PathPart('...') Args(1) should win over CaptureArgs(2) PathPart('')
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained::CaptureArgs->base
+          TestApp::Controller::Action::Chained::CaptureArgs->test_one_arg
+          TestApp::Controller::Action::Chained::CaptureArgs->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        # should dispatch to /base/test_one_arg
+        ok( my $response = request('http://localhost/captureargs/test/one'),
+            'Correct pathpart/arg ran' );
+        TODO: {
+        local $TODO = 'Known bug';
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'base; test_plus_arg; one;', 'Content OK' );
+        }
+    }
+
     #
     #   Args(0) should win over Args() if we actually have no arguments.
     {
@@ -1052,6 +1074,7 @@ sub run_tests {
         ['foo%2Fbar', 'baz%2Fquux'],
         ['foo%2Fbar', 'baz%2Fquux', { foo => 'bar', 'baz' => 'quux%2Ffrood'}],
         ['foo%2Fbar', 'baz%2Fquux', { foo => 'bar', 'baz%2Ffnoo' => 'quux%2Ffrood'}],
+        ['h%C3%BCtte', 'h%C3%BCtte', { test => 'h%C3%BCtte' } ],
     ) {
         my $path = '/chained/roundtrip_urifor/' .
             $thing->[0] . '/' . $thing->[1];
@@ -1063,7 +1086,8 @@ sub run_tests {
             'request ' . $path . ' ok');
         # Just check that the path matches, as who the hell knows or cares
         # where the app is based (live tests etc)
-        ok( index($content, $path) > 1, 'uri can round trip through uri_for' );
+        ok( index($content, $path) > 1, 'uri can round trip through uri_for' )
+            or diag("Expected $path, got $content");
     }
 }
 
