@@ -1743,7 +1743,7 @@ sub finalize {
         $c->finalize_body;
     }
 
-	$c->log_response;
+    $c->log_response;
 
     if ($c->use_stats) {
         my $elapsed = sprintf '%f', $c->stats->elapsed;
@@ -2109,8 +2109,8 @@ sub log_request {
 
     return unless $c->debug;
 
-	my($dump) = grep {$_->[0] eq 'Request' } $c->dump_these;
-	my $request = $dump->[1];
+    my($dump) = grep {$_->[0] eq 'Request' } $c->dump_these;
+    my $request = $dump->[1];
 
     my ( $method, $path, $address ) = ( $request->method, $request->path, $request->address );
     $method ||= '';
@@ -2148,8 +2148,8 @@ sub log_response {
 
     return unless $c->debug;
 
-	my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
-	my $response = $dump->[1];
+    my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
+    my $response = $dump->[1];
 
     $c->log->debug('Response Status: ' . $response->status);
     $c->log_headers('response', $response->headers);
@@ -2165,12 +2165,12 @@ sub log_request_parameters {
     my $c          = shift;
     my %all_params = @_;
 
-	return unless $c->debug;
+    return unless $c->debug;
 
     my $column_width = Catalyst::Utils::term_width() - 44;
     foreach my $type (qw(query body)) {
-		my $params = $all_params{$type};
-		next if ! keys %$params;
+        my $params = $all_params{$type};
+        next if ! keys %$params;
         my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ $column_width, 'Value' ] );
         for my $key ( sort keys %$params ) {
             my $param = $params->{$key};
@@ -2191,7 +2191,7 @@ the debug logs.
 
 sub log_request_uploads {
     my $c = shift;
-	my $request = shift;
+    my $request = shift;
     return unless $c->debug;
     my $uploads = $request->uploads;
     if ( keys %$uploads ) {
