@@ -2151,8 +2151,14 @@ sub log_response {
     my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
     my $response = $dump->[1];
 
-    $c->log->debug('Response Status: ' . $response->status);
-    $c->log_headers('response', $response->headers);
+	$c->log->debug(
+		sprintf(
+			'Response Code: %s; Content-Type: %s; Content-Length: %s',
+			$response->status                            || 'unknown',
+			$response->headers->header('Content-Type')   || 'unknown',
+			$response->headers->header('Content-Length') || 'unknown'
+		)
+	);
 }
 
 =head2 $c->log_request_parameters( query => {}, body => {} )
