@@ -297,7 +297,7 @@ static, and dynamic.
 =head3 Standalone server mode
 
     FastCgiExternalServer /tmp/myapp.fcgi -socket /tmp/myapp.socket
-    Alias /myapp/ /tmp/myapp/myapp.fcgi/
+    Alias /myapp/ /tmp/myapp.fcgi/
 
     # Or, run at the root
     Alias / /tmp/myapp.fcgi/
