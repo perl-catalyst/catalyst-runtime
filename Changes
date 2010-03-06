@@ -1,5 +1,15 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  New features:
+   - Log an extra line in debug mode with the response status code,
+     the content type and content length if available.
+
+  Refactoring:
+   - Display of the end of hit debug messages has been factored out into
+     log_headers, log_request and log_response methods which all call
+     $c->dump_these so that there is a unified point from which to hook
+     in parameter filtering (for example).
+
   Bug fixed:
     - DispatchType::Index's uri_for_action only returns for actions registered
       with it (prevents 'index :Path' or similar resolving to the wrong URI)
