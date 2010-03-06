@@ -159,6 +159,17 @@ TODO: {
     );
 }
 
+{
+    my $index_not_private = $dispatcher->get_action_by_path(
+                             '/action/chained/argsorder/index'
+                            );
+
+    is(
+      Catalyst::uri_for( $context, $index_not_private )->as_string,
+      'http://127.0.0.1/argsorder',
+      'Return non-DispatchType::Index path for index action with args'
+    );
+}
 
 done_testing;
 

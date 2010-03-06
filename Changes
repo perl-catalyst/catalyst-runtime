@@ -1,7 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
   Bug fixed:
-   - uri_for will now escape unsafe chars in captures and encode utf8 chars
+    - DispatchType::Index's uri_for_action only returns for actions registered
+      with it (prevents 'index :Path' or similar resolving to the wrong URI)
+
+5.80021 2010-03-03 23:02:01
+
+  Bug fixed:
+   - $c->uri_for will now escape unsafe characterss in captures
+     ($c->request->captures) and correctly encode utf8 charracters.
 
 5.80020 2010-02-04 06:51:18
 

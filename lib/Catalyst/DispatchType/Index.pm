@@ -67,7 +67,7 @@ Register an action with this DispatchType.
 sub register {
     my ( $self, $c, $action ) = @_;
 
-    $self->_actions->{ $action->reverse } = $action;
+    $self->_actions->{ $action->reverse } = $action if $action->name eq 'index';
 
     return 1;
 }
@@ -84,7 +84,7 @@ sub uri_for_action {
 
     return undef if @$captures;
 
-    return undef unless $action->name eq 'index';
+    return undef unless exists $self->_actions->{ $action->reverse };
 
     return "/".$action->namespace;
 }
