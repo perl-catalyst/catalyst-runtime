@@ -33,7 +33,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * Fix Test::WWW::Mechanize::Catalyst which has been broken by moving stuff
     about.
   * properly pass along server arguments
-  * move disabled tests in unit_core_engine_cgi-prepare_path.t into Plack
+  * Tests in unit_core_engine-prepare_path.t into Plack, or fixed by us?
   * think about whether or not to generate myapp.psgi and how to configure
     middleware
   * make sure we're running under a server that support psgi.streaming - maybe
