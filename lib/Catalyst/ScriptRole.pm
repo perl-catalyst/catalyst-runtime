@@ -72,7 +72,7 @@ sub _run_application {
     else {
         $server = Plack::Loader->auto($self->_plack_loader_args);
     }
-    $app->run($server, $self->_application_args);
+    $app->run($self->_application_args, $server);
 }
 
 1;

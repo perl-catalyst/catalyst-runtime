@@ -2378,6 +2378,10 @@ sub setup_engine {
     unless ($engine) {
         $engine = $class->engine_class;
     }
+    $engine = 'Catalyst::Engine::' . $engine
+        unless $engine =~ /^Catalyst::Engine/;
+
+    $engine = 'Catalyst::Engine' if $engine eq 'Catalyst::Engine::HTTP';
 
     Class::MOP::load_class($engine);
 
