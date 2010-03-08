@@ -1,20 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
-
-BEGIN {
-    plan skip_all => 'these tests should probably be moved to plack, or at least ported away from Engine::CGI';
-}
-
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use TestApp;
-use Catalyst::Engine::CGI;
+use Catalyst::Engine;
 
 # mod_rewrite to app root for non / based app
 {
     my $r = get_req (
-        REDIRECT_URL => '/comics/',
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/',
     );
@@ -26,7 +20,6 @@ use Catalyst::Engine::CGI;
 {
     my $r = get_req (
         PATH_INFO  => '/foo/bar.gif',
-        REDIRECT_URL => '/comics/foo/bar.gif',
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/foo/bar.gif',
     );
@@ -81,11 +74,11 @@ sub get_req {
         PATH_INFO => '/',
     );
 
-    local %ENV = (%template, @_);
-
+    my $engine = Catalyst::Engine->new(
+        env => { %template, @_ },
+    );
     my $i = TestApp->new;
-    $i->engine(Catalyst::Engine::CGI->new);
-    $i->engine->prepare_path($i);
+    $engine->prepare_path($i);
     return $i->req;
 }
 
