@@ -640,7 +640,13 @@ If you want to search for controllers, pass in a regexp as the argument.
 sub controller {
     my ( $c, $name, @args ) = @_;
 
+    my $appclass = ref($c) || $c;
     if( $name ) {
+        unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
+            my $comps = $c->components;
+            my $check = $appclass."::Controller::".$name;
+            return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+        }
         my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
         return $c->_filter_component( $result[ 0 ], @args );
@@ -674,6 +680,11 @@ sub model {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
     if( $name ) {
+        unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
+            my $comps = $c->components;
+            my $check = $appclass."::Model::".$name;
+            return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+        }
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
         return $c->_filter_component( $result[ 0 ], @args );
@@ -728,6 +739,11 @@ sub view {
 
     my $appclass = ref($c) || $c;
     if( $name ) {
+        unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
+            my $comps = $c->components;
+            my $check = $appclass."::View::".$name;
+            return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+        }
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
         return $c->_filter_component( $result[ 0 ], @args );
@@ -3121,6 +3137,8 @@ random: Roland Lammel <lammel@cpan.org>
 Robert Sedlacek C<< <rs@474.at> >>
 
 sky: Arthur Bergman
+
+szbalint: Balint Szilakszi <szbalint@cpan.org>
 
 t0m: Tomas Doran <bobtfish@bobtfish.net>
 

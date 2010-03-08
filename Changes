@@ -4,11 +4,13 @@
    - Log an extra line in debug mode with the response status code,
      the content type and content length if available.
 
-  Refactoring:
+  Refactoring / optimizations:
    - Display of the end of hit debug messages has been factored out into
      log_headers, log_request and log_response methods which all call
      $c->dump_these so that there is a unified point from which to hook
      in parameter filtering (for example).
+   - $c->model/view/controller have become a lot faster for non-regexp names
+     by using direct hash lookup instead of looping.
 
   Bug fixed:
     - DispatchType::Index's uri_for_action only returns for actions registered
