@@ -101,7 +101,8 @@ print <<"EOF";
     you also install the development tools package Catalyst::Devel.
 
         perl -MCPANPLUS -e 'install Catalyst::Devel' # or
-        perl -MCPAN -e 'install Catalyst::Devel'
+        perl -MCPAN -e 'install Catalyst::Devel'     # or
+        cpanm Catalyst::Devel
 
     To get some commonly used plugins, as well as the TT view and DBIC
     model, install Task::Catalyst in the same way.
