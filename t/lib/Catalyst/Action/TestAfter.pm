@@ -3,7 +3,8 @@ package Catalyst::Action::TestAfter;
 use strict;
 use warnings;
 
-use base qw/Catalyst::Action/;
+use base qw/Catalyst::Action/; # N.B. Keep as a non-moose class, this also
+                               # tests metaclass initialization works as expected
 
 sub execute {
     my $self = shift;

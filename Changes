@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ New features:
+  - Merge Catalyst::Controller::ActionRole into Catalyst::Controller.
+
  Bug fixes:
   - Fix warnings in some matching cases for Action methods with
     Args(), when using Catalyst::DispatchType::Chained
