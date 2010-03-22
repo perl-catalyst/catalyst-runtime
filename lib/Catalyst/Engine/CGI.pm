@@ -117,6 +117,12 @@ sub prepare_path {
     my $scheme = $c->request->secure ? 'https' : 'http';
     my $host      = $ENV{HTTP_HOST}   || $ENV{SERVER_NAME};
     my $port      = $ENV{SERVER_PORT} || 80;
+
+    # fix up for IIS
+    if ($ENV{SERVER_SOFTWARE} && $ENV{SERVER_SOFTWARE} =~ m{IIS/[6-9]\.\d}) {
+        $ENV{PATH_INFO} =~ s/^\Q$ENV{SCRIPT_NAME}\E//;
+    }
+
     my $script_name = $ENV{SCRIPT_NAME};
     $script_name =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go if $script_name;
 

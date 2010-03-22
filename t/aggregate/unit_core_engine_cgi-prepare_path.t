@@ -86,7 +86,18 @@ use Catalyst::Engine::CGI;
     is ''.$r->base, 'http://www.foo.com/oslobilder/';
 }
 
-
+# CGI hit on IIS for non / based app
+{
+    my $r = get_req (
+        SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
+        PATH_INFO => '/bobtfish/Gitalist/script/gitalist.cgi/static/css/blueprint/screen.css',
+        SCRIPT_NAME => '/bobtfish/Gitalist/script/gitalist.cgi',
+        PATH_TRANSLATED =>
+'C:\\Inetpub\\vhosts\\foo.com\\httpdocs\\bobtfish\\Gitalist\\script\\gitalist.cgi\\static\\css\\blueprint\\screen.css',
+    );
+    is ''.$r->uri, 'http://www.foo.com/bobtfish/Gitalist/script/gitalist.cgi/static/css/blueprint/screen.css';
+    is ''.$r->base, 'http://www.foo.com/bobtfish/Gitalist/script/gitalist.cgi/';
+}
 
 
 # FIXME - Test proxy logic
