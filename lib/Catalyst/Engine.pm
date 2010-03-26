@@ -543,7 +543,7 @@ sub prepare_uploads {
             my $u = Catalyst::Request::Upload->new
               (
                size => $upload->{size},
-               type => $headers->content_type,
+               type => scalar $headers->content_type,
                headers => $headers,
                tempname => $upload->{tempname},
                filename => $upload->{filename},

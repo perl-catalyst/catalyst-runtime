@@ -19,6 +19,8 @@
   Bug fixed:
     - DispatchType::Index's uri_for_action only returns for actions registered
       with it (prevents 'index :Path' or similar resolving to the wrong URI)
+    - Make sure to construct Upload objects properly, even if there are
+      multiple Content-Type headers (Closes RT#55976).
 
 5.80021 2010-03-03 23:02:01
 
