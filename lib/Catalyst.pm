@@ -2108,8 +2108,6 @@ Writes information about the request to the debug logs.  This includes:
 
 =item * Request method, path, and remote IP address
 
-=item * Request headers (see L</log_headers>)
-
 =item * Query keywords (see L<Catalyst::Request/query_keywords>)
 
 =item * Request parameters
@@ -2134,7 +2132,7 @@ sub log_request {
     $address ||= '';
     $c->log->debug(qq/"$method" request for "$path" from "$address"/);
 
-    $c->log_headers('request', $request->headers);
+    $c->log_request_headers($request->headers);
 
     if ( my $keywords = $request->query_keywords ) {
         $c->log->debug("Query keywords are: $keywords");
@@ -2153,7 +2151,9 @@ Writes information about the response to the debug logs.  This includes:
 
 =item * Response status code
 
-=item * Response headers (see L</log_headers>)
+=item * Content-Type header (if present)
+
+=item * Content-Length header (if present)
 
 =back
 
@@ -2232,6 +2232,15 @@ sub log_request_uploads {
         $c->log->debug( "File Uploads are:\n" . $t->draw );
     }
 }
+
+=head2 $c->log_request_headers($headers);
+
+Hook method which can be wrapped by plugins to log the request headers.
+No-op in the default implementation.
+
+=cut
+
+sub log_request_headers {}
 
 =head2 $c->log_headers($type => $headers)
 

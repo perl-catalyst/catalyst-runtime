@@ -6,7 +6,10 @@
 
   Refactoring / optimizations:
    - Display of the end of hit debug messages has been factored out into
-     log_headers, log_request and log_response methods which all call
+     log_headers, log_request, log_request_headers, log_response and
+     log_response_headers methods so that plugins which customise how
+     much information is shown on the debug screen as easy to write.
+   - Make all logging of request and response state get the information from
      $c->dump_these so that there is a unified point from which to hook
      in parameter filtering (for example).
    - $c->model/view/controller have become a lot faster for non-regexp names
