@@ -11,10 +11,6 @@
      in parameter filtering (for example).
    - $c->model/view/controller have become a lot faster for non-regexp names
      by using direct hash lookup instead of looping.
-   - Now reports the used server address as an IP string rather than a
-     looked up hostname (because nothing really cares and hostname
-     lookups, even on local interfaces, can be slow on dev machines with
-     hosed DNS setups)
 
   Bug fixed:
     - DispatchType::Index's uri_for_action only returns for actions registered

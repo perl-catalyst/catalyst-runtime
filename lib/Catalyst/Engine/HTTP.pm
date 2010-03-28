@@ -534,7 +534,8 @@ sub _socket_data {
         peeraddr  => $iaddr
             ? ( inet_ntoa($iaddr) || '127.0.0.1' )
             : '127.0.0.1',
-        localname => inet_ntoa($localiaddr) || '127.0.0.1',
+        localname => gethostbyaddr( $localiaddr, AF_INET ) || 'localhost',
+        localaddr => inet_ntoa($localiaddr) || '127.0.0.1',
     };
 
     return $data;
