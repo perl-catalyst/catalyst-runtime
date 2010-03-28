@@ -11,8 +11,11 @@
      in parameter filtering (for example).
    - $c->model/view/controller have become a lot faster for non-regexp names
      by using direct hash lookup instead of looping.
+   - IP address => hostname mapping for the server is only done once and cached
+     by Catalyst::Engine::HTTP to somewhat mitigate the problem of people
+     developing on machines pointed at slow DNS servers.
 
-  Bug fixed:
+  Bugs fixed:
     - DispatchType::Index's uri_for_action only returns for actions registered
       with it (prevents 'index :Path' or similar resolving to the wrong URI)
     - Make sure to construct Upload objects properly, even if there are
