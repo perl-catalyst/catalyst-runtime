@@ -2145,7 +2145,26 @@ sub log_request {
 
 =head2 $c->log_response
 
-Writes information about the response to the debug logs.  This includes:
+Writes information about the response to the debug logs by calling
+C<< $c->log_response_status_line >> and C<< $c->log_response_headers >>.
+
+=cut
+
+sub log_response {
+    my $c = shift;
+
+    return unless $c->debug;
+
+    my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
+    my $response = $dump->[1];
+
+    $c->log_response_status_line($response);
+    $c->log_response_headers($response->headers);
+}
+
+=head2 $c->log_response_status_line($response)
+
+Writes one line of information about the response to the debug logs.  This includes:
 
 =over 4
 
@@ -2159,13 +2178,8 @@ Writes information about the response to the debug logs.  This includes:
 
 =cut
 
-sub log_response {
-    my $c = shift;
-
-    return unless $c->debug;
-
-    my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
-    my $response = $dump->[1];
+sub log_response_status_line {
+    my ($c, $response) = @_;
 
     $c->log->debug(
         sprintf(
@@ -2176,6 +2190,15 @@ sub log_response {
         )
     );
 }
+
+=head2 $c->log_response_headers($headers);
+
+Hook method which can be wrapped by plugins to log the responseheaders.
+No-op in the default implementation.
+
+=cut
+
+sub log_response_headers {}
 
 =head2 $c->log_request_parameters( query => {}, body => {} )
 
