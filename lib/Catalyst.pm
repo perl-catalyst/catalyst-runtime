@@ -2278,7 +2278,8 @@ sub log_headers {
 
     return unless $c->debug;
 
-    my $t = Text::SimpleTable->new( [ 35, 'Header Name' ], [ 40, 'Value' ] );
+    my $column_width = Catalyst::Utils::term_width() - 28;
+    my $t = Text::SimpleTable->new( [ 15, 'Header Name' ], [ $column_width, 'Value' ] );
     $headers->scan(
         sub {
             my ( $name, $value ) = @_;
