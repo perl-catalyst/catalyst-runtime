@@ -79,9 +79,6 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 # Remember to update this in Catalyst::Runtime as well!
 
 our $VERSION = '5.80022';
-our $PRETTY_VERSION = $VERSION;
-
-$VERSION = eval $VERSION;
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1162,7 +1159,7 @@ EOF
 
     if ( $class->debug ) {
         my $name = $class->config->{name} || 'Application';
-        $class->log->info("$name powered by Catalyst $Catalyst::PRETTY_VERSION");
+        $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
 
     # Make sure that the application class becomes immutable at this point,
