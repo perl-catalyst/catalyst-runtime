@@ -2787,13 +2787,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
             if $plugin->isa( 'Catalyst::Component' );
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
-            no strict 'refs';
-            if ( my $meta = Class::MOP::get_metaclass_by_name($class) ) {
-              my @superclasses = ($plugin, $meta->superclasses );
-              $meta->superclasses(@superclasses);
-            } else {
-              unshift @{"$class\::ISA"}, $plugin;
-            }
+            my $meta = Class::MOP::get_metaclass_by_name($class);
+            $meta->superclasses($plugin, $meta->superclasses);
         }
         return $class;
     }
