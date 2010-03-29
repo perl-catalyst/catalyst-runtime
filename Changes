@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80022 2010-03-28 19:43:01
+
   New features:
    - Log an extra line in debug mode with the response status code,
      the content type and content length if available.

@@ -78,7 +78,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80021';
+our $VERSION = '5.80022';
 our $PRETTY_VERSION = $VERSION;
 
 $VERSION = eval $VERSION;
