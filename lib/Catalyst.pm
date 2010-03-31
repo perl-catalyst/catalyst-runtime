@@ -1950,7 +1950,7 @@ sub prepare {
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
-    if ( $c->debug ) {
+    if ( $c->debug || $c->config->{enable_catalyst_header} ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
