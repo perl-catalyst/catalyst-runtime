@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  New features:
+   - Setting __PACKAGE__->config(enable_catalyst_header => 1); in your MyApp.pm
+     now enables the X-Catalyst header being printed when not in debug mode.
+   - Require CGI::Simple::Cookie version 1.109 to ensure support for the
+     HttpOnly flag
+
 5.80022 2010-03-28 19:43:01
 
   New features:

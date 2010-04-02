@@ -24,7 +24,7 @@ requires 'MooseX::MethodAttributes::Inheritable' => '0.19';
 requires 'MooseX::Role::WithOverloading' => '0.05';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
-requires 'CGI::Simple::Cookie';
+requires 'CGI::Simple::Cookie' => '1.109';
 requires 'Data::Dump';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
