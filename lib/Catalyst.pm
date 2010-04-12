@@ -95,7 +95,6 @@ sub import {
         my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller');
         $meta->superclasses(@superclasses);
     }
-    $meta->make_mutable if $meta->is_immutable; # HACK
     # Avoid possible C3 issues if 'Moose::Object' is already on RHS of MyApp
     $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
 
