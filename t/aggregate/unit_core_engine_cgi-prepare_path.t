@@ -86,7 +86,16 @@ use Catalyst::Engine::CGI;
     is ''.$r->base, 'http://www.foo.com/oslobilder/';
 }
 
-
+{
+    my $r = get_req (
+        PATH_INFO => '/auth/login',
+        SCRIPT_NAME => '/tx',
+        REQUEST_URI => '/login',
+    );
+    is ''.$r->path, 'auth/login';
+    is ''.$r->uri, 'http://www.foo.com/tx/auth/login';
+    is ''.$r->base, 'http://www.foo.com/tx/';
+}
 
 
 # FIXME - Test proxy logic
