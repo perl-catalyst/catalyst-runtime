@@ -1297,7 +1297,15 @@ sub uri_for {
         }
 
         my $action = $path;
-        $path = $c->dispatcher->uri_for_action($action, $captures);
+        # ->uri_for( $action, \@captures_and_args, \%query_values? )
+        if( !@args && $action->number_of_args ) {
+            my $expanded_action = $c->dispatcher->expand_action( $action );
+
+            my $num_captures = $expanded_action->number_of_captures;
+            unshift @args, splice @$captures, $num_captures;
+        }
+
+       $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
             $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
                 if $c->debug;

@@ -4,7 +4,6 @@ use Moose;
 extends qw(Catalyst::Action);
 
 has chain => (is => 'rw');
-
 no Moose;
 
 =head1 NAME
@@ -30,8 +29,8 @@ sub dispatch {
     my $last = pop(@chain);
     foreach my $action ( @chain ) {
         my @args;
-        if (my $cap = $action->attributes->{CaptureArgs}) {
-          @args = splice(@captures, 0, $cap->[0]);
+        if (my $cap = $action->number_of_captures) {
+          @args = splice(@captures, 0, $cap);
         }
         local $c->request->{arguments} = \@args;
         $action->dispatch( $c );
@@ -43,6 +42,15 @@ sub from_chain {
     my ( $self, $actions ) = @_;
     my $final = $actions->[-1];
     return $self->new({ %$final, chain => $actions });
+}
+
+sub number_of_captures {
+    my ( $self ) = @_;
+    my $chain = $self->chain;
+    my $captures = 0;
+
+    $captures += $_->number_of_captures for @$chain;
+    return $captures;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -66,6 +74,10 @@ actions in order.
 
 Takes a list of Catalyst::Action objects and constructs and returns a
 Catalyst::ActionChain object representing a chain of these actions
+
+=head2 number_of_captures
+
+Returns the total number of captures for the entire chain of actions.
 
 =head2 meta
 
