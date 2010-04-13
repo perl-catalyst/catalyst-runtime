@@ -15,6 +15,8 @@
      now enables the X-Catalyst header being printed when not in debug mode.
    - Require CGI::Simple::Cookie version 1.109 to ensure support for the
      HttpOnly flag
+   - Allow the myapp_test.pl script to be given a list of paths which it
+     will retrieve all of. (RT#53653)
 
   Documentation:
    - The Catalyst::Test::get method is documented as returning the raw
