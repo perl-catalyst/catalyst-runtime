@@ -311,6 +311,8 @@ Clean up after uploads, deleting temp files.
 sub finalize_uploads {
     my ( $self, $c ) = @_;
 
+    # N.B. This code is theoretically entirely unneeded due to ->cleanup(1)
+    #      on the HTTP::Body object.
     my $request = $c->request;
     foreach my $key (keys %{ $request->uploads }) {
         my $upload = $request->uploads->{$key};
@@ -335,6 +337,7 @@ sub prepare_body {
         unless ( $request->_body ) {
             my $type = $request->header('Content-Type');
             $request->_body(HTTP::Body->new( $type, $length ));
+            $request->_body->cleanup(1); # Make extra sure!
             $request->_body->tmpdir( $appclass->config->{uploadtmp} )
               if exists $appclass->config->{uploadtmp};
         }

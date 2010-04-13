@@ -27,7 +27,7 @@ requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';
 requires 'Data::Dump';
 requires 'HTML::Entities';
-requires 'HTTP::Body'    => '1.04'; # makes uploadtmp work
+requires 'HTTP::Body'    => '1.06'; # ->cleanup(1)
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';

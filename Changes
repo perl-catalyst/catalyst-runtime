@@ -4,6 +4,9 @@
    - Additional fix for getting the base application path right when rewriting
      requests into an application sub path with mod_alias and mod_rewrite on
      Apache.
+   - Ensure to always cleanup temporary uploaded files in all cases, even
+     when exceptions occur during request processing, using HTTP::Body's
+     ->cleanup feature. (RT#41442)
 
   New features:
    - Setting __PACKAGE__->config(enable_catalyst_header => 1); in your MyApp.pm
