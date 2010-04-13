@@ -142,7 +142,7 @@ runs the generated application as a FastCGI script
 
 =item C<myapp_test.pl>
 
-runs an action of the generated application from the comand line.
+runs an action of the generated application from the command line.
 
 =back
 
