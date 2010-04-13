@@ -68,7 +68,8 @@ sub finalize_headers {
 
     # Should we keep the connection open?
     my $connection = $c->request->header('Connection');
-    if (   $self->options->{keepalive}
+    if (   $self->options
+        && $self->options->{keepalive}
         && $connection
         && $connection =~ /^keep-alive$/i
     ) {

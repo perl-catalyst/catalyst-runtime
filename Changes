@@ -7,6 +7,8 @@
    - Ensure to always cleanup temporary uploaded files in all cases, even
      when exceptions occur during request processing, using HTTP::Body's
      ->cleanup feature. (RT#41442)
+   - Ensure that Catalyst::Engine::HTTP's options hash is defined before
+     dereferencing it. (RT#49267)
 
   New features:
    - Setting __PACKAGE__->config(enable_catalyst_header => 1); in your MyApp.pm
