@@ -14,6 +14,10 @@
    - Require CGI::Simple::Cookie version 1.109 to ensure support for the
      HttpOnly flag
 
+  Documentation:
+   - The Catalyst::Test::get method is documented as returning the raw
+     response bytes without any character decoding (RT#53678)
+
 5.80022 2010-03-28 19:43:01
 
   New features:
