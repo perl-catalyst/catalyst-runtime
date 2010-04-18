@@ -9,6 +9,8 @@
      ->cleanup feature. (RT#41442)
    - Ensure that Catalyst::Engine::HTTP's options hash is defined before
      dereferencing it. (RT#49267)
+   - Fix regex special characters in REDIRECT_URL variable breaking
+     the request base. (2nd part of RT#24951)
 
   New features:
    - Setting __PACKAGE__->config(enable_catalyst_header => 1); in your MyApp.pm

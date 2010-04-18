@@ -123,7 +123,7 @@ sub prepare_path {
     my $base_path;
     if ( exists $ENV{REDIRECT_URL} ) {
         $base_path = $ENV{REDIRECT_URL};
-        $base_path =~ s/$ENV{PATH_INFO}$//;
+        $base_path =~ s/\Q$ENV{PATH_INFO}\E$//;
     }
     else {
         $base_path = $script_name || '/';
