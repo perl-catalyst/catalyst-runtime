@@ -128,7 +128,6 @@ sub prepare_path {
     else {
         $base_path = $script_name || '/';
     }
-#    $base_path .= '/' unless $base_path =~ m{/$};
 
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
@@ -155,25 +154,27 @@ sub prepare_path {
     # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
     # Here we try to resurrect the original encoded URI from REQUEST_URI.
     my $path_info   = $ENV{PATH_INFO};
-    if (my $req_uri = $ENV{REQUEST_URI}) {
-        $req_uri =~ s/^\Q$base_path\E//;
-        $req_uri =~ s/\?.*$//;
-        if ($req_uri && $req_uri ne '/') {
+#    if (my $req_uri = $ENV{REQUEST_URI}) {
+#        $req_uri =~ s/^\Q$base_path\E//;
+#        $req_uri =~ s/\?.*$//;
+#        if ($req_uri && $req_uri ne '/') {
             # This means that REQUEST_URI needs information from PATH_INFO
             # prepending to it to be useful, otherwise the sub path which is
             # being redirected to becomes the app base address which is
             # incorrect.
-            my ($match) = $req_uri =~ m{^(/?[^/]+)};
-            my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
-            substr($req_uri, 0, length($match), $path_info_part)
-                if $path_info_part;
-            $path_info = $req_uri;
-        }
-    }
-
+#            my ($match) = $req_uri =~ m{^(/?[^/]+)};
+#            my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
+#            substr($req_uri, 0, length($match), $path_info_part)
+#                if $path_info_part;
+#            $path_info = $req_uri;
+#        }
+#    }
+    $path_info =~ s/%2F/%252F/g;
     # set the request URI
+    warn("Base path $base_path, path_info $path_info");
     my $path = $base_path . ( $path_info || '' );
     $path =~ s{^/+}{};
+    $base_path .= '/' unless $base_path =~ m{/$};
 
     # Using URI directly is way too slow, so we construct the URLs manually
     my $uri_class = "URI::$scheme";
