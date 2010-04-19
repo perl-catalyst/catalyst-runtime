@@ -20,11 +20,6 @@ our $VERSION = '0.01';
 
 TestApp->config( name => 'TestApp', root => '/some/dir' );
 
-# Test bug found when re-adjusting the metaclass compat code in Moose
-# in 292360. Test added to Moose in 4b760d6, but leave this attribute
-# above ->setup so we have some generated methods to be double sure.
-has an_attribute_before_we_change_base_classes => ( is => 'ro');
-
 if ($::setup_leakchecker && eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
     with 'CatalystX::LeakChecker';
 

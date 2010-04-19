@@ -2408,6 +2408,10 @@ sub setup_components {
         # we know M::P::O found a file on disk so this is safe
 
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+
+        # Needs to be done as soon as the component is loaded, as loading a sub-component
+        # (next time round the loop) can cause us to get the wrong metaclass..
+        $class->_controller_init_base_classes($component);
     }
 
     for my $component (@comps) {
@@ -2417,6 +2421,7 @@ sub setup_components {
             : $class->expand_component_module( $component, $config );
         for my $component (@expanded_components) {
             next if $comps{$component};
+            $class->_controller_init_base_classes($component); # Also cover inner packages
             $class->components->{ $component } = $class->setup_component($component);
         }
     }
@@ -2468,6 +2473,19 @@ sub expand_component_module {
 =head2 $c->setup_component
 
 =cut
+
+# FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
+#         nearest to Catalyst::Controller first, no matter what order stuff happens
+#         to be loaded. There are TODO tests in Moose for this, see
+#         f2391d17574eff81d911b97be15ea51080500003
+sub _controller_init_base_classes {
+    my ($app_class, $component) = @_;
+    return unless $component->isa('Catalyst::Controller');
+    foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
+        Moose::Meta::Class->initialize( $class )
+            unless find_meta($class);
+    }
+}
 
 sub setup_component {
     my( $class, $component ) = @_;
