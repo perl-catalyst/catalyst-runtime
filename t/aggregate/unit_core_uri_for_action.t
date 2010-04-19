@@ -21,8 +21,6 @@ my $private_action = $dispatcher->get_action_by_path(
                        '/class_forward_test_method'
                      );
 
-warn $dispatcher->uri_for_action($private_action);
-
 ok(!defined($dispatcher->uri_for_action($private_action)),
    "Private action returns undef for URI");
 
