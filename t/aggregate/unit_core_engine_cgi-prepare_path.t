@@ -13,8 +13,8 @@ use Catalyst::Engine::CGI;
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/',
     );
-    is ''.$r->uri, 'http://www.foo.com/comics/';
-    is ''.$r->base, 'http://www.foo.com/comics/';
+    is ''.$r->uri, 'http://www.foo.com/comics/', 'uri is correct';
+    is ''.$r->base, 'http://www.foo.com/comics/', 'base is correct';
 }
 
 # mod_rewrite to sub path under app root for non / based app
@@ -46,8 +46,8 @@ use Catalyst::Engine::CGI;
         SCRIPT_NAME => '/~bobtfish/Gitalist/script/gitalist.cgi',
         REQUEST_URI => '/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F',
     );
-    is ''.$r->uri, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F';
-    is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/';
+    is ''.$r->uri, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F', 'uri correct';
+    is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/', 'base correct';
 }
 
 # Using rewrite rules to ask for a sub-path in your app.
@@ -81,9 +81,9 @@ use Catalyst::Engine::CGI;
         SCRIPT_NAME => '/oslobilder/',
         REQUEST_URI => '/oslobilder/%22foo%22',
     );
-    is ''.$r->path, '%22foo%22';
-    is ''.$r->uri, 'http://www.foo.com/oslobilder/%22foo%22';
-    is ''.$r->base, 'http://www.foo.com/oslobilder/';
+    is ''.$r->path, '%22foo%22', 'path correct';
+    is ''.$r->uri, 'http://www.foo.com/oslobilder/%22foo%22', 'uri correct';
+    is ''.$r->base, 'http://www.foo.com/oslobilder/', 'base correct';
 }
 
 {
@@ -92,9 +92,9 @@ use Catalyst::Engine::CGI;
         SCRIPT_NAME => '/tx',
         REQUEST_URI => '/login',
     );
-    is ''.$r->path, 'auth/login';
-    is ''.$r->uri, 'http://www.foo.com/tx/auth/login';
-    is ''.$r->base, 'http://www.foo.com/tx/';
+    is ''.$r->path, 'auth/login', 'path correct';
+    is ''.$r->uri, 'http://www.foo.com/tx/auth/login', 'uri correct';
+    is ''.$r->base, 'http://www.foo.com/tx/', 'base correct';
 }
 
 # test req->base and c->uri_for work correctly after an internally redirected request
