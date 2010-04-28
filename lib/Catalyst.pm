@@ -1890,7 +1890,7 @@ namespaces.
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
-=head2 $c->handle_request( $class, @arguments )
+=head2 $app->handle_request( @arguments )
 
 Called to handle each HTTP request.
 
