@@ -87,6 +87,7 @@ use Catalyst::Engine::CGI;
 }
 
 {
+    local $TODO = 'Another mod_rewrite case';
     my $r = get_req (
         PATH_INFO => '/auth/login',
         SCRIPT_NAME => '/tx',
