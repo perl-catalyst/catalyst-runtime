@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More;
 
 use lib 't/lib';
 
@@ -61,3 +61,4 @@ my @expected = qw(
 is_deeply [ TestApp->registered_plugins ], \@expected,
   'registered_plugins() should only report the plugins for the current class';
 
+done_testing;

@@ -14,6 +14,7 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 use Catalyst::Controller;
+use Data::OptList;
 use Devel::InnerPackage ();
 use File::stat;
 use Module::Pluggable::Object ();
@@ -2782,6 +2783,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
+        # FIXME: also pass along plugin options as soon as the mop has it
         Class::MOP::load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is decated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
@@ -2797,22 +2799,30 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $class, $plugins ) = @_;
 
         $class->_plugins( {} ) unless $class->_plugins;
-        $plugins ||= [];
+        $plugins = Data::OptList::mkopt($plugins || []);
 
-        my @plugins = Catalyst::Utils::resolve_namespace($class . '::Plugin', 'Catalyst::Plugin', @$plugins);
+        my @plugins = map {
+            [ Catalyst::Utils::resolve_namespace(
+                  $class . '::Plugin',
+                  'Catalyst::Plugin', $_->[0]
+              ),
+              $_->[1],
+            ]
+         } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            Class::MOP::load_class($plugin);
-            my $meta = find_meta($plugin);
+            Class::MOP::load_class($plugin->[0]);
+            # pass along $plugin->[1] as well once cmop supports it
+            my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 
-            $class->_register_plugin($plugin);
+            $class->_register_plugin($plugin->[0]);
         }
 
         my @roles =
-            map { $_->name }
-            grep { $_ && blessed($_) && $_->isa('Moose::Meta::Role') }
-            map { find_meta($_) }
+            map { $_->[0]->name, $_->[1] }
+            grep { $_->[0] && blessed($_->[0]) && $_->[0]->isa('Moose::Meta::Role') }
+            map { [find_meta($_->[0]), $_->[1]] }
             @plugins;
 
         Moose::Util::apply_all_roles(
