@@ -2,6 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+use FindBin;
+use Path::Class;
+use File::Basename;
 
 my %non_unix = (
     MacOS   => 1,
@@ -16,16 +19,19 @@ my %non_unix = (
 
 my $os = $non_unix{$^O} ? $^O : 'Unix';
 
-if(  $os ne 'Unix' ) {
+if ( $os ne 'Unix' ) {
     plan skip_all => 'tests require Unix';
-}
-else {
-    plan tests => 3;
 }
 
 use_ok('Catalyst');
 
 my $context = 'Catalyst';
+
+$context->setup_home;
+my $base = dir($FindBin::Bin)->relative->stringify;
+
+isa_ok( Catalyst::path_to( $context, $base ), 'Path::Class::Dir' );
+isa_ok( Catalyst::path_to( $context, $base, basename $0 ), 'Path::Class::File' );
 
 my $config = Catalyst->config;
 
@@ -37,3 +43,5 @@ $config->{home} = '/Users/sri/myapp/';
 
 is( Catalyst::path_to( $context, 'foo', 'bar' ),
     '/Users/sri/myapp/foo/bar', 'deep Unix path' );
+
+done_testing;

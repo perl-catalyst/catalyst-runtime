@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
-plan tests => 30;
+plan tests => 33;
 
 use_ok('TestApp');
 
@@ -53,6 +53,21 @@ ok(!defined($dispatcher->uri_for_action($regex_action, [ 1, 2, 3 ])),
 is($dispatcher->uri_for_action($regex_action, [ 'foo', 123 ]),
    "/action/regexp/foo/123",
    "Regex action interpolates captures correctly");
+
+my $regex_action_bs = $dispatcher->get_action_by_path(
+                     '/action/regexp/one_backslashes'
+                   );
+
+ok(!defined($dispatcher->uri_for_action($regex_action_bs)),
+   "Regex action without captures returns undef");
+
+ok(!defined($dispatcher->uri_for_action($regex_action_bs, [ 1, 2, 3 ])),
+   "Regex action with too many captures returns undef");
+
+is($dispatcher->uri_for_action($regex_action_bs, [ 'foo', 123 ]),
+   "/action/regexp/foo/123.html",
+   "Regex action interpolates captures correctly");
+
 
 #
 #   Index Action

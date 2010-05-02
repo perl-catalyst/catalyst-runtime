@@ -151,6 +151,7 @@ sub uri_for_action {
             my $re = "$orig";
             $re =~ s/^\^//;
             $re =~ s/\$$//;
+            $re =~ s/\\([^\\])/$1/g;
             my $final = '/';
             my @captures = @$captures;
             while (my ($front, $rest) = split(/\(/, $re, 2)) {

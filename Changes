@@ -1,9 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
   Bug fixes:
-   - Additional fix for getting the base application path right when rewriting
-     requests into an application sub path with mod_alias and mod_rewrite on
-     Apache.
    - Ensure to always cleanup temporary uploaded files in all cases, even
      when exceptions occur during request processing, using HTTP::Body's
      ->cleanup feature. (RT#41442)
@@ -11,6 +8,7 @@
      dereferencing it. (RT#49267)
    - Fix regex special characters in REDIRECT_URL variable breaking
      the request base. (2nd part of RT#24951)
+   - Fix not stripping backslashes in DispatchType::Regex::uri_for_action
 
   New features:
    - Setting __PACKAGE__->config(enable_catalyst_header => 1); in your MyApp.pm
@@ -19,6 +17,7 @@
      HttpOnly flag
    - Allow the myapp_test.pl script to be given a list of paths which it
      will retrieve all of. (RT#53653)
+   - Allow parameterized roles to be applied as plugins.
 
   Documentation:
    - The Catalyst::Test::get method is documented as returning the raw
