@@ -1321,7 +1321,7 @@ sub uri_for {
     # join args with '/', or a blank string
     my $args = join('/', grep { defined($_) } @args);
     $args =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
-#    $args =~ s!^/+!!;
+    $args =~ s!^/+!!;
     my $base = $c->req->base;
     my $class = ref($base);
     $base =~ s{(?<!/)$}{/};
@@ -1890,7 +1890,7 @@ namespaces.
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
-=head2 $c->handle_request( $class, @arguments )
+=head2 $app->handle_request( @arguments )
 
 Called to handle each HTTP request.
 
