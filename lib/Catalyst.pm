@@ -2811,8 +2811,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
          } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            Class::MOP::load_class($plugin->[0]);
             # pass along $plugin->[1] as well once cmop supports it
+            Class::MOP::load_class($plugin->[0]);
             my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 
@@ -2820,9 +2820,9 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         }
 
         my @roles =
-            map { $_->[0]->name, $_->[1] }
-            grep { $_->[0] && blessed($_->[0]) && $_->[0]->isa('Moose::Meta::Role') }
-            map { [find_meta($_->[0]), $_->[1]] }
+            map  { $_->[0]->name, $_->[1] }
+            grep { blessed($_->[0]) && $_->[0]->isa('Moose::Meta::Role') }
+            map  { [find_meta($_->[0]), $_->[1]] }
             @plugins;
 
         Moose::Util::apply_all_roles(
