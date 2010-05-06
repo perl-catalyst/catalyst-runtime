@@ -53,7 +53,7 @@
 5.80021 2010-03-03 23:02:01
 
   Bug fixed:
-   - $c->uri_for will now escape unsafe characterss in captures
+   - $c->uri_for will now escape unsafe characters in captures
      ($c->request->captures) and correctly encode utf8 charracters.
 
 5.80020 2010-02-04 06:51:18
