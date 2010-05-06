@@ -1280,13 +1280,11 @@ sub uri_for {
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
     foreach my $arg (@args) {
         utf8::encode($arg) if utf8::is_utf8($arg);
-    }
-    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
-    if (blessed $path) { # Action object only.
-        s|/|%2F|g for @args;
+        $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     }
 
     if ( blessed($path) ) { # action object
+        s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? @{ shift(@args) }
@@ -1306,8 +1304,6 @@ sub uri_for {
         }
         $path = '/' if $path eq '';
     }
-
-    undef($path) if (defined $path && $path eq '');
 
     unshift(@args, $path);
 
