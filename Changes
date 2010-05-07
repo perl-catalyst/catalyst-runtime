@@ -18,10 +18,16 @@
    - Allow the myapp_test.pl script to be given a list of paths which it
      will retrieve all of. (RT#53653)
    - Allow parameterized roles to be applied as plugins.
+   - Allow requiring minimum versions of plugins when loading them.
 
   Documentation:
    - The Catalyst::Test::get method is documented as returning the raw
      response bytes without any character decoding (RT#53678)
+
+  Cleanups:
+   - Removal of $Catalyst::PRETTY_VERSION. Future releases will always have the
+     full and unmangled version number, including trailing zeroes, in
+     $Catalyst::VERSION.
 
 5.80022 2010-03-28 19:43:01
 
