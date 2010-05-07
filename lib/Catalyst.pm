@@ -2779,7 +2779,6 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        # FIXME: also pass along plugin options as soon as the mop has it
         Class::MOP::load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is decated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
@@ -2807,8 +2806,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
          } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            # pass along $plugin->[1] as well once cmop supports it
-            Class::MOP::load_class($plugin->[0]);
+            Class::MOP::load_class($plugin->[0], $plugin->[1]);
             my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 
