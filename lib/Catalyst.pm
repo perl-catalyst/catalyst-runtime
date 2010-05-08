@@ -79,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80022';
+our $VERSION = '5.80023';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1280,13 +1280,11 @@ sub uri_for {
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
     foreach my $arg (@args) {
         utf8::encode($arg) if utf8::is_utf8($arg);
-    }
-    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
-    if (blessed $path) { # Action object only.
-        s|/|%2F|g for @args;
+        $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     }
 
     if ( blessed($path) ) { # action object
+        s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? @{ shift(@args) }
@@ -1306,8 +1304,6 @@ sub uri_for {
         }
         $path = '/' if $path eq '';
     }
-
-    undef($path) if (defined $path && $path eq '');
 
     unshift(@args, $path);
 
@@ -2783,7 +2779,6 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        # FIXME: also pass along plugin options as soon as the mop has it
         Class::MOP::load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is decated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
@@ -2811,8 +2806,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
          } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            Class::MOP::load_class($plugin->[0]);
-            # pass along $plugin->[1] as well once cmop supports it
+            Class::MOP::load_class($plugin->[0], $plugin->[1]);
             my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 
@@ -2820,9 +2814,9 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         }
 
         my @roles =
-            map { $_->[0]->name, $_->[1] }
-            grep { $_->[0] && blessed($_->[0]) && $_->[0]->isa('Moose::Meta::Role') }
-            map { [find_meta($_->[0]), $_->[1]] }
+            map  { $_->[0]->name, $_->[1] }
+            grep { blessed($_->[0]) && $_->[0]->isa('Moose::Meta::Role') }
+            map  { [find_meta($_->[0]), $_->[1]] }
             @plugins;
 
         Moose::Util::apply_all_roles(
@@ -3184,6 +3178,8 @@ Viljo Marrandi C<vilts@yahoo.com>
 Will Hawes C<info@whawes.co.uk>
 
 willert: Sebastian Willert <willert@cpan.org>
+
+wreis: Wallace Reis <wallace@reis.org.br>
 
 Yuval Kogman, C<nothingmuch@woobling.org>
 

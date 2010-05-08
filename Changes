@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80023 2010-05-07 23:50:27
+
   Bug fixes:
    - Ensure to always cleanup temporary uploaded files in all cases, even
      when exceptions occur during request processing, using HTTP::Body's
@@ -18,10 +20,16 @@
    - Allow the myapp_test.pl script to be given a list of paths which it
      will retrieve all of. (RT#53653)
    - Allow parameterized roles to be applied as plugins.
+   - Allow requiring minimum versions of plugins when loading them.
 
   Documentation:
    - The Catalyst::Test::get method is documented as returning the raw
      response bytes without any character decoding (RT#53678)
+
+  Cleanups:
+   - Removal of $Catalyst::PRETTY_VERSION. Future releases will always have the
+     full and unmangled version number, including trailing zeroes, in
+     $Catalyst::VERSION.
 
 5.80022 2010-03-28 19:43:01
 
@@ -53,7 +61,7 @@
 5.80021 2010-03-03 23:02:01
 
   Bug fixed:
-   - $c->uri_for will now escape unsafe characterss in captures
+   - $c->uri_for will now escape unsafe characters in captures
      ($c->request->captures) and correctly encode utf8 charracters.
 
 5.80020 2010-02-04 06:51:18
