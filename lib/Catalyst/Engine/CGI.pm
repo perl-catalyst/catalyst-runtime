@@ -154,7 +154,7 @@ sub prepare_path {
     # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
     # Here we try to resurrect the original encoded URI from REQUEST_URI.
     my $path_info   = $ENV{PATH_INFO};
-    if ($c->config->{rfc3875_paths}) {
+    if ($c->config->{use_request_uri_for_path}) {
         if (my $req_uri = $ENV{REQUEST_URI}) {
             $req_uri =~ s/^\Q$base_path\E//;
             $req_uri =~ s/\?.*$//;

@@ -18,7 +18,7 @@ use namespace::autoclean;
 
 our $VERSION = '0.01';
 
-TestApp->config( name => 'TestApp', root => '/some/dir', rfc3875_paths => 1 );
+TestApp->config( name => 'TestApp', root => '/some/dir', use_request_uri_for_path => 1 );
 
 if ($::setup_leakchecker && eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
     with 'CatalystX::LeakChecker';
