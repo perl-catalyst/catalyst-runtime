@@ -2946,6 +2946,12 @@ to be shown in hit debug tables in the test server.
 
 =item *
 
+C<use_request_uri_for_path> - Controlls if the C<REQUEST_URI> or C<PATH_INFO> environment
+variable should be used for determining the request path. See L<Catalyst::Engine::CGI/PATH DECODING>
+for more information.
+
+=item *
+
 C<using_frontend_proxy> - See L</PROXY SUPPORT>.
 
 =back
