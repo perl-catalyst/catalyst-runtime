@@ -79,7 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80023';
+our $VERSION = '5.80024';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -3180,6 +3180,8 @@ rafl: Florian Ragwitz <rafl@debian.org>
 random: Roland Lammel <lammel@cpan.org>
 
 Robert Sedlacek C<< <rs@474.at> >>
+
+SpiceMan: Marcel Montes
 
 sky: Arthur Bergman
 

@@ -1,5 +1,24 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80024 2010-05-15 11:55:44
+
+  Bug fixes:
+   - Revert the path resolution behaviour to how it used to work before
+     Catalyst 5.80014_02, so that application paths are (by default)
+     resolved from $ENV{PATH_INFO} and $ENV{SCRIPT_NAME}. This fixes backward
+     compatibility breakage seen by a number of people since that release
+     with mod_rewrite and SSI.
+
+  New features:
+   - Add a use_request_uri_for_path config setting to optionally
+     use the (more correct) $ENV{REQUEST_URI} path resolution behaviour.
+
+  Documentation:
+   - Clarify the documentation for the Catalyst::Stats interface.
+   - Copious documentation about the use_request_uri_for_path feature
+     and the implications of setting this to true/false in
+     Catalyst::Engine::CGI
+
 5.80023 2010-05-07 23:50:27
 
   Bug fixes:
