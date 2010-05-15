@@ -47,13 +47,17 @@ into the application, as these variables are adjusted by mod_rewrite to take acc
 However this method has the major disadvantage that it is impossible to correctly decode some elements
 of the path, as RFC 3875 says: "C<< Unlike a URI path, the PATH_INFO is not URL-encoded, and cannot
 contain path-segment parameters. >>" This means PATH_INFO is B<always> decoded, and therefore Catalyst
-can't distinguish / vs %2F in paths.
+can't distinguish / vs %2F in paths (in addition to other encoded values).
 
 =head2 use_request_uri_for_path => 1
 
 This method uses the C<REQUEST_URI> and C<SCRIPT_NAME> environment variables. As C<REQUEST_URI> is never
 decoded, this means that applications using this mode can correctly handle URIs including the %2F character
 (i.e. with C<AllowEncodedSlashes> set to C<On> in Apache).
+
+Given that this method of path resolution is provably more correct, it is recommended that you use
+this unless you have a specific need to deploy your application in a non-standard environment, and you are
+aware of the implications of not being able to handle encoded URI paths correctly.
 
 However it also means that in a number of cases when the app isn't installed directly at a path, but instead
 is having paths rewritten into it (e.g. as a .cgi/fcgi in a public_html directory, with mod_rewrite in a
