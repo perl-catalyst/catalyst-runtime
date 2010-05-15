@@ -8,7 +8,7 @@ use Catalyst::Engine::CGI;
 
 # mod_rewrite to app root for non / based app
 {
-    my $r = get_req (
+    my $r = get_req (0,
         REDIRECT_URL => '/comics/',
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/',
@@ -19,7 +19,7 @@ use Catalyst::Engine::CGI;
 
 # mod_rewrite to sub path under app root for non / based app
 {
-    my $r = get_req (
+    my $r = get_req (0,
         PATH_INFO  => '/foo/bar.gif',
         REDIRECT_URL => '/comics/foo/bar.gif',
         SCRIPT_NAME => '/comics/dispatch.cgi',
@@ -31,7 +31,7 @@ use Catalyst::Engine::CGI;
 
 # Standard CGI hit for non / based app
 {
-    my $r = get_req (
+    my $r = get_req (0,
         PATH_INFO => '/static/css/blueprint/screen.css',
         SCRIPT_NAME => '/~bobtfish/Gitalist/script/gitalist.cgi',
         REQUEST_URI => '/~bobtfish/Gitalist/script/gitalist.cgi/static/css/blueprint/screen.css',
@@ -41,7 +41,7 @@ use Catalyst::Engine::CGI;
 }
 # / %2F %252F escaping case.
 {
-    my $r = get_req (
+    my $r = get_req (1,
         PATH_INFO => '/%2F/%2F',
         SCRIPT_NAME => '/~bobtfish/Gitalist/script/gitalist.cgi',
         REQUEST_URI => '/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F',
@@ -53,7 +53,7 @@ use Catalyst::Engine::CGI;
 # Using rewrite rules to ask for a sub-path in your app.
 # E.g. RewriteRule ^(.*)$ /path/to/fastcgi/domainprofi.fcgi/iframeredirect$1 [L,NS]
 {
-    my $r = get_req (
+    my $r = get_req (0,
         PATH_INFO => '/iframeredirect/info',
         SCRIPT_NAME => '',
         REQUEST_URI => '/info',
@@ -64,7 +64,7 @@ use Catalyst::Engine::CGI;
 
 # nginx example from espent with path /"foo"
 {
-    my $r = get_req (
+    my $r = get_req (0,
         PATH_INFO => '"foo"',
         SCRIPT_NAME => '/',
         REQUEST_URI => '/%22foo%22',
@@ -76,7 +76,7 @@ use Catalyst::Engine::CGI;
 
 # nginx example from espent with path /"foo" and the app based at /oslobilder
 {
-    my $r = get_req (
+    my $r = get_req (1,
         PATH_INFO => 'oslobilder/"foo"',
         SCRIPT_NAME => '/oslobilder/',
         REQUEST_URI => '/oslobilder/%22foo%22',
@@ -88,7 +88,7 @@ use Catalyst::Engine::CGI;
 
 {
     local $TODO = 'Another mod_rewrite case';
-    my $r = get_req (
+    my $r = get_req (0,
         PATH_INFO => '/auth/login',
         SCRIPT_NAME => '/tx',
         REQUEST_URI => '/login',
@@ -102,7 +102,7 @@ use Catalyst::Engine::CGI;
 # (i.e. REDIRECT_URL set) when the PATH_INFO contains a regex
 {
     my $path = '/engine/request/uri/Rx(here)';
-    my $r = get_req (
+    my $r = get_req (0,
         SCRIPT_NAME => '/',
         PATH_INFO => $path,
         REQUEST_URI => $path,
@@ -121,6 +121,8 @@ use Catalyst::Engine::CGI;
 #       - Test scheme (secure request on port 80)
 
 sub get_req {
+    my $use_request_uri_for_path = shift;
+
     my %template = (
         HTTP_HOST => 'www.foo.com',
         PATH_INFO => '/',
@@ -129,6 +131,9 @@ sub get_req {
     local %ENV = (%template, @_);
 
     my $i = TestApp->new;
+    $i->setup_finished(0);
+    $i->config(use_request_uri_for_path => $use_request_uri_for_path);
+    $i->setup_finished(1);
     $i->engine(Catalyst::Engine::CGI->new);
     $i->engine->prepare_path($i);
     return $i->req;

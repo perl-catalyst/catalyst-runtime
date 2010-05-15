@@ -148,32 +148,19 @@ sub prepare_path {
         }
     }
 
-    # RFC 3875: "Unlike a URI path, the PATH_INFO is not URL-encoded,
-    # and cannot contain path-segment parameters." This means PATH_INFO
-    # is always decoded, and the script can't distinguish / vs %2F.
-    # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
-    # Here we try to resurrect the original encoded URI from REQUEST_URI.
     my $path_info   = $ENV{PATH_INFO};
     if ($c->config->{use_request_uri_for_path}) {
+        # RFC 3875: "Unlike a URI path, the PATH_INFO is not URL-encoded,
+        # and cannot contain path-segment parameters." This means PATH_INFO
+        # is always decoded, and the script can't distinguish / vs %2F.
+        # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
+        # Here we try to resurrect the original encoded URI from REQUEST_URI.
         if (my $req_uri = $ENV{REQUEST_URI}) {
-            $req_uri =~ s/^\Q$base_path\E//;
-            $req_uri =~ s/\?.*$//;
-            if ($req_uri) {
-                # Note that if REQUEST_URI doesn't start with a /, then the user
-                # is probably using mod_rewrite or something to rewrite requests
-                # into a sub-path of their application..
-                # This means that REQUEST_URI needs information from PATH_INFO
-                # prepending to it to be useful, otherwise the sub path which is
-                # being redirected to becomes the app base address which is
-                # incorrect.
-                if (substr($req_uri, 0, 1) ne '/') {
-                    my ($match) = $req_uri =~ m|^([^/]+)|;
-                    my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
-                    substr($req_uri, 0, length($match), $path_info_part)
-                        if $path_info_part;
-                }
-                $path_info = $req_uri;
+            if (defined $script_name) {
+                $req_uri =~ s/^\Q$script_name\E//;
             }
+            $req_uri =~ s/\?.*$//;
+            $path_info = $req_uri if $req_uri;
         }
     }
 
