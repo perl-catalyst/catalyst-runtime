@@ -19,7 +19,7 @@ requires 'namespace::clean' => '0.13';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.95';
-requires 'Moose' => '1.03';
+requires 'Moose' => '1.05';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.19';
 requires 'MooseX::Role::WithOverloading' => '0.05';
 requires 'Carp';

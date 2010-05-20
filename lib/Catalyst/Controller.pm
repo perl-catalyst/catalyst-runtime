@@ -71,11 +71,14 @@ for more info about how Catalyst dispatches to actions.
 
 #I think both of these could be attributes. doesn't really seem like they need
 #to ble class data. i think that attributes +default would work just fine
-__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class/;
+__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps/;
 
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
-__PACKAGE__->_action_class('Catalyst::Action');
 
+has _action_class => (
+    is => 'rw',
+    default => 'Catalyst::Action',
+);
 
 sub _DISPATCH : Private {
     my ( $self, $c ) = @_;
@@ -248,14 +251,21 @@ sub register_action_methods {
     }
 }
 
-sub create_action {
-    my $self = shift;
-    my %args = @_;
+sub action_class {
+    my ($self, %args) = @_;
 
     my $class = (exists $args{attributes}{ActionClass}
                     ? $args{attributes}{ActionClass}[0]
                     : $self->_action_class);
     Class::MOP::load_class($class);
+    return $class;
+}
+
+sub create_action {
+    my $self = shift;
+    my %args = @_;
+
+    my $class = $self->action_class(%args);
 
     my $action_args = $self->config->{action_args};
     my %extra_args = (

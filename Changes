@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Refactoring:
+   - Remove nasty hacks to make classes which are plain old perl work with
+     multiple levels away inherited from Moose classes which do metaclass roles.
+     This issue has been (more correcly) solved in core Moose instead of our
+     workaround.
+
 5.80024 2010-05-15 11:55:44
 
   Bug fixes:

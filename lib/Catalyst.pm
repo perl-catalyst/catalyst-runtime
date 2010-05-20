@@ -77,8 +77,17 @@ __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 __PACKAGE__->stats_class('Catalyst::Stats');
 
-# Remember to update this in Catalyst::Runtime as well!
+# This is here as but we need to be able to call# C::C->action_class, which
+# calls the ->_action_class attribute's accessor to get the default action
+# class for this controller. As the app class is also a controller (eww, warns)
+# but we don't have an instance (just the component name) in the registery,
+# we override _action_class here so that $class->_action_class doesn't explode
+# (so it becomes class data rather than instance data for this one special case).
+# This is a gross back compat hack which can go away for app/ctx split.
+__PACKAGE__->mk_classdata(qw/ _action_class /);
+__PACKAGE__->_action_class('Catalyst::Action');
 
+# Remember to update this in Catalyst::Runtime as well!
 our $VERSION = '5.80024';
 
 sub import {
@@ -1154,7 +1163,7 @@ EOF
 
     # Add our self to components, since we are also a component
     if( $class->isa('Catalyst::Controller') ){
-      $class->components->{$class} = $class;
+      $class->components->{$class} = $class; # HATEFUL SPECIAL CASE
     }
 
     $class->setup_actions;
@@ -1757,7 +1766,7 @@ sub finalize {
     $c->log_response;
 
     if ($c->use_stats) {
-        my $elapsed = sprintf '%f', $c->stats->elapsed;
+        my $elapsed = $c->stats->elapsed;
         my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
         $c->log->info(
             "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
