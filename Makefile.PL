@@ -19,13 +19,14 @@ requires 'namespace::clean' => '0.13';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.95';
-requires 'Moose' => '0.93';
+requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.19';
 requires 'MooseX::Role::WithOverloading' => '0.05';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';
 requires 'Data::Dump';
+requires 'Data::OptList';
 requires 'HTML::Entities';
 requires 'HTTP::Body'    => '1.06'; # ->cleanup(1)
 requires 'HTTP::Headers' => '1.64';

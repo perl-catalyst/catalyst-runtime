@@ -446,11 +446,31 @@ of setting namespace to '' (the null string).
 
 Sets 'path_prefix', as described below.
 
+=head2 action
+
+Allows you to set the attributes that the dispatcher creates actions out of.
+This allows you to do 'rails style routes', or override some of the
+attribute defintions of actions composed from Roles.
+You can set arguments globally (for all actions of the controller) and
+specifically (for a single action).
+
+    __PACKAGE__->config(
+        action => {
+            '*' => { Chained => 'base', Args => 0  },
+            base => { Chained => '/', PathPart => '', CaptureArgs => 0 },
+        },
+     );
+
+In the case above every sub in the package would be made into a Chain
+endpoint with a URI the same as the sub name for each sub, chained
+to the sub named C<base>. Ergo dispatch to C</example> would call the
+C<base> method, then the C<example> method.
+
 =head2 action_args
 
 Allows you to set constructor arguments on your actions. You can set arguments
-globally (for all actions of the controller) and specifically (for a single
-action). This is particularly useful when using C<ActionRole>s
+globally and specifically (as above).
+This is particularly useful when using C<ActionRole>s
 (L<Catalyst::Controller::ActionRole>) and custom C<ActionClass>es.
 
     __PACKAGE__->config(

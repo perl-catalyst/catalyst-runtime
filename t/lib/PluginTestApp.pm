@@ -1,10 +1,13 @@
 package PluginTestApp;
 use Test::More;
 
-use Catalyst qw(
-        Test::Plugin
-        +TestApp::Plugin::FullyQualified
-        );
+use Catalyst (
+    'Test::Plugin',
+    '+TestApp::Plugin::FullyQualified',
+    (eval { require MooseX::Role::Parameterized; 1 }
+        ? ('+TestApp::Plugin::ParameterizedRole' => { method_name => 'affe' })
+        : ()),
+);
 
 sub _test_plugins {
     my $c = shift;

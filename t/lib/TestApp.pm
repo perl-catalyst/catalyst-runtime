@@ -16,9 +16,33 @@ use Catalyst::Utils;
 use Moose;
 use namespace::autoclean;
 
+# -----------
+# t/aggregate/unit_core_ctx_attr.t pukes until lazy is true
+package Greeting;
+use Moose;
+sub hello_notlazy { 'hello there' }
+sub hello_lazy    { 'hello there' }
+
+package TestApp;
+has 'my_greeting_obj_notlazy' => (
+   is      => 'ro',
+   isa     => 'Greeting',
+   default => sub { Greeting->new() },
+   handles => [ qw( hello_notlazy ) ],
+   lazy    => 0,
+);
+has 'my_greeting_obj_lazy' => (
+   is      => 'ro',
+   isa     => 'Greeting',
+   default => sub { Greeting->new() },
+   handles => [ qw( hello_lazy ) ],
+   lazy    => 1,
+);
+# -----------
+
 our $VERSION = '0.01';
 
-TestApp->config( name => 'TestApp', root => '/some/dir' );
+TestApp->config( name => 'TestApp', root => '/some/dir', use_request_uri_for_path => 1 );
 
 # Test bug found when re-adjusting the metaclass compat code in Moose
 # in 292360. Test added to Moose in 4b760d6, but leave this attribute

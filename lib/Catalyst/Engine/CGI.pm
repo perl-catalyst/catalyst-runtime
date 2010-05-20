@@ -28,6 +28,43 @@ appropriate engine module.
 
 This is the Catalyst engine specialized for the CGI environment.
 
+=head1 PATH DECODING
+
+Most web server environments pass the requested path to the application using environment variables,
+from which Catalyst has to reconstruct the request base (i.e. the top level path to / in the application,
+exposed as C<< $c->request->base >>) and the request path below that base.
+
+There are two methods of doing this, both of which have advantages and disadvantages. Which method is used
+is determined by the C<< $c->config(use_request_uri_for_path) >> setting (which can either be true or false).
+
+=head2 use_request_uri_for_path => 0
+
+This is the default (and the) traditional method that Catalyst has used for determining the path information.
+The path is synthesised from a combination of the C<PATH_INFO> and C<SCRIPT_NAME> environment variables.
+The allows the application to behave correctly when C<mod_rewrite> is being used to redirect requests
+into the application, as these variables are adjusted by mod_rewrite to take account for the redirect.
+
+However this method has the major disadvantage that it is impossible to correctly decode some elements
+of the path, as RFC 3875 says: "C<< Unlike a URI path, the PATH_INFO is not URL-encoded, and cannot
+contain path-segment parameters. >>" This means PATH_INFO is B<always> decoded, and therefore Catalyst
+can't distinguish / vs %2F in paths (in addition to other encoded values).
+
+=head2 use_request_uri_for_path => 1
+
+This method uses the C<REQUEST_URI> and C<SCRIPT_NAME> environment variables. As C<REQUEST_URI> is never
+decoded, this means that applications using this mode can correctly handle URIs including the %2F character
+(i.e. with C<AllowEncodedSlashes> set to C<On> in Apache).
+
+Given that this method of path resolution is provably more correct, it is recommended that you use
+this unless you have a specific need to deploy your application in a non-standard environment, and you are
+aware of the implications of not being able to handle encoded URI paths correctly.
+
+However it also means that in a number of cases when the app isn't installed directly at a path, but instead
+is having paths rewritten into it (e.g. as a .cgi/fcgi in a public_html directory, with mod_rewrite in a
+.htaccess file, or when SSI is used to rewrite pages into the app, or when sub-paths of the app are exposed
+at other URIs than that which the app is 'normally' based at with C<mod_rewrite>), the resolution of
+C<< $c->request->base >> will be incorrect.
+
 =head1 OVERLOADED METHODS
 
 This class overloads some methods from C<Catalyst::Engine>.
@@ -128,7 +165,6 @@ sub prepare_path {
     else {
         $base_path = $script_name || '/';
     }
-#    $base_path .= '/' unless $base_path =~ m{/$};
 
     # If we are running as a backend proxy, get the true hostname
   PROXY_CHECK:
@@ -149,25 +185,19 @@ sub prepare_path {
         }
     }
 
-    # RFC 3875: "Unlike a URI path, the PATH_INFO is not URL-encoded,
-    # and cannot contain path-segment parameters." This means PATH_INFO
-    # is always decoded, and the script can't distinguish / vs %2F.
-    # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
-    # Here we try to resurrect the original encoded URI from REQUEST_URI.
     my $path_info   = $ENV{PATH_INFO};
-    if (my $req_uri = $ENV{REQUEST_URI}) {
-        $req_uri =~ s/^\Q$base_path\E//;
-        $req_uri =~ s/\?.*$//;
-        if ($req_uri && $req_uri ne '/') {
-            # This means that REQUEST_URI needs information from PATH_INFO
-            # prepending to it to be useful, otherwise the sub path which is
-            # being redirected to becomes the app base address which is
-            # incorrect.
-            my ($match) = $req_uri =~ m{^(/?[^/]+)};
-            my ($path_info_part) = $path_info =~ m|^(.*?\Q$match\E)|;
-            substr($req_uri, 0, length($match), $path_info_part)
-                if $path_info_part;
-            $path_info = $req_uri;
+    if ($c->config->{use_request_uri_for_path}) {
+        # RFC 3875: "Unlike a URI path, the PATH_INFO is not URL-encoded,
+        # and cannot contain path-segment parameters." This means PATH_INFO
+        # is always decoded, and the script can't distinguish / vs %2F.
+        # See https://issues.apache.org/bugzilla/show_bug.cgi?id=35256
+        # Here we try to resurrect the original encoded URI from REQUEST_URI.
+        if (my $req_uri = $ENV{REQUEST_URI}) {
+            if (defined $script_name) {
+                $req_uri =~ s/^\Q$script_name\E//;
+            }
+            $req_uri =~ s/\?.*$//;
+            $path_info = $req_uri if $req_uri;
         }
     }
 

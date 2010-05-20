@@ -34,6 +34,13 @@ sub run_time_plugins : Local {
     ref($c)->plugin( faux => $faux_plugin );
 
     isa_ok $c, 'Catalyst::Plugin::Test::Plugin';
+
+    # applied parameterized role
+    if (eval { require MooseX::Role::Parameterized; 1 }) {
+        can_ok $c, 'affe';
+        is $c->affe, 'birne', 'right method created by parameterized role';
+    }
+
     isa_ok $c, 'TestApp::Plugin::FullyQualified';
     ok !$c->isa($faux_plugin),
     '... and it should not inherit from the instant plugin';
