@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Fix the --mech and --mechanize options to the myapp_create.pl script
+    to operate correctly by fixing the options passed down into the script.
+
+ Documentation:
+  - Fix missing - in the docs when describing the --mechanize option at one
+    point.
+
 5.80024 2010-05-15 11:55:44
 
   Bug fixes:
