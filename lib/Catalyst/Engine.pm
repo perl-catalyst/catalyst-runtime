@@ -523,10 +523,19 @@ sub prepare_path {
     my $base_path = $env->{SCRIPT_NAME} || "/";
 
     # set the request URI
-    my $req_uri = $env->{REQUEST_URI};
-    $req_uri =~ s/\?.*$//;
-    my $path = $req_uri;
-    $path =~ s{^/+}{};
+    my $path;
+    if (!$ctx->config->{use_request_uri_for_path}) {
+        $path = $base_path . $env->{PATH_INFO};
+        $path =~ s{^/+}{};
+        $path =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+        $path =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
+    }
+    else {
+        my $req_uri = $env->{REQUEST_URI};
+        $req_uri =~ s/\?.*$//;
+        $path = $req_uri;
+        $path =~ s{^/+}{};
+    }
 
     # Using URI directly is way too slow, so we construct the URLs manually
     my $uri_class = "URI::$scheme";
