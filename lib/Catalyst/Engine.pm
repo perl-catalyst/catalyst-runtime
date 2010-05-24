@@ -345,6 +345,8 @@ Clean up after uploads, deleting temp files.
 sub finalize_uploads {
     my ( $self, $c ) = @_;
 
+    # N.B. This code is theoretically entirely unneeded due to ->cleanup(1)
+    #      on the HTTP::Body object.
     my $request = $c->request;
     foreach my $key (keys %{ $request->uploads }) {
         my $upload = $request->uploads->{$key};
@@ -369,6 +371,7 @@ sub prepare_body {
         unless ( $request->_body ) {
             my $type = $request->header('Content-Type');
             $request->_body(HTTP::Body->new( $type, $length ));
+            $request->_body->cleanup(1); # Make extra sure!
             $request->_body->tmpdir( $appclass->config->{uploadtmp} )
               if exists $appclass->config->{uploadtmp};
         }
@@ -651,7 +654,7 @@ sub prepare_uploads {
             my $u = Catalyst::Request::Upload->new
               (
                size => $upload->{size},
-               type => $headers->content_type,
+               type => scalar $headers->content_type,
                headers => $headers,
                tempname => $upload->{tempname},
                filename => $upload->{filename},
@@ -838,13 +841,13 @@ sub unescape_uri {
 
 =head2 $self->env
 
-Hash containing enviroment variables including many special variables inserted
+Hash containing environment variables including many special variables inserted
 by WWW server - like SERVER_*, REMOTE_*, HTTP_* ...
 
-Before accesing enviroment variables consider whether the same information is
+Before accessing environment variables consider whether the same information is
 not directly available via Catalyst objects $c->request, $c->engine ...
 
-BEWARE: If you really need to access some enviroment variable from your Catalyst
+BEWARE: If you really need to access some environment variable from your Catalyst
 application you should use $c->engine->env->{VARNAME} instead of $ENV{VARNAME},
 as in some enviroments the %ENV hash does not contain what you would expect.
 

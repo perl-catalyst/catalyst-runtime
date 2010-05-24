@@ -27,4 +27,9 @@ sub four : Action Regex('^action/regexp/redirect/(\w+)/universe/(\d+)/everything
     );
 }
 
+sub one_backslashes : Action Regex('^action/regexp/(\w+)/(\d+)\.html$') {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;

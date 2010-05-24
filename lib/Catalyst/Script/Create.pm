@@ -46,7 +46,7 @@ sub run {
     Class::MOP::load_class($helper_class);
     my $helper = $helper_class->new( { '.newfiles' => !$self->force, mech => $self->mechanize } );
 
-    $self->_getopt_full_usage unless $helper->mk_component( $self->application_name, @ARGV );
+    $self->_getopt_full_usage unless $helper->mk_component( $self->application_name, @{$self->extra_argv} );
 
 }
 
@@ -68,7 +68,7 @@ Catalyst::Script::Create - Create a new Catalyst Component
  Examples:
    myapp_create.pl controller My::Controller
    myapp_create.pl controller My::Controller BindLex
-   myapp_create.pl -mechanize controller My::Controller
+   myapp_create.pl --mechanize controller My::Controller
    myapp_create.pl view My::View
    myapp_create.pl view MyView TT
    myapp_create.pl view TT TT

@@ -105,7 +105,7 @@ sub list {
             if (my $cap = $curr->attributes->{CaptureArgs}) {
                 unshift(@parts, (("*") x $cap->[0]));
             }
-            if (my $pp = $curr->attributes->{PartPath}) {
+            if (my $pp = $curr->attributes->{PathPart}) {
                 unshift(@parts, $pp->[0])
                     if (defined $pp->[0] && length $pp->[0]);
             }
@@ -304,7 +304,7 @@ sub register {
         );
     }
 
-    $action->attributes->{PartPath} = [ $part ];
+    $action->attributes->{PathPart} = [ $part ];
 
     unshift(@{ $children->{$part} ||= [] }, $action);
 
@@ -358,7 +358,7 @@ sub uri_for_action {
                 unshift(@parts, splice(@captures, -$cap->[0]));
             }
         }
-        if (my $pp = $curr->attributes->{PartPath}) {
+        if (my $pp = $curr->attributes->{PathPart}) {
             unshift(@parts, $pp->[0])
                 if (defined($pp->[0]) && length($pp->[0]));
         }

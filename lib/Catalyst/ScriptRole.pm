@@ -1,9 +1,9 @@
 package Catalyst::ScriptRole;
 use Moose::Role;
-use Plack::Runner;
 use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
 use MooseX::Getopt;
+use Plack::Loader;
 use namespace::autoclean;
 
 with 'MooseX::Getopt' => {
