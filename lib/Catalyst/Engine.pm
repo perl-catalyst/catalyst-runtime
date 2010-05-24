@@ -525,7 +525,12 @@ sub prepare_path {
     # set the request URI
     my $path;
     if (!$ctx->config->{use_request_uri_for_path}) {
-        $path = $base_path . $env->{PATH_INFO};
+        my $path_info = $env->{PATH_INFO};
+        if ( exists $env->{REDIRECT_URL} ) {
+            $base_path = $env->{REDIRECT_URL};
+            $base_path =~ s/\Q$path_info\E$//;
+        }
+        $path = $base_path . $path_info;
         $path =~ s{^/+}{};
         $path =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
         $path =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE

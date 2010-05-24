@@ -9,6 +9,7 @@ use Catalyst::Engine;
 # mod_rewrite to app root for non / based app
 {
     my $r = get_req (0,
+        REDIRECT_URL => '/comics/',
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/',
     );
@@ -20,6 +21,7 @@ use Catalyst::Engine;
 {
     my $r = get_req (0,
         PATH_INFO  => '/foo/bar.gif',
+        REDIRECT_URL => '/comics/foo/bar.gif',
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/foo/bar.gif',
     );
