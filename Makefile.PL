@@ -23,6 +23,7 @@ requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.19';
 requires 'MooseX::Role::WithOverloading' => '0.05';
+requires 'MooseX::Types::LoadableClass' => '0.003';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';

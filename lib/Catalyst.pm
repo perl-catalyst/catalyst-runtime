@@ -29,6 +29,7 @@ use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
 use List::MoreUtils qw/uniq/;
 use attributes;
+use String::RewritePrefix;
 use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
@@ -2552,8 +2553,9 @@ sub setup_engine {
     unless ($engine) {
         $engine = $class->engine_class;
     }
-    $engine = 'Catalyst::Engine::' . $engine
-        unless $engine =~ /^Catalyst::Engine/;
+    else {
+        $engine = String::RewritePrefix->rewrite( { '' => 'Catalyst::Engine::', '+' => '' }, $engine );
+    }
 
     $engine = 'Catalyst::Engine' if $engine eq 'Catalyst::Engine::HTTP';
 
@@ -2589,6 +2591,11 @@ sub setup_engine {
         Catalyst::Exception->throw( message =>
               qq/Engine "$engine" is not supported by this version of Catalyst/
         );
+    }
+
+    if ($ENV{MOD_PERL}) {
+        # FIXME - Immutable
+        $class->meta->add_method(handler => sub { shift->handle_request(@_) });
     }
 
     $class->engine( $engine->new );
