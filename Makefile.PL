@@ -52,7 +52,7 @@ requires 'MooseX::Getopt' => '0.25';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
-requires 'Plack' => '0.9030';
+requires 'Plack' => '0.9935'; # Setup empty PATH_INFO if needed
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
 
 test_requires 'Class::Data::Inheritable';
