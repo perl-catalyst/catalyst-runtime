@@ -185,7 +185,7 @@ something like this:
 
   sub COMPONENT {
       my ($class, $app, $args) = @_;
-      $args = $self->merge_config_hashes($self->config, $args);
+      $args = $class->merge_config_hashes($class->config, $args);
       return $class->new($app, $args);
   }
 
