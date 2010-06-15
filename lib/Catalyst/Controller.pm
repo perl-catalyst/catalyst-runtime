@@ -225,7 +225,7 @@ sub register_action_methods {
 
     foreach my $method (@methods) {
         my $name = $method->name;
-        my $attributes = $method->attributes;
+        my $attributes = $method->can('attributes') ? $method->attributes : [];
         my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
             $c->log->debug( 'Bad action definition "'
