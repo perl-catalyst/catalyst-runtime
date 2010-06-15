@@ -7,6 +7,8 @@
  Documentation:
   - Fix missing - in the docs when describing the --mechanize option at one
     point.
+  - Explained the common practice how to access the component's config
+    values.
 
 5.80024 2010-05-15 11:55:44
 

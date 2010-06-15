@@ -903,6 +903,21 @@ constructed:
         overrides => 'me',
     });
 
+It's common practice to use a Moose attribute
+on the receiving component to access the config value.
+
+    package MyApp::Model::Foo;
+
+    use Moose;
+
+    # this attr will receive 'baz' at construction time
+    has 'bar' => ( 
+        is  => 'rw',
+        isa => 'Str',
+    );
+
+You can then get the value 'baz' by calling $c->model('Foo')->bar
+
 =cut
 
 around config => sub {
@@ -3182,6 +3197,8 @@ willert: Sebastian Willert <willert@cpan.org>
 wreis: Wallace Reis <wallace@reis.org.br>
 
 Yuval Kogman, C<nothingmuch@woobling.org>
+
+rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 =head1 LICENSE
 

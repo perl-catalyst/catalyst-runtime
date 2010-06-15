@@ -170,7 +170,7 @@ to be stored in the application's component hash.
 
 C<< my $component_instance = $component->COMPONENT($app, $arguments); >>
 
-If this method is present (as it is on all Catalyst::Component subclasses,
+If this method is present (as it is on all Catalyst::Component subclasses),
 it is called by Catalyst during setup_components with the application class
 as $app and any config entry on the application for this component (for example,
 in the case of MyApp::Controller::Foo this would be
@@ -199,6 +199,12 @@ Accessor for this component's config hash. Config values can be set as
 key value pair, or you can specify a hashref. In either case the keys
 will be merged with any existing config settings. Each component in
 a Catalyst application has its own config hash.
+
+The component's config hash is merged with any config entry on the
+application for this component and passed to C<new()> (as mentioned
+above at L</COMPONENT>). The common practice to access the merged
+config is to use a Moose attribute for each config entry on the
+receiving component.
 
 =head2 $c->process()
 
