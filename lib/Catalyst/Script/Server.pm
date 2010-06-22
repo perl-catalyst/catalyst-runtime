@@ -231,7 +231,7 @@ Catalyst::Script::Server - Catalyst test server
                       a restart when modified
                       (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
    --rdir --restart_directory  the directory to search for
-                      modified files, can be set mulitple times
+                      modified files, can be set multiple times
                       (defaults to '[SCRIPT_DIR]/..')
    --sym  --follow_symlinks   follow symlinks in search directories
                       (defaults to false. this is a no-op on Win32)
