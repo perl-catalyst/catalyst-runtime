@@ -9,6 +9,7 @@
     point.
   - Explained the common practice how to access the component's config
     values.
+  - Fixed typo in Catalyst/Script/Server.pm (RT #58474)
 
 5.80024 2010-05-15 11:55:44
 
