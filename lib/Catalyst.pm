@@ -892,7 +892,7 @@ component is constructed.
 For example:
 
     MyApp->config({ 'Model::Foo' => { bar => 'baz', overrides => 'me' } });
-    MyApp::Model::Foo->config({ quux => 'frob', 'overrides => 'this' });
+    MyApp::Model::Foo->config({ quux => 'frob', overrides => 'this' });
 
 will mean that C<MyApp::Model::Foo> receives the following data when
 constructed:
