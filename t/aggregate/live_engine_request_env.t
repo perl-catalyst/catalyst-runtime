@@ -24,8 +24,6 @@ use HTTP::Headers;
 use HTTP::Request::Common;
 
 {
-    my $env;
-
     my $response = request("http://localhost/dump/env", {
         extra_env => { $EXPECTED_ENV_VAR => $EXPECTED_ENV_VAL },
     });
@@ -33,6 +31,8 @@ use HTTP::Request::Common;
     ok( $response, 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
+
+    my $env;
     ok( eval '$env = ' . $response->content, 'Unserialize Catalyst::Request' );
     is ref($env), 'HASH';
     ok exists($env->{PATH_INFO}), 'Have a PATH_INFO env var';
