@@ -2595,11 +2595,17 @@ sub setup_engine {
 
     if ($ENV{MOD_PERL}) {
         # FIXME - Immutable
-        $class->meta->add_method(handler => sub { shift->handle_request(@_) });
+        $class->meta->add_method(handler => sub {
+            my $r = shift;
+            my $app = $class->psgi_app;
+            use Plack::Handler::Apache2;
+            Plack::Handler::Apache2->call_app($r, $app);
+        });
     }
 
     $class->engine( $engine->new );
     $class->psgi_app( $class->engine->build_psgi_app($class) );
+
 }
 
 =head2 $c->setup_home
