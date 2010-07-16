@@ -2594,12 +2594,13 @@ sub setup_engine {
     }
 
     if ($ENV{MOD_PERL}) {
+        use Catalyst::Engine::Loader;
+        my $apache = Catalyst::Engine::Loader->auto;
         # FIXME - Immutable
         $class->meta->add_method(handler => sub {
             my $r = shift;
             my $app = $class->psgi_app;
-            use Plack::Handler::Apache2;
-            Plack::Handler::Apache2->call_app($r, $app);
+            $apache->call_app($r, $app);
         });
     }
 

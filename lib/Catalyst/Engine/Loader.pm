@@ -11,9 +11,10 @@ around guess => sub {
     if ($engine eq 'Standalone') {
         if ( $ENV{MOD_PERL} ) {
             my ( $software, $version ) =
-                $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
-
+              $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
             $version =~ s/_//g;
+            $version =~ s/(\.[^.]+)\./$1/g;
+
             if ( $software eq 'mod_perl' ) {
                 if ( $version >= 1.99922 ) {
                     $engine = 'Apache2';
@@ -35,6 +36,7 @@ around guess => sub {
             }
         }
     }
+
     return $engine;
 };
 
