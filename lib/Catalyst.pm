@@ -2594,7 +2594,7 @@ sub setup_engine {
     }
 
     if ($ENV{MOD_PERL}) {
-        use Catalyst::Engine::Loader;
+        require 'Catalyst/Engine/Loader.pm';
         my $apache = Catalyst::Engine::Loader->auto;
         # FIXME - Immutable
         $class->meta->add_method(handler => sub {
