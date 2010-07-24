@@ -1109,6 +1109,7 @@ sub setup {
         }
     }
 
+    $class->setup_config();
     $class->setup_home( delete $flags->{home} );
 
     $class->setup_log( delete $flags->{log} );
@@ -2410,6 +2411,30 @@ Sets up actions for a component.
 =cut
 
 sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
+
+=head2 $c->setup_config
+
+=cut
+
+sub setup_config {
+    my $class = shift;
+
+    my %args = %{$class->config || {} };
+    my @container_classes = qw/MyApp::Container Catalyst::Container/;
+    unshift @container_classes, delete $args{container_class} if exists $args{container_class};
+
+    my $container_class = Class::MOP::load_first_existing_class(@container_classes);
+
+    my $config = $container_class->new( %args, name => "$class" )->fetch('config')->get;
+    $class->config($config);
+    $class->finalize_config; # back-compat
+}
+
+=head $c->finalize_config
+
+=cut
+
+sub finalize_config { }
 
 =head2 $c->setup_components
 
