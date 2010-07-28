@@ -68,7 +68,8 @@ sub finalize_headers {
 
     # Should we keep the connection open?
     my $connection = $c->request->header('Connection');
-    if (   $self->options->{keepalive}
+    if (   $self->options
+        && $self->options->{keepalive}
         && $connection
         && $connection =~ /^keep-alive$/i
     ) {
@@ -534,11 +535,19 @@ sub _socket_data {
         peeraddr  => $iaddr
             ? ( inet_ntoa($iaddr) || '127.0.0.1' )
             : '127.0.0.1',
-        localname => gethostbyaddr( $localiaddr, AF_INET ) || 'localhost',
+        localname => _gethostbyaddr( $localiaddr ),
         localaddr => inet_ntoa($localiaddr) || '127.0.0.1',
     };
 
     return $data;
+}
+
+{   # If you have a crappy DNS server then these can be slow, so cache 'em
+    my %hostname_cache;
+    sub _gethostbyaddr {
+        my $ip = shift;
+        $hostname_cache{$ip} ||= gethostbyaddr( $ip, AF_INET ) || 'localhost';
+    }
 }
 
 sub _inet_addr { unpack "N*", inet_aton( $_[0] ) }

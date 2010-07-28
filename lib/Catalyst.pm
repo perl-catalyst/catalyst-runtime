@@ -14,6 +14,7 @@ use Catalyst::Request::Upload;
 use Catalyst::Response;
 use Catalyst::Utils;
 use Catalyst::Controller;
+use Data::OptList;
 use Devel::InnerPackage ();
 use File::stat;
 use Module::Pluggable::Object ();
@@ -78,10 +79,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80021';
-our $PRETTY_VERSION = $VERSION;
-
-$VERSION = eval $VERSION;
+our $VERSION = '5.80024';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -283,14 +281,15 @@ Specifies a comma-delimited list of log levels.
 
 =head2 -Stats
 
-Enables statistics collection and reporting. You can also force this setting
-from the system environment with CATALYST_STATS or <MYAPP>_STATS. The
-environment settings override the application, with <MYAPP>_STATS having the
-highest priority.
+Enables statistics collection and reporting.
 
-e.g.
+   use Catalyst qw/-Stats=1/;
 
-   use Catalyst qw/-Stats=1/
+You can also force this setting from the system environment with CATALYST_STATS
+or <MYAPP>_STATS. The environment settings override the application, with
+<MYAPP>_STATS having the highest priority.
+
+Stats are also enabled if L<< debugging |/"-Debug" >> is enabled.
 
 =head1 METHODS
 
@@ -893,7 +892,7 @@ component is constructed.
 For example:
 
     MyApp->config({ 'Model::Foo' => { bar => 'baz', overrides => 'me' } });
-    MyApp::Model::Foo->config({ quux => 'frob', 'overrides => 'this' });
+    MyApp::Model::Foo->config({ quux => 'frob', overrides => 'this' });
 
 will mean that C<MyApp::Model::Foo> receives the following data when
 constructed:
@@ -903,6 +902,21 @@ constructed:
         quux => 'frob',
         overrides => 'me',
     });
+
+It's common practice to use a Moose attribute
+on the receiving component to access the config value.
+
+    package MyApp::Model::Foo;
+
+    use Moose;
+
+    # this attr will receive 'baz' at construction time
+    has 'bar' => ( 
+        is  => 'rw',
+        isa => 'Str',
+    );
+
+You can then get the value 'baz' by calling $c->model('Foo')->bar
 
 =cut
 
@@ -1162,7 +1176,7 @@ EOF
 
     if ( $class->debug ) {
         my $name = $class->config->{name} || 'Application';
-        $class->log->info("$name powered by Catalyst $Catalyst::PRETTY_VERSION");
+        $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
 
     # Make sure that the application class becomes immutable at this point,
@@ -1282,13 +1296,11 @@ sub uri_for {
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
     foreach my $arg (@args) {
         utf8::encode($arg) if utf8::is_utf8($arg);
-    }
-    s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @args;
-    if (blessed $path) { # Action object only.
-        s|/|%2F|g for @args;
+        $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     }
 
     if ( blessed($path) ) { # action object
+        s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? @{ shift(@args) }
@@ -1308,8 +1320,6 @@ sub uri_for {
         }
         $path = '/' if $path eq '';
     }
-
-    undef($path) if (defined $path && $path eq '');
 
     unshift(@args, $path);
 
@@ -1516,7 +1526,7 @@ sub welcome_message {
                     <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&amp;mode=all">models</a>, and
                     <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&amp;mode=all">views</a>;
                     they can save you a lot of work.</p>
-                    <pre><code>script/${prefix}_create.pl -help</code></pre>
+                    <pre><code>script/${prefix}_create.pl --help</code></pre>
                     <p>Also, be sure to check out the vast and growing
                     collection of <a href="http://search.cpan.org/search?query=Catalyst">plugins for Catalyst on CPAN</a>;
                     you are likely to find what you need there.
@@ -1893,7 +1903,7 @@ namespaces.
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
-=head2 $c->handle_request( $class, @arguments )
+=head2 $app->handle_request( @arguments )
 
 Called to handle each HTTP request.
 
@@ -1953,7 +1963,7 @@ sub prepare {
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
-    if ( $c->debug ) {
+    if ( $c->debug || $c->config->{enable_catalyst_header} ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
@@ -2108,8 +2118,6 @@ Writes information about the request to the debug logs.  This includes:
 
 =item * Request method, path, and remote IP address
 
-=item * Request headers (see L</log_headers>)
-
 =item * Query keywords (see L<Catalyst::Request/query_keywords>)
 
 =item * Request parameters
@@ -2134,7 +2142,7 @@ sub log_request {
     $address ||= '';
     $c->log->debug(qq/"$method" request for "$path" from "$address"/);
 
-    $c->log_headers('request', $request->headers);
+    $c->log_request_headers($request->headers);
 
     if ( my $keywords = $request->query_keywords ) {
         $c->log->debug("Query keywords are: $keywords");
@@ -2147,15 +2155,8 @@ sub log_request {
 
 =head2 $c->log_response
 
-Writes information about the response to the debug logs.  This includes:
-
-=over 4
-
-=item * Response status code
-
-=item * Response headers (see L</log_headers>)
-
-=back
+Writes information about the response to the debug logs by calling
+C<< $c->log_response_status_line >> and C<< $c->log_response_headers >>.
 
 =cut
 
@@ -2167,15 +2168,47 @@ sub log_response {
     my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
     my $response = $dump->[1];
 
-	$c->log->debug(
-		sprintf(
-			'Response Code: %s; Content-Type: %s; Content-Length: %s',
-			$response->status                            || 'unknown',
-			$response->headers->header('Content-Type')   || 'unknown',
-			$response->headers->header('Content-Length') || 'unknown'
-		)
-	);
+    $c->log_response_status_line($response);
+    $c->log_response_headers($response->headers);
 }
+
+=head2 $c->log_response_status_line($response)
+
+Writes one line of information about the response to the debug logs.  This includes:
+
+=over 4
+
+=item * Response status code
+
+=item * Content-Type header (if present)
+
+=item * Content-Length header (if present)
+
+=back
+
+=cut
+
+sub log_response_status_line {
+    my ($c, $response) = @_;
+
+    $c->log->debug(
+        sprintf(
+            'Response Code: %s; Content-Type: %s; Content-Length: %s',
+            $response->status                            || 'unknown',
+            $response->headers->header('Content-Type')   || 'unknown',
+            $response->headers->header('Content-Length') || 'unknown'
+        )
+    );
+}
+
+=head2 $c->log_response_headers($headers);
+
+Hook method which can be wrapped by plugins to log the responseheaders.
+No-op in the default implementation.
+
+=cut
+
+sub log_response_headers {}
 
 =head2 $c->log_request_parameters( query => {}, body => {} )
 
@@ -2233,6 +2266,15 @@ sub log_request_uploads {
     }
 }
 
+=head2 $c->log_request_headers($headers);
+
+Hook method which can be wrapped by plugins to log the request headers.
+No-op in the default implementation.
+
+=cut
+
+sub log_request_headers {}
+
 =head2 $c->log_headers($type => $headers)
 
 Logs L<HTTP::Headers> (either request or response) to the debug logs.
@@ -2246,7 +2288,8 @@ sub log_headers {
 
     return unless $c->debug;
 
-    my $t = Text::SimpleTable->new( [ 35, 'Header Name' ], [ 40, 'Value' ] );
+    my $column_width = Catalyst::Utils::term_width() - 28;
+    my $t = Text::SimpleTable->new( [ 15, 'Header Name' ], [ $column_width, 'Value' ] );
     $headers->scan(
         sub {
             my ( $name, $value ) = @_;
@@ -2378,10 +2421,6 @@ sub setup_components {
         # we know M::P::O found a file on disk so this is safe
 
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
-
-        # Needs to be done as soon as the component is loaded, as loading a sub-component
-        # (next time round the loop) can cause us to get the wrong metaclass..
-        $class->_controller_init_base_classes($component);
     }
 
     for my $component (@comps) {
@@ -2391,7 +2430,6 @@ sub setup_components {
             : $class->expand_component_module( $component, $config );
         for my $component (@expanded_components) {
             next if $comps{$component};
-            $class->_controller_init_base_classes($component); # Also cover inner packages
             $class->components->{ $component } = $class->setup_component($component);
         }
     }
@@ -2443,19 +2481,6 @@ sub expand_component_module {
 =head2 $c->setup_component
 
 =cut
-
-# FIXME - Ugly, ugly hack to ensure the we force initialize non-moose base classes
-#         nearest to Catalyst::Controller first, no matter what order stuff happens
-#         to be loaded. There are TODO tests in Moose for this, see
-#         f2391d17574eff81d911b97be15ea51080500003
-sub _controller_init_base_classes {
-    my ($app_class, $component) = @_;
-    return unless $component->isa('Catalyst::Controller');
-    foreach my $class ( reverse @{ mro::get_linear_isa($component) } ) {
-        Moose::Meta::Class->initialize( $class )
-            unless find_meta($class);
-    }
-}
 
 sub setup_component {
     my( $class, $component ) = @_;
@@ -2757,13 +2782,8 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
             if $plugin->isa( 'Catalyst::Component' );
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
-            no strict 'refs';
-            if ( my $meta = Class::MOP::get_metaclass_by_name($class) ) {
-              my @superclasses = ($plugin, $meta->superclasses );
-              $meta->superclasses(@superclasses);
-            } else {
-              unshift @{"$class\::ISA"}, $plugin;
-            }
+            my $meta = Class::MOP::get_metaclass_by_name($class);
+            $meta->superclasses($plugin, $meta->superclasses);
         }
         return $class;
     }
@@ -2772,22 +2792,29 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $class, $plugins ) = @_;
 
         $class->_plugins( {} ) unless $class->_plugins;
-        $plugins ||= [];
+        $plugins = Data::OptList::mkopt($plugins || []);
 
-        my @plugins = Catalyst::Utils::resolve_namespace($class . '::Plugin', 'Catalyst::Plugin', @$plugins);
+        my @plugins = map {
+            [ Catalyst::Utils::resolve_namespace(
+                  $class . '::Plugin',
+                  'Catalyst::Plugin', $_->[0]
+              ),
+              $_->[1],
+            ]
+         } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            Class::MOP::load_class($plugin);
-            my $meta = find_meta($plugin);
+            Class::MOP::load_class($plugin->[0], $plugin->[1]);
+            my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 
-            $class->_register_plugin($plugin);
+            $class->_register_plugin($plugin->[0]);
         }
 
         my @roles =
-            map { $_->name }
-            grep { $_ && blessed($_) && $_->isa('Moose::Meta::Role') }
-            map { find_meta($_) }
+            map  { $_->[0]->name, $_->[1] }
+            grep { blessed($_->[0]) && $_->[0]->isa('Moose::Meta::Role') }
+            map  { [find_meta($_->[0]), $_->[1]] }
             @plugins;
 
         Moose::Util::apply_all_roles(
@@ -2801,15 +2828,24 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
 Returns an arrayref of the internal execution stack (actions that are
 currently executing).
 
+=head2 $c->stats
+
+Returns the current timing statistics object. By default Catalyst uses
+L<Catalyst::Stats|Catalyst::Stats>, but can be set otherwise with
+L<< stats_class|/"$c->stats_class" >>.
+
+Even if L<< -Stats|/"-Stats" >> is not enabled, the stats object is still
+available. By enabling it with C< $c->stats->enabled(1) >, it can be used to
+profile explicitly, although MyApp.pm still won't profile nor output anything
+by itself.
+
 =head2 $c->stats_class
 
-Returns or sets the stats (timing statistics) class.
+Returns or sets the stats (timing statistics) class. L<Catalyst::Stats|Catalyst::Stats> is used by default.
 
 =head2 $c->use_stats
 
-Returns 1 when stats collection is enabled.  Stats collection is enabled
-when the -Stats options is set, debug is on or when the <MYAPP>_STATS
-environment variable is set.
+Returns 1 when L<< stats collection|/"-Stats" >> is enabled.
 
 Note that this is a static method, not an accessor and should be overridden
 by declaring C<sub use_stats { 1 }> in your MyApp.pm, not by calling C<< $c->use_stats(1) >>.
@@ -2904,6 +2940,12 @@ C<< $c->components >>).
 
 C<show_internal_actions> - If true, causes internal actions such as C<< _DISPATCH >>
 to be shown in hit debug tables in the test server.
+
+=item *
+
+C<use_request_uri_for_path> - Controlls if the C<REQUEST_URI> or C<PATH_INFO> environment
+variable should be used for determining the request path. See L<Catalyst::Engine::CGI/PATH DECODING>
+for more information.
 
 =item *
 
@@ -3136,6 +3178,8 @@ random: Roland Lammel <lammel@cpan.org>
 
 Robert Sedlacek C<< <rs@474.at> >>
 
+SpiceMan: Marcel Montes
+
 sky: Arthur Bergman
 
 szbalint: Balint Szilakszi <szbalint@cpan.org>
@@ -3150,7 +3194,11 @@ Will Hawes C<info@whawes.co.uk>
 
 willert: Sebastian Willert <willert@cpan.org>
 
+wreis: Wallace Reis <wallace@reis.org.br>
+
 Yuval Kogman, C<nothingmuch@woobling.org>
+
+rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 =head1 LICENSE
 

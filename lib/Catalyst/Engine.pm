@@ -10,6 +10,8 @@ use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
+use Encode ();
+use utf8;
 
 use namespace::clean -except => 'meta';
 
@@ -131,6 +133,14 @@ sub finalize_error {
 
     $c->res->content_type('text/html; charset=utf-8');
     my $name = ref($c)->config->{name} || join(' ', split('::', ref $c));
+    
+    # Prevent Catalyst::Plugin::Unicode::Encoding from running.
+    # This is a little nasty, but it's the best way to be clean whether or
+    # not the user has an encoding plugin.
+
+    if ($c->can('encoding')) {
+      $c->{encoding} = '';
+    }
 
     my ( $title, $error, $infos );
     if ( $c->debug ) {
@@ -279,10 +289,11 @@ sub finalize_error {
 </body>
 </html>
 
-
     # Trick IE. Old versions of IE would display their own error page instead
     # of ours if we'd give it less than 512 bytes.
     $c->res->{body} .= ( ' ' x 512 );
+
+    $c->res->{body} = Encode::encode("UTF-8", $c->res->{body});
 
     # Return 500
     $c->res->status(500);
@@ -311,6 +322,8 @@ Clean up after uploads, deleting temp files.
 sub finalize_uploads {
     my ( $self, $c ) = @_;
 
+    # N.B. This code is theoretically entirely unneeded due to ->cleanup(1)
+    #      on the HTTP::Body object.
     my $request = $c->request;
     foreach my $key (keys %{ $request->uploads }) {
         my $upload = $request->uploads->{$key};
@@ -335,6 +348,7 @@ sub prepare_body {
         unless ( $request->_body ) {
             my $type = $request->header('Content-Type');
             $request->_body(HTTP::Body->new( $type, $length ));
+            $request->_body->cleanup(1); # Make extra sure!
             $request->_body->tmpdir( $appclass->config->{uploadtmp} )
               if exists $appclass->config->{uploadtmp};
         }
@@ -543,7 +557,7 @@ sub prepare_uploads {
             my $u = Catalyst::Request::Upload->new
               (
                size => $upload->{size},
-               type => $headers->content_type,
+               type => scalar $headers->content_type,
                headers => $headers,
                tempname => $upload->{tempname},
                filename => $upload->{filename},
@@ -705,13 +719,13 @@ sub unescape_uri {
 
 =head2 $self->env
 
-Hash containing enviroment variables including many special variables inserted
+Hash containing environment variables including many special variables inserted
 by WWW server - like SERVER_*, REMOTE_*, HTTP_* ...
 
-Before accesing enviroment variables consider whether the same information is
+Before accessing environment variables consider whether the same information is
 not directly available via Catalyst objects $c->request, $c->engine ...
 
-BEWARE: If you really need to access some enviroment variable from your Catalyst
+BEWARE: If you really need to access some environment variable from your Catalyst
 application you should use $c->engine->env->{VARNAME} instead of $ENV{VARNAME},
 as in some enviroments the %ENV hash does not contain what you would expect.
 

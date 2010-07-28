@@ -73,15 +73,15 @@ sub run_test_for {
 
         my $response;
 
-        ok( $response = request("http://localhost/args/args/$path"), "Requested args for path $path");
+        ok( $response = request("http://localhost/args/args/$path"), "Requested /args/args/$path");
 
         is( $response->content, $test, "$test as args" );
 
         undef $response;
 
-        ok( $response = request("http://localhost/args/params/$path"), "Requested params for path $path");
+        ok( $response = request("http://localhost/args/params/$path"), "Requested /args/params/$path");
 
-        is( $response->content, $test, "$test as params" );
+        is( $response->content, $test, "response content $test as params" );
 
         undef $response;
 

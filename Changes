@@ -1,25 +1,105 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ New features:
+  - An 'action_class' method has been added to Catalyst::Controller to
+    allow controller base classes, roles or traits
+    (e.g. Catalyst::Controller::ActionRole) to more easily override
+    the default action creation.
+
+ Bug fixes:
+  - Fix the --mech and --mechanize options to the myapp_create.pl script
+    to operate correctly by fixing the options passed down into the script.
+  - Fix controllers with no method attributes (where the action definitions
+    are entirely contained in config). RT#58057
+
+ Documentation:
+  - Fix missing - in the docs when describing the --mechanize option at one
+    point.
+  - Explained the common practice how to access the component's config
+    values.
+  - Fixed typo in Catalyst/Script/Server.pm (RT #58474)
+
+5.80024 2010-05-15 11:55:44
+
+  Bug fixes:
+   - Revert the path resolution behaviour to how it used to work before
+     Catalyst 5.80014_02, so that application paths are (by default)
+     resolved from $ENV{PATH_INFO} and $ENV{SCRIPT_NAME}. This fixes backward
+     compatibility breakage seen by a number of people since that release
+     with mod_rewrite and SSI.
+
+  New features:
+   - Add a use_request_uri_for_path config setting to optionally
+     use the (more correct) $ENV{REQUEST_URI} path resolution behaviour.
+
+  Documentation:
+   - Clarify the documentation for the Catalyst::Stats interface.
+   - Copious documentation about the use_request_uri_for_path feature
+     and the implications of setting this to true/false in
+     Catalyst::Engine::CGI
+
+5.80023 2010-05-07 23:50:27
+
+  Bug fixes:
+   - Ensure to always cleanup temporary uploaded files in all cases, even
+     when exceptions occur during request processing, using HTTP::Body's
+     ->cleanup feature. (RT#41442)
+   - Ensure that Catalyst::Engine::HTTP's options hash is defined before
+     dereferencing it. (RT#49267)
+   - Fix regex special characters in REDIRECT_URL variable breaking
+     the request base. (2nd part of RT#24951)
+   - Fix not stripping backslashes in DispatchType::Regex::uri_for_action
+
+  New features:
+   - Setting __PACKAGE__->config(enable_catalyst_header => 1); in your MyApp.pm
+     now enables the X-Catalyst header being printed when not in debug mode.
+   - Require CGI::Simple::Cookie version 1.109 to ensure support for the
+     HttpOnly flag
+   - Allow the myapp_test.pl script to be given a list of paths which it
+     will retrieve all of. (RT#53653)
+   - Allow parameterized roles to be applied as plugins.
+   - Allow requiring minimum versions of plugins when loading them.
+
+  Documentation:
+   - The Catalyst::Test::get method is documented as returning the raw
+     response bytes without any character decoding (RT#53678)
+
+  Cleanups:
+   - Removal of $Catalyst::PRETTY_VERSION. Future releases will always have the
+     full and unmangled version number, including trailing zeroes, in
+     $Catalyst::VERSION.
+
+5.80022 2010-03-28 19:43:01
+
   New features:
    - Log an extra line in debug mode with the response status code,
      the content type and content length if available.
 
   Refactoring / optimizations:
    - Display of the end of hit debug messages has been factored out into
-     log_headers, log_request and log_response methods which all call
+     log_headers, log_request, log_request_headers, log_response,
+     log_response_status_line and log_response_headers methods so that
+     plugins which customise how much information is shown on the debug
+     screen as easy to write.
+   - Make all logging of request and response state get the information from
      $c->dump_these so that there is a unified point from which to hook
      in parameter filtering (for example).
    - $c->model/view/controller have become a lot faster for non-regexp names
      by using direct hash lookup instead of looping.
+   - IP address => hostname mapping for the server is only done once and cached
+     by Catalyst::Engine::HTTP to somewhat mitigate the problem of people
+     developing on machines pointed at slow DNS servers.
 
-  Bug fixed:
+  Bugs fixed:
     - DispatchType::Index's uri_for_action only returns for actions registered
       with it (prevents 'index :Path' or similar resolving to the wrong URI)
+    - Make sure to construct Upload objects properly, even if there are
+      multiple Content-Type headers (Closes RT#55976).
 
 5.80021 2010-03-03 23:02:01
 
   Bug fixed:
-   - $c->uri_for will now escape unsafe characterss in captures
+   - $c->uri_for will now escape unsafe characters in captures
      ($c->request->captures) and correctly encode utf8 charracters.
 
 5.80020 2010-02-04 06:51:18

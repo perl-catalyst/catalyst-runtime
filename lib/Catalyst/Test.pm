@@ -202,6 +202,9 @@ method and the L<request|/"$res = request( ... );"> method below:
     is ( $uri->path , '/y');
     my $content = get($uri->path);
 
+Note also that the content is returned as raw bytes, without any attempt
+to decode it into characters.
+
 =head2 $res = request( ... );
 
 Returns an L<HTTP::Response> object. Accepts an optional hashref for request
