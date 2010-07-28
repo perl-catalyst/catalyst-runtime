@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ New features:
+  - An 'action_class' method has been added to Catalyst::Controller to
+    allow controller base classes, roles or traits
+    (e.g. Catalyst::Controller::ActionRole) to more easily override
+    the default action creation.
+
  Bug fixes:
   - Fix the --mech and --mechanize options to the myapp_create.pl script
     to operate correctly by fixing the options passed down into the script.
@@ -9,6 +15,7 @@
     point.
   - Explained the common practice how to access the component's config
     values.
+  - Fixed typo in Catalyst/Script/Server.pm (RT #58474)
 
 5.80024 2010-05-15 11:55:44
 
