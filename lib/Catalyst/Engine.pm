@@ -176,7 +176,6 @@ sub finalize_error {
         $error = '';
         $infos = <<"";
 <pre>
-(es) Por favor inténtelo de nuevo más tarde
 (en) Please come back later
 (fr) SVP veuillez revenir plus tard
 (de) Bitte versuchen sie es spaeter nocheinmal
