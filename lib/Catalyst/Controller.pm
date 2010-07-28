@@ -543,7 +543,7 @@ and registers them with the dispatcher.
 =head2 $self->action_class(%args)
 
 Used when a controller is creating an action to determine the correct base
-action class to use.  
+action class to use.
 
 =head2 $self->create_action(%args)
 
