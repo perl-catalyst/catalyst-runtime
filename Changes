@@ -11,6 +11,7 @@
     to operate correctly by fixing the options passed down into the script.
   - Fix controllers with no method attributes (where the action definitions
     are entirely contained in config). RT#58057
+  - Fix running as a CGI under IIS at non-root locations.
 
  Documentation:
   - Fix missing - in the docs when describing the --mechanize option at one
