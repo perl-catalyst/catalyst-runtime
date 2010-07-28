@@ -225,6 +225,8 @@ sub register_action_methods {
 
     foreach my $method (@methods) {
         my $name = $method->name;
+        # Horrible hack! All method metaclasses should have an attributes
+        # method, core Moose bug - see r13354.
         my $attributes = $method->can('attributes') ? $method->attributes : [];
         my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {

@@ -9,6 +9,8 @@
  Bug fixes:
   - Fix the --mech and --mechanize options to the myapp_create.pl script
     to operate correctly by fixing the options passed down into the script.
+  - Fix controllers with no method attributes (where the action definitions
+    are entirely contained in config). RT#58057
 
  Documentation:
   - Fix missing - in the docs when describing the --mechanize option at one
