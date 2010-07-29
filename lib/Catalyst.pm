@@ -1242,7 +1242,9 @@ sub setup_finalize {
 
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
-When used as a string, provides a textual URI.
+When used as a string, provides a textual URI.  If you need more flexibility
+than this (i.e. the option to provide relative URIs etc. see
+L<Catalyst::Plugin::SmartURI>.
 
 If no arguments are provided, the URI for the current action is returned.
 To return the current action and also provide @args, use
