@@ -28,6 +28,7 @@ requires 'CGI::Simple::Cookie' => '1.109';
 requires 'Data::Dump';
 requires 'Data::OptList';
 requires 'HTML::Entities';
+requires 'HTML::HeadParser';
 requires 'HTTP::Body'    => '1.06'; # ->cleanup(1)
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';

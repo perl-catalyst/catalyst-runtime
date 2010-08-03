@@ -239,6 +239,21 @@ sub local_request {
 
     my $response = $cgi->restore->response;
     $response->request( $request );
+
+    # HTML head parsing based on LWP::UserAgent
+
+    require HTML::HeadParser;
+
+    my $parser = HTML::HeadParser->new();
+    $parser->xml_mode(1) if $response->content_is_xhtml;
+    $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
+
+    $parser->parse( $response->content );
+    my $h = $parser->header;
+    for my $f ( $h->header_field_names ) {
+        $response->init_header( $f, [ $h->header($f) ] );
+    }
+
     return $response;
 }
 

@@ -49,6 +49,22 @@ sub recursion_test : Local {
     $c->forward( 'recursion_test' );
 }
 
+sub base_href_test : Local {
+    my ( $self, $c ) = @_;
+
+    my $body = <<"EndOfBody";
+<html>
+  <head>
+    <base href="http://www.example.com/">
+  </head>
+  <body>
+  </body>
+</html>
+EndOfBody
+
+    $c->response->body($body);
+}
+
 sub end : Private {
     my ($self,$c) = @_;
 }
