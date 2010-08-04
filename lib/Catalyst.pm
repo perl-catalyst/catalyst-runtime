@@ -2407,8 +2407,7 @@ sub setup_components {
 
     my $config  = $class->config->{ setup_components };
 
-    my @comps = sort { length $a <=> length $b }
-                $class->locate_components($config);
+    my @comps = $class->locate_components($config);
     my %comps = map { $_ => 1 } @comps;
 
     my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
@@ -2463,7 +2462,8 @@ sub locate_components {
         %$config
     );
 
-    my @comps = $locator->plugins;
+    # XXX think about ditching this sort entirely
+    my @comps = sort { length $a <=> length $b } $locator->plugins;
 
     return @comps;
 }
