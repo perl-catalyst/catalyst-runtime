@@ -67,7 +67,7 @@ our $GO        = Catalyst::Exception::Go->new;
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
-  for qw/components arguments dispatcher engine log dispatcher_class
+  for qw/container components arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
   setup_finished/;
 
@@ -2425,7 +2425,12 @@ sub setup_config {
 
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
 
-    my $config = $container_class->new( %args, name => "$class" )->fetch('config')->get;
+    my $container = $container_class->new( %args, name => "$class" );
+
+    $container->add_sub_container(Bread::Board::Container->new( name => $_ )) for qw(model controller view);
+    $class->container($container);
+
+    my $config = $container->fetch('config')->get;
     $class->config($config);
     $class->finalize_config; # back-compat
 }
@@ -2473,8 +2478,13 @@ sub setup_components {
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
     }
 
+    my $containers;
+    $containers->{$_} = $class->container->get_sub_container($_) for qw(model view controller);
+
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
+        my $type = lc((split /::/, $component)[1]);
+        $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $instance } ));
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
             : $class->expand_component_module( $component, $config );
