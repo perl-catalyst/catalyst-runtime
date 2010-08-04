@@ -1,7 +1,6 @@
 package Catalyst::Utils;
 
 use strict;
-use Catalyst::Exception;
 use File::Spec;
 use HTTP::Request;
 use Path::Class;
@@ -140,6 +139,13 @@ sub class2tempdir {
         eval { $tmpdir->mkpath };
 
         if ($@) {
+            # don't load Catalyst::Exception as a BEGIN in Utils,
+            # because Utils often gets loaded before MyApp.pm, and if
+            # Catalyst::Exception is loaded before MyApp.pm, it does
+            # not honor setting
+            # $Catalyst::Exception::CATALYST_EXCEPTION_CLASS in
+            # MyApp.pm
+            require Catalyst::Exception;
             Catalyst::Exception->throw(
                 message => qq/Couldn't create tmpdir '$tmpdir', "$@"/ );
         }
