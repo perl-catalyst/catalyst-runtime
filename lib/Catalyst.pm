@@ -2484,6 +2484,11 @@ sub setup_components {
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
         my $type = lc((split /::/, $component)[1]);
+        if ($deprecatedcatalyst_component_names) {
+            $type = 'controller' if $type eq 'c';
+            $type = 'model' if $type eq 'm';
+            $type = 'view' if $type eq 'v';
+        }
         $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $instance } ));
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
