@@ -2495,6 +2495,19 @@ sub setup_components {
             : $class->expand_component_module( $component, $config );
         for my $component (@expanded_components) {
             next if $comps{$component};
+
+            $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components;
+            $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
+                qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
+            ) if $deprecatedcatalyst_component_names;
+
+            if ($deprecatedcatalyst_component_names) {
+                $type = lc((split /::/, $component)[1]);
+                $type = 'controller' if $type eq 'c';
+                $type = 'model' if $type eq 'm';
+                $type = 'view' if $type eq 'v';
+            }
+            $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
             $class->components->{ $component } = $class->setup_component($component);
         }
     }
