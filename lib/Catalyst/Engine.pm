@@ -14,6 +14,8 @@ use Moose::Util::TypeConstraints;
 use Plack::Loader;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
+use Encode ();
+use utf8;
 
 use namespace::clean -except => 'meta';
 
@@ -155,6 +157,14 @@ sub finalize_error {
 
     $c->res->content_type('text/html; charset=utf-8');
     my $name = ref($c)->config->{name} || join(' ', split('::', ref $c));
+    
+    # Prevent Catalyst::Plugin::Unicode::Encoding from running.
+    # This is a little nasty, but it's the best way to be clean whether or
+    # not the user has an encoding plugin.
+
+    if ($c->can('encoding')) {
+      $c->{encoding} = '';
+    }
 
     my ( $title, $error, $infos );
     if ( $c->debug ) {
@@ -303,10 +313,11 @@ sub finalize_error {
 </body>
 </html>
 
-
     # Trick IE. Old versions of IE would display their own error page instead
     # of ours if we'd give it less than 512 bytes.
     $c->res->{body} .= ( ' ' x 512 );
+
+    $c->res->{body} = Encode::encode("UTF-8", $c->res->{body});
 
     # Return 500
     $c->res->status(500);

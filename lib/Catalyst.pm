@@ -81,7 +81,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80024';
+our $VERSION = '5.80025';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -894,7 +894,7 @@ component is constructed.
 For example:
 
     MyApp->config({ 'Model::Foo' => { bar => 'baz', overrides => 'me' } });
-    MyApp::Model::Foo->config({ quux => 'frob', 'overrides => 'this' });
+    MyApp::Model::Foo->config({ quux => 'frob', overrides => 'this' });
 
 will mean that C<MyApp::Model::Foo> receives the following data when
 constructed:
@@ -904,6 +904,21 @@ constructed:
         quux => 'frob',
         overrides => 'me',
     });
+
+It's common practice to use a Moose attribute
+on the receiving component to access the config value.
+
+    package MyApp::Model::Foo;
+
+    use Moose;
+
+    # this attr will receive 'baz' at construction time
+    has 'bar' => ( 
+        is  => 'rw',
+        isa => 'Str',
+    );
+
+You can then get the value 'baz' by calling $c->model('Foo')->bar
 
 =cut
 
@@ -1229,7 +1244,9 @@ sub setup_finalize {
 
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
-When used as a string, provides a textual URI.
+When used as a string, provides a textual URI.  If you need more flexibility
+than this (i.e. the option to provide relative URIs etc.) see
+L<Catalyst::Plugin::SmartURI>.
 
 If no arguments are provided, the URI for the current action is returned.
 To return the current action and also provide @args, use
@@ -2401,8 +2418,7 @@ sub setup_components {
 
     my $config  = $class->config->{ setup_components };
 
-    my @comps = sort { length $a <=> length $b }
-                $class->locate_components($config);
+    my @comps = $class->locate_components($config);
     my %comps = map { $_ => 1 } @comps;
 
     my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
@@ -2457,7 +2473,8 @@ sub locate_components {
         %$config
     );
 
-    my @comps = $locator->plugins;
+    # XXX think about ditching this sort entirely
+    my @comps = sort { length $a <=> length $b } $locator->plugins;
 
     return @comps;
 }
@@ -3145,6 +3162,8 @@ willert: Sebastian Willert <willert@cpan.org>
 wreis: Wallace Reis <wallace@reis.org.br>
 
 Yuval Kogman, C<nothingmuch@woobling.org>
+
+rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 =head1 LICENSE
 

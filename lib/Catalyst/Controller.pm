@@ -225,7 +225,9 @@ sub register_action_methods {
 
     foreach my $method (@methods) {
         my $name = $method->name;
-        my $attributes = $method->attributes;
+        # Horrible hack! All method metaclasses should have an attributes
+        # method, core Moose bug - see r13354.
+        my $attributes = $method->can('attributes') ? $method->attributes : [];
         my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
             $c->log->debug( 'Bad action definition "'
@@ -248,16 +250,25 @@ sub register_action_methods {
     }
 }
 
-sub create_action {
+sub action_class {
     my $self = shift;
     my %args = @_;
 
     my $class = (exists $args{attributes}{ActionClass}
-                    ? $args{attributes}{ActionClass}[0]
-                    : $self->_action_class);
-    Class::MOP::load_class($class);
+        ? $args{attributes}{ActionClass}[0]
+        : $self->_action_class);
 
+    Class::MOP::load_class($class);
+    return $class;
+}
+
+sub create_action {
+    my $self = shift;
+    my %args = @_;
+
+    my $class = $self->action_class(%args);
     my $action_args = $self->config->{action_args};
+
     my %extra_args = (
         %{ $action_args->{'*'}           || {} },
         %{ $action_args->{ $args{name} } || {} },
@@ -528,6 +539,11 @@ action methods for this package.
 
 Creates action objects for a set of action methods using C< create_action >,
 and registers them with the dispatcher.
+
+=head2 $self->action_class(%args)
+
+Used when a controller is creating an action to determine the correct base
+action class to use.
 
 =head2 $self->create_action(%args)
 
