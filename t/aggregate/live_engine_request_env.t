@@ -13,29 +13,29 @@ use vars qw/
 
 BEGIN {
     $EXPECTED_ENV_VAR = "CATALYSTTEST$$"; # has to be uppercase otherwise fails on Win32 
-    $EXPECTED_ENV_VAL = "Test env value " . rand(100000);
+    $EXPECTED_ENV_VAL = $ENV{$EXPECTED_ENV_VAR}
+         = "Test env value " . rand(100000);
 }
 
-use Test::More tests => 7;
+use Test::More;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
 use HTTP::Headers;
 use HTTP::Request::Common;
 
-{
-    my $response = request("http://localhost/dump/env", {
-        extra_env => { $EXPECTED_ENV_VAR => $EXPECTED_ENV_VAL },
-    });
+plan skip_all => 'Does not work in live tests' if ( $ENV{CATALYST_SERVER} );
 
-    ok( $response, 'Request' );
+{
+    my $env;
+
+    ok( my $response = request("http://localhost/dump/env"),
+        'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
-
-    my $env;
     ok( eval '$env = ' . $response->content, 'Unserialize Catalyst::Request' );
     is ref($env), 'HASH';
-    ok exists($env->{PATH_INFO}), 'Have a PATH_INFO env var';
+    ok exists($env->{PATH}), 'Have a PATH env var';
 
     SKIP:
     {
@@ -46,4 +46,6 @@ use HTTP::Request::Common;
             'Value we set as expected';
     }
 }
+
+done_testing;
 
