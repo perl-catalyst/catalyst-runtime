@@ -548,9 +548,11 @@ sub _comp_names_search_prefixes {
     my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
     $filter = qr/$filter/; # Compile regex now rather than once per loop
 
+    my @components = map { $c->container->get_sub_container($_)->get_service_list } $c->container->get_sub_container_list; 
+
     # map the original component name to the sub part that we will search against
     my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
-        grep { /$filter/ } keys %{ $c->components };
+        grep { /$filter/ } @components; 
 
     # undef for a name will return all
     return keys %eligible if !defined $name;
