@@ -48,17 +48,17 @@ sub home : Chained('setup') PathPart('') Args(0) {
 
 sub home_base : Chained('setup') PathPart('') CaptureArgs(2) {
     my($self,$c,$proj_id,$title) = @_;
-    $c->stash->{project_id}=$proj_id;
+    $c->stash({project_id=>$proj_id, project_title=>$title});
 }
 
 sub hpages : Chained('home_base') PathPart('') Args(0) {
     my($self,$c) = @_;
-    $c->response->body( "List project " . $c->stash->{project_id} . " pages");
+    $c->response->body( "List project " . $c->stash->{project_title} . " pages");
 }
 
 sub hpage : Chained('home_base') PathPart('') Args(2) {
     my($self,$c,$page_id, $pagetitle) = @_;
-    $c->response->body( "This is $pagetitle page of " . $c->stash->{project_id} . " project" );
+    $c->response->body( "This is $pagetitle page of " . $c->stash->{project_title} . " project" );
 }
 
 sub no_account : Chained('setup') PathPart('account') Args(0) {
