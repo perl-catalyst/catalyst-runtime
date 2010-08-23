@@ -14,6 +14,8 @@
   - Fix controllers with no method attributes (where the action definitions
     are entirely contained in config). RT#58057
   - Fix running as a CGI under IIS at non-root locations.
+  - Fix warning about "excludes" during role application
+  - Fix warning from MooseX::Getopt regarding duplicate "help" aliases
 
  Documentation:
   - Fix missing - in the docs when describing the --mechanize option at one

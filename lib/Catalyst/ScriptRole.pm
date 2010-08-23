@@ -6,7 +6,7 @@ use MooseX::Getopt;
 use namespace::autoclean;
 
 with 'MooseX::Getopt' => {
-    excludes => [qw/
+    -excludes => [qw/
         _getopt_spec_warnings
         _getopt_spec_exception
         _getopt_full_usage
@@ -18,14 +18,6 @@ has application_name => (
     isa      => Str,
     is       => 'ro',
     required => 1,
-);
-
-has help => (
-    traits        => ['Getopt'],
-    isa           => Bool,
-    is            => 'ro',
-    documentation => 'Display this help and exit',
-    cmd_aliases   => ['?', 'h'],
 );
 
 sub _getopt_spec_exception {}
@@ -40,11 +32,6 @@ sub _getopt_full_usage {
     pod2usage();
     exit 0;
 }
-
-before run => sub {
-    my $self = shift;
-    $self->_getopt_full_usage if $self->help;
-};
 
 sub run {
     my $self = shift;
