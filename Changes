@@ -6,6 +6,8 @@
     to always be parsed for logging at the end of the request when in
     debug mode. This has been fixed so that if the body has not been parsed
     by the time the request is logged, then the body is omitted.
+  - Fix show_internal_actions config setting producing warnings in debug
+    mode (RT#59738)
 
 5.80025 2010-07-29 01:50:00
 

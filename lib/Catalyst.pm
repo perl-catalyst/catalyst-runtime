@@ -1701,7 +1701,7 @@ sub _stats_start_execute {
         my $parent = $c->stack->[-1];
 
         # forward, locate the caller
-        if ( exists $c->counter->{"$parent"} ) {
+        if ( defined $parent && exists $c->counter->{"$parent"} ) {
             $c->stats->profile(
                 begin  => $action,
                 parent => "$parent" . $c->counter->{"$parent"},
