@@ -2150,7 +2150,7 @@ sub log_request {
         $c->log->debug("Query keywords are: $keywords");
     }
 
-    $c->log_request_parameters( query => $request->query_parameters, $request->_has_body ? (body => $request->body_parameters) : () );
+    $c->log_request_parameters( query => $request->query_parameters, body => $request->body_parameters );
 
     $c->log_request_uploads($request);
 }
