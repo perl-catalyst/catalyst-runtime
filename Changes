@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - parse_on_demand fixed when used in conjunction with debug mode.
+    A regression was introduced in 5.80022 which would cause the body
+    to always be parsed for logging at the end of the request when in
+    debug mode. This has been fixed so that if the body has not been parsed
+    by the time the request is logged, then the body is omitted.
+
 5.80025 2010-07-29 01:50:00
 
  New features:
