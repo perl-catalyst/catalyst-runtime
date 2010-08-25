@@ -17,12 +17,14 @@ BEGIN {
          = "Test env value " . rand(100000);
 }
 
-use Test::More tests => 7;
+use Test::More;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
 use HTTP::Headers;
 use HTTP::Request::Common;
+
+plan skip_all => 'Does not work in live tests' if ( $ENV{CATALYST_SERVER} );
 
 {
     my $env;
@@ -44,4 +46,6 @@ use HTTP::Request::Common;
             'Value we set as expected';
     }
 }
+
+done_testing;
 
