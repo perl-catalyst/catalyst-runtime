@@ -18,7 +18,7 @@ use Catalyst::Test 'TestAppShowInternalActions';
 my $last_warning;
 {
     local $SIG{__WARN__} = sub { $last_warning = shift };
-    get('/');
+    my $res = get('/');
 }
 is( $last_warning, undef, 'there should be no warnings about uninitialized value' );
 
