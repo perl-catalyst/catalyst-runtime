@@ -19,6 +19,10 @@
   - Fix show_internal_actions config setting producing warnings in debug
     mode (RT#59738)
 
+  - Make Catalyst::Test::local_request() set the response base from base href
+    in the returned document so that links can be resolved correctly by
+    Test::WWW::Mechanize::Catalyst
+
  Refactoring:
    - moved component name sort that happens in setup_components to
      locate_components to allow methods to wrap around locate_components
