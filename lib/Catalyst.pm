@@ -1701,7 +1701,7 @@ sub _stats_start_execute {
         my $parent = $c->stack->[-1];
 
         # forward, locate the caller
-        if ( exists $c->counter->{"$parent"} ) {
+        if ( defined $parent && exists $c->counter->{"$parent"} ) {
             $c->stats->profile(
                 begin  => $action,
                 parent => "$parent" . $c->counter->{"$parent"},
@@ -2150,7 +2150,7 @@ sub log_request {
         $c->log->debug("Query keywords are: $keywords");
     }
 
-    $c->log_request_parameters( query => $request->query_parameters, body => $request->body_parameters );
+    $c->log_request_parameters( query => $request->query_parameters, $request->_has_body ? (body => $request->body_parameters) : () );
 
     $c->log_request_uploads($request);
 }
@@ -2407,8 +2407,7 @@ sub setup_components {
 
     my $config  = $class->config->{ setup_components };
 
-    my @comps = sort { length $a <=> length $b }
-                $class->locate_components($config);
+    my @comps = $class->locate_components($config);
     my %comps = map { $_ => 1 } @comps;
 
     my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
@@ -2463,7 +2462,8 @@ sub locate_components {
         %$config
     );
 
-    my @comps = $locator->plugins;
+    # XXX think about ditching this sort entirely
+    my @comps = sort { length $a <=> length $b } $locator->plugins;
 
     return @comps;
 }

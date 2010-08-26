@@ -33,8 +33,8 @@ sub run_test {
         } "new_with_options";
         ok $i;
         my $saved;
-        open( $saved, '<&'. STDIN->fileno )
-              or croak("Can't dup stdin: $!");
+        open( $saved, '>&'. STDOUT->fileno )
+            or croak("Can't dup stdout: $!");
         open( STDOUT, '>&='. $fh->fileno )
             or croak("Can't open stdout: $!");
         eval { $i->run };

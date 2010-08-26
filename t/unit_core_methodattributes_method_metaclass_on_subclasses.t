@@ -15,13 +15,13 @@ use Test::More;
 
     sub test {}
 }
-
+my $c = 0;
 foreach my $class (qw/ CT RT /) {
     my $class_name = 'NoAttributes::' . $class;
     my $meta = $class_name->meta;
     my $meth = $meta->find_method_by_name('test');
     {
-        local $TODO = "Known MX::MethodAttributes issue";
+        local $TODO = "Known MX::MethodAttributes issue" if $c++;
         ok $meth->can('attributes'), 'method metaclass has ->attributes method for ' . $class;;
     }
 }

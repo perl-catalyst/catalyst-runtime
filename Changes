@@ -1,5 +1,34 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Fix so that CATALYST_EXCEPTION_CLASS in MyApp is always respected by
+    not loading Catalyst::Exception in Utils.pm BEGIN, because some Scripts::*
+    load Utils before MyApp.pm
+
+  - Fix warnings with new Moose versions about "excludes" during role
+    application
+
+  - Fix warning from MooseX::Getopt regarding duplicate "help" aliases.
+
+  - parse_on_demand fixed when used in conjunction with debug mode.
+    A regression was introduced in 5.80022 which would cause the body
+    to always be parsed for logging at the end of the request when in
+    debug mode. This has been fixed so that if the body has not been parsed
+    by the time the request is logged, then the body is omitted.
+
+  - Fix show_internal_actions config setting producing warnings in debug
+    mode (RT#59738)
+
+ Refactoring:
+   - moved component name sort that happens in setup_components to
+     locate_components to allow methods to wrap around locate_components
+
+ Documentation:
+    - Fix some typos
+
+    - Advertise Catalyst::Plugin::SmartURI
+
+
 5.80025 2010-07-29 01:50:00
 
  New features:
@@ -14,6 +43,8 @@
   - Fix controllers with no method attributes (where the action definitions
     are entirely contained in config). RT#58057
   - Fix running as a CGI under IIS at non-root locations.
+  - Fix warning about "excludes" during role application
+  - Fix warning from MooseX::Getopt regarding duplicate "help" aliases
 
  Documentation:
   - Fix missing - in the docs when describing the --mechanize option at one

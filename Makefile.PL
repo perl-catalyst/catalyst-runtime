@@ -47,7 +47,7 @@ requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
-requires 'MooseX::Getopt' => '0.25';
+requires 'MooseX::Getopt' => '0.30';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
@@ -66,7 +66,7 @@ else {
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
-author_requires 'CatalystX::LeakChecker', '0.05'; # Skipped if this isn't installed
+author_requires 'CatalystX::LeakChecker', '0.05';
 author_requires 'File::Copy::Recursive'; # For http server test
 
 author_tests 't/author';
