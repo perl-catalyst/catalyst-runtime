@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.80027 2010-09-01
+5.80027 2010-09-01 22:14:00
 
  Bug fixes:
   - Fix an issue with newly added test cases which depended on Catalyst::Action::RenderView
