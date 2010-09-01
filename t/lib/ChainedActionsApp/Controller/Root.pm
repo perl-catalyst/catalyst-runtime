@@ -10,24 +10,6 @@ BEGIN { extends 'Catalyst::Controller' }
 #
 __PACKAGE__->config(namespace => '');
 
-=head1 NAME
-
-test_chained::Controller::Root - Root Controller for test_chained
-
-=head1 DESCRIPTION
-
-[enter your description here]
-
-=head1 METHODS
-
-=head2 setup
-
-This is the C<setup> method that initializes the request. Any matching action
-will go through this, so it is an application-wide automatically executed
-action. For more information, see L<Catalyst::DispatchType::Chained>
-
-=cut
-
 sub setup : Chained('/') PathPart('') CaptureArgs(0) {
     my ( $self, $c ) = @_;
     # Common things here are to check for ACL and setup global contexts
@@ -37,14 +19,6 @@ sub home : Chained('setup') PathPart('') Args(0) {
     my($self,$c) = @_;
     $c->response->body( "Application Home Page" );
 }
-
-=head2 home_base
-
-     Args:
-       project_id
-       project_title
-
-=cut
 
 sub home_base : Chained('setup') PathPart('') CaptureArgs(2) {
     my($self,$c,$proj_id,$title) = @_;
@@ -76,36 +50,13 @@ sub account : Chained('account_base') PathPart('') Args(0) {
     $c->response->body( "This is account " . $c->stash->{account_id} );
 }
 
-=head2 default
-
-Standard 404 error page
-
-=cut
-
 sub default : Chained('setup') PathPart('') Args() {
     my ( $self, $c ) = @_;
     $c->response->body( 'Page not found' );
     $c->response->status(404);
 }
 
-=head2 end
-
-Attempt to render a view, if needed.
-
-=cut
-
-sub end : ActionClass('RenderView') {}
-
-=head1 AUTHOR
-
-Ferruccio Zamuner
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
+sub end : Action {}
 
 __PACKAGE__->meta->make_immutable;
 
