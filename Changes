@@ -3,6 +3,9 @@
  Bug fixes:
   - use Class::MOP in Catalyst::Utils.
 
+  - Do not keep a reference to a closed over context in ctx_request, allowing
+    the caller to dispose of the request context at their leisure.
+
 5.80027 2010-09-01 22:14:00
 
  Bug fixes:
