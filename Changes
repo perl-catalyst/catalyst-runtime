@@ -1,10 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80028 2010-09-28 20:49:00
+
  Bug fixes:
   - use Class::MOP in Catalyst::Utils.
 
   - Do not keep a reference to a closed over context in ctx_request, allowing
     the caller to dispose of the request context at their leisure.
+
+  - Changes to be compatible with bleadperl
 
 5.80027 2010-09-01 22:14:00
 
