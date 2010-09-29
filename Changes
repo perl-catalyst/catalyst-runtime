@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Deal with Moose >= 1.15 warning if you add a method called 'meta' to a
+    class which already has one by using _add_meta_method.
+
 5.80028 2010-09-28 20:49:00
 
  Bug fixes:

@@ -100,7 +100,12 @@ sub import {
     $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
 
     unless( $meta->has_method('meta') ){
-        $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
+        if ($Moose::VERSION >= 1.15) {
+            $meta->_add_meta_method('meta');
+        }
+        else {
+            $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
+        }
     }
 
     $caller->arguments( [@arguments] );

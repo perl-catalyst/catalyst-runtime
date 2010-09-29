@@ -25,7 +25,6 @@ sub COMPONENT { # Don't do this yourself, use CatalystX::Component::Traits!
     # Special move as the methodattributes trait has changed our metaclass..
     $meta = find_meta($meta->name);
 
-    $meta->add_method('meta' => sub { $meta });
     $class = $meta->name;
     $class->new($app, $args);
 }
