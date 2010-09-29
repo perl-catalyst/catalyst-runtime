@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Class::MOP::Class;
+use Class::MOP;
 use Catalyst::Runtime;
 
 use Test::More tests => 29;
