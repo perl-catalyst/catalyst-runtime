@@ -750,7 +750,12 @@ sub view {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $comps = $c->components;
             my $check = $appclass."::View::".$name;
-            return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+            if( exists $comps->{$check} ) {
+                return $c->_filter_component( $comps->{$check}, @args );
+            }
+            else {
+                $c->log->warn( "Attempted to use view '$check', but does not exist" );
+            }
         }
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;

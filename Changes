@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Add a warning when $c->view is called and cannot locate a default_view
+    or current_view. This clarifies the logging when ::RenderView gets
+    confused.
+
   - Deal with Moose >= 1.15 warning if you add a method called 'meta' to a
     class which already has one by using _add_meta_method.
 
