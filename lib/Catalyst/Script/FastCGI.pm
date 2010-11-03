@@ -55,6 +55,14 @@ has nproc => (
     documentation => 'Specify a number of child processes',
 );
 
+has title => (
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 't',
+    isa           => Str,
+    is            => 'ro',
+    documentation => 'Set the process title',
+);
+
 sub _application_args {
     my ($self) = shift;
     return (
@@ -65,6 +73,7 @@ sub _application_args {
             manager => $self->manager,
             detach  => $self->daemon,
             keep_stderr => $self->keeperr,
+            title => $self->title,
         }
     );
 }
@@ -96,6 +105,7 @@ Catalyst::Script::FastCGI - The FastCGI Catalyst Script
                   or empty string to disable
    -e --keeperr   send error messages to STDOUT, not
                   to the webserver
+   -t --title     set the process title
 
 =head1 DESCRIPTION
 

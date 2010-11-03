@@ -113,6 +113,7 @@ sub run {
     if ($listen) {
         $options->{manager} ||= "FCGI::ProcManager";
         $options->{nproc}   ||= 1;
+        $options->{title}   ||= "perl-fcgi-pm [$class]";
 
         $self->daemon_fork() if $options->{detach};
 
@@ -123,6 +124,7 @@ sub run {
                 {
                     n_processes => $options->{nproc},
                     pid_fname   => $options->{pidfile},
+                    pm_title => $options->{title},
                 }
             );
 
