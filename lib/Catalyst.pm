@@ -925,12 +925,18 @@ on the receiving component to access the config value.
     use Moose;
 
     # this attr will receive 'baz' at construction time
-    has 'bar' => ( 
+    has 'bar' => (
         is  => 'rw',
         isa => 'Str',
     );
 
 You can then get the value 'baz' by calling $c->model('Foo')->bar
+(or $self->bar inside code in the model).
+
+B<NOTE:> you MUST NOT call C<< $self->config >> or C<< __PACKAGE__->config >>
+as a way of reading config within your code, as this B<will not> give you the
+correctly merged config back. You B<MUST> take the config values supplied to
+the constructor and use those instead.
 
 =cut
 
