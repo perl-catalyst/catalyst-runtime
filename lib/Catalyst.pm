@@ -1858,7 +1858,7 @@ sub finalize_headers {
     if ( $response->body && !$response->content_length ) {
 
         # get the length from a filehandle
-        if ( blessed( $response->body ) && $response->body->can('read') )
+        if ( blessed( $response->body ) && $response->body->can('read') || ref( $response->body ) eq 'GLOB' )
         {
             my $stat = stat $response->body;
             if ( $stat && $stat->size > 0 ) {

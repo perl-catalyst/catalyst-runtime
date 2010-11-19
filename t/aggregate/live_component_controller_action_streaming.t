@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 15*$iters;
+use Test::More tests => 20*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -51,18 +51,25 @@ EOF
   SKIP:
     {
         if ( $ENV{CATALYST_SERVER} ) {
-            skip "Using remote server", 5;
+            skip "Using remote server", 10;
         }
 
         my $file = "$FindBin::Bin/../lib/TestApp/Controller/Action/Streaming.pm";
         my $fh = IO::File->new( $file, 'r' );
         my $buffer;
         if ( defined $fh ) {
-            $fh->read( $buffer, 1024 );
+            $fh->read( $buffer, 2048 );
             $fh->close;
         }
 
         ok( my $response = request('http://localhost/action/streaming/body'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->content_length, -s $file, 'Response Content-Length' );
+        is( $response->content, $buffer, 'Content is read from filehandle' );
+
+        ok( $response = request('http://localhost/action/streaming/body_glob'),
             'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );

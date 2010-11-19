@@ -27,6 +27,19 @@ sub body : Local {
     }
 }
 
+sub body_glob : Local {
+    my ( $self, $c ) = @_;
+
+    my $file = "$FindBin::Bin/../lib/TestApp/Controller/Action/Streaming.pm";
+    open my $fh, '<', $file;
+    if ( defined $fh ) {
+        $c->res->body( $fh );
+    }
+    else {
+        $c->res->body( "Unable to read $file" );
+    }
+}
+
 sub body_large : Local {
     my ($self, $c) = @_;
 
