@@ -370,6 +370,8 @@ or stash it like so:
 
 and access it from the stash.
 
+Keep in mind that the C<end> method used is that of the caller action. So a C<$c-E<gt>detach> inside a forwarded action would run the C<end> method from the original action requested.
+
 =cut
 
 sub forward { my $c = shift; no warnings 'recursion'; $c->dispatcher->forward( $c, @_ ) }
