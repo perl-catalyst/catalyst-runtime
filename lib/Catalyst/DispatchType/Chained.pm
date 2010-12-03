@@ -198,7 +198,7 @@ sub recurse_match {
                               splice( # and strip them off @parts as well
                                 @parts, 0, scalar(@{[split('/', $try_part)]})
                               ))); # @{[]} to avoid split to @_
-	    $found=1;
+            $found=1;
         }
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
@@ -225,7 +225,7 @@ sub recurse_match {
                       $#$action_parts < $#{$best_action->{parts}}  ||
                      ($#$action_parts == $#{$best_action->{parts}} &&
                       $#$captures < $#{$best_action->{captures}} && ($found > $best_action->{found})
-		     ))) {
+                  ))) {
                     $best_action = {
                         actions => [ $action, @$actions ],
                         captures=> [ @captures, @$captures ],
