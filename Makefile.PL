@@ -21,7 +21,7 @@ requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.95';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.19';
+requires 'MooseX::MethodAttributes::Inheritable' => '0.24';
 requires 'MooseX::Role::WithOverloading' => '0.05';
 requires 'MooseX::Types::LoadableClass' => '0.003';
 requires 'Carp';
@@ -30,6 +30,7 @@ requires 'CGI::Simple::Cookie' => '1.109';
 requires 'Data::Dump';
 requires 'Data::OptList';
 requires 'HTML::Entities';
+requires 'HTML::HeadParser';
 requires 'HTTP::Body'    => '1.06'; # ->cleanup(1)
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
@@ -49,7 +50,7 @@ requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
-requires 'MooseX::Getopt' => '0.25';
+requires 'MooseX::Getopt' => '0.30';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
@@ -71,7 +72,7 @@ else {
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
 }
-author_requires 'CatalystX::LeakChecker', '0.05'; # Skipped if this isn't installed
+author_requires 'CatalystX::LeakChecker', '0.05';
 author_requires 'File::Copy::Recursive'; # For http server test
 
 author_tests 't/author';

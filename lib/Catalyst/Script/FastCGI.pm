@@ -56,13 +56,34 @@ has nproc => (
     documentation => 'Specify a number of child processes',
 );
 
+has title => (
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 't',
+    isa           => Str,
+    is            => 'ro',
+    lazy          => 1,
+    builder       => '_build_proc_title',
+    documentation => 'Set the process title',
+);
+
+sub _build_proc_title {
+    my ($self) = @_;
+    return sprintf 'perl-fcgi-pm [%s]', $self->application_name;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    $self->title;
+}
+
 sub _plack_loader_args {
     my ($self) = shift;
     return (
         map { $_->[0] => $self->${ \($_->[1] ? $_->[1]->[0] : $_->[0]) } }
         Data::OptList::mkopt([
             qw/pidfile listen manager nproc keep_stderr/,
-            detach => [ 'daemon'],
+            detach     => [ 'daemon' ],
+            proc_title => [ 'title'  ],
         ])
     );
 }
@@ -72,11 +93,12 @@ sub _application_args {
     return (
         $self->listen,
         {
-            nproc   => $self->nproc,
-            pidfile => $self->pidfile,
-            manager => $self->manager,
-            detach  => $self->daemon,
+            nproc       => $self->nproc,
+            pidfile     => $self->pidfile,
+            manager     => $self->manager,
+            detach      => $self->daemon,
             keep_stderr => $self->keeperr,
+            title       => $self->title,
         }
     );
 }
@@ -108,6 +130,7 @@ Catalyst::Script::FastCGI - The FastCGI Catalyst Script
                   or empty string to disable
    -e --keeperr   send error messages to STDOUT, not
                   to the webserver
+   -t --title     set the process title
 
 =head1 DESCRIPTION
 

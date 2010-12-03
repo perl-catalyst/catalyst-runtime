@@ -7,7 +7,7 @@ use Path::Class;
 use URI;
 use Carp qw/croak/;
 use Cwd;
-
+use Class::MOP;
 use String::RewritePrefix;
 
 use namespace::clean;

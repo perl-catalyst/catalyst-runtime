@@ -27,8 +27,8 @@ Catalyst::Exception::Interface - Role defining the interface for Catalyst except
 
    # This comprises the required interface.
    sub as_string { 'the exception text for stringification' }
-   sub die { shift; die @_ }
-   sub die { shift; die @_ }
+   sub throw { shift; die @_ }
+   sub rethrow { shift; die @_ }
 
 =head1 DESCRIPTION
 

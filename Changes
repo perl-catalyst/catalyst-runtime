@@ -1,5 +1,70 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Documentation:
+  - Clarify that when forwarding or detaching, the end action associated
+    with the original dispatched action will be run afterwards (fallen)
+
+5.80029 2010-10-03 16:39:00
+
+ New features:
+  - Add a warning when $c->view is called and cannot locate a default_view
+    or current_view. This clarifies the logging when ::RenderView gets
+    confused.
+
+ Warning fixes:
+  - Deal warning in with Moose >= 1.15 if you add a method called 'meta' to a
+    class which already has one by using _add_meta_method.
+
+5.80028 2010-09-28 20:49:00
+
+ Bug fixes:
+  - use Class::MOP in Catalyst::Utils.
+
+  - Do not keep a reference to a closed over context in ctx_request, allowing
+    the caller to dispose of the request context at their leisure.
+
+  - Changes to be compatible with bleadperl
+
+5.80027 2010-09-01 22:14:00
+
+ Bug fixes:
+  - Fix an issue with newly added test cases which depended on Catalyst::Action::RenderView
+
+5.80026 2010-09-01 15:14:00
+
+ Bug fixes:
+  - Fix so that CATALYST_EXCEPTION_CLASS in MyApp is always respected by
+    not loading Catalyst::Exception in Utils.pm BEGIN, because some Scripts::*
+    load Utils before MyApp.pm
+
+  - Fix warnings with new Moose versions about "excludes" during role
+    application
+
+  - Fix warning from MooseX::Getopt regarding duplicate "help" aliases.
+
+  - parse_on_demand fixed when used in conjunction with debug mode.
+    A regression was introduced in 5.80022 which would cause the body
+    to always be parsed for logging at the end of the request when in
+    debug mode. This has been fixed so that if the body has not been parsed
+    by the time the request is logged, then the body is omitted.
+
+  - Fix show_internal_actions config setting producing warnings in debug
+    mode (RT#59738)
+
+  - Make Catalyst::Test::local_request() set the response base from base href
+    in the returned document so that links can be resolved correctly by
+    Test::WWW::Mechanize::Catalyst
+
+ Refactoring:
+   - moved component name sort that happens in setup_components to
+     locate_components to allow methods to wrap around locate_components
+
+ Documentation:
+    - Fix some typos
+
+    - Advertise Catalyst::Plugin::SmartURI
+
+
 5.80025 2010-07-29 01:50:00
 
  New features:
@@ -14,6 +79,8 @@
   - Fix controllers with no method attributes (where the action definitions
     are entirely contained in config). RT#58057
   - Fix running as a CGI under IIS at non-root locations.
+  - Fix warning about "excludes" during role application
+  - Fix warning from MooseX::Getopt regarding duplicate "help" aliases
 
  Documentation:
   - Fix missing - in the docs when describing the --mechanize option at one

@@ -81,7 +81,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80025';
+our $VERSION = '5.80029';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -102,7 +102,12 @@ sub import {
     $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
 
     unless( $meta->has_method('meta') ){
-        $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
+        if ($Moose::VERSION >= 1.15) {
+            $meta->_add_meta_method('meta');
+        }
+        else {
+            $meta->add_method(meta => sub { Moose::Meta::Class->initialize("${caller}") } );
+        }
     }
 
     $caller->arguments( [@arguments] );
@@ -367,6 +372,8 @@ or stash it like so:
 
 and access it from the stash.
 
+Keep in mind that the C<end> method used is that of the caller action. So a C<$c-E<gt>detach> inside a forwarded action would run the C<end> method from the original action requested.
+
 =cut
 
 sub forward { my $c = shift; no warnings 'recursion'; $c->dispatcher->forward( $c, @_ ) }
@@ -429,6 +436,10 @@ C<< $c->go >> will perform a full dispatch on the specified action or method,
 with localized C<< $c->action >> and C<< $c->namespace >>. Like C<detach>,
 C<go> escapes the processing of the current request chain on completion, and
 does not return to its caller.
+
+@arguments are arguments to the final destination of $action. @captures are
+arguments to the intermediate steps, if any, on the way to the final sub of
+$action.
 
 =cut
 
@@ -743,7 +754,12 @@ sub view {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $comps = $c->components;
             my $check = $appclass."::View::".$name;
-            return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+            if( exists $comps->{$check} ) {
+                return $c->_filter_component( $comps->{$check}, @args );
+            }
+            else {
+                $c->log->warn( "Attempted to use view '$check', but does not exist" );
+            }
         }
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -913,12 +929,18 @@ on the receiving component to access the config value.
     use Moose;
 
     # this attr will receive 'baz' at construction time
-    has 'bar' => ( 
+    has 'bar' => (
         is  => 'rw',
         isa => 'Str',
     );
 
 You can then get the value 'baz' by calling $c->model('Foo')->bar
+(or $self->bar inside code in the model).
+
+B<NOTE:> you MUST NOT call C<< $self->config >> or C<< __PACKAGE__->config >>
+as a way of reading config within your code, as this B<will not> give you the
+correctly merged config back. You B<MUST> take the config values supplied to
+the constructor and use those instead.
 
 =cut
 
@@ -1703,7 +1725,7 @@ sub _stats_start_execute {
         my $parent = $c->stack->[-1];
 
         # forward, locate the caller
-        if ( exists $c->counter->{"$parent"} ) {
+        if ( defined $parent && exists $c->counter->{"$parent"} ) {
             $c->stats->profile(
                 begin  => $action,
                 parent => "$parent" . $c->counter->{"$parent"},
@@ -1840,7 +1862,7 @@ sub finalize_headers {
     if ( $response->body && !$response->content_length ) {
 
         # get the length from a filehandle
-        if ( blessed( $response->body ) && $response->body->can('read') )
+        if ( blessed( $response->body ) && $response->body->can('read') || ref( $response->body ) eq 'GLOB' )
         {
             my $stat = stat $response->body;
             if ( $stat && $stat->size > 0 ) {
@@ -2161,7 +2183,7 @@ sub log_request {
         $c->log->debug("Query keywords are: $keywords");
     }
 
-    $c->log_request_parameters( query => $request->query_parameters, body => $request->body_parameters );
+    $c->log_request_parameters( query => $request->query_parameters, $request->_has_body ? (body => $request->body_parameters) : () );
 
     $c->log_request_uploads($request);
 }

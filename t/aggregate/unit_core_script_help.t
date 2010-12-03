@@ -15,7 +15,6 @@ use lib "$Bin/../lib";
     sub _getopt_full_usage { $help++ }
 }
 
-test('-h');
 test('--help');
 test('-?');
 

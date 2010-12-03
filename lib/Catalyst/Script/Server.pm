@@ -9,8 +9,6 @@ sub _plack_engine_name { 'Standalone' }
 
 with 'Catalyst::ScriptRole';
 
-__PACKAGE__->meta->get_attribute('help')->cmd_aliases('?');
-
 has debug => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'd',

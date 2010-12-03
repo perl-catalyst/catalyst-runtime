@@ -8,7 +8,7 @@ use MooseX::Types::LoadableClass qw/LoadableClass/;
 use namespace::autoclean;
 
 with 'MooseX::Getopt' => {
-    excludes => [qw/
+    -excludes => [qw/
         _getopt_spec_warnings
         _getopt_spec_exception
         _getopt_full_usage
@@ -20,14 +20,6 @@ has application_name => (
     isa      => Str,
     is       => 'ro',
     required => 1,
-);
-
-has help => (
-    traits        => ['Getopt'],
-    isa           => Bool,
-    is            => 'ro',
-    documentation => 'Display this help and exit',
-    cmd_aliases   => ['?', 'h'],
 );
 
 has loader_class => (
@@ -62,11 +54,6 @@ sub _getopt_full_usage {
     pod2usage();
     exit 0;
 }
-
-before run => sub {
-    my $self = shift;
-    $self->_getopt_full_usage if $self->help;
-};
 
 sub run {
     my $self = shift;

@@ -48,7 +48,7 @@ my $build_exports = sub {
 
         ### place holder for $c after the request finishes; reset every time
         ### requests are done.
-        my $c;
+        my $ctx_closed_over;
 
         ### hook into 'dispatch' -- the function gets called after all plugins
         ### have done their work, and it's an easy place to capture $c.
@@ -56,7 +56,7 @@ my $build_exports = sub {
         my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
-            $c = shift;
+            $ctx_closed_over = shift;
         });
         $meta->make_immutable( replace_constructor => 1 );
         Class::C3::reinitialize(); # Fixes RT#46459, I've failed to write a test for how/why, but it does.
@@ -64,8 +64,18 @@ my $build_exports = sub {
         ### we've already stopped it from doing remote requests above.
         my $res = $request->( @_ );
 
+        # Make sure not to leave a reference $ctx hanging around.
+        # This means that the context will go out of scope as soon as the
+        # caller disposes of it, rather than waiting till the next time
+        # that ctx_request is called. This can be important if your $ctx
+        # ends up with a reference to a shared resource or lock (for example)
+        # which you want to clean up in test teardown - if the $ctx is still
+        # closed over then you're stuffed...
+        my $ctx = $ctx_closed_over;
+        undef $ctx_closed_over;
+
         ### return both values
-        return ( $res, $c );
+        return ( $res, $ctx );
     };
 
     return {
@@ -240,7 +250,30 @@ sub local_request {
     my $ret;
     test_psgi
         app    => sub { $app->({ %{ $_[0] }, %extra_env }) },
-        client => sub { $ret = shift->($request) };
+        client => sub {
+            my $resp = shift->($request);
+
+            # HTML head parsing based on LWP::UserAgent
+            #
+            # This is not just horrible and possibly broken, but also really
+            # doesn't belong here. Whoever wants this should be working on
+            # getting it into Plack::Test, or make a middleware out of it, or
+            # whatever. Seriously - horrible.
+
+            require HTML::HeadParser;
+
+            my $parser = HTML::HeadParser->new();
+            $parser->xml_mode(1) if $resp->content_is_xhtml;
+            $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
+
+            $parser->parse( $resp->content );
+            my $h = $parser->header;
+            for my $f ( $h->header_field_names ) {
+                $resp->init_header( $f, [ $h->header($f) ] );
+            }
+
+            $ret = $resp;
+        };
 
     return $ret;
 }

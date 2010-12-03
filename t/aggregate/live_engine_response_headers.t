@@ -12,7 +12,7 @@ use HTTP::Request::Common;
 
 my $content_length;
 
-foreach my $method qw(HEAD GET) {
+foreach my $method (qw(HEAD GET)) {
     my $expected = join( ', ', 1 .. 10 );
 
     my $request = HTTP::Request::Common->can($method)

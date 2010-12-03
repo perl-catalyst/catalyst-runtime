@@ -17,7 +17,7 @@ Catalyst::Script::CGI - The CGI Catalyst Script
   myapp_cgi.pl [options]
 
   Options:
-  -h     --help           display this help and exits
+  -?     --help           display this help and exits
 
 =head1 DESCRIPTION
 
