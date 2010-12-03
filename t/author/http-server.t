@@ -54,7 +54,7 @@ if ( $single_test ) {
     $return = system( "$^X -I../lib/ $single_test" );
 }
 else {
-    $return = prove( '-r', '-I../lib/', glob('../t/aggregate/live_*.t') );
+    $return = prove( ['../lib/'], [glob('../t/aggregate/live_*.t')] );
 }
 
 # shut it down
@@ -84,11 +84,15 @@ sub check_port {
 }
 
 sub prove {
+    my ($inc, $tests) = @_;
     if (!(my $pid = fork)) {
-        require App::Prove;
-        my $prove = App::Prove->new;
-        $prove->process_args(@_);
-        exit( $prove->run ? 0 : 1 );
+        unshift @INC, @{ $inc };
+
+        require TAP::Harness;
+        my $harness = TAP::Harness->new;
+        my $aggregator = $harness->runtests(@{ $tests });
+
+        exit $aggregator->has_errors ? 1 : 0;
     } else {
         waitpid $pid, 0;
         return $?;
