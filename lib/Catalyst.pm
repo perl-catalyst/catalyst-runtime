@@ -2402,7 +2402,7 @@ Starts the engine.
 
 =cut
 
-sub run { my $c = shift; return $c->engine->run( $c, @_ ) }
+sub run { my $c = shift; return $c->engine->run( $c, $c->psgi_app, @_ ) }
 
 =head2 $c->set_action( $action, $code, $namespace, $attrs )
 

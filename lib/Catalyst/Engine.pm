@@ -780,13 +780,12 @@ run method on the server passed in..
 =cut
 
 sub run {
-    my ($self, $app, @args) = @_;
+    my ($self, $app, $psgi, @args) = @_;
+    # FIXME - Do something sensible with the options we're passed
     my $server = pop @args if blessed $args[-1];
     $server ||= Plack::Loader->auto(); # We're not being called from a script,
                                        # so auto detect what backend to run on.
                                        # This does *NOT* cover mod_perl.
-    # FIXME - Do something sensible with the options we're passed
-    my $psgi = $self->build_psgi_app($app, @args);
     $server->run($psgi);
 }
 
@@ -812,12 +811,12 @@ sub build_psgi_app {
 
     $psgi_app = Plack::Middleware::Conditional->wrap(
         $psgi_app,
+        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
         condition => sub {
             my ($env) = @_;
             return if $app->config->{ignore_frontend_proxy};
             return $env->{REMOTE_ADDR} eq '127.0.0.1' || $app->config->{using_frontend_proxy};
         },
-        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
     );
 
     return $psgi_app;
