@@ -56,7 +56,7 @@ if ( $single_test ) {
     $return = system( "$^X -Ilib/ $single_test" );
 }
 else {
-    $return = prove( ['lib/'], [grep { $_ ne '..' } glob('t/aggregate/live_*.t')] );
+    $return = prove(grep { $_ ne '..' } glob('t/aggregate/live_*.t'));
 }
 
 # shut it down
@@ -86,19 +86,19 @@ sub check_port {
 }
 
 sub prove {
-    my ($inc, $tests) = @_;
+    my (@tests) = @_;
     if (!(my $pid = fork)) {
         require TAP::Harness;
 
         my $aggr = -e '.aggregating';
         my $harness = TAP::Harness->new({
-            ($aggr ? (test_args => $tests) : ()),
-            lib => $inc,
+            ($aggr ? (test_args => \@tests) : ()),
+            lib => ['lib'],
         });
 
         my $aggregator = $aggr
             ? $harness->runtests('t/aggregate.t')
-            : $harness->runtests(@{ $tests });
+            : $harness->runtests(@tests);
 
         exit $aggregator->has_errors ? 1 : 0;
     } else {
