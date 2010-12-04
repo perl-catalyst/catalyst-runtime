@@ -49,12 +49,14 @@ while ( check_port( 'localhost', $port ) != 1 ) {
 # run the testsuite against the HTTP server
 $ENV{CATALYST_SERVER} = "http://localhost:$port";
 
+chdir '..';
+
 my $return;
 if ( $single_test ) {
-    $return = system( "$^X -I../lib/ $single_test" );
+    $return = system( "$^X -Ilib/ $single_test" );
 }
 else {
-    $return = prove( '-r', '-I../lib/', glob('../t/aggregate/live_*.t') );
+    $return = prove(grep { $_ ne '..' } glob('t/aggregate/live_*.t'));
 }
 
 # shut it down
@@ -84,11 +86,21 @@ sub check_port {
 }
 
 sub prove {
+    my (@tests) = @_;
     if (!(my $pid = fork)) {
-        require App::Prove;
-        my $prove = App::Prove->new;
-        $prove->process_args(@_);
-        exit( $prove->run ? 0 : 1 );
+        require TAP::Harness;
+
+        my $aggr = -e '.aggregating';
+        my $harness = TAP::Harness->new({
+            ($aggr ? (test_args => \@tests) : ()),
+            lib => ['lib'],
+        });
+
+        my $aggregator = $aggr
+            ? $harness->runtests('t/aggregate.t')
+            : $harness->runtests(@tests);
+
+        exit $aggregator->has_errors ? 1 : 0;
     } else {
         waitpid $pid, 0;
         return $?;
