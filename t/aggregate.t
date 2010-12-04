@@ -7,9 +7,9 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 BEGIN {
-    unless (eval { require Test::Aggregate; Test::Aggregate->VERSION('0.35_05'); 1 }) {
+    unless (eval { require Test::Aggregate; Test::Aggregate->VERSION('0.364'); 1 }) {
         require Test::More;
-        Test::More::plan(skip_all => 'Test::Aggregate 0.35_05 required for test aggregation');
+        Test::More::plan(skip_all => 'Test::Aggregate 0.364 required for test aggregation');
     }
 }
 

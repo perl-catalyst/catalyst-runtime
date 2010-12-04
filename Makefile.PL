@@ -57,11 +57,13 @@ test_requires 'Test::Exception';
 test_requires 'Test::More' => '0.88';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
-if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.35_05')) {
-    author_requires('Test::Aggregate', '0.35_05');
+if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
+    author_requires('Test::Aggregate', '0.364');
     author_requires('Test::Simple', '0.88');
+    open my $fh, '>', '.aggregating';
 }
 else {
+    unlink '.aggregating';
     tests join q{ },
         grep { $_ ne 't/aggregate.t' }
         map  { glob } qw[t/*.t t/aggregate/*.t];
