@@ -88,13 +88,12 @@ sub check_port {
 sub prove {
     my ($inc, $tests) = @_;
     if (!(my $pid = fork)) {
-        unshift @INC, @{ $inc };
-
         require TAP::Harness;
 
         my $aggr = -e '.aggregating';
         my $harness = TAP::Harness->new({
-            ($aggr ? (test_args => $tests) : ())
+            ($aggr ? (test_args => $tests) : ()),
+            lib => $inc,
         });
 
         my $aggregator = $aggr
