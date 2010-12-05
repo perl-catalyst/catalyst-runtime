@@ -2644,8 +2644,61 @@ sub setup_engine {
     }
 
     $class->engine( $engine->new );
-    $class->psgi_app( $class->engine->build_psgi_app($class) );
 
+    $class->psgi_app( $class->setup_psgi_app );
+
+    return;
+}
+
+=head2 $c->setup_psgi_app
+
+Builds a PSGI application coderef for the catalyst application C<$c>.
+
+If we're able to locate a C<${myapp}.psgi> file in the applications home
+directory, we'll use that to obtain our code reference.
+
+Otherwise the raw psgi app, without any middlewares is created using
+C<raw_psgi_app> and wrapped into L<Plack::Middleware::ReverseProxy>
+conditionally. See L</"PROXY SUPPORT">.
+
+=cut
+
+sub setup_psgi_app {
+    my ($app) = @_;
+
+    if (my $home = Path::Class::Dir->new($app->config->{home})) {
+        my $psgi_file = $home->file(
+            Catalyst::Utils::appprefix($app) . '.psgi',
+        );
+
+        return Plack::Util::load_psgi($psgi_file)
+            if -e $psgi_file;
+    }
+
+    return Plack::Middleware::Conditional->wrap(
+        $app->raw_psgi_app,
+        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
+        condition => sub {
+            my ($env) = @_;
+            return if $app->config->{ignore_frontend_proxy};
+            return $env->{REMOTE_ADDR} eq '127.0.0.1'
+                || $app->config->{using_frontend_proxy};
+        },
+    );
+}
+
+=head2 $c->raw_psgi_app
+
+Returns a PSGI application code reference for the catalyst application
+C<$c>. This is the bare application without any middlewares
+applied. C<${myapp}.psgi> is not taken into account. See
+L</"$c->setup_psgi_app">.
+
+=cut
+
+sub raw_psgi_app {
+    my ($app) = @_;
+    return $app->engine->build_psgi_app($app);
 }
 
 =head2 $c->setup_home

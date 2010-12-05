@@ -799,7 +799,7 @@ middleware if the using_frontend_proxy config setting is set.
 sub build_psgi_app {
     my ($self, $app, @args) = @_;
 
-    my $psgi_app = sub {
+    return sub {
         my ($env) = @_;
 
         return sub {
@@ -808,18 +808,6 @@ sub build_psgi_app {
             $app->handle_request(env => $env);
         };
     };
-
-    $psgi_app = Plack::Middleware::Conditional->wrap(
-        $psgi_app,
-        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
-        condition => sub {
-            my ($env) = @_;
-            return if $app->config->{ignore_frontend_proxy};
-            return $env->{REMOTE_ADDR} eq '127.0.0.1' || $app->config->{using_frontend_proxy};
-        },
-    );
-
-    return $psgi_app;
 }
 
 =head2 $self->write($c, $buffer)
