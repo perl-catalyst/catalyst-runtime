@@ -39,9 +39,8 @@ testOption( [ qw/-e/ ], [undef, opthash(keep_stderr => 1)] );
 testOption( [ qw/--nproc 6/ ], [undef, opthash(nproc => 6)] );
 testOption( [ qw/--n 6/ ], [undef, opthash(nproc => 6)] );
 
-# title
-testOption( [ qw/--title foo/ ], [undef, opthash(title => 'foo')] );
-testOption( [ qw/-t foo/ ], [undef, opthash(title => 'foo')] );
+# proc_title
+testOption( [ qw/--proc_title foo/ ], [undef, opthash(proc_title => 'foo')] );
 
 done_testing;
 
@@ -64,7 +63,7 @@ sub testOption {
 sub opthash {
     return {
         (map { ($_ => undef) } qw(pidfile keep_stderr detach nproc manager)),
-        title => 'perl-fcgi-pm [TestAppToTestScripts]',
+        proc_title => 'perl-fcgi-pm [TestAppToTestScripts]',
         @_,
     };
 }
