@@ -31,8 +31,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 ###  Blockers
 
   * properly pass along server arguments
-  * Fix Test::WWW::Mechanize::Catalyst which has been broken by moving stuff
-    about.
+  * Add some tests for Catalyst::Test::local_request
 
 ###  Nice to have
 
