@@ -33,8 +33,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * properly pass along server arguments
   * Fix Test::WWW::Mechanize::Catalyst which has been broken by moving stuff
     about.
-  * think about whether or not to generate myapp.psgi and how to configure
-    middleware
 
 ###  Nice to have
 
