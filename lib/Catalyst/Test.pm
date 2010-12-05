@@ -27,9 +27,7 @@ my $build_exports = sub {
         }
         $class->import;
 
-        my $app = $class->psgi_app;
-
-        $request = sub { local_request( $app, @_ ) };
+        $request = sub { local_request( $class, @_ ) };
     }
 
     my $get = sub { $request->(@_)->content };
@@ -241,7 +239,9 @@ Simulate a request using L<HTTP::Request::AsCGI>.
 =cut
 
 sub local_request {
-    my $app = shift;
+    my $class = shift;
+
+    my $app = ref($class) eq "CODE" ? $class : $class->psgi_app;
 
     my $request = Catalyst::Utils::request(shift);
     my %extra_env;
@@ -251,7 +251,9 @@ sub local_request {
     test_psgi
         app    => sub { $app->({ %{ $_[0] }, %extra_env }) },
         client => sub {
-            my $resp = shift->($request);
+            my $psgi_app = shift;
+
+            my $resp = $psgi_app->($request);
 
             # HTML head parsing based on LWP::UserAgent
             #
