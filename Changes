@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Deal correctly with GLOB file handles in the response body (setting
+    the Content-Length header appropriately)
+
  Documentation:
   - Clarify that when forwarding or detaching, the end action associated
     with the original dispatched action will be run afterwards (fallen)
