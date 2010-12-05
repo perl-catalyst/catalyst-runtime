@@ -50,6 +50,16 @@ sub account : Chained('account_base') PathPart('') Args(0) {
     $c->response->body( "This is account " . $c->stash->{account_id} );
 }
 
+sub profile_base : Chained('setup') PathPart('account/profile') CaptureArgs(1) {
+    my($self,$c,$acc_id) = @_;
+    $c->stash({account_id=>$acc_id});
+}
+
+sub profile : Chained('profile_base') PathPart('') Args(1) {
+    my($self,$c,$acc) = @_;
+    $c->response->body( "This is profile of " . $acc );
+}
+
 sub default : Chained('setup') PathPart('') Args() {
     my ( $self, $c ) = @_;
     $c->response->body( 'Page not found' );
