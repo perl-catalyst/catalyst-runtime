@@ -184,6 +184,15 @@ sub _plack_loader_args {
         port => $self->port,
         host => $self->host,
         keepalive => $self->keepalive ? 100 : 1,
+        server_ready => sub {
+            my ($args) = @_;
+
+            my $name  = $args->{server_software} || ref($args); # $args is $server
+            my $host  = $args->{host} || 0;
+            my $proto = $args->{proto} || 'http';
+
+            print STDERR "$name: Accepting connections at $proto://$host:$args->{port}/\n";
+        },
     );
 }
 
