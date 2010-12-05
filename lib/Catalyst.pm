@@ -71,7 +71,7 @@ our $GO        = Catalyst::Exception::Go->new;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
-  setup_finished psgi_app/;
+  setup_finished/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->engine_class('Catalyst::Engine');
@@ -2645,9 +2645,12 @@ sub setup_engine {
 
     $class->engine( $engine->new );
 
-    $class->psgi_app( $class->setup_psgi_app );
-
     return;
+}
+
+sub psgi_app {
+    my ($app) = @_;
+    $app->setup_psgi_app;
 }
 
 =head2 $c->setup_psgi_app
