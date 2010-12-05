@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ New features:
+  - Add a --proc_title option to the FCGI script to set the process
+    title.
+
  Bug fixes:
   - Deal correctly with GLOB file handles in the response body (setting
     the Content-Length header appropriately)
