@@ -71,7 +71,7 @@ our $GO        = Catalyst::Exception::Go->new;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
-  setup_finished/;
+  setup_finished _psgi_app/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->engine_class('Catalyst::Engine');
@@ -2648,9 +2648,28 @@ sub setup_engine {
     return;
 }
 
+=head2 $c->psgi_app
+
+Builds a PSGI application coderef for the catalyst application C<$c> using
+L</"$c->setup_psgi_app">, stores it internally, and returns it. On the next call
+to this method, C<setup_psgi_app> won't be invoked again, but its persisted
+return value of it will be returned.
+
+This is the top-level entrypoint for things that need a full blown Catalyst PSGI
+app. If you only need the raw PSGI application, without any middlewares, use
+L</"$c->raw_psgi_app"> instead.
+
+=cut
+
 sub psgi_app {
     my ($app) = @_;
-    $app->setup_psgi_app;
+
+    unless ($app->_psgi_app) {
+        my $psgi_app = $app->setup_psgi_app;
+        $app->_psgi_app($psgi_app);
+    }
+
+    return $app->_psgi_app;
 }
 
 =head2 $c->setup_psgi_app
