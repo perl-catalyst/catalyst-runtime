@@ -7,6 +7,13 @@
  Bug fixes:
   - Deal correctly with GLOB file handles in the response body (setting
     the Content-Length header appropriately)
+  - Chained dispatch has been fixed to always prefer paths
+    with the minimum number of captures (rather than the
+    maximum number of actions). This means that (for example)
+    a URI path /foo/* made out of 2 actions will take preference
+    to a URI path /*/* made out of 3 actions. Please check your applications
+    if you are using chained action and please write new test to report 
+    failing case.
 
  Documentation:
   - Clarify that when forwarding or detaching, the end action associated
