@@ -16,6 +16,11 @@ content_like('/account/ferz', qr/This is account ferz/, 'account');
 content_like('/account/123', qr/This is account 123/, 'account');
 content_like('/account/profile/007/James Bond', qr/This is profile of James Bond/, 'account');
 
+TODO: {
+      local $TODO = q(new chained action test case that fails yet.);
+      content_like('/downloads/', qr/This is downloads index/, 'downloads');
+}
+
 action_notfound('/c');
 
 done_testing;
