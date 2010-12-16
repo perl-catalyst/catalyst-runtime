@@ -2362,11 +2362,11 @@ sub prepare_write { my $c = shift; $c->engine->prepare_write( $c, @_ ) }
 
 =head2 $c->request_class
 
-Returns or sets the request class.
+Returns or sets the request class. Defaults to L<Catalyst::Request>.
 
 =head2 $c->response_class
 
-Returns or sets the response class.
+Returns or sets the response class. Defaults to L<Catalyst::Response>.
 
 =head2 $c->read( [$maxlength] )
 
