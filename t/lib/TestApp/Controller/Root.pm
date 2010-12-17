@@ -14,6 +14,16 @@ sub zero : Path('0') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub zerobody : Local {
+    my ($self, $c) = @_;
+    $c->res->body('0');
+}
+
+sub emptybody : Local {
+    my ($self, $c) = @_;
+    $c->res->body('');
+}
+
 sub localregex : LocalRegex('^localregex$') {
     my ( $self, $c ) = @_;
     $c->res->header( 'X-Test-Class' => ref($self) );
