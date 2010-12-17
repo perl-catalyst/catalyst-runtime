@@ -20,7 +20,7 @@ use Catalyst::Test 'TestApp';
 {
     my $res = request('/emptybody');
     is $res->content, '';
-    ok !$res->header('Content-Length');
+    ok !defined $res->header('Content-Length');
 }
 
 done_testing;
