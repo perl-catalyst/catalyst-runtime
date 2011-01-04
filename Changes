@@ -3,6 +3,12 @@
  New features:
   - Add a --proc_title option to the FCGI script to set the process
     title.
+  - Allow the response body to be set to `undef' explicitly to indicate the
+    absence of a body. It can be used to indicate that no body should be sent at
+    all and processing of views should be skipped. This is especially useful for
+    things like X-Sendfile, which now no longer require providing fake response
+    bodies to suppress view processing. In order for this to work, you will also
+    have upgrade Catalyst::Action::RenderView to at least version 0.15.
 
  Bug fixes:
   - Deal correctly with GLOB file handles in the response body (setting
@@ -12,7 +18,7 @@
     maximum number of actions). This means that (for example)
     a URI path /foo/* made out of 2 actions will take preference
     to a URI path /*/* made out of 3 actions. Please check your applications
-    if you are using chained action and please write new test to report 
+    if you are using chained action and please write new test to report
     failing case.
 
  Documentation:
