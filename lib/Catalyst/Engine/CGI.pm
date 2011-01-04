@@ -288,7 +288,10 @@ around write => sub {
 
     # Prepend the headers if they have not yet been sent
     if ( $self->_has_header_buf ) {
-        $buffer = $self->_clear_header_buf . $buffer;
+        my $headers = $self->_clear_header_buf;
+
+        $buffer = defined $buffer
+            ? $headers . $buffer : $headers;
     }
 
     return $self->$orig( $c, $buffer );
