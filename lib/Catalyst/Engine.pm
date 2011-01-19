@@ -14,6 +14,7 @@ use Moose::Util::TypeConstraints;
 use Plack::Loader;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
+use Catalyst::Engine::Loader;
 use Encode ();
 use utf8;
 
@@ -775,18 +776,32 @@ The amount of input data that has already been read.
 =head2 $self->run($app, $server)
 
 Start the engine. Builds a PSGI application and calls the
-run method on the server passed in..
+run method on the server passed in, which then causes the
+engine to loop, handling requests..
 
 =cut
 
 sub run {
     my ($self, $app, $psgi, @args) = @_;
-    # FIXME - Do something sensible with the options we're passed
+    # @args left here rather than just a $options, $server for back compat with the
+    # old style scripts which send a few args, then a hashref
+
+    # They should never actually be used in the normal case as the Plack engine is
+    # passed in got all the 'standard' args via the loader in the script already.
+
+    # FIXME - we should stash the options in an attribute so that custom args
+    # like Gitalist's --git_dir are possible to get from the app without stupid tricks.
     my $server = pop @args if blessed $args[-1];
-    $server ||= Plack::Loader->auto(); # We're not being called from a script,
-                                       # so auto detect what backend to run on.
-                                       # This does *NOT* cover mod_perl.
-    $server->run($psgi);
+    my $options = pop @args if ref($args[-1]) eq 'HASH';
+    if (! $server ) {
+        $server = Catalyst::Engine::Loader->auto(); # We're not being called from a script,
+                                                    # so auto detect what backend to run on.
+                                                    # This should never happen, as mod_perl
+                                                    # never calls ->run, instead the $app->handle
+                                                    # method is called per request.
+        $app->log->warn("Not supplied a Plack engine, falling back to engine auto-loader (are your scripts ancient?)")
+    }
+    $server->run($psgi, $options);
 }
 
 =head2 build_psgi_app ($app, @args)

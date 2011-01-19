@@ -1116,7 +1116,10 @@ sub setup {
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
     $class->setup_dispatcher( delete $flags->{dispatcher} );
-    $class->setup_engine( delete $flags->{engine} );
+    if (my $engine = delete $flags->{engine}) {
+        $class->log->warn("Specifying the engine in ->setup is no longer supported, XXX FIXME");
+    }
+    $class->setup_engine();
     $class->setup_stats( delete $flags->{stats} );
 
     for my $flag ( sort keys %{$flags} ) {
@@ -2587,50 +2590,10 @@ Sets up engine.
 =cut
 
 sub setup_engine {
-    my ($class, $engine) = @_;
+    my ($class) = @_;
 
-    unless ($engine) {
-        $engine = $class->engine_class;
-    }
-    else {
-        $engine = String::RewritePrefix->rewrite( { '' => 'Catalyst::Engine::', '+' => '' }, $engine );
-    }
-
-    $engine = 'Catalyst::Engine' if $engine eq 'Catalyst::Engine::HTTP';
-
+    my $engine = $class->engine_class;
     Class::MOP::load_class($engine);
-
-    # check for old engines that are no longer compatible
-    my $old_engine;
-    if ( $engine->isa('Catalyst::Engine::Apache')
-        && !Catalyst::Engine::Apache->VERSION )
-    {
-        $old_engine = 1;
-    }
-
-    elsif ( $engine->isa('Catalyst::Engine::Server::Base')
-        && Catalyst::Engine::Server->VERSION le '0.02' )
-    {
-        $old_engine = 1;
-    }
-
-    elsif ($engine->isa('Catalyst::Engine::HTTP::POE')
-        && $engine->VERSION eq '0.01' )
-    {
-        $old_engine = 1;
-    }
-
-    elsif ($engine->isa('Catalyst::Engine::Zeus')
-        && $engine->VERSION eq '0.01' )
-    {
-        $old_engine = 1;
-    }
-
-    if ($old_engine) {
-        Catalyst::Exception->throw( message =>
-              qq/Engine "$engine" is not supported by this version of Catalyst/
-        );
-    }
 
     if ($ENV{MOD_PERL}) {
         require 'Catalyst/Engine/Loader.pm';

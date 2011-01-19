@@ -1,9 +1,16 @@
 package Catalyst::Engine::Loader;
 use Moose;
 use Catalyst::Exception;
+use Catalyst::Utils;
 use namespace::autoclean;
 
 extends 'Plack::Loader';
+
+has application_name => (
+    isa => 'Str',
+    is => 'ro',
+    required => 1,
+);
 
 around guess => sub {
     my ($orig, $self) = (shift, shift);
@@ -37,10 +44,31 @@ around guess => sub {
         }
     }
 
+    my $old_engine = Catalyst::Utils::env_value($self->application_name, 'ENGINE');
+    if (!defined $old_engine) { # Not overridden
+    }
+    elsif ($old_engine =~ /^(CGI|FCGI|HTTP|Apache.*)$/) {
+        # Trust autodetect
+    }
+    elsif ($old_engine eq "HTTP::Prefork") { # Too bad if you're customising, we don't handle options
+                                             # write yourself a script to collect and pass in the options
+        $engine = "Starman";
+    }
+    elsif ($old_engine eq "HTTP::POE") {
+        Catalyst::Exception->throw("HTTP::POE engine no longer works, recommend you use Twiggy instead");
+    }
+    elsif ($old_engine eq "Zeus") {
+        Catalyst::Exception->throw("Zeus engine no longer works");
+    }
+    else {
+        warn("You asked for an unrecognised engine '$old_engine' which is no longer supported, this has been ignored.\n");
+    }
+
     return $engine;
 };
 
-__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
+# Force constructor inlining
+__PACKAGE__->meta->make_immutable( replace_constructor => 1 );
 
 1;
 

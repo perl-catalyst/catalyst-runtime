@@ -33,7 +33,8 @@ has loader_class => (
 has _loader => (
     isa => 'Plack::Loader',
     default => sub {
-        shift->loader_class->new
+        my $self = shift;
+        $self->loader_class->new(application_name => $self->application_name);
     },
     handles => {
         load_engine => 'load',
@@ -65,7 +66,8 @@ sub _application_args {
 }
 
 sub _plack_loader_args {
-    my @app_args = shift->_application_args;
+    my $self = shift;
+    my @app_args = $self->_application_args;
     return (port => $app_args[0]);
 }
 
