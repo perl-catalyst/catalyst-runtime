@@ -6,7 +6,7 @@ Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
 The major change is that L<Plack> now replaces most of the subclasses of
 L<Catalyst::Engine>.  If you are using one of the standard subclasses of
-L<Catalyst::Engine> this should be a straightforward upgrade for you.  It was
+L<Catalyst::Engine> this should be a straightforward upgrade for you. It was
 a design goal for this release to be as backwardly compatible as possible.
 However since L<Plack> is different from L<Catalyst::Engine> it would be 
 possible that edge case differences would exist.  Therefore we recommend care
@@ -29,51 +29,44 @@ still be able to continue using that engine.
 
 Advice for specific subclasses of L<Catalyst::Engine> follows:
 
-=head2 Upgrading the FastCGI Engine
+=head3 Upgrading the FastCGI Engine
 
-    TBD
+No upgrade needed if your myapp_fastcgi.pl script is already upgraded
+enough to use L<Catalyst::Script::FastCGI>.
 
-=head2 Upgrading the mod_perl / Apache Engines
+=head3 Upgrading the mod_perl / Apache Engines
 
-The three engines that are build upon the various iterations of mod_perl,
-L<Catalyst::Engine::Apache2::MP19>, L<Catalyst::Engine::Apache::MP13> and
+The engines that are build upon the various iterations of mod_perl,
+L<Catalyst::Engine::Apache::MP13> and
 L<Catalyst::Engine::Apache2::MP20> should be seemless upgrades and will
 work using using L<Plack::Handler::Apache1> or L<Plack::Handler::Apache2>
 as required.  
 
-=head2 Upgrading the HTTP Engine
+L<Catalyst::Engine::Apache2::MP19>, is however no longer supported, as Plack
+does not support mod_perl version 1.99??? FIXME - is this true?
 
-If you were using L<Catalyst::Engine::HTTP> (the default development server
-that comes with the L<Catalyst> distribution) you should now use...
+=head3 Upgrading the HTTP Engine
 
-    TBD
+The default development server that comes with the L<Catalyst> distribution
+should continue to work as expected with no changes as long as your C<myapp_server>
+script is upgraded to use L<Catalyst::Script::HTTP>.
 
-=head2 Upgrading the CGI Engine
+=head3 Upgrading the CGI Engine
 
 If you were using L<Catalyst::Engine::CGI> you should now use...
 
-    TBD
+No upgrade needed if your myapp_cgi.pl script is already upgraded
+enough to use L<Catalyst::Script::CGI>.
 
-=head2 Upgrading the Preforking Engine
+=head3 Upgrading the Preforking Engine
 
-If you were using L<Catalyst::Engine::HTTP::Prefork> you should now use...
+If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
+is automatically loaded. 
 
-    TBD
-
-=head2 Upgrading the Restarter Engines
-
-If you were using L<Catalyst::Engine::HTTP::Restarter> or 
-L<Catalyst::Engine::HTTP::Restarter::Watcher> these are now longer part of the
-L<Catalyst> distribution.  You should now use...
-
-    TBD
-
-=head2 Upgrading the PSGI Engine
+=head3 Upgrading the PSGI Engine
 
 If you were using L<Catalyst::Engine::PSGI> this new release supercedes this
-engine in supporting L<Plack>.  You should now do...
-
-    TBD
+engine in supporting L<Plack>. You should remove the.. FIXME
 
 =head2 Engines with unknown status
 
@@ -91,13 +84,13 @@ highly welcomed:
     Catalyst::Engine::Server (Marked as Deprecated)
     Catalyst::Engine::HTTP::POE (Marked as Deprecated)
 
-=head2 Engines known to not be compatible.
+=head2 Using middleware
 
-If you are using one of the following L<Catalyst::Engine> subclasses, your
-application may require significant work after upgrading.  We recommend you
-test heavily and sandbox your upgrade.
+XXX Should this be here or elsewhere?
 
-    TBD
+=head2 Making an app.psgi file
+
+=head2 Running with plackup?
 
 =head1 Upgrading to Catalyst 5.80
 

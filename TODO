@@ -38,10 +38,13 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * Document migration for setting engine in setup
   * Document migration for setting engine in $ENV
   * Document what to do if you're a Prefork person
+  * Test Catalyst::Engine::PSGI still works?
 
 ###  Nice to have
 
   * Do we need to do something else about middleware than let the user provide a .psgi?
+    What about the reverse proxy middleware
+  * Do we generate a .psgi by default?
   * throw out Catalyst::Test's remote_request in favour of
     Plack::Test::ExternalServer
   * make sure we're running under a server that support psgi.streaming - maybe
