@@ -127,7 +127,7 @@ sub config {
         # TODO maybe this should be a ClassData option?
         my $class = blessed($self) || $self;
         my $meta = Class::MOP::get_metaclass_by_name($class);
-        unless ($meta->has_package_symbol('$_config')) {
+        unless (${ $meta->get_or_add_package_symbol('$_config') }) {
             # Call merge_hashes to ensure we deep copy the parent
             # config onto the subclass
             $self->_config( Catalyst::Utils::merge_hashes($config, {}) );

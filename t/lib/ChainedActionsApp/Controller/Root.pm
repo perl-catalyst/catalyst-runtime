@@ -60,6 +60,22 @@ sub profile : Chained('profile_base') PathPart('') Args(1) {
     $c->response->body( "This is profile of " . $acc );
 }
 
+=head2 downloads
+
+    This is a different test, this function is void, just to let following in the chain
+    to declare downloads as PathPart.
+
+=cut
+
+sub downloads : Chained('setup') PathPart('') CaptureArgs(0) {
+    my($self,$c) = @_;
+}
+
+sub downloads_index : Chained('downloads') PathPart('downloads') Args(0) {
+    my($self,$c) = @_;
+    $c->response->body( "This is download index");
+}
+
 sub default : Chained('setup') PathPart('') Args() {
     my ( $self, $c ) = @_;
     $c->response->body( 'Page not found' );

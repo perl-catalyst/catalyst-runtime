@@ -839,7 +839,7 @@ sub write {
         $self->_prepared_write(1);
     }
 
-    return 0 if !defined $buffer;
+    $buffer = q[] unless defined $buffer;
 
     my $len = length($buffer);
     $self->_writer->write($buffer);

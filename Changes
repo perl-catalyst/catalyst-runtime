@@ -1,8 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.80030 2011-01-04 13:13:02
+
  New features:
   - Add a --proc_title option to the FCGI script to set the process
     title.
+  - Allow the response body to be set to `undef' explicitly to indicate the
+    absence of a body. It can be used to indicate that no body should be sent at
+    all and processing of views should be skipped. This is especially useful for
+    things like X-Sendfile, which now no longer require providing fake response
+    bodies to suppress view processing. In order for this to work, you will also
+    have upgrade Catalyst::Action::RenderView to at least version 0.15.
 
  Bug fixes:
   - Deal correctly with GLOB file handles in the response body (setting
@@ -12,8 +20,16 @@
     maximum number of actions). This means that (for example)
     a URI path /foo/* made out of 2 actions will take preference
     to a URI path /*/* made out of 3 actions. Please check your applications
-    if you are using chained action and please write new test to report 
+    if you are using chained action and please write new test to report
     failing case.
+  - Stop relying on bugs in the pure-perl version of Package::Stash. New
+    versions of Package::Stash load Package::Stash::XS if
+    available. Package::Stash::XS fixes some of the bugs of the pure-perl
+    version, exposing our faulty assumption and breaking things. We now work
+    with both old and new versions of Package::Stash, both with and without
+    Package::Stash::XS being installed. Older versions of Catalyst-Runtime also
+    work with both old and new versions of Package::Stash, but only if
+    Package::Stash::XS is *not* installed.
 
  Documentation:
   - Clarify that when forwarding or detaching, the end action associated

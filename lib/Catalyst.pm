@@ -81,7 +81,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80029';
+our $VERSION = '5.80030';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1862,7 +1862,7 @@ sub finalize_headers {
     }
 
     # Content-Length
-    if ( $response->body && !$response->content_length ) {
+    if ( defined $response->body && length $response->body && !$response->content_length ) {
 
         # get the length from a filehandle
         if ( blessed( $response->body ) && $response->body->can('read') || ref( $response->body ) eq 'GLOB' )
@@ -2376,11 +2376,11 @@ sub prepare_write { my $c = shift; $c->engine->prepare_write( $c, @_ ) }
 
 =head2 $c->request_class
 
-Returns or sets the request class.
+Returns or sets the request class. Defaults to L<Catalyst::Request>.
 
 =head2 $c->response_class
 
-Returns or sets the response class.
+Returns or sets the response class. Defaults to L<Catalyst::Response>.
 
 =head2 $c->read( [$maxlength] )
 
