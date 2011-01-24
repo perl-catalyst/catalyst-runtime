@@ -2660,6 +2660,10 @@ sub setup_psgi_app {
             if -e $psgi_file;
     }
 
+    # Note - this is for back compatibility. Catalyst should not know
+    #        or care about how it's deployed. The recommended way of
+    #        configuring this is now to use the ReverseProxy middleware
+    #        yourself if you want it in a .psgi file.
     return Plack::Middleware::Conditional->wrap(
         $app->raw_psgi_app,
         builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },

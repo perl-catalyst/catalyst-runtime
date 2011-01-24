@@ -5,6 +5,11 @@ use warnings;
 
 use Test::More;
 
+ok 0, 'Known broken currently';
+done_testing;
+
+__END__
+
 eval "use FCGI";
 plan skip_all => 'FCGI required' if $@;
 
