@@ -75,15 +75,33 @@ sub BUILD {
     $self->proc_title;
 }
 
+# Munge the 'listen' arg so that Plack::Handler::FCGI will accept it.
+sub _listen {
+    my ($self) = @_;
+
+    if (defined (my $listen = $self->listen)) {
+        return [ $listen ];
+    } else {
+        return undef;
+    }
+}
+
 sub _plack_loader_args {
     my ($self) = shift;
-    return (
-        map { $_->[0] => $self->${ \($_->[1] ? $_->[1]->[0] : $_->[0]) } }
-        Data::OptList::mkopt([
-            qw/pidfile listen manager nproc keep_stderr proc_title/,
-            detach     => [ 'daemon' ],
-        ])
-    );
+
+    my $opts = Data::OptList::mkopt([
+      qw/pidfile manager nproc proc_title/,
+            detach          => [ 'daemon' ],
+            keep_stderr     => [ 'keeperr' ],
+            listen          => [ '_listen' ],
+        ]);
+
+    my %args = map { $_->[0] => $self->${ \($_->[1] ? $_->[1]->[0] : $_->[0]) } } @$opts;
+
+    # Plack::Handler::FCGI thinks manager => undef means "use no manager".
+    delete $args{'manager'} unless defined $args{'manager'};
+
+    return %args;
 }
 
 sub _application_args {
