@@ -1,5 +1,24 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.89000 2011-01-24 09:28:45 (TRIAL release)
+
+ This is a development release from psgi branch of Catalyst-Runtime.
+
+ Removed features:
+
+  - All of the Catalyst::Engine::* namespace is now gone. Instead we only have
+    one Catalyst::Engine class speaking the PSGI protocol natively. Everything
+    the various Catalyst::Engine:: classes did before is now supposed to happen
+    through PSGI handlers such as Plack::Handler::FCGI,
+    Plack::Handler::HTTP::Server::PSGI, Plack::Handler::Apache2, and so
+    on. However, deployment can still work the same as it did before. The
+    catalyst scripts still exist and continue to work.
+
+    If you find anything that either doesn't work anymore as it did before or
+    anything that could be done before with the various Catalyst::Engine::
+    classes, but can't be done anymore with the single PSGI Catalyst::Engine
+    class, please tell us *now*.
+
 5.80030 2011-01-04 13:13:02
 
  New features:
