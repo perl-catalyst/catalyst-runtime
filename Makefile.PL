@@ -21,7 +21,7 @@ requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.95';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.24';
-requires 'MooseX::Role::WithOverloading' => '0.05';
+requires 'MooseX::Role::WithOverloading' => '0.09';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';

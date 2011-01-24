@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Update dependency on MooseX::Role::WithOverloading to ensure that
+    a version which can deal with / depends on a new Package::Stash
+    is installed. (As if some other dependency is pulled in during upgrading
+    which results in new Package::Stash, then it can leave you with a broken
+    version of MooseX::Role::WithOverloading.
+
 5.80030 2011-01-04 13:13:02
 
  New features:
