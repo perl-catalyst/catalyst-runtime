@@ -53,10 +53,8 @@ script is upgraded to use L<Catalyst::Script::HTTP>.
 
 =head2 Upgrading the CGI Engine
 
-If you were using L<Catalyst::Engine::CGI> you should now use...
-
-No upgrade needed if your myapp_cgi.pl script is already upgraded
-enough to use L<Catalyst::Script::CGI>.
+If you were using L<Catalyst::Engine::CGI> there is no upgrade needed if your
+myapp_cgi.pl script is already upgraded enough to use L<Catalyst::Script::CGI>.
 
 =head2 Upgrading the Preforking Engine
 
@@ -66,7 +64,34 @@ is automatically loaded.
 =head2 Upgrading the PSGI Engine
 
 If you were using L<Catalyst::Engine::PSGI> this new release supercedes this
-engine in supporting L<Plack>. You should remove the.. FIXME
+engine in supporting L<Plack>. By default the Engine is now always L<Plack>.
+As a result, you can stop depending on L<Catalyst::Engine::PSGI> in your
+C<Makefile.PL>.  Additionally, if you have an C<app.psgi> script you no longer
+need to specify the PSGI engine.  Instead, the L<Catalyst> application class
+now has a new method C<psgi_app> which returns a L<Plack> compatible coderef.
+
+For example, if you were using L<Catalyst::Engine::PSGI> in the past, you may
+have written an C<app.psgi> file similar to this one:
+
+    use Plack::Builder;
+    use MyCatalytApp;
+
+    MyCatalystApp->setup_engine('PSGI');
+
+    builder {
+        enable ... # enable your desired middleware
+        sub { MyCatalystApp->run(@_) };
+    };
+
+Instead, you now just do
+
+    use Plack::Builder;
+    use MyCatalystApp;
+
+    builder {
+        enable ... #enable your desired middleware
+        MyCatalystApp->psgi_app;
+    };
 
 =head2 Engines with unknown status
 
