@@ -159,6 +159,10 @@ sub run {
 sub write {
     my ( $self, $c, $buffer ) = @_;
 
+    # ->write will be called once with the body, even in a redirect (and
+    # in that case, the body is undef)
+    $buffer = '' if !defined $buffer;
+
     unless ( $self->_prepared_write ) {
         $self->prepare_write($c);
         $self->_prepared_write(1);

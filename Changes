@@ -7,6 +7,9 @@
     which results in new Package::Stash, then it can leave you with a broken
     version of MooseX::Role::WithOverloading.
 
+  - Fix undef warning in Catalyst::Engine::FastCGI when writing an empty
+    body (e.g. doing a redirect)
+
 5.80030 2011-01-04 13:13:02
 
  New features:
