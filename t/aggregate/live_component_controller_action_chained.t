@@ -847,6 +847,33 @@ sub run_tests {
     }
 
     #
+    #   Complex path with multiple non-capturing pathparts
+    # PathPart('') CaptureArgs(0), PathPart('foo') CaptureArgs(0), PathPart('') Args(0)
+    # should win over PathPart('') CaptureArgs(1), PathPart('') Args(0)
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->mult_nopp2_base
+          TestApp::Controller::Action::Chained->mult_nopp2_nocap
+          TestApp::Controller::Action::Chained->mult_nopp2_action
+          TestApp::Controller::Action::Chained->mult_nopp2_action_default
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/mult_nopp2/action'),
+            "Complex path with multiple non-capturing pathparts" );
+        TODO: {
+        local $TODO = 'Known bug';
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, '; ', 'Content OK' );
+        }
+    }
+
+    #
     #   Higher Args() hiding more specific CaptureArgs chains sections
     #
     {

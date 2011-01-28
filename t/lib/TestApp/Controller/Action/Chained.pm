@@ -164,6 +164,14 @@ sub mult_nopp_id    : Chained('mult_nopp_base') PathPart('') CaptureArgs(1) { }
 sub mult_nopp_idall : Chained('mult_nopp_id') PathPart('') Args(0) { }
 sub mult_nopp_idnew : Chained('mult_nopp_id') PathPart('new') Args(0) { }
 
+sub mult_nopp2_base            : Chained('/') PathPart('chained/mult_nopp2') CaptureArgs(0) { }
+sub mult_nopp2_nocap           : Chained('mult_nopp2_base') PathPart('') CaptureArgs(0) { }
+sub mult_nopp2_action          : Chained('mult_nopp2_nocap') PathPart('action') CaptureArgs(0) { }
+sub mult_nopp2_action_default  : Chained('mult_nopp2_action') PathPart('') Args(0) { }
+sub mult_nopp2_action_with_arg : Chained('mult_nopp2_action') PathPart('') Args(1) { }
+sub mult_nopp2_load            : Chained('mult_nopp2_base') PathPart('') CaptureArgs(1) { }
+sub mult_nopp2_view            : Chained('mult_nopp2_load') PathPart('') Args(0) { }
+
 #
 #	Test Choice between branches and early return logic
 #   Declaration order is important for $children->{$*}, since this is first match best.
