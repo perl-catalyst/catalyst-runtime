@@ -59,7 +59,9 @@ myapp_cgi.pl script is already upgraded enough to use L<Catalyst::Script::CGI>.
 =head2 Upgrading the Preforking Engine
 
 If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
-is automatically loaded. 
+is automatically loaded.
+
+XXX FIXME - note how to run Starman with different options.
 
 =head2 Upgrading the PSGI Engine
 
@@ -98,14 +100,14 @@ Instead, you now just do
 The following engines have untested or unknown compatibility.  Reports are
 highly welcomed:
 
-    Catalyst::Engine::Embeddable
+    Catalyst::Engine::Embeddable - needs testing, should work?
     Catalyst::Engine::XMPP2
     Catalyst::Engine::SCGI
     Catalyst::Engine::Mojo
-    Catalyst::Engine::Zeus
-    Catalyst::Engine::JobQueue::POE
+    Catalyst::Engine::Zeus - broken for ages
+    Catalyst::Engine::JobQueue::POE - broken for ages
     Catalyst::Engine::Wx
-    Catalyst::Engine::Stomp
+    Catalyst::Engine::Stomp - fixed
     Catalyst::Engine::Server (Marked as Deprecated)
     Catalyst::Engine::HTTP::POE (Marked as Deprecated)
 

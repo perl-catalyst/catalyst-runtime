@@ -33,14 +33,12 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * lighttpd
   * iis6
   * Add some tests for Catalyst::Test::local_request
-  * Docs
   * Test all the options work on all of the scripts
   * Test (and fix if needed) ::Wx
   * Document how to use your own .psgi (and how you need to do ReverseProxy yourself if you do)
   * Document migration for setting engine in setup
   * Document migration for setting engine in $ENV
-  * Document what to do if you're a Prefork person
-  * Test Catalyst::Engine::PSGI still works?
+  * Fix Catalyst::Engine::PSGI .psgi script and in app root running tests.
 
 ###  Nice to have
 

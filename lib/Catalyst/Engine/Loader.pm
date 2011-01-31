@@ -28,8 +28,8 @@ sub _guess_catalyst_engine_class {
     elsif ($old_engine =~ /^(CGI|FCGI|HTTP|Apache.*)$/) {
         return 'Catalyst::Engine';
     }
-    elsif (my ($type) = $old_engine =~ /^(Stomp|Test::MessageDriven|Wx)$/) {
-        return 'Catalyst::Engine::' . $type;
+    else {
+        return 'Catalyst::Engine::' . $old_engine;
     }
 }
 
