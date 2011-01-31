@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ - Fixed Catalyst::Engine::Stomp
+ - Fixed issues auto-loading engine with older scripts.
+
 5.89000 2011-01-24 09:28:45 (TRIAL release)
 
  This is a development release from psgi branch of Catalyst-Runtime.

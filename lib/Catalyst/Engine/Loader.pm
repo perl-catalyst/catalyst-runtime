@@ -12,6 +12,27 @@ has application_name => (
     required => 1,
 );
 
+has catalyst_engine_class => (
+    isa => 'Str',
+    is => 'rw',
+    lazy => 1,
+    builder => '_guess_catalyst_engine_class',
+);
+
+sub _guess_catalyst_engine_class {
+    my $self = shift;
+    my $old_engine = Catalyst::Utils::env_value($self->application_name, 'ENGINE');
+    if (!defined $old_engine) {
+        return 'Catalyst::Engine';
+    }
+    elsif ($old_engine =~ /^(CGI|FCGI|HTTP|Apache.*)$/) {
+        return 'Catalyst::Engine';
+    }
+    elsif (my ($type) = $old_engine =~ /^(Stomp|Test::MessageDriven|Wx)$/) {
+        return 'Catalyst::Engine::' . $type;
+    }
+}
+
 around guess => sub {
     my ($orig, $self) = (shift, shift);
     my $engine = $self->$orig(@_);

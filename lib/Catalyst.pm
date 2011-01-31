@@ -30,6 +30,7 @@ use Class::C3::Adopt::NEXT;
 use List::MoreUtils qw/uniq/;
 use attributes;
 use String::RewritePrefix;
+use Catalyst::Engine::Loader;
 use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
@@ -70,11 +71,10 @@ our $GO        = Catalyst::Exception::Go->new;
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
-  engine_class context_class request_class response_class stats_class
+  engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
-__PACKAGE__->engine_class('Catalyst::Engine');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 __PACKAGE__->stats_class('Catalyst::Stats');
@@ -2589,20 +2589,26 @@ Sets up engine.
 
 =cut
 
+sub engine_class {
+    my $class = shift;
+    $class->engine_loader->catalyst_engine_class(@_);
+}
+
 sub setup_engine {
     my ($class) = @_;
+
+    $class->engine_loader(Catalyst::Engine::Loader->new(application_name => $class));
 
     my $engine = $class->engine_class;
     Class::MOP::load_class($engine);
 
     if ($ENV{MOD_PERL}) {
-        require 'Catalyst/Engine/Loader.pm';
-        my $apache = Catalyst::Engine::Loader->auto;
+        my $apache = $class->engine_loader->auto;
         # FIXME - Immutable
         $class->meta->add_method(handler => sub {
             my $r = shift;
-            my $app = $class->psgi_app;
-            $apache->call_app($r, $app);
+            my $psgi_app = $class->psgi_app;
+            $apache->call_app($r, $psgi_app);
         });
     }
 

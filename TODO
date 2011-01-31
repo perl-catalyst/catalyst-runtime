@@ -35,7 +35,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * Add some tests for Catalyst::Test::local_request
   * Docs
   * Test all the options work on all of the scripts
-  * Test (and fix if needed) Engine::Stomp and ::Wx
+  * Test (and fix if needed) ::Wx
   * Document how to use your own .psgi (and how you need to do ReverseProxy yourself if you do)
   * Document migration for setting engine in setup
   * Document migration for setting engine in $ENV

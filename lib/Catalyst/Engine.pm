@@ -791,10 +791,11 @@ sub run {
 
     # FIXME - we should stash the options in an attribute so that custom args
     # like Gitalist's --git_dir are possible to get from the app without stupid tricks.
-    my $server = pop @args if blessed $args[-1];
-    my $options = pop @args if ref($args[-1]) eq 'HASH';
+    my $server = pop @args if (scalar @args && blessed $args[-1]);
+    my $options = pop @args if (scalar @args && ref($args[-1]) eq 'HASH');
     if (! $server ) {
-        $server = Catalyst::Engine::Loader->auto(); # We're not being called from a script,
+        $server = Catalyst::Engine::Loader->new(application_name => ref($self))->auto();
+        # We're not being called from a script,
                                                     # so auto detect what backend to run on.
                                                     # This should never happen, as mod_perl
                                                     # never calls ->run, instead the $app->handle
