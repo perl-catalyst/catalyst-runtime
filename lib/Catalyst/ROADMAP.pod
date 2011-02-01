@@ -8,7 +8,7 @@ in the the catalyst trunk, currently at
 
 Make sure you get it from there to ensure you have the latest version.
 
-=head2 5.81000 
+=head2 5.91000 
 
 =over
 
@@ -22,24 +22,9 @@ Dispatcher refactoring to provide alternatives to deprecated methods, and
 support for pluggable dispatcher builders (so that attributes can be
 replaced).
 
-=item MyApp should not ISA Catalyst::Controller
-
-=over
-
-=item * 
-
-Update Test suite to not assume MyApp ISA Controller
-
-=item *
-
-After that set up attr handlers that will output helpful error messages when
-you do it as well as how to fix it.
-
 =back
 
-=back
-
-=head2 5.82000
+=head2 5.92000
 
 =over
 
@@ -51,7 +36,7 @@ total engine independence
 
 =back
 
-=head2 5.90000
+=head2 6.00000
 
 =over
 
@@ -69,8 +54,5 @@ separate thing from the Application class.
 =item move all inline pod to bottom of file.
 
 =item update pod coverage tests to detect stubbed pod, ensure real coverage
-
-=item Add support for configuration profiles to be selected at startup time
-through switches / ENV
 
 =back
