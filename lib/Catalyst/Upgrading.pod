@@ -92,7 +92,7 @@ Instead, you should now just do:
 
     builder {
         enable ... #enable your desired middleware
-        MyCatalystApp->psgi_app;
+        MyCatalystApp->raw_psgi_app;
     };
 
 Applications that were using and deploying via L<Catalyst::Engine::PSGI>
