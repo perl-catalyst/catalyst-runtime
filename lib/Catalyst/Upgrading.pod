@@ -68,12 +68,21 @@ XXX FIXME - note how to run Starman with different options.
 If you were using L<Catalyst::Engine::PSGI> this new release supercedes this
 engine in supporting L<Plack>. By default the Engine is now always L<Plack>.
 As a result, you can stop depending on L<Catalyst::Engine::PSGI> in your
-C<Makefile.PL>.  Additionally, if you have an C<app.psgi> script you no longer
+C<Makefile.PL>. 
+
+Applications that were using L<Catalyst::Engine::PSGI>
+previously should entirely continue to work in this release with no changes.
+
+However, if you have an C<app.psgi> script, then you no longer
 need to specify the PSGI engine.  Instead, the L<Catalyst> application class
-now has a new method C<psgi_app> which returns a L<Plack> compatible coderef.
+now has a new method C<raw_psgi_app> which returns a L<Plack> compatible coderef
+which you can wrap in middleware of your choice.
+
+Catalyst will use the .psgi for your application if it is located in the C<home>
+directory of the application
 
 For example, if you were using L<Catalyst::Engine::PSGI> in the past, you will
-have written (or generated) an C<app.psgi> file similar to this one:
+have written (or generated) a C<script/myapp.psgi> file similar to this one:
 
     use Plack::Builder;
     use MyCatalytApp;
@@ -85,7 +94,7 @@ have written (or generated) an C<app.psgi> file similar to this one:
         sub { MyCatalystApp->run(@_) };
     };
 
-Instead, you should now just do:
+Instead, you now say:
 
     use Plack::Builder;
     use MyCatalystApp;
@@ -95,11 +104,11 @@ Instead, you should now just do:
         MyCatalystApp->raw_psgi_app;
     };
 
-Applications that were using and deploying via L<Catalyst::Engine::PSGI>
-previously should entirely continue to work in this release with no changes,
-however if you were using Catalyst::Engine::PSGI previously, then this is
-not compatible with L<Catalyst::Test> in the new version, and instead of
-running a test server
+And also rename C<< script/myapp.psgi >> to C<< myapp.psgi >>.
+
+If you rename your .psgi file without these modifications, then any tests run via
+L<Catalyst::Test> will not be compatible with the new release, and will result in
+the development server starting, rather than the expected test running.
 
 =head2 Engines which are known broken
 
