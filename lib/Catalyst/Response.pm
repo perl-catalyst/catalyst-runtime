@@ -6,7 +6,8 @@ use HTTP::Headers;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has cookies   => (is => 'rw', default => sub { {} });
-has body      => (is => 'rw', default => undef, lazy => 1, predicate => 'has_body');
+has body      => (is => 'rw', default => undef);
+sub has_body { defined($_[0]->body) }
 
 has location  => (is => 'rw');
 has status    => (is => 'rw', default => 200);

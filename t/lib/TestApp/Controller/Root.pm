@@ -75,6 +75,13 @@ EndOfBody
     $c->response->body($body);
 }
 
+sub body_semipredicate : Local {
+    my ($self, $c) = @_;
+    $c->res->body; # Old code tests length($c->res->body), which causes the value to be built (undef), which causes the predicate
+    $c->res->status( $c->res->has_body ? 500 : 200 ); # to return the wrong thing, resulting in a 500.
+    $c->res->body('Body');
+}
+
 sub end : Private {
     my ($self,$c) = @_;
 }

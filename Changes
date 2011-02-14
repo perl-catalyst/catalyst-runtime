@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+Bug fixes:
+  - Fix compatibility issue with code which was testing the value of
+    $c->res->body multiple times. Previously this would cause the value
+    to be built, and ergo cause the $c->res->has_body predicate to start
+    returning true.
+    Having a response body is indicated by $c->res->body being defined.
+
 5.80031 2011-01-31 08:13:02
 
  Bug fixes:
