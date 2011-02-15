@@ -5,7 +5,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Catalyst::Exception;
 use File::Copy ();
-use IO::File   ();
+use IO::File   qw( SEEK_SET );
 use File::Spec::Unix;
 
 has filename => (is => 'rw');
@@ -128,6 +128,10 @@ Returns the size of the uploaded file in bytes.
 
 Returns a scalar containing the contents of the temporary file.
 
+Note that this method will cause the filehandle pointed to by
+C<< $upload->fh >> to be seeked to the start of the file,
+and the file handle to be put into binary mode.
+
 =cut
 
 sub slurp {
@@ -142,10 +146,12 @@ sub slurp {
 
     binmode( $handle, $layer );
 
+    $handle->seek(0, SEEK_SET);
     while ( $handle->sysread( my $buffer, 8192 ) ) {
         $content .= $buffer;
     }
 
+    $handle->seek(0, SEEK_SET);
     return $content;
 }
 
