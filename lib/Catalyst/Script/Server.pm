@@ -146,9 +146,7 @@ sub _restarter_args {
         ($self->_has_restart_regex     ? (filter          => $self->restart_regex)     : ()),
     ),
     (
-        map { $_ => $self->$_ } qw(
-            application_name host port debug pidfile restart_directory 
-            restart_delay)
+        map { $_ => $self->$_ } qw(application_name host port debug pidfile)
     );
 }
 
