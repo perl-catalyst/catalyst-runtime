@@ -144,6 +144,11 @@ sub _restarter_args {
         ($self->_has_restart_delay     ? (sleep_interval  => $self->restart_delay)     : ()),
         ($self->_has_restart_directory ? (directories     => $self->restart_directory) : ()),
         ($self->_has_restart_regex     ? (filter          => $self->restart_regex)     : ()),
+    ),
+    (
+        map { $_ => $self->$_ } qw(
+            application_name host port debug pidfile restart_directory 
+            restart_delay)
     );
 }
 
@@ -175,7 +180,7 @@ sub run {
         # fail.
         $| = 1 if $ENV{HARNESS_ACTIVE};
 
-        Catalyst::Utils::load_class($self->restarter_class);
+        Catalyst::Utils::ensure_class_loaded($self->restarter_class);
 
         my $subclass = $self->restarter_class->pick_subclass;
 
