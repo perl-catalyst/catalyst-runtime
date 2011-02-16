@@ -3226,6 +3226,8 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 
 rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
+dd070: Dhaval Dhanani <dhaval070@gmail.com>
+
 =head1 LICENSE
 
 This library is free software. You can redistribute it and/or modify it under
