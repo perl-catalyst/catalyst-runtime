@@ -187,7 +187,6 @@ sub recurse_match {
     return () unless $children;
     my $best_action;
     my @captures;
-    my $found=0;
     TRY: foreach my $try_part (sort { length($b) <=> length($a) }
                                    keys %$children) {
                                # $b then $a to try longest part first
@@ -198,7 +197,6 @@ sub recurse_match {
                               splice( # and strip them off @parts as well
                                 @parts, 0, scalar(@{[split('/', $try_part)]})
                               ))); # @{[]} to avoid split to @_
-            $found=1;
         }
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
@@ -214,7 +212,7 @@ sub recurse_match {
                 push(@captures, splice(@parts, 0, $capture_attr->[0]));
 
                 # try the remaining parts against children of this action
-                my ($actions, $captures, $action_parts, $found) = $self->recurse_match(
+                my ($actions, $captures, $action_parts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
                                            );
                 #    No best action currently
@@ -222,15 +220,13 @@ sub recurse_match {
                 # OR The action has equal parts but less captured data (ergo more defined)
                 if ($actions    &&
                     (!$best_action                                 ||
-                      $#$action_parts < $#{$best_action->{parts}}  ||
+                     $#$action_parts < $#{$best_action->{parts}}   ||
                      ($#$action_parts == $#{$best_action->{parts}} &&
-                      $#$captures < $#{$best_action->{captures}} && ($found > $best_action->{found})
-                  ))) {
+                      $#$captures < $#{$best_action->{captures}}))){
                     $best_action = {
                         actions => [ $action, @$actions ],
                         captures=> [ @captures, @$captures ],
-                        parts   => $action_parts,
-                        found=>$found
+                        parts   => $action_parts
                         };
                 }
             }
@@ -254,14 +250,13 @@ sub recurse_match {
                     $best_action = {
                         actions => [ $action ],
                         captures=> [],
-                        parts   => \@parts,
-                        found=>$found,
+                        parts   => \@parts
                     }
                 }
             }
         }
     }
-    return @$best_action{qw/actions captures parts found/} if $best_action;
+    return @$best_action{qw/actions captures parts/} if $best_action;
     return ();
 }
 
