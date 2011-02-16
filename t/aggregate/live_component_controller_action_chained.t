@@ -865,12 +865,9 @@ sub run_tests {
 
         ok( my $response = request('http://localhost/chained/mult_nopp2/action'),
             "Complex path with multiple non-capturing pathparts" );
-        TODO: {
-        local $TODO = 'Known bug';
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, '; ', 'Content OK' );
-        }
     }
 
     #
