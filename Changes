@@ -1,6 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-Bug fixes:
+5.80032 UNRELEASED
+
+ Bug fixes:
   - Fix compatibility issue with code which was testing the value of
     $c->res->body multiple times. Previously this would cause the value
     to be built, and ergo cause the $c->res->has_body predicate to start
@@ -10,6 +12,25 @@ Bug fixes:
   - Fix bug with calling $upload->slurp multiple times in one request
     not working as expected as the file handle wasn't returned to
     the zero position. (Adam Sjøgren)
+
+  - Fix some weird perl 5.8 situations where $c can get squashed unexpectedly
+    in Catalyst::execute
+
+  - Fix chained dispatch where chains were being compared for length (number
+    of private parts in the chain) vs where they are being compared for
+    PathPart length (i.e. number of non-capturing URI elements in your path).
+
+    This bug meant that sometimes multiple Args or CaptureArgs (e.g. /*/*)
+    type paths would be preferred to those with fixed path elements
+    (e.g. /account/*)
+
+ New features:
+   - Add MYAPP_RESTARTER and CATALYST_RESTARTER environment variables to
+     allow the restarter class to be chosen per application or generally.
+
+     This feature was added to enable GUI restarters (such as the soon to
+     be released CatalystX::Restarter::GTK to be enabled more easily by
+     developers without changing their application code.
 
 5.80031 2011-01-31 08:13:02
 
