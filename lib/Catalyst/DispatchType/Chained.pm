@@ -212,7 +212,7 @@ sub recurse_match {
                 push(@captures, splice(@parts, 0, $capture_attr->[0]));
 
                 # try the remaining parts against children of this action
-                my ($actions, $captures, $action_parts) = $self->recurse_match(
+                my ($actions, $captures, $action_parts, $n_pathparts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
                                            );
                 #    No best action currently
@@ -222,12 +222,15 @@ sub recurse_match {
                     (!$best_action                                 ||
                      $#$action_parts < $#{$best_action->{parts}}   ||
                      ($#$action_parts == $#{$best_action->{parts}} &&
-                      $#$captures < $#{$best_action->{captures}}))){
+                      $#$captures < $#{$best_action->{captures}} &&
+                      $n_pathparts > $best_action->{n_pathparts}))) {
+                    my @pathparts = split /\//, $action->attributes->{PathPart}->[0];
                     $best_action = {
                         actions => [ $action, @$actions ],
                         captures=> [ @captures, @$captures ],
-                        parts   => $action_parts
-                        };
+                        parts   => $action_parts,
+                        n_pathparts => scalar(@pathparts) + $n_pathparts,
+                    };
                 }
             }
             else {
@@ -236,7 +239,7 @@ sub recurse_match {
                     next TRY_ACTION unless $action->match($c);
                 }
                 my $args_attr = $action->attributes->{Args}->[0];
-
+                my @pathparts = split /\//, $action->attributes->{PathPart}->[0];
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
                 #    And therefore is a better match
@@ -250,13 +253,14 @@ sub recurse_match {
                     $best_action = {
                         actions => [ $action ],
                         captures=> [],
-                        parts   => \@parts
-                    }
+                        parts   => \@parts,
+                        n_pathparts => scalar(@pathparts),
+                    };
                 }
             }
         }
     }
-    return @$best_action{qw/actions captures parts/} if $best_action;
+    return @$best_action{qw/actions captures parts n_pathparts/} if $best_action;
     return ();
 }
 
