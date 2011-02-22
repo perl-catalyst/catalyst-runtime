@@ -1660,7 +1660,9 @@ sub execute {
     push( @{ $c->stack }, $code );
 
     no warnings 'recursion';
-    eval { $c->state( $code->execute( $class, $c, @{ $c->req->args } ) || 0 ) };
+    # N.B. This used to be combined, but I have seen $c get clobbered if so, and
+    #      I have no idea how, ergo $ret (which appears to fix the issue)
+    eval { my $ret = $code->execute( $class, $c, @{ $c->req->args } ) || 0; $c->state( $ret ) };
 
     $c->_stats_finish_execute( $stats_info ) if $c->use_stats and $stats_info;
 
