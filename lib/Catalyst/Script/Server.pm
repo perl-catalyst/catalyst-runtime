@@ -144,8 +144,21 @@ sub _restarter_args {
         ($self->_has_restart_delay     ? (sleep_interval  => $self->restart_delay)     : ()),
         ($self->_has_restart_directory ? (directories     => $self->restart_directory) : ()),
         ($self->_has_restart_regex     ? (filter          => $self->restart_regex)     : ()),
+    ),
+    (
+        map { $_ => $self->$_ } qw(application_name host port debug pidfile)
     );
 }
+
+has restarter_class => (
+    is => 'ro',
+    isa => Str,
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        Catalyst::Utils::env_value($self->application_name, 'RESTARTER') || 'Catalyst::Restarter';
+    }
+);
 
 sub run {
     my $self = shift;
@@ -165,9 +178,9 @@ sub run {
         # fail.
         $| = 1 if $ENV{HARNESS_ACTIVE};
 
-        require Catalyst::Restarter;
+        Catalyst::Utils::ensure_class_loaded($self->restarter_class);
 
-        my $subclass = Catalyst::Restarter->pick_subclass;
+        my $subclass = $self->restarter_class->pick_subclass;
 
         my $restarter = $subclass->new(
             $self->_restarter_args()
