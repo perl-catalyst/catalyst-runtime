@@ -151,8 +151,5 @@ sub restartopthash {
         host => undef,
         %$opthash,
     };
-    delete $val->{fork};
-    delete $val->{background};
-    delete $val->{keepalive};
     return $val;
 }
