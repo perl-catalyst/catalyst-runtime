@@ -143,8 +143,16 @@ sub opthash {
 }
 
 sub restartopthash {
-    return {
-        follow_symlinks => 0,
-        @_,
+    my $opthash = opthash(@_);
+    my $val = {
+        application_name => 'TestAppToTestScripts',
+        port => '3000',
+        debug => undef,
+        host => undef,
+        %$opthash,
     };
+    delete $val->{fork};
+    delete $val->{background};
+    delete $val->{keepalive};
+    return $val;
 }
