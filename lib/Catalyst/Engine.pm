@@ -93,6 +93,7 @@ sub finalize_cookies {
                 -httponly => $val->{httponly} || 0,
             )
         );
+        next if(!defined $cookie); # warn?
 
         push @cookies, $cookie->as_string;
     }

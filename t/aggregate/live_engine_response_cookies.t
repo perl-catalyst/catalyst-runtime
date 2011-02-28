@@ -71,3 +71,24 @@ my $expected = {
         this_is_the_real_name => [ qw(this_is_the_real_name foo&bar path /) ], # not "object"
     }, 'Response Cookies' );
 }
+
+{
+    my $response;
+    ok( $response = request('http://localhost/engine/response/cookies/four'),
+        'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' ) or diag explain $response;
+    is( $response->content_type, 'text/plain', 'Response Content-Type' );
+    is( $response->header('X-Catalyst-Action'),
+        'engine/response/cookies/four', 'Test Action' );
+
+    my $cookies = {};
+
+    for my $string ( $response->header('Set-Cookie') ) {
+        my $cookie = [ split_header_words $string];
+        $cookies->{ $cookie->[0]->[0] } = $cookie->[0];
+    }
+
+    is_deeply( $cookies, {
+        good => [qw|good good_cookie path /|],
+    }, 'Response Cookies' );
+}
