@@ -88,7 +88,7 @@ resources(
     'IRC'         => 'irc://irc.perl.org/#catalyst',
     'license',    => 'http://dev.perl.org/licenses/',
     'homepage',   => 'http://dev.catalyst.perl.org/',
-    'repository', => 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/',
+    'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
 );
 
 install_script glob('script/*.pl');
