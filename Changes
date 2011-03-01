@@ -1,18 +1,23 @@
 # This file documents the revision history for Perl extension Catalyst.
 
- - Fixed Catalyst::Engine::Stomp compatibility. Applications using
-   Catalyst::Engine::Stomp are believed to continue working without
-   any changes with the new Catalyst major version.
+ Bug fixes:
+  - Fixed command-line argument passing in Catalyst::Script::FastCGI.
 
- - Fixed issues auto-loading engine with older scripts.
+  - Fixed Catalyst::Engine::Stomp compatibility. Applications using
+    Catalyst::Engine::Stomp are believed to continue working without
+    any changes with the new Catalyst major version.
 
- - Catalyst::Engine::Wx is officially unsupported and BROKEN. If you
-   are using this engine then please get in touch with us and we'll
-   be happy to help with the changes it needs to be compatible with
-   the new major version of Catalyst.
+  - Fixed issues auto-loading engine with older scripts.
 
- - XXX removal of engine_class?
- - XXX removal of setup_engine($name)?
+ Known problems:
+  - Catalyst::Engine::Wx is officially unsupported and BROKEN. If you
+    are using this engine then please get in touch with us and we'll
+    be happy to help with the changes it needs to be compatible with
+    the new major version of Catalyst.
+
+ Documentation:
+  - The section of Catalyst::Upgrading describing how to upgrade to version 5.90
+    of Catalyst has been much improved.
 
 5.80032 2011-02-23 01:10:00
 
