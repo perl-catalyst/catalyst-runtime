@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.89001 2011-03-01 15:27:00 (TRIAL release)
+
  Bug fixes:
   - Fixed command-line argument passing in Catalyst::Script::FastCGI.
 
