@@ -12,8 +12,8 @@ content_like('/15/GoldFinger', qr/List project GoldFinger pages/, 'GoldFinger Pr
 content_like('/15/GoldFinger/4/007', qr/This is 007 page of GoldFinger project/, '007 page in GoldFinger Project');
 
 content_like('/account', qr/New account o login/, 'no account');
-content_like('/account/ferz', qr/This is account ferz/, 'account');
-content_like('/account/123', qr/This is account 123/, 'account');
+content_like('/account/ferz', qr/This is account ferz/, '/account/ferz');
+content_like('/account/123', qr/This is account 123/, '/account/123');
 content_like('/account/profile/007/James Bond', qr/This is profile of James Bond/, 'account');
 
 TODO: {

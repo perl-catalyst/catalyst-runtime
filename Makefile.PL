@@ -22,7 +22,7 @@ requires 'Class::MOP' => '0.95';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.24';
-requires 'MooseX::Role::WithOverloading' => '0.05';
+requires 'MooseX::Role::WithOverloading' => '0.09';
 requires 'MooseX::Types::LoadableClass' => '0.003';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
@@ -94,7 +94,7 @@ resources(
     'IRC'         => 'irc://irc.perl.org/#catalyst',
     'license',    => 'http://dev.perl.org/licenses/',
     'homepage',   => 'http://dev.catalyst.perl.org/',
-    'repository', => 'http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/',
+    'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
 );
 
 install_script glob('script/*.pl');

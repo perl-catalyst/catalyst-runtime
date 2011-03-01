@@ -5,7 +5,7 @@
    any changes with the new Catalyst major version.
 
  - Fixed issues auto-loading engine with older scripts.
- 
+
  - Catalyst::Engine::Wx is officially unsupported and BROKEN. If you
    are using this engine then please get in touch with us and we'll
    be happy to help with the changes it needs to be compatible with
@@ -13,7 +13,51 @@
 
  - XXX removal of engine_class?
  - XXX removal of setup_engine($name)?
-   
+
+5.80032 2011-02-23 01:10:00
+
+ Bug fixes:
+  - Fix compatibility issue with code which was testing the value of
+    $c->res->body multiple times. Previously this would cause the value
+    to be built, and ergo cause the $c->res->has_body predicate to start
+    returning true.
+    Having a response body is indicated by $c->res->body being defined.
+
+  - Fix bug with calling $upload->slurp multiple times in one request
+    not working as expected as the file handle wasn't returned to
+    the zero position. (Adam Sjøgren)
+
+  - Fix some weird perl 5.8 situations where $c can get squashed unexpectedly
+    in Catalyst::execute
+
+  - Fix chained dispatch where chains were being compared for length (number
+    of private parts in the chain) vs where they are being compared for
+    PathPart length (i.e. number of non-capturing URI elements in your path).
+
+    This bug meant that sometimes multiple Args or CaptureArgs (e.g. /*/*)
+    type paths would be preferred to those with fixed path elements
+    (e.g. /account/*)
+
+ New features:
+   - Add MYAPP_RESTARTER and CATALYST_RESTARTER environment variables to
+     allow the restarter class to be chosen per application or generally.
+
+     This feature was added to enable GUI restarters (such as the soon to
+     be released CatalystX::Restarter::GTK to be enabled more easily by
+     developers without changing their application code.
+
+5.80031 2011-01-31 08:13:02
+
+ Bug fixes:
+  - Update dependency on MooseX::Role::WithOverloading to ensure that
+    a version which can deal with / depends on a new Package::Stash
+    is installed. (As if some other dependency is pulled in during upgrading
+    which results in new Package::Stash, then it can leave you with a broken
+    version of MooseX::Role::WithOverloading.
+
+  - Fix undef warning in Catalyst::Engine::FastCGI when writing an empty
+    body (e.g. doing a redirect)
+
 5.89000 2011-01-24 09:28:45 (TRIAL release)
 
  This is a development release from psgi branch of Catalyst-Runtime.

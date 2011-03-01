@@ -79,6 +79,19 @@ testRestart( ['-r', '--restart_directory', 'root'], restartopthash(directories =
 testRestart( ['-r', '--rr', 'foo'], restartopthash(filter => qr/foo/) );
 testRestart( ['-r', '--restart_regex', 'foo'], restartopthash(filter => qr/foo/) );
 
+local $ENV{TESTAPPTOTESTSCRIPTS_RESTARTER};
+local $ENV{CATALYST_RESTARTER};
+{
+    is _build_testapp([])->restarter_class, 'Catalyst::Restarter', 'default restarter with no $ENV{CATALYST_RESTARTER}';
+}
+{
+    local $ENV{CATALYST_RESTARTER} = "CatalystX::Restarter::Other";
+    is _build_testapp([])->restarter_class, $ENV{CATALYST_RESTARTER}, 'override restarter with $ENV{CATALYST_RESTARTER}';
+}
+{
+    local $ENV{TESTAPPTOTESTSCRIPTS_RESTARTER} = "CatalystX::Restarter::Other2";
+    is _build_testapp([])->restarter_class, $ENV{TESTAPPTOTESTSCRIPTS_RESTARTER}, 'override restarter with $ENV{TESTAPPTOTESTSCRIPTS_RESTARTER}';
+}
 done_testing;
 
 sub testOption {
@@ -132,8 +145,13 @@ sub opthash {
 }
 
 sub restartopthash {
-    return {
-        follow_symlinks => 0,
-        @_,
+    my $opthash = opthash(@_);
+    my $val = {
+        application_name => 'TestAppToTestScripts',
+        port => '3000',
+        debug => undef,
+        host => undef,
+        %$opthash,
     };
+    return $val;
 }
