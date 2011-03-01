@@ -2407,7 +2407,7 @@ Starts the engine.
 
 =cut
 
-sub run { my $c = shift; return $c->engine->run( $c, $c->psgi_app, @_ ) }
+sub run { my $c = shift; return $c->engine->run( $c, $c->_finalized_psgi_app, @_ ) }
 
 =head2 $c->set_action( $action, $code, $namespace, $attrs )
 
@@ -2619,44 +2619,18 @@ sub setup_engine {
     return;
 }
 
-=head2 $c->psgi_app
-
-Builds a PSGI application coderef for the catalyst application C<$c> using
-L</"$c->setup_psgi_app">, stores it internally, and returns it. On the next call
-to this method, C<setup_psgi_app> won't be invoked again, but its persisted
-return value of it will be returned.
-
-This is the top-level entrypoint for things that need a full blown Catalyst PSGI
-app. If you only need the raw PSGI application, without any middlewares, use
-L</"$c->raw_psgi_app"> instead.
-
-=cut
-
-sub psgi_app {
+sub _finalized_psgi_app {
     my ($app) = @_;
 
     unless ($app->_psgi_app) {
-        my $psgi_app = $app->setup_psgi_app;
+        my $psgi_app = $app->_setup_psgi_app;
         $app->_psgi_app($psgi_app);
     }
 
     return $app->_psgi_app;
 }
 
-=head2 $c->setup_psgi_app
-
-Builds a PSGI application coderef for the catalyst application C<$c>.
-
-If we're able to locate a C<${myapp}.psgi> file in the applications home
-directory, we'll use that to obtain our code reference.
-
-Otherwise the raw psgi app, without any middlewares is created using
-C<raw_psgi_app> and wrapped into L<Plack::Middleware::ReverseProxy>
-conditionally. See L</"PROXY SUPPORT">.
-
-=cut
-
-sub setup_psgi_app {
+sub _setup_psgi_app {
     my ($app) = @_;
 
     if (my $home = Path::Class::Dir->new($app->config->{home})) {
@@ -2668,12 +2642,18 @@ sub setup_psgi_app {
             if -e $psgi_file;
     }
 
-    # Note - this is for back compatibility. Catalyst should not know
-    #        or care about how it's deployed. The recommended way of
-    #        configuring this is now to use the ReverseProxy middleware
-    #        yourself if you want it in a .psgi file.
+    return $app->_wrapped_legacy_psgi_app;
+}
+
+# Note - this is for back compatibility. Catalyst should not know or care about
+#        how it's deployed. The recommended way of configuring this is now to
+#        use the ReverseProxy middleware yourself if you want it in a .psgi
+#        file.
+sub _wrapped_legacy_psgi_app {
+    my ($app) = @_;
+
     return Plack::Middleware::Conditional->wrap(
-        $app->raw_psgi_app,
+        $app->psgi_app,
         builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
         condition => sub {
             my ($env) = @_;
@@ -2684,16 +2664,18 @@ sub setup_psgi_app {
     );
 }
 
-=head2 $c->raw_psgi_app
+=head2 $c->psgi_app
 
 Returns a PSGI application code reference for the catalyst application
 C<$c>. This is the bare application without any middlewares
-applied. C<${myapp}.psgi> is not taken into account. See
-L</"$c->setup_psgi_app">.
+applied. C<${myapp}.psgi> is not taken into account.
+
+This is what you want to be using to retrieve the PSGI application code
+reference of your Catalyst application for use in F<.psgi> files.
 
 =cut
 
-sub raw_psgi_app {
+sub psgi_app {
     my ($app) = @_;
     return $app->engine->build_psgi_app($app);
 }

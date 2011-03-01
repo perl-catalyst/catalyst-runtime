@@ -241,7 +241,7 @@ Simulate a request using L<HTTP::Request::AsCGI>.
 sub local_request {
     my $class = shift;
 
-    my $app = ref($class) eq "CODE" ? $class : $class->psgi_app;
+    my $app = ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app;
 
     my $request = Catalyst::Utils::request(shift);
     my %extra_env;
