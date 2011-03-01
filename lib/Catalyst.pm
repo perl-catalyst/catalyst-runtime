@@ -30,7 +30,7 @@ use Class::C3::Adopt::NEXT;
 use List::MoreUtils qw/uniq/;
 use attributes;
 use String::RewritePrefix;
-use Catalyst::Engine::Loader;
+use Catalyst::EngineLoader;
 use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
@@ -2599,7 +2599,7 @@ sub engine_class {
 sub setup_engine {
     my ($class) = @_;
 
-    $class->engine_loader(Catalyst::Engine::Loader->new(application_name => $class));
+    $class->engine_loader(Catalyst::EngineLoader->new(application_name => $class));
 
     my $engine = $class->engine_class;
     Class::MOP::load_class($engine);

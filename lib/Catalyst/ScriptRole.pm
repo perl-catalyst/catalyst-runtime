@@ -3,7 +3,7 @@ use Moose::Role;
 use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
 use MooseX::Getopt;
-use Catalyst::Engine::Loader;
+use Catalyst::EngineLoader;
 use MooseX::Types::LoadableClass qw/LoadableClass/;
 use namespace::autoclean;
 
@@ -26,7 +26,7 @@ has loader_class => (
     isa => LoadableClass,
     is => 'ro',
     coerce => 1,
-    default => 'Catalyst::Engine::Loader',
+    default => 'Catalyst::EngineLoader',
     documentation => 'The class to use to detect and load the PSGI engine',
 );
 

@@ -1,4 +1,4 @@
-package Catalyst::Engine::Loader;
+package Catalyst::EngineLoader;
 use Moose;
 use Catalyst::Exception;
 use Catalyst::Utils;
@@ -97,7 +97,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::Engine::Loader - The Catalyst Engine Loader
+Catalyst::EngineLoader - The Catalyst Engine Loader
 
 =head1 SYNOPSIS
 
