@@ -16,7 +16,7 @@ use strict;
 use warnings;
 use TestApp;
 
-TestApp->psgi_app;
+TestApp->raw_psgi_app;
 };
 close($psgi);
 # Check we wrote out something that compiles
@@ -37,7 +37,7 @@ my $failed = 0;
 eval {
     # Catch infinite recursion (or anything else)
     local $SIG{__WARN__} = sub { warn(@_); $failed = 1; die; };
-    TestApp->setup_psgi_app;
+    TestApp->psgi_app;
 };
 ok(!$@, 'No exception')
     or diag $@;
