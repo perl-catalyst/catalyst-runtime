@@ -7,6 +7,7 @@ use File::Path;
 use FindBin;
 use Test::TCP;
 use Try::Tiny;
+use Plack::Builder;
 
 use Catalyst::Devel 1.0;
 use File::Copy::Recursive;
@@ -43,7 +44,12 @@ if ($pid) {
     require TestApp;
 
     my $psgi_app = TestApp->_wrapped_legacy_psgi_app(TestApp->psgi_app);
-    Plack::Loader->auto(port => $port)->run($psgi_app);
+    Plack::Loader->auto(port => $port)->run(builder {
+        mount '/test_prefix' => $psgi_app;
+        mount '/' => sub {
+            return [501, ['Content-Type' => 'text/plain'], ['broken tests']];
+        };
+    });
 
     exit 0;
 } else {
@@ -51,7 +57,7 @@ if ($pid) {
 }
 
 # run the testsuite against the HTTP server
-$ENV{CATALYST_SERVER} = "http://localhost:$port";
+$ENV{CATALYST_SERVER} = "http://localhost:$port/test_prefix";
 
 chdir '..';
 
