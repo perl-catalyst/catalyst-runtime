@@ -2690,6 +2690,38 @@ sub _wrapped_legacy_psgi_app {
         },
     );
 
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder => sub {
+            my ($to_wrap) = @_;
+            return sub {
+                my ($env) = @_;
+
+                my @script_name = split(m!/!, $env->{PATH_INFO});
+                my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
+                my @path_info;
+
+                while ($script_name[$#script_name] eq $path_translated[$#path_translated]) {
+                    pop(@path_translated);
+                    unshift(@path_info, pop(@script_name));
+                }
+
+                unshift(@path_info, '', '');
+
+                $env->{PATH_INFO} = join('/', @path_info);
+                $env->{SCRIPT_NAME} = join('/', @script_name);
+
+                return $to_wrap->($env);
+            };
+        },
+        condition => sub {
+            my ($env) = @_;
+            my $server = $env->{SERVER_SOFTWARE};
+            return unless $server;
+            return $server =~ /IIS\/[6-9]\.[0-9]/ ? 1 : 0;
+        },
+    );
+
     return $psgi_app;
 }
 
