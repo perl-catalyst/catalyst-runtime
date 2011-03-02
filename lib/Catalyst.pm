@@ -2654,7 +2654,7 @@ sub _setup_psgi_app {
 sub _wrapped_legacy_psgi_app {
     my ($app, $psgi_app) = @_;
 
-    return Plack::Middleware::Conditional->wrap(
+    $psgi_app = Plack::Middleware::Conditional->wrap(
         $psgi_app,
         builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
         condition => sub {
@@ -2664,6 +2664,33 @@ sub _wrapped_legacy_psgi_app {
                 || $app->config->{using_frontend_proxy};
         },
     );
+
+    # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
+    # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
+    # Thanks to Mark Blythe for this fix
+    #
+    # Note that this has probably the same effect as
+    # Plack::Middleware::LighttpdScriptNameFix and we should switch to that if
+    # we can.
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder => sub {
+            my ($to_wrap) = @_;
+            return sub {
+                my ($env) = @_;
+                $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
+                return $to_wrap->($env);
+            };
+        },
+        condition => sub {
+            my ($env) = @_;
+            my $server = $env->{SERVER_SOFTWARE};
+            return unless $server;
+            return $server =~ /lighttpd/ ? 1 : 0;
+        },
+    );
+
+    return $psgi_app;
 }
 
 =head2 $c->psgi_app
