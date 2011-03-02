@@ -2696,6 +2696,25 @@ sub _wrapped_legacy_psgi_app {
             my ($to_wrap) = @_;
             return sub {
                 my ($env) = @_;
+                my $script_name = $env->{SCRIPT_NAME};
+                $env->{PATH_INFO} =~ s/^$script_name//g;
+                return $to_wrap->($env);
+            };
+        },
+        condition => sub {
+            my ($env) = @_;
+            my $server = $env->{SERVER_SOFTWARE};
+            return unless $server;
+            return $server =~ /^nginx/ ? 1 : 0;
+        },
+    );
+
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder => sub {
+            my ($to_wrap) = @_;
+            return sub {
+                my ($env) = @_;
 
                 my @script_name = split(m!/!, $env->{PATH_INFO});
                 my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
