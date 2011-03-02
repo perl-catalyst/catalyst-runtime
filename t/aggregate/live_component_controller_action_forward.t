@@ -242,7 +242,7 @@ sub run_tests {
             'forward_to_uri_check request');
 
         ok( $response->is_success, 'forward_to_uri_check successful');
-        is( $response->content, '/action/forward/foo/bar',
+        is( $response->content, 'action/forward/foo/bar',
              'forward_to_uri_check correct namespace');
     }
 
