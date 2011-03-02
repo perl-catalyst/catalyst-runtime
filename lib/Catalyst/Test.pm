@@ -308,6 +308,7 @@ my $agent;
 
 sub _remote_request {
     require LWP::UserAgent;
+    local $Plack::Test::Impl = 'ExternalServer';
 
     my $request = Catalyst::Utils::request( shift(@_) );
     my $server  = URI->new( $ENV{CATALYST_SERVER} );
@@ -342,13 +343,7 @@ sub _remote_request {
         }
     }
 
-    $request->uri->scheme( $server->scheme );
-    $request->uri->host( $server->host );
-    $request->uri->port( $server->port );
-    $request->uri->path( $server->path . $request->uri->path );
-
     unless ($agent) {
-
         $agent = LWP::UserAgent->new(
             keep_alive   => 1,
             max_redirect => 0,
@@ -362,7 +357,16 @@ sub _remote_request {
         $agent->env_proxy;
     }
 
-    return $agent->request($request);
+    my $ret;
+    test_psgi
+        ua     => $agent,
+        uri    => $server,
+        client => sub {
+            my ($psgi_app) = @_;
+            $ret = $psgi_app->($request);
+        };
+
+    return $ret;
 }
 
 for my $name (qw(local_request remote_request)) {

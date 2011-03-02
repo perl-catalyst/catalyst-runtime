@@ -56,6 +56,7 @@ requires 'MooseX::Types::Common::Numeric';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
 requires 'Plack' => '0.9974'; # IIS6 fix middleware
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
+requires 'Plack::Test::ExternalServer';
 
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
