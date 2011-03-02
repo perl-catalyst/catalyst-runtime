@@ -5,7 +5,6 @@ use Test::More tests => 1;
 
 use File::Path;
 use FindBin;
-use IPC::Open3;
 use IO::Socket;
 
 use Catalyst::Devel 1.0;
@@ -31,19 +30,29 @@ rmtree '../t/tmp/TestApp/t' or die;
 
 # spawn the standalone HTTP server
 my $port = 30000 + int rand(1 + 10000);
-my @cmd = ($^X, "-I$FindBin::Bin/../../lib",
-  "$FindBin::Bin/../../t/tmp/TestApp/script/testapp_server.pl", '--port', $port );
-my $pid = open3( undef, my $server, undef, @cmd)
-    or die "Unable to spawn standalone HTTP server: $!";
 
-# wait for it to start
-print "Waiting for server to start...\n";
-my $timeout = 30;
-my $count = 0;
-while ( check_port( 'localhost', $port ) != 1 ) {
-    sleep 1;
-    die("Server did not start within $timeout seconds: " . join(' ', @cmd))
-        if $count++ > $timeout;
+my $pid = fork;
+if ($pid) {
+    # parent.
+    print "Waiting for server to start...\n";
+    my $timeout = 30;
+    my $count = 0;
+    while ( check_port( 'localhost', $port ) != 1 ) {
+        sleep 1;
+        die "Server did not start within $timeout seconds:"
+            if $count++ > $timeout;
+    }
+} elsif ($pid == 0) {
+    # child process
+    unshift @INC, "$tmpdir/TestApp/lib", "$FindBin::Bin/../../lib";
+    require TestApp;
+
+    my $psgi_app = TestApp->_wrapped_legacy_psgi_app(TestApp->psgi_app);
+    Plack::Loader->auto(port => $port)->run($psgi_app);
+
+    exit 0;
+} else {
+    die "fork failed: $!";
 }
 
 # run the testsuite against the HTTP server
@@ -61,7 +70,6 @@ else {
 
 # shut it down
 kill 'INT', $pid;
-close $server;
 
 # clean up
 rmtree "$FindBin::Bin/../../t/tmp" if -d "$FindBin::Bin/../../t/tmp";
