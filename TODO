@@ -39,9 +39,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Nice to have
 
-  * Do we need to do something else about middleware than let the user provide a .psgi?
-    What about the reverse proxy middleware
-  * Do we generate a .psgi by default?
   * throw out Catalyst::Test's remote_request in favour of
     Plack::Test::ExternalServer
   * make sure we're running under a server that support psgi.streaming - maybe
