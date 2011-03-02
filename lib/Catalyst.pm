@@ -2665,6 +2665,16 @@ sub _wrapped_legacy_psgi_app {
         },
     );
 
+    my $server_matches = sub {
+        my ($re) = @_;
+        return sub {
+            my ($env) = @_;
+            my $server = $env->{SERVER_SOFTWARE};
+            return unless $server;
+            return $server =~ $re ? 1 : 0;
+        };
+    };
+
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
     # Thanks to Mark Blythe for this fix
@@ -2674,7 +2684,8 @@ sub _wrapped_legacy_psgi_app {
     # we can.
     $psgi_app = Plack::Middleware::Conditional->wrap(
         $psgi_app,
-        builder => sub {
+        condition => $server_matches->(qr/lighttpd/),
+        builder   => sub {
             my ($to_wrap) = @_;
             return sub {
                 my ($env) = @_;
@@ -2682,17 +2693,12 @@ sub _wrapped_legacy_psgi_app {
                 return $to_wrap->($env);
             };
         },
-        condition => sub {
-            my ($env) = @_;
-            my $server = $env->{SERVER_SOFTWARE};
-            return unless $server;
-            return $server =~ /lighttpd/ ? 1 : 0;
-        },
     );
 
     $psgi_app = Plack::Middleware::Conditional->wrap(
         $psgi_app,
-        builder => sub {
+        condition => $server_matches->(qr/^nginx/),
+        builder   => sub {
             my ($to_wrap) = @_;
             return sub {
                 my ($env) = @_;
@@ -2701,17 +2707,12 @@ sub _wrapped_legacy_psgi_app {
                 return $to_wrap->($env);
             };
         },
-        condition => sub {
-            my ($env) = @_;
-            my $server = $env->{SERVER_SOFTWARE};
-            return unless $server;
-            return $server =~ /^nginx/ ? 1 : 0;
-        },
     );
 
     $psgi_app = Plack::Middleware::Conditional->wrap(
         $psgi_app,
-        builder => sub {
+        condition => $server_matches->(qr/IIS\/[6-9]\.[0-9]/),
+        builder   => sub {
             my ($to_wrap) = @_;
             return sub {
                 my ($env) = @_;
@@ -2732,12 +2733,6 @@ sub _wrapped_legacy_psgi_app {
 
                 return $to_wrap->($env);
             };
-        },
-        condition => sub {
-            my ($env) = @_;
-            my $server = $env->{SERVER_SOFTWARE};
-            return unless $server;
-            return $server =~ /IIS\/[6-9]\.[0-9]/ ? 1 : 0;
         },
     );
 
