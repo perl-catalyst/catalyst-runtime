@@ -12,8 +12,6 @@ use HTTP::Headers;
 use URI::QueryParam;
 use Moose::Util::TypeConstraints;
 use Plack::Loader;
-use Plack::Middleware::Conditional;
-use Plack::Middleware::ReverseProxy;
 use Catalyst::EngineLoader;
 use Encode ();
 use utf8;

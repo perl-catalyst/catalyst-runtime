@@ -34,6 +34,8 @@ use Catalyst::EngineLoader;
 use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
+use Plack::Middleware::Conditional;
+use Plack::Middleware::ReverseProxy;
 
 BEGIN { require 5.008004; }
 
