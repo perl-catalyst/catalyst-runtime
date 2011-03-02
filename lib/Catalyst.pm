@@ -2642,7 +2642,7 @@ sub _setup_psgi_app {
             if -e $psgi_file;
     }
 
-    return $app->_wrapped_legacy_psgi_app;
+    return $app->_wrapped_legacy_psgi_app($app->psgi_app);
 }
 
 # Note - this is for back compatibility. Catalyst should not know or care about
@@ -2650,10 +2650,10 @@ sub _setup_psgi_app {
 #        use the ReverseProxy middleware yourself if you want it in a .psgi
 #        file.
 sub _wrapped_legacy_psgi_app {
-    my ($app) = @_;
+    my ($app, $psgi_app) = @_;
 
     return Plack::Middleware::Conditional->wrap(
-        $app->psgi_app,
+        $psgi_app,
         builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
         condition => sub {
             my ($env) = @_;
