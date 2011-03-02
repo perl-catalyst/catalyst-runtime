@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.89002 2011-03-02 11:30:00 (TRIAL release)
+
+ Bug fixes:
+  - Fix a couple of test failures caused by optional dependencies such as FCGI
+    not being installed.
+
+ Refactoring:
+  - Simplified the API for getting a PSGI application code reference for a
+    Catalyst application for use in, for example, .psgi files. See
+    Catalyst::Upgrading for details.
+
 5.89001 2011-03-01 15:27:00 (TRIAL release)
 
  Bug fixes:
