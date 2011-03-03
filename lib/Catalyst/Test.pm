@@ -35,21 +35,20 @@ my $build_exports = sub {
     my $ctx_request = sub {
         my $me = ref $self || $self;
 
-        ### throw an exception if ctx_request is being used against a remote
-        ### server
+        # fail if ctx_request is being used against a remote server
         Catalyst::Exception->throw("$me only works with local requests, not remote")
             if $ENV{CATALYST_SERVER};
 
-        ### check explicitly for the class here, or the Cat->meta call will blow
-        ### up in our face
+        # check explicitly for the class here, or the Cat->meta call will blow
+        # up in our face
         Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") unless $class;
 
-        ### place holder for $c after the request finishes; reset every time
-        ### requests are done.
+        # place holder for $c after the request finishes; reset every time
+        # requests are done.
         my $ctx_closed_over;
 
-        ### hook into 'dispatch' -- the function gets called after all plugins
-        ### have done their work, and it's an easy place to capture $c.
+        # hook into 'dispatch' -- the function gets called after all plugins
+        # have done their work, and it's an easy place to capture $c.
 
         my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
@@ -58,8 +57,9 @@ my $build_exports = sub {
         });
         $meta->make_immutable( replace_constructor => 1 );
         Class::C3::reinitialize(); # Fixes RT#46459, I've failed to write a test for how/why, but it does.
-        ### do the request; C::T::request will know about the class name, and
-        ### we've already stopped it from doing remote requests above.
+
+        # do the request; C::T::request will know about the class name, and
+        # we've already stopped it from doing remote requests above.
         my $res = $request->( @_ );
 
         # Make sure not to leave a reference $ctx hanging around.
@@ -72,7 +72,6 @@ my $build_exports = sub {
         my $ctx = $ctx_closed_over;
         undef $ctx_closed_over;
 
-        ### return both values
         return ( $res, $ctx );
     };
 
