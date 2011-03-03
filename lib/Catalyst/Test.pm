@@ -11,28 +11,37 @@ use Class::MOP;
 use Sub::Exporter;
 use Carp;
 
-my $build_exports = sub {
-    my ($self, $meth, $args, $defaults) = @_;
+sub _build_request_export {
+    my ($self, $args) = @_;
 
-    my $request;
+    return sub { remote_request(@_) }
+        if $args->{remote};
+
     my $class = $args->{class};
 
-    if ( $ENV{CATALYST_SERVER} ) {
-        $request = sub { remote_request(@_) };
-    } elsif (!$class) {
-        $request = sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'"; }
-    } else {
-        unless (Class::MOP::is_class_loaded($class)) {
-            Class::MOP::load_class($class);
-        }
-        $class->import;
+    # Here we should be failing right away, but for some stupid backcompat thing
+    # I don't quite remember we fail lazily here. Needs a proper deprecation and
+    # then removal.
+    return sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'" }
+        unless $class;
 
-        $request = sub { local_request( $class, @_ ) };
-    }
+    Class::MOP::load_class($class) unless Class::MOP::is_class_loaded($class);
+    $class->import;
 
-    my $get = sub { $request->(@_)->content };
+    return sub { local_request( $class, @_ ) };
+}
 
-    my $ctx_request = sub {
+sub _build_get_export {
+    my ($self, $args) = @_;
+    my $request = $args->{request};
+
+    return sub { $request->(@_)->content };
+}
+sub _build_ctx_request_export {
+    my ($self, $args) = @_;
+    my ($class, $request) = @{ $args }{qw(class request)};
+
+    return sub {
         my $me = ref $self || $self;
 
         # fail if ctx_request is being used against a remote server
@@ -49,7 +58,6 @@ my $build_exports = sub {
 
         # hook into 'dispatch' -- the function gets called after all plugins
         # have done their work, and it's an easy place to capture $c.
-
         my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
@@ -60,7 +68,7 @@ my $build_exports = sub {
 
         # do the request; C::T::request will know about the class name, and
         # we've already stopped it from doing remote requests above.
-        my $res = $request->( @_ );
+        my $res = $args->{request}->( @_ );
 
         # Make sure not to leave a reference $ctx hanging around.
         # This means that the context will go out of scope as soon as the
@@ -74,6 +82,23 @@ my $build_exports = sub {
 
         return ( $res, $ctx );
     };
+}
+
+my $build_exports = sub {
+    my ($self, $meth, $args, $defaults) = @_;
+    my $class = $args->{class};
+
+    my $request = $self->_build_request_export({
+        class  => $class,
+        remote => $ENV{CATALYST_SERVER},
+    });
+
+    my $get = $self->_build_get_export({ request => $request });
+
+    my $ctx_request = $self->_build_ctx_request_export({
+        class   => $class,
+        request => $request,
+    });
 
     return {
         request      => $request,
