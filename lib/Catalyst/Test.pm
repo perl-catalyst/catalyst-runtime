@@ -262,22 +262,36 @@ C<$c>. Note that this only works for local requests.
 
 =cut
 
-sub _local_request {
-    my $class = shift;
-
-    my $app = ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app;
+sub _request {
+    my $args = shift;
 
     my $request = Catalyst::Utils::request(shift);
+
     my %extra_env;
     _customize_request($request, \%extra_env, @_);
+    $args->{mangle_request}->($request) if $args->{mangle_request};
 
     my $ret;
     test_psgi
-        app    => sub { $app->({ %{ $_[0] }, %extra_env }) },
+        %{ $args },
+        app    => sub { $args->{app}->({ %{ $_[0] }, %extra_env }) },
         client => sub {
-            my $psgi_app = shift;
-
+            my ($psgi_app) = @_;
             my $resp = $psgi_app->($request);
+            $args->{mangle_response}->($resp) if $args->{mangle_response};
+            $ret = $resp;
+        };
+
+    return $ret;
+}
+
+sub _local_request {
+    my $class = shift;
+
+    return _request({
+        app => ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app,
+        mangle_response => sub {
+            my ($resp) = @_;
 
             # HTML head parsing based on LWP::UserAgent
             #
@@ -297,11 +311,8 @@ sub _local_request {
             for my $f ( $h->header_field_names ) {
                 $resp->init_header( $f, [ $h->header($f) ] );
             }
-
-            $ret = $resp;
-        };
-
-    return $ret;
+        },
+    }, @_);
 }
 
 my $agent;
@@ -309,39 +320,6 @@ my $agent;
 sub _remote_request {
     require LWP::UserAgent;
     local $Plack::Test::Impl = 'ExternalServer';
-
-    my $request = Catalyst::Utils::request( shift(@_) );
-    my $server  = URI->new( $ENV{CATALYST_SERVER} );
-
-    _customize_request($request, @_);
-
-    if ( $server->path =~ m|^(.+)?/$| ) {
-        my $path = $1;
-        $server->path("$path") if $path;    # need to be quoted
-    }
-
-    # the request path needs to be sanitised if $server is using a
-    # non-root path due to potential overlap between request path and
-    # response path.
-    if ($server->path) {
-        # If request path is '/', we have to add a trailing slash to the
-        # final request URI
-        my $add_trailing = ($request->uri->path eq '/' || $request->uri->path eq '') ? 1 : 0;
-
-        my @sp = split '/', $server->path;
-        my @rp = split '/', $request->uri->path;
-        shift @sp;shift @rp; # leading /
-        if (@rp) {
-            foreach my $sp (@sp) {
-                $sp eq $rp[0] ? shift @rp : last
-            }
-        }
-        $request->uri->path(join '/', @rp);
-
-        if ( $add_trailing ) {
-            $request->uri->path( $request->uri->path . '/' );
-        }
-    }
 
     unless ($agent) {
         $agent = LWP::UserAgent->new(
@@ -357,16 +335,43 @@ sub _remote_request {
         $agent->env_proxy;
     }
 
-    my $ret;
-    test_psgi
-        ua     => $agent,
-        uri    => $server,
-        client => sub {
-            my ($psgi_app) = @_;
-            $ret = $psgi_app->($request);
-        };
 
-    return $ret;
+    my $server = URI->new($ENV{CATALYST_SERVER});
+    if ( $server->path =~ m|^(.+)?/$| ) {
+        my $path = $1;
+        $server->path("$path") if $path;    # need to be quoted
+    }
+
+    return _request({
+        ua             => $agent,
+        uri            => $server,
+        mangle_request => sub {
+            my ($request) = @_;
+
+            # the request path needs to be sanitised if $server is using a
+            # non-root path due to potential overlap between request path and
+            # response path.
+            if ($server->path) {
+                # If request path is '/', we have to add a trailing slash to the
+                # final request URI
+                my $add_trailing = ($request->uri->path eq '/' || $request->uri->path eq '') ? 1 : 0;
+
+                my @sp = split '/', $server->path;
+                my @rp = split '/', $request->uri->path;
+                shift @sp; shift @rp; # leading /
+                if (@rp) {
+                    foreach my $sp (@sp) {
+                        $sp eq $rp[0] ? shift @rp : last
+                    }
+                }
+                $request->uri->path(join '/', @rp);
+
+                if ( $add_trailing ) {
+                    $request->uri->path( $request->uri->path . '/' );
+                }
+            }
+        },
+    }, @_);
 }
 
 for my $name (qw(local_request remote_request)) {
