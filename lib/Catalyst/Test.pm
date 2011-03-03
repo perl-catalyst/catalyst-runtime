@@ -9,12 +9,12 @@ use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::MOP;
 use Sub::Exporter;
-use Carp;
+use Carp 'croak', 'carp';
 
 sub _build_request_export {
     my ($self, $args) = @_;
 
-    return sub { remote_request(@_) }
+    return sub { _remote_request(@_) }
         if $args->{remote};
 
     my $class = $args->{class};
@@ -28,7 +28,7 @@ sub _build_request_export {
     Class::MOP::load_class($class) unless Class::MOP::is_class_loaded($class);
     $class->import;
 
-    return sub { local_request( $class, @_ ) };
+    return sub { _local_request( $class, @_ ) };
 }
 
 sub _build_get_export {
@@ -249,20 +249,14 @@ header configuration; currently only supports setting 'host' value.
     my $res = request('foo/bar?test=1');
     my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
 
-=head1 FUNCTIONS
-
 =head2 ($res, $c) = ctx_request( ... );
 
 Works exactly like L<request|/"$res = request( ... );">, except it also returns the Catalyst context object,
 C<$c>. Note that this only works for local requests.
 
-=head2 $res = Catalyst::Test::local_request( $AppClass, $url );
-
-Simulate a request using L<HTTP::Request::AsCGI>.
-
 =cut
 
-sub local_request {
+sub _local_request {
     my $class = shift;
 
     my $app = ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app;
@@ -306,14 +300,7 @@ sub local_request {
 
 my $agent;
 
-=head2 $res = Catalyst::Test::remote_request( $url );
-
-Do an actual remote request using LWP.
-
-=cut
-
-sub remote_request {
-
+sub _remote_request {
     require LWP::UserAgent;
 
     my $request = Catalyst::Utils::request( shift(@_) );
@@ -372,6 +359,21 @@ sub remote_request {
     return $agent->request($request);
 }
 
+for my $name (qw(local_request remote_request)) {
+    my $fun = sub {
+        carp <<"EOW";
+Calling Catalyst::Test::${name}() directly is deprecated.
+
+Please import Catalyst::Test into your namespace and use the provided request()
+function instead.
+EOW
+        return __PACKAGE__->can("_${name}")->(@_);
+    };
+
+    no strict 'refs';
+    *$name = $fun;
+}
+
 sub _customize_request {
     my $request = shift;
     my $extra_env = shift;
@@ -419,6 +421,14 @@ Catalyst Contributors, see Catalyst.pm
 
 This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=begin Pod::Coverage
+
+local_request
+
+remote_request
+
+=end Pod::Coverage
 
 =cut
 

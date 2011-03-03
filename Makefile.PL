@@ -82,7 +82,7 @@ author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
-  Pod::Coverage
+  Pod::Coverage::TrustPod
 ));
 
 if ($Module::Install::AUTHOR) {
