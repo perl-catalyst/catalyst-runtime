@@ -64,10 +64,9 @@ if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::A
 }
 else {
     unlink '.aggregating';
-    tests join q{ },
-        grep { $_ ne 't/aggregate.t' }
-        map  { glob } qw[t/*.t t/aggregate/*.t];
+    tests 't/*.t t/aggregate/*.t';
 }
+
 author_requires 'CatalystX::LeakChecker', '0.05';
 author_requires 'File::Copy::Recursive'; # For http server test
 
