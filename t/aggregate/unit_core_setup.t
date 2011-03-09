@@ -3,7 +3,11 @@ use warnings;
 use Class::MOP;
 use Catalyst::Runtime;
 
-use Test::More tests => 29;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Test::More tests => 34;
+use Test::Exception;
 
 {
     # Silence the log.
@@ -86,3 +90,34 @@ my $log_meta = Class::MOP::Class->create_anon_class(
 ok my $c = TestAppWithOwnLogger->new, 'Get with own logger app object';
 ok $c->debug, '$c->debug is true';
 
+local $TODO
+    = 'These tests will not pass until Catalyst stops supporting old (NEXT-using) plugins';
+
+{
+    local $SIG{__WARN__} = sub {
+        my $warn = join '', @_;
+        die $warn if $warn =~ /Deep recursion/;
+        warn $warn;
+    };
+
+    use_ok 'TestAppSetupRecursion';
+
+    no warnings 'once';
+    is $TestAppSetupRecursion::AfterCount, 1, 'setup modifier was only called once';
+}
+
+{
+    local $SIG{__WARN__} = sub {
+        my $warn = join '', @_;
+        die $warn if $warn =~ /Deep recursion/;
+        warn $warn;
+    };
+
+    use_ok 'TestAppSetupRecursionImmutable';
+
+    no warnings 'once';
+    is $TestAppSetupRecursionImmutable::AfterCount, 1, 'setup modifier was only called once';
+
+    ok( TestAppSetupRecursionImmutable->meta->is_immutable,
+        'package is still immutable after setup is called');
+}
