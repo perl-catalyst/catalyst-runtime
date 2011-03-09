@@ -388,25 +388,29 @@ sub _customize_request {
     }
 }
 
-=head2 action_ok
+=head2 action_ok($url [, $test_name ])
 
-Fetches the given URL and checks that the request was successful.
+Fetches the given URL and checks that the request was successful. An optional
+second argument can be given to specify the name of the test.
 
-=head2 action_redirect
+=head2 action_redirect($url [, $test_name ])
 
-Fetches the given URL and checks that the request was a redirect.
+Fetches the given URL and checks that the request was a redirect. An optional
+second argument can be given to specify the name of the test.
 
-=head2 action_notfound
+=head2 action_notfound($url [, $test_name ])
 
-Fetches the given URL and checks that the request was not found.
+Fetches the given URL and checks that the request was not found. An optional
+second argument can be given to specify the name of the test.
 
-=head2 content_like( $url, $regexp [, $test_name] )
+=head2 content_like( $url, $regexp [, $test_name ] )
 
-Fetches the given URL and returns whether the content matches the regexp.
+Fetches the given URL and returns whether the content matches the regexp. An
+optional third argument can be given to specify the name of the test.
 
-=head2 contenttype_is
+=head2 contenttype_is($url, $type [, $test_name ])
 
-Check for given MIME type.
+Verify the given URL has a content type of $type and optionally specify a test name.
 
 =head1 SEE ALSO
 
