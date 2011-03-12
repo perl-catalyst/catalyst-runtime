@@ -3,12 +3,16 @@ use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestApp', {default_host => 'default.com'};
 use Catalyst::Request;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 content_like('/',qr/root/,'content check');
 action_ok('/','Action ok ok','normal action ok');
 action_redirect('/engine/response/redirect/one','redirect check');
 action_notfound('/engine/response/status/s404','notfound check');
+
+# so we can see the default test name
+action_ok('/');
+
 contenttype_is('/action/local/one','text/plain','Contenttype check');
 
 ### local_request() was not setting response base from base href
