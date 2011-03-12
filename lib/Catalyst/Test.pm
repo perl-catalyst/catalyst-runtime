@@ -84,15 +84,15 @@ my $build_exports = sub {
         },
         action_ok => sub {
             my $action = shift;
-            return Test::More->builder->ok($request->($action)->is_success, @_);
+            return Test::More->builder->ok($request->($action)->is_success,@_ || "a route handler is defined for $action");
         },
         action_redirect => sub {
             my $action = shift;
-            return Test::More->builder->ok($request->($action)->is_redirect,@_);
+            return Test::More->builder->ok($request->($action)->is_redirect,@_ || "a route handler redirects for $action");
         },
         action_notfound => sub {
             my $action = shift;
-            return Test::More->builder->is_eq($request->($action)->code,404,@_);
+            return Test::More->builder->is_eq($request->($action)->code,404,@_ || "a route handler is not defined for $action");
         },
         contenttype_is => sub {
             my $action = shift;
