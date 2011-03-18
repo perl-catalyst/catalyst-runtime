@@ -110,15 +110,21 @@ my $build_exports = sub {
         },
         action_ok => sub {
             my $action = shift;
-            return Test::More->builder->ok($request->($action)->is_success, @_);
+            my $meth = $request->($action)->request->method;
+            my @args = @_ ? @_ : ("$meth $action returns successfully");
+            return Test::More->builder->ok($request->($action)->is_success,@args);
         },
         action_redirect => sub {
             my $action = shift;
-            return Test::More->builder->ok($request->($action)->is_redirect,@_);
+            my $meth = $request->($action)->request->method;
+            my @args = @_ ? @_ : ("$meth $action returns a redirect");
+            return Test::More->builder->ok($request->($action)->is_redirect,@args);
         },
         action_notfound => sub {
             my $action = shift;
-            return Test::More->builder->is_eq($request->($action)->code,404,@_);
+            my $meth = $request->($action)->request->method;
+            my @args = @_ ? @_ : ("$meth $action returns a 404");
+            return Test::More->builder->is_eq($request->($action)->code,404,@args);
         },
         contenttype_is => sub {
             my $action = shift;
