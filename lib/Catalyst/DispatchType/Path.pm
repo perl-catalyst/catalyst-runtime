@@ -54,8 +54,13 @@ sub list {
        [ $col1_width, 'Path' ], [ $col2_width, 'Private' ]
     );
     foreach my $path ( sort keys %{ $self->_paths } ) {
-        my $display_path = $path eq '/' ? $path : "/$path";
         foreach my $action ( @{ $self->_paths->{$path} } ) {
+            my $args  = $action->attributes->{Args}->[0];
+            my $parts = defined($args) ? '/*' x $args : '/...';
+            
+            my $display_path = "/$path/$parts";
+            $display_path =~ s{/{1,}}{/}g;
+             
             $paths->row( $display_path, "/$action" );
         }
     }
