@@ -36,6 +36,7 @@ use Carp qw/croak carp shortmess/;
 use Try::Tiny;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
+use Plack::Middleware::IIS6ScriptNameFix;
 
 BEGIN { require 5.008004; }
 
@@ -2709,32 +2710,10 @@ sub _wrapped_legacy_psgi_app {
         },
     );
 
-    $psgi_app = Plack::Middleware::Conditional->wrap(
-        $psgi_app,
-        condition => $server_matches->(qr/IIS\/[6-9]\.[0-9]/),
-        builder   => sub {
-            my ($to_wrap) = @_;
-            return sub {
-                my ($env) = @_;
-
-                my @script_name = split(m!/!, $env->{PATH_INFO});
-                my @path_translated = split(m!/|\\\\?!, $env->{PATH_TRANSLATED});
-                my @path_info;
-
-                while ($script_name[$#script_name] eq $path_translated[$#path_translated]) {
-                    pop(@path_translated);
-                    unshift(@path_info, pop(@script_name));
-                }
-
-                unshift(@path_info, '', '');
-
-                $env->{PATH_INFO} = join('/', @path_info);
-                $env->{SCRIPT_NAME} = join('/', @script_name);
-
-                return $to_wrap->($env);
-            };
-        },
-    );
+    # we're applying this unconditionally as the middleware itself already makes
+    # sure it doesn't fuck things up if it's not running under one of the right
+    # IIS versions
+    $psgi_app = Plack::Middleware::IIS6ScriptNameFix->wrap($psgi_app);
 
     return $psgi_app;
 }
