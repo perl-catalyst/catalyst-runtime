@@ -83,7 +83,6 @@ around guess => sub {
     if (!defined $old_engine) { # Not overridden
     }
     elsif ($old_engine =~ /^(PSGI|CGI|FastCGI|HTTP|Apache.*)$/) {
->>>>>>> Fix bug stopping fastcgi script working
         # Trust autodetect
     }
     elsif ($old_engine eq "HTTP::Prefork") { # Too bad if you're customising, we don't handle options
