@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestApp', {default_host => 'default.com'};
