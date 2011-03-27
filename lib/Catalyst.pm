@@ -16,7 +16,6 @@ use Catalyst::Utils;
 use Catalyst::Controller;
 use Data::OptList;
 use Devel::InnerPackage ();
-use File::stat;
 use Module::Pluggable::Object ();
 use Text::SimpleTable ();
 use Path::Class::Dir ();
@@ -1872,9 +1871,9 @@ sub finalize_headers {
         # get the length from a filehandle
         if ( blessed( $response->body ) && $response->body->can('read') || ref( $response->body ) eq 'GLOB' )
         {
-            my $stat = stat $response->body;
-            if ( $stat && $stat->size > 0 ) {
-                $response->content_length( $stat->size );
+            my $size = -s $response->body;
+            if ( $size ) {
+                $response->content_length( $size );
             }
             else {
                 $c->log->warn('Serving filehandle without a content-length');

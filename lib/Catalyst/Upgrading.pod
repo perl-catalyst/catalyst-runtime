@@ -106,11 +106,25 @@ Instead, you now say:
         MyCatalystApp->psgi_app;
     };
 
-And also rename C<< script/myapp.psgi >> to C<< myapp.psgi >>.
+In the simplest case:
 
-XXX - FIXME - t/psgi_file_testapp_engine_psgi_compat.t
+    MyCatalystApp->setup_engine('PSGI');
+    my $app = sub { MyCatalystApp->run(@_) }
 
-If you rename your .psgi file without these modifications, then any tests run via
+becomes
+
+    MyCatalystApp->setup_engine('PSGI');
+    my $app = MyCatalystApp->psgi_app(@_);
+
+B<NOT>:
+
+    my $app = sub { MyCatalystApp->psgi_app(@_) };
+    # If you make ^^ this mistake, your app won't work, and will confuse the hell out of you!
+
+You can now rename C<< script/myapp.psgi >> to C<< myapp.psgi >>, and the built-in
+Catalyst scripts, and your test suite will start using your .psgi file.
+
+B<NOTE:> If you rename your .psgi file without these modifications, then any tests run via
 L<Catalyst::Test> will not be compatible with the new release, and will result in
 the development server starting, rather than the expected test running.
 
