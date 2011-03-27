@@ -26,8 +26,8 @@ BEGIN {
 }
 use Catalyst::Test qw/ TestApp /;
 
-ok $main::have_loaded_psgi;
 ok request('/');
+ok $main::have_loaded_psgi;
 
 done_testing;
 
