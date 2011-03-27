@@ -45,7 +45,7 @@ work using using L<Plack::Handler::Apache1> or L<Plack::Handler::Apache2>
 as required.  
 
 L<Catalyst::Engine::Apache2::MP19>, is however no longer supported, as Plack
-does not support mod_perl version 1.99??? FIXME - is this true?
+does not support mod_perl version 1.99
 
 =head2 Upgrading the HTTP Engine
 
@@ -63,7 +63,9 @@ myapp_cgi.pl script is already upgraded enough to use L<Catalyst::Script::CGI>.
 If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
 is automatically loaded.
 
-XXX FIXME - note how to run Starman with different options.
+If you were customising your server script to pass opttions to the prefork engine,
+then this is no longer supported. The recommended route to implement this functionality
+is to write a simple .psgi file for your application, then use the L<plackup> untility.
 
 =head2 Upgrading the PSGI Engine
 

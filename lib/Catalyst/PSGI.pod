@@ -36,7 +36,7 @@ The simplest C<.psgi> file for an application called C<TestApp> would be:
 
 It should be noted that Catalyst may apply a number of middleware components for
 you automatically, and these B<will not> be applied if you manually create
-a psgi file yourself. Details of these middlewares can be found XXXX FIXME
+a psgi file yourself. Details of these middlewares can be found below.
 
 Additional information about psgi files can be found at:
 L<http://search.cpan.org/dist/Plack/lib/Plack.pm#.psgi_files>
