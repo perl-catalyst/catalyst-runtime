@@ -791,6 +791,12 @@ sub run {
     # like Gitalist's --git_dir are possible to get from the app without stupid tricks.
     my $server = pop @args if (scalar @args && blessed $args[-1]);
     my $options = pop @args if (scalar @args && ref($args[-1]) eq 'HASH');
+    # Back compat hack for applications with old (non Catalyst::Script) scripts to work in FCGI.
+    if (scalar @args && !ref($args[0])) {
+        if (my $listen = shift @args) {
+            $options->{listen} ||= [$listen];
+        }
+    }
     if (! $server ) {
         $server = Catalyst::EngineLoader->new(application_name => ref($self))->auto();
         # We're not being called from a script, so auto detect what backend to
