@@ -39,7 +39,7 @@ sub _guess_catalyst_engine_class {
     if (!defined $old_engine) {
         return 'Catalyst::Engine';
     }
-    elsif ($old_engine =~ /^(CGI|FCGI|HTTP|Apache.*)$/) {
+    elsif ($old_engine =~ /^(PSGI|CGI|FCGI|HTTP|Apache.*)$/) {
         return 'Catalyst::Engine';
     }
     else {
@@ -82,7 +82,7 @@ around guess => sub {
     my $old_engine = Catalyst::Utils::env_value($self->application_name, 'ENGINE');
     if (!defined $old_engine) { # Not overridden
     }
-    elsif ($old_engine =~ /^(CGI|FCGI|HTTP|Apache.*)$/) {
+    elsif ($old_engine =~ /^(PSGI|CGI|FCGI|HTTP|Apache.*)$/) {
         # Trust autodetect
     }
     elsif ($old_engine eq "HTTP::Prefork") { # Too bad if you're customising, we don't handle options
