@@ -27,8 +27,14 @@ BEGIN {
 }
 use Catalyst::Test qw/ TestApp /;
 
-ok $main::have_loaded_psgi;
-ok request('/');
+ok !$main::have_loaded_psgi, 'legacy psgi file got ignored';
+
+like do {
+    my $warning;
+    local $SIG{__WARN__} = sub { $warning = $_[0] };
+    ok request('/');
+    $warning;
+}, qr/ignored/, 'legacy psgi files raise a warning';
 
 done_testing;
 
