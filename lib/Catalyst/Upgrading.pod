@@ -14,8 +14,10 @@ be taken with this upgrade and that testing should be greater than would be
 the case with a minor point update.
 
 It is highly recommended that you become familar with the L<Plack> ecosystem
-and documentation.  Being able to take advantage of L<Plack> development and
-middleware is a major bonus to this upgrade.
+and documentation. Being able to take advantage of L<Plack> development and
+middleware is a major bonus to this upgrade. Documentation about how to
+take advantage of L<Plack::Middleware> by writing your own C<< .psgi >> file
+is contained in L<Catalyst::PSGI>.
 
 If you have created a custom subclass of L<Catalyst:Engine> you will need to
 convert it to be a subclass of L<Plack::Handler>.

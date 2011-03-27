@@ -30,6 +30,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Blockers
 
+  * Add a warning for PSGI engine compat hack
   * Test all the options work on all of the scripts
   * Document how to use your own .psgi (and how you need to do ReverseProxy yourself if you do)
   * Document migration for setting engine in setup
