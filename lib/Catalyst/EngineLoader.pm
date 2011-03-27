@@ -12,6 +12,23 @@ has application_name => (
     required => 1,
 );
 
+has compat_options => (
+    traits  => ['Hash'],
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { +{} },
+    handles => {
+        has_compat_option => 'exists',
+        compat_option     => 'get',
+    },
+);
+
+sub needs_psgi_engine_compat_hack {
+    my ($self) = @_;
+    return $self->has_compat_option('requested_engine')
+        && $self->compat_option('requested_engine') eq 'PSGI';
+}
+
 has catalyst_engine_class => (
     isa => 'Str',
     is => 'rw',
@@ -116,5 +133,11 @@ Catalyst Contributors, see Catalyst.pm
 
 This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=begin Pod::Coverage
+
+needs_psgi_engine_compat_hack
+
+=end Pod::Coverage
 
 =cut
