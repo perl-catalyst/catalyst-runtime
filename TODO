@@ -35,7 +35,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Nice to have
 
-
   * Capture arguments that the plack engine component was run with somewhere,
     to more easily support custom args from scripts (e.g. Gitalist's 
     --git_dir)
