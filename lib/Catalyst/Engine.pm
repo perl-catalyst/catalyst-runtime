@@ -793,11 +793,9 @@ sub run {
     my $options = pop @args if (scalar @args && ref($args[-1]) eq 'HASH');
     if (! $server ) {
         $server = Catalyst::EngineLoader->new(application_name => ref($self))->auto();
-        # We're not being called from a script,
-                                                    # so auto detect what backend to run on.
-                                                    # This should never happen, as mod_perl
-                                                    # never calls ->run, instead the $app->handle
-                                                    # method is called per request.
+        # We're not being called from a script, so auto detect what backend to
+        # run on.  This should never happen, as mod_perl never calls ->run,
+        # instead the $app->handle method is called per request.
         $app->log->warn("Not supplied a Plack engine, falling back to engine auto-loader (are your scripts ancient?)")
     }
     $server->run($psgi, $options);
