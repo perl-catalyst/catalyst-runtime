@@ -798,7 +798,7 @@ sub run {
         }
     }
     if (! $server ) {
-        $server = Catalyst::EngineLoader->new(application_name => ref($self))->auto();
+        $server = Catalyst::EngineLoader->new(application_name => ref($self))->auto(%$options);
         # We're not being called from a script, so auto detect what backend to
         # run on.  This should never happen, as mod_perl never calls ->run,
         # instead the $app->handle method is called per request.
