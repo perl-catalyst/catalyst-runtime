@@ -9,7 +9,7 @@ use Test::Exception;
 
 use Catalyst::Script::FastCGI;
 
-my $fake_handler = \42;
+local our $fake_handler = \42;
 
 {
     package TestFastCGIScript;
