@@ -86,7 +86,6 @@ use Catalyst::Engine;
     is ''.$r->base, 'http://www.foo.com/oslobilder/', 'base correct';
 }
 {
-    local $TODO = 'Another mod_rewrite case';
     my $r = get_req (0,
         PATH_INFO => '/auth/login',
         SCRIPT_NAME => '/tx',
