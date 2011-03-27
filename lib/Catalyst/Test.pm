@@ -325,7 +325,7 @@ sub _remote_request {
     if ($server->path) {
         # If request path is '/', we have to add a trailing slash to the
         # final request URI
-        my $add_trailing = $request->uri->path eq '/';
+        my $add_trailing = ($request->uri->path eq '/' || $request->uri->path eq '') ? 1 : 0;
 
         my @sp = split '/', $server->path;
         my @rp = split '/', $request->uri->path;
