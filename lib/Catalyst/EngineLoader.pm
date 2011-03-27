@@ -12,21 +12,16 @@ has application_name => (
     required => 1,
 );
 
-has compat_options => (
-    traits  => ['Hash'],
-    is      => 'ro',
-    isa     => 'HashRef',
-    default => sub { +{} },
-    handles => {
-        has_compat_option => 'exists',
-        compat_option     => 'get',
-    },
+has requested_engine => (
+    is        => 'ro',
+    isa       => 'Str',
+    predicate => 'has_requested_engine',
 );
 
 sub needs_psgi_engine_compat_hack {
     my ($self) = @_;
-    return $self->has_compat_option('requested_engine')
-        && $self->compat_option('requested_engine') eq 'PSGI';
+    return $self->has_requested_engine
+        && $self->requested_engine eq 'PSGI';
 }
 
 has catalyst_engine_class => (
@@ -38,7 +33,9 @@ has catalyst_engine_class => (
 
 sub _guess_catalyst_engine_class {
     my $self = shift;
-    my $old_engine = Catalyst::Utils::env_value($self->application_name, 'ENGINE');
+    my $old_engine = $self->has_requested_engine
+        ? $self->requested_engine
+        : Catalyst::Utils::env_value($self->application_name, 'ENGINE');
     if (!defined $old_engine) {
         return 'Catalyst::Engine';
     }

@@ -2599,16 +2599,13 @@ sub engine_class {
 }
 
 sub setup_engine {
-    my ($class, $compat_requested_engine) = @_;
+    my ($class, $requested_engine) = @_;
 
     $class->engine_loader(
         Catalyst::EngineLoader->new({
             application_name => $class,
-            (!defined $compat_requested_engine
-                 ? ()
-                 : (compat_options => {
-                     requested_engine => $compat_requested_engine,
-                 })),
+            (defined $requested_engine
+                 ? (requested_engine => $requested_engine) : ()),
         }),
     );
 
