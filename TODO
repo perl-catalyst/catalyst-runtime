@@ -37,9 +37,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Nice to have
 
-  * make sure we're running under a server that support psgi.streaming - maybe
-    just load the BufferedWrite middleware, although that might break things
-    relying on ->write doing an unbuffered write
   * throw away the restarter and allow using the restarters Plack provides
   * remove per-request state from the engine instance
   * be smarter about how we use PSGI - not every response needs to be delayed
