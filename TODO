@@ -31,10 +31,13 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 ###  Blockers
 
   * Test all the options work on all of the scripts
+  * Fix nginx / lighttpd middlewares so that they are generic, or can somehow 
+    be used by people with their own .psgi files
   * Fix a sane / nicer way to do custom engines.
 
 ###  Nice to have
 
+  * <@rafl> i've been thinking of maybe providing MyApp->apply_default_middlewares($psgi_app)
   * Capture arguments that the plack engine component was run with somewhere,
     to more easily support custom args from scripts (e.g. Gitalist's 
     --git_dir)
@@ -42,7 +45,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * remove per-request state from the engine instance
   * be smarter about how we use PSGI - not every response needs to be delayed
     and streaming
-  * lighttpd, iis6, and nginx path-info fixers as proper middlewars as part of Plack
 
 ##  The horrible hack for plugin setup - replacing it:
 
