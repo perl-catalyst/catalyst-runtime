@@ -50,6 +50,26 @@ or L<Plack::Middleware::AccessLog>.
 
 =head2 What is in the .psgi Catalyst generates by default?
 
+Catalyst generates an application which, if the C<< using_frontend_proxy >>
+setting is on, is wrapped in L<Plack::Middleware::ReverseProxy>, and contains some
+engine specific fixes for uniform behaviour, as contained in:
+
+=over
+
+=item L<Plack::Middleware::LighttpdScriptNameFix> - FIXME, we don't use that really.
+
+=item L<Plack::Middleware::IIS6ScriptNameFix>
+
+=item nginx - FIXME??
+
+=back
+
+If you override the default by providing your own C<< .psgi >> file, then
+none of these things will be done automatically for you by the PSGI
+application returned when you call C<< MyApp->psgi_app >>, and if you need
+any of this functionality, you'll need to implement this in your C<< .psgi >>
+file yourself.
+
 =head1 SEE ALSO
 
 L<Catalyst::Upgrading>, L<Plack>, L<PSGI::FAQ>, L<PSGI>.
