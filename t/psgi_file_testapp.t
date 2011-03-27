@@ -20,7 +20,7 @@ BEGIN {
         use TestApp;
 
         $main::have_loaded_psgi = 1;
-        my $app = sub { TestApp->psgi_app(@_) };
+        my $app = sub { TestApp->psgi_app };
     };
     close($psgi);
 }
