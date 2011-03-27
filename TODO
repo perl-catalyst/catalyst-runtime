@@ -37,8 +37,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Nice to have
 
-  * throw out Catalyst::Test's remote_request in favour of
-    Plack::Test::ExternalServer
   * make sure we're running under a server that support psgi.streaming - maybe
     just load the BufferedWrite middleware, although that might break things
     relying on ->write doing an unbuffered write
