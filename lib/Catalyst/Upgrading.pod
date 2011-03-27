@@ -106,6 +106,8 @@ Instead, you now say:
 
 And also rename C<< script/myapp.psgi >> to C<< myapp.psgi >>.
 
+XXX - FIXME - t/psgi_file_testapp_engine_psgi_compat.t
+
 If you rename your .psgi file without these modifications, then any tests run via
 L<Catalyst::Test> will not be compatible with the new release, and will result in
 the development server starting, rather than the expected test running.
@@ -122,6 +124,14 @@ to the engine code.
 
 =item Catalyst::Engine::Wx
 
+=item Catalyst::Engine::Zeus
+
+=item Catalyst::Engine::JobQueue::POE
+
+=item Catalyst::Engine::XMPP2
+
+=item Catalyst::Engine::SCGI
+
 =back
 
 =head2 Engines with unknown status
@@ -129,15 +139,15 @@ to the engine code.
 The following engines have untested or unknown compatibility.  Reports are
 highly welcomed:
 
-    Catalyst::Engine::Embeddable - needs testing, should work?
-    Catalyst::Engine::XMPP2
-    Catalyst::Engine::SCGI
-    Catalyst::Engine::Mojo
-    Catalyst::Engine::Zeus - broken for ages
-    Catalyst::Engine::JobQueue::POE - broken for ages
-    Catalyst::Engine::Stomp - fixed
-    Catalyst::Engine::Server (Marked as Deprecated)
-    Catalyst::Engine::HTTP::POE (Marked as Deprecated)
+=over
+
+=item Catalyst::Engine::Mojo
+
+=item Catalyst::Engine::Server (Marked as Deprecated)
+
+=item Catalyst::Engine::HTTP::POE (Marked as Deprecated)
+
+=back
 
 =head2 Using middleware
 
