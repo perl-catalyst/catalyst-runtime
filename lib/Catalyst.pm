@@ -36,6 +36,7 @@ use Try::Tiny;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
+use Plack::Middleware::LighttpdScriptNameFix;
 
 BEGIN { require 5.008004; }
 
@@ -2697,23 +2698,7 @@ sub _wrapped_legacy_psgi_app {
 
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
-    # Thanks to Mark Blythe for this fix
-    #
-    # Note that this has probably the same effect as
-    # Plack::Middleware::LighttpdScriptNameFix and we should switch to that if
-    # we can.
-    $psgi_app = Plack::Middleware::Conditional->wrap(
-        $psgi_app,
-        condition => $server_matches->(qr/lighttpd/),
-        builder   => sub {
-            my ($to_wrap) = @_;
-            return sub {
-                my ($env) = @_;
-                $env->{PATH_INFO} ||= delete $env->{SCRIPT_NAME};
-                return $to_wrap->($env);
-            };
-        },
-    );
+    $psgi_app = Plack::Middleware::LighttpdScriptNameFix->wrap($psgi_app);
 
     $psgi_app = Plack::Middleware::Conditional->wrap(
         $psgi_app,
