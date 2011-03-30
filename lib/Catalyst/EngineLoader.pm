@@ -82,8 +82,11 @@ around guess => sub {
     my $old_engine = Catalyst::Utils::env_value($self->application_name, 'ENGINE');
     if (!defined $old_engine) { # Not overridden
     }
-    elsif ($old_engine =~ /^(PSGI|CGI|HTTP|Apache.*)$/) {
+    elsif ($old_engine =~ /^(PSGI|CGI|Apache.*)$/) {
         # Trust autodetect
+    }
+    elsif ($old_engine eq 'HTTP') {
+        $engine = 'Standalone';
     }
     elsif ($old_engine eq 'FastCGI') {
         $engine = 'FCGI';
