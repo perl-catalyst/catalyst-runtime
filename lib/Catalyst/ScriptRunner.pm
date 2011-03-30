@@ -6,7 +6,7 @@ use File::Spec;
 use namespace::autoclean;
 
 sub run {
-    my ($self, $class, $scriptclass) = @_;
+    my ($self, $class, $scriptclass, %args) = @_;
     my $classtoload = "${class}::Script::$scriptclass";
 
     lib->import(File::Spec->catdir($FindBin::Bin, '..', 'lib'));
@@ -17,7 +17,7 @@ sub run {
         $classtoload = "Catalyst::Script::$scriptclass";
         Class::MOP::load_class($classtoload);
     }
-    $classtoload->new_with_options( application_name => $class )->run;
+    $classtoload->new_with_options( application_name => $class, %args )->run;
 }
 
 __PACKAGE__->meta->make_immutable;
