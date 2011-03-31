@@ -51,7 +51,7 @@ sub fix_env {
 my %fixed_env = fix_env(%env);
 
 is($fixed_env{PATH_INFO}, '/bar', 'check PATH_INFO');
-ok((!exists($fixed_env{SCRIPT_NAME}) || !length($fixed_env{SCRIPT_NAME}),
+ok(!exists($fixed_env{SCRIPT_NAME}) || !length($fixed_env{SCRIPT_NAME}),
     'check SCRIPT_NAME');
 
 done_testing;
