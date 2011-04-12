@@ -546,7 +546,7 @@ sub _socket_data {
     my %hostname_cache;
     sub _gethostbyaddr {
         my $ip = shift;
-        $hostname_cache{$ip} ||= gethostbyaddr( $ip, AF_INET ) || 'localhost';
+        $hostname_cache{$ip} ||= gethostbyaddr( $ip, AF_INET ) || $ip;
     }
 }
 
