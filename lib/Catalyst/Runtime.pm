@@ -21,11 +21,11 @@ See L<Catalyst>.
 
 This is the primary class for the Catalyst-Runtime distribution, version 5.80.
 
-=head1 AUTHORS
+=head1 AUTHORS & COPYRIGHT
 
 Catalyst Contributors, see Catalyst.pm
 
-=head1 COPYRIGHT
+=head1 LICENSE
 
 This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
