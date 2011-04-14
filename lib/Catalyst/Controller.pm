@@ -36,15 +36,30 @@ has actions =>
      init_arg => undef,
     );
 
+# ->config(actions => { '*' => ...
+has _all_actions_attributes => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build__all_actions_attributes',
+);
+
 sub BUILD {
     my ($self, $args) = @_;
     my $action  = delete $args->{action}  || {};
     my $actions = delete $args->{actions} || {};
     my $attr_value = $self->merge_config_hashes($actions, $action);
     $self->_controller_actions($attr_value);
+
+    # trigger lazy builder
+    $self->_all_actions_attributes;
 }
 
-
+sub _build__all_actions_attributes {
+    my ($self) = @_;
+    delete $self->_controller_actions->{'*'} || {};
+}
 
 =head1 NAME
 
@@ -195,13 +210,7 @@ sub get_action_methods {
             $meta->find_method_by_name($_)
                 || confess( sprintf 'Action "%s" is not available from controller %s',
                             $_, ref $self )
-          } grep {
-              # '*' is a special action configuration key to apply config to all
-              # actions. It's not to be looked up as a method
-              # name. _controller_actions should probably be cleaned up before
-              # we even get here.
-              $_ ne '*'
-          } keys %{ $self->_controller_actions }
+        } keys %{ $self->_controller_actions }
     ) if ( ref $self );
     return uniq @methods;
 }
@@ -299,17 +308,20 @@ sub _parse_attrs {
         }
     }
 
-    my $actions;
+    my ($actions_config, $all_actions_config);
     if( ref($self) ) {
-        $actions = $self->_controller_actions;
+        $actions_config = $self->_controller_actions;
+        # No, you're not getting actions => { '*' => ... } with actions in MyApp.
+        $all_actions_config = $self->_all_actions_attributes;
     } else {
         my $cfg = $self->config;
-        $actions = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
+        $actions_config = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
+        $all_actions_config = {};
     }
 
     %raw_attributes = (
         %raw_attributes,
-        exists $actions->{$name} ? %{ $actions->{$name } } : (),
+        exists $actions_config->{$name} ? %{ $actions_config->{$name } } : (),
     );
 
     # Private actions with additional attributes will raise a warning and then
@@ -318,10 +330,8 @@ sub _parse_attrs {
     # probably be turned into :Actions instead, or we might want to otherwise
     # disambiguate between those built-in internal actions and user-level
     # Private ones.
-    %raw_attributes = (
-        (exists $actions->{'*'} ? %{ $actions->{'*'} } : ()),
-        %raw_attributes,
-    ) unless $raw_attributes{Private};
+    %raw_attributes = (%{ $all_actions_config }, %raw_attributes)
+        unless $raw_attributes{Private};
 
     my %final_attributes;
 
