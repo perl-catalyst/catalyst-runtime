@@ -296,11 +296,6 @@ sub _parse_attrs {
         }
     }
 
-    #I know that the original behavior was to ignore action if actions was set
-    # but i actually think this may be a little more sane? we can always remove
-    # the merge behavior quite easily and go back to having actions have
-    # presedence over action by modifying the keys. i honestly think this is
-    # superior while mantaining really high degree of compat
     my $actions;
     if( ref($self) ) {
         $actions = $self->_controller_actions;
