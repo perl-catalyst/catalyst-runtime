@@ -510,7 +510,6 @@ sub register {
 
     my $registered = $self->_registered_dispatch_types;
 
-    #my $priv = 0; #seems to be unused
     foreach my $key ( keys %{ $action->attributes } ) {
         next if $key eq 'Private';
         my $class = "Catalyst::DispatchType::$key";
