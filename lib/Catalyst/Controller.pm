@@ -194,10 +194,8 @@ sub get_action_methods {
         @methods,
         map {
             $meta->find_method_by_name($_)
-              || confess( 'Action "'
-                  . $_
-                  . '" is not available from controller '
-                  . ( ref $self ) )
+                || confess( sprintf 'Action "%s" is not available from controller %s',
+                            $_, ref $self )
           } keys %{ $self->_controller_actions }
     ) if ( ref $self );
     return uniq @methods;
