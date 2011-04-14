@@ -182,11 +182,10 @@ around path_prefix => sub {
 sub get_action_methods {
     my $self = shift;
     my $meta = find_meta($self) || confess("No metaclass setup for $self");
-    confess("Metaclass "
-          . ref($meta) . " for "
-          . $meta->name
-          . " cannot support register_actions." )
-      unless $meta->can('get_nearest_methods_with_attributes');
+    confess(
+        sprintf "Metaclass %s for %s cannot support register_actions.",
+            ref $meta, $meta->name,
+    ) unless $meta->can('get_nearest_methods_with_attributes');
     my @methods = $meta->get_nearest_methods_with_attributes;
 
     # actions specified via config are also action_methods
