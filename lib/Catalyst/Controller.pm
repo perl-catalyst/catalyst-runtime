@@ -195,6 +195,12 @@ sub get_action_methods {
             $meta->find_method_by_name($_)
                 || confess( sprintf 'Action "%s" is not available from controller %s',
                             $_, ref $self )
+          } grep {
+              # '*' is a special action configuration key to apply config to all
+              # actions. It's not to be looked up as a method
+              # name. _controller_actions should probably be cleaned up before
+              # we even get here.
+              $_ ne '*'
           } keys %{ $self->_controller_actions }
     ) if ( ref $self );
     return uniq @methods;
@@ -301,10 +307,21 @@ sub _parse_attrs {
         $actions = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
     }
 
-    %raw_attributes = ((exists $actions->{'*'} ? %{$actions->{'*'}} : ()),
-                       %raw_attributes,
-                       (exists $actions->{$name} ? %{$actions->{$name}} : ()));
+    %raw_attributes = (
+        %raw_attributes,
+        exists $actions->{$name} ? %{ $actions->{$name } } : (),
+    );
 
+    # Private actions with additional attributes will raise a warning and then
+    # be ignored. Adding '*' arguments to the default _DISPATCH / etc. methods,
+    # which are Private, will prevent those from being registered. They should
+    # probably be turned into :Actions instead, or we might want to otherwise
+    # disambiguate between those built-in internal actions and user-level
+    # Private ones.
+    %raw_attributes = (
+        (exists $actions->{'*'} ? %{ $actions->{'*'} } : ()),
+        %raw_attributes,
+    ) unless $raw_attributes{Private};
 
     my %final_attributes;
 
