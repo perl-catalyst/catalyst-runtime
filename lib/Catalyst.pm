@@ -2410,7 +2410,27 @@ Starts the engine.
 
 =cut
 
-sub run { my $c = shift; return $c->engine->run( $c, $c->_finalized_psgi_app, @_ ) }
+sub run {
+    my $c = shift;
+    $c->engine_loader->needs_psgi_engine_compat_hack ?
+      $c->_run_needs_psgi_engine_compat_hack(@_) :
+      $c->engine->run( $c, $c->_finalized_psgi_app, @_ );
+}
+
+sub _run_needs_psgi_engine_compat_hack {
+    my $c = shift;
+
+    ## We assume if they used the classic PSGI Engine, they must has CC:M
+    for my $metal (Catalyst::Controller::Metal->metals_for($c)) {
+        my $res = $metal->call(@_);
+        if (defined $res && !(ref $res eq 'ARRAY' && $res->[0] == 404)) {
+            return $res;
+        }
+    }
+
+    ## If we got this far, just do the psgi app
+    $c->_finalized_psgi_app->(@_)
+}
 
 =head2 $c->set_action( $action, $code, $namespace, $attrs )
 
