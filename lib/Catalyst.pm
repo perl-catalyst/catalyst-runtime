@@ -1684,8 +1684,8 @@ sub execute {
                 $error = qq/Caught exception in $class->$name "$error"/;
             }
             $c->error($error);
-            $c->state(0);
         }
+        $c->state(0);
     }
     return $c->state;
 }
