@@ -54,7 +54,7 @@ sub fix_env {
     my (%input_env) = @_;
 
     my $mangled_env;
-    my $app = Catalyst->_wrapped_legacy_psgi_app(sub {
+    my $app = Catalyst->apply_default_middlewares(sub {
         my ($env) = @_;
         $mangled_env = $env;
         return [ 200, ['Content-Type' => 'text/plain'], [''] ];

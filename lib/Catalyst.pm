@@ -2688,7 +2688,23 @@ EOW
     return $app->apply_default_middlewares($app->psgi_app);
 }
 
-# FIXME - document me
+=head2 $c->apply_default_middlewares
+
+Adds the following L<Plack> middlewares to your application, since they are
+useful and commonly needed:
+
+L<Plack::Middleware::ReverseProxy>, (conditionally added based on the status
+of your $ENV{REMOTE_ADDR}, and can be forced on with C<using_frontend_proxy>
+or forced off with C<ignore_frontend_proxy>), L<Plack::Middleware::LighttpdScriptNameFix>
+(if you are using Lighttpd), L<Plack::Middleware::IIS6ScriptNameFix> (always
+applied since this middleware is smart enough to conditionally apply itself).
+
+Additionally if we detect we are using Nginx, we add a bit of custom middleware
+to solve some problems with the way that server handles $ENV{PATH_INFO} and
+$ENV{SCRIPT_NAME}
+
+=cut
+
 
 sub apply_default_middlewares {
     my ($app, $psgi_app) = @_;

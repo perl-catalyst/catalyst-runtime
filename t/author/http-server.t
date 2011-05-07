@@ -43,7 +43,7 @@ if ($pid) {
     unshift @INC, "$tmpdir/TestApp/lib", "$FindBin::Bin/../../lib";
     require TestApp;
 
-    my $psgi_app = TestApp->_wrapped_legacy_psgi_app(TestApp->psgi_app);
+    my $psgi_app = TestApp->apply_default_middlewares(TestApp->psgi_app);
     Plack::Loader->auto(port => $port)->run(builder {
         mount '/test_prefix' => $psgi_app;
         mount '/' => sub {
