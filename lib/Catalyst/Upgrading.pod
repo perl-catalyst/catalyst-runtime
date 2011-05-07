@@ -175,6 +175,17 @@ XXX Should this be here or elsewhere?
 
 =head2 Running with plackup?
 
+=head2 Tests in 5.89
+
+Tests should generally work the same in Catalyst 5.89, however there are some differences.
+
+Previously, if using L<Catalyst::Test> and doing local requests (against a local server),
+if the application threw an exception then this exception propagated into the test.
+
+This behaviour has been removed, and now a 500 response will be returned to the test.
+This change unifies behaviour, to make local test requests behave similarly to remote 
+requests.
+
 =head1 Upgrading to Catalyst 5.80
 
 Most applications and plugins should run unaltered on Catalyst 5.80.

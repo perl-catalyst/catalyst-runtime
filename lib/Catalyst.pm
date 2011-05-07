@@ -2685,14 +2685,12 @@ documentation on how to upgrade from Catalyst::Engine::PSGI.
 EOW
     }
 
-    return $app->_wrapped_legacy_psgi_app($app->psgi_app);
+    return $app->apply_default_middlewares($app->psgi_app);
 }
 
-# Note - this is for back compatibility. Catalyst should not know or care about
-#        how it's deployed. The recommended way of configuring this is now to
-#        use the ReverseProxy middleware yourself if you want it in a .psgi
-#        file.
-sub _wrapped_legacy_psgi_app {
+# FIXME - document me
+
+sub apply_default_middlewares {
     my ($app, $psgi_app) = @_;
 
     $psgi_app = Plack::Middleware::Conditional->wrap(
