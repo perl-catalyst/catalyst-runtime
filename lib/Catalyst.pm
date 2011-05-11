@@ -1866,6 +1866,7 @@ sub finalize_headers {
             $response->body(
                 qq{<html><body><p>This item has moved <a href="$location">here</a>.</p></body></html>}
             );
+            $response->content_type('text/html; charset=utf-8');
         }
     }
 
