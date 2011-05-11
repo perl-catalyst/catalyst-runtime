@@ -82,6 +82,28 @@ sub body_semipredicate : Local {
     $c->res->body('Body');
 }
 
+
+sub test_redirect :Global {
+    my ($self, $c) = @_;
+    # Don't set content_type
+    # Don't set body
+    $c->res->redirect('/go_here');
+}
+
+sub test_redirect_with_contenttype :Global {
+    my ($self, $c) = @_;
+    # set content_type but don't set body
+    $c->res->content_type('image/jpeg');
+    $c->res->redirect('/go_here');
+}
+
+sub test_redirect_with_content :Global {
+    my ($self, $c) = @_;
+    $c->res->content_type('text/plain');
+    $c->res->body('Please kind sir, I beg you to go to /go_here.');
+    $c->res->redirect('/go_here');
+}
+
 sub end : Private {
     my ($self,$c) = @_;
 }
