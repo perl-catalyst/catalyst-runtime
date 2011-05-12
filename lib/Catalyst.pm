@@ -1241,7 +1241,7 @@ EOF
 A hook to attach modifiers to. This method does not do anything except set the
 C<setup_finished> accessor.
 
-Applying method modifiers to the C<setup> method doesn't work, because of quirky thingsdone for plugin setup.
+Applying method modifiers to the C<setup> method doesn't work, because of quirky things done for plugin setup.
 
 Example:
 
