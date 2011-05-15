@@ -36,15 +36,30 @@ has actions =>
      init_arg => undef,
     );
 
+# ->config(actions => { '*' => ...
+has _all_actions_attributes => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build__all_actions_attributes',
+);
+
 sub BUILD {
     my ($self, $args) = @_;
     my $action  = delete $args->{action}  || {};
     my $actions = delete $args->{actions} || {};
     my $attr_value = $self->merge_config_hashes($actions, $action);
     $self->_controller_actions($attr_value);
+
+    # trigger lazy builder
+    $self->_all_actions_attributes;
 }
 
-
+sub _build__all_actions_attributes {
+    my ($self) = @_;
+    delete $self->_controller_actions->{'*'} || {};
+}
 
 =head1 NAME
 
@@ -182,11 +197,10 @@ around path_prefix => sub {
 sub get_action_methods {
     my $self = shift;
     my $meta = find_meta($self) || confess("No metaclass setup for $self");
-    confess("Metaclass "
-          . ref($meta) . " for "
-          . $meta->name
-          . " cannot support register_actions." )
-      unless $meta->can('get_nearest_methods_with_attributes');
+    confess(
+        sprintf "Metaclass %s for %s cannot support register_actions.",
+            ref $meta, $meta->name,
+    ) unless $meta->can('get_nearest_methods_with_attributes');
     my @methods = $meta->get_nearest_methods_with_attributes;
 
     # actions specified via config are also action_methods
@@ -194,11 +208,9 @@ sub get_action_methods {
         @methods,
         map {
             $meta->find_method_by_name($_)
-              || confess( 'Action "'
-                  . $_
-                  . '" is not available from controller '
-                  . ( ref $self ) )
-          } keys %{ $self->_controller_actions }
+                || confess( sprintf 'Action "%s" is not available from controller %s',
+                            $_, ref $self )
+        } keys %{ $self->_controller_actions }
     ) if ( ref $self );
     return uniq @methods;
 }
@@ -296,23 +308,30 @@ sub _parse_attrs {
         }
     }
 
-    #I know that the original behavior was to ignore action if actions was set
-    # but i actually think this may be a little more sane? we can always remove
-    # the merge behavior quite easily and go back to having actions have
-    # presedence over action by modifying the keys. i honestly think this is
-    # superior while mantaining really high degree of compat
-    my $actions;
+    my ($actions_config, $all_actions_config);
     if( ref($self) ) {
-        $actions = $self->_controller_actions;
+        $actions_config = $self->_controller_actions;
+        # No, you're not getting actions => { '*' => ... } with actions in MyApp.
+        $all_actions_config = $self->_all_actions_attributes;
     } else {
         my $cfg = $self->config;
-        $actions = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
+        $actions_config = $self->merge_config_hashes($cfg->{actions}, $cfg->{action});
+        $all_actions_config = {};
     }
 
-    %raw_attributes = ((exists $actions->{'*'} ? %{$actions->{'*'}} : ()),
-                       %raw_attributes,
-                       (exists $actions->{$name} ? %{$actions->{$name}} : ()));
+    %raw_attributes = (
+        %raw_attributes,
+        exists $actions_config->{$name} ? %{ $actions_config->{$name } } : (),
+    );
 
+    # Private actions with additional attributes will raise a warning and then
+    # be ignored. Adding '*' arguments to the default _DISPATCH / etc. methods,
+    # which are Private, will prevent those from being registered. They should
+    # probably be turned into :Actions instead, or we might want to otherwise
+    # disambiguate between those built-in internal actions and user-level
+    # Private ones.
+    %raw_attributes = (%{ $all_actions_config }, %raw_attributes)
+        unless $raw_attributes{Private};
 
     my %final_attributes;
 

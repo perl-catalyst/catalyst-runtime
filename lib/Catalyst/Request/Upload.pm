@@ -7,6 +7,7 @@ use Catalyst::Exception;
 use File::Copy ();
 use IO::File ();
 use File::Spec::Unix;
+use namespace::clean -except => 'meta';
 
 has filename => (is => 'rw');
 has headers => (is => 'rw');

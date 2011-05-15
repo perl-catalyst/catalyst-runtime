@@ -269,7 +269,7 @@ you identify the ones in conflict, and resolve them.
 To be able to generate a linear @ISA, the list of superclasses for each
 class must be resolvable using the C3 algorithm. Unfortunately, when
 superclasses are being used as mixins (to add functionality used in your class),
-and with multiple inheritence, it is easy to get this wrong.
+and with multiple inheritance, it is easy to get this wrong.
 
 Most common is the case of:
 

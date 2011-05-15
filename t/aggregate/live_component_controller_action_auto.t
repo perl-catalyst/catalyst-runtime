@@ -10,7 +10,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
-use Test::More tests => 18*$iters;
+use Test::More tests => 27*$iters;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -132,5 +132,59 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, 'default (auto: 1)', 'Content OK' );
+    }
+
+    # test detach in auto
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Auto::Detach->begin
+          TestApp::Controller::Action::Auto->auto
+          TestApp::Controller::Action::Auto::Detach->auto
+          TestApp::Controller::Root->end
+        ];
+    
+        my $expected = join( ", ", @expected );
+    
+        ok( my $response = request('http://localhost/action/auto/detach'), 'auto with detach' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'detach auto', 'Content OK' );
+    }
+
+    # test detach in auto forward
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Auto::Detach->begin
+          TestApp::Controller::Action::Auto->auto
+          TestApp::Controller::Action::Auto::Detach->auto
+          TestApp::Controller::Action::Auto::Detach->with_forward_detach
+          TestApp::Controller::Root->end
+        ];
+    
+        my $expected = join( ", ", @expected );
+    
+        ok( my $response = request('http://localhost/action/auto/detach?with_forward_detach=1'), 'auto with_forward_detach' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'detach with_forward_detach', 'Content OK' );
+    }
+
+    # test detach in auto forward detach action
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Auto::Detach->begin
+          TestApp::Controller::Action::Auto->auto
+          TestApp::Controller::Action::Auto::Detach->auto
+          TestApp::Controller::Action::Auto::Detach->with_forward_detach
+          TestApp::Controller::Action::Auto::Detach->detach_action
+          TestApp::Controller::Root->end
+        ];
+    
+        my $expected = join( ", ", @expected );
+    
+        ok( my $response = request('http://localhost/action/auto/detach?with_forward_detach=1&detach_to_action=1'), 'auto with_forward_detach to detach_action' );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'detach_action', 'Content OK' );
     }
 }

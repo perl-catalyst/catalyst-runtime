@@ -879,7 +879,7 @@ not directly available via Catalyst objects $c->request, $c->engine ...
 
 BEWARE: If you really need to access some environment variable from your Catalyst
 application you should use $c->engine->env->{VARNAME} instead of $ENV{VARNAME},
-as in some enviroments the %ENV hash does not contain what you would expect.
+as in some environments the %ENV hash does not contain what you would expect.
 
 =head1 AUTHORS
 
