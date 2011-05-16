@@ -19,7 +19,9 @@ sub three :Relative {
     my ( $self, $c ) = @_;
 
     local $, = ',';
+    local $\ = ':';
     $c->res->print(qw/foo bar baz/);
 }
+
 
 1;
