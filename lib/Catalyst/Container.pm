@@ -150,16 +150,12 @@ sub BUILD {
             block => sub {
                 my $s = shift;
  
-                my @files = @{$s->param('global_files')};
-
-                my $cfg = Config::Any->load_files({
-                    files       => \@files,
+                return Config::Any->load_files({
+                    files       => $s->param('global_files'),
                     filter      => \&_fix_syntax,
                     use_ext     => 1,
                     driver_args => $s->param('driver'),
                 });
-
-                return $cfg;
             },
             dependencies => [ depends_on('global_files') ],
         );
@@ -168,16 +164,12 @@ sub BUILD {
             block => sub {
                 my $s = shift;
 
-                my @files = @{$s->param('local_files')};
-
-                my $cfg = Config::Any->load_files({
-                    files       => \@files,
+                return Config::Any->load_files({
+                    files       => $s->param('local_files'),
                     filter      => \&_fix_syntax,
                     use_ext     => 1,
                     driver_args => $s->param('driver'),
                 });
-
-                 return $cfg;
             },
             dependencies => [ depends_on('local_files') ],
         );
@@ -234,7 +226,7 @@ sub _fix_syntax {
 }
 
 sub _config_substitutions {
-    my ($self, $name, $subs) = (shift, shift, shift);
+    my ($self, $name, $subs) = @_;
 
     $subs->{ HOME } ||= sub { shift->path_to( '' ); };
     $subs->{ ENV } ||=

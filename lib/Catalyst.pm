@@ -548,7 +548,7 @@ sub _comp_names_search_prefixes {
     my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
     $filter = qr/$filter/; # Compile regex now rather than once per loop
 
-    my @components = map { $c->container->get_sub_container($_)->get_service_list } $c->container->get_sub_container_list; 
+    my @components = map { $c->container->get_sub_container($_)->get_service_list } qw(controller view model); 
 
     # map the original component name to the sub part that we will search against
     my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
@@ -656,7 +656,9 @@ sub controller {
     if( $name ) {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::Controller::".$name;
-            return $c->_filter_component( $c->container->get_sub_container('controller')->get_service($check)->get, @args ) if $c->container->get_sub_container('controller')->has_service($check);
+            my $container = $c->container->get_sub_container('controller');
+            return $c->_filter_component( $container->resolve(service => "$check"), @args ) 
+                if $container->has_service($check);
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -693,7 +695,9 @@ sub model {
     if( $name ) {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::Model::".$name;
-            return $c->_filter_component( $c->container->get_sub_container('model')->get_service($check)->get, @args ) if $c->container->get_sub_container('model')->has_service($check);
+            my $container = $c->container->get_sub_container('model');
+            return $c->_filter_component( $container->resolve(service => "$check"), @args ) 
+                if $container->has_service($check);
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -751,9 +755,10 @@ sub view {
     if( $name ) {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::View::".$name;
-            if ($c->container->get_sub_container('view')->has_service($check)) {
+            my $container = $c->container->get_sub_container('view');
+            if ($container->has_service($check)) {
 
-                return $c->_filter_component( $c->container->get_sub_container('view')->get_service($check)->get, @args );
+                return $c->_filter_component( $container->get_service($check)->get, @args );
             }
             else {
                 $c->log->warn( "Attempted to use view '$check', but does not exist" );
@@ -794,7 +799,7 @@ Returns the available names which can be passed to $c->controller
 
 sub controllers {
     my ( $c ) = @_;
-    return $c->_comp_names(qw/Controller C/);
+    return $c->container->get_sub_container('controller')->get_service_list;
 }
 
 =head2 $c->models
@@ -805,7 +810,7 @@ Returns the available names which can be passed to $c->model
 
 sub models {
     my ( $c ) = @_;
-    return $c->_comp_names(qw/Model M/);
+    return $c->container->get_sub_container('model')->get_service_list;
 }
 
 
@@ -817,7 +822,7 @@ Returns the available names which can be passed to $c->view
 
 sub views {
     my ( $c ) = @_;
-    return $c->_comp_names(qw/View V/);
+    return $c->container->get_sub_container('view')->get_service_list;
 }
 
 =head2 $c->comp($name)
@@ -1589,6 +1594,34 @@ These methods are not meant to be used by end users.
 =head2 $c->components
 
 Returns a hash of components.
+
+=cut
+
+around components => sub {
+    my $orig  = shift;
+    my $class = shift; 
+    my $comps = shift;
+
+    return $class->$orig if ( !$comps );
+
+    $class->setup_config unless defined $class->container;
+
+# should there be a warning here, not to use this accessor to create the components?
+    my $components = {};
+
+    my $containers;
+    $containers->{$_} = $class->container->get_sub_container($_) for qw(model view controller);
+
+    for my $component ( keys %$comps ) {
+        $components->{ $component } = $comps->{$component};
+
+        my $type = _get_component_type($component);
+
+        $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
+    }
+
+    return $class->$orig($components);
+};
 
 =head2 $c->context_class
 
@@ -2483,13 +2516,9 @@ sub setup_components {
 
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
-        my $type = lc((split /::/, $component)[1]);
-        if ($deprecatedcatalyst_component_names) {
-            $type = 'controller' if $type eq 'c';
-            $type = 'model' if $type eq 'm';
-            $type = 'view' if $type eq 'v';
+        if ( my $type = _get_component_type($component) ) {
+            $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $instance } ));
         }
-        $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $instance } ));
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
             : $class->expand_component_module( $component, $config );
@@ -2501,15 +2530,23 @@ sub setup_components {
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             ) if $deprecatedcatalyst_component_names;
 
-            if ($deprecatedcatalyst_component_names) {
-                $type = lc((split /::/, $component)[1]);
-                $type = 'controller' if $type eq 'c';
-                $type = 'model' if $type eq 'm';
-                $type = 'view' if $type eq 'v';
+            if (my $type = _get_component_type($component)) {
+                $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
             }
-            $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
+
             $class->components->{ $component } = $class->setup_component($component);
         }
+    }
+}
+
+sub _get_component_type {
+    my $component = shift;
+    my @parts     = split /::/, $component;
+
+    for (@parts) {
+        return 'controller' if /c|controller/i;
+        return 'model'      if /m|model/i;
+        return 'view'       if /v|view/i;
     }
 }
 
