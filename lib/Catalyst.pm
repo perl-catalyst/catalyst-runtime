@@ -758,7 +758,7 @@ sub view {
             my $container = $c->container->get_sub_container('view');
             if ($container->has_service($check)) {
 
-                return $c->_filter_component( $container->get_service($check)->get, @args );
+                return $c->_filter_component( $container->resolve(service => $check), @args );
             }
             else {
                 $c->log->warn( "Attempted to use view '$check', but does not exist" );
