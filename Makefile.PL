@@ -13,6 +13,7 @@ perl_version '5.008004';
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
 
+requires 'Bread::Board';
 requires 'List::MoreUtils';
 requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean' => '0.13';
