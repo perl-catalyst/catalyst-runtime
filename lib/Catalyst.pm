@@ -548,11 +548,11 @@ sub _comp_names_search_prefixes {
     my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
     $filter = qr/$filter/; # Compile regex now rather than once per loop
 
-    my @components = map { $c->container->get_sub_container($_)->get_service_list } qw(controller view model); 
+    my @components = map { $c->container->get_sub_container($_)->get_service_list } qw(controller view model);
 
     # map the original component name to the sub part that we will search against
     my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
-        grep { /$filter/ } @components; 
+        grep { /$filter/ } @components;
 
     # undef for a name will return all
     return keys %eligible if !defined $name;
@@ -657,7 +657,7 @@ sub controller {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::Controller::".$name;
             my $container = $c->container->get_sub_container('controller');
-            return $c->_filter_component( $container->resolve(service => "$check"), @args ) 
+            return $c->_filter_component( $container->resolve(service => "$check"), @args )
                 if $container->has_service($check);
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
@@ -696,7 +696,7 @@ sub model {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::Model::".$name;
             my $container = $c->container->get_sub_container('model');
-            return $c->_filter_component( $container->resolve(service => "$check"), @args ) 
+            return $c->_filter_component( $container->resolve(service => "$check"), @args )
                 if $container->has_service($check);
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
@@ -1599,14 +1599,15 @@ Returns a hash of components.
 
 around components => sub {
     my $orig  = shift;
-    my $class = shift; 
+    my $class = shift;
     my $comps = shift;
 
     return $class->$orig if ( !$comps );
 
+# FIXME: should this ugly kludge exist?
     $class->setup_config unless defined $class->container;
 
-# should there be a warning here, not to use this accessor to create the components?
+# FIXME: should there be a warning here, not to use this accessor to create the components?
     my $components = {};
 
     my $containers;
