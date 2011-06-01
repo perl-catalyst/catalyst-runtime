@@ -12,7 +12,7 @@ use Catalyst::Test 'TestApp';
 my $expected = {
    one => "foo",
    two => "foobar",
-   three => "foo,bar,baz",
+   three => "foo,bar,baz:",
 };
 
 for my $action ( sort keys %{$expected} ) {

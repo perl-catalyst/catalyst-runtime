@@ -201,6 +201,7 @@ sub print {
         defined $self->write($,) or return;
         defined $self->write($_) or return;
     }
+    defined $self->write($\) or return;
 
     return 1;
 }
