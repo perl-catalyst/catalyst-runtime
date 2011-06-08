@@ -2453,7 +2453,9 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 sub setup_config {
     my $class = shift;
 
-    my %args = %{$class->config || {} };
+    my %args = %{ $class->config || {} };
+
+# FIXME: what is this 'MyApp' doing here?
     my @container_classes = qw/MyApp::Container Catalyst::Container/;
     unshift @container_classes, delete $args{container_class} if exists $args{container_class};
 
