@@ -226,7 +226,7 @@ sub _fix_syntax {
 }
 
 sub _config_substitutions {
-    my ($self, $name, $subs) = @_;
+    my ( $self, $name, $subs, $arg ) = @_;
 
     $subs->{ HOME } ||= sub { shift->path_to( '' ); };
     $subs->{ ENV } ||=
@@ -244,11 +244,8 @@ sub _config_substitutions {
     $subs->{ literal } ||= sub { return $_[ 1 ]; };
     my $subsre = join( '|', keys %$subs );
 
-    for ( @_ ) {
-        my $arg = $_;
-        $arg =~ s{__($subsre)(?:\((.+?)\))?__}{ $subs->{ $1 }->( $name, $2 ? split( /,/, $2 ) : () ) }eg;
-        return $arg;
-    }
+    $arg =~ s{__($subsre)(?:\((.+?)\))?__}{ $subs->{ $1 }->( $name, $2 ? split( /,/, $2 ) : () ) }eg;
+    return $arg;
 }
 
 1;

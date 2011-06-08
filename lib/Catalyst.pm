@@ -2466,7 +2466,7 @@ sub setup_config {
     $container->add_sub_container(Bread::Board::Container->new( name => $_ )) for qw(model controller view);
     $class->container($container);
 
-    my $config = $container->fetch('config')->get;
+    my $config = $container->resolve(service => 'config');
     $class->config($config);
     $class->finalize_config; # back-compat
 }
