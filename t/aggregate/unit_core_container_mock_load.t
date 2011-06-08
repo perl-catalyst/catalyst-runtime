@@ -18,12 +18,12 @@ __PACKAGE__->config->{ substitutions } = {
 
 __PACKAGE__->setup;
 
-ok( my $conf = __PACKAGE__->config );
+ok( my $conf = __PACKAGE__->config, 'config loads' );
 is( $conf->{ 'Controller::Foo' }->{ foo }, 'bar' );
 is( $conf->{ 'Controller::Foo' }->{ new }, 'key' );
 is( $conf->{ 'Model::Baz' }->{ qux },      'xyzzy' );
 is( $conf->{ 'Model::Baz' }->{ another },  'new key' );
 is( $conf->{ 'view' },                     'View::TT::New' );
 is( $conf->{ 'foo_sub' },                  'x-y' );
-is( $conf->{ 'literal_macro' },            '__DATA__' );
+is( $conf->{ 'literal_macro' },            '__DATA__', 'literal macro' );
 is( $conf->{ 'Plugin::Zot' }->{ zoot },    'zooot');
