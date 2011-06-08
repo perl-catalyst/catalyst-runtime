@@ -149,7 +149,7 @@ sub BUILD {
         service global_config => (
             block => sub {
                 my $s = shift;
- 
+
                 return Config::Any->load_files({
                     files       => $s->param('global_files'),
                     filter      => \&_fix_syntax,
