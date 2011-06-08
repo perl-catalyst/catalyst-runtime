@@ -2547,9 +2547,9 @@ sub _get_component_type {
     my @parts     = split /::/, $component;
 
     for (@parts) {
-        return 'controller' if /c|controller/i;
-        return 'model'      if /m|model/i;
-        return 'view'       if /v|view/i;
+        return 'controller' if /^c|controller$/i;
+        return 'model'      if /^m|model$/i;
+        return 'view'       if /^v|view$/i;
     }
 }
 
