@@ -90,15 +90,33 @@ is_deeply(
 );
 
 is_deeply(
+    [ sort TestAppComponents->controllers ],
+    [ sort @controllers ],
+    'controllers are listed correctly by $c->controllers()',
+);
+
+is_deeply(
     [ sort $container->get_sub_container('model')->get_service_list ],
     [ sort @models ],
     'models are in the container',
 );
 
 is_deeply(
+    [ sort TestAppComponents->models ],
+    [ sort @models ],
+    'models are listed correctly by $c->models()',
+);
+
+is_deeply(
     [ sort $container->get_sub_container('view')->get_service_list ],
     [ sort @views ],
     'views are in the container',
+);
+
+is_deeply(
+    [ sort TestAppComponents->views ],
+    [ sort @views ],
+    'views are listed correctly by $c->views()',
 );
 
 is_deeply(

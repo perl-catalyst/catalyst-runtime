@@ -1,8 +1,8 @@
-# 2 initial tests, and 6 per component in the loop below
+# 3 initial tests, and 6 per component in the loop below
 # (do not forget to update the number of components in test 3 as well)
 # 5 extra tests for the loading options
 # One test for components in inner packages
-use Test::More tests => 2 + 6 * 24 + 8 + 1;
+use Test::More tests => 3 + 6 * 24 + 9 + 1;
 
 use strict;
 use warnings;
@@ -94,6 +94,11 @@ my $shut_up_deprecated_warnings = q{
 
 eval "package $appclass; use Catalyst; $shut_up_deprecated_warnings __PACKAGE__->setup";
 
+is_deeply(
+    [ sort $appclass->locate_components ],
+    [ map { $appclass . '::' . $_->{prefix} . '::' . $_->{name} } @components ],    'locate_components finds the components correctly'
+);
+
 can_ok( $appclass, 'components');
 
 my $complist = $appclass->components;
@@ -162,6 +167,24 @@ __PACKAGE__->config->{ setup_components } = {
 };
 __PACKAGE__->setup;
 );
+
+{
+    my $config = {
+        search_extra => [ '::Extra' ],
+        except       => [ "${appclass}::Controller::Foo" ]
+    };
+    my @components_located = $appclass->locate_components($config);
+    my @components_expected;
+    for (@components) {
+        my $name = $appclass . '::' . $_->{prefix} . '::' . $_->{name};
+        push @components_expected, $name if $name ne "${appclass}::Controller::Foo";
+    }
+    is_deeply(
+        [ sort @components_located ],
+        [ sort @components_expected ],
+        'locate_components finds the components correctly'
+    );
+}
 
 can_ok( $appclass, 'components');
 
