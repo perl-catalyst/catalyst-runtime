@@ -1,23 +1,25 @@
-package MockApp;
+package MockAppEnv;
 
 use Test::More tests => 10;
 use Cwd;
 
+{
 # Remove all relevant env variables to avoid accidental fail
-foreach my $name ( grep { m{^(CATALYST|MOCKAPP)} } keys %ENV ) {
-    delete $ENV{ $name };
+    foreach my $name ( grep { m{^(CATALYST|MOCKAPPENV)} } keys %ENV ) {
+        delete $ENV{ $name };
+    }
+
+    $ENV{ CATALYST_HOME }  = cwd . '/t/mockapp';
+    $ENV{ MOCKAPPENV_CONFIG } = $ENV{ CATALYST_HOME } . '/mockapp.pl';
+
+    use_ok( 'Catalyst' );
+
+    __PACKAGE__->config->{substitutions} = {
+        foo => sub { shift; join( '-', @_ ); }
+    };
+
+    __PACKAGE__->setup;
 }
-
-$ENV{ CATALYST_HOME }  = cwd . '/t/mockapp';
-$ENV{ MOCKAPP_CONFIG } = $ENV{ CATALYST_HOME } . '/mockapp.pl';
-
-use_ok( 'Catalyst' );
-
-__PACKAGE__->config->{substitutions} = {
-    foo => sub { shift; join( '-', @_ ); }
-};
-
-__PACKAGE__->setup;
 
 ok( my $conf = __PACKAGE__->config, 'config loads' );
 is( $conf->{ 'Controller::Foo' }->{ foo }, 'bar' );
