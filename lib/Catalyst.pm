@@ -2804,7 +2804,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my $class = ref $proto || $proto;
 
         Class::MOP::load_class( $plugin );
-        $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is decated and will not work in 5.81" )
+        $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is deprecated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
