@@ -427,6 +427,10 @@ Shortcut for $req->parameters.
 
 Returns the path, i.e. the part of the URI after $req->base, for the current request.
 
+    http://localhost/path/foo
+
+    $c->request->path will contain 'path/foo'
+
 =head2 $req->path_info
 
 Alias for path, added for compatibility with L<CGI>.
