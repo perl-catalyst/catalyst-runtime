@@ -43,9 +43,8 @@ __PACKAGE__->setup_config;
 __PACKAGE__->setup_log;
 
 for my $component (TestAppComponents->locate_components) {
-    my $classname = "$component";
     eval <<COMPONENT;
-package $classname;
+package $component;
 use warnings;
 use strict;
 use base 'Catalyst::Component';
