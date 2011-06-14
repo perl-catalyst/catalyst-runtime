@@ -1,8 +1,7 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 13;
 use Moose::Meta::Class;
-use Data::Dumper;
 
 my %config = (
     foo => 42,
@@ -77,7 +76,7 @@ Moose::Meta::Class->create( $regular => (
     $component = eval { TestAppComponent->setup_component($config) };
     ok( !$@, "setup_component doesnt die with $config" );
     is( $message, undef, "no exception thrown" );
-    is_deeply( $component, bless(\%config, $config), "the returned config is correct" );
+    is_deeply( $component, \%config, "the returned config is correct" );
 
     undef $message;
     $component = eval { TestAppComponent->setup_component($dieing) };
@@ -95,5 +94,3 @@ Moose::Meta::Class->create( $regular => (
     is( $message, undef, "no exception thrown" );
     isa_ok( $component, $regular, "the returned value is correct" );
 }
-
-done_testing();
