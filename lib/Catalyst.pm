@@ -2455,8 +2455,7 @@ sub setup_config {
 
     my %args = %{ $class->config || {} };
 
-# FIXME: what is this 'MyApp' doing here?
-    my @container_classes = qw/MyApp::Container Catalyst::Container/;
+    my @container_classes = ( (ref $class || $class) . '::Container', 'Catalyst::Container');
     unshift @container_classes, delete $args{container_class} if exists $args{container_class};
 
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
