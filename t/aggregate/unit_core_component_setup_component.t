@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More;
 use Moose::Meta::Class;
 
 my %config = (
@@ -94,3 +94,5 @@ Moose::Meta::Class->create( $regular => (
     is( $message, undef, "no exception thrown" );
     isa_ok( $component, $regular, "the returned value is correct" );
 }
+
+done_testing;

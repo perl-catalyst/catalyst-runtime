@@ -1,4 +1,4 @@
-use Test::More tests => 1;
+use Test::More;
 use strict;
 use warnings;
 
@@ -27,3 +27,4 @@ my $warn = '';
 like($warn, qr/after Catalyst::Component in MyApp::Component/,
     'correct warning thrown');
 
+done_testing;

@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More;
 use strict;
 use warnings;
 use lib 't/lib';
@@ -24,3 +24,4 @@ TestApp->setup;
 
 is($model_foo->model_quux_method, 'chunkybacon', 'Model method getting $self->{quux} from config');
 
+done_testing;

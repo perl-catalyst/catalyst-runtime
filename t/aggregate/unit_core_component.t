@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More;
 use strict;
 use warnings;
 
@@ -91,3 +91,4 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
     is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 }
 
+done_testing;

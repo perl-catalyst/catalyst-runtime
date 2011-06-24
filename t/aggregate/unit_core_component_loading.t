@@ -1,8 +1,5 @@
-# 3 initial tests, and 6 per component in the loop below
-# (do not forget to update the number of components in test 3 as well)
-# 5 extra tests for the loading options
-# One test for components in inner packages
-use Test::More tests => 3 + 6 * 24 + 9 + 1;
+# way too many tests to count
+use Test::More;
 
 use strict;
 use warnings;
@@ -256,3 +253,5 @@ eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 isa_ok($appclass->controller('Test'), 'Catalyst::Controller');
 
 rmtree($libdir);
+
+done_testing;
