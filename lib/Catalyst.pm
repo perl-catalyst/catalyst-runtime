@@ -2461,8 +2461,6 @@ sub setup_config {
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
 
     my $container = $container_class->new( %args, name => "$class" );
-
-    $container->add_sub_container(Bread::Board::Container->new( name => $_ )) for qw(model controller view);
     $class->container($container);
 
     my $config = $container->resolve(service => 'config');

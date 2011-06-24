@@ -40,26 +40,115 @@ has name => (
 sub BUILD {
     my $self = shift;
 
-    container $self => as {
-        service name => $self->name;
-        service driver => $self->driver;
-        service file => $self->file;
-        service substitutions => $self->substitutions;
+    return if (
+        $self->name eq 'model'      or
+        $self->name eq 'view'       or
+        $self->name eq 'controller'
+    );
 
-        service extensions => (
+    $self->build_root_container;
+
+    $self->build_model_subcontainer;
+    $self->build_view_subcontainer;
+    $self->build_controller_subcontainer;
+}
+
+sub build_model_subcontainer {
+    my $self = shift;
+
+    $self->add_sub_container(__PACKAGE__->new( name => 'model' ));
+}
+
+sub build_view_subcontainer {
+    my $self = shift;
+
+    $self->add_sub_container(__PACKAGE__->new( name => 'view' ));
+}
+
+sub build_controller_subcontainer {
+    my $self = shift;
+
+    $self->add_sub_container(__PACKAGE__->new( name => 'controller' ));
+}
+
+sub build_root_container {
+    my $self = shift;
+
+    $self->build_substitutions_service();
+    $self->build_file_service();
+    $self->build_driver_service();
+    $self->build_name_service();
+    $self->build_prefix_service();
+    $self->build_extensions_service();
+    $self->build_path_service();
+    $self->build_config_service();
+    $self->build_raw_config_service();
+    $self->build_global_files_service();
+    $self->build_local_files_service();
+    $self->build_global_config_service();
+    $self->build_local_config_service();
+    $self->build_config_local_suffix_service();
+    $self->build_config_path_service();
+}
+
+sub build_name_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::Literal->new( name => 'name', value => $self->name )
+    );
+}
+
+sub build_driver_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::Literal->new( name => 'driver', value => $self->driver )
+    );
+}
+
+sub build_file_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::Literal->new( name => 'file', value => $self->file )
+    );
+}
+
+sub build_substitutions_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::Literal->new( name => 'substitutions', value => $self->substitutions )
+    );
+}
+
+sub build_extensions_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'extensions',
             block => sub {
                 return \@{Config::Any->extensions};
             },
-        );
+        )
+    );
+}
 
-        service prefix => (
+sub build_prefix_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'prefix',
             block => sub {
                 return Catalyst::Utils::appprefix( shift->param('name') );
             },
             dependencies => [ depends_on('name') ],
-         );
+        )
+    );
+}
 
-        service path => (
+sub build_path_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'path',
             block => sub {
                 my $s = shift;
 
@@ -68,9 +157,15 @@ sub BUILD {
                 || $s->param('name')->path_to( $s->param('prefix') );
             },
             dependencies => [ depends_on('file'), depends_on('name'), depends_on('prefix') ],
-        );
+        )
+    );
+}
 
-        service config => (
+sub build_config_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'config',
             block => sub {
                 my $s = shift;
 
@@ -84,9 +179,15 @@ sub BUILD {
                 $v->visit( $s->param('raw_config') );
             },
             dependencies => [ depends_on('name'), depends_on('raw_config'), depends_on('substitutions') ],
-        );
+        )
+    );
+}
 
-        service raw_config => (
+sub build_raw_config_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'raw_config',
             block => sub {
                 my $s = shift;
 
@@ -102,9 +203,15 @@ sub BUILD {
                 return $config;
             },
             dependencies => [ depends_on('global_config'), depends_on('local_config') ],
-        );
+        )
+    );
+}
 
-        service global_files => (
+sub build_global_files_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'global_files',
             block => sub {
                 my $s = shift;
 
@@ -122,9 +229,15 @@ sub BUILD {
                 return \@files;
             },
             dependencies => [ depends_on('extensions'), depends_on('config_path') ],
-        );
+        )
+    );
+}
 
-        service local_files => (
+sub build_local_files_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'local_files',
             block => sub {
                 my $s = shift;
 
@@ -144,9 +257,15 @@ sub BUILD {
                 return \@files;
             },
             dependencies => [ depends_on('extensions'), depends_on('config_path'), depends_on('config_local_suffix') ],
-        );
+        )
+    );
+}
 
-        service global_config => (
+sub build_global_config_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'global_config',
             block => sub {
                 my $s = shift;
 
@@ -158,9 +277,15 @@ sub BUILD {
                 });
             },
             dependencies => [ depends_on('global_files') ],
-        );
+        )
+    );
+}
 
-        service local_config => (
+sub build_local_config_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'local_config',
             block => sub {
                 my $s = shift;
 
@@ -172,9 +297,15 @@ sub BUILD {
                 });
             },
             dependencies => [ depends_on('local_files') ],
-        );
+        )
+    );
+}
 
-        service config_path => (
+sub build_config_path_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'config_path',
             block => sub {
                 my $s = shift;
 
@@ -191,9 +322,15 @@ sub BUILD {
                 return [ $path, $extension ];
             },
             dependencies => [ depends_on('prefix'), depends_on('path') ],
-        );
+        )
+    );
+}
 
-        service config_local_suffix => (
+sub build_config_local_suffix_service {
+    my $self = shift;
+    $self->add_service(
+        Bread::Board::BlockInjection->new(
+            name => 'config_local_suffix',
             block => sub {
                 my $s = shift;
                 my $suffix = Catalyst::Utils::env_value( $s->param('name'), 'CONFIG_LOCAL_SUFFIX' ) || $self->config_local_suffix;
@@ -201,9 +338,8 @@ sub BUILD {
                 return $suffix;
             },
             dependencies => [ depends_on('name') ],
-        );
-
-    };
+        )
+    );
 }
 
 sub _fix_syntax {
