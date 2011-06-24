@@ -1,6 +1,6 @@
 package MockApp;
 
-use Test::More tests => 10;
+use Test::More;
 use Cwd;
 
 # Remove all relevant env variables to avoid accidental fail
@@ -8,7 +8,7 @@ foreach my $name ( grep { m{^(CATALYST)} } keys %ENV ) {
     delete $ENV{ $name };
 }
 
-$ENV{ CATALYST_HOME } = cwd . '/t/mockapp';
+$ENV{ CATALYST_HOME } = cwd . '/t/lib/MockAppConfigLoader';
 
 use_ok( 'Catalyst' );
 
@@ -27,3 +27,5 @@ is( $conf->{ 'view' },                     'View::TT::New' );
 is( $conf->{ 'foo_sub' },                  'x-y' );
 is( $conf->{ 'literal_macro' },            '__DATA__', 'literal macro' );
 is( $conf->{ 'Plugin::Zot' }->{ zoot },    'zooot');
+
+done_testing;
