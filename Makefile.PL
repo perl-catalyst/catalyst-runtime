@@ -51,6 +51,7 @@ requires 'MRO::Compat';
 requires 'MooseX::Getopt' => '0.30';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
+requires 'MooseX::Types::LoadableClass';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
 
 test_requires 'Class::Data::Inheritable';

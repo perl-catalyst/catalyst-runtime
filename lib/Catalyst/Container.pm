@@ -4,6 +4,7 @@ use Moose;
 use Config::Any;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
+use MooseX::Types::LoadableClass qw/ LoadableClass /;
 
 extends 'Bread::Board::Container';
 
@@ -37,14 +38,15 @@ has name => (
     default => 'TestApp',
 );
 
+has sub_container_class => (
+    isa     => LoadableClass,
+    is      => 'ro',
+    coerce  => 1,
+    default => 'Bread::Board::Container',
+);
+
 sub BUILD {
     my $self = shift;
-
-    return if (
-        $self->name eq 'model'      or
-        $self->name eq 'view'       or
-        $self->name eq 'controller'
-    );
 
     $self->build_root_container;
 
@@ -56,19 +58,25 @@ sub BUILD {
 sub build_model_subcontainer {
     my $self = shift;
 
-    $self->add_sub_container(__PACKAGE__->new( name => 'model' ));
+    $self->add_sub_container(
+        $self->sub_container_class->new( name => 'model' )
+    );
 }
 
 sub build_view_subcontainer {
     my $self = shift;
 
-    $self->add_sub_container(__PACKAGE__->new( name => 'view' ));
+    $self->add_sub_container(
+        $self->sub_container_class->new( name => 'view' )
+    );
 }
 
 sub build_controller_subcontainer {
     my $self = shift;
 
-    $self->add_sub_container(__PACKAGE__->new( name => 'controller' ));
+    $self->add_sub_container(
+        $self->sub_container_class->new( name => 'controller' )
+    );
 }
 
 sub build_root_container {
