@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Fix the disable_component_resolution_regex_fallback config setting
+    to also work in the $c->component method.
+
 5.80032 2011-02-23 01:10:00
 
  Bug fixes:
