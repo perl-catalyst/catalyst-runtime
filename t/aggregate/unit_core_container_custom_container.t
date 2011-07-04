@@ -7,7 +7,7 @@ use Test::More;
 {
     package ContainerTestApp;
     use Moose;
-    BEGIN { extends 'Catalyst' };
+    extends 'Catalyst';
 
     __PACKAGE__->setup_config();
     __PACKAGE__->setup_log();
@@ -23,7 +23,7 @@ is( ref $container, 'Catalyst::Container', 'The container is Catalyst::Container
 {
     package CustomContainerTestApp::Container;
     use Moose;
-    BEGIN { extends 'Catalyst::Container' };
+    extends 'Catalyst::Container';
 
     sub my_custom_method { 1 }
 }
@@ -44,3 +44,4 @@ can_ok($container, 'my_custom_method');
 ok( eval { $container->my_custom_method }, 'executes the method correctly');
 
 done_testing;
+
