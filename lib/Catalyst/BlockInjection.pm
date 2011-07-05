@@ -1,7 +1,7 @@
-package Catalyst::ConstructorInjection;
+package Catalyst::BlockInjection;
 use Moose;
 
-extends 'Bread::Board::ConstructorInjection';
+extends 'Bread::Board::BlockInjection';
 
 with 'Catalyst::Service::WithContext';
 

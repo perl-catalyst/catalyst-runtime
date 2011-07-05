@@ -651,18 +651,17 @@ If you want to search for controllers, pass in a regexp as the argument.
 
 sub controller {
     my ( $c, $name, @args ) = @_;
+    my $container = $c->container->get_sub_container('controller');
 
     my $appclass = ref($c) || $c;
     if( $name ) {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::Controller::".$name;
-            my $container = $c->container->get_sub_container('controller');
-            return $c->_filter_component( $container->resolve(service => "$check"), @args )
+            return $container->resolve(service => "$check", parameters => { context => \@args } )
                 if $container->has_service($check);
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
+        return map { $container->resolve(service => "$_", parameters => { context => \@args } ) } @result if ref $name;
     }
 
     return $c->component( $c->action->class );
@@ -692,16 +691,16 @@ If you want to search for models, pass in a regexp as the argument.
 sub model {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
+    my $container = $c->container->get_sub_container('model');
+
     if( $name ) {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::Model::".$name;
-            my $container = $c->container->get_sub_container('model');
-            return $c->_filter_component( $container->resolve(service => "$check"), @args )
+            return $container->resolve( service => "$check", parameters => { context => \@args } )
                 if $container->has_service($check);
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
+        return map { $container->resolve( service => "$_", parameters => { context => \@args } ) } @result if ref $name;
     }
 
     if (ref $c) {
@@ -713,6 +712,7 @@ sub model {
     return $c->model( $appclass->config->{default_model} )
       if $appclass->config->{default_model};
 
+# FIXME: will this still be mantained?
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
     if( $rest ) {
@@ -723,7 +723,7 @@ sub model {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $c->_filter_component( $comp );
+    return $container->resolve( service => ref $comp, parameters => { context => \@args } );
 }
 
 
@@ -750,23 +750,21 @@ If you want to search for views, pass in a regexp as the argument.
 
 sub view {
     my ( $c, $name, @args ) = @_;
-
     my $appclass = ref($c) || $c;
+    my $container = $c->container->get_sub_container('view');
+
     if( $name ) {
         unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $check = $appclass."::View::".$name;
-            my $container = $c->container->get_sub_container('view');
             if ($container->has_service($check)) {
-
-                return $c->_filter_component( $container->resolve(service => $check), @args );
+                return $container->resolve(service => $check, parameters => { context => \@args } );
             }
             else {
                 $c->log->warn( "Attempted to use view '$check', but does not exist" );
             }
         }
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-        return $c->_filter_component( $result[ 0 ], @args );
+        return map { $container->resolve(service => "$_", parameters => { context => \@args } ) } @result if ref $name;
     }
 
     if (ref $c) {
@@ -788,7 +786,7 @@ sub view {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $c->_filter_component( $comp );
+    return $container->resolve( service => ref $comp, parameters => { context => \@args } );
 }
 
 =head2 $c->controllers
@@ -1622,7 +1620,7 @@ around components => sub {
         my ($type, $name) = _get_component_type_name($component);
 
 # FIXME: shouldn't the service name be $name?
-        $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
+        $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
     }
 
     return $class->$orig($components);
@@ -2522,7 +2520,7 @@ sub setup_components {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
         if ( my ($type, $name) = _get_component_type_name($component) ) {
 # FIXME: shouldn't the service name be $name?
-            $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $instance } ));
+            $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $component, block => sub { return $instance } ));
         }
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
@@ -2536,7 +2534,7 @@ sub setup_components {
             ) if $deprecatedcatalyst_component_names;
 
             if (my ($type, $name) = _get_component_type_name($component)) {
-                $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
+                $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
             }
 
             $class->components->{ $component } = $class->setup_component($component);

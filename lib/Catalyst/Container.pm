@@ -5,6 +5,7 @@ use Config::Any;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
+use Catalyst::BlockInjection;
 
 extends 'Bread::Board::Container';
 

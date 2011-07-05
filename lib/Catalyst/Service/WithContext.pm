@@ -12,13 +12,15 @@ has accept_context_sub => (
 );
 
 around 'get' => sub {
-    my ( $orig, $self, @params ) = @_;
+    my ( $orig, $self, %params ) = @_;
 
-    my $instance = $self->$orig();
+    my $context = delete $params{context};
+
+    my $instance = $self->$orig(%params);
     my $ac_sub   = $self->accept_context_sub;
 
     if ( $instance->can($ac_sub) ) {
-        return $instance->$ac_sub( @params );
+        return $instance->$ac_sub( @$context );
     }
 
     return $instance;
