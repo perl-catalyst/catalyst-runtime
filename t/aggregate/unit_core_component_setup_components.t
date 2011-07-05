@@ -42,9 +42,11 @@ for my $component (@comps) {
     is_deeply( \@comps, \@loaded_comps, 'all components loaded' );
 }
 
-my @controllers = @comps[0..7];
-my @models      = @comps[8..15];
-my @views       = @comps[16..23];
+my @comps_copy  = @comps;
+
+my @controllers = map { s/^TestAppComponents::(C|Controller):://; $_; } @comps_copy[0..7];
+my @models      = map { s/^TestAppComponents::(M|Model):://; $_; }      @comps_copy[8..15];
+my @views       = map { s/^TestAppComponents::(V|View):://; $_; }       @comps_copy[16..23];
 my $container   = TestAppComponents->container;
 
 is_deeply(
