@@ -1,28 +1,48 @@
-use Test::More tests => 51;
+use Test::More;
 use strict;
 use warnings;
+use Moose::Meta::Class;
 
 use_ok('Catalyst');
 
-my @complist =
+our @complist =
   map { "MyMVCTestApp::$_"; }
   qw/C::Controller M::Model V::View Controller::C Model::M View::V Controller::Model::Dummy::Model Model::Dummy::Model/;
 
-{
+foreach my $comp (@complist) {
+    Moose::Meta::Class->create(
+        $comp =>
+            version => '0.1',
+    );
+}
+our $warnings = 0;
+our $loaded   = 0;
 
+Moose::Meta::Class->create('Some::Test::Object');
+
+Moose::Meta::Class->create(
+    'MyMVCTestApp::Model::Test::Object' =>
+        superclasses => [ 'Catalyst::Model', 'Some::Test::Object' ],
+);
+
+{
     package MyMVCTestApp;
 
     use base qw/Catalyst/;
 
-    __PACKAGE__->components( { map { ( ref($_)||$_ , $_ ) } @complist } );
+    sub locate_components {
+        return (@::complist, 'MyMVCTestApp::Model::Test::Object');
+    }
 
-    my $thingie={};
-    bless $thingie, 'Some::Test::Object';
-    __PACKAGE__->components->{'MyMVCTestApp::Model::Test::Object'} = $thingie;
+    no warnings 'redefine';
+    *Catalyst::Log::warn = sub { $::warnings++ };
+    *Catalyst::Utils::ensure_class_loaded = sub { $::loaded++ if Class::MOP::is_class_loaded(shift) };
 
-    # allow $c->log->warn to work
-    __PACKAGE__->setup_log;
+    __PACKAGE__->setup;
 }
+
+ok( $warnings, 'Issues deprecated warnings' );
+is( $loaded, scalar @complist + 1, 'Loaded all components' );
 
 is( MyMVCTestApp->view('View'), 'MyMVCTestApp::V::View', 'V::View ok' );
 
@@ -61,9 +81,7 @@ is_deeply( [ sort MyMVCTestApp->models ],
            'models ok');
 
 {
-    my $warnings = 0;
-    no warnings 'redefine';
-    local *Catalyst::Log::warn = sub { $warnings++ };
+    $warnings = 0;
 
     like (MyMVCTestApp->view , qr/^MyMVCTestApp\::(V|View)\::/ , 'view() with no defaults returns *something*');
     ok( $warnings, 'view() w/o a default is random, warnings thrown' );
@@ -78,9 +96,7 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp:
   'current_view_instance precedes current_view ok');
 
 {
-    my $warnings = 0;
-    no warnings 'redefine';
-    local *Catalyst::Log::warn = sub { $warnings++ };
+    $warnings = 0;
 
     ok( my $model = MyMVCTestApp->model );
 
@@ -118,9 +134,7 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
     is_deeply( [ MyMVCTestApp->model( qr{Test} ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
 
     {
-        my $warnings = 0;
-        no warnings 'redefine';
-        local *Catalyst::Log::warn = sub { $warnings++ };
+        $warnings = 0;
 
         # object w/ regexp fallback
         is_deeply( [ MyMVCTestApp->model( 'Test' ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
@@ -225,3 +239,5 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
     is( MyApp::WithoutRegexFallback->controller('Foo'), undef, 'no controller Foo found');
     ok( !$warnings, 'no regexp fallback warnings' );
 }
+
+done_testing();

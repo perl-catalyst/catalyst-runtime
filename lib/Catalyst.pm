@@ -1619,8 +1619,9 @@ around components => sub {
     for my $component ( keys %$comps ) {
         $components->{ $component } = $comps->{$component};
 
-        my $type = _get_component_type($component);
+        my ($type, $name) = _get_component_type_name($component);
 
+# FIXME: shouldn't the service name be $name?
         $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
     }
 
@@ -2519,7 +2520,8 @@ sub setup_components {
 
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
-        if ( my $type = _get_component_type($component) ) {
+        if ( my ($type, $name) = _get_component_type_name($component) ) {
+# FIXME: shouldn't the service name be $name?
             $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $instance } ));
         }
         my @expanded_components = $instance->can('expand_modules')
@@ -2533,7 +2535,7 @@ sub setup_components {
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             ) if $deprecatedcatalyst_component_names;
 
-            if (my $type = _get_component_type($component)) {
+            if (my ($type, $name) = _get_component_type_name($component)) {
                 $containers->{$type}->add_service(Bread::Board::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
             }
 
@@ -2542,14 +2544,19 @@ sub setup_components {
     }
 }
 
-sub _get_component_type {
+sub _get_component_type_name {
     my $component = shift;
     my @parts     = split /::/, $component;
 
-    for (@parts) {
-        return 'controller' if /^c|controller$/i;
-        return 'model'      if /^m|model$/i;
-        return 'view'       if /^v|view$/i;
+    while (my $type = shift @parts) {
+        return ('controller', join '::', @parts)
+            if $type =~ /^(c|controller)$/i;
+
+        return ('model', join '::', @parts)
+            if $type =~ /^(m|model)$/i;
+
+        return ('view', join '::', @parts)
+            if $type =~ /^(v|view)$/i;
     }
 }
 
