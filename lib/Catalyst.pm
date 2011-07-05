@@ -653,15 +653,28 @@ sub controller {
     my ( $c, $name, @args ) = @_;
     my $container = $c->container->get_sub_container('controller');
 
-    my $appclass = ref($c) || $c;
+    my $appclass = ref $c || $c;
     if( $name ) {
-        unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
-            my $check = $appclass."::Controller::".$name;
-            return $container->resolve(service => "$check", parameters => { context => \@args } )
-                if $container->has_service($check);
+        if ( !ref $name ) { # Direct component hash lookup to avoid costly regexps
+            return $container->resolve(service => $name, parameters => { context => [ $c, @args ] } )
+                if $container->has_service($name);
         }
-        my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
-        return map { $container->resolve(service => "$_", parameters => { context => \@args } ) } @result if ref $name;
+        elsif ( ref $name eq 'Regexp' ) {
+            my @comps = $container->get_service_list;
+            my @result;
+            for (@comps) {
+                push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
+                    if m/$name/;
+            }
+            return @result;
+        }
+        else {
+            my $short_name = ref $name;
+            $short_name =~ s/^${appclass}::(C|Controller)//;
+            return $container->resolve( service => $short_name, parameters => { context => [ $c, @args ] } )
+                if $container->has_service($short_name);
+        }
+        return;
     }
 
     return $c->component( $c->action->class );
@@ -694,13 +707,26 @@ sub model {
     my $container = $c->container->get_sub_container('model');
 
     if( $name ) {
-        unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
-            my $check = $appclass."::Model::".$name;
-            return $container->resolve( service => "$check", parameters => { context => \@args } )
-                if $container->has_service($check);
+        if ( !ref $name ) { # Direct component hash lookup to avoid costly regexps
+            return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } )
+                if $container->has_service($name);
         }
-        my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
-        return map { $container->resolve( service => "$_", parameters => { context => \@args } ) } @result if ref $name;
+        elsif ( ref $name eq 'Regexp' ) {
+            my @comps = $container->get_service_list;
+            my @result;
+            for (@comps) {
+                push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
+                    if m/$name/;
+            }
+            return @result;
+        }
+        else {
+            my $short_name = ref $name;
+            $short_name =~ s/^${appclass}::(M|Model)//;
+            return $container->resolve( service => $short_name, parameters => { context => [ $c, @args ] } )
+                if $container->has_service($short_name);
+        }
+        return;
     }
 
     if (ref $c) {
@@ -713,7 +739,7 @@ sub model {
       if $appclass->config->{default_model};
 
 # FIXME: will this still be mantained?
-    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
+    my( $comp, $rest ) = $container->get_service_list;
 
     if( $rest ) {
         $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
@@ -723,7 +749,7 @@ sub model {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $container->resolve( service => ref $comp, parameters => { context => \@args } );
+    return $container->resolve( service => $comp, parameters => { context => [ $c, @args ] } );
 }
 
 
@@ -754,17 +780,31 @@ sub view {
     my $container = $c->container->get_sub_container('view');
 
     if( $name ) {
-        unless ( ref($name) ) { # Direct component hash lookup to avoid costly regexps
-            my $check = $appclass."::View::".$name;
-            if ($container->has_service($check)) {
-                return $container->resolve(service => $check, parameters => { context => \@args } );
+        if ( !ref $name ) { # Direct component hash lookup to avoid costly regexps
+            if ( $container->has_service($name) ) {
+                return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } );
             }
             else {
-                $c->log->warn( "Attempted to use view '$check', but does not exist" );
+                $c->log->warn( "Attempted to use view '$name', but does not exist" );
             }
         }
-        my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
-        return map { $container->resolve(service => "$_", parameters => { context => \@args } ) } @result if ref $name;
+        elsif ( ref $name eq 'Regexp' ) {
+            my @comps = $container->get_service_list;
+            my @result;
+            for (@comps) {
+                push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
+                    if m/$name/;
+            }
+            return @result;
+        }
+        else {
+            my $short_name = ref $name;
+            $short_name =~ s/^${appclass}::(V|View)//;
+            return $container->resolve( service => $short_name, parameters => { context => [ $c, @args ] } )
+                if $container->has_service($short_name);
+        }
+
+        return;
     }
 
     if (ref $c) {
@@ -776,7 +816,7 @@ sub view {
     return $c->view( $appclass->config->{default_view} )
       if $appclass->config->{default_view};
 
-    my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
+    my( $comp, $rest ) = $container->get_service_list;
 
     if( $rest ) {
         $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
@@ -786,7 +826,7 @@ sub view {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $container->resolve( service => ref $comp, parameters => { context => \@args } );
+    return $container->resolve( service => $comp, parameters => { context => [ $c, @args ] } );
 }
 
 =head2 $c->controllers
@@ -844,37 +884,30 @@ disable_component_resolution_regex_fallback to a true value.
 =cut
 
 sub component {
-    my ( $c, $name, @args ) = @_;
+    my ( $c, $component, @args ) = @_;
 
-    if( $name ) {
+    my ($type, $name) = _get_component_type_name($component);
+    my $container = $c->container->get_sub_container($type);
+
+    if( $component ) {
         my $comps = $c->components;
 
-        if( !ref $name ) {
-            # is it the exact name?
-            return $c->_filter_component( $comps->{ $name }, @args )
-                       if exists $comps->{ $name };
-
-            # perhaps we just omitted "MyApp"?
-            my $composed = ( ref $c || $c ) . "::${name}";
-            return $c->_filter_component( $comps->{ $composed }, @args )
-                       if exists $comps->{ $composed };
-
-            # search all of the models, views and controllers
-            my( $comp ) = $c->_comp_search_prefixes( $name, qw/Model M Controller C View V/ );
-            return $c->_filter_component( $comp, @args ) if $comp;
+        if( !ref $component ) {
+            return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } )
+               if $container->has_service( $name );
         }
 
         return
             if $c->config->{disable_component_resolution_regex_fallback};
 
         # This is here so $c->comp( '::M::' ) works
-        my $query = ref $name ? $name : qr{$name}i;
+        my $query = ref $component ? $component : qr{$component}i;
 
         my @result = grep { m{$query} } keys %{ $c->components };
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
+        return map { $c->_filter_component( $_, @args ) } @result if ref $component;
 
         if( $result[ 0 ] ) {
-            $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
+            $c->log->warn( Carp::shortmess(qq(Found results for "${component}" using regexp fallback)) );
             $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
             $c->log->warn( 'is unreliable and unsafe. You have been warned' );
             return $c->_filter_component( $result[ 0 ], @args );
@@ -1620,7 +1653,7 @@ around components => sub {
         my ($type, $name) = _get_component_type_name($component);
 
 # FIXME: shouldn't the service name be $name?
-        $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
+        $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
     }
 
     return $class->$orig($components);
@@ -2519,8 +2552,7 @@ sub setup_components {
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
         if ( my ($type, $name) = _get_component_type_name($component) ) {
-# FIXME: shouldn't the service name be $name?
-            $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $component, block => sub { return $instance } ));
+            $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $name, block => sub { return $instance } ));
         }
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
@@ -2534,7 +2566,7 @@ sub setup_components {
             ) if $deprecatedcatalyst_component_names;
 
             if (my ($type, $name) = _get_component_type_name($component)) {
-                $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $component, block => sub { return $class->setup_component($component) } ));
+                $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
             }
 
             $class->components->{ $component } = $class->setup_component($component);
