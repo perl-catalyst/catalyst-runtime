@@ -19,7 +19,7 @@ around 'get' => sub {
     my $instance = $self->$orig(%params);
     my $ac_sub   = $self->accept_context_sub;
 
-    if ( eval { $instance->can($ac_sub) } ) {
+    if ( $instance->can($ac_sub) ) {
         return $instance->$ac_sub( @$context );
     }
 
