@@ -49,7 +49,23 @@ has sub_container_class => (
 sub BUILD {
     my $self = shift;
 
-    $self->build_root_container;
+    $self->${\"build_${_}_service"} for qw/
+        substitutions
+        file
+        driver
+        name
+        prefix
+        extensions
+        path
+        config
+        raw_config
+        global_files
+        local_files
+        global_config
+        local_config
+        config_local_suffix
+        config_path
+    /;
 
     $self->build_model_subcontainer;
     $self->build_view_subcontainer;
@@ -78,26 +94,6 @@ sub build_controller_subcontainer {
     $self->add_sub_container(
         $self->sub_container_class->new( name => 'controller' )
     );
-}
-
-sub build_root_container {
-    my $self = shift;
-
-    $self->build_substitutions_service();
-    $self->build_file_service();
-    $self->build_driver_service();
-    $self->build_name_service();
-    $self->build_prefix_service();
-    $self->build_extensions_service();
-    $self->build_path_service();
-    $self->build_config_service();
-    $self->build_raw_config_service();
-    $self->build_global_files_service();
-    $self->build_local_files_service();
-    $self->build_global_config_service();
-    $self->build_local_config_service();
-    $self->build_config_local_suffix_service();
-    $self->build_config_path_service();
 }
 
 sub build_name_service {
