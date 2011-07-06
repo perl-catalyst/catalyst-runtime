@@ -393,4 +393,9 @@ sub _config_substitutions {
     return $arg;
 }
 
+sub get_component {
+    my ( $self, $type, $name, $args ) = @_;
+    return $self->get_sub_container($type)->resolve( service => $name, parameters => { context => $args } );
+}
+
 1;

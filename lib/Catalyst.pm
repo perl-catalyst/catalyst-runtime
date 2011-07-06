@@ -536,6 +536,34 @@ sub clear_errors {
     $c->error(0);
 }
 
+sub _find_component_regexp {
+    my ( $c, $container, $name, $args ) = @_;
+
+    return
+        if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
+
+    my $appclass = ref $c || $c;
+    my $prefix   = ucfirst $container->name;
+    my $p        = substr $prefix, 0, 1;
+
+    my $query = ref $name ? $name : qr{$name}i;
+    $query =~ s/^${appclass}::($p|$prefix):://i;
+
+    my @comps  = $container->get_service_list;
+    my @result = map {
+        $container->resolve( service => $_, parameters => { context => $args } )
+    } grep { m/$query/ } @comps;
+
+    if (!ref $name && $result[0]) {
+        $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
+        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
+        $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+        return $result[0];
+    }
+
+    return @result;
+}
+
 =head2 COMPONENT ACCESSORS
 
 =head2 $c->controller($name)
@@ -558,38 +586,13 @@ If you want to search for controllers, pass in a regexp as the argument.
 sub controller {
     my ( $c, $name, @args ) = @_;
     my $container = $c->container->get_sub_container('controller');
+    unshift @args, $c;
 
-    my $appclass = ref $c || $c;
     if( $name ) {
-        if ( !ref $name ) { # Direct component hash lookup to avoid costly regexps
-            return $container->resolve(service => $name, parameters => { context => [ $c, @args ] } )
-                if $container->has_service($name);
-        }
+        return $c->container->get_component('controller', $name, \@args)
+            if $container->has_service($name) && !ref $name;
 
-        return
-            if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
-
-        my $query = ref $name ? $name : qr{$name}i;
-        $query =~ s/^${appclass}::(C|Controller):://;
-        my @comps = $container->get_service_list;
-        my @result;
-        for (@comps) {
-            push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
-                if m/$query/;
-        }
-
-        if (@result) {
-            if (!ref $name) {
-                $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
-                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-                return shift @result;
-            }
-
-            return @result;
-        }
-
-        return;
+        return $c->_find_component_regexp( $container, $name, \@args );
     }
 
     return $c->component( $c->action->class );
@@ -620,36 +623,14 @@ sub model {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
     my $container = $c->container->get_sub_container('model');
+    unshift @args, $c;
 
     if( $name ) {
-        if ( !ref $name && $container->has_service($name)) { # Direct component hash lookup to avoid costly regexps
-            return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } );
-        }
+        # Direct component hash lookup to avoid costly regexps
+        return $c->container->get_component('model', $name, \@args)
+            if ( !ref $name && $container->has_service($name));
 
-        return
-            if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
-
-        my $query = ref $name ? $name : qr{$name}i;
-        $query =~ s/^${appclass}::(M|Model):://;
-        my @comps = $container->get_service_list;
-        my @result;
-        for (@comps) {
-            push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
-                if m/$query/;
-        }
-
-        if (@result) {
-            if (!ref $name) {
-                $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
-                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-                return shift @result;
-            }
-
-            return @result;
-        }
-
-        return;
+        return $c->_find_component_regexp( $container, $name, \@args );
     }
 
     if (ref $c) {
@@ -672,7 +653,7 @@ sub model {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $container->resolve( service => $comp, parameters => { context => [ $c, @args ] } );
+    return $container->resolve( service => $comp, parameters => { context => \@args } );
 }
 
 
@@ -701,41 +682,19 @@ sub view {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
     my $container = $c->container->get_sub_container('view');
+    unshift @args, $c;
 
     if( $name ) {
         if ( !ref $name ) { # Direct component hash lookup to avoid costly regexps
             if ( $container->has_service($name) ) {
-                return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } );
+                return $c->container->get_component('view', $name, \@args);
             }
             else {
                 $c->log->warn( "Attempted to use view '$name', but does not exist" );
             }
         }
 
-        return
-            if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
-
-        my $query = ref $name ? $name : qr{$name}i;
-        $query =~ s/^${appclass}::(V|View):://;
-        my @comps = $container->get_service_list;
-        my @result;
-        for (@comps) {
-            push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
-                if m/$query/;
-        }
-
-        if (@result) {
-            if (!ref $name) {
-                $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
-                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-                return shift @result;
-            }
-
-            return @result;
-        }
-
-        return;
+        return $c->_find_component_regexp( $container, $name, \@args );
     }
 
     if (ref $c) {
@@ -757,7 +716,7 @@ sub view {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $container->resolve( service => $comp, parameters => { context => [ $c, @args ] } );
+    return $container->resolve( service => $comp, parameters => { context => \@args } );
 }
 
 =head2 $c->controllers
