@@ -589,6 +589,7 @@ sub controller {
     unshift @args, $c;
 
     if( $name ) {
+        # Direct component hash lookup to avoid costly regexps
         return $c->container->get_component('controller', $name, \@args)
             if $container->has_service($name) && !ref $name;
 
@@ -628,7 +629,7 @@ sub model {
     if( $name ) {
         # Direct component hash lookup to avoid costly regexps
         return $c->container->get_component('model', $name, \@args)
-            if ( !ref $name && $container->has_service($name));
+            if $container->has_service($name) && !ref $name;
 
         return $c->_find_component_regexp( $container, $name, \@args );
     }
