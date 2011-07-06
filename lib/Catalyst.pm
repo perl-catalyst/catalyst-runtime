@@ -536,34 +536,6 @@ sub clear_errors {
     $c->error(0);
 }
 
-sub _find_component_regexp {
-    my ( $c, $container, $name, $args ) = @_;
-
-    return
-        if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
-
-    my $appclass = ref $c || $c;
-    my $prefix   = ucfirst $container->name;
-    my $p        = substr $prefix, 0, 1;
-
-    my $query = ref $name ? $name : qr{$name}i;
-    $query =~ s/^${appclass}::($p|$prefix):://i;
-
-    my @comps  = $container->get_service_list;
-    my @result = map {
-        $container->resolve( service => $_, parameters => { context => $args } )
-    } grep { m/$query/ } @comps;
-
-    if (!ref $name && $result[0]) {
-        $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
-        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-        $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-        return $result[0];
-    }
-
-    return @result;
-}
-
 =head2 COMPONENT ACCESSORS
 
 =head2 $c->controller($name)
@@ -592,7 +564,7 @@ sub controller {
         return $container->get_component($name, \@args)
             if $container->has_service($name) && !ref $name;
 
-        return $c->_find_component_regexp( $container, $name, \@args );
+        return $container->get_component_regexp( $c, $name, \@args );
     }
 
     return $c->component( $c->action->class );
@@ -630,7 +602,7 @@ sub model {
         return $container->get_component($name, \@args)
             if ( !ref $name && $container->has_service($name));
 
-        return $c->_find_component_regexp( $container, $name, \@args );
+        return $container->get_component_regexp( $c, $name, \@args );
     }
 
     if (ref $c) {
@@ -694,7 +666,7 @@ sub view {
             }
         }
 
-        return $c->_find_component_regexp( $container, $name, \@args );
+        return $container->get_component_regexp( $c, $name, \@args );
     }
 
     if (ref $c) {
@@ -787,20 +759,7 @@ sub component {
                 return $container->get_component( $name, \@args );
             }
 
-            return
-                if $c->config->{disable_component_resolution_regex_fallback};
-
-            my $query      = qr{$name}i;
-            my @components = $container->get_service_list;
-            my @result     = grep { m{$query} } @components;
-
-            if (@result) {
-                $c->log->warn( Carp::shortmess(qq(Found results for "${component}" using regexp fallback)) );
-                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-
-                return $container->get_component( $result[0], \@args );
-            }
+            return $container->get_component_regexp( $c, $name, \@args );
         }
 
         return
