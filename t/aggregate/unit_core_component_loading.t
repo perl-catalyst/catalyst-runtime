@@ -235,6 +235,7 @@ eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 is($@, '', "Didn't load component twice");
 is($appclass->model('TopLevel::Nested')->called,1, 'COMPONENT called once');
 
+# relying on regex fallback
 ok($appclass->model('TopLevel::Generated'), 'Have generated model');
 is(ref($appclass->model('TopLevel::Generated')), 'FooBarBazQuux',
     'ACCEPT_CONTEXT in generated inner package fired as expected');

@@ -569,7 +569,7 @@ sub controller {
         return
             if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
 
-        my $query = ref $name ? $name : qr{$name};
+        my $query = ref $name ? $name : qr{$name}i;
         $query =~ s/^${appclass}::(C|Controller):://;
         my @comps = $container->get_service_list;
         my @result;
@@ -583,6 +583,7 @@ sub controller {
                 $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
                 $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
                 $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+                return shift @result;
             }
 
             return @result;
@@ -628,7 +629,7 @@ sub model {
         return
             if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
 
-        my $query = ref $name ? $name : qr{$name};
+        my $query = ref $name ? $name : qr{$name}i;
         $query =~ s/^${appclass}::(M|Model):://;
         my @comps = $container->get_service_list;
         my @result;
@@ -642,6 +643,7 @@ sub model {
                 $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
                 $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
                 $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+                return shift @result;
             }
 
             return @result;
@@ -713,7 +715,7 @@ sub view {
         return
             if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
 
-        my $query = ref $name ? $name : qr{$name};
+        my $query = ref $name ? $name : qr{$name}i;
         $query =~ s/^${appclass}::(V|View):://;
         my @comps = $container->get_service_list;
         my @result;
@@ -727,6 +729,7 @@ sub view {
                 $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
                 $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
                 $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+                return shift @result;
             }
 
             return @result;
@@ -823,10 +826,25 @@ sub component {
             if( !ref $component && $container->has_service($name) ) {
                 return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } );
             }
+
+            return
+                if $c->config->{disable_component_resolution_regex_fallback};
+
+            my $query      = qr{$name}i;
+            my @components = $container->get_service_list;
+            my @result     = grep { m{$query} } @components;
+
+            if (@result) {
+                $c->log->warn( Carp::shortmess(qq(Found results for "${component}" using regexp fallback)) );
+                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
+                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+
+                return $container->resolve( service => $result[0], parameters => { context => [$c, @args] } );
+            }
         }
 
         return
-            if $c->config->{disable_component_resolution_regex_fallback};
+            if $c->config->{disable_component_resolution_regex_fallback} && !ref $component;
 
         # This is here so $c->comp( '::M::' ) works
         my $query = ref $component ? $component : qr{$component}i;
