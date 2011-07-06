@@ -23,10 +23,9 @@ sub get_component_regexp {
     my $query = ref $name ? $name : qr{$name}i;
     $query =~ s/^${appclass}::($p|$prefix):://i;
 
-    my @comps  = $self->get_service_list;
     my @result = map {
-        $self->resolve( service => $_, parameters => { context => $args } )
-    } grep { m/$query/ } @comps;
+        $self->get_component( $_, $args )
+    } grep { m/$query/ } $self->get_service_list;
 
     if (!ref $name && $result[0]) {
         $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
