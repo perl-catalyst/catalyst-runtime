@@ -658,14 +658,11 @@ sub view {
     unshift @args, $c;
 
     if( $name ) {
-        if ( !ref $name ) { # Direct component hash lookup to avoid costly regexps
-            if ( $container->has_service($name) ) {
-                return $container->get_component($name, \@args);
-            }
-            else {
-                $c->log->warn( "Attempted to use view '$name', but does not exist" );
-            }
-        }
+        # Direct component hash lookup to avoid costly regexps
+        return $container->get_component($name, \@args)
+            if !ref $name && $container->has_service($name);
+
+        $c->log->warn( "Attempted to use view '$name', but does not exist" );
 
         return $container->get_component_regexp( $c, $name, \@args );
     }
