@@ -536,100 +536,6 @@ sub clear_errors {
     $c->error(0);
 }
 
-sub _comp_search_prefixes {
-    my $c = shift;
-    return map $c->components->{ $_ }, $c->_comp_names_search_prefixes(@_);
-}
-
-# search components given a name and some prefixes
-sub _comp_names_search_prefixes {
-    my ( $c, $name, @prefixes ) = @_;
-    my $appclass = ref $c || $c;
-    my $filter   = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
-    $filter = qr/$filter/; # Compile regex now rather than once per loop
-
-    my @components = map { $c->container->get_sub_container($_)->get_service_list } qw(controller view model);
-
-    # map the original component name to the sub part that we will search against
-    my %eligible = map { my $n = $_; $n =~ s{^$appclass\::[^:]+::}{}; $_ => $n; }
-        grep { /$filter/ } @components;
-
-    # undef for a name will return all
-    return keys %eligible if !defined $name;
-
-    my $query  = ref $name ? $name : qr/^$name$/i;
-    my @result = grep { $eligible{$_} =~ m{$query} } keys %eligible;
-
-    return @result if @result;
-
-    # if we were given a regexp to search against, we're done.
-    return if ref $name;
-
-    # skip regexp fallback if configured
-    return
-        if $appclass->config->{disable_component_resolution_regex_fallback};
-
-    # regexp fallback
-    $query  = qr/$name/i;
-    @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
-
-    # no results? try against full names
-    if( !@result ) {
-        @result = grep { m{$query} } keys %eligible;
-    }
-
-    # don't warn if we didn't find any results, it just might not exist
-    if( @result ) {
-        # Disgusting hack to work out correct method name
-        my $warn_for = lc $prefixes[0];
-        my $msg = "Used regexp fallback for \$c->${warn_for}('${name}'), which found '" .
-           (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
-           "component resolution is unreliable and unsafe.";
-        my $short = $result[0];
-        # remove the component namespace prefix
-        $short =~ s/.*?(Model|Controller|View):://;
-        my $shortmess = Carp::shortmess('');
-        if ($shortmess =~ m#Catalyst/Plugin#) {
-           $msg .= " You probably need to set '$short' instead of '${name}' in this " .
-              "plugin's config";
-        } elsif ($shortmess =~ m#Catalyst/lib/(View|Controller)#) {
-           $msg .= " You probably need to set '$short' instead of '${name}' in this " .
-              "component's config";
-        } else {
-           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}('${name}'), " .
-              "but if you really wanted to search, pass in a regexp as the argument " .
-              "like so: \$c->${warn_for}(qr/${name}/)";
-        }
-        $c->log->warn( "${msg}$shortmess" );
-    }
-
-    return @result;
-}
-
-# Find possible names for a prefix
-sub _comp_names {
-    my ( $c, @prefixes ) = @_;
-    my $appclass = ref $c || $c;
-
-    my $filter = "^${appclass}::(" . join( '|', @prefixes ) . ')::';
-
-    my @names = map { s{$filter}{}; $_; }
-        $c->_comp_names_search_prefixes( undef, @prefixes );
-
-    return @names;
-}
-
-# Filter a component before returning by calling ACCEPT_CONTEXT if available
-sub _filter_component {
-    my ( $c, $comp, @args ) = @_;
-
-    if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
-        return $comp->ACCEPT_CONTEXT( $c, @args );
-    }
-
-    return $comp;
-}
-
 =head2 COMPONENT ACCESSORS
 
 =head2 $c->controller($name)
@@ -886,15 +792,15 @@ disable_component_resolution_regex_fallback to a true value.
 sub component {
     my ( $c, $component, @args ) = @_;
 
-    my ($type, $name) = _get_component_type_name($component);
-    my $container = $c->container->get_sub_container($type);
+    if ( $component ) {
+        my ($type, $name) = _get_component_type_name($component);
 
-    if( $component ) {
-        my $comps = $c->components;
+        if ($type && $c->container->has_sub_container($type)) {
+            my $container = $c->container->get_sub_container($type);
 
-        if( !ref $component ) {
-            return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } )
-               if $container->has_service( $name );
+            if( !ref $component && $container->has_service($name) ) {
+                return $container->resolve( service => $name, parameters => { context => [ $c, @args ] } );
+            }
         }
 
         return
@@ -903,14 +809,21 @@ sub component {
         # This is here so $c->comp( '::M::' ) works
         my $query = ref $component ? $component : qr{$component}i;
 
-        my @result = grep { m{$query} } keys %{ $c->components };
-        return map { $c->_filter_component( $_, @args ) } @result if ref $component;
+        for my $subcontainer_name (qw/model view controller/) {
+            my $subcontainer = $c->container->get_sub_container($subcontainer_name);
+            my @components   = $subcontainer->get_service_list;
+            my @result       = grep { m{$query} } @components;
 
-        if( $result[ 0 ] ) {
-            $c->log->warn( Carp::shortmess(qq(Found results for "${component}" using regexp fallback)) );
-            $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-            $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-            return $c->_filter_component( $result[ 0 ], @args );
+            if (@result) {
+                return map { $subcontainer->resolve( service => $_, parameters => { context => [$c, @args] } ) } @result
+                    if ref $component;
+
+                $c->log->warn( Carp::shortmess(qq(Found results for "${component}" using regexp fallback)) );
+                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
+                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
+
+                return $subcontainer->resolve( service => $result[0], parameters => { context => [$c, @args] } );
+            }
         }
 
         # I would expect to return an empty list here, but that breaks back-compat
