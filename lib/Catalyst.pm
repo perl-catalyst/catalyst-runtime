@@ -569,11 +569,13 @@ sub controller {
         return
             if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
 
+        my $query = ref $name ? $name : qr{$name};
+        $query =~ s/^${appclass}::(C|Controller):://;
         my @comps = $container->get_service_list;
         my @result;
         for (@comps) {
             push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
-                if m/$name/;
+                if m/$query/;
         }
 
         if (@result) {
@@ -626,11 +628,13 @@ sub model {
         return
             if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
 
+        my $query = ref $name ? $name : qr{$name};
+        $query =~ s/^${appclass}::(M|Model):://;
         my @comps = $container->get_service_list;
         my @result;
         for (@comps) {
             push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
-                if m/$name/;
+                if m/$query/;
         }
 
         if (@result) {
@@ -709,11 +713,13 @@ sub view {
         return
             if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
 
+        my $query = ref $name ? $name : qr{$name};
+        $query =~ s/^${appclass}::(V|View):://;
         my @comps = $container->get_service_list;
         my @result;
         for (@comps) {
             push @result, $container->resolve( service => $_, parameters => { context => [ $c, @args ] } )
-                if m/$name/;
+                if m/$query/;
         }
 
         if (@result) {
