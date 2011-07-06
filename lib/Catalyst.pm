@@ -866,6 +866,9 @@ sub component {
             return $c->_filter_component( $comp, @args ) if $comp;
         }
 
+        return
+            if $c->config->{disable_component_resolution_regex_fallback};
+
         # This is here so $c->comp( '::M::' ) works
         my $query = ref $name ? $name : qr{$name}i;
 
@@ -2869,7 +2872,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my $class = ref $proto || $proto;
 
         Class::MOP::load_class( $plugin );
-        $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is decated and will not work in 5.81" )
+        $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is deprecated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
         $proto->_plugins->{$plugin} = 1;
         unless ($instant) {
