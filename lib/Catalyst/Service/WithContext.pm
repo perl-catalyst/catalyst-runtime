@@ -28,3 +28,34 @@ around 'get' => sub {
 
 no Moose::Role;
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Catalyst::Service::WithContext
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=over 4
+
+=item B<accept_context_sub>
+
+=item B<get>
+
+=back
+
+=head1 AUTHOR
+
+André Walker
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

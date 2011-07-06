@@ -2373,7 +2373,7 @@ sub setup_config {
     $class->finalize_config; # back-compat
 }
 
-=head $c->finalize_config
+=head2 $c->finalize_config
 
 =cut
 
