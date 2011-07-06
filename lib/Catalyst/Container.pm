@@ -43,7 +43,7 @@ has sub_container_class => (
     isa     => LoadableClass,
     is      => 'ro',
     coerce  => 1,
-    default => 'Bread::Board::Container',
+    default => 'Catalyst::SubContainer',
 );
 
 sub BUILD {
@@ -391,11 +391,6 @@ sub _config_substitutions {
 
     $arg =~ s{__($subsre)(?:\((.+?)\))?__}{ $subs->{ $1 }->( $name, $2 ? split( /,/, $2 ) : () ) }eg;
     return $arg;
-}
-
-sub get_component {
-    my ( $self, $type, $name, $args ) = @_;
-    return $self->get_sub_container($type)->resolve( service => $name, parameters => { context => $args } );
 }
 
 1;
