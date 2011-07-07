@@ -51,16 +51,6 @@ has sub_container_class => (
     }
 );
 
-# FIXME - Move all the Pod to the bottom!
-
-=head1 NAME
-
-Catalyst::Container - IOC for Catalyst components
-
-=head1 METHODS
-
-=cut
-
 sub BUILD {
     my $self = shift;
 
@@ -89,19 +79,11 @@ sub BUILD {
     ) for qw/ model view controller /;
 }
 
-=head2 build_model_subcontainer
-
-=cut
-
 sub build_model_subcontainer {
     my $self = shift;
 
     return $self->new_sub_container( name => 'model' );
 }
-
-=head2 build_view_subcontainer
-
-=cut
 
 sub build_view_subcontainer {
     my $self = shift;
@@ -109,19 +91,11 @@ sub build_view_subcontainer {
     return $self->new_sub_container( name => 'view' );
 }
 
-=head2 build_controller_subcontainer
-
-=cut
-
 sub build_controller_subcontainer {
     my $self = shift;
 
     return $self->new_sub_container( name => 'controller' );
 }
-
-=head2 build_name_service
-
-=cut
 
 sub build_name_service {
     my $self = shift;
@@ -129,19 +103,11 @@ sub build_name_service {
     return Bread::Board::Literal->new( name => 'name', value => $self->name );
 }
 
-=head2 build_driver_service
-
-=cut
-
 sub build_driver_service {
     my $self = shift;
 
     return Bread::Board::Literal->new( name => 'driver', value => $self->driver );
 }
-
-=head2 build_file_service
-
-=cut
 
 sub build_file_service {
     my $self = shift;
@@ -149,19 +115,11 @@ sub build_file_service {
     return Bread::Board::Literal->new( name => 'file', value => $self->file );
 }
 
-=head2 build_substitutions_service
-
-=cut
-
 sub build_substitutions_service {
     my $self = shift;
 
     return Bread::Board::Literal->new( name => 'substitutions', value => $self->substitutions );
 }
-
-=head2 build_extensions_service
-
-=cut
 
 sub build_extensions_service {
     my $self = shift;
@@ -174,10 +132,6 @@ sub build_extensions_service {
     );
 }
 
-=head2 build_prefix_service
-
-=cut
-
 sub build_prefix_service {
     my $self = shift;
 
@@ -189,10 +143,6 @@ sub build_prefix_service {
         dependencies => [ depends_on('name') ],
     );
 }
-
-=head2 build_path_service
-
-=cut
 
 sub build_path_service {
     my $self = shift;
@@ -209,10 +159,6 @@ sub build_path_service {
         dependencies => [ depends_on('file'), depends_on('name'), depends_on('prefix') ],
     );
 }
-
-=head2 build_config_service
-
-=cut
 
 sub build_config_service {
     my $self = shift;
@@ -234,10 +180,6 @@ sub build_config_service {
         dependencies => [ depends_on('name'), depends_on('raw_config'), depends_on('substitutions') ],
     );
 }
-
-=head2 build_raw_config_service
-
-=cut
 
 sub build_raw_config_service {
     my $self = shift;
@@ -261,10 +203,6 @@ sub build_raw_config_service {
         dependencies => [ depends_on('global_config'), depends_on('local_config') ],
     );
 }
-
-=head2 build_global_files_service
-
-=cut
 
 sub build_global_files_service {
     my $self = shift;
@@ -290,10 +228,6 @@ sub build_global_files_service {
         dependencies => [ depends_on('extensions'), depends_on('config_path') ],
     );
 }
-
-=head2 build_local_files_service
-
-=cut
 
 sub build_local_files_service {
     my $self = shift;
@@ -322,10 +256,6 @@ sub build_local_files_service {
     );
 }
 
-=head2 build_global_config_service
-
-=cut
-
 sub build_global_config_service {
     my $self = shift;
 
@@ -345,10 +275,6 @@ sub build_global_config_service {
     );
 }
 
-=head2 build_local_config_service
-
-=cut
-
 sub build_local_config_service {
     my $self = shift;
 
@@ -367,10 +293,6 @@ sub build_local_config_service {
         dependencies => [ depends_on('local_files') ],
     );
 }
-
-=head2 build_config_path_service
-
-=cut
 
 sub build_config_path_service {
     my $self = shift;
@@ -396,10 +318,6 @@ sub build_config_path_service {
     );
 }
 
-=head2 build_config_local_suffix_service
-
-=cut
-
 sub build_config_local_suffix_service {
     my $self = shift;
 
@@ -414,10 +332,6 @@ sub build_config_local_suffix_service {
         dependencies => [ depends_on('name') ],
     );
 }
-
-=head2 _fix_syntax
-
-=cut
 
 sub _fix_syntax {
     my $config     = shift;
@@ -437,10 +351,6 @@ sub _fix_syntax {
         }
     }
 }
-
-=head2 _config_substitutions
-
-=cut
 
 sub _config_substitutions {
     my ( $self, $name, $subs, $arg ) = @_;
@@ -465,6 +375,58 @@ sub _config_substitutions {
     return $arg;
 }
 
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Catalyst::Container - IOC for Catalyst components
+
+=head1 METHODS
+
+=head2 build_model_subcontainer
+
+=head2 build_view_subcontainer
+
+=head2 build_controller_subcontainer
+
+=head2 build_name_service
+
+=head2 build_driver_service
+
+=head2 build_file_service
+
+=head2 build_substitutions_service
+
+=head2 build_extensions_service
+
+=head2 build_prefix_service
+
+=head2 build_path_service
+
+=head2 build_config_service
+
+=head2 build_raw_config_service
+
+=head2 build_global_files_service
+
+=head2 build_local_files_service
+
+=head2 build_global_config_service
+
+=head2 build_local_config_service
+
+=head2 build_config_path_service
+
+=head2 build_config_local_suffix_service
+
+=head2 _fix_syntax
+
+=head2 _config_substitutions
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
@@ -475,5 +437,3 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
-
-1;
