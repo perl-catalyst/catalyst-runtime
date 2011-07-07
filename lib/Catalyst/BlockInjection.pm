@@ -18,13 +18,13 @@ __END__
 
 Catalyst::BlockInjection
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-André Walker
+Catalyst Contributors, see Catalyst.pm
 
-=head1 LICENSE
+=head1 COPYRIGHT
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

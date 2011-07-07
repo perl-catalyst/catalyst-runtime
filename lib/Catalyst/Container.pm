@@ -460,17 +460,9 @@ sub _config_substitutions {
 
 =head1 AUTHORS
 
-=over 4
+Catalyst Contributors, see Catalyst.pm
 
-=item Justin Hunter (arcanez)
-
-=item André Walker (andrewalker)
-
-=back
-
-Based on L<Catalyst::Plugin::ConfigLoader>, by Brian Cassidy.
-
-=head1 LICENSE
+=head1 COPYRIGHT
 
 This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.

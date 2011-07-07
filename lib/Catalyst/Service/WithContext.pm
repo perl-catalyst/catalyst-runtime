@@ -1,6 +1,7 @@
 package Catalyst::Service::WithContext;
 use Moose::Role;
 
+# Why is the needed to be loaded?
 use Bread::Board::Types;
 
 with 'Bread::Board::Service';
@@ -41,7 +42,7 @@ Catalyst::Service::WithContext
 
 =head1 METHODS
 
-=over 4
+=over
 
 =item B<accept_context_sub>
 
@@ -49,13 +50,13 @@ Catalyst::Service::WithContext
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-André Walker
+Catalyst Contributors, see Catalyst.pm
 
-=head1 LICENSE
+=head1 COPYRIGHT
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut
