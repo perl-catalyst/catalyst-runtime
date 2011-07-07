@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Deprecations:
+  - Removed component resolution regexp fallback. Now it always warns
+    when the component is not found, and returns undef.
+
  Bug fixes:
   - Fix the disable_component_resolution_regex_fallback config setting
     to also work in the $c->component method.

@@ -1,4 +1,4 @@
-use Test::More tests => 51;
+use Test::More;
 use strict;
 use warnings;
 
@@ -123,13 +123,13 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
         local *Catalyst::Log::warn = sub { $warnings++ };
 
         # object w/ regexp fallback
-        is_deeply( [ MyMVCTestApp->model( 'Test' ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
+        is_deeply( MyMVCTestApp->model( 'Test' ), undef, 'no regexp fallback' );
         ok( $warnings, 'regexp fallback warnings' );
     }
 
-    is_deeply( [ MyMVCTestApp->view('MyMVCTestApp::V::View$') ], [ 'MyMVCTestApp::V::View' ], 'Explicit return ok');
-    is_deeply( [ MyMVCTestApp->controller('MyMVCTestApp::C::Controller$') ], [ 'MyMVCTestApp::C::Controller' ], 'Explicit return ok');
-    is_deeply( [ MyMVCTestApp->model('MyMVCTestApp::M::Model$') ], [ 'MyMVCTestApp::M::Model' ], 'Explicit return ok');
+    is( MyMVCTestApp->view('MyMVCTestApp::V::View$'), undef, 'no regexp fallback');
+    is( MyMVCTestApp->controller('MyMVCTestApp::C::Controller$'), undef, 'no regexp fallback');
+    is( MyMVCTestApp->model('MyMVCTestApp::M::Model$'), undef, 'no regexp fallback');
 }
 
 {
@@ -175,25 +175,6 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
     my $x = $c->view('V', qw/foo2 bar2/);
     is_deeply($args, [qw/foo2 bar2/], '$c->view args passed to ACCEPT_CONTEXT ok');
 
-    # regexp fallback
-    $c->view('::View::V', qw/foo3 bar3/);
-    is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
-
-
-}
-
-{
-    my $warn = '';
-    no warnings 'redefine';
-    local *Catalyst::Log::warn = sub { $warn .= $_[1] };
-
-    is_deeply (MyMVCTestApp->controller('MyMVCTestApp::Controller::C'),
-        MyMVCTestApp->components->{'MyMVCTestApp::Controller::C'},
-        'controller by fully qualified name ok');
-
-    # You probably meant $c->controller('C') instead of $c->controller({'MyMVCTestApp::Controller::C'})
-    my ($suggested_comp_name, $orig_comp_name) = $warn =~ /You probably meant (.*) instead of (.*) /;
-    isnt($suggested_comp_name, $orig_comp_name, 'suggested fix in warning for fully qualified component names makes sense' );
 }
 
 {
@@ -223,5 +204,6 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
 
     # try to get nonexisting object w/o regexp fallback
     is( MyApp::WithoutRegexFallback->controller('Foo'), undef, 'no controller Foo found');
-    ok( !$warnings, 'no regexp fallback warnings' );
 }
+
+done_testing;

@@ -560,48 +560,9 @@ sub _comp_names_search_prefixes {
 
     return @result if @result;
 
-    # if we were given a regexp to search against, we're done.
-    return if ref $name;
+    $c->log->warn("Looking for '$name', but nothing was found.");
 
-    # skip regexp fallback if configured
-    return
-        if $appclass->config->{disable_component_resolution_regex_fallback};
-
-    # regexp fallback
-    $query  = qr/$name/i;
-    @result = grep { $eligible{ $_ } =~ m{$query} } keys %eligible;
-
-    # no results? try against full names
-    if( !@result ) {
-        @result = grep { m{$query} } keys %eligible;
-    }
-
-    # don't warn if we didn't find any results, it just might not exist
-    if( @result ) {
-        # Disgusting hack to work out correct method name
-        my $warn_for = lc $prefixes[0];
-        my $msg = "Used regexp fallback for \$c->${warn_for}('${name}'), which found '" .
-           (join '", "', @result) . "'. Relying on regexp fallback behavior for " .
-           "component resolution is unreliable and unsafe.";
-        my $short = $result[0];
-        # remove the component namespace prefix
-        $short =~ s/.*?(Model|Controller|View):://;
-        my $shortmess = Carp::shortmess('');
-        if ($shortmess =~ m#Catalyst/Plugin#) {
-           $msg .= " You probably need to set '$short' instead of '${name}' in this " .
-              "plugin's config";
-        } elsif ($shortmess =~ m#Catalyst/lib/(View|Controller)#) {
-           $msg .= " You probably need to set '$short' instead of '${name}' in this " .
-              "component's config";
-        } else {
-           $msg .= " You probably meant \$c->${warn_for}('$short') instead of \$c->${warn_for}('${name}'), " .
-              "but if you really wanted to search, pass in a regexp as the argument " .
-              "like so: \$c->${warn_for}(qr/${name}/)";
-        }
-        $c->log->warn( "${msg}$shortmess" );
-    }
-
-    return @result;
+    return;
 }
 
 # Find possible names for a prefix
@@ -832,12 +793,6 @@ should be used instead.
 If C<$name> is a regexp, a list of components matched against the full
 component name will be returned.
 
-If Catalyst can't find a component by name, it will fallback to regex
-matching by default. To disable this behaviour set
-disable_component_resolution_regex_fallback to a true value.
-
-    __PACKAGE__->config( disable_component_resolution_regex_fallback => 1 );
-
 =cut
 
 sub component {
@@ -860,21 +815,9 @@ sub component {
             my( $comp ) = $c->_comp_search_prefixes( $name, qw/Model M Controller C View V/ );
             return $c->_filter_component( $comp, @args ) if $comp;
         }
-
-        return
-            if $c->config->{disable_component_resolution_regex_fallback};
-
-        # This is here so $c->comp( '::M::' ) works
-        my $query = ref $name ? $name : qr{$name}i;
-
-        my @result = grep { m{$query} } keys %{ $c->components };
-        return map { $c->_filter_component( $_, @args ) } @result if ref $name;
-
-        if( $result[ 0 ] ) {
-            $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
-            $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-            $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-            return $c->_filter_component( $result[ 0 ], @args );
+        else {
+            my @result = grep { m{$name} } keys %{ $c->components };
+            return map { $c->_filter_component( $_, @args ) } @result;
         }
 
         # I would expect to return an empty list here, but that breaks back-compat
@@ -2923,14 +2866,6 @@ C<default_model> - The default model picked if you say C<< $c->model >>. See L<<
 =item *
 
 C<default_view> - The default view to be rendered or returned when C<< $c->view >> is called. See L<< /$c->view($name) >>.
-
-=item *
-
-C<disable_component_resolution_regex_fallback> - Turns
-off the deprecated component resolution functionality so
-that if any of the component methods (e.g. C<< $c->controller('Foo') >>)
-are called then regex search will not be attempted on string values and
-instead C<undef> will be returned.
 
 =item *
 
