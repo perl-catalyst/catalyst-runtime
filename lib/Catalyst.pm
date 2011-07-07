@@ -558,14 +558,13 @@ If you want to search for controllers, pass in a regexp as the argument.
 sub controller {
     my ( $c, $name, @args ) = @_;
     my $container = $c->container->get_sub_container('controller');
-    unshift @args, $c;
 
     if( $name ) {
         # Direct component hash lookup to avoid costly regexps
-        return $container->get_component($name, \@args)
+        return $container->get_component( $name, $c, @args )
             if $container->has_service($name) && !ref $name;
 
-        return $container->get_component_regexp( $c, $name, \@args );
+        return $container->get_component_regexp( $name, $c, @args );
     }
 
     return $c->component( $c->action->class );
@@ -596,14 +595,13 @@ sub model {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
     my $container = $c->container->get_sub_container('model');
-    unshift @args, $c;
 
     if( $name ) {
         # Direct component hash lookup to avoid costly regexps
-        return $container->get_component($name, \@args)
+        return $container->get_component( $name, $c, @args )
             if $container->has_service($name) && !ref $name;
 
-        return $container->get_component_regexp( $c, $name, \@args );
+        return $container->get_component_regexp( $name, $c, @args );
     }
 
     if (ref $c) {
@@ -626,7 +624,7 @@ sub model {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $container->get_component( $comp, \@args );
+    return $container->get_component( $comp, $c, @args );
 }
 
 
@@ -655,16 +653,15 @@ sub view {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
     my $container = $c->container->get_sub_container('view');
-    unshift @args, $c;
 
     if( $name ) {
         # Direct component hash lookup to avoid costly regexps
-        return $container->get_component($name, \@args)
+        return $container->get_component( $name, $c, @args )
             if !ref $name && $container->has_service($name);
 
         $c->log->warn( "Attempted to use view '$name', but does not exist" );
 
-        return $container->get_component_regexp( $c, $name, \@args );
+        return $container->get_component_regexp( $name, $c, @args );
     }
 
     if (ref $c) {
@@ -686,7 +683,7 @@ sub view {
         $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
     }
 
-    return $container->get_component( $comp, \@args );
+    return $container->get_component( $comp, $c, @args );
 }
 
 =head2 $c->controllers

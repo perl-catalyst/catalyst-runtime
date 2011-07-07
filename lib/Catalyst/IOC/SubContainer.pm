@@ -2,7 +2,6 @@ package Catalyst::IOC::SubContainer;
 use Bread::Board;
 use Moose;
 use Catalyst::IOC::BlockInjection;
-use Catalyst::Utils;
 
 extends 'Bread::Board::Container';
 
@@ -13,26 +12,27 @@ has disable_regex_fallback => (
 );
 
 sub get_component {
-    my ( $self, $name, $args ) = @_;
+    my ( $self, $name, @args ) = @_;
 
     return $self->resolve(
         service    => $name,
-        parameters => { accept_context_args => $args },
+        parameters => { accept_context_args => \@args },
     );
 }
 
 sub get_component_regexp {
-    my ( $self, $c, $name, $args ) = @_;
+    my ( $self, $name, $c, @args ) = @_;
 
     return
         if $self->disable_regex_fallback && !ref $name;
 
-    my $query  = ref $name ? $name : qr{$name}i;
-    my $prefix = Catalyst::Utils::class2classprefix($query) // '';
-    $query     =~ s/^${prefix}:://i;
+    my $query   = ref $name ? $name : qr{$name}i;
+    my $appname = $self->parent->name;
+    $query      =~ s/^${appname}:://i;
+    $query      =~ s/[MVC]|(Model|View|Controller):://i;
 
     my @result = map {
-        $self->get_component( $_, $args )
+        $self->get_component( $_, $c, @args )
     } grep { m/$query/ } $self->get_service_list;
 
     if (!ref $name && $result[0]) {
