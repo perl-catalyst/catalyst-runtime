@@ -1,4 +1,4 @@
-package Catalyst::Service::WithContext;
+package Catalyst::IOC::Service::WithAcceptContext;
 use Moose::Role;
 
 with 'Bread::Board::Service';

@@ -1,7 +1,7 @@
-package Catalyst::SubContainer;
+package Catalyst::IOC::SubContainer;
 use Bread::Board;
 use Moose;
-use Catalyst::BlockInjection;
+use Catalyst::IOC::BlockInjection;
 
 extends 'Bread::Board::Container';
 
@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::SubContainer - Container for models, controllers and views
+Catalyst::IOC::SubContainer - Container for models, controllers and views
 
 =head1 METHODS
 

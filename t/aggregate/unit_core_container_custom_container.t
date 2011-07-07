@@ -17,13 +17,13 @@ my $container = ContainerTestApp->container;
 
 # 'is' instead of 'isa_ok', because I want it to be only Catalyst::Container
 # and not some subclass
-is( ref $container, 'Catalyst::Container', 'The container is Catalyst::Container, not a subclass');
+is( ref $container, 'Catalyst::IOC::Container', 'The container is Catalyst::IOC::Container, not a subclass');
 
 # now, check if it loads the subclass when it exists
 {
     package CustomContainerTestApp::Container;
     use Moose;
-    extends 'Catalyst::Container';
+    extends 'Catalyst::IOC::Container';
 
     sub my_custom_method { 1 }
 }
@@ -39,9 +39,8 @@ is( ref $container, 'Catalyst::Container', 'The container is Catalyst::Container
 $container = CustomContainerTestApp->container;
 
 isa_ok($container, 'CustomContainerTestApp::Container');
-isa_ok($container, 'Catalyst::Container');
+isa_ok($container, 'Catalyst::IOC::Container');
 can_ok($container, 'my_custom_method');
 ok( eval { $container->my_custom_method }, 'executes the method correctly');
 
 done_testing;
-

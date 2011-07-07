@@ -1,9 +1,9 @@
-package Catalyst::BlockInjection;
+package Catalyst::IOC::BlockInjection;
 use Moose;
 
 extends 'Bread::Board::BlockInjection';
 
-with 'Catalyst::Service::WithContext';
+with 'Catalyst::IOC::Service::WithAcceptContext';
 
 __PACKAGE__->meta->make_immutable;
 
@@ -16,7 +16,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::BlockInjection
+Catalyst::IOC::BlockInjection
 
 =head1 AUTHORS
 

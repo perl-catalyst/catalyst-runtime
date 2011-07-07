@@ -1,11 +1,11 @@
-package Catalyst::Container;
+package Catalyst::IOC::Container;
 use Bread::Board;
 use Moose;
 use Config::Any;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
-use Catalyst::BlockInjection;
+use Catalyst::IOC::BlockInjection;
 use namespace::autoclean;
 
 extends 'Bread::Board::Container';
@@ -45,7 +45,7 @@ has sub_container_class => (
     isa     => LoadableClass,
     is      => 'ro',
     coerce  => 1,
-    default => 'Catalyst::SubContainer',
+    default => 'Catalyst::IOC::SubContainer',
     handles => {
         new_sub_container => 'new',
     }

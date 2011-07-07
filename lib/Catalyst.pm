@@ -1523,7 +1523,7 @@ around components => sub {
         my ($type, $name) = _get_component_type_name($component);
 
 # FIXME: shouldn't the service name be $name?
-        $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
+        $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
     }
 
     return $class->$orig($components);
@@ -2360,7 +2360,7 @@ sub setup_config {
 
     my %args = %{ $class->config || {} };
 
-    my @container_classes = ( "${class}::Container", 'Catalyst::Container');
+    my @container_classes = ( "${class}::Container", 'Catalyst::IOC::Container');
     unshift @container_classes, delete $args{container_class} if exists $args{container_class};
 
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
@@ -2422,7 +2422,7 @@ sub setup_components {
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
         if ( my ($type, $name) = _get_component_type_name($component) ) {
-            $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $name, block => sub { return $instance } ));
+            $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $instance } ));
         }
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
@@ -2436,7 +2436,7 @@ sub setup_components {
             ) if $deprecatedcatalyst_component_names;
 
             if (my ($type, $name) = _get_component_type_name($component)) {
-                $containers->{$type}->add_service(Catalyst::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
+                $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
             }
 
             $class->components->{ $component } = $class->setup_component($component);
