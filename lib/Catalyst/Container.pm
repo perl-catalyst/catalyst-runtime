@@ -6,9 +6,11 @@ use Data::Visitor::Callback;
 use Catalyst::Utils ();
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Catalyst::BlockInjection;
+use namespace::autoclean;
 
 extends 'Bread::Board::Container';
 
+# FIXME - Why do any of these attributes need to be rw?
 has config_local_suffix => (
     is      => 'rw',
     isa     => 'Str',
@@ -44,7 +46,12 @@ has sub_container_class => (
     is      => 'ro',
     coerce  => 1,
     default => 'Catalyst::SubContainer',
+    handles => {
+        new_sub_container => 'new',
+    }
 );
+
+# FIXME - Move all the Pod to the bottom!
 
 =head1 NAME
 
@@ -89,7 +96,7 @@ sub BUILD {
 sub build_model_subcontainer {
     my $self = shift;
 
-    return $self->sub_container_class->new( name => 'model' );
+    return $self->new_sub_container( name => 'model' );
 }
 
 =head2 build_view_subcontainer
@@ -99,7 +106,7 @@ sub build_model_subcontainer {
 sub build_view_subcontainer {
     my $self = shift;
 
-    return $self->sub_container_class->new( name => 'view' );
+    return $self->new_sub_container( name => 'view' );
 }
 
 =head2 build_controller_subcontainer
@@ -109,7 +116,7 @@ sub build_view_subcontainer {
 sub build_controller_subcontainer {
     my $self = shift;
 
-    return $self->sub_container_class->new( name => 'controller' );
+    return $self->new_sub_container( name => 'controller' );
 }
 
 =head2 build_name_service
