@@ -2365,7 +2365,11 @@ sub setup_config {
 
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
 
-    my $container = $container_class->new( %args, name => "$class" );
+    my $container = $container_class->new( %args,
+        name                   => "$class",
+        disable_regex_fallback =>
+            $class->config->{disable_component_resolution_regex_fallback},
+    );
     $class->container($container);
 
     my $config = $container->resolve(service => 'config');

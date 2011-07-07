@@ -10,6 +10,12 @@ use namespace::autoclean;
 
 extends 'Bread::Board::Container';
 
+has disable_regex_fallback => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1,
+);
+
 has config_local_suffix => (
     is      => 'ro',
     isa     => 'Str',
@@ -81,19 +87,28 @@ sub BUILD {
 sub build_model_subcontainer {
     my $self = shift;
 
-    return $self->new_sub_container( name => 'model' );
+    return $self->new_sub_container(
+        name                   => 'model',
+        disable_regex_fallback => $self->disable_regex_fallback,
+    );
 }
 
 sub build_view_subcontainer {
     my $self = shift;
 
-    return $self->new_sub_container( name => 'view' );
+    return $self->new_sub_container(
+        name                   => 'view',
+        disable_regex_fallback => $self->disable_regex_fallback,
+    );
 }
 
 sub build_controller_subcontainer {
     my $self = shift;
 
-    return $self->new_sub_container( name => 'controller' );
+    return $self->new_sub_container(
+        name                   => 'controller',
+        disable_regex_fallback => $self->disable_regex_fallback,
+    );
 }
 
 sub build_name_service {

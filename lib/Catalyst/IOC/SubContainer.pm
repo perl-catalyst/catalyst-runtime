@@ -2,8 +2,15 @@ package Catalyst::IOC::SubContainer;
 use Bread::Board;
 use Moose;
 use Catalyst::IOC::BlockInjection;
+use Catalyst::Utils;
 
 extends 'Bread::Board::Container';
+
+has disable_regex_fallback => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1,
+);
 
 sub get_component {
     my ( $self, $name, $args ) = @_;
@@ -18,14 +25,11 @@ sub get_component_regexp {
     my ( $self, $c, $name, $args ) = @_;
 
     return
-        if $c->config->{disable_component_resolution_regex_fallback} && !ref $name;
+        if $self->disable_regex_fallback && !ref $name;
 
-    my $appclass = ref $c || $c;
-    my $prefix   = ucfirst $self->name;
-    my $p        = substr $prefix, 0, 1;
-
-    my $query = ref $name ? $name : qr{$name}i;
-    $query =~ s/^${appclass}::($p|$prefix):://i;
+    my $query  = ref $name ? $name : qr{$name}i;
+    my $prefix = Catalyst::Utils::class2classprefix($query) // '';
+    $query     =~ s/^${prefix}:://i;
 
     my @result = map {
         $self->get_component( $_, $args )
