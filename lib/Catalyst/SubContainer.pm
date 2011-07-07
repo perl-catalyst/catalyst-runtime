@@ -7,7 +7,11 @@ extends 'Bread::Board::Container';
 
 sub get_component {
     my ( $self, $name, $args ) = @_;
-    return $self->resolve( service => $name, parameters => { context => $args } );
+
+    return $self->resolve(
+        service    => $name,
+        parameters => { accept_context_args => $args },
+    );
 }
 
 sub get_component_regexp {
@@ -38,3 +42,28 @@ sub get_component_regexp {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Catalyst::SubContainer - Container for models, controllers and views
+
+=head1 METHODS
+
+=head2 get_component
+
+=head2 get_component_regexp
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

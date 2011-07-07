@@ -1,9 +1,6 @@
 package Catalyst::Service::WithContext;
 use Moose::Role;
 
-# Why is the needed to be loaded?
-use Bread::Board::Types;
-
 with 'Bread::Board::Service';
 
 has accept_context_sub => (
@@ -15,13 +12,13 @@ has accept_context_sub => (
 around 'get' => sub {
     my ( $orig, $self, %params ) = @_;
 
-    my $context = delete $params{context};
+    my $accept_context_args = delete $params{accept_context_args};
 
     my $instance = $self->$orig(%params);
     my $ac_sub   = $self->accept_context_sub;
 
     if ( $instance->can($ac_sub) ) {
-        return $instance->$ac_sub( @$context );
+        return $instance->$ac_sub( @$accept_context_args );
     }
 
     return $instance;
