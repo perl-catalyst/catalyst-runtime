@@ -10,33 +10,32 @@ use namespace::autoclean;
 
 extends 'Bread::Board::Container';
 
-# FIXME - Why do any of these attributes need to be rw?
 has config_local_suffix => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'Str',
     default => 'local',
 );
 
 has driver => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'HashRef',
     default => sub { +{} },
 );
 
 has file => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'Str',
     default => '',
 );
 
 has substitutions => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'HashRef',
     default => sub { +{} },
 );
 
 has name => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'Str',
     default => 'TestApp',
 );
