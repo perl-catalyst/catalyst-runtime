@@ -557,15 +557,9 @@ If you want to search for controllers, pass in a regexp as the argument.
 
 sub controller {
     my ( $c, $name, @args ) = @_;
-    my $container = $c->container->get_sub_container('controller');
 
-    if( $name ) {
-        # Direct component hash lookup to avoid costly regexps
-        return $container->get_component( $name, $c, @args )
-            if $container->has_service($name) && !ref $name;
-
-        return $container->get_component_regexp( $name, $c, @args );
-    }
+    return $c->container->get_component_from_sub_container( 'controller', $name, $c, @args)
+        if( $name );
 
     return $c->component( $c->action->class );
 }
@@ -596,13 +590,8 @@ sub model {
     my $appclass = ref($c) || $c;
     my $container = $c->container->get_sub_container('model');
 
-    if( $name ) {
-        # Direct component hash lookup to avoid costly regexps
-        return $container->get_component( $name, $c, @args )
-            if $container->has_service($name) && !ref $name;
-
-        return $container->get_component_regexp( $name, $c, @args );
-    }
+    return $c->container->get_component_from_sub_container( 'model', $name, $c, @args)
+        if( $name );
 
     if (ref $c) {
         return $c->stash->{current_model_instance}
@@ -654,15 +643,8 @@ sub view {
     my $appclass = ref($c) || $c;
     my $container = $c->container->get_sub_container('view');
 
-    if( $name ) {
-        # Direct component hash lookup to avoid costly regexps
-        return $container->get_component( $name, $c, @args )
-            if !ref $name && $container->has_service($name);
-
-        $c->log->warn( "Attempted to use view '$name', but does not exist" );
-
-        return $container->get_component_regexp( $name, $c, @args );
-    }
+    return $c->container->get_component_from_sub_container( 'view', $name, $c, @args)
+        if( $name );
 
     if (ref $c) {
         return $c->stash->{current_view_instance}

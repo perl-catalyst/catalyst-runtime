@@ -17,11 +17,6 @@ sub get_component {
 sub get_component_regexp {
     my ( $self, $query, $c, @args ) = @_;
 
-    if (!ref $query) {
-        $c->log->warn("Looking for '$query', but nothing was found.");
-        return;
-    }
-
     my @result = map {
         $self->get_component( $_, $c, @args )
     } grep { m/$query/ } $self->get_service_list;

@@ -380,6 +380,25 @@ sub _config_substitutions {
     return $arg;
 }
 
+sub get_component_from_sub_container {
+    my ( $self, $sub_container_name, $name, $c, @args ) = @_;
+
+    my $sub_container = $self->get_sub_container( $sub_container_name );
+
+    return $sub_container->get_component_regexp( $name, $c, @args )
+        if ref $name;
+
+    return $sub_container->get_component( $name, $c, @args )
+        if $sub_container->has_service( $name );
+
+    $c->log->warn(
+        "Attempted to use $sub_container_name '$name', " .
+        "but it does not exist"
+    );
+
+    return;
+}
+
 1;
 
 __END__
