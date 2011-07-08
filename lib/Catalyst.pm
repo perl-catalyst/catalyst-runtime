@@ -732,53 +732,39 @@ should be used instead.
 If C<$name> is a regexp, a list of components matched against the full
 component name will be returned.
 
-If Catalyst can't find a component by name, it will fallback to regex
-matching by default. To disable this behaviour set
-disable_component_resolution_regex_fallback to a true value.
-
-    __PACKAGE__->config( disable_component_resolution_regex_fallback => 1 );
-
 =cut
 
 sub component {
     my ( $c, $component, @args ) = @_;
-    unshift @args, $c;
 
     if ( $component ) {
+        # FIXME: I probably shouldn't be doing this
+        return $c->components->{$component}
+            if exists $c->components->{$component};
+
         my ($type, $name) = _get_component_type_name($component);
 
         if ($type && $c->container->has_sub_container($type)) {
             my $container = $c->container->get_sub_container($type);
 
             if( !ref $component && $container->has_service($name) ) {
-                return $container->get_component( $name, \@args );
+                return $container->get_component( $name, $c, @args );
             }
 
-            return $container->get_component_regexp( $c, $name, \@args );
+            return $container->get_component_regexp( $name, $c, @args );
         }
 
-        return
-            if $c->config->{disable_component_resolution_regex_fallback} && !ref $component;
+        if (ref $component) {
+            for my $subcontainer_name (qw/model view controller/) {
+                my $subcontainer = $c->container->get_sub_container($subcontainer_name);
+                my @components   = $subcontainer->get_service_list;
+                my @result       = grep { m{$component} } @components;
 
-        # This is here so $c->comp( '::M::' ) works
-        my $query = ref $component ? $component : qr{$component}i;
-
-        for my $subcontainer_name (qw/model view controller/) {
-            my $subcontainer = $c->container->get_sub_container($subcontainer_name);
-            my @components   = $subcontainer->get_service_list;
-            my @result       = grep { m{$query} } @components;
-
-            if (@result) {
-                return map { $subcontainer->get_component( $_, \@args ) } @result
-                    if ref $component;
-
-                $c->log->warn( Carp::shortmess(qq(Found results for "${component}" using regexp fallback)) );
-                $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-                $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-
-                return $subcontainer->get_component( $result[0], \@args );
+                return map { $subcontainer->get_component( $_, $c, @args ) } @result;
             }
         }
+
+        $c->log->warn("Looking for '$component', but nothing was found.");
 
         # I would expect to return an empty list here, but that breaks back-compat
     }
@@ -2362,11 +2348,7 @@ sub setup_config {
 
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
 
-    my $container = $container_class->new( %args,
-        name                   => "$class",
-        disable_regex_fallback =>
-            $class->config->{disable_component_resolution_regex_fallback},
-    );
+    my $container = $container_class->new( %args, name => "$class" );
     $class->container($container);
 
     my $config = $container->resolve(service => 'config');
@@ -2921,14 +2903,6 @@ C<default_model> - The default model picked if you say C<< $c->model >>. See L<<
 =item *
 
 C<default_view> - The default view to be rendered or returned when C<< $c->view >> is called. See L<< /$c->view($name) >>.
-
-=item *
-
-C<disable_component_resolution_regex_fallback> - Turns
-off the deprecated component resolution functionality so
-that if any of the component methods (e.g. C<< $c->controller('Foo') >>)
-are called then regex search will not be attempted on string values and
-instead C<undef> will be returned.
 
 =item *
 

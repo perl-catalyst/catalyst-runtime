@@ -5,12 +5,6 @@ use Catalyst::IOC::BlockInjection;
 
 extends 'Bread::Board::Container';
 
-has disable_regex_fallback => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 1,
-);
-
 sub get_component {
     my ( $self, $name, @args ) = @_;
 
@@ -21,26 +15,16 @@ sub get_component {
 }
 
 sub get_component_regexp {
-    my ( $self, $name, $c, @args ) = @_;
+    my ( $self, $query, $c, @args ) = @_;
 
-    return
-        if $self->disable_regex_fallback && !ref $name;
-
-    my $query   = ref $name ? $name : qr{$name}i;
-    my $appname = $self->parent->name;
-    $query      =~ s/^${appname}:://i;
-    $query      =~ s/[MVC]|(Model|View|Controller):://i;
+    if (!ref $query) {
+        $c->log->warn("Looking for '$query', but nothing was found.");
+        return;
+    }
 
     my @result = map {
         $self->get_component( $_, $c, @args )
     } grep { m/$query/ } $self->get_service_list;
-
-    if (!ref $name && $result[0]) {
-        $c->log->warn( Carp::shortmess(qq(Found results for "${name}" using regexp fallback)) );
-        $c->log->warn( 'Relying on the regexp fallback behavior for component resolution' );
-        $c->log->warn( 'is unreliable and unsafe. You have been warned' );
-        return $result[0];
-    }
 
     return @result;
 }

@@ -30,29 +30,15 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 
 # regexp behavior
 {
-    is_deeply( [ MyApp->comp( qr{Model} ) ], [ 'MyApp::M::Model'], 'regexp ok' );
-    is_deeply( [ MyApp->comp('MyApp::V::View$') ], [ 'MyApp::V::View' ], 'Explicit return ok');
-    is_deeply( [ MyApp->comp('MyApp::C::Controller$') ], [ 'MyApp::C::Controller' ], 'Explicit return ok');
-    is_deeply( [ MyApp->comp('MyApp::M::Model$') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
-
-    # a couple other varieties for regexp fallback
-    is_deeply( [ MyApp->comp('M::Model') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
+    is_deeply( [ MyApp->comp( qr{Model} ) ], [ 'MyApp::M::Model' ], 'regexp ok' );
 
     {
         my $warnings = 0;
         no warnings 'redefine';
         local *Catalyst::Log::warn = sub { $warnings++ };
 
-        is_deeply( [ MyApp->comp('::M::Model') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
+        is_deeply( [ MyApp->comp('::M::Model') ], \@complist, 'no reulsts for regexp fallback');
         ok( $warnings, 'regexp fallback warnings' );
-
-        $warnings = 0;
-        is_deeply( [ MyApp->comp('Mode') ], [ 'MyApp::M::Model' ], 'Explicit return ok');
-        ok( $warnings, 'regexp fallback warnings' );
-
-        $warnings = 0;
-        is(MyApp->comp('::M::'), 'MyApp::M::Model', 'Regex return ok');
-        ok( $warnings, 'regexp fallback for comp() warns' );
     }
 
 }
@@ -86,9 +72,6 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 
     $c->component('M::Model', qw/foo2 bar2/);
     is_deeply($args, [qw/foo2 bar2/], 'args passed to ACCEPT_CONTEXT ok');
-
-    $c->component('Mode', qw/foo3 bar3/);
-    is_deeply($args, [qw/foo3 bar3/], 'args passed to ACCEPT_CONTEXT ok');
 }
 
 done_testing;
