@@ -56,6 +56,8 @@ sub BUILD {
     $self->add_service(
         $self->${\"build_${_}_service"}
     ) for qw/
+        default_view
+        default_model
         substitutions
         file
         driver
@@ -102,7 +104,7 @@ sub build_controller_subcontainer {
     );
 }
 
-sub build_default_model {
+sub build_default_model_service {
     Bread::Board::BlockInjection->new(
         block => sub {
             shift->param('config')->{default_model};
@@ -111,7 +113,7 @@ sub build_default_model {
     );
 }
 
-sub build_default_view {
+sub build_default_view_service {
     Bread::Board::BlockInjection->new(
         name => 'default_view',
         block => sub {
@@ -450,6 +452,10 @@ Catalyst::Container - IOC for Catalyst components
 =head2 build_view_subcontainer
 
 =head2 build_controller_subcontainer
+
+=head2 build_default_model_service
+
+=head2 build_default_view_service
 
 =head2 build_name_service
 
