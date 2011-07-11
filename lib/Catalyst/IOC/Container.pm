@@ -51,13 +51,11 @@ has sub_container_class => (
 );
 
 sub BUILD {
-    my $self = shift;
+    my ( $self, $params ) = @_;
 
     $self->add_service(
         $self->${\"build_${_}_service"}
     ) for qw/
-        default_view
-        default_model
         substitutions
         file
         driver
@@ -76,14 +74,26 @@ sub BUILD {
     /;
 
     $self->add_sub_container(
-        $self->${ \"build_${_}_subcontainer" }
-    ) for qw/ model view controller /;
+        $self->build_controller_subcontainer
+    );
+
+    $self->add_sub_container(
+        $self->build_view_subcontainer(
+            default_component => $params->{default_view},
+        )
+    );
+
+    $self->add_sub_container(
+        $self->build_model_subcontainer(
+            default_component => $params->{default_model},
+        )
+    );
 }
 
 sub build_model_subcontainer {
     my $self = shift;
 
-    return $self->new_sub_container(
+    return $self->new_sub_container( @_,
         name => 'model',
     );
 }
@@ -91,7 +101,7 @@ sub build_model_subcontainer {
 sub build_view_subcontainer {
     my $self = shift;
 
-    return $self->new_sub_container(
+    return $self->new_sub_container( @_,
         name => 'view',
     );
 }
@@ -101,26 +111,6 @@ sub build_controller_subcontainer {
 
     return $self->new_sub_container(
         name => 'controller',
-    );
-}
-
-sub build_default_model_service {
-    Bread::Board::BlockInjection->new(
-        name => 'default_model',
-        block => sub {
-            shift->param('config')->{default_model};
-        },
-        dependencies => [ depends_on('config') ],
-    );
-}
-
-sub build_default_view_service {
-    Bread::Board::BlockInjection->new(
-        name => 'default_view',
-        block => sub {
-            shift->param('config')->{default_view};
-        },
-        dependencies => [ depends_on('config') ],
     );
 }
 
@@ -408,9 +398,7 @@ sub get_component_from_sub_container {
     my $sub_container = $self->get_sub_container( $sub_container_name );
 
     if (!$name) {
-        my $default_name = 'default_' . $sub_container_name;
-        my $default      = $self->resolve( service => $default_name )
-            if $self->has_service($default_name);
+        my $default = $sub_container->default_component;
 
         return $sub_container->get_component( $default, $c, @args )
             if $default && $sub_container->has_service( $default );
@@ -420,6 +408,8 @@ sub get_component_from_sub_container {
         $c->log->warn( "* \$c->config(default_$sub_container_name => 'the name of the default $sub_container_name to use')" );
         $c->log->warn( "* \$c->stash->{current_$sub_container_name} # the name of the view to use for this request" );
         $c->log->warn( "* \$c->stash->{current_${sub_container_name}_instance} # the instance of the $sub_container_name to use for this request" );
+
+        return;
     }
 
     return $sub_container->get_component_regexp( $name, $c, @args )

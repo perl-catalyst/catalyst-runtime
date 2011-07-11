@@ -6,9 +6,9 @@ use Moose::Meta::Class;
 
 use_ok('Catalyst');
 
-our @complist =
-  map { "MyMVCTestApp::$_"; }
-  qw/C::Controller M::Model V::View Controller::C Model::M View::V Controller::Model::Dummy::Model Model::Dummy::Model/;
+our @complist_suffix = qw/C::Controller M::Model V::View Controller::C Model::M View::V Controller::Model::Dummy::Model Model::Dummy::Model/;
+
+our @complist = map { "MyMVCTestApp::$_" } @complist_suffix;
 
 foreach my $comp (@complist) {
     Moose::Meta::Class->create(
@@ -88,8 +88,8 @@ is_deeply( [ sort MyMVCTestApp->models ],
 {
     $warnings = 0;
 
-    like (MyMVCTestApp->view , qr/^MyMVCTestApp\::(V|View)\::/ , 'view() with no defaults returns *something*');
-    ok( $warnings, 'view() w/o a default is random, warnings thrown' );
+    is( MyMVCTestApp->view , undef, 'view() w/o a default is undef' );
+    ok( $warnings, 'warnings thrown for view() w/o a default' );
 }
 
 is ( bless ({stash=>{current_view=>'V'}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'current_view ok');
@@ -103,13 +103,8 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp:
 {
     $warnings = 0;
 
-    ok( my $model = MyMVCTestApp->model );
-
-    ok( (($model =~ /^MyMVCTestApp\::(M|Model)\::/) ||
-        $model->isa('Some::Test::Object')),
-        'model() with no defaults returns *something*' );
-
-    ok( $warnings, 'model() w/o a default is random, warnings thrown' );
+    is( MyMVCTestApp->model, undef, 'model() w/o a default is undef' );
+    ok( $warnings, 'warnings thrown for model() w/o a default' );
 }
 
 is ( bless ({stash=>{current_model=>'M'}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'current_model ok');
@@ -129,13 +124,59 @@ is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyMVCTestA
     is( get('/foo/test_controller'), 'bar', 'controller() with empty args returns current controller' );
 }
 
-MyMVCTestApp->config->{default_view} = 'V';
-is ( bless ({stash=>{}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'default_view ok');
-is ( MyMVCTestApp->view , 'MyMVCTestApp::View::V', 'default_view in class method ok');
+our @complist_default_view =
+    map { "MyMVCTestAppDefaultView::$_" } @complist_suffix;
 
-MyMVCTestApp->config->{default_model} = 'M';
-is ( bless ({stash=>{}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'default_model ok');
-is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class method ok');
+{
+    package MyMVCTestAppDefaultView;
+
+    use base qw/Catalyst/;
+
+    sub locate_components {
+        return @::complist_default_view;
+    }
+
+    no warnings 'redefine';
+    *Catalyst::Utils::ensure_class_loaded = sub {
+        my $class = shift;
+        $::loaded++
+            if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultView/
+    };
+
+    __PACKAGE__->config( default_view => 'V' );
+
+    __PACKAGE__->setup;
+}
+
+is( bless ({stash=>{}}, 'MyMVCTestAppDefaultView')->view, 'MyMVCTestAppDefaultView::View::V', 'default_view ok' );
+is( MyMVCTestAppDefaultView->view , 'MyMVCTestAppDefaultView::View::V', 'default_view in class method ok' );
+
+our @complist_default_model =
+    map { "MyMVCTestAppDefaultModel::$_" } @complist_suffix;
+
+{
+    package MyMVCTestAppDefaultModel;
+
+    use base qw/Catalyst/;
+
+    sub locate_components {
+        return @::complist_default_model;
+    }
+
+    no warnings 'redefine';
+    *Catalyst::Utils::ensure_class_loaded = sub {
+        my $class = shift;
+        $::loaded++
+            if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultModel/
+    };
+
+    __PACKAGE__->config( default_model => 'M' );
+
+    __PACKAGE__->setup;
+}
+
+is( bless ({stash=>{}}, 'MyMVCTestAppDefaultModel')->model , 'MyMVCTestAppDefaultModel::Model::M', 'default_model ok' );
+is( MyMVCTestAppDefaultModel->model , 'MyMVCTestAppDefaultModel::Model::M', 'default_model in class method ok' );
 
 # regexp behavior tests
 {

@@ -5,6 +5,12 @@ use Catalyst::IOC::BlockInjection;
 
 extends 'Bread::Board::Container';
 
+has default_component => (
+    isa => 'Str|Undef',
+    is  => 'ro',
+    required => 0,
+);
+
 sub get_component {
     my ( $self, $name, @args ) = @_;
 
