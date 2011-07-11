@@ -9,6 +9,7 @@ has default_component => (
     isa => 'Str|Undef',
     is  => 'ro',
     required => 0,
+    writer   => '_set_default_component',
 );
 
 sub get_component {
@@ -36,7 +37,7 @@ sub make_single_default {
 
     my @complist = $self->get_service_list;
 
-    $self->default_component( shift @complist )
+    $self->_set_default_component( shift @complist )
         if !$self->default_component && scalar @complist == 1;
 }
 
