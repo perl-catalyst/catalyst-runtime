@@ -1,6 +1,7 @@
 use Test::More;
 use strict;
 use warnings;
+
 use Moose::Meta::Class;
 
 use_ok('Catalyst');
@@ -36,7 +37,11 @@ Moose::Meta::Class->create(
 
     no warnings 'redefine';
     *Catalyst::Log::warn = sub { $::warnings++ };
-    *Catalyst::Utils::ensure_class_loaded = sub { $::loaded++ if Class::MOP::is_class_loaded(shift) };
+    *Catalyst::Utils::ensure_class_loaded = sub {
+        my $class = shift;
+        $::loaded++
+            if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestApp/
+    };
 
     __PACKAGE__->setup;
 }
@@ -114,6 +119,15 @@ is ( bless ({stash=>{current_model_instance=> $model }}, 'MyMVCTestApp')->model 
 
 is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyMVCTestApp::M::Model' }}, 'MyMVCTestApp')->model , $model,
   'current_model_instance precedes current_model ok');
+
+{
+    use FindBin '$Bin';
+    use lib "$Bin/../lib";
+
+    use Catalyst::Test 'TestAppController';
+
+    is( get('/foo/test_controller'), 'bar', 'controller() with empty args returns current controller' );
+}
 
 MyMVCTestApp->config->{default_view} = 'V';
 is ( bless ({stash=>{}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'default_view ok');
