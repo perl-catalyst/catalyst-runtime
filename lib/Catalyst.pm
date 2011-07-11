@@ -1462,7 +1462,6 @@ around components => sub {
 
         my ($type, $name) = _get_component_type_name($component);
 
-# FIXME: shouldn't the service name be $name?
         $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
     }
 
@@ -2382,6 +2381,9 @@ sub setup_components {
             $class->components->{ $component } = $class->setup_component($component);
         }
     }
+
+    $containers->{model}->make_single_default;
+    $containers->{view}->make_single_default;
 }
 
 sub _get_component_type_name {

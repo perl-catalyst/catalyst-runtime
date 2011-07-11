@@ -30,6 +30,16 @@ sub get_component_regexp {
     return @result;
 }
 
+# FIXME: not the best name for a sub
+sub make_single_default {
+    my ( $self ) = @_;
+
+    my @complist = $self->get_service_list;
+
+    $self->default_component( shift @complist )
+        if !$self->default_component && scalar @complist == 1;
+}
+
 1;
 
 __END__
@@ -45,6 +55,8 @@ Catalyst::IOC::SubContainer - Container for models, controllers and views
 =head2 get_component
 
 =head2 get_component_regexp
+
+=head2 make_single_default
 
 =head1 AUTHORS
 
