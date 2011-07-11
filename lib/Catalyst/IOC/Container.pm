@@ -102,6 +102,25 @@ sub build_controller_subcontainer {
     );
 }
 
+sub build_default_model {
+    Bread::Board::BlockInjection->new(
+        block => sub {
+            shift->param('config')->{default_model};
+        },
+        dependencies => [ depends_on('config') ],
+    );
+}
+
+sub build_default_view {
+    Bread::Board::BlockInjection->new(
+        name => 'default_view',
+        block => sub {
+            shift->param('config')->{default_view};
+        },
+        dependencies => [ depends_on('config') ],
+    );
+}
+
 sub build_name_service {
     my $self = shift;
 
@@ -384,6 +403,21 @@ sub get_component_from_sub_container {
     my ( $self, $sub_container_name, $name, $c, @args ) = @_;
 
     my $sub_container = $self->get_sub_container( $sub_container_name );
+
+    if (!$name) {
+        my $default_name = 'default_' . $sub_container_name;
+        my $default      = $self->resolve( service => $default_name )
+            if $self->has_service($default_name);
+
+        return $sub_container->get_component( $default, $c, @args )
+            if $default && $sub_container->has_service( $default );
+
+        # this is never a controller, so this is safe
+        $c->log->warn( "Calling \$c->$sub_container_name() is not supported unless you specify one of:" );
+        $c->log->warn( "* \$c->config(default_$sub_container_name => 'the name of the default $sub_container_name to use')" );
+        $c->log->warn( "* \$c->stash->{current_$sub_container_name} # the name of the view to use for this request" );
+        $c->log->warn( "* \$c->stash->{current_${sub_container_name}_instance} # the instance of the $sub_container_name to use for this request" );
+    }
 
     return $sub_container->get_component_regexp( $name, $c, @args )
         if ref $name;

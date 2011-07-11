@@ -595,33 +595,16 @@ If you want to search for models, pass in a regexp as the argument.
 
 sub model {
     my ( $c, $name, @args ) = @_;
-    my $appclass = ref($c) || $c;
-    my $container = $c->container->get_sub_container('model');
 
-    return $c->container->get_component_from_sub_container( 'model', $name, $c, @args)
-        if( $name );
-
-    if (ref $c) {
+    if (ref $c && !$name) {
         return $c->stash->{current_model_instance}
-          if $c->stash->{current_model_instance};
-        return $c->model( $c->stash->{current_model} )
-          if $c->stash->{current_model};
-    }
-    return $c->model( $appclass->config->{default_model} )
-      if $appclass->config->{default_model};
+            if $c->stash->{current_model_instance};
 
-# FIXME: will this still be mantained?
-    my( $comp, $rest ) = $container->get_service_list;
-
-    if( $rest ) {
-        $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
-        $c->log->warn( '* $c->config(default_model => "the name of the default model to use")' );
-        $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
-        $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
+        $name = $c->stash->{current_model}
+            if $c->stash->{current_model};
     }
 
-    return $container->get_component( $comp, $c, @args );
+    return $c->container->get_component_from_sub_container( 'model', $name, $c, @args);
 }
 
 
@@ -648,32 +631,16 @@ If you want to search for views, pass in a regexp as the argument.
 
 sub view {
     my ( $c, $name, @args ) = @_;
-    my $appclass = ref($c) || $c;
-    my $container = $c->container->get_sub_container('view');
 
-    return $c->container->get_component_from_sub_container( 'view', $name, $c, @args)
-        if( $name );
-
-    if (ref $c) {
+    if (ref $c && !$name) {
         return $c->stash->{current_view_instance}
-          if $c->stash->{current_view_instance};
-        return $c->view( $c->stash->{current_view} )
-          if $c->stash->{current_view};
-    }
-    return $c->view( $appclass->config->{default_view} )
-      if $appclass->config->{default_view};
+            if $c->stash->{current_view_instance};
 
-    my( $comp, $rest ) = $container->get_service_list;
-
-    if( $rest ) {
-        $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
-        $c->log->warn( '* $c->config(default_view => "the name of the default view to use")' );
-        $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
-        $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
+        $name = $c->stash->{current_view}
+            if $c->stash->{current_view};
     }
 
-    return $container->get_component( $comp, $c, @args );
+    return $c->container->get_component_from_sub_container( 'view', $name, $c, @args);
 }
 
 =head2 $c->controllers
