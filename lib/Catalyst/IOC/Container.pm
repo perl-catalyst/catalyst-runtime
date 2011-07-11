@@ -106,6 +106,7 @@ sub build_controller_subcontainer {
 
 sub build_default_model_service {
     Bread::Board::BlockInjection->new(
+        name => 'default_model',
         block => sub {
             shift->param('config')->{default_model};
         },
