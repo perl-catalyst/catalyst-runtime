@@ -444,10 +444,6 @@ Catalyst::Container - IOC for Catalyst components
 
 =head2 build_controller_subcontainer
 
-=head2 build_default_model_service
-
-=head2 build_default_view_service
-
 =head2 build_name_service
 
 =head2 build_driver_service
@@ -477,6 +473,8 @@ Catalyst::Container - IOC for Catalyst components
 =head2 build_config_path_service
 
 =head2 build_config_local_suffix_service
+
+=head2 get_component_from_sub_container
 
 =head2 _fix_syntax
 
