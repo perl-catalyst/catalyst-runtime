@@ -695,10 +695,6 @@ sub component {
     my ( $c, $component, @args ) = @_;
 
     if ( $component ) {
-        # FIXME: I probably shouldn't be doing this
-        return $c->components->{$component}
-            if exists $c->components->{$component};
-
         my ($type, $name) = _get_component_type_name($component);
 
         if ($type && $c->container->has_sub_container($type)) {
@@ -717,9 +713,15 @@ sub component {
                 my @components   = $subcontainer->get_service_list;
                 my @result       = grep { m{$component} } @components;
 
-                return map { $subcontainer->get_component( $_, $c, @args ) } @result;
+                return map { $subcontainer->get_component( $_, $c, @args ) } @result
+                    if @result;
             }
         }
+
+        # FIXME: I probably shouldn't be doing this
+        # I'm keeping it temporarily for things like $c->comp('MyApp')
+        return $c->components->{$component}
+            if exists $c->components->{$component} and !@args;
 
         $c->log->warn("Looking for '$component', but nothing was found.");
 
