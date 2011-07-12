@@ -27,6 +27,7 @@ use URI::https;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
+use List::Util qw/first/;
 use List::MoreUtils qw/uniq/;
 use attributes;
 use utf8;
@@ -695,26 +696,41 @@ sub component {
     my ( $c, $component, @args ) = @_;
 
     if ( $component ) {
-        my ($type, $name) = _get_component_type_name($component);
-
-        if ($type && $c->container->has_sub_container($type)) {
-            my $container = $c->container->get_sub_container($type);
-
-            if( !ref $component && $container->has_service($name) ) {
-                return $container->get_component( $name, $c, @args );
-            }
-
-            return $container->get_component_regexp( $name, $c, @args );
-        }
-
         if (ref $component) {
+            my @result;
             for my $subcontainer_name (qw/model view controller/) {
                 my $subcontainer = $c->container->get_sub_container($subcontainer_name);
                 my @components   = $subcontainer->get_service_list;
-                my @result       = grep { m{$component} } @components;
+                @result          = grep { m{$component} } @components;
 
                 return map { $subcontainer->get_component( $_, $c, @args ) } @result
                     if @result;
+            }
+
+            # it expects an empty list on failed searches
+            return @result;
+        }
+        else {
+            my ($type, $name) = _get_component_type_name($component);
+
+            if ($type && $c->container->has_sub_container($type)) {
+                my $container = $c->container->get_sub_container($type);
+
+                if ( !ref $component && $container->has_service($name) ) {
+                    return $container->get_component( $name, $c, @args );
+                }
+
+                return $container->get_component_regexp( $name, $c, @args );
+            }
+            else {
+                for my $subcontainer_name (qw/model view controller/) {
+                    my $subcontainer = $c->container->get_sub_container($subcontainer_name);
+                    my @components   = $subcontainer->get_service_list;
+                    my $result       = first { $_ eq $component } @components;
+
+                    return $subcontainer->get_component( $result, $c, @args )
+                        if $result;
+                }
             }
         }
 
@@ -2388,9 +2404,16 @@ sub setup_components {
     $containers->{view}->make_single_default;
 }
 
+# FIXME: should this sub exist?
+# should it be moved to Catalyst::Utils,
+# or replaced by something already existing there?
 sub _get_component_type_name {
     my $component = shift;
     my @parts     = split /::/, $component;
+
+    if (scalar @parts == 1) {
+        return (undef, $component);
+    }
 
     while (my $type = shift @parts) {
         return ('controller', join '::', @parts)
