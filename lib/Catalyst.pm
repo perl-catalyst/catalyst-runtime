@@ -718,10 +718,7 @@ sub component {
     my ( $c, $component, @args ) = @_;
 
     return sort keys %{ $c->components }
-        unless ( $component );
-
-    return $c->_find_component( $component, @args )
-        if ref $component;
+        unless $component;
 
     my ($type, $name) = _get_component_type_name($component);
 
@@ -730,6 +727,11 @@ sub component {
     ) if $type;
 
     my @result = $c->_find_component( $component, @args );
+
+    # list context for regexp searches
+    return @result if ref $component;
+
+    # only one component (if it's found) for string searches
     return shift @result if @result;
 
     # FIXME: I probably shouldn't be doing this
