@@ -678,6 +678,28 @@ sub views {
     return $c->container->get_sub_container('view')->get_service_list;
 }
 
+sub _find_component {
+    my ($c, $component, @args) = @_;
+    my @result;
+
+    my $query = ref $component
+              ? $component
+              : qr{^$component$}
+              ;
+
+    for my $subcontainer_name (qw/model view controller/) {
+        my $subcontainer = $c->container->get_sub_container($subcontainer_name);
+        my @components   = $subcontainer->get_service_list;
+        @result          = grep { m{$component} } @components;
+
+        return map { $subcontainer->get_component( $_, $c, @args ) } @result
+            if @result;
+    }
+
+    # it expects an empty list on failed searches
+    return @result;
+}
+
 =head2 $c->comp($name)
 
 =head2 $c->component($name)
@@ -695,56 +717,33 @@ component name will be returned.
 sub component {
     my ( $c, $component, @args ) = @_;
 
-    if ( $component ) {
-        if (ref $component) {
-            my @result;
-            for my $subcontainer_name (qw/model view controller/) {
-                my $subcontainer = $c->container->get_sub_container($subcontainer_name);
-                my @components   = $subcontainer->get_service_list;
-                @result          = grep { m{$component} } @components;
+    return sort keys %{ $c->components }
+        unless ( $component );
 
-                return map { $subcontainer->get_component( $_, $c, @args ) } @result
-                    if @result;
-            }
+    return $c->_find_component( $component, @args )
+        if ref $component;
 
-            # it expects an empty list on failed searches
-            return @result;
-        }
-        else {
-            my ($type, $name) = _get_component_type_name($component);
+    my ($type, $name) = _get_component_type_name($component);
 
-            if ($type && $c->container->has_sub_container($type)) {
-                my $container = $c->container->get_sub_container($type);
+    return $c->container->get_component_from_sub_container(
+        $type, $name, $c, @args
+    ) if $type;
 
-                if ( !ref $component && $container->has_service($name) ) {
-                    return $container->get_component( $name, $c, @args );
-                }
+    my @result = $c->_find_component( $component, @args );
+    return shift @result if @result;
 
-                return $container->get_component_regexp( $name, $c, @args );
-            }
-            else {
-                for my $subcontainer_name (qw/model view controller/) {
-                    my $subcontainer = $c->container->get_sub_container($subcontainer_name);
-                    my @components   = $subcontainer->get_service_list;
-                    my $result       = first { $_ eq $component } @components;
+    # FIXME: I probably shouldn't be doing this
+    # I'm keeping it temporarily for things like $c->comp('MyApp')
+    return $c->components->{$component}
+        if exists $c->components->{$component} and !@args;
 
-                    return $subcontainer->get_component( $result, $c, @args )
-                        if $result;
-                }
-            }
-        }
+    $c->log->warn("Looking for '$component', but nothing was found.");
 
-        # FIXME: I probably shouldn't be doing this
-        # I'm keeping it temporarily for things like $c->comp('MyApp')
-        return $c->components->{$component}
-            if exists $c->components->{$component} and !@args;
+    # I would expect to return an empty list here, but that breaks back-compat
+    $c->log->warn("Component not found, returning the list of existing");
+    $c->log->warn("components. This behavior is going to be deprecated");
+    $c->log->warn("in future releases.");
 
-        $c->log->warn("Looking for '$component', but nothing was found.");
-
-        # I would expect to return an empty list here, but that breaks back-compat
-    }
-
-    # fallback
     return sort keys %{ $c->components };
 }
 
