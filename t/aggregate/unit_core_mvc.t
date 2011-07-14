@@ -4,8 +4,6 @@ use warnings;
 
 use Moose::Meta::Class;
 
-use_ok('Catalyst');
-
 our @complist_suffix = qw/C::Controller M::Model V::View Controller::C Model::M View::V Controller::Model::Dummy::Model Model::Dummy::Model/;
 
 our @complist = map { "MyMVCTestApp::$_" } @complist_suffix;
@@ -32,14 +30,14 @@ Moose::Meta::Class->create(
     use base qw/Catalyst/;
 
     sub locate_components {
-        return (@::complist, 'MyMVCTestApp::Model::Test::Object');
+        return (@complist, 'MyMVCTestApp::Model::Test::Object');
     }
 
     no warnings 'redefine';
-    *Catalyst::Log::warn = sub { $::warnings++ };
-    *Catalyst::Utils::ensure_class_loaded = sub {
+    local *Catalyst::Log::warn = sub { $warnings++ };
+    local *Catalyst::Utils::ensure_class_loaded = sub {
         my $class = shift;
-        $::loaded++
+        $loaded++
             if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestApp/
     };
 
@@ -86,7 +84,9 @@ is_deeply( [ sort MyMVCTestApp->models ],
            'models ok');
 
 {
-    $warnings = 0;
+    my $warnings = 0;
+    no warnings 'redefine';
+    local *Catalyst::Log::warn = sub { $warnings++ };
 
     is( MyMVCTestApp->view , undef, 'view() w/o a default is undef' );
     ok( $warnings, 'warnings thrown for view() w/o a default' );
@@ -101,7 +101,9 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp:
   'current_view_instance precedes current_view ok');
 
 {
-    $warnings = 0;
+    my $warnings = 0;
+    no warnings 'redefine';
+    local *Catalyst::Log::warn = sub { $warnings++ };
 
     is( MyMVCTestApp->model, undef, 'model() w/o a default is undef' );
     ok( $warnings, 'warnings thrown for model() w/o a default' );
@@ -133,13 +135,14 @@ our @complist_default_view =
     use base qw/Catalyst/;
 
     sub locate_components {
-        return @::complist_default_view;
+        return @complist_default_view;
     }
 
     no warnings 'redefine';
-    *Catalyst::Utils::ensure_class_loaded = sub {
+    local *Catalyst::Log::warn = sub { $warnings++ };
+    local *Catalyst::Utils::ensure_class_loaded = sub {
         my $class = shift;
-        $::loaded++
+        $loaded++
             if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultView/
     };
 
@@ -160,13 +163,14 @@ our @complist_default_model =
     use base qw/Catalyst/;
 
     sub locate_components {
-        return @::complist_default_model;
+        return @complist_default_model;
     }
 
     no warnings 'redefine';
-    *Catalyst::Utils::ensure_class_loaded = sub {
+    local *Catalyst::Log::warn = sub { $warnings++ };
+    local *Catalyst::Utils::ensure_class_loaded = sub {
         my $class = shift;
-        $::loaded++
+        $loaded++
             if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultModel/
     };
 
@@ -189,7 +193,9 @@ is( MyMVCTestAppDefaultModel->model , 'MyMVCTestAppDefaultModel::Model::M', 'def
     is_deeply( [ MyMVCTestApp->model( qr{Test} ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
 
     {
-        $warnings = 0;
+        my $warnings = 0;
+        no warnings 'redefine';
+        local *Catalyst::Log::warn = sub { $warnings++ };
 
         # object w/ regexp fallback
         is( MyMVCTestApp->model( 'Test' ), undef, 'no regexp fallback' );
