@@ -2356,6 +2356,7 @@ sub setup_components {
     my $class = shift;
 
     my $config  = $class->config->{ setup_components };
+    my $search_extra = $config->{ search_extra };
 
     my @comps = $class->locate_components($config);
     my %comps = map { $_ => 1 } @comps;
@@ -2379,7 +2380,7 @@ sub setup_components {
 
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
-        if ( my ($type, $name) = _get_component_type_name($component) ) {
+        if ( my ($type, $name) = _get_component_type_name($component, $search_extra) ) {
             $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $instance } ));
         }
         my @expanded_components = $instance->can('expand_modules')
@@ -2393,7 +2394,7 @@ sub setup_components {
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             ) if $deprecatedcatalyst_component_names;
 
-            if (my ($type, $name) = _get_component_type_name($component)) {
+            if (my ($type, $name) = _get_component_type_name($component, $search_extra)) {
                 $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
             }
 
@@ -2409,8 +2410,11 @@ sub setup_components {
 # should it be moved to Catalyst::Utils,
 # or replaced by something already existing there?
 sub _get_component_type_name {
-    my $component = shift;
-    my @parts     = split /::/, $component;
+    my ( $component, $search_extra) = @_;
+    $search_extra ||= [];
+    my @search_extra = map { s/^:://; lc $_ } @$search_extra;
+
+    my @parts = split /::/, $component;
 
     if (scalar @parts == 1) {
         return (undef, $component);
@@ -2425,7 +2429,18 @@ sub _get_component_type_name {
 
         return ('view', join '::', @parts)
             if $type =~ /^(v|view)$/i;
+
+        return (_get_component_type($component), join '::', @parts)
+            if @search_extra and ( grep { lc $type eq $_ } @search_extra );
     }
+}
+
+sub _get_component_type {
+    my ( $instance ) = @_;
+
+    return 'controller' if $instance->isa('Catalyst::Controller');
+    return 'model'      if $instance->isa('Catalyst::Model');
+    return 'view'       if $instance->isa('Catalyst::View');
 }
 
 =head2 $c->locate_components( $setup_component_config )
