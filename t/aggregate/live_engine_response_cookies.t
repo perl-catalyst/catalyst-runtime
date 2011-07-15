@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 15;
+use Test::More;
 use Catalyst::Test 'TestApp';
 use HTTP::Headers::Util 'split_header_words';
 
@@ -92,3 +92,6 @@ my $expected = {
         good => [qw|good good_cookie path /|],
     }, 'Response Cookies' );
 }
+
+done_testing;
+
