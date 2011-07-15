@@ -94,7 +94,7 @@ sub finalize_cookies {
             )
         );
 
-        push @cookies, $cookie->as_string;
+        push @cookies, $cookie->as_string if $cookie;
     }
 
     for my $cookie (@cookies) {
