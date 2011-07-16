@@ -77,15 +77,19 @@ sub BUILD {
         $self->build_controller_subcontainer
     );
 
+    my $config        = $self->resolve( service => 'config' );
+    my $default_view  = $params->{default_view}  || $config->{default_view};
+    my $default_model = $params->{default_model} || $config->{default_model};
+
     $self->add_sub_container(
         $self->build_view_subcontainer(
-            default_component => $params->{default_view},
+            default_component => $default_view,
         )
     );
 
     $self->add_sub_container(
         $self->build_model_subcontainer(
-            default_component => $params->{default_model},
+            default_component => $default_model,
         )
     );
 }
