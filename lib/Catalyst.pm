@@ -913,7 +913,7 @@ Please do not use this functionality in new code.
 sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
 
-    # See block comment in t/unit_core_plugin.t
+    # See block comment in t/aggregate/unit_core_plugin.t
     $class->log->warn(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.81/);
 
     $class->_register_plugin( $plugin, 1 );
