@@ -47,7 +47,7 @@ Although --pidfile is supported --pid seems to be preferred, and if we are bothe
 
 --pidfile handling is shiit. MooseX::Daemonize will blow up really nastilly if not installed..
 
- --background seem to does nothing.
+ --background handling also shit.
 
 ###  Nice to have
 

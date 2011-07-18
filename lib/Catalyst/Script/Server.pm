@@ -68,6 +68,11 @@ sub BUILD {
     my $self = shift;
     $self->pidfile->write
         if $self->_has_pidfile;
+    if ($self->background) {
+        # FIXME - This is evil. Should we just add MX::Daemonize to the deps?
+        Class::MOP::load_class('MooseX::Daemonize::Core');
+        MooseX::Daemonize::Core->meta->apply($self);
+    }
 }
 
 has keepalive => (
@@ -206,6 +211,16 @@ sub run {
         $restarter->run_and_watch;
     }
     else {
+        if ($self->background) {
+            $self->daemon_fork;
+
+            return 1 unless $self->is_daemon;
+
+            Class::MOP::load_class($self->application_name);
+
+            $self->daemon_detach;
+        }
+
         $self->_run_application;
     }
 
