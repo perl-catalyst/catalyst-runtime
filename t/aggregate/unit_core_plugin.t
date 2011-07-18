@@ -32,7 +32,7 @@ my $logger = Class::MOP::Class->create_anon_class(
         },
     },
 )->new_object;
-PluginTestApp->log($logger);
+#PluginTestApp->log($logger);
 
 use Catalyst::Test qw/PluginTestApp/;
 

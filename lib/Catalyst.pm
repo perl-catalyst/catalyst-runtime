@@ -740,7 +740,7 @@ sub component {
     # I'm keeping it temporarily for things like $c->comp('MyApp')
     #return $c->components->{$component}
     #    if exists $c->components->{$component} and !@args;
-
+    Carp::cluck("MOO") if $component eq "PluginTestApp";
     $c->log->warn("Looking for '$component', but nothing was found.");
 
     # I would expect to return an empty list here, but that breaks back-compat
