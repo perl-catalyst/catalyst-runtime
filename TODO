@@ -35,6 +35,22 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     be used by people with their own .psgi files
   * Fix a sane / nicer way to do custom engines.
 
+#### Script survey
+
+##### myapp_web_fastcgi.pl
+
+Looks to me like we are mapping --deamon to --detach but I think the modern Plack FCGI handler prefers --deamonize
+
+Although --pidfile is supported --pid seems to be preferred, and if we are bothering to map, why not map for the future?
+
+##### myapp_web_server.pl
+
+--fork, this gets passed and Plack doesn’t complain, but it doesn’t fork.  Maybe we could just detect this switch and complain about it (say you should use plackup and Starman, for example?)
+
+--keepalive, passed, no complaint but doesn’t really seem to do anything.
+
+--pidfile, --background, these also seem to do nothing.
+
 ###  Nice to have
 
   * <@rafl> i've been thinking of maybe providing
