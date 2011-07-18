@@ -66,8 +66,7 @@ has pidfile => (
 
 sub BUILD {
     my $self = shift;
-    $self->pidfile->write
-        if $self->_has_pidfile;
+
     if ($self->background) {
         # FIXME - This is evil. Should we just add MX::Daemonize to the deps?
         Class::MOP::load_class('MooseX::Daemonize::Core');
@@ -191,6 +190,8 @@ sub run {
     if ( $self->restart ) {
         die "Cannot run in the background and also watch for changed files.\n"
             if $self->background;
+        die "Cannot write out a pid file and fork for the restarter.\n"
+            if $self->_has_pidfile;
 
         # If we load this here, then in the case of a restarter, it does not
         # need to be reloaded for each restart.
@@ -220,6 +221,9 @@ sub run {
 
             $self->daemon_detach;
         }
+
+        $self->pidfile->write
+            if $self->_has_pidfile;
 
         $self->_run_application;
     }
