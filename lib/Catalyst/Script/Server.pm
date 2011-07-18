@@ -5,8 +5,6 @@ use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use Catalyst::Utils;
 use namespace::autoclean;
 
-sub _plack_engine_name { 'Standalone' }
-
 with 'Catalyst::ScriptRole';
 
 has debug => (
@@ -46,13 +44,31 @@ has port => (
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
+use Moose::Util::TypeConstraints;
+class_type 'MooseX::Daemonize::Pid::File';
+subtype 'MyStr', as Str, where { 1 }; # FIXME - Fuck ugly!
+coerce 'MooseX::Daemonize::Pid::File', from 'MyStr', via {
+    Class::MOP::load_class("MooseX::Daemonize::Pid::File");
+    MooseX::Daemonize::Pid::File->new( file => $_ );
+};
+MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
+    'MooseX::Daemonize::Pid::File' => '=s',
+);
 has pidfile => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'pid',
-    isa           => Str,
+    isa           => 'MooseX::Daemonize::Pid::File',
     is            => 'ro',
     documentation => 'Specify a pidfile',
+    coerce        => 1,
+    predicate     => '_has_pidfile',
 );
+
+sub BUILD {
+    my $self = shift;
+    $self->pidfile->write
+        if $self->_has_pidfile;
+}
 
 has keepalive => (
     traits        => [qw(Getopt)],
@@ -129,6 +145,11 @@ has follow_symlinks => (
     documentation => 'Follow symbolic links',
     predicate     => '_has_follow_symlinks',
 );
+
+sub _plack_engine_name {
+    my $self = shift;
+    return $self->fork ? 'Starman' : $self->keepalive ? 'Starman' : 'Standalone';
+}
 
 sub _restarter_args {
     my $self = shift;

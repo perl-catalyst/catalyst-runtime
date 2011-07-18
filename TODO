@@ -45,11 +45,9 @@ Although --pidfile is supported --pid seems to be preferred, and if we are bothe
 
 ##### myapp_web_server.pl
 
---fork, this gets passed and Plack doesn’t complain, but it doesn’t fork.  Maybe we could just detect this switch and complain about it (say you should use plackup and Starman, for example?)
+--pidfile handling is shiit. MooseX::Daemonize will blow up really nastilly if not installed..
 
---keepalive, passed, no complaint but doesn’t really seem to do anything.
-
---pidfile, --background, these also seem to do nothing.
+ --background seem to does nothing.
 
 ###  Nice to have
 
