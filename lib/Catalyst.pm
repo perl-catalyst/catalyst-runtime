@@ -738,8 +738,8 @@ sub component {
 
     # FIXME: I probably shouldn't be doing this
     # I'm keeping it temporarily for things like $c->comp('MyApp')
-    return $c->components->{$component}
-        if exists $c->components->{$component} and !@args;
+    #return $c->components->{$component}
+    #    if exists $c->components->{$component} and !@args;
 
     $c->log->warn("Looking for '$component', but nothing was found.");
 
