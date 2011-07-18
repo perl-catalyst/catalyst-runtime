@@ -67,7 +67,7 @@ our $GO        = Catalyst::Exception::Go->new;
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
-__PACKAGE__->mk_classdata($_)
+__PACKAGE__->mk_classdata($_) # XXX FIXME - components remove from here
   for qw/container components arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
   setup_finished/;
@@ -93,10 +93,12 @@ sub import {
     return if $caller eq 'main';
 
     my $meta = Moose::Meta::Class->initialize($caller);
-    unless ( $caller->isa('Catalyst') ) {
-        my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller');
-        $meta->superclasses(@superclasses);
-    }
+
+    unless ( $caller->isa('Catalyst') ) { # XXX - Remove!
+        my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller'); # XXX - Remove!
+        $meta->superclasses(@superclasses); # XXX - Remove!
+    } # XXX - Remove!
+
     # Avoid possible C3 issues if 'Moose::Object' is already on RHS of MyApp
     $meta->superclasses(grep { $_ ne 'Moose::Object' } $meta->superclasses);
 
@@ -1043,11 +1045,11 @@ EOF
     }
 
     # Initialize our data structure
-    $class->components( {} );
+    $class->components( {} ); # XXX - Remove!
 
     $class->setup_components;
 
-    if ( $class->debug ) {
+    if ( $class->debug ) { # XXX - Fixme to be a method on the container? (Or at least get a) data structure back from the container!!
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
         for my $comp ( sort keys %{ $class->components } ) {
@@ -1460,6 +1462,10 @@ Returns a hash of components.
 
 =cut
 
+# FIXME - We deal with ->components({'Foo' => 'Bar'})
+#         however we DO NOT deal with ->components->{Foo} = 'Bar'
+#         We should return a locked hash back to the user? So that if they try the latter, they
+#         get breakage, rather than their addition being silently ignored?
 around components => sub {
     my $orig  = shift;
     my $class = shift;
@@ -2398,6 +2404,7 @@ sub setup_components {
                 $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
             }
 
+            # FIXME - Remove this!!
             $class->components->{ $component } = $class->setup_component($component);
         }
     }
@@ -2491,6 +2498,7 @@ sub expand_component_module {
 
 =cut
 
+## FIXME - Why the hell do we try calling the ->COMPONENT method twice, this is madness!?!
 sub setup_component {
     my( $class, $component ) = @_;
 
