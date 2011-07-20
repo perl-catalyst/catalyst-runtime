@@ -745,8 +745,8 @@ sub component {
 
     # I would expect to return an empty list here, but that breaks back-compat
     $c->log->warn("Component not found, returning the list of existing");
-    $c->log->warn("components. This behavior is going to be deprecated");
-    $c->log->warn("in future releases.");
+    $c->log->warn("components. This behavior is deprecated, and will be");
+    $c->log->warn("removed in future releases.");
 
     return sort keys %{ $c->components };
 }
