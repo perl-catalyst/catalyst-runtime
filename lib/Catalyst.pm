@@ -719,8 +719,11 @@ component name will be returned.
 sub component {
     my ( $c, $component, @args ) = @_;
 
-    return sort keys %{ $c->components }
-        unless $component;
+    unless ($component) {
+        $c->log->warn("Calling \$c->component without args is deprecated");
+        $c->log->warn("and will be removed in future releases.");
+        return sort keys %{ $c->components };
+    }
 
     my ($type, $name) = _get_component_type_name($component);
 
