@@ -1,5 +1,6 @@
 package PluginTestApp;
 use Test::More;
+use base 'Catalyst';
 
 use Catalyst (
     'Test::Plugin',
