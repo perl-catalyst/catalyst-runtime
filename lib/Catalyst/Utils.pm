@@ -84,6 +84,20 @@ sub class2classsuffix {
     return $class;
 }
 
+=head2 class2classshortsuffix($class)
+
+    MyApp::Controller::Foo::Bar becomes Foo::Bar
+
+=cut
+
+sub class2classshortsuffix {
+    my $class  = shift || '';
+    my $prefix = class2classprefix($class) || '';
+    $class =~ s/$prefix\:://;
+    return $class;
+}
+
+
 =head2 class2env($class);
 
 Returns the environment name for class.

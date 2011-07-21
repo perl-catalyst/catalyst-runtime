@@ -561,16 +561,7 @@ If you want to search for controllers, pass in a regexp as the argument.
 sub controller {
     my ( $c, $name, @args ) = @_;
 
-# FIXME: should this be a Catalyst::Utils method?
-    if (!$name) {
-        my $class  = $c->action->class;
-
-        my $prefix = length Catalyst::Utils::class2classprefix($class);
-
-        # MyApp::Controller::Foo becomes Foo
-        # the + 2 is because of the ::
-        $name = substr $class, $prefix + 2;
-    }
+    $name ||= Catalyst::Utils::class2classshortsuffix( $c->action->class );
 
     return $c->container->get_component_from_sub_container( 'controller', $name, $c, @args);
 }
