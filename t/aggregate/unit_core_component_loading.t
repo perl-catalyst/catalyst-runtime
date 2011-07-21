@@ -100,6 +100,7 @@ can_ok( $appclass, 'components');
 
 my $complist = $appclass->components;
 
+# FIXME should the app class really be included in ->components?
 # the +1 below is for the app class itself
 is(scalar keys %$complist, 24+1, "Correct number of components loaded");
 
