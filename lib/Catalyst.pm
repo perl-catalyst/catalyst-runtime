@@ -680,28 +680,6 @@ sub views {
     return $c->container->get_sub_container('view')->get_service_list;
 }
 
-sub _find_component {
-    my ($c, $component, @args) = @_;
-    my @result;
-
-    my $query = ref $component
-              ? $component
-              : qr{^$component$}
-              ;
-
-    for my $subcontainer_name (qw/model view controller/) {
-        my $subcontainer = $c->container->get_sub_container($subcontainer_name);
-        my @components   = $subcontainer->get_service_list;
-        @result          = grep { m{$component} } @components;
-
-        return map { $subcontainer->get_component( $_, $c, @args ) } @result
-            if @result;
-    }
-
-    # it expects an empty list on failed searches
-    return @result;
-}
-
 =head2 $c->comp($name)
 
 =head2 $c->component($name)
@@ -721,7 +699,7 @@ sub component {
 
     unless ($component) {
         $c->log->warn('Calling $c->component with no args is deprecated and ');
-        $c->log->warn('will be removed in future releases.');
+        $c->log->warn('will be removed in a future release.');
         $c->log->warn('Use $c->component_list instead.');
         return $c->component_list;
     }
@@ -732,7 +710,7 @@ sub component {
         $type, $name, $c, @args
     ) if $type;
 
-    my @result = $c->_find_component( $component, @args );
+    my @result = $c->container->find_component( $component, $c, @args );
 
     # list context for regexp searches
     return @result if ref $component;
@@ -750,7 +728,8 @@ sub component {
     # I would expect to return an empty list here, but that breaks back-compat
     $c->log->warn('Component not found, returning the list of existing');
     $c->log->warn('components. This behavior is deprecated and will be');
-    $c->log->warn('removed in future releases. Use $c->component_list instead.');
+    $c->log->warn('removed in a future release. Use $c->component_list');
+    $c->log->warn('instead.');
 
     return $c->component_list;
 }

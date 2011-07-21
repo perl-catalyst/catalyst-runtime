@@ -430,6 +430,29 @@ sub get_component_from_sub_container {
     return;
 }
 
+sub find_component {
+    my ( $self, $component, @args ) = @_;
+    my @result;
+
+    my $query = ref $component
+              ? $component
+              : qr{^$component$}
+              ;
+
+    for my $subcontainer_name (qw/model view controller/) {
+        my $subcontainer = $self->get_sub_container($subcontainer_name);
+        my @components   = $subcontainer->get_service_list;
+        @result          = grep { m{$component} } @components;
+
+        return map { $subcontainer->get_component( $_, @args ) } @result
+            if @result;
+    }
+
+    # it expects an empty list on failed searches
+    return @result;
+}
+
+
 1;
 
 __END__
@@ -479,6 +502,8 @@ Catalyst::Container - IOC for Catalyst components
 =head2 build_config_local_suffix_service
 
 =head2 get_component_from_sub_container
+
+=head2 find_component
 
 =head2 _fix_syntax
 
