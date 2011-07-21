@@ -1453,13 +1453,19 @@ sub components {
     $class->setup_config unless defined $class->container;
 
     my $containers;
-    $containers->{$_} = $class->container->get_sub_container($_) for qw(model view controller);
+    $containers->{$_} = $class->container->get_sub_container($_)
+        for qw(model view controller);
 
     if ( $comps ) {
         for my $component ( keys %$comps ) {
             my ($type, $name) = _get_component_type_name($component);
 
-            $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
+            $containers->{$type}->add_service(
+                Catalyst::IOC::BlockInjection->new(
+                    name  => $name,
+                    block => sub { $class->setup_component($component) },
+                )
+            );
         }
     }
 
@@ -1467,13 +1473,16 @@ sub components {
     for my $container (keys %$containers) {
         my @service_list = $containers->{$container}->get_service_list;
         for my $component (@service_list) {
-            $components{$component} =
-                $containers->{$container}->resolve(service => $component);
+            my $comp = $containers->{$container}->resolve(
+                service => $component
+            );
+            my $comp_name = ref $comp || $comp;
+            $components{$comp_name} = $comp;
         }
     }
 
     return lock_hash %components;
-};
+}
 
 =head2 $c->context_class
 
