@@ -718,10 +718,11 @@ sub component {
     # only one component (if it's found) for string searches
     return shift @result if @result;
 
-    # FIXME: I probably shouldn't be doing this
-    # I'm keeping it temporarily for things like $c->comp('MyApp')
-    return $c->components->{$component}
-        if exists $c->components->{$component} and !@args;
+    if (ref $c eq $component) {
+        $c->log->warn('You are calling $c->comp("MyApp"). This behaviour is');
+        $c->log->warn('deprecated, and will be removed in a future release.');
+        return $c;
+    }
 
     $c->log->warn("Looking for '$component', but nothing was found.");
 
