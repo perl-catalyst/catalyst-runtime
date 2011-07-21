@@ -712,6 +712,11 @@ sub component {
 
     my @result = $c->container->find_component( $component, $c, @args );
 
+    # one last search for things like $c->comp(qr/::M::/)
+    @result = $c->container->find_component_regexp(
+        $c->components, $component, $c, @args
+    ) if !@result and ref $component;
+
     # list context for regexp searches
     return @result if ref $component;
 

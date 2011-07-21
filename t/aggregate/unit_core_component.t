@@ -45,11 +45,6 @@ is_deeply([ MyApp->comp('Foo') ], \@complist, 'Fallthrough return ok');
 
 # multiple returns
 {
-# FIXME: this cannot be found by looking only in the container.
-# either the test must be changed, or the regexp must be run against
-# $c->components() in Catalyst.pm
-    diag('this test will not work by searching the container');
-    diag('check the source of this file for more info');
     my @expected = sort qw( MyApp::C::Controller MyApp::M::Model );
     my @got = sort MyApp->comp( qr{::[MC]::} );
     is_deeply( \@got, \@expected, 'multiple results from regexp ok' );

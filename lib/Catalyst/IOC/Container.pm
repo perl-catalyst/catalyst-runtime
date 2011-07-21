@@ -452,6 +452,25 @@ sub find_component {
     return @result;
 }
 
+sub find_component_regexp {
+    my ( $self, $components, $component, @args ) = @_;
+    my @result;
+
+    my @components = grep { m{$component} } keys %{ $components };
+
+    for (@components) {
+        # FIXME this is naughty enough being called inside Catalyst.pm
+        # find some alternative for this sub and remember to delete here
+        my ($type, $name) = Catalyst::_get_component_type_name($_);
+
+        push @result, $self->get_component_from_sub_container(
+            $type, $name, @args
+        ) if $type;
+    }
+
+    return @result;
+}
+
 
 1;
 
@@ -504,6 +523,8 @@ Catalyst::Container - IOC for Catalyst components
 =head2 get_component_from_sub_container
 
 =head2 find_component
+
+=head2 find_component_regexp
 
 =head2 _fix_syntax
 
