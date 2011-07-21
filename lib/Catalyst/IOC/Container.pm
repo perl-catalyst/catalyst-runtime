@@ -471,6 +471,7 @@ sub find_component_regexp {
     return @result;
 }
 
+# FIXME sorry for the name again :)
 sub get_components_types {
     my ( $self ) = @_;
     my @comps_types;
@@ -537,6 +538,8 @@ Catalyst::Container - IOC for Catalyst components
 =head2 build_config_local_suffix_service
 
 =head2 get_component_from_sub_container
+
+=head2 get_components_types
 
 =head2 find_component
 
