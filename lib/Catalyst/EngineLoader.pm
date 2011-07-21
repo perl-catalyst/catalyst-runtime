@@ -39,7 +39,20 @@ sub _guess_catalyst_engine_class {
     if (!defined $old_engine) {
         return 'Catalyst::Engine';
     }
-    elsif ($old_engine =~ /^(PSGI|CGI|FastCGI|HTTP|Apache.*)$/) {
+    elsif ($old_engine eq 'PSGI') {
+        ## If we are running under plackup let the Catalyst::Engine::PSGI
+        ## continue to run, but warn.
+        warn <<"EOW";
+You are running Catalyst::Engine::PSGI, which is considered a legacy engine for
+this version of Catalyst.  We will continue running and use your existing psgi
+file, but it is recommended to perform the trivial upgrade process, which will
+leave you with less code and a forward path.
+
+Please review Catalyst::Upgrading
+EOW
+        return 'Catalyst::Engine::' . $old_engine;
+    }
+    elsif ($old_engine =~ /^(CGI|FastCGI|HTTP|Apache.*)$/) {
         return 'Catalyst::Engine';
     }
     else {

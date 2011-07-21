@@ -20,6 +20,17 @@ use namespace::clean -except => 'meta';
 
 has env => (is => 'ro', writer => '_set_env', clearer => '_clear_env');
 
+my $WARN_ABOUT_ENV = 0;
+around env => sub {
+  my ($orig, $self, @args) = @_;
+  if(@args) {
+    warn "env as a writer is deprecated, you probably need to upgrade Catalyst::Engine::PSGI"
+      unless $WARN_ABOUT_ENV++;
+    return $self->_set_env(@args);
+  }
+  return $self->$orig;
+};
+
 # input position and length
 has read_length => (is => 'rw');
 has read_position => (is => 'rw');
