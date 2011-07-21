@@ -42,6 +42,7 @@ has _response_cb => (
     isa     => 'CodeRef',
     writer  => '_set_response_cb',
     clearer => '_clear_response_cb',
+    predicate => '_has_response_cb',
 );
 
 has _writer => (
@@ -341,6 +342,15 @@ Abstract method, allows engines to write headers to response
 
 sub finalize_headers {
     my ($self, $ctx) = @_;
+
+    # This is a less-than-pretty hack to avoid breaking the old
+    # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
+    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
+    # just pulls the headers out of $ctx->response in its run method and never
+    # sets response_cb. So take the lack of a response_cb as a sign that we
+    # don't need to set the headers.
+
+    return unless $self->_has_response_cb;
 
     my @headers;
     $ctx->response->headers->scan(sub { push @headers, @_ });
