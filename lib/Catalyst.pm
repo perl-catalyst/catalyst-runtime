@@ -720,9 +720,10 @@ sub component {
     my ( $c, $component, @args ) = @_;
 
     unless ($component) {
-        $c->log->warn("Calling \$c->component without args is deprecated");
-        $c->log->warn("and will be removed in future releases.");
-        return sort keys %{ $c->components };
+        $c->log->warn('Calling $c->component with no args is deprecated and ');
+        $c->log->warn('will be removed in future releases.');
+        $c->log->warn('Use $c->component_list instead.');
+        return $c->component_list;
     }
 
     my ($type, $name) = _get_component_type_name($component);
@@ -747,12 +748,20 @@ sub component {
     $c->log->warn("Looking for '$component', but nothing was found.");
 
     # I would expect to return an empty list here, but that breaks back-compat
-    $c->log->warn("Component not found, returning the list of existing");
-    $c->log->warn("components. This behavior is deprecated, and will be");
-    $c->log->warn("removed in future releases.");
+    $c->log->warn('Component not found, returning the list of existing');
+    $c->log->warn('components. This behavior is deprecated and will be');
+    $c->log->warn('removed in future releases. Use $c->component_list instead.');
 
-    return sort keys %{ $c->components };
+    return $c->component_list;
 }
+
+=head2 $c->component_list
+
+Returns the sorted list of the component names of the application.
+
+=cut
+
+sub component_list { sort keys %{ shift->components } }
 
 =head2 CLASS DATA AND HELPER CLASSES
 
