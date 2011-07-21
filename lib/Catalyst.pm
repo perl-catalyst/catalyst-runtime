@@ -27,7 +27,7 @@ use URI::https;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
-use List::Util qw/first/;
+use Hash::Util qw/lock_hash/;
 use List::MoreUtils qw/uniq/;
 use attributes;
 use utf8;
@@ -67,8 +67,8 @@ our $GO        = Catalyst::Exception::Go->new;
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
-__PACKAGE__->mk_classdata($_) # XXX FIXME - components remove from here
-  for qw/container components arguments dispatcher engine log dispatcher_class
+__PACKAGE__->mk_classdata($_)
+  for qw/container arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
   setup_finished/;
 
@@ -1035,9 +1035,6 @@ EOF
         $class->setup unless $Catalyst::__AM_RESTARTING;
     }
 
-    # Initialize our data structure
-    $class->components( {} ); # XXX - Remove!
-
     $class->setup_components;
 
     if ( $class->debug ) { # XXX - Fixme to be a method on the container? (Or at least get a) data structure back from the container!!
@@ -1049,11 +1046,6 @@ EOF
         }
         $class->log->debug( "Loaded components:\n" . $t->draw . "\n" )
           if ( keys %{ $class->components } );
-    }
-
-    # Add our self to components, since we are also a component
-    if( $class->isa('Catalyst::Controller') ){
-      $class->components->{$class} = $class;
     }
 
     $class->setup_actions;
@@ -1453,35 +1445,33 @@ Returns a hash of components.
 
 =cut
 
-# FIXME - We deal with ->components({'Foo' => 'Bar'})
-#         however we DO NOT deal with ->components->{Foo} = 'Bar'
-#         We should return a locked hash back to the user? So that if they try the latter, they
-#         get breakage, rather than their addition being silently ignored?
-around components => sub {
-    my $orig  = shift;
-    my $class = shift;
-    my $comps = shift;
+sub components {
+    my ( $class, $comps ) = @_;
 
-    return $class->$orig if ( !$comps );
-
-# FIXME: should this ugly kludge exist?
+    # FIXME: should this ugly kludge exist?
     $class->setup_config unless defined $class->container;
-
-# FIXME: should there be a warning here, not to use this accessor to create the components?
-    my $components = {};
 
     my $containers;
     $containers->{$_} = $class->container->get_sub_container($_) for qw(model view controller);
 
-    for my $component ( keys %$comps ) {
-        $components->{ $component } = $comps->{$component};
+    if ( $comps ) {
+        for my $component ( keys %$comps ) {
+            my ($type, $name) = _get_component_type_name($component);
 
-        my ($type, $name) = _get_component_type_name($component);
-
-        $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
+            $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
+        }
     }
 
-    return $class->$orig($components);
+    my %components;
+    for my $container (keys %$containers) {
+        my @service_list = $containers->{$container}->get_service_list;
+        for my $component (@service_list) {
+            $components{$component} =
+                $containers->{$container}->resolve(service => $component);
+        }
+    }
+
+    return lock_hash %components;
 };
 
 =head2 $c->context_class
@@ -2376,7 +2366,7 @@ sub setup_components {
     $containers->{$_} = $class->container->get_sub_container($_) for qw(model view controller);
 
     for my $component (@comps) {
-        my $instance = $class->components->{ $component } = $class->setup_component($component);
+        my $instance = $class->setup_component($component);
         if ( my ($type, $name) = _get_component_type_name($component, $search_extra) ) {
             $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $instance } ));
         }
@@ -2394,9 +2384,6 @@ sub setup_components {
             if (my ($type, $name) = _get_component_type_name($component, $search_extra)) {
                 $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
             }
-
-            # FIXME - Remove this!!
-            $class->components->{ $component } = $class->setup_component($component);
         }
     }
 
