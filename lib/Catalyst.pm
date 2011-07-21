@@ -95,7 +95,7 @@ sub import {
     my $meta = Moose::Meta::Class->initialize($caller);
 
     unless ( $caller->isa('Catalyst') ) { # XXX - Remove!
-        my @superclasses = ($meta->superclasses, $class, 'Catalyst::Controller'); # XXX - Remove!
+        my @superclasses = ($meta->superclasses, $class, 'Catalyst::Component'); # XXX - Remove!
         $meta->superclasses(@superclasses); # XXX - Remove!
     } # XXX - Remove!
 
@@ -114,6 +114,15 @@ sub import {
     $caller->arguments( [@arguments] );
     $caller->setup_home;
 }
+
+sub MODIFY_CODE_ATTRIBUTES {
+    Catalyst::Exception->throw(
+        "Catalyst applications (aka MyApp) cannot be controllers anymore. " .
+        "That has been deprecated and removed. You should create a " .
+        "controller class called Root.pm, and move relevant code to that class."
+    );
+}
+
 
 sub _application { $_[0] }
 
