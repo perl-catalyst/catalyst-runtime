@@ -471,6 +471,22 @@ sub find_component_regexp {
     return @result;
 }
 
+sub get_components_types {
+    my ( $self ) = @_;
+    my @comps_types;
+
+    for my $sub_container_name (qw/model view controller/) {
+        my $sub_container = $self->get_sub_container($sub_container_name);
+        for my $service ( $sub_container->get_service_list ) {
+            my $comp     = $self->resolve(service => $service);
+            my $compname = ref $comp || $comp;
+            my $type     = ref $comp ? 'instance' : 'class';
+            push @comps_types, [ $compname, $type ];
+        }
+    }
+
+    return @comps_types;
+}
 
 1;
 

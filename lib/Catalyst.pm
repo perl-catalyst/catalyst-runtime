@@ -1043,15 +1043,15 @@ EOF
 
     $class->setup_components;
 
-    if ( $class->debug ) { # XXX - Fixme to be a method on the container? (Or at least get a) data structure back from the container!!
+    if (
+        $class->debug and
+        my @comps_types = $class->container->get_components_types
+    ) {
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
-        for my $comp ( sort keys %{ $class->components } ) {
-            my $type = ref $class->components->{$comp} ? 'instance' : 'class';
-            $t->row( $comp, $type );
-        }
-        $class->log->debug( "Loaded components:\n" . $t->draw . "\n" )
-          if ( keys %{ $class->components } );
+        $t->row( @$_ ) for @comps_types;
+
+        $class->log->debug( "Loaded components:\n" . $t->draw . "\n" );
     }
 
     $class->setup_actions;
