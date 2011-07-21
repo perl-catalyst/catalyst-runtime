@@ -16,8 +16,7 @@ if ( $ENV{CATALYST_SERVER} ) {
 {
     ok( my $response = request('http://localhost/'), 'Request' );
 
-# FIXME: does this warning really need to be like that?
-    like($TestAppViewWarnings::log_messages[0], qr/Attempted to use view/s, 'View failure warning received');
+    like($TestAppViewWarnings::log_messages[0], qr/Calling \$c->view\(\) is not supported/s, 'View failure warning received');
 
 }
 
