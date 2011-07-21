@@ -2433,14 +2433,6 @@ sub _get_component_type_name {
     return (undef, $component);
 }
 
-sub _get_component_type {
-    my ( $instance ) = @_;
-
-    return 'controller' if $instance->isa('Catalyst::Controller');
-    return 'model'      if $instance->isa('Catalyst::Model');
-    return 'view'       if $instance->isa('Catalyst::View');
-}
-
 =head2 $c->locate_components( $setup_component_config )
 
 This method is meant to provide a list of component modules that should be
