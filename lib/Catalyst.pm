@@ -2358,7 +2358,12 @@ sub setup_components {
     my $class = shift;
 
     my $config  = $class->config->{ setup_components };
-    my $search_extra = $config->{ search_extra };
+
+    Catalyst::Exception->throw(
+        qq{You are using search_extra config option. That option is\n} .
+        qq{deprecated, please refer to the documentation for\n} .
+        qq{other ways of achieving the same results.\n}
+    ) if delete $config->{ search_extra };
 
     my @comps = $class->locate_components($config);
     my %comps = map { $_ => 1 } @comps;
@@ -2382,7 +2387,7 @@ sub setup_components {
 
     for my $component (@comps) {
         my $instance = $class->setup_component($component);
-        if ( my ($type, $name) = _get_component_type_name($component, $search_extra) ) {
+        if ( my ($type, $name) = _get_component_type_name($component) ) {
             $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $instance } ));
         }
         my @expanded_components = $instance->can('expand_modules')
@@ -2396,7 +2401,7 @@ sub setup_components {
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             ) if $deprecatedcatalyst_component_names;
 
-            if (my ($type, $name) = _get_component_type_name($component, $search_extra)) {
+            if (my ($type, $name) = _get_component_type_name($component)) {
                 $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
             }
         }
@@ -2410,15 +2415,9 @@ sub setup_components {
 # should it be moved to Catalyst::Utils,
 # or replaced by something already existing there?
 sub _get_component_type_name {
-    my ( $component, $search_extra) = @_;
-    $search_extra ||= [];
-    my @search_extra = map { s/^:://; lc $_ } @$search_extra;
+    my ( $component ) = @_;
 
     my @parts = split /::/, $component;
-
-    if (scalar @parts == 1) {
-        return (undef, $component);
-    }
 
     while (my $type = shift @parts) {
         return ('controller', join '::', @parts)
@@ -2429,10 +2428,9 @@ sub _get_component_type_name {
 
         return ('view', join '::', @parts)
             if $type =~ /^(v|view)$/i;
-
-        return (_get_component_type($component), join '::', @parts)
-            if @search_extra and ( grep { lc $type eq $_ } @search_extra );
     }
+
+    return (undef, $component);
 }
 
 sub _get_component_type {
@@ -2449,9 +2447,7 @@ This method is meant to provide a list of component modules that should be
 setup for the application.  By default, it will use L<Module::Pluggable>.
 
 Specify a C<setup_components> config option to pass additional options directly
-to L<Module::Pluggable>. To add additional search paths, specify a key named
-C<search_extra> as an array reference. Items in the array beginning with C<::>
-will have the application class name prepended to them.
+to L<Module::Pluggable>.
 
 =cut
 
@@ -2460,9 +2456,6 @@ sub locate_components {
     my $config = shift;
 
     my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
-    my $extra   = delete $config->{ search_extra } || [];
-
-    push @paths, @$extra;
 
     my $locator = Module::Pluggable::Object->new(
         search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
@@ -2931,12 +2924,6 @@ the upload) before actually recieving all the data. See L</ON-DEMAND PARSER>
 C<root> - The root directory for templates. Usually this is just a
 subdirectory of the home directory, but you can set it to change the
 templates to a different directory.
-
-=item *
-
-C<search_extra> - Array reference passed to Module::Pluggable to for additional
-namespaces from which components will be loaded (and constructed and stored in
-C<< $c->components >>).
 
 =item *
 
