@@ -53,6 +53,7 @@ requires 'MRO::Compat';
 requires 'MooseX::Getopt' => '0.30';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
+requires 'MooseX::Daemonize' => '0.13';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
 requires 'Plack' => '0.9974'; # IIS6 fix middleware
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
