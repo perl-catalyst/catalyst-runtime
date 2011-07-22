@@ -48,12 +48,14 @@ testOption( [ qw/-k/ ], ['3000', undef, opthash(keepalive => 1)] );
 testOption( [ qw/--keepalive/ ], ['3000', undef, opthash(keepalive => 1)] );
 
 # symlinks       -follow_symlinks          --sym --follow_symlinks
-testOption( [ qw/--follow_symlinks/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
+#
 testOption( [ qw/--sym/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
+testOption( [ qw/--follow_symlinks/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
 
 # background     -background               --bg --background
 testOption( [ qw/--background/ ], ['3000', undef, opthash(background => 1)] );
 testOption( [ qw/--bg/ ], ['3000', undef, opthash(background => 1)] );
+
 
 # restart        -r -restart --restart     -R --restart
 testRestart( ['-r'], restartopthash() );
@@ -103,10 +105,22 @@ sub testOption {
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
     my $server = pop @TestAppToTestScripts::RUN_ARGS;
+
+      use Data::Dump 'dump';
+      note dump 1,$server;
+      note dump 2,@TestAppToTestScripts::RUN_ARGS;
+      note dump 3,$argstring;
+
     like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';
+
+    my @run_args =  @TestAppToTestScripts::RUN_ARGS;
+    $run_args[-1]->{pidfile} = $run_args[-1]->{pidfile}->file->stringify
+      if $run_args[-1]->{pidfile};
+
+
     # Mangle argv into the options..
     $resultarray->[-1]->{argv} = $argstring;
-    is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
+    is_deeply \@run_args, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
 }
 
 sub testRestart {
