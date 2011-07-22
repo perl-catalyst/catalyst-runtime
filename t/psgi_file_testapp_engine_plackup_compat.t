@@ -4,6 +4,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 
 use Test::More;
+use Test::Exception;
 use Plack::Test;
 use TestApp;
 use HTTP::Request::Common;
@@ -19,7 +20,7 @@ like $warning, qr/You are running Catalyst\:\:Engine\:\:PSGI/,
 
 test_psgi $app, sub {
     my $cb = shift;
-    eval {
+    lives_ok {
         my $TIMEOUT_IN_SECONDS = 5;
         local $SIG{ALRM} = sub { die "alarm\n" };
         alarm($TIMEOUT_IN_SECONDS);
@@ -30,7 +31,7 @@ test_psgi $app, sub {
 
         alarm(0);
         1
-    } || fail "$@ problem";
+    } q{app didn't die or timeout};
 };
 
 done_testing;
