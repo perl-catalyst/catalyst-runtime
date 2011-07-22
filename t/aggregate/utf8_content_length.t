@@ -5,6 +5,8 @@ use lib "$Bin/../lib";
 use File::Spec;
 use Test::More;
 
+BEGIN { delete $ENV{CATALYST_HOME} }
+
 use Catalyst::Test qw/TestAppEncoding/;
 
 if ( $ENV{CATALYST_SERVER} ) {

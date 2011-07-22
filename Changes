@@ -7,6 +7,7 @@
     output that cookie (rather than trying to do so and causing an exception
     as previously happened). A warning is logged if this occurs in debug
     mode.
+  - Update tests to ignore $ENV{CATALYST_HOME} where required
 
 5.80032 2011-02-23 01:10:00
 
