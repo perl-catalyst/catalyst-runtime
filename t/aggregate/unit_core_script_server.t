@@ -105,12 +105,6 @@ sub testOption {
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
     my $server = pop @TestAppToTestScripts::RUN_ARGS;
-
-      use Data::Dump 'dump';
-      note dump 1,$server;
-      note dump 2,@TestAppToTestScripts::RUN_ARGS;
-      note dump 3,$argstring;
-
     like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';
 
     my @run_args =  @TestAppToTestScripts::RUN_ARGS;
