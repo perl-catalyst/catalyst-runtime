@@ -63,6 +63,7 @@ test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
 test_requires 'Test::More' => '0.88';
 test_requires 'Data::Dump';
+test_requires 'HTTP::Request::Common';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
