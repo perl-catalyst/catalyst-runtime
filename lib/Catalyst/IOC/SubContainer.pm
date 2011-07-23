@@ -6,8 +6,8 @@ use Catalyst::IOC::BlockInjection;
 extends 'Bread::Board::Container';
 
 has default_component => (
-    isa => 'Str|Undef',
-    is  => 'ro',
+    isa      => 'Str|Undef',
+    is       => 'ro',
     required => 0,
     writer   => '_set_default_component',
 );
@@ -31,7 +31,8 @@ sub get_component_regexp {
     return @result;
 }
 
-# FIXME: not the best name for a sub
+# FIXME - is this sub ok?
+# is the name ok too?
 sub make_single_default {
     my ( $self ) = @_;
 
@@ -55,9 +56,15 @@ Catalyst::IOC::SubContainer - Container for models, controllers and views
 
 =head2 get_component
 
+Gets the service of the container for the searched component. Also executes the ACCEPT_CONTEXT sub in the component, if it exists.
+
 =head2 get_component_regexp
 
+Gets all components from container that match a given regexp.
+
 =head2 make_single_default
+
+If the container has only one component, and no default has been defined, this method makes that one existing service the default.
 
 =head1 AUTHORS
 
