@@ -1443,11 +1443,13 @@ sub components {
     my ( $class, $comps ) = @_;
 
     # people create components calling this sub directly, before setup
-    $class->setup_config unless my $container = $class->container;
+    $class->setup_config unless $class->container;
+
+    my $container = $class->container;
 
     if ( $comps ) {
         $container->add_component(
-            $_, $class->setup_component($_)
+            $_, $class
         ) for keys %$comps;
     }
 
@@ -2314,9 +2316,6 @@ each component into the application.
 
 The C<setup_components> config option is passed to both of the above methods.
 
-Installation of each component is performed by the L<setup_component> method,
-below.
-
 =cut
 
 sub setup_components {
@@ -2347,9 +2346,10 @@ sub setup_components {
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
     }
 
+    my $container = $class->container;
+
     for my $component (@comps) {
-        my $instance = $class->setup_component($component);
-        $class->container->add_component( $component, $instance );
+        my $instance = $container->add_component( $component, $class );
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
             : $class->expand_component_module( $component, $config );
@@ -2361,12 +2361,12 @@ sub setup_components {
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             ) if $deprecatedcatalyst_component_names;
 
-            $class->container->add_component( $component, $class->setup_component($component) );
+            $container->add_component( $component, $class );
         }
     }
 
-    $class->container->get_sub_container('model')->make_single_default;
-    $class->container->get_sub_container('view')->make_single_default;
+    $container->get_sub_container('model')->make_single_default;
+    $container->get_sub_container('view')->make_single_default;
 }
 
 
@@ -2407,47 +2407,6 @@ is expected to return a list of component (package) names to be set up.
 sub expand_component_module {
     my ($class, $module) = @_;
     return Devel::InnerPackage::list_packages( $module );
-}
-
-=head2 $c->setup_component
-
-=cut
-
-## FIXME - Why the hell do we try calling the ->COMPONENT method twice, this is madness!?!
-sub setup_component {
-    my( $class, $component ) = @_;
-
-    unless ( $component->can( 'COMPONENT' ) ) {
-        return $component;
-    }
-
-    my $suffix = Catalyst::Utils::class2classsuffix( $component );
-    my $config = $class->config->{ $suffix } || {};
-    # Stash catalyst_component_name in the config here, so that custom COMPONENT
-    # methods also pass it. local to avoid pointlessly shitting in config
-    # for the debug screen, as $component is already the key name.
-    local $config->{catalyst_component_name} = $component;
-
-    my $instance = eval { $component->COMPONENT( $class, $config ); };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        Catalyst::Exception->throw(
-            message => qq/Couldn't instantiate component "$component", "$error"/
-        );
-    }
-    elsif (!blessed $instance) {
-        my $metaclass = Moose::Util::find_meta($component);
-        my $method_meta = $metaclass->find_method_by_name('COMPONENT');
-        my $component_method_from = $method_meta->associated_metaclass->name;
-        my $value = defined($instance) ? $instance : 'undef';
-        Catalyst::Exception->throw(
-            message =>
-            qq/Couldn't instantiate component "$component", COMPONENT() method (from $component_method_from) didn't return an object-like value (value was $value)./
-        );
-    }
-
-    return $instance;
 }
 
 =head2 $c->setup_dispatcher
