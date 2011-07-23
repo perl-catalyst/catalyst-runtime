@@ -703,18 +703,7 @@ sub component {
         return $c->component_list;
     }
 
-    my ($type, $name) = _get_component_type_name($component);
-
-    return $c->container->get_component_from_sub_container(
-        $type, $name, $c, @args
-    ) if $type;
-
     my @result = $c->container->find_component( $component, $c, @args );
-
-    # one last search for things like $c->comp(qr/::M::/)
-    @result = $c->container->find_component_regexp(
-        $c->components, $component, $c, @args
-    ) if !@result and ref $component;
 
     # list context for regexp searches
     return @result if ref $component;

@@ -432,8 +432,13 @@ sub get_component_from_sub_container {
 }
 
 sub find_component {
-    my ( $self, $component, @args ) = @_;
+    my ( $self, $component, $c, @args ) = @_;
+    my ( $type, $name ) = Catalyst::_get_component_type_name($component);
     my @result;
+
+    return $self->get_component_from_sub_container(
+        $type, $name, $c, @args
+    ) if $type;
 
     my $query = ref $component
               ? $component
@@ -445,9 +450,14 @@ sub find_component {
         my @components   = $subcontainer->get_service_list;
         @result          = grep { m{$component} } @components;
 
-        return map { $subcontainer->get_component( $_, @args ) } @result
+        return map { $subcontainer->get_component( $_, $c, @args ) } @result
             if @result;
     }
+
+    # one last search for things like $c->comp(qr/::M::/)
+    @result = $self->find_component_regexp(
+        $c->components, $component, $c, @args
+    ) if !@result and ref $component;
 
     # it expects an empty list on failed searches
     return @result;
