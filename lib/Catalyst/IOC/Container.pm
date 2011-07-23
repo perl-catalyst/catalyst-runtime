@@ -38,7 +38,7 @@ has substitutions => (
 has name => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'TestApp',
+    default => 'MyApp',
 );
 
 has sub_container_class => (
@@ -78,6 +78,7 @@ sub BUILD {
         $self->build_controller_subcontainer
     );
 
+    # FIXME - the config should be merged at this point
     my $config        = $self->resolve( service => 'config' );
     my $default_view  = $params->{default_view}  || $config->{default_view};
     my $default_model = $params->{default_model} || $config->{default_model};
@@ -408,6 +409,7 @@ sub get_component_from_sub_container {
         return $sub_container->get_component( $default, $c, @args )
             if $default && $sub_container->has_service( $default );
 
+        # FIXME - should I be calling $c->log->warn here?
         # this is never a controller, so this is safe
         $c->log->warn( "Calling \$c->$sub_container_name() is not supported unless you specify one of:" );
         $c->log->warn( "* \$c->config(default_$sub_container_name => 'the name of the default $sub_container_name to use')" );
@@ -446,7 +448,7 @@ sub find_component {
               ;
 
     for my $subcontainer_name (qw/model view controller/) {
-        my $subcontainer = $self->get_sub_container($subcontainer_name);
+        my $subcontainer = $self->get_sub_container( $subcontainer_name );
         my @components   = $subcontainer->get_service_list;
         @result          = grep { m{$component} } @components;
 
@@ -454,6 +456,7 @@ sub find_component {
             if @result;
     }
 
+    # FIXME - I guess I shouldn't be calling $c->components here
     # one last search for things like $c->comp(qr/::M::/)
     @result = $self->find_component_regexp(
         $c->components, $component, $c, @args
@@ -569,19 +572,37 @@ Catalyst::Container - IOC for Catalyst components
 
 =head1 METHODS
 
+=head1 Containers
+
 =head2 build_model_subcontainer
+
+Container that stores all models.
 
 =head2 build_view_subcontainer
 
+Container that stores all views.
+
 =head2 build_controller_subcontainer
+
+Container that stores all controllers.
+
+=head1 Services
 
 =head2 build_name_service
 
+Name of the application.
+
 =head2 build_driver_service
+
+Config options passed directly to the driver being used.
 
 =head2 build_file_service
 
+?
+
 =head2 build_substitutions_service
+
+Executes all the substitutions in config. See L</_config_substitutions> method.
 
 =head2 build_extensions_service
 
@@ -605,21 +626,77 @@ Catalyst::Container - IOC for Catalyst components
 
 =head2 build_config_local_suffix_service
 
-=head2 get_component_from_sub_container
+Determines the suffix of files used to override the main config. By default
+this value is C<local>, which will load C<myapp_local.conf>.  The suffix can
+be specified in the following order of preference:
+
+=over
+
+=item * C<$ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }>
+
+=item * C<$ENV{ CATALYST_CONFIG_LOCAL_SUFFIX }>
+
+=back
+
+The first one of these values found replaces the default of C<local> in the
+name of the local config file to be loaded.
+
+For example, if C< $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }> is set to C<testing>,
+ConfigLoader will try and load C<myapp_testing.conf> instead of
+C<myapp_local.conf>.
+
+=head2 get_component_from_sub_container($sub_container, $name, $c, @args)
+
+Looks for components in a given subcontainer (such as controller, model or view), and returns the searched component. If $name is undef, it returns the default component (such as default_view, if $sub_container is 'view'). If $name is a regexp, it returns an array of matching components. Otherwise, it looks for the component with name $name.
 
 =head2 get_components_types
 
 =head2 get_all_components
 
+Fetches all the components, in each of the sub_containers model, view and controller, and returns a readonly hash. The keys are the class names, and the values are the blessed objects. This is what is returned by $c->components.
+
 =head2 add_component
+
+Adds a component to the appropriate subcontainer. The subcontainer is guessed by the component name given.
 
 =head2 find_component
 
+Searches for components in all containers. If $component is the full class name, the subcontainer is guessed, and it gets the searched component in there. Otherwise, it looks for a component with that name in all subcontainers. If $component is a regexp, it calls the method below, find_component_regexp, and matches all components against that regexp.
+
 =head2 find_component_regexp
+
+Finds components that match a given regexp. Used internally, by find_component.
 
 =head2 _fix_syntax
 
 =head2 _config_substitutions
+
+This method substitutes macros found with calls to a function. There are a
+number of default macros:
+
+=over
+
+=item * C<__HOME__> - replaced with C<$c-E<gt>path_to('')>
+
+=item * C<__ENV(foo)__> - replaced with the value of C<$ENV{foo}>
+
+=item * C<__path_to(foo/bar)__> - replaced with C<$c-E<gt>path_to('foo/bar')>
+
+=item * C<__literal(__FOO__)__> - leaves __FOO__ alone (allows you to use
+C<__DATA__> as a config value, for example)
+
+=back
+
+The parameter list is split on comma (C<,>). You can override this method to
+do your own string munging, or you can define your own macros in
+C<MyApp-E<gt>config-E<gt>{ 'Plugin::ConfigLoader' }-E<gt>{ substitutions }>.
+Example:
+
+    MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } = {
+        baz => sub { my $c = shift; qux( @_ ); }
+    }
+
+The above will respond to C<__baz(x,y)__> in config strings.
 
 =head1 AUTHORS
 
