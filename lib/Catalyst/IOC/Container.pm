@@ -4,6 +4,7 @@ use Moose;
 use Config::Any;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
+use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Catalyst::IOC::BlockInjection;
 use namespace::autoclean;
@@ -489,6 +490,27 @@ sub get_components_types {
     return @comps_types;
 }
 
+sub get_all_components {
+    my $self = shift;
+    my %components;
+
+    my $containers = {
+        map { $_ => $self->get_sub_container($_) } qw(model view controller)
+    };
+
+    for my $container (keys %$containers) {
+        for my $component ($containers->{$container}->get_service_list) {
+            my $comp = $containers->{$container}->resolve(
+                service => $component
+            );
+            my $comp_name = ref $comp || $comp;
+            $components{$comp_name} = $comp;
+        }
+    }
+
+    return lock_hash %components;
+}
+
 1;
 
 __END__
@@ -540,6 +562,8 @@ Catalyst::Container - IOC for Catalyst components
 =head2 get_component_from_sub_container
 
 =head2 get_components_types
+
+=head2 get_all_components
 
 =head2 find_component
 

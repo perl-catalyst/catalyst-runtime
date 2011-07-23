@@ -27,7 +27,6 @@ use URI::https;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
-use Hash::Util qw/lock_hash/;
 use List::MoreUtils qw/uniq/;
 use attributes;
 use utf8;
@@ -1474,19 +1473,7 @@ sub components {
         }
     }
 
-    my %components;
-    for my $container (keys %$containers) {
-        my @service_list = $containers->{$container}->get_service_list;
-        for my $component (@service_list) {
-            my $comp = $containers->{$container}->resolve(
-                service => $component
-            );
-            my $comp_name = ref $comp || $comp;
-            $components{$comp_name} = $comp;
-        }
-    }
-
-    return lock_hash %components;
+    return $class->container->get_all_components();
 }
 
 =head2 $c->context_class
