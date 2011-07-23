@@ -1442,22 +1442,16 @@ Returns a hash of components.
 sub components {
     my ( $class, $comps ) = @_;
 
-    # FIXME: should this ugly kludge exist?
-    $class->setup_config unless defined $class->container;
-
-    my $containers;
-    $containers->{$_} = $class->container->get_sub_container($_)
-        for qw(model view controller);
+    # people create components calling this sub directly, before setup
+    $class->setup_config unless my $container = $class->container;
 
     if ( $comps ) {
-        for my $component ( keys %$comps ) {
-            $class->container->add_component(
-                $component, $class->setup_component($component)
-            );
-        }
+        $container->add_component(
+            $_, $class->setup_component($_)
+        ) for keys %$comps;
     }
 
-    return $class->container->get_all_components();
+    return $container->get_all_components();
 }
 
 =head2 $c->context_class
