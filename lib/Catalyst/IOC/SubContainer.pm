@@ -52,6 +52,10 @@ __END__
 
 Catalyst::IOC::SubContainer - Container for models, controllers and views
 
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
 =head1 METHODS
 
 =head2 get_component

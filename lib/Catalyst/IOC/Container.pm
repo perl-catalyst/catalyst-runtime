@@ -570,6 +570,10 @@ __END__
 
 Catalyst::Container - IOC for Catalyst components
 
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
 =head1 METHODS
 
 =head1 Containers
