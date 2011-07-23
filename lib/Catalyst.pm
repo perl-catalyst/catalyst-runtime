@@ -1451,13 +1451,8 @@ sub components {
 
     if ( $comps ) {
         for my $component ( keys %$comps ) {
-            my ($type, $name) = _get_component_type_name($component);
-
-            $containers->{$type}->add_service(
-                Catalyst::IOC::BlockInjection->new(
-                    name  => $name,
-                    block => sub { $class->setup_component($component) },
-                )
+            $class->container->add_component(
+                $component, $class->setup_component($component)
             );
         }
     }
@@ -2358,14 +2353,9 @@ sub setup_components {
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
     }
 
-    my $containers;
-    $containers->{$_} = $class->container->get_sub_container($_) for qw(model view controller);
-
     for my $component (@comps) {
         my $instance = $class->setup_component($component);
-        if ( my ($type, $name) = _get_component_type_name($component) ) {
-            $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $instance } ));
-        }
+        $class->container->add_component( $component, $instance );
         my @expanded_components = $instance->can('expand_modules')
             ? $instance->expand_modules( $component, $config )
             : $class->expand_component_module( $component, $config );
@@ -2377,37 +2367,14 @@ sub setup_components {
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             ) if $deprecatedcatalyst_component_names;
 
-            if (my ($type, $name) = _get_component_type_name($component)) {
-                $containers->{$type}->add_service(Catalyst::IOC::BlockInjection->new( name => $name, block => sub { return $class->setup_component($component) } ));
-            }
+            $class->container->add_component( $component, $class->setup_component($component) );
         }
     }
 
-    $containers->{model}->make_single_default;
-    $containers->{view}->make_single_default;
+    $class->container->get_sub_container('model')->make_single_default;
+    $class->container->get_sub_container('view')->make_single_default;
 }
 
-# FIXME: should this sub exist?
-# should it be moved to Catalyst::Utils,
-# or replaced by something already existing there?
-sub _get_component_type_name {
-    my ( $component ) = @_;
-
-    my @parts = split /::/, $component;
-
-    while (my $type = shift @parts) {
-        return ('controller', join '::', @parts)
-            if $type =~ /^(c|controller)$/i;
-
-        return ('model', join '::', @parts)
-            if $type =~ /^(m|model)$/i;
-
-        return ('view', join '::', @parts)
-            if $type =~ /^(v|view)$/i;
-    }
-
-    return (undef, $component);
-}
 
 =head2 $c->locate_components( $setup_component_config )
 

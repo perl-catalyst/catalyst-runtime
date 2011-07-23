@@ -433,7 +433,7 @@ sub get_component_from_sub_container {
 
 sub find_component {
     my ( $self, $component, $c, @args ) = @_;
-    my ( $type, $name ) = Catalyst::_get_component_type_name($component);
+    my ( $type, $name ) = _get_component_type_name($component);
     my @result;
 
     return $self->get_component_from_sub_container(
@@ -470,9 +470,7 @@ sub find_component_regexp {
     my @components = grep { m{$component} } keys %{ $components };
 
     for (@components) {
-        # FIXME this is naughty enough being called inside Catalyst.pm
-        # find some alternative for this sub and remember to delete here
-        my ($type, $name) = Catalyst::_get_component_type_name($_);
+        my ($type, $name) = _get_component_type_name($_);
 
         push @result, $self->get_component_from_sub_container(
             $type, $name, @args
@@ -519,6 +517,44 @@ sub get_all_components {
     }
 
     return lock_hash %components;
+}
+
+sub add_component {
+# FIXME I'm aware it shouldn't be getting $instance as an argument
+# and that setup_component should be removed. This is temporary
+    my ( $self, $component, $instance ) = @_;
+    my ( $type, $name ) = _get_component_type_name($component);
+
+    return unless $type;
+
+    $self->get_sub_container($type)->add_service(
+        Catalyst::IOC::BlockInjection->new(
+            name  => $name,
+            block => sub { $instance },
+        )
+    );
+}
+
+# FIXME: should this sub exist?
+# should it be moved to Catalyst::Utils,
+# or replaced by something already existing there?
+sub _get_component_type_name {
+    my ( $component ) = @_;
+
+    my @parts = split /::/, $component;
+
+    while (my $type = shift @parts) {
+        return ('controller', join '::', @parts)
+            if $type =~ /^(c|controller)$/i;
+
+        return ('model', join '::', @parts)
+            if $type =~ /^(m|model)$/i;
+
+        return ('view', join '::', @parts)
+            if $type =~ /^(v|view)$/i;
+    }
+
+    return (undef, $component);
 }
 
 1;
@@ -574,6 +610,8 @@ Catalyst::Container - IOC for Catalyst components
 =head2 get_components_types
 
 =head2 get_all_components
+
+=head2 add_component
 
 =head2 find_component
 
