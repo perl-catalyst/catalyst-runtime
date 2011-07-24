@@ -1123,7 +1123,7 @@ sub setup {
     $class->setup_plugins( delete $flags->{plugins} );
     $class->setup_dispatcher( delete $flags->{dispatcher} );
     if (my $engine = delete $flags->{engine}) {
-        $class->log->warn("Specifying the engine in ->setup is no longer supported, XXX FIXME");
+        $class->log->warn("Specifying the engine in ->setup is no longer supported, see Catalyst::Upgrading");
     }
     $class->setup_engine();
     $class->setup_stats( delete $flags->{stats} );

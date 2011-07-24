@@ -56,7 +56,7 @@ engine specific fixes for uniform behaviour, as contained in:
 
 =over
 
-=item L<Plack::Middleware::LighttpdScriptNameFix> - FIXME, we don't use that really.
+=item L<Plack::Middleware::LighttpdScriptNameFix>
 
 =item L<Plack::Middleware::IIS6ScriptNameFix>
 

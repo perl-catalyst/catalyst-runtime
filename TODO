@@ -43,12 +43,6 @@ Looks to me like we are mapping --deamon to --detach but I think the modern Plac
 
 Although --pidfile is supported --pid seems to be preferred, and if we are bothering to map, why not map for the future?
 
-##### myapp_web_server.pl
-
---pidfile handling is shiit. MooseX::Daemonize will blow up really nastilly if not installed..
-
- --background handling also shit.
-
 ###  Nice to have
 
   * <@rafl> i've been thinking of maybe providing

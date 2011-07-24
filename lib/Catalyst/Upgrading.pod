@@ -167,13 +167,21 @@ highly welcomed:
 
 =back
 
+=head2 Specifying the engine in the call to ->setup
+
+XXX FIXME
+
 =head2 Using middleware
 
-XXX Should this be here or elsewhere?
+XXX FIXME Should this be here or elsewhere?
 
 =head2 Making an app.psgi file
 
+FIXME
+
 =head2 Running with plackup?
+
+FIXME
 
 =head2 Tests in 5.89
 
