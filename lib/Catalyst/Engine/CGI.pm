@@ -261,7 +261,7 @@ sub prepare_request {
     my ( $self, $c, %args ) = @_;
 
     if ( $args{env} ) {
-        $self->env( $args{env} );
+        $self->_set_env( $args{env} );
     }
 }
 

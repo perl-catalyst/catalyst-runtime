@@ -15,7 +15,7 @@ use utf8;
 
 use namespace::clean -except => 'meta';
 
-has env => (is => 'rw');
+has env => (is => 'rw', writer => '_set_env');
 
 # input position and length
 has read_length => (is => 'rw');
