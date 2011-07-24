@@ -9,6 +9,9 @@
 
  Bug fixes:
 
+  - mod_perl handler fixed to work with application classes which have manually
+    been made immutable.
+
   - Scripts now force the Plack engine choice manually, rather than relying
     on auto-detection, as the automatic mechanism gets it wrong if (for
     example) Coro is loaded.

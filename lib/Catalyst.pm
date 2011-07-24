@@ -2626,12 +2626,19 @@ sub setup_engine {
 
     if ($ENV{MOD_PERL}) {
         my $apache = $class->engine_loader->auto;
-        # FIXME - Immutable
-        $class->meta->add_method(handler => sub {
+
+        my $meta = find_meta($class);
+        my $was_immutable = $meta->is_immutable;
+        my %immutable_options = $meta->immutable_options;
+        $meta->make_mutable if $was_immutable;
+
+        $meta->add_method(handler => sub {
             my $r = shift;
             my $psgi_app = $class->psgi_app;
             $apache->call_app($r, $psgi_app);
         });
+
+        $meta->make_immutable(%immutable_options) if $was_immutable;
     }
 
     $class->engine( $engine->new );
