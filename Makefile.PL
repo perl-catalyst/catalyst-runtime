@@ -79,6 +79,7 @@ else {
 author_requires 'CatalystX::LeakChecker', '0.05';
 author_requires 'File::Copy::Recursive'; # For http server test
 author_requires 'Catalyst::Devel', '1.0'; # For http server test
+author_requires 'Catalyst::Engine::PSGI';
 
 author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(

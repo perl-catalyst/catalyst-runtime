@@ -9,6 +9,9 @@ use Plack::Test;
 use TestApp;
 use HTTP::Request::Common;
 
+plan skip_all => "Catalyst::Engine::PSGI required for this test"
+    unless eval { require Catalyst::Engine::PSGI; 1; };
+
 my $warning;
 local $SIG{__WARN__} = sub { $warning = $_[0] };
 
