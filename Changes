@@ -6,8 +6,8 @@
 
   - Fix Path actions debug screen to display number of arguments
 
-  - Remove special-casing of '*' for get_action_methods, instead making the
-    handling more generic
+  - Fix a regression that prevented configuring attributes for all actions using
+    ->config(actions => { '*' => \%attrs }) from working
 
   - Append $\ in Catalyst::Response->print to more closely match
     IO::Handle's behaviour.
