@@ -70,6 +70,8 @@ application returned when you call C<< MyApp->psgi_app >>, and if you need
 any of this functionality, you'll need to implement this in your C<< .psgi >>
 file yourself.
 
+XXX FIXME - Add details about how to get 'standard' wrapping done if you want it.
+
 =head1 SEE ALSO
 
 L<Catalyst::Upgrading>, L<Plack>, L<PSGI::FAQ>, L<PSGI>.

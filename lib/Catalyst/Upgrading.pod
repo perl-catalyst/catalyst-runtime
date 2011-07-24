@@ -171,17 +171,9 @@ highly welcomed:
 
 XXX FIXME
 
-=head2 Using middleware
+=head2 Plack functionality
 
-XXX FIXME Should this be here or elsewhere?
-
-=head2 Making an app.psgi file
-
-FIXME
-
-=head2 Running with plackup?
-
-FIXME
+See L<Catalyst::PSGI>.
 
 =head2 Tests in 5.89
 
