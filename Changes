@@ -1,13 +1,38 @@
 # This file documents the revision history for Perl extension Catalyst.
 
  Bug fixes:
+  - Fix Catalyst::Request so that the hostname accessor is not incorrectly
+    populated with 'localhost' if a reverse DNS lookup fails.
+
+  - Fix Path actions debug screen to display number of arguments
+
+  - Remove special-casing of '*' for get_action_methods, instead making the
+    handling more generic
+
+  - Append $\ in Catalyst::Response->print to more closely match
+    IO::Handle's behaviour.
+
+  - Fixed situation where a detach($action) from a forward within auto
+    was not breaking out correctly
+
   - Fix the disable_component_resolution_regex_fallback config setting
     to also work in the $c->component method.
+
   - Handle users setting cookies with an undef value by not trying to
     output that cookie (rather than trying to do so and causing an exception
     as previously happened). A warning is logged if this occurs in debug
     mode.
   - Update tests to ignore $ENV{CATALYST_HOME} where required
+
+  - Change repository metadata to point at git.
+
+  - Clean namespaces in Catalyst::Request::Upload
+
+  - Catalyst::Test: Fixes to action_ok, action_redirect and action_notfound
+    test functions to be better documented, and have better default test
+    names.
+
+  - Update tests to ignore CATALYST_HOME env var.
 
 5.80032 2011-02-23 01:10:00
 
