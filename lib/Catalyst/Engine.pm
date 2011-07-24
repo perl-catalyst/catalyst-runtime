@@ -128,6 +128,11 @@ sub finalize_cookies {
                 -httponly => $val->{httponly} || 0,
             )
         );
+        if (!defined $cookie) {
+            $c->log->warn("undef passed in '$name' cookie value - not setting cookie")
+                if $c->debug;
+            next;
+        }
 
         push @cookies, $cookie->as_string;
     }

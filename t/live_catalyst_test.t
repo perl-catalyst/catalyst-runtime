@@ -6,7 +6,7 @@ use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestApp', {default_host => 'default.com'};
 use Catalyst::Request;
 
-use Test::More tests => 10;
+use Test::More;
 
 content_like('/',qr/root/,'content check');
 action_ok('/','Action ok ok','normal action ok');
@@ -43,3 +43,6 @@ my $req = '/dump/request';
     eval '$creq = ' . request($req, \%opts)->content;
     is( $creq->uri->host, $opts{host}, 'target host is mutable via options hashref' );
 }
+
+done_testing;
+

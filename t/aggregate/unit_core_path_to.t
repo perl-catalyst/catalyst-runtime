@@ -27,6 +27,8 @@ use_ok('Catalyst');
 
 my $context = 'Catalyst';
 
+delete $ENV{CATALYST_HOME}; # otherwise it'll set itself up to the wrong place
+
 $context->setup_home;
 my $base = dir($FindBin::Bin)->relative->stringify;
 
