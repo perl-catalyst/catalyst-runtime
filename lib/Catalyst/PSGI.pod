@@ -70,7 +70,9 @@ application returned when you call C<< MyApp->psgi_app >>, and if you need
 any of this functionality, you'll need to implement this in your C<< .psgi >>
 file yourself.
 
-XXX FIXME - Add details about how to get 'standard' wrapping done if you want it.
+An apply_default_middlewares method is supplied to wrap your application
+in the default middlewares if you want this behaviour and you are providing
+your own .psgi file.
 
 =head1 SEE ALSO
 
