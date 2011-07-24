@@ -80,6 +80,8 @@ author_requires 'File::Copy::Recursive'; # For http server test
 author_requires 'Catalyst::Devel', '1.0'; # For http server test
 author_requires 'Catalyst::Engine::PSGI';
 author_requires 'Test::Without::Module';
+author_requires 'Starman';
+author_requires 'MooseX::Daemonize';
 
 author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(
