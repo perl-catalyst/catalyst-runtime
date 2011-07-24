@@ -30,7 +30,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Blockers
 
-  * Test all the options work on all of the scripts
+  * Ensure all PSGI related FIXMEs in docs or code are in this list
   * Fix nginx middlewares so that they are generic, or can somehow
     be used by people with their own .psgi files
   * Fix a sane / nicer way to do custom engines.

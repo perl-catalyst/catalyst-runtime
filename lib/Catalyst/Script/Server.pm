@@ -3,6 +3,7 @@ use Moose;
 use MooseX::Types::Common::Numeric qw/PositiveInt/;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use Catalyst::Utils;
+use Try::Tiny;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -46,18 +47,24 @@ has port => (
 
 use Moose::Util::TypeConstraints;
 class_type 'MooseX::Daemonize::Pid::File';
-subtype 'MyStr', as Str, where { 1 }; # FIXME - Fuck ugly!
-coerce 'MooseX::Daemonize::Pid::File', from 'MyStr', via {
-    Class::MOP::load_class("MooseX::Daemonize::Pid::File");
+subtype 'Catalyst::Script::Server::Types::Pidfile',
+    as 'MooseX::Daemonize::Pid::File',
+    where { 1 };
+coerce 'Catalyst::Script::Server::Types::Pidfile', from Str, via {
+    try { Class::MOP::load_class("MooseX::Daemonize::Pid::File") }
+    catch {
+        warn("Could not load MooseX::Daemonize::Pid::File, needed for --pid option\n");
+        exit 1;
+    };
     MooseX::Daemonize::Pid::File->new( file => $_ );
 };
 MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
-    'MooseX::Daemonize::Pid::File' => '=s',
+    'Catalyst::Script::Server::Types::Pidfile' => '=s',
 );
 has pidfile => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'pid',
-    isa           => 'MooseX::Daemonize::Pid::File',
+    isa           => 'Catalyst::Script::Server::Types::Pidfile',
     is            => 'ro',
     documentation => 'Specify a pidfile',
     coerce        => 1,
@@ -69,7 +76,11 @@ sub BUILD {
 
     if ($self->background) {
         # FIXME - This is evil. Should we just add MX::Daemonize to the deps?
-        Class::MOP::load_class('MooseX::Daemonize::Core');
+        try { Class::MOP::load_class('MooseX::Daemonize::Core') }
+        catch {
+            warn("MooseX::Daemonize is needed for the --background option\n");
+            exit 1;
+        };
         MooseX::Daemonize::Core->meta->apply($self);
     }
 }
@@ -124,7 +135,7 @@ has restart_delay => (
 {
     use Moose::Util::TypeConstraints;
 
-    my $tc = subtype as RegexpRef;
+    my $tc = subtype 'Catalyst::Script::Server::Types::RegexpRef', as RegexpRef;
     coerce $tc, from Str, via { qr/$_/ };
 
     MooseX::Getopt::OptionTypeMap->add_option_type_to_map($tc => '=s');
