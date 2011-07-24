@@ -833,6 +833,7 @@ sub run {
         # instead the $app->handle method is called per request.
         $app->log->warn("Not supplied a Plack engine, falling back to engine auto-loader (are your scripts ancient?)")
     }
+    $app->run_options($options);
     $server->run($psgi, $options);
 }
 

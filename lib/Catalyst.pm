@@ -75,7 +75,7 @@ our $GO        = Catalyst::Exception::Go->new;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
-  setup_finished _psgi_app loading_psgi_file/;
+  setup_finished _psgi_app loading_psgi_file run_options/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1572,6 +1572,16 @@ sub welcome_message {
 </html>
 EOF
 }
+
+=head2 run_options
+
+Contains a hash of options passed from the application script, including
+the original ARGV the script receieved, the processed values from that
+ARGV and any extra arguments to the script which were not processed.
+
+This can be used to add custom options to your application's scripts
+and setup your application differently depending on the values of these
+options.
 
 =head1 INTERNAL METHODS
 

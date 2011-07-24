@@ -37,8 +37,15 @@ sub testOption {
     } "new_with_options";
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
+
     my $server = pop @TestAppToTestScripts::RUN_ARGS;
     is $server, $fake_handler, 'Loaded Plack handler gets passed to the app';
+
+    if (scalar(@TestAppToTestScripts::RUN_ARGS) && ref($TestAppToTestScripts::RUN_ARGS[-1]) eq "HASH") {
+        is ref(delete($TestAppToTestScripts::RUN_ARGS[-1]->{argv})), 'ARRAY';
+        is ref(delete($TestAppToTestScripts::RUN_ARGS[-1]->{extra_argv})), 'ARRAY';
+    }
+
     is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison";
 }
 
