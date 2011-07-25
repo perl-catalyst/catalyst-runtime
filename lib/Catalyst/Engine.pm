@@ -15,7 +15,7 @@ use utf8;
 
 use namespace::clean -except => 'meta';
 
-has env => (is => 'rw');
+has env => (is => 'rw', writer => '_set_env');
 
 # input position and length
 has read_length => (is => 'rw');
@@ -93,6 +93,11 @@ sub finalize_cookies {
                 -httponly => $val->{httponly} || 0,
             )
         );
+        if (!defined $cookie) {
+            $c->log->warn("undef passed in '$name' cookie value - not setting cookie")
+                if $c->debug;
+            next;
+        }
 
         push @cookies, $cookie->as_string;
     }

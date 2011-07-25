@@ -32,4 +32,11 @@ sub three : Local {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub four : Local {
+    my ( $self, $c ) = @_;
+    $c->res->cookies->{good} = { value => 'good_cookie', path => '/' };
+    $c->res->cookies->{bad} = { value => undef };
+    $c->forward('TestApp::View::Dump::Request');
+}
+
 1;
