@@ -11,3 +11,5 @@ use Test::Without::Module qw(
 );
 require "$Bin/../aggregate/unit_core_script_server.t";
 
+1;
+

@@ -177,3 +177,6 @@ sub restartopthash {
     };
     return $val;
 }
+
+1;
+
