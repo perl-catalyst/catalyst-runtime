@@ -64,9 +64,27 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     - This is so that you can just load the container and get models etc from it,
       without loading Catalyst.
 
+    - Finish moving setup_component
+        - $component->COMPONENT() is still called by setup_component
+          (should there be a Service::WithCOMPONENT to solve this?)
+        - make it a method, not function
+
+    - Break $instance->expand_modules() in setup_components and figure
+      out later how to bring it back
+
+    - Move expand_component_module
+
+    - Move locate_components
+
+    - Move contents of setup_components
+
   - Finished documentation for ::IOC parts.
 
+  - Creating service()-like sugar for component
+
   - Test cases for extending the container in an application.
+    - Using the sugar added in the previous item
+    - Test when Model::Foo depends_on Model::Bar
 
   - Allowing people to change component lifecycles
 
