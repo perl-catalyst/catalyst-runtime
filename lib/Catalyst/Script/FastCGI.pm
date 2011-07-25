@@ -90,8 +90,9 @@ sub _plack_loader_args {
     my ($self) = shift;
 
     my $opts = Data::OptList::mkopt([
-      qw/pidfile manager nproc proc_title/,
-            detach          => [ 'daemon' ],
+      qw/manager nproc proc_title/,
+            pid             => [ 'pidfile' ],
+            daemonize       => [ 'daemon' ],
             keep_stderr     => [ 'keeperr' ],
             listen          => [ '_listen' ],
         ]);

@@ -37,12 +37,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 #### Script survey
 
-##### myapp_web_fastcgi.pl
-
-Looks to me like we are mapping --deamon to --detach but I think the modern Plack FCGI handler prefers --deamonize
-
-Although --pidfile is supported --pid seems to be preferred, and if we are bothering to map, why not map for the future?
-
 ###  Nice to have
 
   * <@rafl> i've been thinking of maybe providing
