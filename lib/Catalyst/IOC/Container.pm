@@ -526,16 +526,12 @@ sub add_component {
 
     return unless $type;
 
-    my $instance = setup_component( $component, $class );
-
     $self->get_sub_container($type)->add_service(
         Catalyst::IOC::BlockInjection->new(
             name  => $name,
-            block => sub { $instance },
+            block => sub { $self->setup_component( $component, $class ) },
         )
     );
-
-    return $instance;
 }
 
 # FIXME: should this sub exist?
@@ -563,7 +559,7 @@ sub _get_component_type_name {
 # FIXME ugly and temporary
 # Just moved it here the way it was, so we can work on it here in the container
 sub setup_component {
-    my ( $component, $class ) = @_;
+    my ( $self, $component, $class ) = @_;
 
     unless ( $component->can( 'COMPONENT' ) ) {
         return $component;
@@ -572,7 +568,7 @@ sub setup_component {
     # FIXME I know this isn't the "Dependency Injection" way of doing things,
     # its just temporary
     my $suffix = Catalyst::Utils::class2classsuffix( $component );
-    my $config = $class->config->{ $suffix } || {};
+    my $config = $self->resolve(service => 'config')->{ $suffix } || {};
 
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it. local to avoid pointlessly shitting in config

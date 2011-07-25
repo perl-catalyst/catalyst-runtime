@@ -2349,10 +2349,9 @@ sub setup_components {
     my $container = $class->container;
 
     for my $component (@comps) {
-        my $instance = $container->add_component( $component, $class );
-        my @expanded_components = $instance->can('expand_modules')
-            ? $instance->expand_modules( $component, $config )
-            : $class->expand_component_module( $component, $config );
+        $container->add_component( $component, $class );
+# FIXME - $instance->expand_modules() is broken
+        my @expanded_components = $class->expand_component_module( $component, $config );
         for my $component (@expanded_components) {
             next if $comps{$component};
 
