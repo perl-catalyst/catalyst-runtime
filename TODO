@@ -64,6 +64,10 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     - This is so that you can just load the container and get models etc from it,
       without loading Catalyst.
 
+  - Finished documentation for ::IOC parts.
+
+  - Test cases for extending the container in an application.
+
   - Allowing people to change component lifecycles
 
     - This is done by being able to use an alternate Service class..
