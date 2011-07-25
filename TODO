@@ -54,3 +54,29 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   - Profit! (Things like changing the complete app config per vhost, i.e.
     writing a config loader / app class role which dispatches per vhost to
     differently configured apps is piss easy)
+
+## GSOC
+
+### Next large steps:
+
+  - Moving setup_components etc into the container
+
+    - This is so that you can just load the container and get models etc from it,
+      without loading Catalyst.
+
+  - Allowing people to change component lifecycles
+
+    - This is done by being able to use an alternate Service class..
+
+      I.E. We currently force everything to do Catalyst/IOC/Service/WithAcceptContext.pm, but
+      things without an ACCEPT_CONTEXT could just not bother, and it would be nice to have
+      one that cached the object in request scope (i.e. Catalyst::Component::InstancePerContext)
+      etc.
+
+      However we need to work out an interface for people to setup / configure this.
+
+### To polish off
+
+  - Document current methods
+  - +    $class->container->get_sub_container('model')->make_single_default;
++    $class->container->get_sub_container('view')->make_single_default;
