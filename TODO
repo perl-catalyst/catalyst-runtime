@@ -61,18 +61,9 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   - Moving setup_components etc into the container
 
-    - This is so that you can just load the container and get models etc from it,
-      without loading Catalyst.
+    - Move setup_components down into the container (setup_components becomes a one or two line method in Catalyst.pm)
 
-    - Finish moving setup_component
-        - $component->COMPONENT() is still called by setup_component
-          (should there be a Service::WithCOMPONENT to solve this?)
-        - make it a method, not function
-
-    - Break $instance->expand_modules() in setup_components and figure
-      out later how to bring it back
-
-    - Move expand_component_module
+    - refactor / cleanup setup_component
 
     - Move locate_components
 
@@ -88,17 +79,52 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   - Allowing people to change component lifecycles
 
-    - This is done by being able to use an alternate Service class..
+     role Service::WithAcceptContext {}
+     role Service::WithCOMPONENT {}
+     class Service::CatalystComponent extends Service with (WithAcceptContext, WithCOMPONENT) {}
 
-      I.E. We currently force everything to do Catalyst/IOC/Service/WithAcceptContext.pm, but
-      things without an ACCEPT_CONTEXT could just not bother, and it would be nice to have
-      one that cached the object in request scope (i.e. Catalyst::Component::InstancePerContext)
-      etc.
+    a) configure additional services in that container 
+        -  super simple container $default_container => as { more services };
+        class MyApp::Container extends Catalyst::Container {
+            use Bread::Board; # Or our own sugar?
+            method BUILD { container $self => as { 
+                    service model => ...; # some constructor injection to MyApp::Model or something
+                    container Model => as {
+                        component Foo => (dependencies => ['/model']); # As per default!
+                        component Bar => (dependencies => ['/model/Foo']); # Magic!
+                    };
+                    # Note - implementation of BB may need to be changed to support making sure existing 
+                    # services actually get overridden. not sure how the default container behaves when doing that
+                    # above code would build the constructor injection as it currently does,
+                    # defaulting to the class name in the right namespace as declared by the surrounding container
+                    # as well as adding using the catalyst-specific service class
+            } }
+        };
+    b) make component services depend on that, and 
 
-      However we need to work out an interface for people to setup / configure this.
+
+    c) ask for those 
+              services declared in a) outside of a web context
+       simple as well. $customised_container->fetch('service')->get # or whatever the api was
+
+19:23 < andrewalker> edenc, when explaining to me how it should be, drafted this: https://gist.github.com/1098186
+19:26 < edenc> I like the possibility of being able to provide a backwards-compatible structure which we can muck around with by configuring B::B
+19:26 <@rafl> so, the request context clearly isn't a service
+19:27 <@rafl> but that's ok. there's parametrised services
+19:27 < edenc> yeah, that was a draft
+19:27 <@rafl> the outer Foo service is pretty much what i'd expect Service::WithAcceptContext to do, except with a dependency on a context instead of a service parameter
+19:32 <@rafl> actually having services for the pre-ACCEPT_CONTEXT bits is what i want to think about
 
 ### To polish off
 
   - Document current methods
   - +    $class->container->get_sub_container('model')->make_single_default;
 +    $class->container->get_sub_container('view')->make_single_default;
+
+### Known issues
+
+    - Broken $instance->expand_modules() in setup_components and figure
+      out later how to bring it back
+
+    - expand_component_module
+
