@@ -60,8 +60,8 @@ testOption( [ qw/--follow_symlinks/ ], ['3000', undef, opthash(follow_symlinks =
 
 if (try { require MooseX::Daemonize; 1; }) {
     # background     -background               --bg --background
-    testOption( [ qw/--background/ ], ['3000', undef, opthash(background => 1)] );
-    testOption( [ qw/--bg/ ], ['3000', undef, opthash(background => 1)] );
+    testBackgroundOptionWithFork( [ qw/--background/ ]);
+    testBackgroundOptionWithFork( [ qw/--bg/ ]);
 }
 
 # restart        -r -restart --restart     -R --restart
@@ -113,6 +113,7 @@ sub testOption {
         fail $_;
     };
     # First element of RUN_ARGS will be the script name, which we don't care about
+
     shift @TestAppToTestScripts::RUN_ARGS;
     my $server = pop @TestAppToTestScripts::RUN_ARGS;
     like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';
@@ -125,6 +126,24 @@ sub testOption {
     # Mangle argv into the options..
     $resultarray->[-1]->{argv} = $argstring;
     is_deeply \@run_args, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
+}
+
+sub testBackgroundOptionWithFork {
+    my ($argstring) = @_;
+
+    ## First, make sure we can get an app
+    my $app = _build_testapp($argstring);
+    try {
+        $app->run;
+    }
+    catch {
+        fail $_;
+    };
+
+    ## Check a few args
+    is_deeply $app->{ARGV}, $argstring;
+    is $app->{port}, '3000';
+    is($app->{background}, 1);
 }
 
 sub testRestart {
