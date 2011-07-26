@@ -4,6 +4,7 @@ use Moose;
 use Config::Any;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
+use Devel::InnerPackage ();
 use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Moose::Util;
@@ -600,6 +601,10 @@ sub setup_component {
     return $instance;
 }
 
+sub expand_component_module {
+    my ( $class, $module ) = @_;
+    return Devel::InnerPackage::list_packages( $module );
+}
 
 1;
 
@@ -744,6 +749,13 @@ Example:
     }
 
 The above will respond to C<__baz(x,y)__> in config strings.
+
+=head2 $c->expand_component_module( $component, $setup_component_config )
+
+Components found by C<locate_components> will be passed to this method, which
+is expected to return a list of component (package) names to be set up.
+
+=cut
 
 =head1 AUTHORS
 

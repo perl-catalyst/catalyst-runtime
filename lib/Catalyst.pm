@@ -15,7 +15,6 @@ use Catalyst::Response;
 use Catalyst::Utils;
 use Catalyst::Controller;
 use Data::OptList;
-use Devel::InnerPackage ();
 use File::stat;
 use Module::Pluggable::Object ();
 use Text::SimpleTable ();
@@ -2311,8 +2310,8 @@ sub finalize_config { }
 This method is called internally to set up the application's components.
 
 It finds modules by calling the L<locate_components> method, expands them to
-package names with the L<expand_component_module> method, and then installs
-each component into the application.
+package names with the $container->expand_component_module method, and then
+installs each component into the application.
 
 The C<setup_components> config option is passed to both of the above methods.
 
@@ -2351,10 +2350,11 @@ sub setup_components {
     for my $component (@comps) {
         $container->add_component( $component, $class );
 # FIXME - $instance->expand_modules() is broken
-        my @expanded_components = $class->expand_component_module( $component, $config );
+        my @expanded_components = $container->expand_component_module( $component );
         for my $component (@expanded_components) {
             next if $comps{$component};
 
+            # FIXME - Why is it inside the for loop? It makes no sense
             $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components;
             $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
@@ -2394,18 +2394,6 @@ sub locate_components {
     my @comps = sort { length $a <=> length $b } $locator->plugins;
 
     return @comps;
-}
-
-=head2 $c->expand_component_module( $component, $setup_component_config )
-
-Components found by C<locate_components> will be passed to this method, which
-is expected to return a list of component (package) names to be set up.
-
-=cut
-
-sub expand_component_module {
-    my ($class, $module) = @_;
-    return Devel::InnerPackage::list_packages( $module );
 }
 
 =head2 $c->setup_dispatcher
