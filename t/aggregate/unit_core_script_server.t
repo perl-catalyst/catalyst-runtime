@@ -4,10 +4,13 @@ use warnings;
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
+use File::Temp qw/ tempdir /;
 use Test::More;
 use Try::Tiny;
 
 use Catalyst::Script::Server;
+
+chdir(tempdir(CLEANUP => 1));
 
 my $testopts;
 
