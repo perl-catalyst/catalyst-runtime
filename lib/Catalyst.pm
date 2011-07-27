@@ -16,7 +16,6 @@ use Catalyst::Utils;
 use Catalyst::Controller;
 use Data::OptList;
 use File::stat;
-use Module::Pluggable::Object ();
 use Text::SimpleTable ();
 use Path::Class::Dir ();
 use Path::Class::File ();
@@ -2319,6 +2318,7 @@ The C<setup_components> config option is passed to both of the above methods.
 
 sub setup_components {
     my $class = shift;
+    my $container = $class->container;
 
     my $config  = $class->config->{ setup_components };
 
@@ -2328,7 +2328,7 @@ sub setup_components {
         qq{other ways of achieving the same results.\n}
     ) if delete $config->{ search_extra };
 
-    my @comps = $class->locate_components($config);
+    my @comps = $container->locate_components($class, $config);
     my %comps = map { $_ => 1 } @comps;
 
     my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
@@ -2344,8 +2344,6 @@ sub setup_components {
 
         Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
     }
-
-    my $container = $class->container;
 
     for my $component (@comps) {
         $container->add_component( $component, $class );
@@ -2368,33 +2366,9 @@ sub setup_components {
     $container->get_sub_container('view')->make_single_default;
 }
 
-
-=head2 $c->locate_components( $setup_component_config )
-
-This method is meant to provide a list of component modules that should be
-setup for the application.  By default, it will use L<Module::Pluggable>.
-
-Specify a C<setup_components> config option to pass additional options directly
-to L<Module::Pluggable>.
-
-=cut
-
-sub locate_components {
-    my $class  = shift;
-    my $config = shift;
-
-    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
-
-    my $locator = Module::Pluggable::Object->new(
-        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
-        %$config
-    );
-
-    # XXX think about ditching this sort entirely
-    my @comps = sort { length $a <=> length $b } $locator->plugins;
-
-    return @comps;
-}
+# FIXME - removed locate_components
+# don't people mess with this method directly?
+# what to do with that?
 
 =head2 $c->setup_dispatcher
 

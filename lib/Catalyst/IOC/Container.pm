@@ -9,6 +9,7 @@ use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Moose::Util;
 use Catalyst::IOC::BlockInjection;
+use Module::Pluggable::Object ();
 use namespace::autoclean;
 
 extends 'Bread::Board::Container';
@@ -606,6 +607,22 @@ sub expand_component_module {
     return Devel::InnerPackage::list_packages( $module );
 }
 
+sub locate_components {
+    my ( $self, $class, $config ) = @_;
+
+    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
+
+    my $locator = Module::Pluggable::Object->new(
+        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
+        %$config
+    );
+
+    # XXX think about ditching this sort entirely
+    my @comps = sort { length $a <=> length $b } $locator->plugins;
+
+    return @comps;
+}
+
 1;
 
 __END__
@@ -755,7 +772,13 @@ The above will respond to C<__baz(x,y)__> in config strings.
 Components found by C<locate_components> will be passed to this method, which
 is expected to return a list of component (package) names to be set up.
 
-=cut
+=head2 locate_components( $setup_component_config )
+
+This method is meant to provide a list of component modules that should be
+setup for the application.  By default, it will use L<Module::Pluggable>.
+
+Specify a C<setup_components> config option to pass additional options directly
+to L<Module::Pluggable>.
 
 =head1 AUTHORS
 
