@@ -16,13 +16,13 @@ use Test::Without::Module qw(
 );
 require "$Bin/../aggregate/unit_core_script_server.t";
 
-no Test::Without::Module qw(
+Test::Without::Module->unimport(qw(
     Starman
     Plack::Handler::Starman
     MooseX::Daemonize
     MooseX::Daemonize::Pid::File
     MooseX::Daemonize::Core
-);
+));
 
 1;
 
