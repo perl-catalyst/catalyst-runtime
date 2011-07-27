@@ -133,6 +133,10 @@ sub testBackgroundOptionWithFork {
 
     ## First, make sure we can get an app
     my $app = _build_testapp($argstring);
+
+    ## Sorry, don't really fork since this cause trouble in Test::Aggregate
+    $app->meta->add_around_method_modifier('daemon_fork', sub { return; });
+
     try {
         $app->run;
     }
