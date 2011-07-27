@@ -623,6 +623,59 @@ sub locate_components {
     return @comps;
 }
 
+sub setup_components {
+    my ( $self, $class ) = @_;
+
+    # FIXME - should I get config as an argument, and throw the exception in
+    # Catalyst.pm?
+    my $config = $self->resolve(service => 'config')->{ setup_components };
+
+    Catalyst::Exception->throw(
+        qq{You are using search_extra config option. That option is\n} .
+        qq{deprecated, please refer to the documentation for\n} .
+        qq{other ways of achieving the same results.\n}
+    ) if delete $config->{ search_extra };
+
+    my @comps = $self->locate_components( $class, $config );
+    my %comps = map { $_ => 1 } @comps;
+
+    my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
+    $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
+        qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
+    ) if $deprecatedcatalyst_component_names;
+
+    for my $component ( @comps ) {
+
+        # We pass ignore_loaded here so that overlay files for (e.g.)
+        # Model::DBI::Schema sub-classes are loaded - if it's in @comps
+        # we know M::P::O found a file on disk so this is safe
+
+        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+    }
+
+    for my $component (@comps) {
+        $self->add_component( $component, $class );
+        # FIXME - $instance->expand_modules() is broken
+        my @expanded_components = $self->expand_component_module( $component );
+        for my $component (@expanded_components) {
+            next if $comps{$component};
+
+            # FIXME - Why is it inside the for loop? It makes no sense
+            $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components;
+
+            # FIXME - should I be calling warn here?
+            $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
+                qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
+            ) if $deprecatedcatalyst_component_names;
+
+            $self->add_component( $component, $class );
+        }
+    }
+
+    $self->get_sub_container('model')->make_single_default;
+    $self->get_sub_container('view')->make_single_default;
+}
+
 1;
 
 __END__
