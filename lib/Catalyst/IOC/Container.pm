@@ -151,6 +151,7 @@ sub build_extensions_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'extensions',
         block => sub {
             return \@{Config::Any->extensions};
@@ -162,6 +163,7 @@ sub build_prefix_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'prefix',
         block => sub {
             return Catalyst::Utils::appprefix( shift->param('name') );
@@ -174,6 +176,7 @@ sub build_path_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'path',
         block => sub {
             my $s = shift;
@@ -190,6 +193,7 @@ sub build_config_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'config',
         block => sub {
             my $s = shift;
@@ -211,6 +215,7 @@ sub build_raw_config_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'raw_config',
         block => sub {
             my $s = shift;
@@ -234,6 +239,7 @@ sub build_global_files_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'global_files',
         block => sub {
             my $s = shift;
@@ -259,6 +265,7 @@ sub build_local_files_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'local_files',
         block => sub {
             my $s = shift;
@@ -286,6 +293,7 @@ sub build_global_config_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'global_config',
         block => sub {
             my $s = shift;
@@ -305,6 +313,7 @@ sub build_local_config_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'local_config',
         block => sub {
             my $s = shift;
@@ -324,6 +333,7 @@ sub build_config_path_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'config_path',
         block => sub {
             my $s = shift;
@@ -348,6 +358,7 @@ sub build_config_local_suffix_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
         name => 'config_local_suffix',
         block => sub {
             my $s = shift;
@@ -533,8 +544,9 @@ sub add_component {
 
     $self->get_sub_container($type)->add_service(
         Catalyst::IOC::BlockInjection->new(
-            name  => $name,
-            block => sub { $self->setup_component( $component, $class ) },
+            lifecycle => 'Singleton', # FIXME?
+            name      => $name,
+            block     => sub { $self->setup_component( $component, $class ) },
         )
     );
 }
