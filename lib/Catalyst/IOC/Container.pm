@@ -616,7 +616,6 @@ sub get_all_components {
 sub add_component {
     my ( $self, $component, $class ) = @_;
     my ( $type, $name ) = _get_component_type_name($component);
-    my $suffix = Catalyst::Utils::class2classsuffix( $component );
 
     return unless $type;
 
@@ -625,12 +624,15 @@ sub add_component {
             lifecycle => 'Singleton', # FIXME?
             name      => $name,
             class     => $component,
-            dependencies => {
-                application_name => Bread::Board::Dependency->new( service_path => '/application_name' ),
-                config => Bread::Board::Dependency->new( service_path => '/config' ),
-            },
-            params => {
-                suffix => $suffix,
+            dependencies => [
+                depends_on( '/application_name' ),
+                depends_on( '/config' ),
+            ],
+            parameters => {
+                suffix => {
+                    isa => 'Str',
+                    default => Catalyst::Utils::class2classsuffix( $component ),
+                },
             },
         )
     );
@@ -656,47 +658,6 @@ sub _get_component_type_name {
     }
 
     return (undef, $component);
-}
-
-# FIXME ugly and temporary
-# Just moved it here the way it was, so we can work on it here in the container
-sub setup_component {
-    my ( $self, $component, $class ) = @_;
-
-    unless ( $component->can( 'COMPONENT' ) ) {
-        return $component;
-    }
-
-    # FIXME I know this isn't the "Dependency Injection" way of doing things,
-    # its just temporary
-    my $suffix = Catalyst::Utils::class2classsuffix( $component );
-    my $config = $self->resolve(service => 'config')->{ $suffix } || {};
-
-    # Stash catalyst_component_name in the config here, so that custom COMPONENT
-    # methods also pass it. local to avoid pointlessly shitting in config
-    # for the debug screen, as $component is already the key name.
-    local $config->{catalyst_component_name} = $component;
-
-    my $instance = eval { $component->COMPONENT( $class, $config ); };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        Catalyst::Exception->throw(
-            message => qq/Couldn't instantiate component "$component", "$error"/
-        );
-    }
-    elsif (!blessed $instance) {
-        my $metaclass = Moose::Util::find_meta($component);
-        my $method_meta = $metaclass->find_method_by_name('COMPONENT');
-        my $component_method_from = $method_meta->associated_metaclass->name;
-        my $value = defined($instance) ? $instance : 'undef';
-        Catalyst::Exception->throw(
-            message =>
-            qq/Couldn't instantiate component "$component", COMPONENT() method (from $component_method_from) didn't return an object-like value (value was $value)./
-        );
-    }
-
-    return $instance;
 }
 
 sub expand_component_module {

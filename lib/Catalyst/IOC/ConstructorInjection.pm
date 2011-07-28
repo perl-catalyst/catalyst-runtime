@@ -2,7 +2,10 @@ package Catalyst::IOC::ConstructorInjection;
 use Moose;
 extends 'Bread::Board::ConstructorInjection';
 
-with 'Catalyst::IOC::Service::WithAcceptContext';
+with 'Bread::Board::Service::WithClass',
+     'Bread::Board::Service::WithDependencies',
+     'Bread::Board::Service::WithParameters',
+     'Catalyst::IOC::Service::WithAcceptContext';
 
 sub _build_constructor_name { 'COMPONENT' }
 
@@ -10,11 +13,12 @@ sub get {
     my $self = shift;
 
     my $constructor = $self->constructor_name;
-    my $config      = $self->param('config')->{ $self->params->{suffix} } || {};
-    my $class       = $self->param('class');
     my $component   = $self->class;
+    my $params      = $self->params;
+    my $config      = $params->{config}->{ $self->param('suffix') } || {};
+    my $app_name    = $params->{application_name};
 
-    unless ( $self->class->can( $constructor ) ) {
+    unless ( $component->can( $constructor ) ) {
         # FIXME - make some deprecation warnings
         return $component;
     }
@@ -22,9 +26,9 @@ sub get {
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it. local to avoid pointlessly shitting in config
     # for the debug screen, as $component is already the key name.
-    local $config->{catalyst_component_name} = $self->class;
+    local $config->{catalyst_component_name} = $component;
 
-    my $instance = eval { $component->$constructor( $class, $config ) };
+    my $instance = eval { $component->$constructor( $app_name, $config ) };
 
     if ( my $error = $@ ) {
         chomp $error;
