@@ -776,8 +776,6 @@ Searches for components in all containers. If $component is the full class name,
 
 Finds components that match a given regexp. Used internally, by find_component.
 
-=head2 setup_component
-
 =head2 _fix_syntax
 
 =head2 _config_substitutions
