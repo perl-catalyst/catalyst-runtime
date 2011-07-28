@@ -650,11 +650,7 @@ sub setup_components {
 
     my @comps = $self->locate_components( $class, $config );
     my %comps = map { $_ => 1 } @comps;
-
-    my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
-    $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
-        qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
-    ) if $deprecatedcatalyst_component_names;
+    my $deprecatedcatalyst_component_names = 0;
 
     for my $component ( @comps ) {
 
@@ -669,18 +665,21 @@ sub setup_components {
         $self->add_component( $component, $class );
         # FIXME - $instance->expand_modules() is broken
         my @expanded_components = $self->expand_component_module( $component );
-        for my $component (@expanded_components) {
-            next if $comps{$component};
 
-            # FIXME - Why is it inside the for loop? It makes no sense
-            $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components;
-
+        if (
+            !$deprecatedcatalyst_component_names &&
+            ($deprecatedcatalyst_component_names = $component =~ m/::[CMV]::/) ||
+            ($deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components)
+        ) {
             # FIXME - should I be calling warn here?
             $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
-            ) if $deprecatedcatalyst_component_names;
+            );
+        }
 
-            $self->add_component( $component, $class );
+        for my $component (@expanded_components) {
+            $self->add_component( $component, $class )
+                unless $comps{$component};
         }
     }
 
