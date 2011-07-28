@@ -30,7 +30,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Blockers
 
-  * Ensure all PSGI related FIXMEs in docs or code are in this list
   * Fix nginx middlewares so that they are generic, or can somehow
     be used by people with their own .psgi files
   * Fix a sane / nicer way to do custom engines.
@@ -39,8 +38,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Nice to have
 
-  * <@rafl> i've been thinking of maybe providing
-    MyApp->apply_default_middlewares($psgi_app)
   * Capture arguments that the plack engine component was run with somewhere,
     to more easily support custom args from scripts (e.g. Gitalist's 
     --git_dir)
