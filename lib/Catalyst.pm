@@ -597,8 +597,9 @@ sub model {
     my ( $c, $name, @args ) = @_;
 
     if (ref $c && !$name) {
+        my $current_instance = $c->stash->{current_model_instance};
         return $current_instance
-            if my $current_instance = $c->stash->{current_model_instance};
+            if $current_instance;
 
         $name = $c->stash->{current_model};
     }
@@ -632,8 +633,9 @@ sub view {
     my ( $c, $name, @args ) = @_;
 
     if (ref $c && !$name) {
+        my $current_instance = $c->stash->{current_view_instance};
         return $current_instance
-            if my $current_instance = $c->stash->{current_view_instance};
+            if $current_instance;
 
         $name = $c->stash->{current_view};
     }
