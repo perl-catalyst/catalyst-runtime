@@ -1,6 +1,6 @@
 package TestApp;
+use Moose;
 
-use strict;
 use Catalyst qw/
     Test::MangleDollarUnderScore
     Test::Errors 
@@ -11,9 +11,9 @@ use Catalyst qw/
     +TestApp::Plugin::AddDispatchTypes
     +TestApp::Role
 /;
+extends 'Catalyst';
 use Catalyst::Utils;
 
-use Moose;
 use namespace::autoclean;
 
 # -----------
