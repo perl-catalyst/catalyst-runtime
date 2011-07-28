@@ -124,7 +124,7 @@ sub build_controller_subcontainer {
     );
 }
 
-sub build_name_service {
+sub build_application_name_service {
     my $self = shift;
 
     return Bread::Board::Literal->new( name => 'application_name', value => $self->application_name );
