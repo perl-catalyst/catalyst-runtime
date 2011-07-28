@@ -38,7 +38,7 @@
      engines clarified.
 
  Deprecations:
-  - Catalyst::Test's local_request function is now deprecate. You should just
+  - Catalyst::Test's local_request function is now deprecated. You should just
     use the normal request function against a local server instead.
 
 5.80033 2011-07-24 16:09:00
