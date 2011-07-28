@@ -2317,10 +2317,7 @@ The C<setup_components> config option is passed to both of the above methods.
 =cut
 
 sub setup_components {
-    my $class = shift;
-    # FIXME - I believe I shouldn't be handing $class over
-    # Just don't know how to solve this.
-    return $class->container->setup_components( $class );
+    shift->container->resolve( service => 'setup_components' );
 }
 
 # FIXME - removed locate_components

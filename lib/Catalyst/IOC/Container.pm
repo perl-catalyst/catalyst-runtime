@@ -76,6 +76,7 @@ sub BUILD {
         config_local_suffix
         config_path
         locate_components
+        setup_components
     /;
 
     $self->add_sub_container(
@@ -404,6 +405,63 @@ sub build_locate_components_service {
     );
 }
 
+sub build_setup_components_service {
+    my $self = shift;
+
+    return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
+        name      => 'setup_components',
+        block     => sub {
+            my $s     = shift;
+            my $class = $s->param('application_name');
+            my @comps = @{ $s->param( 'locate_components' ) };
+            my %comps = map { $_ => 1 } @comps;
+            my $deprecatedcatalyst_component_names = 0;
+
+            for my $component ( @comps ) {
+
+                # We pass ignore_loaded here so that overlay files for (e.g.)
+                # Model::DBI::Schema sub-classes are loaded - if it's in @comps
+                # we know M::P::O found a file on disk so this is safe
+
+                Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
+            }
+
+            for my $component (@comps) {
+                $self->add_component( $component, $class );
+                # FIXME - $instance->expand_modules() is broken
+                my @expanded_components = $self->expand_component_module( $component );
+
+                if (
+                    !$deprecatedcatalyst_component_names &&
+                    ($deprecatedcatalyst_component_names = $component =~ m/::[CMV]::/) ||
+                    ($deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components)
+                ) {
+                    # FIXME - should I be calling warn here?
+                    $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
+                        qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
+                    );
+                }
+
+                for my $component (@expanded_components) {
+                    $self->add_component( $component, $class )
+                        unless $comps{$component};
+                }
+            }
+
+            # FIXME - how can this be done?
+            #$s->param('/model')->make_single_default;
+            #$s->param('/view')->make_single_default;
+        },
+        dependencies => [
+            depends_on('application_name'),
+            depends_on('locate_components'),
+            #depends_on('/model'),
+            #depends_on('/view'),
+        ],
+    );
+}
+
 sub _fix_syntax {
     my $config     = shift;
     my @components = (
@@ -653,48 +711,6 @@ sub expand_component_module {
     return Devel::InnerPackage::list_packages( $module );
 }
 
-sub setup_components {
-    my ( $self, $class ) = @_;
-
-    my @comps = @{ $self->resolve( service => 'locate_components' ) };
-    my %comps = map { $_ => 1 } @comps;
-    my $deprecatedcatalyst_component_names = 0;
-
-    for my $component ( @comps ) {
-
-        # We pass ignore_loaded here so that overlay files for (e.g.)
-        # Model::DBI::Schema sub-classes are loaded - if it's in @comps
-        # we know M::P::O found a file on disk so this is safe
-
-        Catalyst::Utils::ensure_class_loaded( $component, { ignore_loaded => 1 } );
-    }
-
-    for my $component (@comps) {
-        $self->add_component( $component, $class );
-        # FIXME - $instance->expand_modules() is broken
-        my @expanded_components = $self->expand_component_module( $component );
-
-        if (
-            !$deprecatedcatalyst_component_names &&
-            ($deprecatedcatalyst_component_names = $component =~ m/::[CMV]::/) ||
-            ($deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components)
-        ) {
-            # FIXME - should I be calling warn here?
-            $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
-                qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
-            );
-        }
-
-        for my $component (@expanded_components) {
-            $self->add_component( $component, $class )
-                unless $comps{$component};
-        }
-    }
-
-    $self->get_sub_container('model')->make_single_default;
-    $self->get_sub_container('view')->make_single_default;
-}
-
 1;
 
 __END__
@@ -851,6 +867,8 @@ setup for the application.  By default, it will use L<Module::Pluggable>.
 
 Specify a C<setup_components> config option to pass additional options directly
 to L<Module::Pluggable>.
+
+=head2 build_setup_components_service
 
 =head1 AUTHORS
 
