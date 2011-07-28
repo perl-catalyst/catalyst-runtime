@@ -39,9 +39,9 @@ has substitutions => (
 );
 
 has application_name => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => 'MyApp',
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
 );
 
 has sub_container_class => (
