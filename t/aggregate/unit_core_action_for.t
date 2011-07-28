@@ -12,7 +12,7 @@ plan tests => 4;
 
 use_ok('TestApp');
 
-is(TestApp->action_for('global_action')->code, TestApp::Controller::Root->can('global_action'),
+is(TestApp->controller('Root')->action_for('global_action')->code, TestApp::Controller::Root->can('global_action'),
    'action_for on appclass ok');
 
 is(TestApp->controller('Args')->action_for('args')->code,
