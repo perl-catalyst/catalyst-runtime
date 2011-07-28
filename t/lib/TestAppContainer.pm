@@ -1,13 +1,11 @@
 package TestAppContainer;
-
-use strict;
-use warnings;
-
-use MRO::Compat;
-
+use Moose;
 use Catalyst;
+extends 'Catalyst';
 
 our $VERSION = '0.01';
+
+__PACKAGE__->config(applevel_config => 'foo');
 
 __PACKAGE__->setup;
 
