@@ -167,9 +167,9 @@ sub build_prefix_service {
         lifecycle => 'Singleton',
         name => 'prefix',
         block => sub {
-            return Catalyst::Utils::appprefix( shift->param('name') );
+            return Catalyst::Utils::appprefix( shift->param('application_name') );
         },
-        dependencies => [ depends_on('name') ],
+        dependencies => [ depends_on('application_name') ],
     );
 }
 
@@ -182,7 +182,7 @@ sub build_path_service {
         block => sub {
             my $s = shift;
 
-            return Catalyst::Utils::env_value( $s->param('name'), 'CONFIG' )
+            return Catalyst::Utils::env_value( $s->param('application_name'), 'CONFIG' )
             || $s->param('file')
             || $s->param('application_name')->path_to( $s->param('prefix') );
         },
@@ -398,7 +398,7 @@ sub build_locate_components_service {
             # XXX think about ditching this sort entirely
             my @comps = sort { length $a <=> length $b } $locator->plugins;
 
-            return @comps;
+            return \@comps;
         },
         dependencies => [ depends_on('application_name'), depends_on('config') ],
     );
@@ -656,7 +656,7 @@ sub expand_component_module {
 sub setup_components {
     my ( $self, $class ) = @_;
 
-    my @comps = $self->resolve( service => 'locate_components' );
+    my @comps = @{ $self->resolve( service => 'locate_components' ) };
     my %comps = map { $_ => 1 } @comps;
     my $deprecatedcatalyst_component_names = 0;
 
