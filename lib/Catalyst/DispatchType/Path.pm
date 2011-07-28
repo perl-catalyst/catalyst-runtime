@@ -57,10 +57,10 @@ sub list {
         foreach my $action ( @{ $self->_paths->{$path} } ) {
             my $args  = $action->attributes->{Args}->[0];
             my $parts = defined($args) ? '/*' x $args : '/...';
-            
+
             my $display_path = "/$path/$parts";
             $display_path =~ s{/{1,}}{/}g;
-             
+
             $paths->row( $display_path, "/$action" );
         }
     }
