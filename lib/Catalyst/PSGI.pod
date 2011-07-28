@@ -60,7 +60,7 @@ engine specific fixes for uniform behaviour, as contained in:
 
 =item L<Plack::Middleware::IIS6ScriptNameFix>
 
-=item nginx - FIXME??
+=item nginx - local to Catalyst
 
 =back
 
