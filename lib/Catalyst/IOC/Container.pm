@@ -719,9 +719,9 @@ Container that stores all controllers.
 
 =head1 Services
 
-=head2 build_name_service
+=head2 build_application_name_service
 
-Name of the application.
+Name of the application (such as MyApp).
 
 =head2 build_driver_service
 
