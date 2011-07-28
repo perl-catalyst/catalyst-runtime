@@ -2317,7 +2317,7 @@ The C<setup_components> config option is passed to both of the above methods.
 =cut
 
 sub setup_components {
-    shift->container->resolve( service => 'setup_components' );
+    shift->container->setup_components();
 }
 
 # FIXME - removed locate_components
