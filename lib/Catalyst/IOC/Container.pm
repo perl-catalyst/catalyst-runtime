@@ -9,6 +9,7 @@ use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Moose::Util;
 use Catalyst::IOC::BlockInjection;
+use Catalyst::IOC::ConstructorInjection;
 use Module::Pluggable::Object ();
 use namespace::autoclean;
 
@@ -615,14 +616,22 @@ sub get_all_components {
 sub add_component {
     my ( $self, $component, $class ) = @_;
     my ( $type, $name ) = _get_component_type_name($component);
+    my $suffix = Catalyst::Utils::class2classsuffix( $component );
 
     return unless $type;
 
     $self->get_sub_container($type)->add_service(
-        Catalyst::IOC::BlockInjection->new(
+        Catalyst::IOC::ConstructorInjection->new(
             lifecycle => 'Singleton', # FIXME?
             name      => $name,
-            block     => sub { $self->setup_component( $component, $class ) },
+            class     => $component,
+            dependencies => {
+                application_name => Bread::Board::Dependency->new( service_path => '/application_name' ),
+                config => Bread::Board::Dependency->new( service_path => '/config' ),
+            },
+            params => {
+                suffix => $suffix,
+            },
         )
     );
 }
