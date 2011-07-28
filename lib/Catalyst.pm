@@ -597,11 +597,10 @@ sub model {
     my ( $c, $name, @args ) = @_;
 
     if (ref $c && !$name) {
-        return $c->stash->{current_model_instance}
-            if $c->stash->{current_model_instance};
+        return $current_instance
+            if my $current_instance = $c->stash->{current_model_instance};
 
-        $name = $c->stash->{current_model}
-            if $c->stash->{current_model};
+        $name = $c->stash->{current_model};
     }
 
     return $c->container->get_component_from_sub_container( 'model', $name, $c, @args);
@@ -633,11 +632,10 @@ sub view {
     my ( $c, $name, @args ) = @_;
 
     if (ref $c && !$name) {
-        return $c->stash->{current_view_instance}
-            if $c->stash->{current_view_instance};
+        return $current_instance
+            if my $current_instance = $c->stash->{current_view_instance};
 
-        $name = $c->stash->{current_view}
-            if $c->stash->{current_view};
+        $name = $c->stash->{current_view};
     }
 
     return $c->container->get_component_from_sub_container( 'view', $name, $c, @args);
