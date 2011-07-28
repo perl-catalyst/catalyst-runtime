@@ -38,7 +38,7 @@ has substitutions => (
     default => sub { +{} },
 );
 
-has name => (
+has application_name => (
     is      => 'ro',
     isa     => 'Str',
     default => 'MyApp',
@@ -63,7 +63,7 @@ sub BUILD {
         substitutions
         file
         driver
-        name
+        application_name
         prefix
         extensions
         path
@@ -126,7 +126,7 @@ sub build_controller_subcontainer {
 sub build_name_service {
     my $self = shift;
 
-    return Bread::Board::Literal->new( name => 'name', value => $self->name );
+    return Bread::Board::Literal->new( name => 'application_name', value => $self->application_name );
 }
 
 sub build_driver_service {
@@ -183,9 +183,9 @@ sub build_path_service {
 
             return Catalyst::Utils::env_value( $s->param('name'), 'CONFIG' )
             || $s->param('file')
-            || $s->param('name')->path_to( $s->param('prefix') );
+            || $s->param('application_name')->path_to( $s->param('prefix') );
         },
-        dependencies => [ depends_on('file'), depends_on('name'), depends_on('prefix') ],
+        dependencies => [ depends_on('file'), depends_on('application_name'), depends_on('prefix') ],
     );
 }
 
@@ -201,13 +201,13 @@ sub build_config_service {
             my $v = Data::Visitor::Callback->new(
                 plain_value => sub {
                     return unless defined $_;
-                    return $self->_config_substitutions( $s->param('name'), $s->param('substitutions'), $_ );
+                    return $self->_config_substitutions( $s->param('application_name'), $s->param('substitutions'), $_ );
                 }
 
             );
             $v->visit( $s->param('raw_config') );
         },
-        dependencies => [ depends_on('name'), depends_on('raw_config'), depends_on('substitutions') ],
+        dependencies => [ depends_on('application_name'), depends_on('raw_config'), depends_on('substitutions') ],
     );
 }
 
@@ -362,11 +362,11 @@ sub build_config_local_suffix_service {
         name => 'config_local_suffix',
         block => sub {
             my $s = shift;
-            my $suffix = Catalyst::Utils::env_value( $s->param('name'), 'CONFIG_LOCAL_SUFFIX' ) || $self->config_local_suffix;
+            my $suffix = Catalyst::Utils::env_value( $s->param('application_name'), 'CONFIG_LOCAL_SUFFIX' ) || $self->config_local_suffix;
 
             return $suffix;
         },
-        dependencies => [ depends_on('name') ],
+        dependencies => [ depends_on('application_name') ],
     );
 }
 
