@@ -5,11 +5,13 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
 use File::Temp qw/ tempdir /;
+use Cwd;
 use Test::More;
 use Try::Tiny;
 
 use Catalyst::Script::Server;
 
+my $cwd = getcwd;
 chdir(tempdir(CLEANUP => 1));
 
 my $testopts;
@@ -203,6 +205,8 @@ sub restartopthash {
     };
     return $val;
 }
+
+chdir($cwd);
 
 1;
 
