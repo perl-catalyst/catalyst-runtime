@@ -28,7 +28,10 @@
     This fixes compatibility with previous stable releases for applications
     deployed in these environments.
 
-  - Catalyst::Test fixes - XXX FIXME
+ Enhancements:
+
+  - Catalyst::Test's remote_request method not uses Plack::Test to perform
+    the remote request.
 
  Documentation:
   - Added a Catalyst::PSGI manual page with information about writing a .psgi
