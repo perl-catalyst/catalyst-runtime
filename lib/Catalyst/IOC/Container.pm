@@ -75,6 +75,7 @@ sub BUILD {
         local_config
         config_local_suffix
         config_path
+        locate_components
     /;
 
     $self->add_sub_container(
@@ -370,6 +371,39 @@ sub build_config_local_suffix_service {
     );
 }
 
+sub build_locate_components_service {
+    my $self = shift;
+
+    return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
+        name      => 'locate_components',
+        block     => sub {
+            my $s      = shift;
+            my $class  = $s->param('application_name');
+            my $config = $s->param('config')->{ setup_components };
+
+            Catalyst::Exception->throw(
+                qq{You are using search_extra config option. That option is\n} .
+                qq{deprecated, please refer to the documentation for\n} .
+                qq{other ways of achieving the same results.\n}
+            ) if delete $config->{ search_extra };
+
+            my @paths = qw( ::Controller ::C ::Model ::M ::View ::V );
+
+            my $locator = Module::Pluggable::Object->new(
+                search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
+                %$config
+            );
+
+            # XXX think about ditching this sort entirely
+            my @comps = sort { length $a <=> length $b } $locator->plugins;
+
+            return @comps;
+        },
+        dependencies => [ depends_on('application_name'), depends_on('config') ],
+    );
+}
+
 sub _fix_syntax {
     my $config     = shift;
     my @components = (
@@ -619,36 +653,10 @@ sub expand_component_module {
     return Devel::InnerPackage::list_packages( $module );
 }
 
-sub locate_components {
-    my ( $self, $class, $config ) = @_;
-
-    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
-
-    my $locator = Module::Pluggable::Object->new(
-        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
-        %$config
-    );
-
-    # XXX think about ditching this sort entirely
-    my @comps = sort { length $a <=> length $b } $locator->plugins;
-
-    return @comps;
-}
-
 sub setup_components {
     my ( $self, $class ) = @_;
 
-    # FIXME - should I get config as an argument, and throw the exception in
-    # Catalyst.pm?
-    my $config = $self->resolve(service => 'config')->{ setup_components };
-
-    Catalyst::Exception->throw(
-        qq{You are using search_extra config option. That option is\n} .
-        qq{deprecated, please refer to the documentation for\n} .
-        qq{other ways of achieving the same results.\n}
-    ) if delete $config->{ search_extra };
-
-    my @comps = $self->locate_components( $class, $config );
+    my @comps = $self->resolve( service => 'locate_components' );
     my %comps = map { $_ => 1 } @comps;
     my $deprecatedcatalyst_component_names = 0;
 
@@ -836,7 +844,7 @@ The above will respond to C<__baz(x,y)__> in config strings.
 Components found by C<locate_components> will be passed to this method, which
 is expected to return a list of component (package) names to be set up.
 
-=head2 locate_components( $setup_component_config )
+=head2 build_locate_components_service
 
 This method is meant to provide a list of component modules that should be
 setup for the application.  By default, it will use L<Module::Pluggable>.
