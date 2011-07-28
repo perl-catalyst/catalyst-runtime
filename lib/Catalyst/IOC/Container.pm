@@ -396,10 +396,7 @@ sub build_locate_components_service {
                 %$config
             );
 
-            # XXX think about ditching this sort entirely
-            my @comps = sort { length $a <=> length $b } $locator->plugins;
-
-            return \@comps;
+            return [ $locator->plugins ];
         },
         dependencies => [ depends_on('application_name'), depends_on('config') ],
     );

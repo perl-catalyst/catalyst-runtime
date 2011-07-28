@@ -2320,9 +2320,26 @@ sub setup_components {
     shift->container->setup_components();
 }
 
+=head2 locate_components
+
+=cut
+
 # FIXME - removed locate_components
 # don't people mess with this method directly?
 # what to do with that?
+
+sub locate_components {
+    my $class = shift;
+
+    $class->log->warn('The locate_components method has been deprecated.');
+    $class->log->warn('Please read Catalyst::IOC::Container documentation to');
+    $class->log->warn('update your application.');
+
+    # XXX think about ditching this sort entirely
+    return sort { length $a <=> length $b }
+        @{ $class->container->resolve( service => 'locate_components' ) };
+}
+
 
 =head2 $c->setup_dispatcher
 
