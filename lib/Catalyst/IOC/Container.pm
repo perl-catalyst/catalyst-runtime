@@ -822,7 +822,7 @@ setup for the application.  By default, it will use L<Module::Pluggable>.
 Specify a C<setup_components> config option to pass additional options directly
 to L<Module::Pluggable>.
 
-=head2 build_setup_components_service
+=head2 setup_components
 
 =head1 AUTHORS
 
