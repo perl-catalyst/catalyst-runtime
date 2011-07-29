@@ -2,6 +2,8 @@ use Test::More;
 use strict;
 use warnings;
 
+*Catalyst::Utils::ensure_class_loaded = sub { };
+
 use Moose::Meta::Class;
 
 our @complist_suffix = qw/C::Controller M::Model V::View Controller::C Model::M View::V Controller::Model::Dummy::Model Model::Dummy::Model/;
@@ -29,13 +31,22 @@ Moose::Meta::Class->create(
 
     use base qw/Catalyst/;
 
-    sub locate_components {
-        return (@complist, 'MyMVCTestApp::Model::Test::Object');
-    }
-
     no warnings 'redefine';
+
+    local *Catalyst::IOC::Container::build_locate_components_service = sub {
+        my $self = shift;
+
+        return Bread::Board::BlockInjection->new(
+            lifecycle => 'Singleton',
+            name      => 'locate_components',
+            block     => sub {
+                return [@complist, 'MyMVCTestApp::Model::Test::Object'];
+
+            },
+        );
+    };
     local *Catalyst::Log::warn = sub { $warnings++ };
-    local *Catalyst::Utils::ensure_class_loaded = sub {
+    *Class::MOP::load_class = sub {
         my $class = shift;
         $loaded++
             if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestApp/
@@ -133,14 +144,21 @@ our @complist_default_view =
     package MyMVCTestAppDefaultView;
 
     use base qw/Catalyst/;
-
-    sub locate_components {
-        return @complist_default_view;
-    }
-
     no warnings 'redefine';
+
+    local *Catalyst::IOC::Container::build_locate_components_service = sub {
+        my $self = shift;
+
+        return Bread::Board::BlockInjection->new(
+            lifecycle => 'Singleton',
+            name      => 'locate_components',
+            block     => sub {
+                return \@complist_default_view;
+            },
+        );
+    };
     local *Catalyst::Log::warn = sub { $warnings++ };
-    local *Catalyst::Utils::ensure_class_loaded = sub {
+    *Class::MOP::load_class = sub {
         my $class = shift;
         $loaded++
             if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultView/
@@ -162,13 +180,21 @@ our @complist_default_model =
 
     use base qw/Catalyst/;
 
-    sub locate_components {
-        return @complist_default_model;
-    }
-
     no warnings 'redefine';
+
+    local *Catalyst::IOC::Container::build_locate_components_service = sub {
+        my $self = shift;
+
+        return Bread::Board::BlockInjection->new(
+            lifecycle => 'Singleton',
+            name      => 'locate_components',
+            block     => sub {
+                return \@complist_default_model;
+            },
+        );
+    };
     local *Catalyst::Log::warn = sub { $warnings++ };
-    local *Catalyst::Utils::ensure_class_loaded = sub {
+    *Class::MOP::load_class = sub {
         my $class = shift;
         $loaded++
             if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultModel/
@@ -258,6 +284,12 @@ is( MyMVCTestAppDefaultModel->model , 'MyMVCTestAppDefaultModel::Model::M', 'def
     package MyApp::WithoutRegexFallback;
 
     use base qw/Catalyst/;
+
+    no warnings 'redefine';
+
+    *Class::MOP::load_class = sub {
+        $loaded++;
+    };
 
     __PACKAGE__->config( { disable_component_resolution_regex_fallback => 1 } );
 
