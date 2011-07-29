@@ -8,12 +8,12 @@ The major change is that L<Plack> now replaces most of the subclasses of
 L<Catalyst::Engine>.  If you are using one of the standard subclasses of
 L<Catalyst::Engine> this should be a straightforward upgrade for you. It was
 a design goal for this release to be as backwardly compatible as possible.
-However since L<Plack> is different from L<Catalyst::Engine> it would be 
-possible that edge case differences would exist.  Therefore we recommend care
-be taken with this upgrade and that testing should be greater than would be
-the case with a minor point update.
+However since L<Plack> is different from L<Catalyst::Engine> it is possible
+that edge case differences exist.  Therefore we recommend care be taken with
+this upgrade and that testing should be greater than would be the case with a
+minor point update.
 
-It is highly recommended that you become familar with the L<Plack> ecosystem
+It is highly recommended that you become familiar with the L<Plack> ecosystem
 and documentation. Being able to take advantage of L<Plack> development and
 middleware is a major bonus to this upgrade. Documentation about how to
 take advantage of L<Plack::Middleware> by writing your own C<< .psgi >> file
@@ -23,7 +23,7 @@ If you have created a custom subclass of L<Catalyst:Engine> you will need to
 convert it to be a subclass of L<Plack::Handler>.
 
 If you are using the L<Plack> engine, L<Catalyst::Engine::PSGI>, this new
-release supercedes that code.
+release supersedes that code.
 
 If you are using a subclass of L<Catalyst::Engine> that is aimed at nonstandard
 or internal / testing uses, such as L<Catalyst::Engine::Embeddable> you should
@@ -40,7 +40,7 @@ enough to use L<Catalyst::Script::FastCGI>.
 
 The engines that are build upon the various iterations of mod_perl,
 L<Catalyst::Engine::Apache::MP13> and
-L<Catalyst::Engine::Apache2::MP20> should be seemless upgrades and will
+L<Catalyst::Engine::Apache2::MP20> should be seamless upgrades and will
 work using using L<Plack::Handler::Apache1> or L<Plack::Handler::Apache2>
 as required.  
 
@@ -63,13 +63,13 @@ myapp_cgi.pl script is already upgraded enough to use L<Catalyst::Script::CGI>.
 If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
 is automatically loaded.
 
-If you were customising your server script to pass opttions to the prefork engine,
+If you were customising your server script to pass options to the prefork engine,
 then this is no longer supported. The recommended route to implement this functionality
-is to write a simple .psgi file for your application, then use the L<plackup> untility.
+is to write a simple .psgi file for your application, then use the L<plackup> utility.
 
 =head2 Upgrading the PSGI Engine
 
-If you were using L<Catalyst::Engine::PSGI> this new release supercedes this
+If you were using L<Catalyst::Engine::PSGI> this new release supersedes this
 engine in supporting L<Plack>. By default the Engine is now always L<Plack>.
 As a result, you can stop depending on L<Catalyst::Engine::PSGI> in your
 C<Makefile.PL>. 
@@ -123,8 +123,8 @@ B<NOT>:
     my $app = sub { MyCatalystApp->psgi_app(@_) };
     # If you make ^^ this mistake, your app won't work, and will confuse the hell out of you!
 
-You can now rename C<< script/myapp.psgi >> to C<< myapp.psgi >>, and the built-in
-Catalyst scripts, and your test suite will start using your .psgi file.
+You can now move C<< script/myapp.psgi >> to C<< myapp.psgi >> and the built-in
+Catalyst scripts and your test suite will start using your .psgi file.
 
 B<NOTE:> If you rename your .psgi file without these modifications, then any tests run via
 L<Catalyst::Test> will not be compatible with the new release, and will result in
@@ -182,8 +182,8 @@ Tests should generally work the same in Catalyst 5.89, however there are some di
 Previously, if using L<Catalyst::Test> and doing local requests (against a local server),
 if the application threw an exception then this exception propagated into the test.
 
-This behaviour has been removed, and now a 500 response will be returned to the test.
-This change unifies behaviour, to make local test requests behave similarly to remote 
+This behavior has been removed, and now a 500 response will be returned to the test.
+This change unifies behavior, to make local test requests behave similarly to remote
 requests.
 
 =head1 Upgrading to Catalyst 5.80
@@ -198,7 +198,7 @@ issues upgrading to this release.
 Most issues found with pre-existing components have been easy to
 solve. This document provides a complete description of behavior changes
 which may cause compatibility issues, and of new Catalyst warnings which
-be unclear.
+might be unclear.
 
 If you think you have found an upgrade-related issue which is not covered in
 this document, please email the Catalyst list to discuss the problem.
@@ -209,7 +209,7 @@ this document, please email the Catalyst list to discuss the problem.
 
 You can only apply method modifiers after the application's C<< ->setup >>
 method has been called. This means that modifiers will not work with methods
-which run during the call to C<< ->setup >>.
+run during the call to C<< ->setup >>.
 
 See L<Catalyst::Manual::ExtendingCatalyst> for more information about using
 L<Moose> in your applications.
