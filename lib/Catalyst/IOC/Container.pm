@@ -799,6 +799,11 @@ Reads config from global_files.
 
 Reads config from local_files.
 
+=head2 build_class_config_service
+
+Reads config set from the application's class attribute config,
+i.e. MyApp->config( name => 'MyApp', ... )
+
 =head2 build_config_path_service
 
 Splits the path to the config file, and returns on array ref containing
