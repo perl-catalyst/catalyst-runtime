@@ -460,7 +460,7 @@ The following test demonstrates the problem:
     use Test::More;
     isnt(BaseClass->can('foo'), Child->can('foo'));
 
-=head2 Extending Catalyst::Request or other classes in an ad-hoc manner using mk_accessors
+=head2 Extending Catalyst::Request or other classes in an ad hoc manner using mk_accessors
 
 Previously, it was possible to add additional accessors to Catalyst::Request
 (or other classes) by calling the mk_accessors class method.

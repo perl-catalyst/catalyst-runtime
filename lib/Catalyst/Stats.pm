@@ -166,6 +166,8 @@ __PACKAGE__->meta->make_immutable();
 
 __END__
 
+=for stopwords addChild getNodeValue mysub rollup setNodeValue
+
 =head1 NAME
 
 Catalyst::Stats - Catalyst Timing Statistics Class

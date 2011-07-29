@@ -21,7 +21,7 @@ for specifics about your web server deployment).
 
 =head2 What is a .psgi file
 
-A C<< .psgi >> file lets you manually controll how your application code reference is built.
+A C<< .psgi >> file lets you manually control how your application code reference is built.
 
 Catalyst normally takes care of this for you, but it's possible to do it manually by
 creating a C<myapp.psgi> file in the root of your application.
