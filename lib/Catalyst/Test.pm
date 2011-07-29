@@ -209,8 +209,8 @@ functions take either a URI or an L<HTTP::Request> object.
 
 =head1 INLINE TESTS WILL NO LONGER WORK
 
-While it used to be possible to inline a whole testapp into a C<.t> file for a
-distribution, this will no longer work.
+While it used to be possible to inline a whole test app into a C<.t> file for
+a distribution, this will no longer work.
 
 The convention is to place your L<Catalyst> test apps into C<t/lib> in your
 distribution. E.g.: C<t/lib/TestApp.pm>, C<t/lib/TestApp/Controller/Root.pm>,

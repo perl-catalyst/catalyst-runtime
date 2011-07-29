@@ -138,6 +138,8 @@ sub query_params    { shift->query_parameters(@_) }
 sub path_info       { shift->path(@_) }
 sub snippets        { shift->captures(@_) }
 
+=for stopwords param params
+
 =head1 NAME
 
 Catalyst::Request - provides information about the current client request
