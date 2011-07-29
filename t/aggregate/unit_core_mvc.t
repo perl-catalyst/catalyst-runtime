@@ -2,7 +2,10 @@ use Test::More;
 use strict;
 use warnings;
 
-*Catalyst::Utils::ensure_class_loaded = sub { };
+{
+    no warnings 'redefine';
+    *Catalyst::Utils::ensure_class_loaded = sub { };
+}
 
 use Moose::Meta::Class;
 
