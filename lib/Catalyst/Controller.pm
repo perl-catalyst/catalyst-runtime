@@ -482,7 +482,7 @@ Sets 'path_prefix', as described below.
 
 Allows you to set the attributes that the dispatcher creates actions out of.
 This allows you to do 'rails style routes', or override some of the
-attribute defintions of actions composed from Roles.
+attribute definitions of actions composed from Roles.
 You can set arguments globally (for all actions of the controller) and
 specifically (for a single action).
 
