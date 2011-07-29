@@ -818,23 +818,36 @@ to L<Module::Pluggable>.
 
 =head2 get_component_from_sub_container($sub_container, $name, $c, @args)
 
-Looks for components in a given subcontainer (such as controller, model or view), and returns the searched component. If $name is undef, it returns the default component (such as default_view, if $sub_container is 'view'). If $name is a regexp, it returns an array of matching components. Otherwise, it looks for the component with name $name.
+Looks for components in a given subcontainer (such as controller, model or
+view), and returns the searched component. If $name is undef, it returns the
+default component (such as default_view, if $sub_container is 'view'). If
+$name is a regexp, it returns an array of matching components. Otherwise, it
+looks for the component with name $name.
 
 =head2 get_components_names_types
 
-Gets all components from all containers and returns them as an array of arrayrefs containing the component name and the component type (i.e., whether it's an instance or a class).
+Gets all components from all containers and returns them as an array of
+arrayrefs containing the component name and the component type (i.e., whether
+it's an instance or a class).
 
 =head2 get_all_components
 
-Fetches all the components, in each of the sub_containers model, view and controller, and returns a readonly hash. The keys are the class names, and the values are the blessed objects. This is what is returned by $c->components.
+Fetches all the components, in each of the sub_containers model, view and
+controller, and returns a readonly hash. The keys are the class names, and
+the values are the blessed objects. This is what is returned by $c->components.
 
 =head2 add_component
 
-Adds a component to the appropriate subcontainer. The subcontainer is guessed by the component name given.
+Adds a component to the appropriate subcontainer. The subcontainer is guessed
+by the component name given.
 
 =head2 find_component
 
-Searches for components in all containers. If $component is the full class name, the subcontainer is guessed, and it gets the searched component in there. Otherwise, it looks for a component with that name in all subcontainers. If $component is a regexp, it calls the method below, find_component_regexp, and matches all components against that regexp.
+Searches for components in all containers. If $component is the full class
+name, the subcontainer is guessed, and it gets the searched component in there.
+Otherwise, it looks for a component with that name in all subcontainers. If
+$component is a regexp, it calls the method below, find_component_regexp,
+and matches all components against that regexp.
 
 =head2 find_component_regexp
 
