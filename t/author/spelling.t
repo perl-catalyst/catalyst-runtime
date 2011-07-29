@@ -5,9 +5,9 @@ use Test::Spelling;
 
 add_stopwords(qw(
     undef env regex rethrow rethrows stringifies CPAN STDERR SIGCHLD
-    roadmap wishlist refactor refactored runtime pluggable pluggability hoc apis
+    roadmap wishlist refactor refactored Runtime pluggable pluggability hoc apis
     fastcgi nginx IIS middlewares
-    ctx _application MyApp restarter httponly Utils
+    ctx _application MyApp restarter httponly Utils stash's unescapes
     dispatchtype dispatchtypes redispatch redispatching
     CaptureArgs ChainedParent PathPart PathPrefix
     BUILDARGS metaclass
