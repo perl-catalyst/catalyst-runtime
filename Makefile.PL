@@ -88,6 +88,7 @@ author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
+  Test::Spelling
   Pod::Coverage::TrustPod
 ));
 
