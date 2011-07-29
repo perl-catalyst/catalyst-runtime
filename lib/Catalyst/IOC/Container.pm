@@ -629,8 +629,9 @@ sub add_component {
                     default => Catalyst::Utils::class2classsuffix( $component ),
                 },
                 accept_context_args => {
-                    isa => 'ArrayRef',
-                    default => sub { [] },
+                    isa => 'ArrayRef|Undef',
+                    required => 0,
+                    default => undef,
                 },
             },
         )
