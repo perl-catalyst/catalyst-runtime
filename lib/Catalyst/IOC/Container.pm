@@ -418,7 +418,7 @@ sub setup_components {
     }
 
     for my $component (@comps) {
-        $self->add_component( $component, $class );
+        $self->add_component( $component );
         # FIXME - $instance->expand_modules() is broken
         my @expanded_components = $self->expand_component_module( $component );
 
@@ -428,13 +428,14 @@ sub setup_components {
             ($deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @expanded_components)
         ) {
             # FIXME - should I be calling warn here?
+            # Maybe it's time to remove it, or become fatal
             $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
                 qq{Please switch your class names to ::Model::, ::View:: and ::Controller: as appropriate.\n}
             );
         }
 
         for my $component (@expanded_components) {
-            $self->add_component( $component, $class )
+            $self->add_component( $component )
                 unless $comps{$component};
         }
     }
@@ -610,7 +611,7 @@ sub get_all_components {
 }
 
 sub add_component {
-    my ( $self, $component, $class ) = @_;
+    my ( $self, $component ) = @_;
     my ( $type, $name ) = _get_component_type_name($component);
 
     return unless $type;
@@ -836,7 +837,7 @@ Searches for components in all containers. If $component is the full class name,
 
 Finds components that match a given regexp. Used internally, by find_component.
 
-=head2 $c->expand_component_module( $component, $setup_component_config )
+=head2 expand_component_module
 
 Components found by C<locate_components> will be passed to this method, which
 is expected to return a list of component (package) names to be set up.

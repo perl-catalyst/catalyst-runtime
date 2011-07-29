@@ -1446,9 +1446,7 @@ sub components {
     my $container = $class->container;
 
     if ( $comps ) {
-        $container->add_component(
-            $_, $class
-        ) for keys %$comps;
+        $container->add_component( $_ ) for keys %$comps;
     }
 
     return $container->get_all_components();
