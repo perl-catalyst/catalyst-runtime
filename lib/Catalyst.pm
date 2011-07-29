@@ -276,11 +276,11 @@ the name will be replaced with underscores, e.g. MyApp::Web should use
 MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
 
 If none of these are set, Catalyst will attempt to automatically detect the
-home directory. If you are working in a development envirnoment, Catalyst
+home directory. If you are working in a development environment, Catalyst
 will try and find the directory containing either Makefile.PL, Build.PL or
 dist.ini. If the application has been installed into the system (i.e.
 you have done C<make install>), then Catalyst will use the path to your
-application module, without the .pm extension (ie, /foo/MyApp if your
+application module, without the .pm extension (e.g., /foo/MyApp if your
 application was installed at /foo/MyApp.pm)
 
 =head2 -Log
@@ -348,9 +348,10 @@ call to forward.
 
 Note that L<< forward|/"$c->forward( $action [, \@arguments ] )" >> implies
 an C<< eval { } >> around the call (actually
-L<< execute|/"$c->execute( $class, $coderef )" >> does), thus de-fatalizing
-all 'dies' within the called action. If you want C<die> to propagate you
-need to do something like:
+L<< execute|/"$c->execute( $class, $coderef )" >> does), thus rendering all
+exceptions thrown by the called action non-fatal and pushing them onto
+$c->error instead. If you want C<die> to propagate you need to do something
+like:
 
     $c->forward('foo');
     die join "\n", @{ $c->error } if @{ $c->error };
@@ -412,7 +413,7 @@ L<reverse|Catalyst::Action/reverse> return information for the visited action
 when they are invoked within the visited action.  This is different from the
 behavior of L<< forward|/"$c->forward( $action [, \@arguments ] )" >>, which
 continues to use the $c->action object from the caller action even when
-invoked from the callee.
+invoked from the called action.
 
 C<< $c->stash >> is kept unchanged.
 
@@ -2266,7 +2267,7 @@ sub log_response_status_line {
 
 =head2 $c->log_response_headers($headers);
 
-Hook method which can be wrapped by plugins to log the responseheaders.
+Hook method which can be wrapped by plugins to log the response headers.
 No-op in the default implementation.
 
 =cut
@@ -3047,7 +3048,7 @@ welcome screens
 
 C<parse_on_demand> - The request body (for example file uploads) will not be parsed
 until it is accessed. This allows you to (for example) check authentication (and reject
-the upload) before actually recieving all the data. See L</ON-DEMAND PARSER>
+the upload) before actually receiving all the data. See L</ON-DEMAND PARSER>
 
 =item *
 
@@ -3223,6 +3224,8 @@ Wiki:
 
 =head2 L<Catalyst::Test> - The test suite.
 
+=begin stopwords
+
 =head1 PROJECT FOUNDER
 
 sri: Sebastian Riedel <sri@cpan.org>
@@ -3364,6 +3367,8 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
+
+=end stopwords
 
 =head1 COPYRIGHT
 

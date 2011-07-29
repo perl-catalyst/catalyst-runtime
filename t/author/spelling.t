@@ -4,15 +4,15 @@ use Test::More;
 use Test::Spelling;
 
 add_stopwords(qw(
-    undef env regex rethrow rethrows stringifies CPAN STDERR SIGCHLD baz
+    undef env regex unary rethrow rethrows stringifies CPAN STDERR SIGCHLD baz
     roadmap wishlist refactor refactored Runtime pluggable pluggability hoc apis
-    fastcgi nginx IIS middlewares
+    fastcgi nginx Lighttpd IIS middlewares backend IRC
     ctx _application MyApp restarter httponly Utils stash's unescapes
     dispatchtype dispatchtypes redispatch redispatching
     CaptureArgs ChainedParent PathPart PathPrefix
-    BUILDARGS metaclass
-    filename tempname request's
-    wiki bitmask uri url urls dir hostname http https IP SSL
+    BUILDARGS metaclass namespaces
+    filename tempname request's subdirectory ini uninstalled uppercased
+    wiki bitmask uri url urls dir hostname proxied http https IP SSL
 ));
 set_spell_cmd('aspell list -l en');
 all_pod_files_spelling_ok();
