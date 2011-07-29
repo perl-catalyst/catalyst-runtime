@@ -681,7 +681,7 @@ Catalyst::Container - IOC for Catalyst components
 
 =head1 METHODS
 
-=head1 Containers
+=head1 Building Containers
 
 =head2 build_model_subcontainer
 
@@ -695,7 +695,7 @@ Container that stores all views.
 
 Container that stores all controllers.
 
-=head1 Services
+=head1 Building Services
 
 =head2 build_application_name_service
 
@@ -710,75 +710,6 @@ Config options passed directly to the driver being used.
 ?
 
 =head2 build_substitutions_service
-
-Executes all the substitutions in config. See L</_config_substitutions> method.
-
-=head2 build_extensions_service
-
-=head2 build_prefix_service
-
-=head2 build_path_service
-
-=head2 build_config_service
-
-=head2 build_raw_config_service
-
-=head2 build_global_files_service
-
-=head2 build_local_files_service
-
-=head2 build_global_config_service
-
-=head2 build_local_config_service
-
-=head2 build_config_path_service
-
-=head2 build_config_local_suffix_service
-
-Determines the suffix of files used to override the main config. By default
-this value is C<local>, which will load C<myapp_local.conf>.  The suffix can
-be specified in the following order of preference:
-
-=over
-
-=item * C<$ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }>
-
-=item * C<$ENV{ CATALYST_CONFIG_LOCAL_SUFFIX }>
-
-=back
-
-The first one of these values found replaces the default of C<local> in the
-name of the local config file to be loaded.
-
-For example, if C< $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }> is set to C<testing>,
-ConfigLoader will try and load C<myapp_testing.conf> instead of
-C<myapp_local.conf>.
-
-=head2 get_component_from_sub_container($sub_container, $name, $c, @args)
-
-Looks for components in a given subcontainer (such as controller, model or view), and returns the searched component. If $name is undef, it returns the default component (such as default_view, if $sub_container is 'view'). If $name is a regexp, it returns an array of matching components. Otherwise, it looks for the component with name $name.
-
-=head2 get_components_types
-
-=head2 get_all_components
-
-Fetches all the components, in each of the sub_containers model, view and controller, and returns a readonly hash. The keys are the class names, and the values are the blessed objects. This is what is returned by $c->components.
-
-=head2 add_component
-
-Adds a component to the appropriate subcontainer. The subcontainer is guessed by the component name given.
-
-=head2 find_component
-
-Searches for components in all containers. If $component is the full class name, the subcontainer is guessed, and it gets the searched component in there. Otherwise, it looks for a component with that name in all subcontainers. If $component is a regexp, it calls the method below, find_component_regexp, and matches all components against that regexp.
-
-=head2 find_component_regexp
-
-Finds components that match a given regexp. Used internally, by find_component.
-
-=head2 _fix_syntax
-
-=head2 _config_substitutions
 
 This method substitutes macros found with calls to a function. There are a
 number of default macros:
@@ -807,10 +738,71 @@ Example:
 
 The above will respond to C<__baz(x,y)__> in config strings.
 
-=head2 $c->expand_component_module( $component, $setup_component_config )
+=head2 build_extensions_service
 
-Components found by C<locate_components> will be passed to this method, which
-is expected to return a list of component (package) names to be set up.
+Config::Any's available config file extensions (e.g. xml, json, pl, etc).
+
+=head2 build_prefix_service
+
+The prefix, based on the application name, that will be used to lookup the
+config files (which will be in the format $prefix.$extension). If the app is
+MyApp::Foo, the prefix will be myapp_foo.
+
+=head2 build_path_service
+
+The path to the config file (or environment variable, if defined).
+
+=head2 build_config_service
+
+The resulting configuration for the application, after it has successfully
+been loaded, and all substitutions have been made.
+
+=head2 build_raw_config_service
+
+The merge of local_config and global_config hashes, before substitutions.
+
+=head2 build_global_files_service
+
+Gets all files for config that don't have the local_suffix, such as myapp.conf.
+
+=head2 build_local_files_service
+
+Gets all files for config that have the local_suffix, such as myapp_local.conf.
+
+=head2 build_global_config_service
+
+Reads config from global_files.
+
+=head2 build_local_config_service
+
+Reads config from local_files.
+
+=head2 build_config_path_service
+
+Splits the path to the config file, and returns on array ref containing
+the path to the config file minus the extension in the first position,
+and the extension in the second.
+
+=head2 build_config_local_suffix_service
+
+Determines the suffix of files used to override the main config. By default
+this value is C<local>, which will load C<myapp_local.conf>.  The suffix can
+be specified in the following order of preference:
+
+=over
+
+=item * C<$ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }>
+
+=item * C<$ENV{ CATALYST_CONFIG_LOCAL_SUFFIX }>
+
+=back
+
+The first one of these values found replaces the default of C<local> in the
+name of the local config file to be loaded.
+
+For example, if C< $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }> is set to C<testing>,
+ConfigLoader will try and load C<myapp_testing.conf> instead of
+C<myapp_local.conf>.
 
 =head2 build_locate_components_service
 
@@ -819,6 +811,35 @@ setup for the application.  By default, it will use L<Module::Pluggable>.
 
 Specify a C<setup_components> config option to pass additional options directly
 to L<Module::Pluggable>.
+
+=head1 Other methods
+
+=head2 get_component_from_sub_container($sub_container, $name, $c, @args)
+
+Looks for components in a given subcontainer (such as controller, model or view), and returns the searched component. If $name is undef, it returns the default component (such as default_view, if $sub_container is 'view'). If $name is a regexp, it returns an array of matching components. Otherwise, it looks for the component with name $name.
+
+=head2 get_components_types
+
+=head2 get_all_components
+
+Fetches all the components, in each of the sub_containers model, view and controller, and returns a readonly hash. The keys are the class names, and the values are the blessed objects. This is what is returned by $c->components.
+
+=head2 add_component
+
+Adds a component to the appropriate subcontainer. The subcontainer is guessed by the component name given.
+
+=head2 find_component
+
+Searches for components in all containers. If $component is the full class name, the subcontainer is guessed, and it gets the searched component in there. Otherwise, it looks for a component with that name in all subcontainers. If $component is a regexp, it calls the method below, find_component_regexp, and matches all components against that regexp.
+
+=head2 find_component_regexp
+
+Finds components that match a given regexp. Used internally, by find_component.
+
+=head2 $c->expand_component_module( $component, $setup_component_config )
+
+Components found by C<locate_components> will be passed to this method, which
+is expected to return a list of component (package) names to be set up.
 
 =head2 setup_components
 
