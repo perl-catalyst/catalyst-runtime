@@ -738,7 +738,7 @@ foreach my $public_method_name (qw/
             $package_hash{$class}++ || do {
                 warn("Class $class is calling the deprecated method\n"
                     . "  Catalyst::Dispatcher::$public_method_name,\n"
-                    . "  this will be removed in Catalyst 5.9X\n");
+                    . "  this will be removed in Catalyst 5.9\n");
             };
         });
     }

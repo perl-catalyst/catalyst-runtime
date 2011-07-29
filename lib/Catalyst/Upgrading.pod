@@ -2,7 +2,7 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
-=head1 Upgrading to Catalyst 5.90
+=head1 Upgrading to Catalyst 5.9
 
 The major change is that L<Plack> now replaces most of the subclasses of
 L<Catalyst::Engine>.  If you are using one of the standard subclasses of
@@ -132,7 +132,7 @@ the development server starting, rather than the expected test running.
 
 =head2 Engines which are known broken
 
-The following engines B<DO NOT> work as of Catalyst version 5.90. The core
+The following engines B<DO NOT> work as of Catalyst version 5.9. The core
 team is extremely happy to work with the developers and/or users of these
 engines to help them port to the new Plack/Engine system, however applications
 which are currently using these engines B<WILL NOT> run without modification
@@ -175,9 +175,9 @@ XXX FIXME
 
 See L<Catalyst::PSGI>.
 
-=head2 Tests in 5.89
+=head2 Tests in 5.9
 
-Tests should generally work the same in Catalyst 5.89, however there are some differences.
+Tests should generally work the same in Catalyst 5.9, however there are some differences.
 
 Previously, if using L<Catalyst::Test> and doing local requests (against a local server),
 if the application threw an exception then this exception propagated into the test.
@@ -556,7 +556,7 @@ is highly deprecated.
 The first time one of these methods is called, a warning will be emitted:
 
     Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,
-    this will be removed in Catalyst 5.9X
+    this will be removed in Catalyst 5.9
 
 You should B<NEVER> be calling any of these methods from application code.
 
