@@ -63,9 +63,13 @@ L<Catalyst::Controller>
 
 L<CatalystX::LeakChecker>
 
+=begin stopwords
+
 =head1 AUTHOR
 
 Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=end stopwords
 
 =head1 COPYRIGHT
 
