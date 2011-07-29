@@ -8,7 +8,6 @@ use Devel::InnerPackage ();
 use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Moose::Util;
-use Catalyst::IOC::BlockInjection;
 use Catalyst::IOC::ConstructorInjection;
 use Module::Pluggable::Object ();
 use namespace::autoclean;
@@ -618,7 +617,6 @@ sub add_component {
 
     $self->get_sub_container($type)->add_service(
         Catalyst::IOC::ConstructorInjection->new(
-            lifecycle => 'Singleton', # FIXME?
             name      => $name,
             class     => $component,
             dependencies => [
@@ -629,6 +627,10 @@ sub add_component {
                 suffix => {
                     isa => 'Str',
                     default => Catalyst::Utils::class2classsuffix( $component ),
+                },
+                accept_context_args => {
+                    isa => 'ArrayRef',
+                    default => sub { [] },
                 },
             },
         )

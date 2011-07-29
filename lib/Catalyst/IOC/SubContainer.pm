@@ -1,7 +1,6 @@
 package Catalyst::IOC::SubContainer;
 use Bread::Board;
 use Moose;
-use Catalyst::IOC::BlockInjection;
 
 extends 'Bread::Board::Container';
 
