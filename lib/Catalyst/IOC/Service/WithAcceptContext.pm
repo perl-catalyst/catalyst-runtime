@@ -10,12 +10,13 @@ has accept_context_sub => (
 );
 
 around 'get' => sub {
-    my ( $orig, $self, %params ) = @_;
+    my $orig = shift;
+    my $self = shift;
 
-    my $accept_context_args = delete $params{accept_context_args};
+    my $instance = $self->$orig(@_);
 
-    my $instance = $self->$orig(%params);
-    my $ac_sub   = $self->accept_context_sub;
+    my $accept_context_args = $self->param('accept_context_args');
+    my $ac_sub = $self->accept_context_sub;
 
     if ( $accept_context_args && $instance->can($ac_sub) ) {
         return $instance->$ac_sub( @$accept_context_args );
@@ -33,7 +34,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::Service::WithContext
+Catalyst::Service::WithAcceptContext
 
 =head1 DESCRIPTION
 
