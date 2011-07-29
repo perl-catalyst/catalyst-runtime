@@ -14,7 +14,7 @@ add_stopwords(qw(
     filename tempname request's
     wiki bitmask uri url urls dir hostname http https IP SSL
 ));
-set_spell_cmd('aspell list -l en_GB');
+set_spell_cmd('aspell list -l en');
 all_pod_files_spelling_ok();
 
 done_testing();
