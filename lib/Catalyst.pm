@@ -2604,7 +2604,8 @@ Sets up engine.
 
 sub engine_class {
     my $class = shift;
-    $class->engine_loader->catalyst_engine_class(@_);
+    confess("Setting ->engine_class manually is no longer supported. XXX FIXME") if scalar @_;
+    $class->engine_loader->catalyst_engine_class;
 }
 
 sub setup_engine {
