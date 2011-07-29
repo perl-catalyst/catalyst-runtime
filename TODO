@@ -59,16 +59,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ### Next large steps:
 
-  - Moving setup_components etc into the container
-
-    - Move setup_components down into the container (setup_components becomes a one or two line method in Catalyst.pm)
-
-    - refactor / cleanup setup_component
-
-    - Move locate_components
-
-    - Move contents of setup_components
-
   - Finished documentation for ::IOC parts.
 
   - Creating service()-like sugar for component
