@@ -571,10 +571,11 @@ sub find_component_regexp {
     return @result;
 }
 
-# FIXME sorry for the name again :)
-sub get_components_types {
+# FIXME - t0m, how do you feel about this name?
+# also, do you think I should draw it here, or just return the data structure?
+sub get_components_names_types {
     my ( $self ) = @_;
-    my @comps_types;
+    my @comps_names_types;
 
     for my $sub_container_name (qw/model view controller/) {
         my $sub_container = $self->get_sub_container($sub_container_name);
@@ -582,11 +583,11 @@ sub get_components_types {
             my $comp     = $self->resolve(service => $service);
             my $compname = ref $comp || $comp;
             my $type     = ref $comp ? 'instance' : 'class';
-            push @comps_types, [ $compname, $type ];
+            push @comps_names_types, [ $compname, $type ];
         }
     }
 
-    return @comps_types;
+    return @comps_names_types;
 }
 
 sub get_all_components {
@@ -819,7 +820,9 @@ to L<Module::Pluggable>.
 
 Looks for components in a given subcontainer (such as controller, model or view), and returns the searched component. If $name is undef, it returns the default component (such as default_view, if $sub_container is 'view'). If $name is a regexp, it returns an array of matching components. Otherwise, it looks for the component with name $name.
 
-=head2 get_components_types
+=head2 get_components_names_types
+
+Gets all components from all containers and returns them as an array of arrayrefs containing the component name and the component type (i.e., whether it's an instance or a class).
 
 =head2 get_all_components
 
