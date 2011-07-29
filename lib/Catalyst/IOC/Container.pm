@@ -73,29 +73,27 @@ sub BUILD {
         local_files
         global_config
         local_config
+        class_config
         config_local_suffix
         config_path
         locate_components
     /;
 
+    my $config = $self->resolve( service => 'config' );
+
     $self->add_sub_container(
         $self->build_controller_subcontainer
     );
 
-    # FIXME - the config should be merged at this point
-    my $config        = $self->resolve( service => 'config' );
-    my $default_view  = $params->{default_view}  || $config->{default_view};
-    my $default_model = $params->{default_model} || $config->{default_model};
-
     $self->add_sub_container(
         $self->build_view_subcontainer(
-            default_component => $default_view,
+            default_component => $config->{default_view},
         )
     );
 
     $self->add_sub_container(
         $self->build_model_subcontainer(
-            default_component => $default_model,
+            default_component => $config->{default_model},
         )
     );
 }
@@ -224,15 +222,17 @@ sub build_raw_config_service {
             my @global = @{$s->param('global_config')};
             my @locals = @{$s->param('local_config')};
 
-            my $config = {};
+            my $config = $s->param('class_config');
+
             for my $cfg (@global, @locals) {
                 for (keys %$cfg) {
                     $config = Catalyst::Utils::merge_hashes( $config, $cfg->{$_} );
                 }
             }
+
             return $config;
         },
-        dependencies => [ depends_on('global_config'), depends_on('local_config') ],
+        dependencies => [ depends_on('global_config'), depends_on('local_config'), depends_on('class_config') ],
     );
 }
 
@@ -287,6 +287,26 @@ sub build_local_files_service {
             return \@files;
         },
         dependencies => [ depends_on('extensions'), depends_on('config_path'), depends_on('config_local_suffix') ],
+    );
+}
+
+sub build_class_config_service {
+    my $self = shift;
+
+    return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
+        name => 'class_config',
+        block => sub {
+            my $s   = shift;
+            my $app = $s->param('application_name');
+
+            # Container might be called outside Catalyst context
+            return {} unless Class::MOP::is_class_loaded($app);
+
+            # config might not have been defined
+            return $app->config || {};
+        },
+        dependencies => [ depends_on('application_name') ],
     );
 }
 
