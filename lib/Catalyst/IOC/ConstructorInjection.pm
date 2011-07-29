@@ -36,7 +36,11 @@ __END__
 
 =head1 NAME
 
-Catalyst::IOC::BlockInjection
+Catalyst::IOC::ConstructorInjection
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
 
 =head1 AUTHORS
 

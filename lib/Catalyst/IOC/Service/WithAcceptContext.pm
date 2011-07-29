@@ -38,15 +38,9 @@ Catalyst::Service::WithAcceptContext
 
 =head1 DESCRIPTION
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
-=over
-
-=item B<accept_context_sub>
-
-=item B<get>
-
-=back
+=head2 accept_context_sub
 
 =head1 AUTHORS
 
