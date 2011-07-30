@@ -100,9 +100,7 @@ can_ok( $appclass, 'components');
 
 my $complist = $appclass->components;
 
-# FIXME should the app class really be included in ->components?
-# the +1 below is for the app class itself
-is(scalar keys %$complist, 24+1, "Correct number of components loaded");
+is(scalar keys %$complist, 24, "Correct number of components loaded");
 
 foreach (keys %$complist) {
 
@@ -155,45 +153,49 @@ foreach my $component (@components) {
     );
 }
 
-eval qq(
-package $appclass;
-use Catalyst;
-$shut_up_deprecated_warnings
-__PACKAGE__->config->{ setup_components } = {
-    search_extra => [ '::Extra' ],
-    except       => [ "${appclass}::Controller::Foo" ]
-};
-__PACKAGE__->setup;
-);
-
-{
-    my $config = {
+SKIP: {
+    # FIXME - any backcompat planned?
+    skip "search_extra has been removed", 5;
+    eval qq(
+    package $appclass;
+    use Catalyst;
+    $shut_up_deprecated_warnings
+    __PACKAGE__->config->{ setup_components } = {
         search_extra => [ '::Extra' ],
         except       => [ "${appclass}::Controller::Foo" ]
     };
-    my @components_located = $appclass->locate_components($config);
-    my @components_expected;
-    for (@components) {
-        my $name = $appclass . '::' . $_->{prefix} . '::' . $_->{name};
-        push @components_expected, $name if $name ne "${appclass}::Controller::Foo";
-    }
-    is_deeply(
-        [ sort @components_located ],
-        [ sort @components_expected ],
-        'locate_components finds the components correctly'
+    __PACKAGE__->setup;
     );
+
+    {
+        my $config = {
+            search_extra => [ '::Extra' ],
+            except       => [ "${appclass}::Controller::Foo" ]
+        };
+        my @components_located = $appclass->locate_components($config);
+        my @components_expected;
+        for (@components) {
+            my $name = $appclass . '::' . $_->{prefix} . '::' . $_->{name};
+            push @components_expected, $name if $name ne "${appclass}::Controller::Foo";
+        }
+        is_deeply(
+            [ sort @components_located ],
+            [ sort @components_expected ],
+            'locate_components finds the components correctly'
+        );
+    }
+
+    can_ok( $appclass, 'components');
+
+    $complist = $appclass->components;
+
+    is(scalar keys %$complist, 24+1, "Correct number of components loaded");
+
+    ok( !exists $complist->{ "${appclass}::Controller::Foo" }, 'Controller::Foo was skipped' );
+    ok( exists $complist->{ "${appclass}::Extra::Foo" }, 'Extra::Foo was loaded' );
+
+    rmtree($libdir);
 }
-
-can_ok( $appclass, 'components');
-
-$complist = $appclass->components;
-
-is(scalar keys %$complist, 24+1, "Correct number of components loaded");
-
-ok( !exists $complist->{ "${appclass}::Controller::Foo" }, 'Controller::Foo was skipped' );
-ok( exists $complist->{ "${appclass}::Extra::Foo" }, 'Extra::Foo was loaded' );
-
-rmtree($libdir);
 
 $appclass = "ComponentOnce";
 
@@ -236,6 +238,7 @@ eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 is($@, '', "Didn't load component twice");
 is($appclass->model('TopLevel::Nested')->called,1, 'COMPONENT called once');
 
+# FIXME - OMG why should this even work?!!
 ok($appclass->model('TopLevel::GENERATED'), 'Have generated model');
 is(ref($appclass->model('TopLevel::GENERATED')), 'FooBarBazQuux',
     'ACCEPT_CONTEXT in generated inner package fired as expected');
