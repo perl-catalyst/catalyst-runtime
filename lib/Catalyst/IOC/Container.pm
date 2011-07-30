@@ -600,7 +600,7 @@ sub get_components_names_types {
     for my $sub_container_name (qw/model view controller/) {
         my $sub_container = $self->get_sub_container($sub_container_name);
         for my $service ( $sub_container->get_service_list ) {
-            my $comp     = $self->resolve(service => $service);
+            my $comp     = $sub_container->resolve(service => $service);
             my $compname = ref $comp || $comp;
             my $type     = ref $comp ? 'instance' : 'class';
             push @comps_names_types, [ $compname, $type ];
