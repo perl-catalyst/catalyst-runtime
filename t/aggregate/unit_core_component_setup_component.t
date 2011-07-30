@@ -1,6 +1,8 @@
 use strict;
 use warnings;
-use Test::More;
+
+# FIXME - backcompat?
+use Test::More skip_all => "Removed setup_component from Catalyst.pm";
 use Moose::Meta::Class;
 
 my %config = (
