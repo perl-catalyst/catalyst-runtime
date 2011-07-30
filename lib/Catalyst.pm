@@ -2281,14 +2281,14 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 sub setup_config {
     my $class = shift;
 
-    my $args = $class->config || {};
+    my %args = %{ $class->config || {} };
 
     my @container_classes = ( "${class}::Container", 'Catalyst::IOC::Container');
-    unshift @container_classes, delete $args->{container_class} if exists $args->{container_class};
+    unshift @container_classes, delete $args{container_class} if exists $args{container_class};
 
     my $container_class = Class::MOP::load_first_existing_class(@container_classes);
 
-    my $container = $container_class->new( application_name => "$class", name => "$class" );
+    my $container = $container_class->new( %args, application_name => "$class", name => "$class" );
     $class->container($container);
 
     my $config = $container->resolve( service => 'config' );
