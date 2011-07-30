@@ -39,7 +39,9 @@ for my $component (@comps) {
 
     ok( !$@, "setup_components doesnt die" );
     ok( $warnings, "it warns about deprecated names" );
-    is_deeply( \@comps, \@loaded_comps, 'all components loaded' );
+
+    # FIXME - do I need the original sort in locate_components service?
+    is_deeply( [ sort @comps ], [ sort @loaded_comps ], 'all components loaded' );
 }
 
 my @comps_copy  = @comps;
