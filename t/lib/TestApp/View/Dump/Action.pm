@@ -5,7 +5,7 @@ use base qw[TestApp::View::Dump];
 
 sub process {
     my ( $self, $c ) = @_;
-    return $self->SUPER::process( $c, $c->action );
+    return $self->SUPER::process( $c, $c->action, 0 );
 }
 
 1;
