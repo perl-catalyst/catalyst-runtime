@@ -51,8 +51,12 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Nice to have
 
+  * Test/WWW/Mechanize/Catalyst.pm stable throws a deprecation alert when
+    using Catalyst::Test changes introduced by Cataplack.  Suggested fix is
+    in the repo: http://dev.catalystframework.org/svnweb/Catalyst/revision?rev=14059
+
   * Capture arguments that the plack engine component was run with somewhere,
-    to more easily support custom args from scripts (e.g. Gitalist's 
+    to more easily support custom args from scripts (e.g. Gitalist's
     --git_dir)
   * throw away the restarter and allow using the restarters Plack provides
   * remove per-request state from the engine instance
