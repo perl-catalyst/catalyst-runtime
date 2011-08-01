@@ -1,11 +1,22 @@
 package Catalyst::IOC::ConstructorInjection;
 use Moose;
+use Catalyst::Utils ();
 extends 'Bread::Board::ConstructorInjection';
 
 with 'Bread::Board::Service::WithClass',
      'Bread::Board::Service::WithDependencies',
-     'Bread::Board::Service::WithParameters',
+     'Catalyst::IOC::Service::WithParameters',
      'Catalyst::IOC::Service::WithCOMPONENT';
+
+has config_key => (
+    is         => 'ro',
+    isa        => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_config_key {
+    Catalyst::Utils::class2classsuffix( shift->class );
+}
 
 # FIXME - how much of this should move to ::WithCOMPONENT?
 sub get {
@@ -14,7 +25,7 @@ sub get {
     my $constructor = $self->constructor_name;
     my $component   = $self->class;
     my $params      = $self->params;
-    my $config      = $params->{config}->{ $self->param('suffix') } || {};
+    my $config      = $params->{config}->{ $self->config_key } || {};
     my $app_name    = $params->{application_name};
 
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
