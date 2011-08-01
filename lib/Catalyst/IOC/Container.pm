@@ -656,12 +656,6 @@ sub add_component {
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
             ],
-            parameters => {
-                suffix => {
-                    isa => 'Str',
-                    default => Catalyst::Utils::class2classsuffix( $component ),
-                },
-            },
         )
     );
 
@@ -671,13 +665,6 @@ sub add_component {
             dependencies => [
                 depends_on( "/component/$component_service_name" ),
             ],
-            parameters => {
-                accept_context_args => {
-                    isa => 'ArrayRef|Undef',
-                    required => 0,
-                    default => undef,
-                },
-            },
             block => sub { return shift->param($component_service_name) },
         )
     );

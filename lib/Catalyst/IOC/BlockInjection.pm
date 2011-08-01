@@ -3,7 +3,7 @@ use Moose;
 extends 'Bread::Board::BlockInjection';
 
 with 'Bread::Board::Service::WithDependencies',
-     'Bread::Board::Service::WithParameters',
+     'Catalyst::IOC::Service::WithParameters',
      'Catalyst::IOC::Service::WithAcceptContext';
 
 __PACKAGE__->meta->make_immutable;
