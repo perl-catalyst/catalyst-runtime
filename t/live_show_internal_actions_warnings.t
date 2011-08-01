@@ -21,9 +21,6 @@ my $last_warning;
     my $res = get('/');
 }
 
-# FIXME - is this test really useful?
-# it doesn't change anything if we remove the show_internal_actions => 1 line
-# from TestAppShowInternalActions
 is( $last_warning, undef, 'there should be no warnings about uninitialized value' );
 
 done_testing;
