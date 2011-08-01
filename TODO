@@ -57,21 +57,35 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ## GSOC
 
-### Next large steps:
+### Next large steps, planned:
 
-  - Finished documentation for ::IOC parts.
+For all components that have been discovered, in whatever way, we create a service:
+ - that's a catalyst component service
+ - which is basically just a constructor injection
+ - except the constructor name is COMPONENT
+ - and we're "implicitly" passing along some constructor args
+ - Lifecycle => Singleton
+
+ - We make a 'components' sub container in the main container.
+   - This gets the ConstructorInjection COMPONENT services, as model_Foo.
+   - Lifecycle of these services is Singleton
+   - This simplifies the code for MyApp->components, as it need only list one sub-container
+
+ - We create a second service (depending on the first one) for ACCEPT_CONTEXT
+   - This has a custom service which calls ACCEPT_CONTEXT when the instance is fetched
+   - Not Singleton lifecycle
+ 
+   Note - ACCEPT_CONTEXT can be called on app values - if you have a Model::Foo, with an ACCEPT_CONTEXT
+   and you call MyApp->model('Foo') then ACCEPT_CONTEXT gets invoked with a $c of 'MyApp' (this is not\
+   the normal case, but we need to preserve for compat)
+
+### Next steps - less planned:
 
   - Creating service()-like sugar for component
 
   - Test cases for extending the container in an application.
     - Using the sugar added in the previous item
     - Test when Model::Foo depends_on Model::Bar
-
-  - Allowing people to change component lifecycles
-
-     role Service::WithAcceptContext {}
-     role Service::WithCOMPONENT {}
-     class Service::CatalystComponent extends Service with (WithAcceptContext, WithCOMPONENT) {}
 
     a) configure additional services in that container 
         -  super simple container $default_container => as { more services };
@@ -90,26 +104,58 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
                     # as well as adding using the catalyst-specific service class
             } }
         };
-    b) make component services depend on that, and 
+
+  let's consider the usage patterns we actually want to enable by doing the whole B::B thing
+  what happens if i make the "per-app" service for a component life only for the duration of the request?
+  or be instanciated every time i look up the component?
+  (or scoping it per session, or having a block injection, or something)
+
+  say you override the app service to be per-request
+  now the wrapper for the per-request variant doesn't make sense anymore. does it?
+  because you're only overriding one half of what has been generated automatically
+
+  ah, so you have basically ended up with getting a request scoped thing to be used to construct a request scoped thing, which is pointless? Would/could you not just override the 
+  service which is actually getting looked up instead, and make it not depend on the auto-generated per-app scope service, which will then just never be built?
+
+  yes, you could. but then you'd have to be aware of the distinction
+  which is what i hoped to be a barely visible backcompat thing
+  but which i'm afraid it won't be if we go for two actual separate services
+
+  what stops the sugar we give from not just making you specify the lifecycle, and giving you the obvious name / wiring?
+  i.e. everything looks like 'Foo', so you don't have to know COMPONENT/Foo exists
+
+  my hopes of not needing any sugar at all, i guess
+
+  only a couple of new lifecycles to be registered with the container - ??
 
 
-    c) ask for those 
-              services declared in a) outside of a web context
-       simple as well. $customised_container->fetch('service')->get # or whatever the api was
+### To polish off / t0m review
 
-19:23 < andrewalker> edenc, when explaining to me how it should be, drafted this: https://gist.github.com/1098186
-19:26 < edenc> I like the possibility of being able to provide a backwards-compatible structure which we can muck around with by configuring B::B
-19:26 <@rafl> so, the request context clearly isn't a service
-19:27 <@rafl> but that's ok. there's parametrised services
-19:27 < edenc> yeah, that was a draft
-19:27 <@rafl> the outer Foo service is pretty much what i'd expect Service::WithAcceptContext to do, except with a dependency on a context instead of a service parameter
-19:32 <@rafl> actually having services for the pre-ACCEPT_CONTEXT bits is what i want to think about
-
-### To polish off
-
-  - Document current methods
   - +    $class->container->get_sub_container('model')->make_single_default;
-+    $class->container->get_sub_container('view')->make_single_default;
+    +    $class->container->get_sub_container('view')->make_single_default;
+
+    get_components_names_types
+
+    locate_components
+
+    +# FIXME - t0m, how do you feel about this name?
+    +# also, do you think I should draw it here, or just return the data structure?
+    +sub get_components_names_types {
+
+    +    MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } = {
+
+    +# FIXME - just till I understand how it's supposed to be done
+    +# Made this so that COMPONENT is executed once,
+    +# and ACCEPT_CONTEXT every call.
+    +has instance => (
+    +    is => 'rw',
+
+    # This is ok??
+    +my $applevel_config = TestAppContainer->container->resolve(service => 'config')->{applevel_config};
+    +__PACKAGE__->config(applevel_config => 'foo');
+
+
+    accept_context_args - where does this come from?
 
 ### Known issues
 
