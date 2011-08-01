@@ -555,12 +555,12 @@ sub get_component_from_sub_container {
 }
 
 sub find_component {
-    my ( $self, $component, $c, @args ) = @_;
+    my ( $self, $component, @args ) = @_;
     my ( $type, $name ) = _get_component_type_name($component);
     my @result;
 
     return $self->get_component_from_sub_container(
-        $type, $name, $c, @args
+        $type, $name, @args
     ) if $type;
 
     my $query = ref $component
@@ -573,14 +573,13 @@ sub find_component {
         my @components   = $subcontainer->get_service_list;
         @result          = grep { m{$component} } @components;
 
-        return map { $subcontainer->get_component( $_, $c, @args ) } @result
+        return map { $subcontainer->get_component( $_, @args ) } @result
             if @result;
     }
 
-    # FIXME - I guess I shouldn't be calling $c->components here
     # one last search for things like $c->comp(qr/::M::/)
     @result = $self->find_component_regexp(
-        $c->components, $component, $c, @args
+        $component, @args
     ) if !@result and ref $component;
 
     # it expects an empty list on failed searches
@@ -588,10 +587,10 @@ sub find_component {
 }
 
 sub find_component_regexp {
-    my ( $self, $components, $component, @args ) = @_;
+    my ( $self, $component, @args ) = @_;
     my @result;
 
-    my @components = grep { m{$component} } keys %{ $components };
+    my @components = grep { m{$component} } keys %{ $self->get_all_components };
 
     for (@components) {
         my ($type, $name) = _get_component_type_name($_);
@@ -627,18 +626,14 @@ sub get_all_components {
     my $self = shift;
     my %components;
 
-    my $containers = {
-        map { $_ => $self->get_sub_container($_) } qw(model view controller)
-    };
+    my $container = $self->get_sub_container('component');
 
-    for my $container (keys %$containers) {
-        for my $component ($containers->{$container}->get_service_list) {
-            my $comp = $containers->{$container}->resolve(
-                service => $component
-            );
-            my $comp_name = ref $comp || $comp;
-            $components{$comp_name} = $comp;
-        }
+    for my $component ($container->get_service_list) {
+        my $comp = $container->resolve(
+            service => $component
+        );
+        my $comp_name = ref $comp || $comp;
+        $components{$comp_name} = $comp;
     }
 
     return lock_hash %components;
