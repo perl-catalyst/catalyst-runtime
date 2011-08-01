@@ -5,7 +5,7 @@ extends 'Bread::Board::ConstructorInjection';
 
 with 'Bread::Board::Service::WithClass',
      'Bread::Board::Service::WithDependencies',
-     'Catalyst::IOC::Service::WithParameters',
+     'Bread::Board::Service::WithParameters',
      'Catalyst::IOC::Service::WithCOMPONENT';
 
 has config_key => (
