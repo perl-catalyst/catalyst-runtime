@@ -8,6 +8,7 @@ use Devel::InnerPackage ();
 use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Moose::Util;
+use Catalyst::IOC::BlockInjection;
 use Catalyst::IOC::ConstructorInjection;
 use Module::Pluggable::Object ();
 use namespace::autoclean;
@@ -82,6 +83,10 @@ sub BUILD {
     my $config = $self->resolve( service => 'config' );
 
     $self->add_sub_container(
+        $self->build_component_subcontainer
+    );
+
+    $self->add_sub_container(
         $self->build_controller_subcontainer
     );
 
@@ -119,6 +124,14 @@ sub build_controller_subcontainer {
 
     return $self->new_sub_container(
         name => 'controller',
+    );
+}
+
+sub build_component_subcontainer {
+    my $self = shift;
+
+    return Bread::Board::Container->new(
+        name => 'component',
     );
 }
 
@@ -637,10 +650,13 @@ sub add_component {
 
     return unless $type;
 
-    $self->get_sub_container($type)->add_service(
+    my $component_service_name = "${type}_${name}";
+
+    $self->get_sub_container('component')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
-            name      => $name,
+            name      => $component_service_name,
             class     => $component,
+            lifecycle => 'Singleton',
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
@@ -650,12 +666,24 @@ sub add_component {
                     isa => 'Str',
                     default => Catalyst::Utils::class2classsuffix( $component ),
                 },
+            },
+        )
+    );
+
+    $self->get_sub_container($type)->add_service(
+        Catalyst::IOC::BlockInjection->new(
+            name         => $name,
+            dependencies => [
+                depends_on( "/component/$component_service_name" ),
+            ],
+            parameters => {
                 accept_context_args => {
                     isa => 'ArrayRef|Undef',
                     required => 0,
                     default => undef,
                 },
             },
+            block => sub { return shift->param($component_service_name) },
         )
     );
 }

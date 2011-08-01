@@ -18,7 +18,7 @@ around 'get' => sub {
     my $accept_context_args = $self->param('accept_context_args');
     my $ac_sub = $self->accept_context_sub;
 
-    if ( $accept_context_args && $instance->can($ac_sub) ) {
+    if ( $instance->can($ac_sub) ) {
         return $instance->$ac_sub( @$accept_context_args );
     }
 
@@ -34,7 +34,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::Service::WithAcceptContext
+Catalyst::IOC::Service::WithAcceptContext
 
 =head1 DESCRIPTION
 

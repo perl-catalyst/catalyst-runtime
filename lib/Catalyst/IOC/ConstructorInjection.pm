@@ -5,8 +5,7 @@ extends 'Bread::Board::ConstructorInjection';
 with 'Bread::Board::Service::WithClass',
      'Bread::Board::Service::WithDependencies',
      'Bread::Board::Service::WithParameters',
-     'Catalyst::IOC::Service::WithCOMPONENT',
-     'Catalyst::IOC::Service::WithAcceptContext';
+     'Catalyst::IOC::Service::WithCOMPONENT';
 
 # FIXME - how much of this should move to ::WithCOMPONENT?
 sub get {

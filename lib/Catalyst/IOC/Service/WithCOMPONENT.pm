@@ -3,14 +3,6 @@ use Moose::Role;
 
 with 'Bread::Board::Service';
 
-# FIXME - just till I understand how it's supposed to be done
-# Made this so that COMPONENT is executed once,
-# and ACCEPT_CONTEXT every call.
-has instance => (
-    is => 'rw',
-    required => 0,
-);
-
 sub _build_constructor_name { 'COMPONENT' }
 
 around 'get' => sub {
@@ -22,10 +14,6 @@ around 'get' => sub {
     unless ( $component->can( $constructor ) ) {
         # FIXME - make some deprecation warnings
         return $component;
-    }
-
-    if ($self->instance) {
-        return $self->instance;
     }
 
     my $instance = eval { $self->$orig() };
@@ -47,8 +35,6 @@ around 'get' => sub {
         );
     }
 
-    $self->instance($instance);
-
     return $instance;
 };
 
@@ -61,7 +47,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::Service::WithCOMPONENT
+Catalyst::IOC::Service::WithCOMPONENT
 
 =head1 DESCRIPTION
 
