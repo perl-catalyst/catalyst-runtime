@@ -66,6 +66,12 @@ For all components that have been discovered, in whatever way, we create a servi
  - and we're "implicitly" passing along some constructor args
  - Lifecycle => Singleton
 
+ - Fix B::B so that Service::WithParametrs' parameters attribute has a builder
+ - Fix ConstructorInjection so that default parameters are supplied (for accept_context_args)
+ - Fix ConstructorInjection's 'suffix' - should be called 'config_key' or something, and
+   should be an attribute on the service (as it never changes), rather than a parameter
+   to the service 
+
  - We make a 'components' sub container in the main container.
    - This gets the ConstructorInjection COMPONENT services, as model_Foo.
    - Lifecycle of these services is Singleton
@@ -87,47 +93,55 @@ For all components that have been discovered, in whatever way, we create a servi
     - Using the sugar added in the previous item
     - Test when Model::Foo depends_on Model::Bar
 
-    a) configure additional services in that container 
-        -  super simple container $default_container => as { more services };
-        class MyApp::Container extends Catalyst::Container {
-            use Bread::Board; # Or our own sugar?
-            method BUILD { container $self => as { 
-                    service model => ...; # some constructor injection to MyApp::Model or something
-                    container Model => as {
-                        component Foo => (dependencies => ['/model']); # As per default!
-                        component Bar => (dependencies => ['/model/Foo']); # Magic!
-                    };
-                    # Note - implementation of BB may need to be changed to support making sure existing 
-                    # services actually get overridden. not sure how the default container behaves when doing that
-                    # above code would build the constructor injection as it currently does,
-                    # defaulting to the class name in the right namespace as declared by the surrounding container
-                    # as well as adding using the catalyst-specific service class
-            } }
-        };
 
-  let's consider the usage patterns we actually want to enable by doing the whole B::B thing
-  what happens if i make the "per-app" service for a component life only for the duration of the request?
-  or be instanciated every time i look up the component?
-  (or scoping it per session, or having a block injection, or something)
+#### Extending my app, notes
 
-  say you override the app service to be per-request
-  now the wrapper for the per-request variant doesn't make sense anymore. does it?
-  because you're only overriding one half of what has been generated automatically
+Basically try to implement something like this (starting out without the sugar!), and see how it breaks
+and what needs to be done to fix it!
 
-  ah, so you have basically ended up with getting a request scoped thing to be used to construct a request scoped thing, which is pointless? Would/could you not just override the 
-  service which is actually getting looked up instead, and make it not depend on the auto-generated per-app scope service, which will then just never be built?
+##### Eventual syntax
 
-  yes, you could. but then you'd have to be aware of the distinction
-  which is what i hoped to be a barely visible backcompat thing
-  but which i'm afraid it won't be if we go for two actual separate services
+package MyApp::Container;
+use Catalyst::IOC;
+    
+    container $self, as { 
+            container model => as {
+                component Foo => (); # As per default!
+                component Bar => (dependencies => ['/model/Foo']); # Magic!
+                component Baz => ( lifecycle => 'InstancePerContext );
+                component Quux => ( lifecycle => 'Singleton' ); # ACCEPT_CONTEXT not called
+            };                    
+            # Note - implementation of BB may need to be changed to support making sure existing 
+            # services actually get overridden. not sure how the default container behaves when doing that
+            # above code would build the constructor injection as it currently does,
+            # defaulting to the class name in the right namespace as declared by the surrounding container
+            # as well as adding using the catalyst-specific service class
+    };
 
-  what stops the sugar we give from not just making you specify the lifecycle, and giving you the obvious name / wiring?
-  i.e. everything looks like 'Foo', so you don't have to know COMPONENT/Foo exists
+1;
 
-  my hopes of not needing any sugar at all, i guess
+##### To start with
 
-  only a couple of new lifecycles to be registered with the container - ??
+package MyApp::Container;
+use Moose;
 
+extends 'Catalyst::Container;
+
+after BUILD => sub {
+    my $self = shift;
+    my $model_container = $self->get_sub_container('model');
+    my $service = Catalyst::IOC::ConstructorInjection->new(
+        name      => 'Baz',
+        class     => 'MyApp::Model::Baz',
+        dependencies => [
+            depends_on( '/application_name' ),
+            depends_on( '/config' ),
+            depends_on( '/model/Foo' ),
+        ],
+        lifecycle => 'InstancePerContext',
+    );
+    $model_container->add_service( 'Foo', $service );
+};
 
 ### To polish off / t0m review
 
