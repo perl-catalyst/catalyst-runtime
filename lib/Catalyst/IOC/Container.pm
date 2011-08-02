@@ -782,12 +782,14 @@ C<__DATA__> as a config value, for example)
 
 The parameter list is split on comma (C<,>). You can override this method to
 do your own string munging, or you can define your own macros in
-C<MyApp-E<gt>config-E<gt>{ 'Plugin::ConfigLoader' }-E<gt>{ substitutions }>.
+C<< <MyApp->config( 'Plugin::ConfigLoader' => { substitutions => { ... } } ) >>.
 Example:
 
-    MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } = {
-        baz => sub { my $c = shift; qux( @_ ); }
-    }
+    MyApp->config( 'Plugin::ConfigLoader' => {
+        substitutions => {
+            baz => sub { my $c = shift; qux( @_ ); },
+        },
+    });
 
 The above will respond to C<__baz(x,y)__> in config strings.
 

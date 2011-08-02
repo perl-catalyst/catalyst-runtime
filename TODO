@@ -148,8 +148,6 @@ after BUILD => sub {
   - +    $class->container->get_sub_container('model')->make_single_default;
     +    $class->container->get_sub_container('view')->make_single_default;
 
-    +sub controller { shift->_lookup_mvc('controller', @_) }
-
     get_components_names_types
 
     locate_components
@@ -157,19 +155,6 @@ after BUILD => sub {
     +# FIXME - t0m, how do you feel about this name?
     +# also, do you think I should draw it here, or just return the data structure?
     +sub get_components_names_types {
-
-    +    MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } = {
-
-    +# FIXME - just till I understand how it's supposed to be done
-    +# Made this so that COMPONENT is executed once,
-    +# and ACCEPT_CONTEXT every call.
-    +has instance => (
-    +    is => 'rw',
-
-    # This is ok??
-    +my $applevel_config = TestAppContainer->container->resolve(service => 'config')->{applevel_config};
-    +__PACKAGE__->config(applevel_config => 'foo');
-
 
     +Same as L<build_model_subcontainer>, but for controllers. The difference is
     +that there is no ACCEPT_CONTEXT for controllers.
