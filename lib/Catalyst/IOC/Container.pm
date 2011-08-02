@@ -745,8 +745,7 @@ Same as L<build_model_subcontainer>, but for views.
 
 =head2 build_controller_subcontainer
 
-Same as L<build_model_subcontainer>, but for controllers. The difference is
-that there is no ACCEPT_CONTEXT for controllers.
+Same as L<build_model_subcontainer>, but for controllers.
 
 =head1 Building Services
 
