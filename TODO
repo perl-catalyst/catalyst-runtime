@@ -148,9 +148,12 @@ after BUILD => sub {
   - +    $class->container->get_sub_container('model')->make_single_default;
     +    $class->container->get_sub_container('view')->make_single_default;
 
+    locate_components service vs setup_components method
+      - can we be more lazy?
+      - should setup_components be a service that things like the ->component lookup
+        can depend on?
+      
     get_components_names_types
-
-    locate_components
 
     +# FIXME - t0m, how do you feel about this name?
     +# also, do you think I should draw it here, or just return the data structure?
@@ -180,3 +183,4 @@ after BUILD => sub {
 
     - expand_component_module
 
+    - People wrapping locate_components in Catalyst.pm
