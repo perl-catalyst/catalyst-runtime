@@ -11,7 +11,7 @@ sub dump {
 
     return unless $reference;
 
-    $purity = $purity // 1;
+    $purity = defined $purity ? $purity : 1;
 
     my $dumper = Data::Dumper->new( [$reference] );
     $dumper->Indent(1);
