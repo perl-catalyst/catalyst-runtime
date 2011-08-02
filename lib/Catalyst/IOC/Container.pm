@@ -647,7 +647,15 @@ sub add_component {
 
     my $component_service_name = "${type}_${name}";
 
-    $self->get_sub_container('component')->add_service(
+    # The 'component' sub-container will create the object, and store it's
+    # instance, which, by default, will live throughout the application.
+    # The model/view/controller sub-containers only reference the instance
+    # held in the aforementioned sub-container, and execute the ACCEPT_CONTEXT
+    # sub every time they are called, when it exists.
+    my $instance_container       = $self->get_sub_container('component');
+    my $accept_context_container = $self->get_sub_container($type);
+
+    $instance_container->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name      => $component_service_name,
             class     => $component,
@@ -657,17 +665,20 @@ sub add_component {
                 depends_on( '/config' ),
             ],
         )
-    );
+    ) unless $instance_container->has_service( $component_service_name );
+    # ^ custom containers might have added the service already.
+    # we don't want to override that.
 
-    $self->get_sub_container($type)->add_service(
+    $accept_context_container->add_service(
         Catalyst::IOC::BlockInjection->new(
             name         => $name,
             dependencies => [
                 depends_on( "/component/$component_service_name" ),
             ],
-            block => sub { return shift->param($component_service_name) },
+            block => sub { shift->param($component_service_name) },
         )
-    );
+    ) unless $accept_context_container->has_service( $name );
+    # ^ same as above
 }
 
 # FIXME: should this sub exist?
