@@ -156,9 +156,6 @@ after BUILD => sub {
        Without this change, the user could make a custom service which mangled the param, and use 
        Catalyst/IOC/Service/WithAcceptContext.pm, with this change, that module will always see the
        un-mangled version?? However, without this change, shit doesn't work...
-    
-    +    $purity = $purity // 1;
-    ^^ perl 5.10 only
 
 ### Known issues
 
