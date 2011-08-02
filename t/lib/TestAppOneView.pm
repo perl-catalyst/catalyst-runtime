@@ -1,7 +1,7 @@
 package TestAppOneView;
-use strict;
-use warnings;
+use Moose;
 use Catalyst;
+extends 'Catalyst';
 
 __PACKAGE__->setup;
 

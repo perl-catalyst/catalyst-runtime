@@ -615,15 +615,16 @@ sub view { shift->_lookup_mvc('view', @_) }
 sub _lookup_mvc {
     my ( $c, $type, $name, @args ) = @_;
 
-    if (ref $c && !$name && $type ne 'controller') {
+    if (ref $c && !$name) {
         my $current_instance = $c->stash->{"current_${type}_instance"};
         return $current_instance
-            if $current_instance;
+            if $current_instance && $type ne 'controller';
 
-        $name = $c->stash->{"current_${type}"};
+        $name = $type eq 'controller'
+              ? Catalyst::Utils::class2classshortsuffix($c->action->class)
+              : $c->stash->{"current_${type}"}
+              ;
     }
-
-    $name ||= Catalyst::Utils::class2classshortsuffix($c->action->class);
 
     return $c->container->get_component_from_sub_container($type, $name, $c, @args);
 }
