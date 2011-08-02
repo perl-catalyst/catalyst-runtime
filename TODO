@@ -57,34 +57,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ## GSOC
 
-### Next large steps, planned:
-
-For all components that have been discovered, in whatever way, we create a service:
- - that's a catalyst component service
- - which is basically just a constructor injection
- - except the constructor name is COMPONENT
- - and we're "implicitly" passing along some constructor args
- - Lifecycle => Singleton
-
- - Fix B::B so that Service::WithParametrs' parameters attribute has a builder
- - Fix ConstructorInjection so that default parameters are supplied (for accept_context_args)
- - Fix ConstructorInjection's 'suffix' - should be called 'config_key' or something, and
-   should be an attribute on the service (as it never changes), rather than a parameter
-   to the service 
-
- - We make a 'components' sub container in the main container.
-   - This gets the ConstructorInjection COMPONENT services, as model_Foo.
-   - Lifecycle of these services is Singleton
-   - This simplifies the code for MyApp->components, as it need only list one sub-container
-
- - We create a second service (depending on the first one) for ACCEPT_CONTEXT
-   - This has a custom service which calls ACCEPT_CONTEXT when the instance is fetched
-   - Not Singleton lifecycle
- 
-   Note - ACCEPT_CONTEXT can be called on app values - if you have a Model::Foo, with an ACCEPT_CONTEXT
-   and you call MyApp->model('Foo') then ACCEPT_CONTEXT gets invoked with a $c of 'MyApp' (this is not\
-   the normal case, but we need to preserve for compat)
-
 ### Next steps - less planned:
 
   - Creating service()-like sugar for component
@@ -151,10 +123,6 @@ after BUILD => sub {
 
 ### To polish off / t0m review
 
-    +Same as L<build_model_subcontainer>, but for controllers. The difference is
-    +that there is no ACCEPT_CONTEXT for controllers.
-    ^^ This is wrong!!
-    
     -    my $accept_context_args = $self->param('accept_context_args');
     +    my $accept_context_args = $params{accept_context_args};
     ^^ This (may be) wrong! I am thinking the service should be allowed to mangle the 
