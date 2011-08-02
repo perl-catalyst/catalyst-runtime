@@ -616,11 +616,11 @@ sub _lookup_mvc {
     my ( $c, $type, $name, @args ) = @_;
 
     if (ref $c && !$name && $type ne 'controller') {
-        my $current_instance = $c->stash->{current_${type}_instance};
+        my $current_instance = $c->stash->{"current_${type}_instance"};
         return $current_instance
             if $current_instance;
 
-        $name = $c->stash->{current_${type}};
+        $name = $c->stash->{"current_${type}"};
     }
 
     $name ||= Catalyst::Utils::class2classshortsuffix($c->action->class);
