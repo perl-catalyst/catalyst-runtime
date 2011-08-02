@@ -123,6 +123,11 @@ after BUILD => sub {
 
 ### To polish off / t0m review
 
+    locate_components service vs setup_components method
+      - can we be more lazy?
+      - should setup_components be a service that things like the ->component lookup
+        can depend on?
+
     -    my $accept_context_args = $self->param('accept_context_args');
     +    my $accept_context_args = $params{accept_context_args};
     ^^ This (may be) wrong! I am thinking the service should be allowed to mangle the 
