@@ -1017,11 +1017,11 @@ EOF
 
     if (
         $class->debug and
-        my @comps_names_types = $class->container->get_components_names_types
+        my %comps = $class->container->get_all_components
     ) {
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
-        $t->row( @$_ ) for @comps_names_types;
+        $t->row( $_ => ref($comps) ? 'instance' : 'class' ) for keys %comps;
 
         $class->log->debug( "Loaded components:\n" . $t->draw . "\n" );
     }

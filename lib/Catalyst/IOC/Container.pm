@@ -603,25 +603,6 @@ sub find_component_regexp {
     return @result;
 }
 
-# FIXME - t0m, how do you feel about this name?
-# also, do you think I should draw it here, or just return the data structure?
-sub get_components_names_types {
-    my ( $self ) = @_;
-    my @comps_names_types;
-
-    for my $sub_container_name (qw/model view controller/) {
-        my $sub_container = $self->get_sub_container($sub_container_name);
-        for my $service ( $sub_container->get_service_list ) {
-            my $comp     = $sub_container->resolve(service => $service);
-            my $compname = ref $comp || $comp;
-            my $type     = ref $comp ? 'instance' : 'class';
-            push @comps_names_types, [ $compname, $type ];
-        }
-    }
-
-    return @comps_names_types;
-}
-
 sub get_all_components {
     my $self = shift;
     my %components;

@@ -152,12 +152,6 @@ after BUILD => sub {
       - can we be more lazy?
       - should setup_components be a service that things like the ->component lookup
         can depend on?
-      
-    get_components_names_types
-
-    +# FIXME - t0m, how do you feel about this name?
-    +# also, do you think I should draw it here, or just return the data structure?
-    +sub get_components_names_types {
 
     +Same as L<build_model_subcontainer>, but for controllers. The difference is
     +that there is no ACCEPT_CONTEXT for controllers.
@@ -170,8 +164,6 @@ after BUILD => sub {
        Without this change, the user could make a custom service which mangled the param, and use 
        Catalyst/IOC/Service/WithAcceptContext.pm, with this change, that module will always see the
        un-mangled version?? However, without this change, shit doesn't work...
-
-    accept_context_args - where does this come from?
     
     +    $purity = $purity // 1;
     ^^ perl 5.10 only
