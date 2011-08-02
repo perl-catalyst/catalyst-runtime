@@ -145,14 +145,6 @@ after BUILD => sub {
 
 ### To polish off / t0m review
 
-  - +    $class->container->get_sub_container('model')->make_single_default;
-    +    $class->container->get_sub_container('view')->make_single_default;
-
-    locate_components service vs setup_components method
-      - can we be more lazy?
-      - should setup_components be a service that things like the ->component lookup
-        can depend on?
-
     +Same as L<build_model_subcontainer>, but for controllers. The difference is
     +that there is no ACCEPT_CONTEXT for controllers.
     ^^ This is wrong!!

@@ -7,9 +7,18 @@ extends 'Bread::Board::Container';
 has default_component => (
     isa      => 'Str|Undef',
     is       => 'ro',
-    required => 0,
-    writer   => '_set_default_component',
+    builder  => '_build_default_component',
+    lazy     => 1,
 );
+
+sub _build_default_componentt {
+    my ( $self ) = @_;
+
+    my @complist = $self->get_service_list;
+
+    scalar @complist == 1 ? $complist[0] : undef;
+}
+
 
 sub get_component {
     my ( $self, $name, @args ) = @_;
@@ -28,17 +37,6 @@ sub get_component_regexp {
     } grep { m/$query/ } $self->get_service_list;
 
     return @result;
-}
-
-# FIXME - is this sub ok?
-# is the name ok too?
-sub make_single_default {
-    my ( $self ) = @_;
-
-    my @complist = $self->get_service_list;
-
-    $self->_set_default_component( shift @complist )
-        if !$self->default_component && scalar @complist == 1;
 }
 
 1;

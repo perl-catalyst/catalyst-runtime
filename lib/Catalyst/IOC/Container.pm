@@ -472,9 +472,6 @@ sub setup_components {
                 unless $comps{$component};
         }
     }
-
-    $self->get_sub_container('model')->make_single_default;
-    $self->get_sub_container('view')->make_single_default;
 }
 
 sub _fix_syntax {
