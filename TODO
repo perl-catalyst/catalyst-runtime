@@ -93,6 +93,12 @@ For all components that have been discovered, in whatever way, we create a servi
     - Using the sugar added in the previous item
     - Test when Model::Foo depends_on Model::Bar
 
+  - Tests for using the container outside of Catalyst
+    - Custom container which adds some (very simple) services which are initialized from
+      the application config file (note plain services, not components)
+    - Depend on (and test) these inside Catalyst
+    - Test loading container outside Catalyst, and these services working
+    - Test Catalyst / MyApp is not loaded
 
 #### Extending my app, notes
 
