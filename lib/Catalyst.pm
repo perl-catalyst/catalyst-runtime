@@ -564,13 +564,7 @@ If you want to search for controllers, pass in a regexp as the argument.
 
 =cut
 
-sub controller {
-    my ( $c, $name, @args ) = @_;
-
-    $name ||= Catalyst::Utils::class2classshortsuffix( $c->action->class );
-
-    return $c->container->get_component_from_sub_container( 'controller', $name, $c, @args);
-}
+sub controller { shift->_lookup_mvc('controller', @_) }
 
 =head2 $c->model($name)
 
@@ -593,20 +587,7 @@ If you want to search for models, pass in a regexp as the argument.
 
 =cut
 
-sub model {
-    my ( $c, $name, @args ) = @_;
-
-    if (ref $c && !$name) {
-        my $current_instance = $c->stash->{current_model_instance};
-        return $current_instance
-            if $current_instance;
-
-        $name = $c->stash->{current_model};
-    }
-
-    return $c->container->get_component_from_sub_container( 'model', $name, $c, @args);
-}
-
+sub model { shift->_lookup_mvc('model', @_) }
 
 =head2 $c->view($name)
 
@@ -629,18 +610,22 @@ If you want to search for views, pass in a regexp as the argument.
 
 =cut
 
-sub view {
-    my ( $c, $name, @args ) = @_;
+sub view { shift->_lookup_mvc('view', @_) }
 
-    if (ref $c && !$name) {
-        my $current_instance = $c->stash->{current_view_instance};
+sub _lookup_mvc {
+    my ( $c, $type, $name, @args ) = @_;
+
+    if (ref $c && !$name && $type ne 'controller') {
+        my $current_instance = $c->stash->{current_${type}_instance};
         return $current_instance
             if $current_instance;
 
-        $name = $c->stash->{current_view};
+        $name = $c->stash->{current_${type}};
     }
 
-    return $c->container->get_component_from_sub_container( 'view', $name, $c, @args);
+    $name ||= Catalyst::Utils::class2classshortsuffix($c->action->class);
+
+    return $c->container->get_component_from_sub_container($type, $name, $c, @args);
 }
 
 =head2 $c->controllers
