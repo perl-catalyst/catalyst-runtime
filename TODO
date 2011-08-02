@@ -148,6 +148,8 @@ after BUILD => sub {
   - +    $class->container->get_sub_container('model')->make_single_default;
     +    $class->container->get_sub_container('view')->make_single_default;
 
+    +sub controller { shift->_lookup_mvc('controller', @_) }
+
     get_components_names_types
 
     locate_components
@@ -169,7 +171,21 @@ after BUILD => sub {
     +__PACKAGE__->config(applevel_config => 'foo');
 
 
+    +Same as L<build_model_subcontainer>, but for controllers. The difference is
+    +that there is no ACCEPT_CONTEXT for controllers.
+    ^^ This is wrong!!
+    
+    -    my $accept_context_args = $self->param('accept_context_args');
+    +    my $accept_context_args = $params{accept_context_args};
+    ^^ This is wrong! The service should be allowed to mangle the accept_context args, no?
+       Without this change, the user could make a custom service which mangled the param, and use 
+       Catalyst/IOC/Service/WithAcceptContext.pm, with this change, that module will always see the
+       un-mangled version??
+
     accept_context_args - where does this come from?
+    
+    +    $purity = $purity // 1;
+    ^^ perl 5.10 only
 
 ### Known issues
 
