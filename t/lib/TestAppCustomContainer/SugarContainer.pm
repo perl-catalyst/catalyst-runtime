@@ -1,14 +1,17 @@
-package TestAppCustomContainerNoSugar::Container;
+package TestAppCustomContainer::SugarContainer;
 use Moose;
+use namespace::autoclean;
+use Catalyst::IOC;
 
 extends 'Catalyst::IOC::Container';
 
+# translate to sugar
 sub BUILD {
     my $self = shift;
     $self->get_sub_container('component')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Baz',
-            class        => 'TestAppCustomContainerNoSugar::Model::Baz',
+            class        => 'TestAppCustomContainer::Model::Baz',
             lifecycle    => 'InstancePerContext',
             dependencies => [
                 depends_on( '/application_name' ),
@@ -33,5 +36,7 @@ sub BUILD {
         )
     );
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;

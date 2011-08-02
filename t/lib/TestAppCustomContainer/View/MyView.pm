@@ -1,4 +1,4 @@
-package TestAppCustomContainerNoSugar::View::MyView;
+package TestAppCustomContainer::View::MyView;
 use Moose;
 extends 'Catalyst::View';
 

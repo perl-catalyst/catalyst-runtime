@@ -1,4 +1,4 @@
-package TestAppCustomContainerNoSugar::Model::Bar;
+package TestAppCustomContainer::Model::Foo;
 use Moose;
 extends 'Catalyst::Model';
 

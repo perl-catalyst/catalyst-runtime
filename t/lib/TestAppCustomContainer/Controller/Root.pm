@@ -1,4 +1,4 @@
-package TestAppCustomContainerNoSugar::Controller::Root;
+package TestAppCustomContainer::Controller::Root;
 use Moose;
 BEGIN { extends 'Catalyst::Controller' }
 
