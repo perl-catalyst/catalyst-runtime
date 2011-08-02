@@ -715,17 +715,27 @@ Catalyst::Container - IOC for Catalyst components
 
 =head1 Building Containers
 
+=head2 build_component_subcontainer
+
+Container that stores all components, i.e. all models, views and controllers
+together. Each service is an instance of the actual component, and by default
+it lives while the application is running. Retrieving components from this
+subcontainer will instantiate the component, if it hasn't been instantiated
+already, but will not execute ACCEPT_CONTEXT.
+
 =head2 build_model_subcontainer
 
-Container that stores all models.
+Container that stores references for all models that are inside the components
+subcontainer. Retrieving a model triggers ACCEPT_CONTEXT, if it exists.
 
 =head2 build_view_subcontainer
 
-Container that stores all views.
+Same as L<build_model_subcontainer>, but for views.
 
 =head2 build_controller_subcontainer
 
-Container that stores all controllers.
+Same as L<build_model_subcontainer>, but for controllers. The difference is
+that there is no ACCEPT_CONTEXT for controllers.
 
 =head1 Building Services
 
