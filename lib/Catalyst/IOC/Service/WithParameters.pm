@@ -1,15 +1,13 @@
 package Catalyst::IOC::Service::WithParameters;
 use Moose::Role;
 
-with 'Bread::Board::Service',
-     'Bread::Board::Service::WithParameters';
+with 'Bread::Board::Service::WithParameters' => { excludes => '_build_parameters' };
 
 sub _build_parameters {
     return {
         accept_context_args => {
-            isa      => 'ArrayRef|Undef',
-            required => 0,
-            default  => undef,
+            isa      => 'ArrayRef',
+            required => 1,
         }
     };
 }

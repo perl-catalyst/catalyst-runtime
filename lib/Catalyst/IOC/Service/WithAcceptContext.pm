@@ -9,13 +9,14 @@ has accept_context_sub => (
     default => 'ACCEPT_CONTEXT',
 );
 
-around 'get' => sub {
-    my $orig = shift;
-    my $self = shift;
+around get => sub {
+    my $orig   = shift;
+    my $self   = shift;
+    my %params = @_;
 
     my $instance = $self->$orig(@_);
 
-    my $accept_context_args = $self->param('accept_context_args');
+    my $accept_context_args = $params{accept_context_args};
     my $ac_sub = $self->accept_context_sub;
 
     if ( $instance->can($ac_sub) ) {
