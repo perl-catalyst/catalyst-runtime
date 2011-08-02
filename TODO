@@ -64,6 +64,8 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   - Test cases for extending the container in an application.
     - Using the sugar added in the previous item
     - Test when Model::Foo depends_on Model::Bar
+    - Test for component Foo => ( lifecycle => 'Singleton', class => 'My::External::Class', dependencies => { config => depends_on("config") } )
+    - Fix ^^ so that you can get your component's namespaced config nicely.
 
   - Tests for using the container outside of Catalyst
     - Custom container which adds some (very simple) services which are initialized from
@@ -82,12 +84,16 @@ and what needs to be done to fix it!
 package MyApp::Container;
 use Catalyst::IOC;
     
-    container $self, as { 
+    container $self, as {
             container model => as {
                 component Foo => (); # As per default!
                 component Bar => (dependencies => ['/model/Foo']); # Magic!
                 component Baz => ( lifecycle => 'InstancePerContext );
                 component Quux => ( lifecycle => 'Singleton' ); # ACCEPT_CONTEXT not called
+                # Catalyst::Model::Adaptor example
+                conponent Fnar => ( lifecycle => 'Singleton', class => 'My::External::Class', dependencies => { config => depends_on('config')} );
+                #                                                                                               ^^ FIXME - gets whole config, not Model::Foo
+                #                                                                                                  There should be a 'nice' way to get the 'standard' config
             };                    
             # Note - implementation of BB may need to be changed to support making sure existing 
             # services actually get overridden. not sure how the default container behaves when doing that
