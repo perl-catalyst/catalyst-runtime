@@ -12,7 +12,10 @@ sub BUILD {
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Baz',
             class        => 'TestAppCustomContainer::Model::Baz',
-#            lifecycle    => 'InstancePerContext',
+
+# FIXME - it should simply be Request (or InstancePerRequest, etc)
+# see Bread/Board/Service.pm line 47
+            lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
