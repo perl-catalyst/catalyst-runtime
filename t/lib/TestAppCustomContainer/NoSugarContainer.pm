@@ -11,7 +11,7 @@ sub BUILD {
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Baz',
             class        => 'TestAppCustomContainer::Model::Baz',
-            lifecycle    => 'InstancePerContext',
+#            lifecycle    => 'InstancePerContext',
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
