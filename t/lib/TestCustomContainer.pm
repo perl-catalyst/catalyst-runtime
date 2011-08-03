@@ -20,6 +20,16 @@ has sugar => (
     isa => 'Int',
 );
 
+# Reason for this class:
+# I wanted have a set of tests that would test both the sugar version of the
+# container, as the sugar-less. I figured I shouldn't just copy and paste
+# the tests. So after struggling for hours to find a way to test twice
+# against the same TestApp using only one file, I decided to break it
+# into a separate class (this one), and call it at
+#           -  live_container_custom_container_sugar.t and
+#           -  live_container_custom_container_nosugar.t
+# setting only the sugar attribute.
+
 sub BUILD {
     my $self = shift;
 
