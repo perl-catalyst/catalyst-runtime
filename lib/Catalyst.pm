@@ -1644,6 +1644,8 @@ sub finalize {
         $c->finalize_body;
     }
 
+    $c->finalize_ioc;
+
     $c->log_response;
 
     if ($c->use_stats) {
@@ -1760,6 +1762,14 @@ Finalizes uploads. Cleans up any temporary files.
 =cut
 
 sub finalize_uploads { my $c = shift; $c->engine->finalize_uploads( $c, @_ ) }
+
+=head2 $c->finalize_ioc
+
+Flushes all services with Request lifecycle.
+
+=cut
+
+sub finalize_ioc { shift->container->flush_request_services() }
 
 =head2 $c->get_action( $action, $namespace )
 
