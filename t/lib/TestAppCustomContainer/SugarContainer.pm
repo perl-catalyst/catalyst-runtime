@@ -5,39 +5,31 @@ use Catalyst::IOC;
 
 extends 'Catalyst::IOC::Container';
 
-# translate to sugar
 sub BUILD {
     my $self = shift;
-    $self->get_sub_container('component')->add_service(
-        Catalyst::IOC::ConstructorInjection->new(
-            name         => 'model_Baz',
-            class        => 'TestAppCustomContainer::Model::Baz',
 
-# FIXME - it should simply be Request (or InstancePerRequest, etc)
-# see Bread/Board/Service.pm line 47
-            lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
-            dependencies => [
-                depends_on( '/application_name' ),
-                depends_on( '/config' ),
-                depends_on( '/model/Foo' ),
-            ],
-        )
-    );
-    $self->get_sub_container('model')->add_service(
-        Catalyst::IOC::BlockInjection->new(
-            name         => 'Baz',
-            dependencies => [
-                depends_on( '/model/Foo' ),
-                depends_on( '/component/model_Baz' ),
-            ],
-            block => sub {
-                my $s        = shift;
-                my $foo      = $s->param('Foo');
-                my $instance = $s->param('model_Baz');
-                return $instance;
-            },
-        )
-    );
+    container $self => as {
+        container model => as {
+            component Foo => ();
+            component Bar => ( dependencies => [ depends_on('/model/Foo') ] );
+            component Baz => (
+                lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
+                dependencies => [
+                    depends_on( '/application_name' ),
+                    depends_on( '/config' ),
+                    depends_on( '/model/Foo' ),
+                ],
+            );
+            component Quux => ( lifecycle => 'Singleton' );
+            component Fnar => (
+                lifecycle => 'Singleton',
+                class     => 'My::External::Class',
+                dependencies => [ depends_on('config') ],
+            #   ^^ FIXME - gets whole config, not Model::Foo
+            #   There should be a 'nice' way to get the 'standard' config
+            );
+        };
+    };
 }
 
 __PACKAGE__->meta->make_immutable;
