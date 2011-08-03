@@ -1021,7 +1021,7 @@ EOF
     ) {
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
-        $t->row( $_ => ref($comps) ? 'instance' : 'class' ) for keys %comps;
+        $t->row( $_ => ref($comps{$_}) ? 'instance' : 'class' ) for keys %comps;
 
         $class->log->debug( "Loaded components:\n" . $t->draw . "\n" );
     }
