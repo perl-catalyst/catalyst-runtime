@@ -4,7 +4,10 @@ use Moose::Role;
 with 'Bread::Board::Service::WithParameters' => { excludes => '_build_parameters' };
 
 sub _build_parameters {
-    return {
+    {
+        ctx => {
+            required => 1,
+        },
         accept_context_args => {
             isa      => 'ArrayRef',
             required => 1,
