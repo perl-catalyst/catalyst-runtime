@@ -27,7 +27,7 @@ is_deeply([ TestAppComponent->comp('Foo') ], \@complist, 'Fallthrough return ok'
         no warnings 'redefine';
         local *Catalyst::Log::warn = sub { $warnings++ };
 
-        is_deeply( [ TestAppComponent->comp('::M::Model') ], \@complist, 'no reulsts for regexp fallback');
+        is_deeply( [ TestAppComponent->comp('::M::Model$') ], \@complist, 'no results for regexp fallback');
         ok( $warnings, 'regexp fallback warnings' );
     }
 
