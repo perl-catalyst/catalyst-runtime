@@ -39,7 +39,8 @@ sub BUILD {
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Baz',
             class        => 'TestAppCustomContainer::Model::Baz',
-
+# t0m - I'm fine with this - sugar can just s/Request/+Catalyst::IOC::LifeCycle::Request/
+#       Also, 'Request' is fine as a name for a lifecycle IMO.
 # FIXME - it should simply be Request (or InstancePerRequest, etc)
 # see Bread/Board/Service.pm line 47
             lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
@@ -72,6 +73,7 @@ sub BUILD {
 
 # FIXME - it should probably be our
 # Catalyst::IOC::LifeCycle::Singleton
+# t0m - I think normal Singleton is fine here, it's per app lifetime.
             lifecycle    => 'Singleton',
             dependencies => [
                 depends_on( '/component/model_Quux' ),
