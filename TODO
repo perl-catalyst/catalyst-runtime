@@ -57,6 +57,24 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ## GSOC
 
+### Next steps - planned:
+
+  - Test custom container
+    - writing some tests which verify that the models you think should be
+      there are there, and that they received their dependencies as arguments
+    - i.e. Model::Bar should get params { foo => $model_foo } when being
+      constructed, etc
+    - Need to test that if you have a standard component Frotz
+      and a customized component Fnar, and Fnar depends on Frotz
+    - And yeah, some tests that the customised components actually work via
+      $c->model('Foo'), and that COMPONENT is called (or not called)
+      as appropiate and that ACCEPT_CONTEXT is called (or not) as appropriate
+
+  - Kill flush_request_services
+    - we're already passing $ctx in when we locate services so the ::Request
+      lifecycle can just stash the object in, or retrieve the object from the
+      stash
+
 ### Next steps - less planned:
 
   - Creating service()-like sugar for component
