@@ -2,9 +2,9 @@ package Catalyst::IOC::BlockInjection;
 use Moose;
 extends 'Bread::Board::BlockInjection';
 
-with 'Bread::Board::Service::WithDependencies',
-     'Catalyst::IOC::Service::WithParameters',
-     'Catalyst::IOC::Service::WithAcceptContext';
+with 'Catalyst::IOC::Service::WithAcceptContext';
+with 'Catalyst::IOC::Service::WithParameters',
+     'Bread::Board::Service::WithDependencies';
 
 __PACKAGE__->meta->make_immutable;
 

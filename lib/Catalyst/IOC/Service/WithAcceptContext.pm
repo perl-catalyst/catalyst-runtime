@@ -1,8 +1,6 @@
 package Catalyst::IOC::Service::WithAcceptContext;
 use Moose::Role;
 
-with 'Bread::Board::Service';
-
 has accept_context_sub => (
     is => 'ro',
     isa => 'Str',
@@ -12,12 +10,11 @@ has accept_context_sub => (
 around get => sub {
     my $orig   = shift;
     my $self   = shift;
-    my %params = @_;
+
+    my $accept_context_args = $self->param('accept_context_args');
+    my $ac_sub = $self->accept_context_sub;
 
     my $instance = $self->$orig(@_);
-
-    my $accept_context_args = $params{accept_context_args};
-    my $ac_sub = $self->accept_context_sub;
 
     if ( $instance->can($ac_sub) ) {
         return $instance->$ac_sub( @$accept_context_args );

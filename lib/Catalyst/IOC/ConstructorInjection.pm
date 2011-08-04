@@ -4,8 +4,8 @@ use Catalyst::Utils ();
 extends 'Bread::Board::ConstructorInjection';
 
 with 'Bread::Board::Service::WithClass',
-     'Bread::Board::Service::WithDependencies',
      'Bread::Board::Service::WithParameters',
+     'Bread::Board::Service::WithDependencies',
      'Catalyst::IOC::Service::WithCOMPONENT';
 
 has config_key => (
