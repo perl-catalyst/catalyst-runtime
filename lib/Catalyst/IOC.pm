@@ -1,7 +1,8 @@
 package Catalyst::IOC;
-use Moose;
-extends 'Bread::Board';
+use strict;
+use warnings;
 
-__PACKAGE__->meta->make_immutable;
+# You want to use Sub::Exporter here to export our sugar (and probably some of
+# the bread::board sugar
 
-no Moose; 1;
+1;
