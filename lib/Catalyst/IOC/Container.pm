@@ -667,7 +667,9 @@ sub _get_component_type_name {
 
     my @parts = split /::/, $component;
 
-    while (my $type = shift @parts) {
+    while (scalar @parts > 1) {
+        my $type = shift @parts;
+
         return ('controller', join '::', @parts)
             if $type =~ /^(c|controller)$/i;
 
