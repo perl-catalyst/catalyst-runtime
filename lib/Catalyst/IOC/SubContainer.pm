@@ -21,11 +21,14 @@ sub _build_default_componentt {
 
 
 sub get_component {
-    my ( $self, $name, @args ) = @_;
+    my ( $self, $name, $ctx, @args ) = @_;
 
     return $self->resolve(
         service    => $name,
-        parameters => { accept_context_args => \@args },
+        parameters => {
+            accept_context_args => [ $ctx, @args ],
+            ctx => $ctx,
+        },
     );
 }
 
