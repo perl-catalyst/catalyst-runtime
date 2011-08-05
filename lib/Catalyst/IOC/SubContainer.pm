@@ -11,7 +11,7 @@ has default_component => (
     lazy     => 1,
 );
 
-sub _build_default_componentt {
+sub _build_default_component {
     my ( $self ) = @_;
 
     my @complist = $self->get_service_list;

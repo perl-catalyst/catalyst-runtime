@@ -82,6 +82,16 @@ sub BUILD {
 
     my $config = $self->resolve( service => 'config' );
 
+    # don't force default_component to be undef if the config wasn't set
+    my @default_view  = $config->{default_view}
+                      ? ( default_component => $config->{default_view} )
+                      : ( )
+                      ;
+    my @default_model = $config->{default_model}
+                      ? ( default_component => $config->{default_model} )
+                      : ( )
+                      ;
+
     $self->add_sub_container(
         $self->build_component_subcontainer
     );
@@ -91,15 +101,11 @@ sub BUILD {
     );
 
     $self->add_sub_container(
-        $self->build_view_subcontainer(
-            default_component => $config->{default_view},
-        )
+        $self->build_view_subcontainer( @default_view )
     );
 
     $self->add_sub_container(
-        $self->build_model_subcontainer(
-            default_component => $config->{default_model},
-        )
+        $self->build_model_subcontainer( @default_model )
     );
 }
 
