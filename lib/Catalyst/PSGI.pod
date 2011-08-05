@@ -1,6 +1,10 @@
 =pod
 
-=head1 Catalyst and PSGI
+=head1 NAME
+
+Catalyst::PSGI - How Catalyst and PSGI work together
+
+=head1 SYNOPSIS
 
 Catalyst used to contain a whole set of C<< Catalyst::Engine::XXXX >> classes to
 adapt to various different web servers, and environments (e.g. CGI, FastCGI, mod_perl)
