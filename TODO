@@ -39,13 +39,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     this version.
 
   * Installation issues with some common modules (from Task::Catalyst)
-      - Catalyst::ActionRole::ACL (test failures, fix in repo:
-        https://github.com/bobtfish/catalyst-actionrole-acl/pull/1)
-      - Catalyst::Plugin::Session::Store::DBIC ( test failure because of
-        change to the way Test::Catalyst works, fix in repo at:
-        http://dev.catalystframework.org/svnweb/Catalyst/revision?rev=14058)
       - Catalyst::Engine::HTTP::Prefork ?? maybe remove from Task::Catalyst?
-      - CatalystX-SimpleLogin : will work once we fix Catalyst::ActionRole::ACL.
 
 #### Script survey
 
