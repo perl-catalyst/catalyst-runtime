@@ -32,6 +32,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   - Release psgi branch of Catalyst-Devel
   - Release new Task::Catalyst
+  - Release 5.9 branch of Catalyst-Manual
 
 ###  Blockers
 
@@ -51,8 +52,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     If it isn't needed, remove. If it is needed, split it out into it's own
     file and document why it's needed.
 
-  * Where do all the setup docs from Engine::* go? Into the Manual?
-    At least for nginx, these are somewhat cat specific
+  * Finish fixing up Catalyst::Manual::Deployment and update for psgi.
 
   * I've noticed a small difference with Catalyst::Test. The latest stable
     version include two headers, 'host' and 'https'. They are missing from
