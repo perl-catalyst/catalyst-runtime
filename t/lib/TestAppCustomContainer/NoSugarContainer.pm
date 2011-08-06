@@ -27,10 +27,12 @@ sub BUILD {
                 depends_on( '/component/model_Bar' ),
             ],
             block => sub {
-                my $s        = shift;
-                my $foo      = $s->param('Foo');
-                my $instance = $s->param('model_Bar');
-                return $instance;
+                my $s   = shift;
+
+                my $foo = $s->param('Foo');
+                $foo->inc_bar_got_it;
+
+                return $s->param('model_Bar');
             },
         )
     );
@@ -55,10 +57,12 @@ sub BUILD {
                 depends_on( '/component/model_Baz' ),
             ],
             block => sub {
-                my $s        = shift;
-                my $foo      = $s->param('Foo');
-                my $instance = $s->param('model_Baz');
-                return $instance;
+                my $s   = shift;
+
+                my $foo = $s->param('Foo');
+                $foo->inc_baz_got_it;
+
+                return $s->param('model_Baz');
             },
         )
     );
@@ -78,7 +82,7 @@ sub BUILD {
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Fnar',
             lifecycle    => 'Singleton',
-            class        => 'My::External::Class',
+            class        => 'TestAppCustomContainer::External::Class',
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
