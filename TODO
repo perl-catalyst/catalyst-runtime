@@ -37,7 +37,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   * Fix nginx middlewares so that they are generic, or can somehow
     be used by people with their own .psgi files
-  * Fix a sane / nicer way to do custom engines.
 
   * I've noticed a small difference with Catalyst::Test. The latest stable
     version include two headers, 'host' and 'https'. They are missing from

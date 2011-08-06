@@ -2603,26 +2603,28 @@ Sets up engine.
 =cut
 
 sub engine_class {
-    my $class = shift;
-    confess("Setting ->engine_class manually is no longer supported. XXX FIXME") if scalar @_;
+    my ($class, $requested_engine) = @_;
+
+    if (!$class->engine_loader || $requested_engine) {
+        $class->engine_loader(
+            Catalyst::EngineLoader->new({
+                application_name => $class,
+                (defined $requested_engine
+                     ? (requested_engine => $requested_engine) : ()),
+            }),
+        );
+    }
     $class->engine_loader->catalyst_engine_class;
 }
 
 sub setup_engine {
     my ($class, $requested_engine) = @_;
 
-    $class->engine_loader(
-        Catalyst::EngineLoader->new({
-            application_name => $class,
-            (defined $requested_engine
-                 ? (requested_engine => $requested_engine) : ()),
-        }),
-    );
+    my $engine = $class->engine_class($requested_engine);
 
     # Don't really setup_engine -- see _setup_psgi_app for explanation.
     return if $class->loading_psgi_file;
 
-    my $engine = $class->engine_class;
     Class::MOP::load_class($engine);
 
     if ($ENV{MOD_PERL}) {
