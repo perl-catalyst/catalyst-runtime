@@ -3,6 +3,8 @@ use Moose::Role;
 
 with 'Bread::Board::Service::WithParameters' => { excludes => '_build_parameters' };
 
+# FIXME - shouldn't this be merged with WithAcceptContext?
+
 sub _build_parameters {
     {
         ctx => {
