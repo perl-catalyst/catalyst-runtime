@@ -41,8 +41,18 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   * Test tutotial apps?
 
-  * Fix nginx middlewares so that they are generic, or can somehow
-    be used by people with their own .psgi files
+  * Test nginx middleware to determine if it is needed with:
+
+    root app - with use_request_uri_for_path
+    root app - without use_request_uri_for_path
+    non-root app - with use_request_uri_for_path
+    non-root app - without use_request_uri_for_path
+
+    If it isn't needed, remove. If it is needed, split it out into it's own
+    file and document why it's needed.
+
+  * Where do all the setup docs from Engine::* go? Into the Manual?
+    At least for nginx, these are somewhat cat specific
 
   * I've noticed a small difference with Catalyst::Test. The latest stable
     version include two headers, 'host' and 'https'. They are missing from
