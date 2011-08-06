@@ -35,6 +35,12 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Blockers
 
+  * Test everything in the %conflicts list
+
+  * Anything left in Task::Catalyst failing?
+
+  * Test tutotial apps?
+
   * Fix nginx middlewares so that they are generic, or can somehow
     be used by people with their own .psgi files
 
