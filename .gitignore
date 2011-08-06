@@ -2,6 +2,7 @@
 !.gitignore
 Makefile*
 !Makefile.PL
+MYMETA.json
 MYMETA.yml
 META.yml
 blib
