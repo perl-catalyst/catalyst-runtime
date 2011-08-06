@@ -36,11 +36,11 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ###  Blockers
 
+  * Test::WWW::Mechanize::Catalyst new release
+
   * Test everything in the %conflicts list
 
-  * Anything left in Task::Catalyst failing?
-
-  * Test tutotial apps?
+  * Test tutorial apps
 
   * Test nginx middleware to determine if it is needed with:
 

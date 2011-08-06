@@ -162,6 +162,7 @@ my %conflicts = (
 #    new version, but still work fine..
 #    'Catalyst::ActionRole::ACL'                  => '0.05',
 #    'Catalyst::Plugin::Session::Store::DBIC'     => '0.11',
+      'Test::WWW::Mechanize::Catalyst'            => '0.53', # Dep warnings unless upgraded.
 );
 check_conflicts(%conflicts);
 
