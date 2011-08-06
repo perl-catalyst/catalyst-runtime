@@ -33,21 +33,24 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * Fix nginx middlewares so that they are generic, or can somehow
     be used by people with their own .psgi files
   * Fix a sane / nicer way to do custom engines.
-
   * I've noticed a small difference with Catalyst::Test. The latest stable
     version include two headers, 'host' and 'https'. They are missing from
     this version.
 
-  * Installation issues with some common modules (from Task::Catalyst)
-      - Catalyst::Engine::HTTP::Prefork ?? maybe remove from Task::Catalyst?
+### Things to discuss
+
+  * Catalyst::Engine::HTTP::Prefork no longer works since it requires
+    Catalyst::Engine::CGI which no longer is in the cataplack distribution.
+    Investigation shows moving CE:CGI to CE:HTTP:Prefork allows tests to pass.
+
+### PSGI Release Punchlist
+
+  * Release a version of Task::Catalyst without CE:PSGI and CE:HTTP:Prefork
+    since those are deprecated.
 
 #### Script survey
 
 ###  Nice to have
-
-  * Test/WWW/Mechanize/Catalyst.pm stable throws a deprecation alert when
-    using Catalyst::Test changes introduced by Cataplack.  Suggested fix is
-    in the repo: http://dev.catalystframework.org/svnweb/Catalyst/revision?rev=14059
 
   * Capture arguments that the plack engine component was run with somewhere,
     to more easily support custom args from scripts (e.g. Gitalist's
