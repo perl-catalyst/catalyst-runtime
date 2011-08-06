@@ -28,6 +28,11 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ##  PSGI
 
+###  To do at release time
+
+  - Release psgi branch of Catalyst-Devel
+  - Release new Task::Catalyst
+
 ###  Blockers
 
   * Fix nginx middlewares so that they are generic, or can somehow
@@ -36,12 +41,8 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   * I've noticed a small difference with Catalyst::Test. The latest stable
     version include two headers, 'host' and 'https'. They are missing from
-    this version.
-
-  * Installation issues with some common modules (from Task::Catalyst)
-      - Catalyst::Engine::HTTP::Prefork ?? maybe remove from Task::Catalyst?
-
-#### Script survey
+    this version - Pedro Melo on list
+    ^^ Cannot replicate this? Mailed back to ask for tests..
 
 ###  Nice to have
 
