@@ -137,27 +137,31 @@ my %conflicts = (
     'Catalyst::Plugin::Unicode::Encoding' => '0.2',
     'Catalyst::Plugin::Authentication' => '0.10010', # _config accessor in ::Credential::Password
     'Catalyst::Authentication::Credential::HTTP' => '1.009',
-    'Catalyst::Plugin::Session::Store::File' => '0.16',
-    'Catalyst::Plugin::Session' => '0.21',
-    'Catalyst::Plugin::Session::State::Cookie' => '0.10',
+    'Catalyst::Plugin::Session::Store::File'     => '0.16',
+    'Catalyst::Plugin::Session'                  => '0.21',
+    'Catalyst::Plugin::Session::State::Cookie'   => '0.10',
     'Catalyst::Plugin::Session::Store::FastMmap' => '0.09',
-    'Catalyst::Controller::AllowDisable' => '0.03',
-    'Reaction' => '0.001999',
-    'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
-    'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
+    'Catalyst::Controller::AllowDisable'         => '0.03',
+    'Reaction'                                   => '0.001999',
+    'Catalyst::Plugin::Upload::Image::Magick'    => '0.03',
+    'Catalyst::Plugin::ConfigLoader'             => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
-    'Catalyst::Devel'                  => '1.19',
-    'Catalyst::Plugin::SmartURI'       => '0.032',
-    'CatalystX::CRUD'                  => '0.37',
-    'Catalyst::Action::RenderView'     => '0.07',
-    'Catalyst::Plugin::DebugCookie'    => '0.999002',
-    'Catalyst::Plugin::Authentication' => '0.100091',
-    'CatalystX::Imports'               => '0.03',
-    'Catalyst::Plugin::HashedCookies'  => '1.03',
-    'Catalyst::Action::REST'           => '0.67',
-    'CatalystX::CRUD'                  => '0.42',
-    'CatalystX::CRUD::Model::RDBO'     => '0.20',
-    'Catalyst::View::Mason'            => '0.17',
+    'Catalyst::Devel'                            => '1.19',
+    'Catalyst::Plugin::SmartURI'                 => '0.032',
+    'CatalystX::CRUD'                            => '0.37',
+    'Catalyst::Action::RenderView'               => '0.07',
+    'Catalyst::Plugin::DebugCookie'              => '0.999002',
+    'Catalyst::Plugin::Authentication'           => '0.100091',
+    'CatalystX::Imports'                         => '0.03',
+    'Catalyst::Plugin::HashedCookies'            => '1.03',
+    'Catalyst::Action::REST'                     => '0.67',
+    'CatalystX::CRUD'                            => '0.42',
+    'CatalystX::CRUD::Model::RDBO'               => '0.20',
+    'Catalyst::View::Mason'                      => '0.17',
+#    Note these are not actually needed - they fail tests against the
+#    new version, but still work fine..
+#    'Catalyst::ActionRole::ACL'                  => '0.05',
+#    'Catalyst::Plugin::Session::Store::DBIC'     => '0.11',
 );
 check_conflicts(%conflicts);
 
