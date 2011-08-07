@@ -22,6 +22,10 @@
 
   - Fix calling MyApp->engine_class to set the engine class manually.
 
+  - Re-add a $res->headers->{status} field to Catalyst::Test responses.
+    This _should_ be accessed with $c->res->code instead, but is here
+    for backward compatibility.
+
  Documentation:
 
   - Documentation which was in the now removed Catalyst::Engine::* classes

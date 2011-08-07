@@ -153,4 +153,8 @@ lives_ok {
     request(GET('/dummy'), []);
 } 'array additional param to request method ignored';
 
+my $res = request(GET('/'));
+is $res->code, 200, 'Response code 200';
+is $res->headers->{status}, 200, 'Back compat "status" header present';
+
 done_testing;

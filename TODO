@@ -53,8 +53,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   * Test::WWW::Mechanize::Catalyst new release
 
-  * CatalystX::CRUD 0.51 is broken, but works against latest master.
-
   * Test nginx middleware to determine if it is needed with:
 
     root app - with use_request_uri_for_path

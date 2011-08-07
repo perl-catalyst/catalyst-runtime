@@ -311,6 +311,10 @@ sub _local_request {
             for my $f ( $h->header_field_names ) {
                 $resp->init_header( $f, [ $h->header($f) ] );
             }
+            # Another horrible hack to make the response headers have a
+            # 'status' field. This is for back-compat, but you should
+            # call $resp->code instead!
+            $resp->init_header('status', [ $resp->code ]);
         },
     }, @_);
 }
