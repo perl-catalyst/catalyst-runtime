@@ -52,8 +52,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     If it isn't needed, remove. If it is needed, split it out into it's own
     file and document why it's needed.
 
-  * Finish fixing up Catalyst::Manual::Deployment and update for psgi.
-
   * I've noticed a small difference with Catalyst::Test. The latest stable
     version include two headers, 'host' and 'https'. They are missing from
     this version - Pedro Melo on list

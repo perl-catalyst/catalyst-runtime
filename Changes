@@ -1,8 +1,31 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Fixed extensions:
+
+  - A number of modules have been updated to pass their tests or not
+    produce deprecation warnings with the latest version of Catalyst.
+
+    These are:
+
+    Test::WWW::Mechanize::Catalyst - has been updated to not produce
+        deprecation warnings.
+
+    Catalyst::ActionRole::ACL - has been updated to fix failing tests
+        (although older versions still function perfectly with this
+        version of Catalyst).
+
+    Catalyst::Plugin::Session::Store::DBIC - has been updated to fix
+        failing tests (although older versions still function perfectly
+        with this version of Catalyst).
+
  Backward compatibility fixes:
 
   - Fix calling MyApp->engine_class to set the engine class manually.
+
+ Documentation:
+
+  - Documentation which was in the now removed Catalyst::Engine::* classes
+    has been moved to Catalyst::Manual::Deployment
 
 5.89003 2011-07-28 20:11:50 (TRIAL release)
 
