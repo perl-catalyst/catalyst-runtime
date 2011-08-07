@@ -40,6 +40,9 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
  * Have a look at the Devel::REPL BEFORE_PLUGIN stuff
    I wonder if what we need is that combined with plugins-as-roles
 
+  * Catalyst::Engine::HTTP::Prefork no longer works since it requires
+    Catalyst::Engine::CGI which no longer is in the cataplack distribution.
+    Investigation shows moving CE:CGI to CE:HTTP:Prefork allows tests to pass.
 
 #  PSGI
 
@@ -48,8 +51,13 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   - Release psgi branch of Catalyst-Devel
   - Release new Task::Catalyst
   - Release 5.9 branch of Catalyst-Manual
+  - Release Catalyst::Engine::HTTP::Prefork with deprecation notice
+    (and maybe compat?)
 
 ##  Blockers
+
+  * Better docs for stopping using Engine::HTTP::Prefork and
+    starting using Starman, maybe?
 
   * Test::WWW::Mechanize::Catalyst new release
 
