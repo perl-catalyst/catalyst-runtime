@@ -59,8 +59,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   * Better docs for stopping using Engine::HTTP::Prefork and
     starting using Starman, maybe?
 
-  * Test::WWW::Mechanize::Catalyst new release
-
   * Test nginx middleware to determine if it is needed with:
 
     root app - with use_request_uri_for_path
