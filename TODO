@@ -74,6 +74,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     - we're already passing $ctx in when we locate services so the ::Request
       lifecycle can just stash the object in, or retrieve the object from the
       stash
+      (actually, we're not passing $ctx when we locate services. Problem!)
 
 ### Next steps - less planned:
 
