@@ -38,7 +38,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   * Test::WWW::Mechanize::Catalyst new release
 
-  * Test everything in the %conflicts list
+  * CatalystX::CRUD is broken? (Try latest? Broken against latest master?)
 
   * Test tutorial apps
 
