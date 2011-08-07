@@ -55,8 +55,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
   * CatalystX::CRUD is broken? (Try latest? Broken against latest master?)
 
-  * Test tutorial apps
-
   * Test nginx middleware to determine if it is needed with:
 
     root app - with use_request_uri_for_path
