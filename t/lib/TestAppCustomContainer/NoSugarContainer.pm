@@ -26,6 +26,10 @@ sub BUILD {
             dependencies => [
                 Bread::Board::Dependency->new(
                     service_path => 'Foo',
+
+                    # FIXME - obviously this is a mistake
+                    # what to do with ctx here?
+                    # I have no way to get $s here, do I?
                     service_params => {
                         ctx => +{},
                         accept_context_args => [ +{} ],
@@ -49,6 +53,8 @@ sub BUILD {
             name         => 'model_Baz',
             class        => 'TestAppCustomContainer::Model::Baz',
             lifecycle    => 'Singleton',
+
+            # while it doesn't fully work
             #lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
             dependencies => [
                 depends_on( '/application_name' ),
@@ -63,6 +69,8 @@ sub BUILD {
             dependencies => [
                 Bread::Board::Dependency->new(
                     service_path => 'Foo',
+
+                    # FIXME - same as above
                     service_params => {
                         ctx => +{},
                         accept_context_args => [ +{} ],
