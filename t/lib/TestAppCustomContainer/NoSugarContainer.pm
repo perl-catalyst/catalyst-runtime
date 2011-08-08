@@ -23,6 +23,7 @@ sub BUILD {
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::BlockInjection->new(
             name         => 'Bar',
+            lifecycle    => 'Singleton',
             dependencies => [
                 Bread::Board::Dependency->new(
                     service_path => 'Foo',
