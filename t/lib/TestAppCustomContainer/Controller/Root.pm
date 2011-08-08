@@ -14,6 +14,21 @@ sub container_isa :Local {
     $c->res->body(ref $c->container);
 }
 
+sub get_model_bar :Local {
+    my ($self, $c) = @_;
+    $c->res->body(ref $c->model('Bar'));
+}
+
+sub get_model_baz :Local {
+    my ($self, $c) = @_;
+    $c->res->body(ref $c->model('Baz'));
+}
+
+sub get_model_foo :Local {
+    my ($self, $c) = @_;
+    $c->res->body(ref $c->model('Foo'));
+}
+
 __PACKAGE__->meta->make_immutable;
 no Moose;
 1;
