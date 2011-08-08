@@ -2740,20 +2740,6 @@ sub apply_default_middlewares {
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
     $psgi_app = Plack::Middleware::LighttpdScriptNameFix->wrap($psgi_app);
 
-    $psgi_app = Plack::Middleware::Conditional->wrap(
-        $psgi_app,
-        condition => $server_matches->(qr/^nginx/),
-        builder   => sub {
-            my ($to_wrap) = @_;
-            return sub {
-                my ($env) = @_;
-                my $script_name = $env->{SCRIPT_NAME};
-                $env->{PATH_INFO} =~ s/^$script_name//g;
-                return $to_wrap->($env);
-            };
-        },
-    );
-
     # we're applying this unconditionally as the middleware itself already makes
     # sure it doesn't fuck things up if it's not running under one of the right
     # IIS versions

@@ -31,6 +31,12 @@
   - Documentation which was in the now removed Catalyst::Engine::* classes
     has been moved to Catalyst::Manual::Deployment
 
+ Changes:
+
+  - nginx specific behaviour is removed as it is not needed with any
+    web server configuration I can come up with (recommended config is
+    documented in Catalst::Manual::Deployment::nginx::FastCGI)
+
 5.89003 2011-07-28 20:11:50 (TRIAL release)
 
  Backward compatibility fixes:
