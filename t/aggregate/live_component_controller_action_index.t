@@ -30,37 +30,37 @@ sub run_tests {
           TestApp::Controller::Root->index
           TestApp::Controller::Root->end
         ];
-    
+
         my $expected = join( ", ", @expected );
         ok( my $response = request('http://localhost/'), 'root index' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, 'root index', 'root index ok' );
-        
+
         ok( $response = request('http://localhost'), 'root index no slash' );
         is( $response->content, 'root index', 'root index no slash ok' );
     }
-    
+
     # test first-level controller index
     {
         my @expected = qw[
           TestApp::Controller::Index->index
           TestApp::Controller::Root->end
         ];
-    
+
         my $expected = join( ", ", @expected );
-        
+
         ok( my $response = request('http://localhost/index/'), 'first-level controller index' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, 'Index index', 'first-level controller index ok' );
-        
+
         ok( $response = request('http://localhost/index'), 'first-level controller index no slash' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'Index index', 'first-level controller index no slash ok' );        
-    }    
-    
+        is( $response->content, 'Index index', 'first-level controller index no slash ok' );
+    }
+
     # test second-level controller index
     {
         my @expected = qw[
@@ -68,20 +68,20 @@ sub run_tests {
           TestApp::Controller::Action::Index->index
           TestApp::Controller::Root->end
         ];
-    
+
         my $expected = join( ", ", @expected );
-        
+
         ok( my $response = request('http://localhost/action/index/'), 'second-level controller index' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
         is( $response->content, 'Action-Index index', 'second-level controller index ok' );
-        
+
         ok( $response = request('http://localhost/action/index'), 'second-level controller index no slash' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'Action-Index index', 'second-level controller index no slash ok' );        
+        is( $response->content, 'Action-Index index', 'second-level controller index no slash ok' );
     }
-    
+
     # test controller default when index is present
     {
         my @expected = qw[
@@ -89,9 +89,9 @@ sub run_tests {
           TestApp::Controller::Action::Index->default
           TestApp::Controller::Root->end
         ];
-    
+
         my $expected = join( ", ", @expected );
-        
+
         ok( my $response = request('http://localhost/action/index/foo'), 'default with index' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );

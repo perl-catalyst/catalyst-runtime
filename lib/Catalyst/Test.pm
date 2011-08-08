@@ -4,51 +4,60 @@ use strict;
 use warnings;
 use Test::More ();
 
+use Plack::Test;
 use Catalyst::Exception;
 use Catalyst::Utils;
 use Class::MOP;
 use Sub::Exporter;
+use Carp 'croak', 'carp';
 
-my $build_exports = sub {
-    my ($self, $meth, $args, $defaults) = @_;
+sub _build_request_export {
+    my ($self, $args) = @_;
 
-    my $request;
+    return sub { _remote_request(@_) }
+        if $args->{remote};
+
     my $class = $args->{class};
 
-    if ( $ENV{CATALYST_SERVER} ) {
-        $request = sub { remote_request(@_) };
-    } elsif (! $class) {
-        $request = sub { Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") };
-    } else {
-        unless (Class::MOP::is_class_loaded($class)) {
-            Class::MOP::load_class($class);
-        }
-        $class->import;
+    # Here we should be failing right away, but for some stupid backcompat thing
+    # I don't quite remember we fail lazily here. Needs a proper deprecation and
+    # then removal.
+    return sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'" }
+        unless $class;
 
-        $request = sub { local_request( $class, @_ ) };
-    }
+    Class::MOP::load_class($class) unless Class::MOP::is_class_loaded($class);
+    $class->import;
 
-    my $get = sub { $request->(@_)->content };
+    return sub { _local_request( $class, @_ ) };
+}
 
-    my $ctx_request = sub {
+sub _build_get_export {
+    my ($self, $args) = @_;
+    my $request = $args->{request};
+
+    return sub { $request->(@_)->content };
+}
+sub _build_ctx_request_export {
+    my ($self, $args) = @_;
+    my ($class, $request) = @{ $args }{qw(class request)};
+
+    return sub {
         my $me = ref $self || $self;
 
-        ### throw an exception if ctx_request is being used against a remote
-        ### server
+        # fail if ctx_request is being used against a remote server
         Catalyst::Exception->throw("$me only works with local requests, not remote")
             if $ENV{CATALYST_SERVER};
 
-        ### check explicitly for the class here, or the Cat->meta call will blow
-        ### up in our face
+        # check explicitly for the class here, or the Cat->meta call will blow
+        # up in our face
         Catalyst::Exception->throw("Must specify a test app: use Catalyst::Test 'TestApp'") unless $class;
 
-        ### place holder for $c after the request finishes; reset every time
-        ### requests are done.
+        # place holder for $c after the request finishes; reset every time
+        # requests are done.
         my $ctx_closed_over;
 
-        ### hook into 'dispatch' -- the function gets called after all plugins
-        ### have done their work, and it's an easy place to capture $c.
-
+        # hook into 'dispatch' -- the function gets called after all plugins
+        # have done their work, and it's an easy place to capture $c.
         my $meta = Class::MOP::get_metaclass_by_name($class);
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
@@ -56,9 +65,10 @@ my $build_exports = sub {
         });
         $meta->make_immutable( replace_constructor => 1 );
         Class::C3::reinitialize(); # Fixes RT#46459, I've failed to write a test for how/why, but it does.
-        ### do the request; C::T::request will know about the class name, and
-        ### we've already stopped it from doing remote requests above.
-        my $res = $request->( @_ );
+
+        # do the request; C::T::request will know about the class name, and
+        # we've already stopped it from doing remote requests above.
+        my $res = $args->{request}->( @_ );
 
         # Make sure not to leave a reference $ctx hanging around.
         # This means that the context will go out of scope as soon as the
@@ -70,9 +80,25 @@ my $build_exports = sub {
         my $ctx = $ctx_closed_over;
         undef $ctx_closed_over;
 
-        ### return both values
         return ( $res, $ctx );
     };
+}
+
+my $build_exports = sub {
+    my ($self, $meth, $args, $defaults) = @_;
+    my $class = $args->{class};
+
+    my $request = $self->_build_request_export({
+        class  => $class,
+        remote => $ENV{CATALYST_SERVER},
+    });
+
+    my $get = $self->_build_get_export({ request => $request });
+
+    my $ctx_request = $self->_build_ctx_request_export({
+        class   => $class,
+        request => $request,
+    });
 
     return {
         request      => $request,
@@ -229,102 +255,77 @@ header configuration; currently only supports setting 'host' value.
     my $res = request('foo/bar?test=1');
     my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
 
-=head1 FUNCTIONS
-
 =head2 ($res, $c) = ctx_request( ... );
 
 Works exactly like L<request|/"$res = request( ... );">, except it also returns the Catalyst context object,
 C<$c>. Note that this only works for local requests.
 
-=head2 $res = Catalyst::Test::local_request( $AppClass, $url );
-
-Simulate a request using L<HTTP::Request::AsCGI>.
-
 =cut
 
-sub local_request {
+sub _request {
+    my $args = shift;
+
+    my $request = Catalyst::Utils::request(shift);
+
+    my %extra_env;
+    _customize_request($request, \%extra_env, @_);
+    $args->{mangle_request}->($request) if $args->{mangle_request};
+
+    my $ret;
+    test_psgi
+        %{ $args },
+        app    => sub { $args->{app}->({ %{ $_[0] }, %extra_env }) },
+        client => sub {
+            my ($psgi_app) = @_;
+            my $resp = $psgi_app->($request);
+            $args->{mangle_response}->($resp) if $args->{mangle_response};
+            $ret = $resp;
+        };
+
+    return $ret;
+}
+
+sub _local_request {
     my $class = shift;
 
-    require HTTP::Request::AsCGI;
+    return _request({
+        app => ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app,
+        mangle_response => sub {
+            my ($resp) = @_;
 
-    my $request = Catalyst::Utils::request( shift(@_) );
-    _customize_request($request, @_);
-    my $cgi     = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
+            # HTML head parsing based on LWP::UserAgent
+            #
+            # This is not just horrible and possibly broken, but also really
+            # doesn't belong here. Whoever wants this should be working on
+            # getting it into Plack::Test, or make a middleware out of it, or
+            # whatever. Seriously - horrible.
 
-    $class->handle_request( env => \%ENV );
+            require HTML::HeadParser;
 
-    my $response = $cgi->restore->response;
-    $response->request( $request );
+            my $parser = HTML::HeadParser->new();
+            $parser->xml_mode(1) if $resp->content_is_xhtml;
+            $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
 
-    # HTML head parsing based on LWP::UserAgent
-
-    require HTML::HeadParser;
-
-    my $parser = HTML::HeadParser->new();
-    $parser->xml_mode(1) if $response->content_is_xhtml;
-    $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
-
-    $parser->parse( $response->content );
-    my $h = $parser->header;
-    for my $f ( $h->header_field_names ) {
-        $response->init_header( $f, [ $h->header($f) ] );
-    }
-
-    return $response;
+            $parser->parse( $resp->content );
+            my $h = $parser->header;
+            for my $f ( $h->header_field_names ) {
+                $resp->init_header( $f, [ $h->header($f) ] );
+            }
+            # Another horrible hack to make the response headers have a
+            # 'status' field. This is for back-compat, but you should
+            # call $resp->code instead!
+            $resp->init_header('status', [ $resp->code ]);
+        },
+    }, @_);
 }
 
 my $agent;
 
-=head2 $res = Catalyst::Test::remote_request( $url );
-
-Do an actual remote request using LWP.
-
-=cut
-
-sub remote_request {
-
+sub _remote_request {
     require LWP::UserAgent;
-
-    my $request = Catalyst::Utils::request( shift(@_) );
-    my $server  = URI->new( $ENV{CATALYST_SERVER} );
-
-    _customize_request($request, @_);
-
-    if ( $server->path =~ m|^(.+)?/$| ) {
-        my $path = $1;
-        $server->path("$path") if $path;    # need to be quoted
-    }
-
-    # the request path needs to be sanitised if $server is using a
-    # non-root path due to potential overlap between request path and
-    # response path.
-    if ($server->path) {
-        # If request path is '/', we have to add a trailing slash to the
-        # final request URI
-        my $add_trailing = $request->uri->path eq '/';
-
-        my @sp = split '/', $server->path;
-        my @rp = split '/', $request->uri->path;
-        shift @sp;shift @rp; # leading /
-        if (@rp) {
-            foreach my $sp (@sp) {
-                $sp eq $rp[0] ? shift @rp : last
-            }
-        }
-        $request->uri->path(join '/', @rp);
-
-        if ( $add_trailing ) {
-            $request->uri->path( $request->uri->path . '/' );
-        }
-    }
-
-    $request->uri->scheme( $server->scheme );
-    $request->uri->host( $server->host );
-    $request->uri->port( $server->port );
-    $request->uri->path( $server->path . $request->uri->path );
+    local $Plack::Test::Impl = 'ExternalServer';
 
     unless ($agent) {
-
         $agent = LWP::UserAgent->new(
             keep_alive   => 1,
             max_redirect => 0,
@@ -338,15 +339,71 @@ sub remote_request {
         $agent->env_proxy;
     }
 
-    return $agent->request($request);
+
+    my $server = URI->new($ENV{CATALYST_SERVER});
+    if ( $server->path =~ m|^(.+)?/$| ) {
+        my $path = $1;
+        $server->path("$path") if $path;    # need to be quoted
+    }
+
+    return _request({
+        ua             => $agent,
+        uri            => $server,
+        mangle_request => sub {
+            my ($request) = @_;
+
+            # the request path needs to be sanitised if $server is using a
+            # non-root path due to potential overlap between request path and
+            # response path.
+            if ($server->path) {
+                # If request path is '/', we have to add a trailing slash to the
+                # final request URI
+                my $add_trailing = ($request->uri->path eq '/' || $request->uri->path eq '') ? 1 : 0;
+
+                my @sp = split '/', $server->path;
+                my @rp = split '/', $request->uri->path;
+                shift @sp; shift @rp; # leading /
+                if (@rp) {
+                    foreach my $sp (@sp) {
+                        $sp eq $rp[0] ? shift @rp : last
+                    }
+                }
+                $request->uri->path(join '/', @rp);
+
+                if ( $add_trailing ) {
+                    $request->uri->path( $request->uri->path . '/' );
+                }
+            }
+        },
+    }, @_);
+}
+
+for my $name (qw(local_request remote_request)) {
+    my $fun = sub {
+        carp <<"EOW";
+Calling Catalyst::Test::${name}() directly is deprecated.
+
+Please import Catalyst::Test into your namespace and use the provided request()
+function instead.
+EOW
+        return __PACKAGE__->can("_${name}")->(@_);
+    };
+
+    no strict 'refs';
+    *$name = $fun;
 }
 
 sub _customize_request {
     my $request = shift;
+    my $extra_env = shift;
     my $opts = pop(@_) || {};
     $opts = {} unless ref($opts) eq 'HASH';
     if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
         $request->header( 'Host' => $host );
+    }
+
+    if (my $extra = $opts->{extra_env}) {
+        @{ $extra_env }{keys %{ $extra }} = values %{ $extra };
     }
 }
 
@@ -387,6 +444,14 @@ Catalyst Contributors, see Catalyst.pm
 
 This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=begin Pod::Coverage
+
+local_request
+
+remote_request
+
+=end Pod::Coverage
 
 =cut
 

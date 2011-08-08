@@ -5,7 +5,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Catalyst::Exception;
 use File::Copy ();
-use IO::File   qw( SEEK_SET );
+use IO::File ();
 use File::Spec::Unix;
 use namespace::clean -except => 'meta';
 
@@ -147,12 +147,12 @@ sub slurp {
 
     binmode( $handle, $layer );
 
-    $handle->seek(0, SEEK_SET);
+    $handle->seek(0, IO::File::SEEK_SET);
     while ( $handle->sysread( my $buffer, 8192 ) ) {
         $content .= $buffer;
     }
 
-    $handle->seek(0, SEEK_SET);
+    $handle->seek(0, IO::File::SEEK_SET);
     return $content;
 }
 

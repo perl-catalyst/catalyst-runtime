@@ -17,12 +17,11 @@ use HTTP::Request::Common;
 {
     my $creq;
 
-    local $ENV{REMOTE_USER} = 'dwc';
     my $request = GET(
         'http://localhost/dump/request',
     );
 
-    ok( my $response = request($request), 'Request' );
+    ok( my $response = request($request, { extra_env => { REMOTE_USER => 'dwc' } }), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     like( $response->content, qr/'Catalyst::Request'/,

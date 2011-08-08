@@ -19,9 +19,11 @@ requires 'namespace::clean' => '0.13';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::MOP' => '0.95';
+requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Inheritable' => '0.24';
 requires 'MooseX::Role::WithOverloading' => '0.09';
+requires 'MooseX::Types::LoadableClass' => '0.003';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';
@@ -43,6 +45,7 @@ requires 'Text::SimpleTable' => '0.03';
 requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
+requires 'Try::Tiny';
 requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
@@ -51,10 +54,15 @@ requires 'MooseX::Getopt' => '0.30';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
+requires 'Plack' => '0.9974'; # IIS6 fix middleware
+requires 'Plack::Middleware::ReverseProxy' => '0.04';
+requires 'Plack::Test::ExternalServer';
 
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
 test_requires 'Test::More' => '0.88';
+test_requires 'Data::Dump';
+test_requires 'HTTP::Request::Common';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
@@ -70,13 +78,17 @@ else {
 author_requires 'CatalystX::LeakChecker', '0.05';
 author_requires 'File::Copy::Recursive'; # For http server test
 author_requires 'Catalyst::Devel', '1.0'; # For http server test
+author_requires 'Catalyst::Engine::PSGI';
+author_requires 'Test::Without::Module';
+author_requires 'Starman';
+author_requires 'MooseX::Daemonize';
 
 author_tests 't/author';
 author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
-  Pod::Coverage
+  Pod::Coverage::TrustPod
 ));
 
 if ($Module::Install::AUTHOR) {
@@ -125,27 +137,32 @@ my %conflicts = (
     'Catalyst::Plugin::Unicode::Encoding' => '0.2',
     'Catalyst::Plugin::Authentication' => '0.10010', # _config accessor in ::Credential::Password
     'Catalyst::Authentication::Credential::HTTP' => '1.009',
-    'Catalyst::Plugin::Session::Store::File' => '0.16',
-    'Catalyst::Plugin::Session' => '0.21',
-    'Catalyst::Plugin::Session::State::Cookie' => '0.10',
+    'Catalyst::Plugin::Session::Store::File'     => '0.16',
+    'Catalyst::Plugin::Session'                  => '0.21',
+    'Catalyst::Plugin::Session::State::Cookie'   => '0.10',
     'Catalyst::Plugin::Session::Store::FastMmap' => '0.09',
-    'Catalyst::Controller::AllowDisable' => '0.03',
-    'Reaction' => '0.001999',
-    'Catalyst::Plugin::Upload::Image::Magick' => '0.03',
-    'Catalyst::Plugin::ConfigLoader'   => '0.22', # Older versions work but
+    'Catalyst::Controller::AllowDisable'         => '0.03',
+    'Reaction'                                   => '0.001999',
+    'Catalyst::Plugin::Upload::Image::Magick'    => '0.03',
+    'Catalyst::Plugin::ConfigLoader'             => '0.22', # Older versions work but
                                                   # throw Data::Visitor warns
-    'Catalyst::Devel'                  => '1.19',
-    'Catalyst::Plugin::SmartURI'       => '0.032',
-    'CatalystX::CRUD'                  => '0.37',
-    'Catalyst::Action::RenderView'     => '0.07',
-    'Catalyst::Plugin::DebugCookie'    => '0.999002',
-    'Catalyst::Plugin::Authentication' => '0.100091',
-    'CatalystX::Imports'               => '0.03',
-    'Catalyst::Plugin::HashedCookies'  => '1.03',
-    'Catalyst::Action::REST'           => '0.67',
-    'CatalystX::CRUD'                  => '0.42',
-    'CatalystX::CRUD::Model::RDBO'     => '0.20',
-    'Catalyst::View::Mason'            => '0.17',
+    'Catalyst::Devel'                            => '1.19',
+    'Catalyst::Plugin::SmartURI'                 => '0.032',
+    'CatalystX::CRUD'                            => '0.37',
+    'Catalyst::Action::RenderView'               => '0.07',
+    'Catalyst::Plugin::DebugCookie'              => '0.999002',
+    'Catalyst::Plugin::Authentication'           => '0.100091',
+    'CatalystX::Imports'                         => '0.03',
+    'Catalyst::Plugin::HashedCookies'            => '1.03',
+    'Catalyst::Action::REST'                     => '0.67',
+    'CatalystX::CRUD'                            => '0.42',
+    'CatalystX::CRUD::Model::RDBO'               => '0.20',
+    'Catalyst::View::Mason'                      => '0.17',
+#    Note these are not actually needed - they fail tests against the
+#    new version, but still work fine..
+#    'Catalyst::ActionRole::ACL'                  => '0.05',
+#    'Catalyst::Plugin::Session::Store::DBIC'     => '0.11',
+      'Test::WWW::Mechanize::Catalyst'            => '0.53', # Dep warnings unless upgraded.
 );
 check_conflicts(%conflicts);
 

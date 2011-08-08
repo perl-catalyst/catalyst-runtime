@@ -5,8 +5,9 @@ use Test::More tests => 1;
 
 use File::Path;
 use FindBin;
-use IPC::Open3;
-use IO::Socket;
+use Test::TCP;
+use Try::Tiny;
+use Plack::Builder;
 
 use Catalyst::Devel 1.0;
 use File::Copy::Recursive;
@@ -30,24 +31,33 @@ File::Copy::Recursive::dircopy( '../t/lib', '../t/tmp/TestApp/lib' ) or die;
 rmtree '../t/tmp/TestApp/t' or die;
 
 # spawn the standalone HTTP server
-my $port = 30000 + int rand(1 + 10000);
-my @cmd = ($^X, "-I$FindBin::Bin/../../lib",
-  "$FindBin::Bin/../../t/tmp/TestApp/script/testapp_server.pl", '--port', $port );
-my $pid = open3( undef, my $server, undef, @cmd)
-    or die "Unable to spawn standalone HTTP server: $!";
+my $port = empty_port;
 
-# wait for it to start
-print "Waiting for server to start...\n";
-my $timeout = 30;
-my $count = 0;
-while ( check_port( 'localhost', $port ) != 1 ) {
-    sleep 1;
-    die("Server did not start within $timeout seconds: " . join(' ', @cmd))
-        if $count++ > $timeout;
+my $pid = fork;
+if ($pid) {
+    # parent.
+    print "Waiting for server to start...\n";
+    wait_port_timeout($port, 30);
+} elsif ($pid == 0) {
+    # child process
+    unshift @INC, "$tmpdir/TestApp/lib", "$FindBin::Bin/../../lib";
+    require TestApp;
+
+    my $psgi_app = TestApp->apply_default_middlewares(TestApp->psgi_app);
+    Plack::Loader->auto(port => $port)->run(builder {
+        mount '/test_prefix' => $psgi_app;
+        mount '/' => sub {
+            return [501, ['Content-Type' => 'text/plain'], ['broken tests']];
+        };
+    });
+
+    exit 0;
+} else {
+    die "fork failed: $!";
 }
 
 # run the testsuite against the HTTP server
-$ENV{CATALYST_SERVER} = "http://localhost:$port";
+$ENV{CATALYST_SERVER} = "http://localhost:$port/test_prefix";
 
 chdir '..';
 
@@ -61,28 +71,21 @@ else {
 
 # shut it down
 kill 'INT', $pid;
-close $server;
 
 # clean up
 rmtree "$FindBin::Bin/../../t/tmp" if -d "$FindBin::Bin/../../t/tmp";
 
 is( $return, 0, 'live tests' );
 
-sub check_port {
-    my ( $host, $port ) = @_;
+sub wait_port_timeout {
+    my ($port, $timeout) = @_;
 
-    my $remote = IO::Socket::INET->new(
-        Proto    => "tcp",
-        PeerAddr => $host,
-        PeerPort => $port
-    );
-    if ($remote) {
-        close $remote;
-        return 1;
+    # wait_port waits for 10 seconds
+    for (1 .. int($timeout / 10)) { # meh, good enough.
+        try { wait_port $port; 1 } and return;
     }
-    else {
-        return 0;
-    }
+
+    die "Server did not start within $timeout seconds";
 }
 
 sub prove {

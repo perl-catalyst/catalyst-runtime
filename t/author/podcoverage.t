@@ -9,7 +9,10 @@ my @modules = all_modules;
 our @private = ( 'BUILD' );
 foreach my $module (@modules) {
     local @private = (@private, 'run') if $module =~ /^Catalyst::Script::/;
-    pod_coverage_ok($module, { also_private => \@private });
+    pod_coverage_ok($module, {
+        also_private   => \@private,
+        coverage_class => 'Pod::Coverage::TrustPod',
+    });
 }
 
 done_testing;

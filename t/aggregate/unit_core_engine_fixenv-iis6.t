@@ -5,12 +5,7 @@ use warnings;
 
 use Test::More;
 
-eval "use FCGI";
-plan skip_all => 'FCGI required' if $@;
-
-plan tests => 2;
-
-require Catalyst::Engine::FastCGI;
+use Catalyst;
 
 my %env = (
     'SCRIPT_NAME' => '/koo/blurb',
@@ -55,8 +50,23 @@ my %env = (
     'HTTP_HOST' => '127.0.0.1:83'
 );
 
-Catalyst::Engine::FastCGI->_fix_env(\%env);
+sub fix_env {
+    my (%input_env) = @_;
 
-is($env{PATH_INFO}, '//blurb', 'check PATH_INFO');
-is($env{SCRIPT_NAME}, '/koo', 'check SCRIPT_NAME');
+    my $mangled_env;
+    my $app = Catalyst->apply_default_middlewares(sub {
+        my ($env) = @_;
+        $mangled_env = $env;
+        return [ 200, ['Content-Type' => 'text/plain'], [''] ];
+    });
 
+    $app->({ %input_env, 'psgi.url_scheme' => 'http' });
+    return %{ $mangled_env };
+}
+
+my %fixed_env = fix_env(%env);
+
+is($fixed_env{PATH_INFO}, '//blurb', 'check PATH_INFO');
+is($fixed_env{SCRIPT_NAME}, '/koo', 'check SCRIPT_NAME');
+
+done_testing;

@@ -2,6 +2,208 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.9
+
+The major change is that L<Plack> now replaces most of the subclasses of
+L<Catalyst::Engine>.  If you are using one of the standard subclasses of
+L<Catalyst::Engine> this should be a straightforward upgrade for you. It was
+a design goal for this release to be as backwardly compatible as possible.
+However since L<Plack> is different from L<Catalyst::Engine> it is possible
+that edge case differences exist.  Therefore we recommend care be taken with
+this upgrade and that testing should be greater than would be the case with a
+minor point update.
+
+It is highly recommended that you become familiar with the L<Plack> ecosystem
+and documentation. Being able to take advantage of L<Plack> development and
+middleware is a major bonus to this upgrade. Documentation about how to
+take advantage of L<Plack::Middleware> by writing your own C<< .psgi >> file
+is contained in L<Catalyst::PSGI>.
+
+If you have created a custom subclass of L<Catalyst:Engine> you will need to
+convert it to be a subclass of L<Plack::Handler>.
+
+If you are using the L<Plack> engine, L<Catalyst::Engine::PSGI>, this new
+release supersedes that code.
+
+If you are using a subclass of L<Catalyst::Engine> that is aimed at nonstandard
+or internal / testing uses, such as L<Catalyst::Engine::Embeddable> you should
+still be able to continue using that engine.
+
+Advice for specific subclasses of L<Catalyst::Engine> follows:
+
+=head2 Upgrading the FastCGI Engine
+
+No upgrade needed if your myapp_fastcgi.pl script is already upgraded
+enough to use L<Catalyst::Script::FastCGI>.
+
+=head2 Upgrading the mod_perl / Apache Engines
+
+The engines that are build upon the various iterations of mod_perl,
+L<Catalyst::Engine::Apache::MP13> and
+L<Catalyst::Engine::Apache2::MP20> should be seamless upgrades and will
+work using using L<Plack::Handler::Apache1> or L<Plack::Handler::Apache2>
+as required.  
+
+L<Catalyst::Engine::Apache2::MP19>, is however no longer supported, as Plack
+does not support mod_perl version 1.99
+
+=head2 Upgrading the HTTP Engine
+
+The default development server that comes with the L<Catalyst> distribution
+should continue to work as expected with no changes as long as your C<myapp_server>
+script is upgraded to use L<Catalyst::Script::HTTP>.
+
+=head2 Upgrading the CGI Engine
+
+If you were using L<Catalyst::Engine::CGI> there is no upgrade needed if your
+myapp_cgi.pl script is already upgraded enough to use L<Catalyst::Script::CGI>.
+
+=head2 Upgrading the Preforking Engine
+
+If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
+is automatically loaded. You should (at least) change your C<Makefile.PL>
+to depend on Starman.
+
+You can regenerate your C<myapp_server.pl> script with C<catalyst.pl>
+and implement a C<MyApp::Script::Server> class that looks like this:
+
+    package MyApp::Script::Server;
+    use Moose;
+    use namespace::autoclean;
+
+    extends 'CatalystX::Script::Server::Starman';
+
+    1;
+
+This takes advantage of the new script system, and adds a number of options to
+the standard server script as extra options are added by Starman.
+
+More information about these options can be seen at
+L<CatalystX::Script::Server::Starman/SYNOPSIS>.
+
+An alternate route to implement this functionality is to write a simple .psgi
+file for your application, then use the L<plackup> utility to start the
+server.
+
+=head2 Upgrading the PSGI Engine
+
+If you were using L<Catalyst::Engine::PSGI> this new release supersedes this
+engine in supporting L<Plack>. By default the Engine is now always L<Plack>.
+As a result, you can stop depending on L<Catalyst::Engine::PSGI> in your
+C<Makefile.PL>. 
+
+Applications that were using L<Catalyst::Engine::PSGI>
+previously should entirely continue to work in this release with no changes.
+
+However, if you have an C<app.psgi> script, then you no longer
+need to specify the PSGI engine.  Instead, the L<Catalyst> application class
+now has a new method C<psgi_app> which returns a L<PSGI> compatible coderef
+which you can wrap in middleware of your choice.
+
+Catalyst will use the .psgi for your application if it is located in the C<home>
+directory of the application
+
+For example, if you were using L<Catalyst::Engine::PSGI> in the past, you will
+have written (or generated) a C<script/myapp.psgi> file similar to this one:
+
+    use Plack::Builder;
+    use MyCatalytApp;
+
+    MyCatalystApp->setup_engine('PSGI');
+
+    builder {
+        enable ... # enable your desired middleware
+        sub { MyCatalystApp->run(@_) };
+    };
+
+Instead, you now say:
+
+    use Plack::Builder;
+    use MyCatalystApp;
+
+    builder {
+        enable ... #enable your desired middleware
+        MyCatalystApp->psgi_app;
+    };
+
+In the simplest case:
+
+    MyCatalystApp->setup_engine('PSGI');
+    my $app = sub { MyCatalystApp->run(@_) }
+
+becomes
+
+    MyCatalystApp->setup_engine('PSGI');
+    my $app = MyCatalystApp->psgi_app(@_);
+
+B<NOT>:
+
+    my $app = sub { MyCatalystApp->psgi_app(@_) };
+    # If you make ^^ this mistake, your app won't work, and will confuse the hell out of you!
+
+You can now move C<< script/myapp.psgi >> to C<< myapp.psgi >> and the built-in
+Catalyst scripts and your test suite will start using your .psgi file.
+
+B<NOTE:> If you rename your .psgi file without these modifications, then any tests run via
+L<Catalyst::Test> will not be compatible with the new release, and will result in
+the development server starting, rather than the expected test running.
+
+=head2 Engines which are known broken
+
+The following engines B<DO NOT> work as of Catalyst version 5.9. The core
+team is extremely happy to work with the developers and/or users of these
+engines to help them port to the new Plack/Engine system, however applications
+which are currently using these engines B<WILL NOT> run without modification
+to the engine code.
+
+=over
+
+=item Catalyst::Engine::Wx
+
+=item Catalyst::Engine::Zeus
+
+=item Catalyst::Engine::JobQueue::POE
+
+=item Catalyst::Engine::XMPP2
+
+=item Catalyst::Engine::SCGI
+
+=back
+
+=head2 Engines with unknown status
+
+The following engines have untested or unknown compatibility.  Reports are
+highly welcomed:
+
+=over
+
+=item Catalyst::Engine::Mojo
+
+=item Catalyst::Engine::Server (Marked as Deprecated)
+
+=item Catalyst::Engine::HTTP::POE (Marked as Deprecated)
+
+=back
+
+=head2 Specifying the engine in the call to ->setup
+
+XXX FIXME
+
+=head2 Plack functionality
+
+See L<Catalyst::PSGI>.
+
+=head2 Tests in 5.9
+
+Tests should generally work the same in Catalyst 5.9, however there are some differences.
+
+Previously, if using L<Catalyst::Test> and doing local requests (against a local server),
+if the application threw an exception then this exception propagated into the test.
+
+This behavior has been removed, and now a 500 response will be returned to the test.
+This change unifies behavior, to make local test requests behave similarly to remote
+requests.
+
 =head1 Upgrading to Catalyst 5.80
 
 Most applications and plugins should run unaltered on Catalyst 5.80.
@@ -14,7 +216,7 @@ issues upgrading to this release.
 Most issues found with pre-existing components have been easy to
 solve. This document provides a complete description of behavior changes
 which may cause compatibility issues, and of new Catalyst warnings which
-be unclear.
+might be unclear.
 
 If you think you have found an upgrade-related issue which is not covered in
 this document, please email the Catalyst list to discuss the problem.
@@ -25,7 +227,7 @@ this document, please email the Catalyst list to discuss the problem.
 
 You can only apply method modifiers after the application's C<< ->setup >>
 method has been called. This means that modifiers will not work with methods
-which run during the call to C<< ->setup >>.
+run during the call to C<< ->setup >>.
 
 See L<Catalyst::Manual::ExtendingCatalyst> for more information about using
 L<Moose> in your applications.
@@ -372,7 +574,7 @@ is highly deprecated.
 The first time one of these methods is called, a warning will be emitted:
 
     Class $class is calling the deprecated method Catalyst::Dispatcher::$public_method_name,
-    this will be removed in Catalyst 5.9X
+    this will be removed in Catalyst 5.9
 
 You should B<NEVER> be calling any of these methods from application code.
 

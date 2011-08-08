@@ -1,9 +1,10 @@
 package Catalyst::Script::FastCGI;
-
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
 use Moose;
 use MooseX::Types::Moose qw/Str Bool Int/;
+use Data::OptList;
 use namespace::autoclean;
+
+sub _plack_engine_name { 'FCGI' }
 
 with 'Catalyst::ScriptRole';
 
@@ -59,20 +60,62 @@ has proc_title => (
     traits        => [qw(Getopt)],
     isa           => Str,
     is            => 'ro',
+    lazy          => 1,
+    builder       => '_build_proc_title',
     documentation => 'Set the process title',
 );
+
+sub _build_proc_title {
+    my ($self) = @_;
+    return sprintf 'perl-fcgi-pm [%s]', $self->application_name;
+}
+
+sub BUILD {
+    my ($self) = @_;
+    $self->proc_title;
+}
+
+# Munge the 'listen' arg so that Plack::Handler::FCGI will accept it.
+sub _listen {
+    my ($self) = @_;
+
+    if (defined (my $listen = $self->listen)) {
+        return [ $listen ];
+    } else {
+        return undef;
+    }
+}
+
+sub _plack_loader_args {
+    my ($self) = shift;
+
+    my $opts = Data::OptList::mkopt([
+      qw/manager nproc proc_title/,
+            pid             => [ 'pidfile' ],
+            daemonize       => [ 'daemon' ],
+            keep_stderr     => [ 'keeperr' ],
+            listen          => [ '_listen' ],
+        ]);
+
+    my %args = map { $_->[0] => $self->${ \($_->[1] ? $_->[1]->[0] : $_->[0]) } } @$opts;
+
+    # Plack::Handler::FCGI thinks manager => undef means "use no manager".
+    delete $args{'manager'} unless defined $args{'manager'};
+
+    return %args;
+}
 
 sub _application_args {
     my ($self) = shift;
     return (
         $self->listen,
         {
-            nproc   => $self->nproc,
-            pidfile => $self->pidfile,
-            manager => $self->manager,
-            detach  => $self->daemon,
+            nproc       => $self->nproc,
+            pidfile     => $self->pidfile,
+            manager     => $self->manager,
+            detach      => $self->daemon,
             keep_stderr => $self->keeperr,
-            proc_title => $self->proc_title,
+            proc_title  => $self->proc_title,
         }
     );
 }

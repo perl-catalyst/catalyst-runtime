@@ -24,14 +24,40 @@ subclass of Catalyst::Log, no ::Plugin:: needed.
 See also: Catalyst::Plugin::Log::Dispatch and
 http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
-# REFACTORING
+## Capture arguments that the plack engine component was run with somewhere,
+    to more easily support custom args from scripts (e.g. Gitalist's
+    --git_dir)
 
-##  The horrible hack for plugin setup - replacing it:
+## throw away the restarter and allow using the restarters Plack provides
+
+## remove per-request state from the engine instance
+
+## be smarter about how we use PSGI - not every response needs to be delayed
+    and streaming
+
+#  The horrible hack for plugin setup - replacing it:
 
  * Have a look at the Devel::REPL BEFORE_PLUGIN stuff
    I wonder if what we need is that combined with plugins-as-roles
 
-## App / ctx split:
+#  PSGI
+
+##  To do at release time
+
+  - Release psgi branch of Catalyst-Devel
+  - Release new Task::Catalyst
+  - Release 5.9 branch of Catalyst-Manual
+  - Release Catalyst::Engine::HTTP::Prefork with deprecation notice
+    + exit in Makefile.PL if Catalyst > 5.89 is installed.
+
+##  Blockers
+
+  * I've noticed a small difference with Catalyst::Test. The latest stable
+    version include two headers, 'host' and 'https'. They are missing from
+    this version - Pedro Melo on list
+    ^^ Cannot replicate this? Mailed back to ask for tests..
+
+# App / ctx split:
 
   NOTE - these are notes that t0m thought up after doing back compat for
          catalyst_component_class, may be inaccurate, wrong or missing things

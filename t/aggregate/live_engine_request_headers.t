@@ -31,7 +31,7 @@ use HTTP::Request::Common;
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     isa_ok( $creq, 'Catalyst::Request' );
-    ok( $creq->secure, 'Forwarded port sets securet' );
+    ok( $creq->secure, 'Forwarded port sets secure' );
     isa_ok( $creq->headers, 'HTTP::Headers', 'Catalyst::Request->headers' );
     is( $creq->header('X-Whats-Cool'), $request->header('X-Whats-Cool'), 'Catalyst::Request->header X-Whats-Cool' );
     
@@ -45,7 +45,7 @@ use HTTP::Request::Common;
 
     is( $creq->header('User-Agent'), $request->header('User-Agent'), 'Catalyst::Request->header User-Agent' );
 
-    my $host = sprintf( '%s:%d', $request->uri->host, $request->uri->port );
+    my $host = sprintf( '%s:%d', $request->header('X-Forwarded-Host'), $request->header('X-Forwarded-Port') );
     is( $creq->header('Host'), $host, 'Catalyst::Request->header Host' );
 
     SKIP:

@@ -1,14 +1,9 @@
 package Catalyst::Script::Server;
-
-BEGIN {
-    $ENV{CATALYST_ENGINE} ||= 'HTTP';
-    require Catalyst::Engine::HTTP;
-}
-
 use Moose;
 use MooseX::Types::Common::Numeric qw/PositiveInt/;
 use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use Catalyst::Utils;
+use Try::Tiny;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -50,13 +45,45 @@ has port => (
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
+use Moose::Util::TypeConstraints;
+class_type 'MooseX::Daemonize::Pid::File';
+subtype 'Catalyst::Script::Server::Types::Pidfile',
+    as 'MooseX::Daemonize::Pid::File',
+    where { 1 };
+coerce 'Catalyst::Script::Server::Types::Pidfile', from Str, via {
+    try { Class::MOP::load_class("MooseX::Daemonize::Pid::File") }
+    catch {
+        warn("Could not load MooseX::Daemonize::Pid::File, needed for --pid option\n");
+        exit 1;
+    };
+    MooseX::Daemonize::Pid::File->new( file => $_ );
+};
+MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
+    'Catalyst::Script::Server::Types::Pidfile' => '=s',
+);
 has pidfile => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'pid',
-    isa           => Str,
+    isa           => 'Catalyst::Script::Server::Types::Pidfile',
     is            => 'ro',
     documentation => 'Specify a pidfile',
+    coerce        => 1,
+    predicate     => '_has_pidfile',
 );
+
+sub BUILD {
+    my $self = shift;
+
+    if ($self->background) {
+        # FIXME - This is evil. Should we just add MX::Daemonize to the deps?
+        try { Class::MOP::load_class('MooseX::Daemonize::Core') }
+        catch {
+            warn("MooseX::Daemonize is needed for the --background option\n");
+            exit 1;
+        };
+        MooseX::Daemonize::Core->meta->apply($self);
+    }
+}
 
 has keepalive => (
     traits        => [qw(Getopt)],
@@ -108,7 +135,7 @@ has restart_delay => (
 {
     use Moose::Util::TypeConstraints;
 
-    my $tc = subtype as RegexpRef;
+    my $tc = subtype 'Catalyst::Script::Server::Types::RegexpRef', as RegexpRef;
     coerce $tc, from Str, via { qr/$_/ };
 
     MooseX::Getopt::OptionTypeMap->add_option_type_to_map($tc => '=s');
@@ -133,6 +160,11 @@ has follow_symlinks => (
     documentation => 'Follow symbolic links',
     predicate     => '_has_follow_symlinks',
 );
+
+sub _plack_engine_name {
+    my $self = shift;
+    return $self->fork ? 'Starman' : $self->keepalive ? 'Starman' : 'Standalone';
+}
 
 sub _restarter_args {
     my $self = shift;
@@ -169,6 +201,8 @@ sub run {
     if ( $self->restart ) {
         die "Cannot run in the background and also watch for changed files.\n"
             if $self->background;
+        die "Cannot write out a pid file and fork for the restarter.\n"
+            if $self->_has_pidfile;
 
         # If we load this here, then in the case of a restarter, it does not
         # need to be reloaded for each restart.
@@ -189,10 +223,41 @@ sub run {
         $restarter->run_and_watch;
     }
     else {
+        if ($self->background) {
+            $self->daemon_fork;
+
+            return 1 unless $self->is_daemon;
+
+            Class::MOP::load_class($self->application_name);
+
+            $self->daemon_detach;
+        }
+
+        $self->pidfile->write
+            if $self->_has_pidfile;
+
         $self->_run_application;
     }
 
 
+}
+
+sub _plack_loader_args {
+    my ($self) = shift;
+    return (
+        port => $self->port,
+        host => $self->host,
+        keepalive => $self->keepalive ? 100 : 1,
+        server_ready => sub {
+            my ($args) = @_;
+
+            my $name  = $args->{server_software} || ref($args); # $args is $server
+            my $host  = $args->{host} || 0;
+            my $proto = $args->{proto} || 'http';
+
+            print STDERR "$name: Accepting connections at $proto://$host:$args->{port}/\n";
+        },
+    );
 }
 
 sub _application_args {
