@@ -41,6 +41,21 @@ sub BUILD {
     is(get('/container_class'), $self->container_class);
     is(get('/container_isa'), $self->container_class);
 
+    {
+        ok(my ($res, $c) = ctx_request('/get_model_baz'), 'request');
+        ok($res->is_success, 'request 2xx');
+        is($res->content, 'TestAppCustomContainer::Model::Baz', 'content is expected');
+
+        ok(my $baz = $c->container->get_sub_container('component')->resolve(service => 'model_Baz'), 'fetching Baz');
+        isa_ok($baz, 'TestAppCustomContainer::Model::Baz');
+        is($baz->accept_context_called, 1, 'ACCEPT_CONTEXT called');
+        isa_ok($baz->foo, 'TestAppCustomContainer::Model::Foo', 'Baz got Foo ok');
+
+        ok(my $foo = $c->container->get_sub_container('component')->resolve(service => 'model_Foo'), 'fetching Foo');
+        isa_ok($foo, 'TestAppCustomContainer::Model::Foo');
+        is($foo->baz_got_it, 1, 'Baz accessed Foo once');
+    }
+
     done_testing;
 }
 

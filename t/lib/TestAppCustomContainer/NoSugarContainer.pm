@@ -11,11 +11,12 @@ sub BUILD {
     $self->get_sub_container('component')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Bar',
+            lifecycle    => 'Singleton',
             class        => 'TestAppCustomContainer::Model::Bar',
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
-                depends_on( '/model/Foo' ),
+                depends_on( 'model_Foo' ),
             ],
         )
     );
@@ -23,7 +24,13 @@ sub BUILD {
         Catalyst::IOC::BlockInjection->new(
             name         => 'Bar',
             dependencies => [
-                depends_on( '/model/Foo' ),
+                Bread::Board::Dependency->new(
+                    service_path => 'Foo',
+                    service_params => {
+                        ctx => +{},
+                        accept_context_args => [ +{} ],
+                    },
+                ),
                 depends_on( '/component/model_Bar' ),
             ],
             block => sub {
@@ -41,11 +48,12 @@ sub BUILD {
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Baz',
             class        => 'TestAppCustomContainer::Model::Baz',
-            lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
+            lifecycle    => 'Singleton',
+            #lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
-                depends_on( '/model/Foo' ),
+                depends_on( 'model_Foo' ),
             ],
         )
     );
@@ -53,7 +61,13 @@ sub BUILD {
         Catalyst::IOC::BlockInjection->new(
             name         => 'Baz',
             dependencies => [
-                depends_on( '/model/Foo' ),
+                Bread::Board::Dependency->new(
+                    service_path => 'Foo',
+                    service_params => {
+                        ctx => +{},
+                        accept_context_args => [ +{} ],
+                    },
+                ),
                 depends_on( '/component/model_Baz' ),
             ],
             block => sub {
