@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90000 - UNRELEASED
+
  Fixed extensions:
 
   - A number of modules have been updated to pass their tests or not
