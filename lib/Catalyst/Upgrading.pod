@@ -61,11 +61,29 @@ myapp_cgi.pl script is already upgraded enough to use L<Catalyst::Script::CGI>.
 =head2 Upgrading the Preforking Engine
 
 If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
-is automatically loaded.
+is automatically loaded. You should (at least) change your C<Makefile.PL>
+to depend on Starman.
 
-If you were customising your server script to pass options to the prefork engine,
-then this is no longer supported. The recommended route to implement this functionality
-is to write a simple .psgi file for your application, then use the L<plackup> utility.
+You can regenerate your C<myapp_server.pl> script with C<catalyst.pl>
+and implement a C<MyApp::Script::Server> class that looks like this:
+
+    package MyApp::Script::Server;
+    use Moose;
+    use namespace::autoclean;
+
+    extends 'CatalystX::Script::Server::Starman';
+
+    1;
+
+This takes advantage of the new script system, and adds a number of options to
+the standard server script as extra options are added by Starman.
+
+More information about these options can be seen at
+L<CatalystX::Script::Server::Starman/SYNOPSIS>.
+
+An alternate route to implement this functionality is to write a simple .psgi
+file for your application, then use the L<plackup> utility to start the
+server.
 
 =head2 Upgrading the PSGI Engine
 
