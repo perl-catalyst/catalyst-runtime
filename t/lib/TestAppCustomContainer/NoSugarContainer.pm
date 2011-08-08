@@ -16,7 +16,7 @@ sub BUILD {
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
-                depends_on( 'model_Foo' ),
+                depends_on( '/model/Foo' ),
             ],
         )
     );
@@ -60,7 +60,7 @@ sub BUILD {
             dependencies => [
                 depends_on( '/application_name' ),
                 depends_on( '/config' ),
-                depends_on( 'model_Foo' ),
+                depends_on( '/model/Foo' ),
             ],
         )
     );
