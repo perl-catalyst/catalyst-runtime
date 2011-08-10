@@ -694,19 +694,6 @@ sub expand_component_module {
     return Devel::InnerPackage::list_packages( $module );
 }
 
-# copied from stevan's OX
-sub flush_request_services {
-    my $self = shift;
-    my @services = $self->get_service_list;
-
-    foreach my $service (@services) {
-        my $injection = $self->get_service($service);
-        if ($injection->does('Catalyst::IOC::LifeCycle::Request')) {
-            $injection->flush_instance;
-        }
-    }
-}
-
 1;
 
 __END__
@@ -913,8 +900,6 @@ Finds components that match a given regexp. Used internally, by find_component.
 
 Components found by C<locate_components> will be passed to this method, which
 is expected to return a list of component (package) names to be set up.
-
-=head2 flush_request_services
 
 =head2 setup_components
 
