@@ -4,13 +4,20 @@ use warnings;
 use Bread::Board;
 use Catalyst::IOC::ConstructorInjection;
 
-# FIXME - neither of these work:
+# FIXME - All of these imports need to get the importing package
+#         as the customise_container and current_container variables
+#         NEED to be in the containers package so there can be multiple
+#         containers..
 use Sub::Exporter -setup => {
     exports => [qw/
         component
+        model
+        container
     /],
     groups  => { default => [qw/
         component
+        model
+        container
     /]},
 };
 #use Sub::Exporter -setup => [
@@ -32,6 +39,23 @@ use Sub::Exporter -setup => {
 #Moose::Exporter->setup_import_methods(
 #    also => ['Bread::Board'],
 #);
+our $customise_container;
+our $current_container;
+
+sub container (&) {
+    my $code = shift;
+    $customise_container = sub {
+        warn("In customise container");
+        local $current_container = shift();
+        $code->();
+    };
+}
+
+sub model (&) {
+    my $code = shift;
+    local $current_container = $current_container->get_sub_container('model');
+    $code->();
+}
 
 sub component {
     my ($name, %args) = @_;
@@ -40,14 +64,15 @@ sub component {
 
     # FIXME - check $args{type} here!
 
-    Catalyst::IOC::ConstructorInjection->new(
+    my $service = Catalyst::IOC::ConstructorInjection->new(
         %args,
         name             => $name,
         lifecycle        => 'Singleton',
         # XX FIXME - needs to become possible to intuit catalyst_component_name
         #            from dependencies (like config)
         catalyst_component_name => 'TestAppCustomContainer::Model::Bar',
-    )
+    );
+    $current_container->add_service($service);
 }
 
 1;
