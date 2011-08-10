@@ -4,6 +4,7 @@ use Moose;
 use Config::Any;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
+use List::Util qw(first);
 use Devel::InnerPackage ();
 use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
@@ -670,23 +671,16 @@ sub add_component {
 # or replaced by something already existing there?
 sub _get_component_type_name {
     my ( $component ) = @_;
+    my $result;
 
-    my @parts = split /::/, $component;
-
-    while (scalar @parts > 1) {
-        my $type = shift @parts;
-
-        return ('controller', join '::', @parts)
-            if $type =~ /^(c|controller)$/i;
-
-        return ('model', join '::', @parts)
-            if $type =~ /^(m|model)$/i;
-
-        return ('view', join '::', @parts)
-            if $type =~ /^(v|view)$/i;
+    while ( !$result and (my $index = index $component, '::') > 0 ) {
+        my $type   = lc substr $component, 0, $index;
+        $component = substr $component, $index + 2;
+        $result    = first { $type eq $_ or $type eq substr($_, 0, 1) }
+                         qw{ model view controller };
     }
 
-    return (undef, $component);
+    return ($result, $component);
 }
 
 sub expand_component_module {
