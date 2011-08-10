@@ -9,11 +9,13 @@ sub BUILD {
     my $self = shift;
 
     warn("Add Bar to model");
+    my $bar_config = $self->resolve(service => 'config')->{'Model::Bar'} || {};
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name             => 'Bar',
             lifecycle        => 'Singleton',
             class            => 'TestAppCustomContainer::Model::Bar',
+            config           => $bar_config,
             dependencies     => {
                 application_name => depends_on( '/application_name' ),
                 config => depends_on( '/config' ),
@@ -58,6 +60,7 @@ sub BUILD {
 #        )
 #    );
 
+    my $fnar_config = $self->resolve(service => 'config')->{'Model::Fnar'} || {};
     $self->get_sub_container('component')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'model_Fnar',
@@ -65,8 +68,8 @@ sub BUILD {
             class        => 'TestAppCustomContainer::External::Class',
             dependencies => [
                 depends_on( '/application_name' ),
-                depends_on( '/config' ),
             ],
+            config => $fnar_config,
         )
     );
     $self->get_sub_container('model')->add_service(

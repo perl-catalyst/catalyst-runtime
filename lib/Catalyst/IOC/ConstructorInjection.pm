@@ -8,28 +8,17 @@ with 'Bread::Board::Service::WithClass',
      'Bread::Board::Service::WithParameters',
      'Bread::Board::Service::WithDependencies';
 
-has config_key => (
+has config => (
     is         => 'ro',
-    isa        => 'Str',
-    lazy_build => 1,
+    isa        => 'HashRef',
+    required => 1,
 );
-
-sub _build_config_key { Catalyst::Utils::class2classsuffix( shift->class ) }
-
-sub _build_constructor_name { 'COMPONENT' }
 
 sub get {
     my $self = shift;
 
-    my $instance;
-
-    my $constructor = $self->constructor_name;
     my $component   = $self->class;
-    my %params = %{ $self->params };
-    use Data::Dumper;
-    Carp::cluck("Building $component with " . Dumper(\%params));
-    my $config      = delete($params{'config'})->{ $self->config_key } || {};
-    %$config = (%$config, %params);
+    my %config = (%{ $self->config }, %{ $self->params });
 
     # FIXME - Is depending on the application name to pass into constructors here a good idea?
     #         This makes app/ctx split harder I think.. Need to think more here, but I think
@@ -41,15 +30,19 @@ sub get {
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it. local to avoid pointlessly shitting in config
     # for the debug screen, as $component is already the key name.
-    local $config->{catalyst_component_name} = $component;
+    # XXX FIXME - WRONG!!! MyApp::Model::Foo may be an instance of something
+    #             totally diferent, ergo it should get a catalyst_component_name
+    #             of MyApp::Model::Foo.. Write failing tests for this in master?
+    $config{catalyst_component_name} = $component;
 
-    unless ( $component->can( $constructor ) ) {
+    unless ( $component->can( 'COMPONENT' ) ) {
         # FIXME - make some deprecation warnings
         return $component;
     }
 
+    my $instance;
     try {
-        $instance = $component->$constructor( $app_name, $config );
+        $instance = $component->COMPONENT( $app_name, \%config );
     }
     catch {
         Catalyst::Exception->throw(
@@ -61,12 +54,12 @@ sub get {
         if blessed $instance;
 
     my $metaclass = Moose::Util::find_meta($component);
-    my $method_meta = $metaclass->find_method_by_name($constructor);
+    my $method_meta = $metaclass->find_method_by_name('COMPONENT');
     my $component_method_from = $method_meta->associated_metaclass->name;
     my $value = defined($instance) ? $instance : 'undef';
     Catalyst::Exception->throw(
         message =>
-        qq/Couldn't instantiate component "$component", $constructor() method (from $component_method_from) didn't return an object-like value (value was $value)./
+        qq/Couldn't instantiate component "$component", COMPONENT method (from $component_method_from) didn't return an object-like value (value was $value)./
     );
 }
 

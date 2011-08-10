@@ -645,15 +645,17 @@ sub add_component {
     # sub every time they are called, when it exists.
     my $instance_container       = $self->get_sub_container('component');
     my $accept_context_container = $self->get_sub_container($type);
+    my $app_config = $self->resolve( service => 'config' );
+    my $config = $app_config->{Catalyst::Utils::class2classsuffix($component)} || {};
 
     $instance_container->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name      => $component_service_name,
             class     => $component,
             lifecycle => 'Singleton',
+            config    => $config,
             dependencies => [
                 depends_on( '/application_name' ),
-                depends_on( '/config' ),
             ],
         )
     ) unless $instance_container->has_service( $component_service_name );
