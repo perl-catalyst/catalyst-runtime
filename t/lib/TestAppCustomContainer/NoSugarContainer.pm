@@ -9,16 +9,14 @@ sub BUILD {
     my $self = shift;
 
     warn("Add Bar to model");
-    my $bar_config = $self->resolve(service => 'config')->{'Model::Bar'} || {};
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name             => 'Bar',
             lifecycle        => 'Singleton',
             class            => 'TestAppCustomContainer::Model::Bar',
-            config           => $bar_config,
+            catalyst_component_name => 'TestAppCustomContainer::Model::Bar',
             dependencies     => {
                 application_name => depends_on( '/application_name' ),
-                config => depends_on( '/config' ),
                 foo => depends_on('/model/DefaultSetup'),
             },
         )

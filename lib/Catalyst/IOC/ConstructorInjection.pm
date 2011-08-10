@@ -1,24 +1,49 @@
 package Catalyst::IOC::ConstructorInjection;
 use Moose;
+use Bread::Board::Dependency;
 use Try::Tiny;
 use Catalyst::Utils ();
+
 extends 'Bread::Board::ConstructorInjection';
 
-with 'Bread::Board::Service::WithClass',
-     'Bread::Board::Service::WithParameters',
-     'Bread::Board::Service::WithDependencies';
+sub BUILD {
+    my $self = shift;
+    $self->add_dependency(__catalyst_config => Bread::Board::Dependency->new(service_path => '/config'));
+    warn("Added dependency for config in " . $self->class);
+}
+
+has catalyst_component_name => (
+    is => 'ro',
+);
 
 has config => (
+    init_arg   => undef,
     is         => 'ro',
     isa        => 'HashRef',
-    required => 1,
+    writer     => '_set_config',
+    clearer    => '_clear_config',
 );
+
+around resolve_dependencies => sub {
+    my ($orig, $self, @args) = @_;
+    my %deps = $self->$orig(@args);
+    use Data::Dumper;
+        warn("$self Resolve deps" . Data::Dumper::Dumper(\%deps));
+    my $app_config = delete $deps{__catalyst_config};
+    my $conf_key = Catalyst::Utils::class2classsuffix($self->catalyst_component_name);
+    $self->_set_config($app_config->{$conf_key} || {});
+    return %deps;
+};
 
 sub get {
     my $self = shift;
-
+    warn("In get $self");
     my $component   = $self->class;
-    my %config = (%{ $self->config }, %{ $self->params });
+
+    my $params = $self->params;
+    my %config = (%{ $self->config }, %{ $params });
+    warn(Data::Dumper::Dumper(\%config));
+    $self->_clear_config;
 
     # FIXME - Is depending on the application name to pass into constructors here a good idea?
     #         This makes app/ctx split harder I think.. Need to think more here, but I think
@@ -30,10 +55,7 @@ sub get {
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it. local to avoid pointlessly shitting in config
     # for the debug screen, as $component is already the key name.
-    # XXX FIXME - WRONG!!! MyApp::Model::Foo may be an instance of something
-    #             totally diferent, ergo it should get a catalyst_component_name
-    #             of MyApp::Model::Foo.. Write failing tests for this in master?
-    $config{catalyst_component_name} = $component;
+    $config{catalyst_component_name} = $self->catalyst_component_name;
 
     unless ( $component->can( 'COMPONENT' ) ) {
         # FIXME - make some deprecation warnings
