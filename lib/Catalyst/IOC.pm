@@ -2,21 +2,17 @@ package Catalyst::IOC;
 use strict;
 use warnings;
 use Bread::Board;
+use Catalyst::IOC::ConstructorInjection;
 
 # FIXME - neither of these work:
-#use Sub::Exporter -setup => [
-#    qw(
-#        as
-#        container
-#        depends_on
-#        service
-#        alias
-#        wire_names
-#        include
-#        typemap
-#        infer
-#    )
-#];
+use Sub::Exporter -setup => {
+    exports => [qw/
+        component
+    /],
+    groups  => { default => [qw/
+        component
+    /]},
+};
 #use Sub::Exporter -setup => [
 #    qw(
 #        Bread::Board::as
@@ -32,10 +28,27 @@ use Bread::Board;
 #];
 # I'm probably doing it wrong.
 # Anyway, I'll just use Moose::Exporter. Do I really have to use Sub::Exporter?
-use Moose::Exporter;
-Moose::Exporter->setup_import_methods(
-    also => ['Bread::Board'],
-);
+#use Moose::Exporter;
+#Moose::Exporter->setup_import_methods(
+#    also => ['Bread::Board'],
+#);
+
+sub component {
+    my ($name, %args) = @_;
+    $args{dependencies} ||= {};
+    $args{dependencies}{application_name} = depends_on( '/application_name' );
+
+    # FIXME - check $args{type} here!
+
+    Catalyst::IOC::ConstructorInjection->new(
+        %args,
+        name             => $name,
+        lifecycle        => 'Singleton',
+        # XX FIXME - needs to become possible to intuit catalyst_component_name
+        #            from dependencies (like config)
+        catalyst_component_name => 'TestAppCustomContainer::Model::Bar',
+    )
+}
 
 1;
 
