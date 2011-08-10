@@ -1,5 +1,6 @@
 package Catalyst::IOC::ConstructorInjection;
 use Moose;
+use Try::Tiny;
 use Catalyst::Utils ();
 extends 'Bread::Board::ConstructorInjection';
 
@@ -19,6 +20,8 @@ sub _build_constructor_name { 'COMPONENT' }
 
 sub get {
     my $self = shift;
+
+    my $instance;
 
     my $constructor = $self->constructor_name;
     my $component   = $self->class;
@@ -40,26 +43,26 @@ sub get {
         return $component;
     }
 
-    my $instance = eval { $component->$constructor( $app_name, $config ) };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        Catalyst::Exception->throw(
-            message => qq/Couldn't instantiate component "$component", "$error"/
-        );
+    try {
+        $instance = $component->$constructor( $app_name, $config );
     }
-    elsif (!blessed $instance) {
-        my $metaclass = Moose::Util::find_meta($component);
-        my $method_meta = $metaclass->find_method_by_name($constructor);
-        my $component_method_from = $method_meta->associated_metaclass->name;
-        my $value = defined($instance) ? $instance : 'undef';
+    catch {
         Catalyst::Exception->throw(
-            message =>
-            qq/Couldn't instantiate component "$component", $constructor() method (from $component_method_from) didn't return an object-like value (value was $value)./
+            message => qq/Couldn't instantiate component "$component", "$_"/
         );
-    }
+    };
 
-    return $instance;
+    return $instance
+        if blessed $instance;
+
+    my $metaclass = Moose::Util::find_meta($component);
+    my $method_meta = $metaclass->find_method_by_name($constructor);
+    my $component_method_from = $method_meta->associated_metaclass->name;
+    my $value = defined($instance) ? $instance : 'undef';
+    Catalyst::Exception->throw(
+        message =>
+        qq/Couldn't instantiate component "$component", $constructor() method (from $component_method_from) didn't return an object-like value (value was $value)./
+    );
 }
 
 __PACKAGE__->meta->make_immutable;
