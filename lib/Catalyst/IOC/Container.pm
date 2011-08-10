@@ -867,12 +867,6 @@ default component (such as default_view, if $sub_container is 'view'). If
 $name is a regexp, it returns an array of matching components. Otherwise, it
 looks for the component with name $name.
 
-=head2 get_components_names_types
-
-Gets all components from all containers and returns them as an array of
-arrayrefs containing the component name and the component type (i.e., whether
-it's an instance or a class).
-
 =head2 get_all_components
 
 Fetches all the components, in each of the sub_containers model, view and
