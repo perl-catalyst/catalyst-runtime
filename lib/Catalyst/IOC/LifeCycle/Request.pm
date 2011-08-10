@@ -1,6 +1,7 @@
 package Catalyst::IOC::LifeCycle::Request;
 use Moose::Role;
 use namespace::autoclean;
+use Carp;
 with 'Bread::Board::LifeCycle';
 
 around get => sub {
@@ -9,17 +10,9 @@ around get => sub {
 
     my $instance = $self->$orig(@_);
 
-# FIXME -
-# during setup in Catalyst.pm:
-#  - $class->setup_actions (line 3025)
-#      - $c->dispatcher->setup_actions (line 2271)
-#          - $c->components in Catalyst/Dispatcher.pm line 604
-# which boils down to line 616 in Catalyst/IOC/Container.pm
-# resolving the component _without_ the 'context' parameter.
-# Should it get the context parameter? Should all calls to a
-# ConstructorInjection service pass that parameter?
     my $ctx = $self->param('ctx')
-        or return $instance;
+        or confess qq/This component has a Request lifecycle.\n/ .
+                   qq/The 'ctx' parameter is mandatory./;
 
     my $stash_key = "__Catalyst_IOC_LifeCycle_Request_" . $self->name;
     return $ctx->stash->{$stash_key} ||= $instance;
