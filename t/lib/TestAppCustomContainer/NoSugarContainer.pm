@@ -9,24 +9,19 @@ sub BUILD {
     my $self = shift;
 
     $self->get_sub_container('component')->add_service(
-        Catalyst::IOC::ConstructorInjection->new(
-            name         => 'model_Bar',
-            lifecycle    => 'Singleton',
-            class        => 'TestAppCustomContainer::Model::Bar',
-            dependencies => [
-                depends_on( '/application_name' ),
-                depends_on( '/config' ),
-                depends_on( '/model/Foo' ),
-            ],
-        )
-    );
-    $self->get_sub_container('model')->add_service(
-        Catalyst::IOC::BlockInjection->new(
-            name         => 'Bar',
-            lifecycle    => 'Singleton',
-            dependencies => [
-                Bread::Board::Dependency->new(
-                    service_path => 'Foo',
+        # Catalyst::IOC::ConstructorInjection gives the constructor the wrong
+        # parameters
+        Bread::Board::ConstructorInjection->new(
+            name             => 'model_Bar',
+            lifecycle        => 'Singleton',
+            class            => 'TestAppCustomContainer::Model::Bar',
+            constructor_name => 'new',
+            dependencies     => {
+                application_name => depends_on( '/application_name' ),
+                config => depends_on( '/config' ),
+                foo => Bread::Board::Dependency->new(
+                    service_name => 'foo',
+                    service_path => '/model/Foo',
 
                     # FIXME - obviously this is a mistake
                     # what to do with ctx here?
@@ -36,39 +31,36 @@ sub BUILD {
                         accept_context_args => [ +{} ],
                     },
                 ),
-                depends_on( '/component/model_Bar' ),
-            ],
-            block => sub {
-                my $s   = shift;
-
-                my $foo = $s->param('Foo');
-                $foo->inc_bar_got_it;
-
-                return $s->param('model_Bar');
             },
-        )
-    );
-
-    $self->get_sub_container('component')->add_service(
-        Catalyst::IOC::ConstructorInjection->new(
-            name         => 'model_Baz',
-            class        => 'TestAppCustomContainer::Model::Baz',
-            lifecycle    => 'Singleton',
-
-            # while it doesn't fully work
-            #lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
-            dependencies => [
-                depends_on( '/application_name' ),
-                depends_on( '/config' ),
-                depends_on( '/model/Foo' ),
-            ],
         )
     );
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::BlockInjection->new(
+            name         => 'Bar',
+            lifecycle    => 'Singleton',
+            dependencies => [
+                depends_on( '/component/model_Bar' ),
+            ],
+            block => sub {
+                shift->param('model_Bar');
+            },
+        )
+    );
+
+    # FIXME - this is to avoid the default service to be added
+    # if that happened, the app would die
+    $self->get_sub_container('component')->add_service(
+        service model_Baz => 'TestAppCustomContainer::Model::Baz',
+    );
+    $self->get_sub_container('model')->add_service(
+        # FIXME - i think it should be a ConstructorInjection
+        # but only BlockInjection gets ctx parameter
+        Catalyst::IOC::BlockInjection->new(
             name         => 'Baz',
+            lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
             dependencies => [
                 Bread::Board::Dependency->new(
+                    service_name => 'foo',
                     service_path => 'Foo',
 
                     # FIXME - same as above
@@ -77,15 +69,9 @@ sub BUILD {
                         accept_context_args => [ +{} ],
                     },
                 ),
-                depends_on( '/component/model_Baz' ),
             ],
             block => sub {
-                my $s   = shift;
-
-                my $foo = $s->param('Foo');
-                $foo->inc_baz_got_it;
-
-                return $s->param('model_Baz');
+                TestAppCustomContainer::Model::Baz->new(foo => shift->param('foo'));
             },
         )
     );
