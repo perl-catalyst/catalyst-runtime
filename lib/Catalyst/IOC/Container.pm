@@ -581,7 +581,7 @@ sub find_component {
     }
 
     # one last search for things like $c->comp(qr/::M::/)
-    @result = $self->find_component_regexp(
+    @result = $self->_find_component_regexp(
         $component, @args
     ) if !@result and ref $component;
 
@@ -589,7 +589,7 @@ sub find_component {
     return @result;
 }
 
-sub find_component_regexp {
+sub _find_component_regexp {
     my ( $self, $component, @args ) = @_;
     my @result;
 
@@ -883,12 +883,8 @@ by the component name given.
 Searches for components in all containers. If $component is the full class
 name, the subcontainer is guessed, and it gets the searched component in there.
 Otherwise, it looks for a component with that name in all subcontainers. If
-$component is a regexp, it calls the method below, find_component_regexp,
-and matches all components against that regexp.
-
-=head2 find_component_regexp
-
-Finds components that match a given regexp. Used internally, by find_component.
+$component is a regexp it calls _find_component_regexp and matches all
+components against that regexp.
 
 =head2 expand_component_module
 
