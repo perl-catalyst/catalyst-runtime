@@ -8,14 +8,14 @@ around get => sub {
     my $orig = shift;
     my $self = shift;
 
-    my $instance = $self->$orig(@_);
-
-    my $ctx = $self->param('ctx')
+    # FIXME - ugly, but the only way it'll work
+    # we should find out why
+    my $ctx = {@_}->{'ctx'}
         or confess qq/This component has a Request lifecycle.\n/ .
                    qq/The 'ctx' parameter is mandatory./;
 
     my $stash_key = "__Catalyst_IOC_LifeCycle_Request_" . $self->name;
-    return $ctx->stash->{$stash_key} ||= $instance;
+    return $ctx->stash->{$stash_key} ||= $self->$orig(@_);
 };
 
 1;
