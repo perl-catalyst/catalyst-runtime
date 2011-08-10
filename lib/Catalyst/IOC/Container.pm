@@ -611,14 +611,19 @@ sub get_all_components {
     my $self = shift;
     my %components;
 
-    my $container = $self->get_sub_container('component');
+    foreach my $type (qw/model view controller /) {
+        my $container = $self->get_sub_container('component');
 
-    for my $component ($container->get_service_list) {
-        my $comp = $container->resolve(
-            service => $component
-        );
-        my $comp_name = ref $comp || $comp;
-        $components{$comp_name} = $comp;
+        for my $component ($container->get_service_list) {
+            my $comp = $container->resolve(
+                service => $component
+            );
+            my $comp_name = ref $comp || $comp; # THIS IS WRONG! :)
+                                                # Just as it is called Model::Foo
+                                                # does not mean it has to be
+                                                # an instance of model::foo
+            $components{$comp_name} = $comp;
+        }
     }
 
     return lock_hash %components;
