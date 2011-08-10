@@ -443,6 +443,7 @@ sub build_locate_components_service {
 
 sub setup_components {
     my $self = shift;
+    warn("Setting up default components");
     my $class = $self->resolve( service => 'application_name' );
     my @comps = @{ $self->resolve( service => 'locate_components' ) };
     my %comps = map { $_ => 1 } @comps;
@@ -612,7 +613,7 @@ sub get_all_components {
     my %components;
 
     foreach my $type (qw/model view controller /) {
-        my $container = $self->get_sub_container('component');
+        my $container = $self->get_sub_container($type);
 
         for my $component ($container->get_service_list) {
             my $comp = $container->resolve(

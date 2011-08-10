@@ -25,7 +25,12 @@ sub get {
 
     my $constructor = $self->constructor_name;
     my $component   = $self->class;
-    my $config      = $self->param('config')->{ $self->config_key } || {};
+    my %params = %{ $self->params };
+    use Data::Dumper;
+    Carp::cluck("Building $component with " . Dumper(\%params));
+    my $config      = delete($params{'config'})->{ $self->config_key } || {};
+    %$config = (%$config, %params);
+
     # FIXME - Is depending on the application name to pass into constructors here a good idea?
     #         This makes app/ctx split harder I think.. Need to think more here, but I think
     #         we want to pass the application in as a parameter when building the service

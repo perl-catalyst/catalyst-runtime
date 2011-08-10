@@ -13,8 +13,8 @@ sub BUILD {}
 
 after BUILD => sub {
     my $self = shift;
-    ok $self->foo;
-    isa_ok($self->foo, 'TestAppCustomContainer::Model::DefaultSetup');
+    ok($self->foo, ref($self) . " got a ->foo");
+    isa_ok($self->foo, 'TestAppCustomContainer::Model::DefaultSetup', ref($self) . " isa 'TestAppCustomContainer::Model::DefaultSetup'");
 };
 
 1;
