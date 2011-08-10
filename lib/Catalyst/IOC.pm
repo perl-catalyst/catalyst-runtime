@@ -39,6 +39,8 @@ Moose::Exporter->setup_import_methods(
 
 1;
 
+# FIXME - should the code example below be on this file or Catalyst::IOC::Container?
+
 __END__
 
 =pod
@@ -49,6 +51,41 @@ Catalyst::IOC - IOC for Catalyst, based on Bread::Board
 
 =head1 SYNOPSIS
 
+    package MyApp::Container;
+    use Catalyst::IOC;
+
+    sub BUILD {
+        my $self = shift;
+
+        container $self => as {
+            container model => as {
+
+                # default component
+                component Foo => ();
+
+                # model Bar needs model Foo to be built before
+                # and Bar's constructor gets Foo as a parameter
+                component Bar => ( dependencies => [
+                    depends_on('/model/Foo'),
+                ]);
+
+                # Baz is rebuilt once per HTTP request
+                component Baz => ( lifecycle => 'Request' );
+
+                # built only once per application life time
+                component Quux => ( lifecycle => 'Singleton' );
+
+                # built once per app life time and uses an external model,
+                # outside the default directory
+                # no need for wrappers or Catalyst::Model::Adaptor
+                component Fnar => (
+                    lifecycle => 'Singleton',
+                    class => 'My::External::Class',
+                );
+            };
+        }
+    }
+
 =head1 DESCRIPTION
 
 =head1 METHODS
@@ -56,6 +93,10 @@ Catalyst::IOC - IOC for Catalyst, based on Bread::Board
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
+
+=head1 SEE ALSO
+
+L<Bread::Board>
 
 =head1 COPYRIGHT
 
