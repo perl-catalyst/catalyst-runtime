@@ -53,8 +53,7 @@ sub get {
     my $app_name    = $self->param('application_name');
 
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
-    # methods also pass it. local to avoid pointlessly shitting in config
-    # for the debug screen, as $component is already the key name.
+    # methods also pass it.
     $config{catalyst_component_name} = $self->catalyst_component_name;
 
     unless ( $component->can( 'COMPONENT' ) ) {
