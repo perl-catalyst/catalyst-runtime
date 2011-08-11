@@ -636,6 +636,8 @@ sub get_all_components {
             # ugly to check MyApp::M::Foo. So, either we change the hash key,
             # or we drop support for ::[CMV]::, or I don't know, maybe you
             # have a better solution? :)
+            # maybe catalyst_component_name? But then we'd have the same
+            # problem on Catalyst::IOC line 73
 
             $components{$comp_name} = $comp;
         }
