@@ -308,9 +308,6 @@ sub _invoke_as_path {
 sub _find_component {
     my ( $self, $c, $component ) = @_;
 
-    # fugly, why doesn't ->component('MyApp') work?
-    return $c if ($component eq blessed($c));
-
     return blessed($component)
         ? $component
         : $c->component($component);
