@@ -2269,10 +2269,10 @@ sub setup_config {
 
     my %args = %{ $class->config || {} };
 
-    my @container_classes = ( "${class}::Container", 'Catalyst::IOC::Container');
-    unshift @container_classes, delete $args{container_class} if exists $args{container_class};
-
-    my $container_class = Class::MOP::load_first_existing_class(@container_classes);
+    my $container_class = exists $args{container_class}
+                        ? Class::MOP::load_class(delete $args{container_class})
+                        : Class::MOP::load_first_existing_class("${class}::Container", 'Catalyst::IOC::Container')
+                        ;
 
     my $container = $container_class->new( %args, application_name => "$class", name => "$class" );
     $class->container($container);
