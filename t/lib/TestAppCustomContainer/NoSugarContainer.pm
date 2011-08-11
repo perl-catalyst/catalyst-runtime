@@ -11,10 +11,10 @@ sub BUILD {
     warn("Add Bar to model");
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
-            name             => 'Bar',
+            name             => 'SingletonLifeCycle',
             lifecycle        => 'Singleton',
-            class            => 'TestAppCustomContainer::Model::Bar',
-            catalyst_component_name => 'TestAppCustomContainer::Model::Bar',
+            class            => 'TestAppCustomContainer::Model::SingletonLifeCycle',
+            catalyst_component_name => 'TestAppCustomContainer::Model::SingletonLifeCycle',
             dependencies     => {
                 application_name => depends_on( '/application_name' ),
                 foo => depends_on('/model/DefaultSetup'),

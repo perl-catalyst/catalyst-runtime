@@ -1,4 +1,4 @@
-package TestAppCustomContainer::Model::Bar;
+package TestAppCustomContainer::Model::SingletonLifeCycle;
 use Moose;
 extends 'Catalyst::Model';
 with 'TestAppCustomContainer::Role::HoldsFoo',
