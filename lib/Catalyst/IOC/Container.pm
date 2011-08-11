@@ -612,6 +612,9 @@ sub get_all_components {
     my $self = shift;
     my %components;
 
+    # FIXME - if we're getting from these containers, we need to either:
+    #   - pass 'ctx' and 'accept_context_args' OR
+    #   - make these params optional
     foreach my $type (qw/model view controller /) {
         my $container = $self->get_sub_container($type);
 
@@ -623,6 +626,17 @@ sub get_all_components {
                                                 # Just as it is called Model::Foo
                                                 # does not mean it has to be
                                                 # an instance of model::foo
+            # (André's answer)
+            # t0m, you're absolutely right, I really hadn't thought about it.
+            # But then, we have a problem: suppose there is a component called
+            # MyApp::M::Foo, for instance. The service name would be 'Foo',
+            # and it would be stored in the 'model' sub container. So we have
+            # $app_name . '::' . uc_first($type) . '::' . $service_name
+            # that would return MyApp::Model::Foo. It would get really, really
+            # ugly to check MyApp::M::Foo. So, either we change the hash key,
+            # or we drop support for ::[CMV]::, or I don't know, maybe you
+            # have a better solution? :)
+
             $components{$comp_name} = $comp;
         }
     }
