@@ -66,13 +66,19 @@ sub component {
 
     # FIXME - check $args{type} here!
 
+    my $component_name = join '::', (
+        $current_container->resolve(service => '/application_name'),
+        ucfirst($current_container->name),
+        $name
+    );
+
     my $service = Catalyst::IOC::ConstructorInjection->new(
         %args,
         name             => $name,
         lifecycle        => 'Singleton',
         # XX FIXME - needs to become possible to intuit catalyst_component_name
         #            from dependencies (like config)
-        catalyst_component_name => 'TestAppCustomContainer::Model::Bar',
+        catalyst_component_name => $component_name,
     );
     $current_container->add_service($service);
 }
