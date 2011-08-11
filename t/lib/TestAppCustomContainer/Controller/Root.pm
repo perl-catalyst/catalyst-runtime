@@ -26,7 +26,7 @@ sub get_model_baz :Local {
 
 sub get_model_foo :Local {
     my ($self, $c) = @_;
-    $c->res->body(ref $c->model('Foo'));
+    $c->res->body(ref $c->model('DefaultSetup'));
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -1,7 +1,7 @@
 package Catalyst::IOC;
 use strict;
 use warnings;
-use Bread::Board;
+use Bread::Board qw/depends_on/;
 use Catalyst::IOC::ConstructorInjection;
 
 # FIXME - All of these imports need to get the importing package
@@ -10,11 +10,13 @@ use Catalyst::IOC::ConstructorInjection;
 #         containers..
 use Sub::Exporter -setup => {
     exports => [qw/
+        depends_on
         component
         model
         container
     /],
     groups  => { default => [qw/
+        depends_on
         component
         model
         container
