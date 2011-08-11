@@ -592,16 +592,16 @@ sub find_component {
 }
 
 sub _find_component_regexp {
-    my ( $self, $component, @args ) = @_;
+    my ( $self, $component, $ctx, @args ) = @_;
     my @result;
 
-    my @components = grep { m{$component} } keys %{ $self->get_all_components };
+    my @components = grep { m{$component} } keys %{ $self->get_all_components($ctx) };
 
     for (@components) {
         my ($type, $name) = _get_component_type_name($_);
 
         push @result, $self->get_component_from_sub_container(
-            $type, $name, @args
+            $type, $name, $ctx, @args
         ) if $type;
     }
 
@@ -609,7 +609,7 @@ sub _find_component_regexp {
 }
 
 sub get_all_components {
-    my $self = shift;
+    my ($self, $class) = @_;
     my %components;
 
     # FIXME - if we're getting from these containers, we need to either:
@@ -619,10 +619,9 @@ sub get_all_components {
         my $container = $self->get_sub_container($type);
 
         for my $component ($container->get_service_list) {
-            my $comp = $container->get_service($component);
+            my $comp_service = $container->get_service($component);
 
-            # is this better?
-            $components{$comp->catalyst_component_name} = $comp->get;
+            $components{$comp_service->catalyst_component_name} = $comp_service->get(ctx => $class);
         }
     }
 
@@ -664,6 +663,7 @@ sub add_component {
     $accept_context_container->add_service(
         Catalyst::IOC::BlockInjection->new(
             name         => $name,
+            catalyst_component_name => $component,
             dependencies => [
                 depends_on( "/component/$component_service_name" ),
             ],

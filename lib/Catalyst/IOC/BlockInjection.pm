@@ -6,6 +6,10 @@ with 'Catalyst::IOC::Service::WithAcceptContext',
      'Catalyst::IOC::Service::WithParameters',
      'Bread::Board::Service::WithDependencies';
 
+has catalyst_component_name => (
+    is => 'ro',
+);
+
 __PACKAGE__->meta->make_immutable;
 
 no Moose; 1;

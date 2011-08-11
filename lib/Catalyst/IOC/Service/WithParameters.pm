@@ -12,7 +12,7 @@ sub _build_parameters {
         },
         accept_context_args => {
             isa      => 'ArrayRef',
-            required => 1,
+            default  => sub { [] },
         }
     };
 }
