@@ -619,27 +619,10 @@ sub get_all_components {
         my $container = $self->get_sub_container($type);
 
         for my $component ($container->get_service_list) {
-            my $comp = $container->resolve(
-                service => $component
-            );
-            my $comp_name = ref $comp || $comp; # THIS IS WRONG! :)
-                                                # Just as it is called Model::Foo
-                                                # does not mean it has to be
-                                                # an instance of model::foo
-            # (André's answer)
-            # t0m, you're absolutely right, I really hadn't thought about it.
-            # But then, we have a problem: suppose there is a component called
-            # MyApp::M::Foo, for instance. The service name would be 'Foo',
-            # and it would be stored in the 'model' sub container. So we have
-            # $app_name . '::' . uc_first($type) . '::' . $service_name
-            # that would return MyApp::Model::Foo. It would get really, really
-            # ugly to check MyApp::M::Foo. So, either we change the hash key,
-            # or we drop support for ::[CMV]::, or I don't know, maybe you
-            # have a better solution? :)
-            # maybe catalyst_component_name? But then we'd have the same
-            # problem on Catalyst::IOC line 73
+            my $comp = $container->get_service($component);
 
-            $components{$comp_name} = $comp;
+            # is this better?
+            $components{$comp->catalyst_component_name} = $comp->get;
         }
     }
 
