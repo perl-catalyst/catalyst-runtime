@@ -57,7 +57,26 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ## GSOC
 
+### Final steps for GSOC
+
+##### Things that work:
+
+##### Things that don't work:
+
+##### Need planning, have questions:
+
 ### Next steps - planned:
+
+  - some imports need to get the importing package in Catalyst::IOC
+
+  - test values directly instead of serializing them over http in t/lib/TestCustomContainer.pm
+
+  - 16:01 < shadowpaste> "t0m" at 217.168.150.38 pasted "more explicit? thoughts?" (13 lines) at http://paste.scsys.co.uk/131520
+
+  - make ACCEPT_CONTEXT and COMPONENT optional in Catalyst::IOC::BlockInjection and Catalyst::IOC::ConstructorInjection
+    - Create COMPONENTSingleton life cycle
+
+  - Back compat for Catalyst.pm moved methods (locate_components)
 
   - Test custom container
     - writing some tests which verify that the models you think should be
