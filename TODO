@@ -70,12 +70,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
       $c->model('Foo'), and that COMPONENT is called (or not called)
       as appropiate and that ACCEPT_CONTEXT is called (or not) as appropriate
 
-  - Kill flush_request_services
-    - we're already passing $ctx in when we locate services so the ::Request
-      lifecycle can just stash the object in, or retrieve the object from the
-      stash
-      (actually, we're not passing $ctx when we locate services. Problem!)
-
 ### Next steps - less planned:
 
   - Creating service()-like sugar for component
@@ -123,43 +117,12 @@ use Catalyst::IOC;
 
 1;
 
-##### To start with
-
-package MyApp::Container;
-use Moose;
-
-extends 'Catalyst::Container;
-
-after BUILD => sub {
-    my $self = shift;
-    my $model_container = $self->get_sub_container('model');
-    my $service = Catalyst::IOC::ConstructorInjection->new(
-        name      => 'Baz',
-        class     => 'MyApp::Model::Baz',
-        dependencies => [
-            depends_on( '/application_name' ),
-            depends_on( '/config' ),
-            depends_on( '/model/Foo' ),
-        ],
-        lifecycle => 'InstancePerContext',
-    );
-    $model_container->add_service( 'Foo', $service );
-};
-
 ### To polish off / t0m review
 
     locate_components service vs setup_components method
       - can we be more lazy?
       - should setup_components be a service that things like the ->component lookup
         can depend on?
-
-    -    my $accept_context_args = $self->param('accept_context_args');
-    +    my $accept_context_args = $params{accept_context_args};
-    ^^ This (may be) wrong! I am thinking the service should be allowed to mangle the 
-       accept_context args, no?
-       Without this change, the user could make a custom service which mangled the param, and use 
-       Catalyst/IOC/Service/WithAcceptContext.pm, with this change, that module will always see the
-       un-mangled version?? However, without this change, shit doesn't work...
 
 ### Known issues
 
