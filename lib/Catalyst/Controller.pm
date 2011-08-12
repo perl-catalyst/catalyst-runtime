@@ -154,6 +154,12 @@ around action_namespace => sub {
 
     my $class = ref($self) || $self;
     my $appclass = ref($c) || $c;
+
+    # FIXME - catalyst_component_name is no longer a class accessor, because
+    # 'MyApp as a controller' behavior is removed. But is this call to
+    # catalyst_component_name necessary, or is it always the same as $class?
+    my $component_name = ref($self) ? $self->catalyst_component_name : $self;
+
     if( ref($self) ){
         return $self->$orig if $self->has_action_namespace;
     } else {
@@ -175,7 +181,7 @@ around action_namespace => sub {
         }
     }
 
-    my $namespace = Catalyst::Utils::class2prefix($self->catalyst_component_name, $case_s) || '';
+    my $namespace = Catalyst::Utils::class2prefix($component_name, $case_s) || '';
     $self->$orig($namespace) if ref($self);
     return $namespace;
 };
