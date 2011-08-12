@@ -61,9 +61,49 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ##### Things that work:
 
+    - the default container loads all components, calls ACCEPT_CONTEXT() when appropriate, and COMPONENT() when appropriate, behaving like current Catalyst does
+
+    - its possible to create a custom container, and override the components you want. Lifecycle, class, dependencies, all overridable.
+
+    - config files are loaded without Catalyst::Plugin::ConfigLoader
+
+    - per request life cycle somewhat works
+
+    - external modules are loaded just using a custom container, much like Catalyst::Model::Adaptor
+
 ##### Things that don't work:
 
+    - expand_component_module
+
+    - loading two containers simultaneously
+
+    - sugar is still not completely implemented
+
+    - Some back compat
+        - wrappers around setup_component, setup_components, locate_components in Catalyst.pm
+        - $instance->expand_modules
+        - search_extra
+        - Crazy tests for things such as:
+           sub COMPONENT {
+             ...
+             *${appclass}::Model::TopLevel::GENERATED::ACCEPT_CONTEXT = sub { ... };
+             ...
+           }
+
 ##### Need planning, have questions:
+
+    - per request life cycle
+
+    - sugar - we should discuss the syntax with rafl and edenc
+
+    - when / when not COMPONENT should be called
+
+    - locate_components service vs setup_components method
+      - can we be more lazy?
+      - should setup_components be a service that things like the ->component lookup
+        can depend on?
+
+    - There are a few more FIXMEs, idk if any relevant here
 
 ### Next steps - planned:
 
@@ -135,19 +175,3 @@ use Catalyst::IOC;
     };
 
 1;
-
-### To polish off / t0m review
-
-    locate_components service vs setup_components method
-      - can we be more lazy?
-      - should setup_components be a service that things like the ->component lookup
-        can depend on?
-
-### Known issues
-
-    - Broken $instance->expand_modules() in setup_components and figure
-      out later how to bring it back
-
-    - expand_component_module
-
-    - People wrapping locate_components in Catalyst.pm
