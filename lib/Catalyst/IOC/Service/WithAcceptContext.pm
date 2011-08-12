@@ -17,6 +17,9 @@ around get => sub {
     my $instance = $self->$orig(@_);
 
     if ( $accept_context_args && $instance->can($ac_sub) ) {
+        # FIXME - MADNESS!
+        # how the heck does this warn CODE???????????
+        warn ref $accept_context_args if ref $accept_context_args ne 'ARRAY';
         return $instance->$ac_sub( @$accept_context_args );
     }
 
