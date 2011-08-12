@@ -108,6 +108,13 @@ sub BUILD {
     $self->add_sub_container(
         $self->build_model_subcontainer( @default_model )
     );
+
+    {
+        no strict 'refs';
+        my $class = ref $self;
+        warn("In build " . ${ $class . '::customise_container' });
+        ${ $class . '::customise_container' }->($self);
+    }
 }
 
 sub build_model_subcontainer {

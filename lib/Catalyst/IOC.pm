@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Bread::Board qw/depends_on/;
 use Catalyst::IOC::ConstructorInjection;
+no strict 'refs';
 
 # FIXME - All of these imports need to get the importing package
 #         as the customise_container and current_container variables
@@ -41,34 +42,34 @@ use Sub::Exporter -setup => {
 #Moose::Exporter->setup_import_methods(
 #    also => ['Bread::Board'],
 #);
-our $customise_container;
-our $current_container;
-
 sub container (&) {
     my $code = shift;
-    $customise_container = sub {
+    my $caller = caller;
+    ${"${caller}::customise_container"} = sub {
         warn("In customise container");
-        local $current_container = shift();
+        local ${"${caller}::current_container"} = shift;
         $code->();
     };
 }
 
 sub model (&) {
     my $code = shift;
-    local $current_container = $current_container->get_sub_container('model');
+    my $caller = caller;
+    local ${"${caller}::current_container"} = ${"${caller}::current_container"}->get_sub_container('model');
     $code->();
 }
 
 sub component {
     my ($name, %args) = @_;
+    my $caller = caller;
     $args{dependencies} ||= {};
     $args{dependencies}{application_name} = depends_on( '/application_name' );
 
     # FIXME - check $args{type} here!
 
     my $component_name = join '::', (
-        $current_container->resolve(service => '/application_name'),
-        ucfirst($current_container->name),
+        ${"${caller}::current_container"}->resolve(service => '/application_name'),
+        ucfirst(${"${caller}::current_container"}->name),
         $name
     );
 
@@ -80,7 +81,7 @@ sub component {
         #            from dependencies (like config)
         catalyst_component_name => $component_name,
     );
-    $current_container->add_service($service);
+    ${"${caller}::current_container"}->add_service($service);
 }
 
 1;

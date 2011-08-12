@@ -2,14 +2,7 @@ package TestAppCustomContainer::SugarContainer;
 use Moose;
 use namespace::autoclean;
 use Catalyst::IOC;
-use Bread::Board qw/ depends_on /;
 extends 'Catalyst::IOC::Container';
-
-sub BUILD {
-    my $self = shift;
-    warn("In build");
-    $Catalyst::IOC::customise_container->($self);
-}
 
 container {
     model {
