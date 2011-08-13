@@ -2,42 +2,73 @@
 
 5.90000 - UNRELEASED
 
- Fixed extensions:
+ Major changes in this release:
 
-  - A number of modules have been updated to pass their tests or not
+    The Catalyst::Engine classes have all been removed and deprecated,
+    to be replaced with Plack handlers.
+
+    Plack is an implementation of the PSGI specification, which is
+    a standard interface between web servers and application frameworks.
+
+    This should be no different for developers, and you should not have to
+    migrate your applications unless you are using a custom engine already.
+
+    This change benefits Catalyst significantly by reducing the amount of
+    code inside the framework, and means that the framework gets upstream
+    bug fixes in Plack, and automatically gains support for any web server
+    which a PSGI compliant handler is written for.
+
+    It also allows you more flexibility with your application, and allows
+    the use of cross web framework 'middleware'.
+
+    Developers are recommended to read Catalyst::Upgrading for notes about
+    upgrading, especially if you are using an unusual deployment method.
+
+    Documentation for how to take advantage of PSGI can be found in
+    Catalyst::PSGI, and information about deploying your application
+    has been moved to Catalyst::Manual::Deployment.
+
+    A number of modules have been updated to pass their tests or not
     produce deprecation warnings with the latest version of Catalyst.
+    It is recommended that you upgrade any of these that you are using
+    after installing this version of Catalyst.
 
-    These are:
+    These extensions are:
 
-    Test::WWW::Mechanize::Catalyst - has been updated to not produce
-        deprecation warnings.
+        Catalyst::Engine::HTTP::Prefork - this is now deprecated, see
+            Catalyst::Upgrading.
 
-    Catalyst::ActionRole::ACL - has been updated to fix failing tests
-        (although older versions still function perfectly with this
-        version of Catalyst).
+        Test::WWW::Mechanize::Catalyst - has been updated to not produce
+            deprecation warnings.
 
-    Catalyst::Plugin::Session::Store::DBIC - has been updated to fix
-        failing tests (although older versions still function perfectly
-        with this version of Catalyst).
+        Catalyst::ActionRole::ACL - has been updated to fix failing tests
+            (although older versions still function perfectly with this
+            version of Catalyst).
 
- Backward compatibility fixes:
+        Catalyst::Plugin::Session::Store::DBIC - has been updated to fix
+            failing tests (although older versions still function perfectly
+            with this version of Catalyst).
 
-  - Fix calling MyApp->engine_class to set the engine class manually.
+ Changelong since the last TRIAL release:
 
-  - Re-add a $res->headers->{status} field to Catalyst::Test responses.
-    This _should_ be accessed with $c->res->code instead, but is here
-    for backward compatibility.
+   Backward compatibility fixes:
 
- Documentation:
+    - Fix calling MyApp->engine_class to set the engine class manually.
 
-  - Documentation which was in the now removed Catalyst::Engine::* classes
-    has been moved to Catalyst::Manual::Deployment
+    - Re-add a $res->headers->{status} field to Catalyst::Test responses.
+      This _should_ be accessed with $c->res->code instead, but is here
+      for backward compatibility.
 
- Changes:
+   Documentation:
 
-  - nginx specific behaviour is removed as it is not needed with any
-    web server configuration I can come up with (recommended config is
-    documented in Catalst::Manual::Deployment::nginx::FastCGI)
+    - Documentation which was in the now removed Catalyst::Engine::* classes
+      has been moved to Catalyst::Manual::Deployment
+
+   Changes:
+
+    - nginx specific behaviour is removed as it is not needed with any
+      web server configuration I can come up with (recommended config is
+      documented in Catalst::Manual::Deployment::nginx::FastCGI)
 
 5.89003 2011-07-28 20:11:50 (TRIAL release)
 
