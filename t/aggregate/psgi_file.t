@@ -28,7 +28,7 @@ system($^X, '-I', "$FindBin::Bin/../lib", '-c', $path)
 #my $psgi_ref = require $path;
 # otherwise this test passes!
 # I don't exactly know why that is yet, however, to be safe for future, that
-# is why this test writes out it's own .psgi file in a temp directory - so that that
+# is why this test writes out its own .psgi file in a temp directory - so that that
 # path has never been require'd before, and will never be require'd again..
 
 local TestApp->config->{home} = $home;
