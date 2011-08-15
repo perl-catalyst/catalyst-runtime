@@ -46,12 +46,12 @@ sub BUILD {
         # DefaultSetup ACCEPT_CONTEXT called - total: 1
         ok(my ($res, $c) = ctx_request('/get_model_baz'), 'request');
         ok($res->is_success, 'request 2xx');
-        is($res->content, 'TestAppCustomContainer::Model::Baz', 'content is expected');
+        is($res->content, 'TestAppCustomContainer::Model::RequestLifeCycle', 'content is expected');
 
-        ok(my $baz = $c->container->get_sub_container('model')->resolve(service => 'Baz', parameters => { ctx => $c, accept_context_args => [$c] } ), 'fetching Baz');
-        isa_ok($baz, 'TestAppCustomContainer::Model::Baz');
+        ok(my $baz = $c->container->get_sub_container('model')->resolve(service => 'RequestLifeCycle', parameters => { ctx => $c, accept_context_args => [$c] } ), 'fetching RequestLifeCycle');
+        isa_ok($baz, 'TestAppCustomContainer::Model::RequestLifeCycle');
         is($baz->accept_context_called, 1, 'ACCEPT_CONTEXT called');
-        isa_ok($baz->foo, 'TestAppCustomContainer::Model::Foo', 'Baz got Foo ok');
+        isa_ok($baz->foo, 'TestAppCustomContainer::Model::Foo', 'RequestLifeCycle got Foo ok');
 
         # DefaultSetup ACCEPT_CONTEXT called - total: 2
         ok(get('/get_model_baz'), 'another request');

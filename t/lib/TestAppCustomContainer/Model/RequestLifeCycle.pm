@@ -1,4 +1,4 @@
-package TestAppCustomContainer::Model::Baz;
+package TestAppCustomContainer::Model::RequestLifeCycle;
 use Moose;
 extends 'Catalyst::Model';
 with 'TestAppCustomContainer::Role::HoldsFoo',

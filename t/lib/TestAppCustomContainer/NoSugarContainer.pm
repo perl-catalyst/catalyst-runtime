@@ -26,9 +26,9 @@ sub BUILD {
         # FIXME - i think it should be a ConstructorInjection
         # but only BlockInjection gets ctx parameter
         Catalyst::IOC::ConstructorInjection->new(
-            name         => 'Baz',
+            name         => 'RequestLifeCycle',
             lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
-            class        => 'TestAppCustomContainer::Model::Baz',
+            class        => 'TestAppCustomContainer::Model::RequestLifeCycle',
             dependencies => {
                 application_name => depends_on( '/application_name' ),
                 foo => depends_on('/model/DefaultSetup'),
