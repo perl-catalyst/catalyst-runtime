@@ -194,10 +194,6 @@ Reports are highly encouraged:
 
 =back
 
-=head2 Specifying the engine in the call to ->setup
-
-XXX FIXME
-
 =head2 Plack functionality
 
 See L<Catalyst::PSGI>.
