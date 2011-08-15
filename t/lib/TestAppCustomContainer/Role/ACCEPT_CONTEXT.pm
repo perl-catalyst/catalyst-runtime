@@ -12,12 +12,14 @@ has accept_context_called => (
     },
 );
 
-sub ACCEPT_CONTEXT {
-    my ( $self, $ctx, @args ) = @_;
+sub ACCEPT_CONTEXT {}
+
+around ACCEPT_CONTEXT => sub {
+    my ( $orig, $self, $ctx, @args ) = @_;
 
     $self->inc_accept_context_called;
 
-    return $self;
-}
+    return $self->$orig() || $self;
+};
 
 1;
