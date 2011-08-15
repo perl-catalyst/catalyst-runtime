@@ -9,9 +9,8 @@ Catalyst::PSGI - How Catalyst and PSGI work together
 The L<PSGI> specification defines an interface between web servers and
 Perl-based web applications and frameworks. It supports the writing of
 portable applications that can be run using various methods (as a
-standalone server, or using mod_perl, FastCGI, etc.). L<Plack> is a set
-of middleware tools for running Perl applications compatible with the
-PSGI specification.
+standalone server, or using mod_perl, FastCGI, etc.). L<Plack> is an
+implementation of the PSGI specification for running Perl applications.
 
 Catalyst used to contain an entire set of C<< Catalyst::Engine::XXXX >>
 classes to handle various web servers and environments (e.g. CGI,
@@ -64,8 +63,8 @@ L<http://search.cpan.org/dist/Plack/lib/Plack.pm#.psgi_files>
 
 =head2 What is in the .psgi file Catalyst generates by default?
 
-Catalyst generates an application which, if the C<< using_frontend_proxy
->> setting is on, is wrapped in L<Plack::Middleware::ReverseProxy>, and
+Catalyst generates an application which, if the C<using_frontend_proxy>
+setting is on, is wrapped in L<Plack::Middleware::ReverseProxy>, and
 contains some engine-specific fixes for uniform behaviour, as contained
 in:
 
