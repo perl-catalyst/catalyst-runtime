@@ -4,9 +4,15 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 
 =head1 DESCRIPTION
 
-This is an overview of the user-visible changes to Catalyst in version 5.8.
+This is an overview of the user-visible changes to Catalyst in version 5.9.
 
-=head2 Deprecations
+=head2
+
+=head1 PREVIOUS VERSIONS
+
+=head2 Catalyst 5.8
+
+=head3 Deprecations
 
 Please see L<Catalyst::Upgrading> for a full description of how changes in the
 framework may affect your application.
@@ -29,7 +35,7 @@ Below is a brief list of features which have been deprecated in this release:
 
 =back
 
-=head2 New features
+=head3 New features
 
 =head3 Dispatcher
 
@@ -84,7 +90,7 @@ Added code method as an alias for C<< $res->status >>
 
 =back
 
-=head2 Consequences of the Moose back end
+=head3 Consequences of the Moose back end
 
 =over
 
@@ -124,7 +130,7 @@ Your application class is forced to become immutable at the end of compilation.
 
 =back
 
-=head2 Bug fixes
+=head3 Bug fixes
 
 =over
 
