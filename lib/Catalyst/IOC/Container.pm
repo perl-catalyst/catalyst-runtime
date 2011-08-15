@@ -9,6 +9,7 @@ use Devel::InnerPackage ();
 use Hash::Util qw/lock_hash/;
 use MooseX::Types::LoadableClass qw/ LoadableClass /;
 use Moose::Util;
+use Scalar::Util qw/refaddr/;
 use Catalyst::IOC::BlockInjection;
 use Catalyst::IOC::ConstructorInjection;
 use Module::Pluggable::Object ();
@@ -111,6 +112,7 @@ sub BUILD {
 
     {
         no strict 'refs';
+        no warnings 'once';
         my $class = ref $self;
         warn("In build $class");
         ${ $class . '::customise_container' }->($self)
@@ -456,6 +458,20 @@ sub setup_components {
     my @comps = @{ $self->resolve( service => 'locate_components' ) };
     my %comps = map { $_ => 1 } @comps;
     my $deprecatedcatalyst_component_names = 0;
+
+    my $app_locate_components_addr = refaddr(
+        $class->can('locate_components')
+    );
+    my $cat_locate_components_addr = refaddr(
+        Catalyst->can('locate_components')
+    );
+
+    if ($app_locate_components_addr != $cat_locate_components_addr) {
+        $class->log->warn(qq{You have overridden locate_components. That } .
+            qq{no longer works. Please refer to the documentation to achieve } .
+            qq{similar results.\n}
+        );
+    }
 
     for my $component ( @comps ) {
 

@@ -2327,7 +2327,6 @@ sub locate_components {
         @{ $class->container->resolve( service => 'locate_components' ) };
 }
 
-
 =head2 $c->setup_dispatcher
 
 Sets up dispatcher.
