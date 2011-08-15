@@ -1,5 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90001 - 2011-08-15 22:42
+
+ Realise that we accidentally chopped a digit off the versioning scheme
+ without anyone noticing, which is a bad thing.
+
+ Feel like a fool. Well done t0m.
+
+ Cut another release.
+
 5.9000 - 2011-08-15 22:18
 
  See Catalyst::Delta for the major changes in this release.
