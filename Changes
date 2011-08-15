@@ -2,54 +2,9 @@
 
 5.9000 - UNRELEASED
 
- Major changes in this release:
+ See Catalyst::Delta for the major changes in this release.
 
-    The Catalyst::Engine classes have all been removed and deprecated,
-    to be replaced with Plack handlers.
-
-    Plack is an implementation of the PSGI specification, which is
-    a standard interface between web servers and application frameworks.
-
-    This should be no different for developers, and you should not have to
-    migrate your applications unless you are using a custom engine already.
-
-    This change benefits Catalyst significantly by reducing the amount of
-    code inside the framework, and means that the framework gets upstream
-    bug fixes in Plack, and automatically gains support for any web server
-    which a PSGI compliant handler is written for.
-
-    It also allows you more flexibility with your application, and allows
-    the use of cross web framework 'middleware'.
-
-    Developers are recommended to read Catalyst::Upgrading for notes about
-    upgrading, especially if you are using an unusual deployment method.
-
-    Documentation for how to take advantage of PSGI can be found in
-    Catalyst::PSGI, and information about deploying your application
-    has been moved to Catalyst::Manual::Deployment.
-
-    A number of modules have been updated to pass their tests or not
-    produce deprecation warnings with the latest version of Catalyst.
-    It is recommended that you upgrade any of these that you are using
-    after installing this version of Catalyst.
-
-    These extensions are:
-
-        Catalyst::Engine::HTTP::Prefork - this is now deprecated, see
-            Catalyst::Upgrading.
-
-        Test::WWW::Mechanize::Catalyst - has been updated to not produce
-            deprecation warnings.
-
-        Catalyst::ActionRole::ACL - has been updated to fix failing tests
-            (although older versions still function perfectly with this
-            version of Catalyst).
-
-        Catalyst::Plugin::Session::Store::DBIC - has been updated to fix
-            failing tests (although older versions still function perfectly
-            with this version of Catalyst).
-
- Changelong since the last TRIAL release:
+ Changelog since the last TRIAL release:
 
    Backward compatibility fixes:
 
