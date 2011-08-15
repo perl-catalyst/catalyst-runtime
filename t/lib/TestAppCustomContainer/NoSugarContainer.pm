@@ -8,7 +8,7 @@ extends 'Catalyst::IOC::Container';
 sub BUILD {
     my $self = shift;
 
-    warn("Add Bar to model");
+    warn("Add SingletonLifeCycle to model");
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name             => 'SingletonLifeCycle',
@@ -22,29 +22,19 @@ sub BUILD {
         )
     );
 
-#    $self->get_sub_container('model')->add_service(
-#        # FIXME - i think it should be a ConstructorInjection
-#        # but only BlockInjection gets ctx parameter
-#        Catalyst::IOC::BlockInjection->new(
-#            name         => 'Baz',
-#            lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
-#            dependencies => [
-#                Bread::Board::Dependency->new(
-#                    service_name => 'foo',
-#                    service_path => 'Foo',
-#
-#                    # FIXME - same as above
-#                    service_params => {
-#                        ctx => +{},
-#                        accept_context_args => [ +{} ],
-#                    },
-#                ),
-#            ],
-#            block => sub {
-#                TestAppCustomContainer::Model::Baz->new(foo => shift->param('foo'));
-#            },
-#        )
-#    );
+    $self->get_sub_container('model')->add_service(
+        # FIXME - i think it should be a ConstructorInjection
+        # but only BlockInjection gets ctx parameter
+        Catalyst::IOC::ConstructorInjection->new(
+            name         => 'Baz',
+            lifecycle    => '+Catalyst::IOC::LifeCycle::Request',
+            class        => 'TestAppCustomContainer::Model::Baz',
+            dependencies => {
+                application_name => depends_on( '/application_name' ),
+                foo => depends_on('/model/DefaultSetup'),
+            },
+        )
+    );
 
 # Broken deps!?!
 #    $self->get_sub_container('model')->add_service(

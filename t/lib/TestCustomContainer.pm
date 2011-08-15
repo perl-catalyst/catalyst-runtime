@@ -32,14 +32,15 @@ has sugar => (
 
 sub BUILD {
     my $self = shift;
+    my $app  = $self->app_name;
 
     $ENV{TEST_APP_CURRENT_CONTAINER} = $self->container_class;
 
     require Catalyst::Test;
-    Catalyst::Test->import($self->app_name);
+    Catalyst::Test->import($app);
 
-    is(get('/container_class'), $self->container_class, 'config is set properly');
-    is(get('/container_isa'), $self->container_class,   'and container isa our container class');
+    is($app->config('container_class'), $self->container_class, 'config is set properly');
+    isa_ok($app->container, $self->container_class, 'and container isa our container class');
 
     {
         # DefaultSetup ACCEPT_CONTEXT called - total: 1
@@ -51,10 +52,6 @@ sub BUILD {
         isa_ok($baz, 'TestAppCustomContainer::Model::Baz');
         is($baz->accept_context_called, 1, 'ACCEPT_CONTEXT called');
         isa_ok($baz->foo, 'TestAppCustomContainer::Model::Foo', 'Baz got Foo ok');
-
-#        ok(my $foo = $c->container->get_sub_container('component')->resolve(service => 'model_Foo'), 'fetching Foo');
-#        isa_ok($foo, 'TestAppCustomContainer::Model::Foo');
-#        is($foo->baz_got_it, 1, 'Baz accessed Foo once');
 
         # DefaultSetup ACCEPT_CONTEXT called - total: 2
         ok(get('/get_model_baz'), 'another request');
@@ -74,10 +71,6 @@ sub BUILD {
         # FIXME - is this expected behavior?
         is($bar->accept_context_called, 1, 'ACCEPT_CONTEXT called');
         isa_ok($bar->foo, 'TestAppCustomContainer::Model::Foo', 'Bar got Foo ok');
-
-#        ok(my $foo = $c->container->get_sub_container('component')->resolve(service => 'model_Foo'), 'fetching Foo');
-#        isa_ok($foo, 'TestAppCustomContainer::Model::Foo');
-#        is($foo->bar_got_it, 1, 'Bar accessed Foo once');
 
         # DefaultSetup ACCEPT_CONTEXT *not* called - total: 3
         ok(get('/get_model_bar'), 'another request');
