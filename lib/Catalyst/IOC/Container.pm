@@ -112,8 +112,9 @@ sub BUILD {
     {
         no strict 'refs';
         my $class = ref $self;
-        warn("In build " . ${ $class . '::customise_container' });
-        ${ $class . '::customise_container' }->($self);
+        warn("In build $class");
+        ${ $class . '::customise_container' }->($self)
+            if ${ $class . '::customise_container' };
     }
 }
 
