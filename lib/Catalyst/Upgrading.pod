@@ -141,7 +141,6 @@ In the simplest case:
 
 becomes
 
-    MyCatalystApp->setup_engine('PSGI');
     my $app = MyCatalystApp->psgi_app(@_);
 
 B<NOT>:
