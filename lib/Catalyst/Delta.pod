@@ -6,7 +6,7 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 
 This is an overview of the user-visible changes to Catalyst between major Catalyst releases.
 
-=head2 VERSION 5.9XXX 'cataplack'
+=head2 VERSION 5.9XXXX 'cataplack'
 
 The Catalyst::Engine sub-classes have all been removed and deprecated,
 to be replaced with Plack handlers.
@@ -65,7 +65,7 @@ function perfectly with this version of Catalyst).
 
 =head1 PREVIOUS VERSIONS
 
-=head2 VERSION 5.8XXX 'catamoose'
+=head2 VERSION 5.8XXXX 'catamoose'
 
 =head3 Deprecations
 
