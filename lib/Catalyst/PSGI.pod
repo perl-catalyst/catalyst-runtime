@@ -52,7 +52,7 @@ The simplest C<.psgi> file for an application called C<TestApp> would be:
     use warnings;
     use TestApp;
 
-    my $app = sub { TestApp->psgi_app(@_) };
+    my $app = TestApp->psgi_app(@_);
 
 Note that Catalyst will apply a number of middleware components for you
 automatically, and these B<will not> be applied if you manually create a
