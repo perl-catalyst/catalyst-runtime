@@ -156,6 +156,10 @@ any tests run via L<Catalyst::Test> will not be compatible with the new
 release, and will result in the development server starting, rather than
 the expected test running.
 
+B<NOTE:> If you are directly accessing C<< $c->req->env >> to get the PSGI
+environment then this accessor is moved to C<< $c->engine->env >>,
+you will need to update your code.
+
 =head2 Engines which are known to be broken
 
 The following engines B<DO NOT> work as of Catalyst version 5.9. The

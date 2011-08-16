@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Documentation fixes:
+
+    - Fix incorrect example in Catalyst::PSGI.
+    - Add note that if you are using the PSGI engine, then $c->req->env
+      needs to become $c->engine->env when you upgrade.
+
 5.90001 - 2011-08-15 22:42
 
  Realise that we accidentally chopped a digit off the versioning scheme
