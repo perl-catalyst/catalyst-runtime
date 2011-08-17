@@ -27,8 +27,8 @@ has config => (
 around resolve_dependencies => sub {
     my ($orig, $self, @args) = @_;
     my %deps = $self->$orig(@args);
-    use Data::Dumper;
-        warn("$self Resolve deps" . Data::Dumper::Dumper(\%deps));
+#    use Data::Dumper;
+#        warn("$self Resolve deps" . Data::Dumper::Dumper(\%deps));
     my $app_config = delete $deps{__catalyst_config};
     my $conf_key = Catalyst::Utils::class2classsuffix($self->catalyst_component_name);
     $self->_set_config($app_config->{$conf_key} || {});
@@ -42,7 +42,7 @@ sub get {
 
     my $params = $self->params;
     my %config = (%{ $self->config }, %{ $params });
-    warn(Data::Dumper::Dumper(\%config));
+#    warn(Data::Dumper::Dumper(\%config));
     $self->_clear_config;
 
     # FIXME - Is depending on the application name to pass into constructors here a good idea?
