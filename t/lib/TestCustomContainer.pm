@@ -43,52 +43,15 @@ sub BUILD {
     isa_ok($app->container, $self->container_class, 'and container isa our container class');
 
     {
-        # DefaultSetup ACCEPT_CONTEXT called - total: 1
         ok(my ($res, $c) = ctx_request('/'), 'request');
         ok($res->is_success, 'request 2xx');
         is($res->content, 'foo', 'content is expected');
 
-        ok(my $baz = $c->container->get_sub_container('model')->resolve(service => 'RequestLifeCycle', parameters => { ctx => $c, accept_context_args => [$c] } ), 'fetching RequestLifeCycle');
-        isa_ok($baz, 'TestAppCustomContainer::Model::RequestLifeCycle');
-        is($baz->accept_context_called, 1, 'ACCEPT_CONTEXT called');
-        isa_ok($baz->foo, 'TestAppCustomContainer::Model::Foo', 'RequestLifeCycle got Foo ok');
+        ok(my $model = $c->container->get_sub_container('model')->resolve(service => 'RequestLifeCycle', parameters => { ctx => $c, accept_context_args => [$c] } ), 'fetching RequestLifeCycle');
+        isa_ok($model, 'TestAppCustomContainer::Model::RequestLifeCycle');
 
-        # DefaultSetup ACCEPT_CONTEXT called - total: 2
-        ok(get('/get_model_baz'), 'another request');
-        is($baz->accept_context_called, 1, 'ACCEPT_CONTEXT not called again (instance per context)');
-#        is($foo->baz_got_it, 2, 'Baz accessed Foo again');
-    }
-
-    {
-        # DefaultSetup ACCEPT_CONTEXT called - total: 3
-        ok(my ($res, $c) = ctx_request('/get_model_bar'), 'request');
-        ok($res->is_success, 'request 2xx');
-        is($res->content, 'TestAppCustomContainer::Model::Bar', 'content is expected');
-
-        ok(my $bar = $c->container->get_sub_container('component')->resolve(service => 'model_Bar'), 'fetching Bar');
-        isa_ok($bar, 'TestAppCustomContainer::Model::Bar');
-
-        # FIXME - is this expected behavior?
-        is($bar->accept_context_called, 1, 'ACCEPT_CONTEXT called');
-        isa_ok($bar->foo, 'TestAppCustomContainer::Model::Foo', 'Bar got Foo ok');
-
-        # DefaultSetup ACCEPT_CONTEXT *not* called - total: 3
-        ok(get('/get_model_bar'), 'another request');
-        is($bar->accept_context_called, 1, 'ACCEPT_CONTEXT not called again (lifecycle is Singleton)');
-#        is($foo->bar_got_it, 1, 'Bar didn\'t access Foo again');
-    }
-
-    {
-        # DefaultSetup ACCEPT_CONTEXT called - total: 4
-        ok(my ($res, $c) = ctx_request('/get_model_foo'), 'request');
-        ok($res->is_success, 'request 2xx');
-        is($res->content, 'TestAppCustomContainer::Model::Foo', 'content is expected');
-
-#        ok(my $foo = $c->container->get_sub_container('component')->resolve(service => 'model_Foo'), 'fetching Foo');
-#        isa_ok($foo, 'TestAppCustomContainer::Model::Foo');
-#        is($foo->accept_context_called, 4, 'ACCEPT_CONTEXT called');
-#        is($foo->bar_got_it, 1, 'Bar accessed Foo once');
-#        is($foo->baz_got_it, 2, 'Baz accessed Foo twice');
+        ok(my $model2 = $c->model('RequestLifeCycle'), 'fetching RequestLifeCycle again');
+        is($model, $model2, 'object is not recreated during the same request');
     }
 
     done_testing;
