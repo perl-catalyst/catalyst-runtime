@@ -648,6 +648,8 @@ sub get_all_components {
         for my $component ($container->get_service_list) {
             my $comp_service = $container->get_service($component);
 
+            warn "getting  $component in $class, type $type";
+
             $components{$comp_service->catalyst_component_name} = $comp_service->get(ctx => $class);
         }
     }

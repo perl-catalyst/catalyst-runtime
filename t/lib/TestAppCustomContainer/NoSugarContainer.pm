@@ -31,6 +31,8 @@ sub BUILD {
             catalyst_component_name => 'TestAppCustomContainer::Model::RequestLifeCycle',
             dependencies => {
                 application_name => depends_on( '/application_name' ),
+                # FIXME - this is what is blowing up everything:
+                # DefaultSetup needs the context. It's not getting it here!
                 foo => depends_on('/model/DefaultSetup'),
             },
         )
