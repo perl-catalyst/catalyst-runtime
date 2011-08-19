@@ -17,7 +17,6 @@ sub BUILD {
             catalyst_component_name => 'TestAppCustomContainer::Model::SingletonLifeCycle',
             dependencies     => {
                 application_name => depends_on( '/application_name' ),
-                foo => depends_on('/model/DefaultSetup'),
             },
         )
     );
@@ -31,12 +30,24 @@ sub BUILD {
             catalyst_component_name => 'TestAppCustomContainer::Model::RequestLifeCycle',
             dependencies => {
                 application_name => depends_on( '/application_name' ),
-                # FIXME - this is what is blowing up everything:
-                # DefaultSetup needs the context. It's not getting it here!
-                foo => depends_on('/model/DefaultSetup'),
             },
         )
     );
+
+#    warn("Add DependsOnDefaultSetup to model");
+#    $self->get_sub_container('model')->add_service(
+#        Catalyst::IOC::ConstructorInjection->new(
+#            name             => 'DependsOnDefaultSetup',
+#            class            => 'TestAppCustomContainer::Model::DependsOnDefaultSetup',
+#            catalyst_component_name => 'TestAppCustomContainer::Model::DependsOnDefaultSetup',
+#            dependencies     => {
+#                application_name => depends_on( '/application_name' ),
+#                # FIXME - this is what is blowing up everything:
+#                # DefaultSetup needs the context. It's not getting it here!
+#                foo => depends_on('/model/DefaultSetup'),
+#            },
+#        )
+#    );
 
 # Broken deps!?!
 #    $self->get_sub_container('model')->add_service(
