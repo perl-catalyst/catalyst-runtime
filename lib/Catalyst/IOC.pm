@@ -65,6 +65,13 @@ sub component {
     $args{dependencies} ||= {};
     $args{dependencies}{application_name} = depends_on( '/application_name' );
 
+    my $lifecycle = $args{lifecycle};
+    my %catalyst_lifecycles = map { $_ => 1 } qw/ COMPONENTSingleton Request /;
+    $args{lifecycle} = $lifecycle
+                     ? $catalyst_lifecycles{$lifecycle} ? "+Catalyst::IOC::LifeCycle::$lifecycle" : $lifecycle
+                     : 'Singleton'
+                     ;
+
     # FIXME - check $args{type} here!
 
     my $component_name = join '::', (
@@ -75,10 +82,7 @@ sub component {
 
     my $service = Catalyst::IOC::ConstructorInjection->new(
         %args,
-        name             => $name,
-        lifecycle        => 'Singleton',
-        # XX FIXME - needs to become possible to intuit catalyst_component_name
-        #            from dependencies (like config)
+        name => $name,
         catalyst_component_name => $component_name,
     );
     ${"${caller}::current_container"}->add_service($service);
