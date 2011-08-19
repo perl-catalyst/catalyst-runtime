@@ -4,10 +4,15 @@ use warnings;
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
+use File::Temp qw/ tempdir /;
+use Cwd;
 use Test::More;
-use Test::Exception;
+use Try::Tiny;
 
 use Catalyst::Script::Server;
+
+my $cwd = getcwd;
+chdir(tempdir(CLEANUP => 1));
 
 my $testopts;
 
@@ -35,25 +40,34 @@ testOption( [ qw/--port 3001/ ], ['3001', undef, opthash()] );
     testOption( [ qw// ], [5000, undef, opthash()] );
 }
 
-# fork           -f -fork --fork           -f --fork
-testOption( [ qw/--fork/ ], ['3000', undef, opthash(fork => 1)] );
-testOption( [ qw/-f/ ], ['3000', undef, opthash(fork => 1)] );
+if (try { require Starman; 1; }) {
+    # fork           -f -fork --fork           -f --fork
+    testOption( [ qw/--fork/ ], ['3000', undef, opthash(fork => 1)] );
+    testOption( [ qw/-f/ ], ['3000', undef, opthash(fork => 1)] );
+}
 
-# pidfile        -pidfile                  --pid --pidfile
-testOption( [ qw/--pidfile cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
-testOption( [ qw/--pid cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
+if (try { require MooseX::Daemonize; 1; }) {
+    # pidfile        -pidfile                  --pid --pidfile
+    testOption( [ qw/--pidfile cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
+    testOption( [ qw/--pid cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
+}
 
-# keepalive      -k -keepalive --keepalive -k --keepalive
-testOption( [ qw/-k/ ], ['3000', undef, opthash(keepalive => 1)] );
-testOption( [ qw/--keepalive/ ], ['3000', undef, opthash(keepalive => 1)] );
+if (try { require Starman; 1; }) {
+    # keepalive      -k -keepalive --keepalive -k --keepalive
+    testOption( [ qw/-k/ ], ['3000', undef, opthash(keepalive => 1)] );
+    testOption( [ qw/--keepalive/ ], ['3000', undef, opthash(keepalive => 1)] );
+}
 
 # symlinks       -follow_symlinks          --sym --follow_symlinks
-testOption( [ qw/--follow_symlinks/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
+#
 testOption( [ qw/--sym/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
+testOption( [ qw/--follow_symlinks/ ], ['3000', undef, opthash(follow_symlinks => 1)] );
 
-# background     -background               --bg --background
-testOption( [ qw/--background/ ], ['3000', undef, opthash(background => 1)] );
-testOption( [ qw/--bg/ ], ['3000', undef, opthash(background => 1)] );
+if (try { require MooseX::Daemonize; 1; }) {
+    # background     -background               --bg --background
+    testBackgroundOptionWithFork( [ qw/--background/ ]);
+    testBackgroundOptionWithFork( [ qw/--bg/ ]);
+}
 
 # restart        -r -restart --restart     -R --restart
 testRestart( ['-r'], restartopthash() );
@@ -97,14 +111,48 @@ done_testing;
 sub testOption {
     my ($argstring, $resultarray) = @_;
     my $app = _build_testapp($argstring);
-    lives_ok {
+    try {
         $app->run;
+    }
+    catch {
+        fail $_;
     };
     # First element of RUN_ARGS will be the script name, which we don't care about
+
     shift @TestAppToTestScripts::RUN_ARGS;
+    my $server = pop @TestAppToTestScripts::RUN_ARGS;
+    like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';
+
+    my @run_args =  @TestAppToTestScripts::RUN_ARGS;
+    $run_args[-1]->{pidfile} = $run_args[-1]->{pidfile}->file->stringify
+      if scalar(@run_args) && $run_args[-1]->{pidfile};
+
+
     # Mangle argv into the options..
     $resultarray->[-1]->{argv} = $argstring;
-    is_deeply \@TestAppToTestScripts::RUN_ARGS, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
+    is_deeply \@run_args, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
+}
+
+sub testBackgroundOptionWithFork {
+    my ($argstring) = @_;
+
+    ## First, make sure we can get an app
+    my $app = _build_testapp($argstring);
+
+    ## Sorry, don't really fork since this cause trouble in Test::Aggregate
+    $app->meta->add_around_method_modifier('daemon_fork', sub { return; });
+
+    try {
+        $app->run;
+    }
+    catch {
+        fail $_;
+    };
+
+    ## Check a few args
+    is_deeply $app->{ARGV}, $argstring;
+    is $app->{port}, '3000';
+    is($app->{background}, 1);
 }
 
 sub testRestart {
@@ -123,9 +171,13 @@ sub _build_testapp {
     local @ARGV = @$argstring;
     local @TestAppToTestScripts::RUN_ARGS;
     my $i;
-    lives_ok {
+    try {
         $i = Catalyst::Script::Server->new_with_options(application_name => 'TestAppToTestScripts');
-    } "new_with_options " . join(' ', @$argstring);;
+        pass "new_with_options " . join(' ', @$argstring);
+    }
+    catch {
+        fail "new_with_options " . join(' ', @$argstring) . " " . $_;
+    };
     ok $i;
     return $i;
 }
@@ -153,3 +205,8 @@ sub restartopthash {
     };
     return $val;
 }
+
+chdir($cwd);
+
+1;
+

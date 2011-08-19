@@ -3,6 +3,8 @@ use Moose::Role;
 use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
 use MooseX::Getopt;
+use Catalyst::EngineLoader;
+use MooseX::Types::LoadableClass qw/LoadableClass/;
 use namespace::autoclean;
 
 with 'MooseX::Getopt' => {
@@ -18,6 +20,27 @@ has application_name => (
     isa      => Str,
     is       => 'ro',
     required => 1,
+);
+
+has loader_class => (
+    isa => LoadableClass,
+    is => 'ro',
+    coerce => 1,
+    default => 'Catalyst::EngineLoader',
+    documentation => 'The class to use to detect and load the PSGI engine',
+);
+
+has _loader => (
+    isa => 'Plack::Loader',
+    default => sub {
+        my $self = shift;
+        $self->loader_class->new(application_name => $self->application_name);
+    },
+    handles => {
+        load_engine => 'load',
+        autoload_engine => 'auto',
+    },
+    lazy => 1,
 );
 
 sub _getopt_spec_exception {}
@@ -42,11 +65,24 @@ sub _application_args {
     ()
 }
 
+sub _plack_loader_args {
+    my $self = shift;
+    my @app_args = $self->_application_args;
+    return (port => $app_args[0]);
+}
+
 sub _run_application {
     my $self = shift;
     my $app = $self->application_name;
     Class::MOP::load_class($app);
-    $app->run($self->_application_args);
+    my $server;
+    if (my $e = $self->can('_plack_engine_name') ) {
+        $server = $self->load_engine($self->$e, $self->_plack_loader_args);
+    }
+    else {
+        $server = $self->autoload_engine($self->_plack_loader_args);
+    }
+    $app->run($self->_application_args, $server);
 }
 
 1;

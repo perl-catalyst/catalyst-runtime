@@ -4,9 +4,70 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 
 =head1 DESCRIPTION
 
-This is an overview of the user-visible changes to Catalyst in version 5.8.
+This is an overview of the user-visible changes to Catalyst between major Catalyst releases.
 
-=head2 Deprecations
+=head2 VERSION 5.9XXXX 'cataplack'
+
+The Catalyst::Engine sub-classes have all been removed and deprecated,
+to be replaced with Plack handlers.
+
+Plack is an implementation of the L<PSGI> specification, which is
+a standard interface between web servers and application frameworks.
+
+This should be no different for developers, and you should not have to
+migrate your applications unless you are using a custom engine already.
+
+This change benefits Catalyst significantly by reducing the amount of
+code inside the framework, and means that the framework gets upstream
+bug fixes in L<Plack>, and automatically gains support for any web server
+which a L<PSGI> compliant handler is written for.
+
+It also allows you more flexibility with your application, and allows
+the use of cross web framework 'middleware'.
+
+Developers are recommended to read L<Catalyst::Upgrading> for notes about
+upgrading, especially if you are using an unusual deployment method.
+
+Documentation for how to take advantage of L<PSGI> can be found in
+L<Catalyst::PSGI>, and information about deploying your application
+has been moved to L<Catalyst::Manual::Deployment>.
+
+=head3 Updated modules:
+
+A number of modules have been updated to pass their tests or not
+produce deprecation warnings with the latest version of Catalyst.
+It is recommended that you upgrade any of these that you are using
+after installing this version of Catalyst.
+
+These extensions are:
+
+=over
+
+=item L<Catalyst::Engine::HTTP::Prefork>
+
+This is now deprecated, see L<Catalyst::Upgrading>.
+
+=item L<Test::WWW::Mechanize::Catalyst>
+
+Has been updated to not produce deprecation warnings, upgrade recommended.
+
+=item Catalyst::ActionRole::ACL
+
+Has been updated to fix failing tests (although older versions still
+function perfectly with this version of Catalyst).
+
+=item Catalyst::Plugin::Session::Store::DBIC
+
+Has been updated to fix failing tests (although older versions still
+function perfectly with this version of Catalyst).
+
+=back
+
+=head1 PREVIOUS VERSIONS
+
+=head2 VERSION 5.8XXXX 'catamoose'
+
+=head3 Deprecations
 
 Please see L<Catalyst::Upgrading> for a full description of how changes in the
 framework may affect your application.
@@ -29,7 +90,7 @@ Below is a brief list of features which have been deprecated in this release:
 
 =back
 
-=head2 New features
+=head3 New features
 
 =head3 Dispatcher
 
@@ -84,7 +145,7 @@ Added code method as an alias for C<< $res->status >>
 
 =back
 
-=head2 Consequences of the Moose back end
+=head3 Consequences of the Moose back end
 
 =over
 
@@ -124,7 +185,7 @@ Your application class is forced to become immutable at the end of compilation.
 
 =back
 
-=head2 Bug fixes
+=head3 Bug fixes
 
 =over
 

@@ -107,7 +107,7 @@ use Catalyst::Test ();
 
 # FIXME - These vhosts in tests tests should be somewhere else...
 
-sub customize { Catalyst::Test::_customize_request(@_) }
+sub customize { Catalyst::Test::_customize_request($_[0], {}, @_[1 .. $#_]) }
 
 {
     my $req = Catalyst::Utils::request('/dummy');
@@ -152,5 +152,9 @@ lives_ok {
 lives_ok {
     request(GET('/dummy'), []);
 } 'array additional param to request method ignored';
+
+my $res = request(GET('/'));
+is $res->code, 200, 'Response code 200';
+is $res->headers->{status}, 200, 'Back compat "status" header present';
 
 done_testing;

@@ -15,6 +15,8 @@ lives_ok {
     Catalyst::Script::CGI->new_with_options(application_name => 'TestAppToTestScripts')->run;
 } "new_with_options";
 shift @TestAppToTestScripts::RUN_ARGS;
+my $server = pop @TestAppToTestScripts::RUN_ARGS;
+like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';
 is_deeply \@TestAppToTestScripts::RUN_ARGS, [], "no args";
 
 done_testing;

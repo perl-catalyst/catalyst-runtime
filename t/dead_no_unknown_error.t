@@ -7,7 +7,6 @@ use lib "$Bin/lib";
 use Test::More tests => 1;
 
 use Catalyst ();
-use Catalyst::Engine::HTTP;
 eval {
     require TestAppUnknownError;
 };

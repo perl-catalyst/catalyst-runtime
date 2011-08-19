@@ -4,7 +4,7 @@ use Test::More;
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use TestApp;
-use Catalyst::Engine::CGI;
+use Catalyst::Engine;
 
 # mod_rewrite to app root for non / based app
 {
@@ -13,8 +13,8 @@ use Catalyst::Engine::CGI;
         SCRIPT_NAME => '/comics/dispatch.cgi',
         REQUEST_URI => '/comics/',
     );
-    is ''.$r->uri, 'http://www.foo.com/comics/', 'uri is correct';
-    is ''.$r->base, 'http://www.foo.com/comics/', 'base is correct';
+    is ''.$r->uri, 'http://www.foo.com/comics/';
+    is ''.$r->base, 'http://www.foo.com/comics/';
 }
 
 # mod_rewrite to sub path under app root for non / based app
@@ -46,8 +46,8 @@ use Catalyst::Engine::CGI;
         SCRIPT_NAME => '/~bobtfish/Gitalist/script/gitalist.cgi',
         REQUEST_URI => '/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F',
     );
-    is ''.$r->uri, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F', 'uri correct';
-    is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/', 'base correct';
+    is ''.$r->uri, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/%252F/%252F';
+    is ''.$r->base, 'http://www.foo.com/~bobtfish/Gitalist/script/gitalist.cgi/';
 }
 
 # Using rewrite rules to ask for a sub-path in your app.
@@ -85,20 +85,6 @@ use Catalyst::Engine::CGI;
     is ''.$r->uri, 'http://www.foo.com/oslobilder/%22foo%22', 'uri correct';
     is ''.$r->base, 'http://www.foo.com/oslobilder/', 'base correct';
 }
-
-# CGI hit on IIS for non / based app
-{
-    my $r = get_req(0,
-        SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
-        PATH_INFO => '/bobtfish/Gitalist/script/gitalist.cgi/static/css/blueprint/screen.css',
-        SCRIPT_NAME => '/bobtfish/Gitalist/script/gitalist.cgi',
-        PATH_TRANSLATED =>
-'C:\\Inetpub\\vhosts\\foo.com\\httpdocs\\bobtfish\\Gitalist\\script\\gitalist.cgi\\static\\css\\blueprint\\screen.css',
-    );
-    is ''.$r->uri, 'http://www.foo.com/bobtfish/Gitalist/script/gitalist.cgi/static/css/blueprint/screen.css';
-    is ''.$r->base, 'http://www.foo.com/bobtfish/Gitalist/script/gitalist.cgi/';
-}
-
 {
     my $r = get_req (0,
         PATH_INFO => '/auth/login',
@@ -125,6 +111,7 @@ use Catalyst::Engine::CGI;
     is $r->base, 'http://www.foo.com/', 'Base is correct';
 }
 
+
 # FIXME - Test proxy logic
 #       - Test query string
 #       - Test non standard port numbers
@@ -139,14 +126,14 @@ sub get_req {
         PATH_INFO => '/',
     );
 
-    local %ENV = (%template, @_);
-
+    my $engine = Catalyst::Engine->new(
+        env => { %template, @_ },
+    );
     my $i = TestApp->new;
     $i->setup_finished(0);
     $i->config(use_request_uri_for_path => $use_request_uri_for_path);
     $i->setup_finished(1);
-    $i->engine(Catalyst::Engine::CGI->new);
-    $i->engine->prepare_path($i);
+    $engine->prepare_path($i);
     return $i->req;
 }
 

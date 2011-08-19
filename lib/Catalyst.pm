@@ -27,8 +27,15 @@ use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
 use List::MoreUtils qw/uniq/;
 use attributes;
+use String::RewritePrefix;
+use Catalyst::EngineLoader;
 use utf8;
 use Carp qw/croak carp shortmess/;
+use Try::Tiny;
+use Plack::Middleware::Conditional;
+use Plack::Middleware::ReverseProxy;
+use Plack::Middleware::IIS6ScriptNameFix;
+use Plack::Middleware::LighttpdScriptNameFix;
 
 BEGIN { require 5.008004; }
 
@@ -65,19 +72,24 @@ our $GO        = Catalyst::Exception::Go->new;
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
+<<<<<<< HEAD
   for qw/container arguments dispatcher engine log dispatcher_class
   engine_class context_class request_class response_class stats_class
   setup_finished/;
+=======
+  for qw/components arguments dispatcher engine log dispatcher_class
+  engine_loader context_class request_class response_class stats_class
+  setup_finished _psgi_app loading_psgi_file/;
+>>>>>>> master
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
-__PACKAGE__->engine_class('Catalyst::Engine::CGI');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.80033';
+our $VERSION = '5.90001';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -954,7 +966,10 @@ sub setup {
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
     $class->setup_dispatcher( delete $flags->{dispatcher} );
-    $class->setup_engine( delete $flags->{engine} );
+    if (my $engine = delete $flags->{engine}) {
+        $class->log->warn("Specifying the engine in ->setup is no longer supported, see Catalyst::Upgrading");
+    }
+    $class->setup_engine();
     $class->setup_stats( delete $flags->{stats} );
 
     for my $flag ( sort keys %{$flags} ) {
@@ -1713,9 +1728,9 @@ sub finalize_headers {
         # get the length from a filehandle
         if ( blessed( $response->body ) && $response->body->can('read') || ref( $response->body ) eq 'GLOB' )
         {
-            my $stat = stat $response->body;
-            if ( $stat && $stat->size > 0 ) {
-                $response->content_length( $stat->size );
+            my $size = -s $response->body;
+            if ( $size ) {
+                $response->content_length( $size );
             }
             else {
                 $c->log->warn('Serving filehandle without a content-length');
@@ -1789,7 +1804,7 @@ sub handle_request {
 
     # Always expect worst case!
     my $status = -1;
-    eval {
+    try {
         if ($class->debug) {
             my $secs = time - $START || 1;
             my $av = sprintf '%.3f', $COUNT / $secs;
@@ -1800,12 +1815,11 @@ sub handle_request {
         my $c = $class->prepare(@arguments);
         $c->dispatch;
         $status = $c->finalize;
-    };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        $class->log->error(qq/Caught exception in engine "$error"/);
     }
+    catch {
+        chomp(my $error = $_);
+        $class->log->error(qq/Caught exception in engine "$error"/);
+    };
 
     $COUNT++;
 
@@ -1842,28 +1856,38 @@ sub prepare {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
 
-    #XXX reuse coderef from can
-    # Allow engine to direct the prepare flow (for POE)
-    if ( $c->engine->can('prepare') ) {
-        $c->engine->prepare( $c, @arguments );
-    }
-    else {
-        $c->prepare_request(@arguments);
-        $c->prepare_connection;
-        $c->prepare_query_parameters;
-        $c->prepare_headers;
-        $c->prepare_cookies;
-        $c->prepare_path;
+    try {
+        # Allow engine to direct the prepare flow (for POE)
+        if ( my $prepare = $c->engine->can('prepare') ) {
+            $c->engine->$prepare( $c, @arguments );
+        }
+        else {
+            $c->prepare_request(@arguments);
+            $c->prepare_connection;
+            $c->prepare_query_parameters;
+            $c->prepare_headers;
+            $c->prepare_cookies;
+            $c->prepare_path;
 
-        # Prepare the body for reading, either by prepare_body
-        # or the user, if they are using $c->read
-        $c->prepare_read;
+            # Prepare the body for reading, either by prepare_body
+            # or the user, if they are using $c->read
+            $c->prepare_read;
 
-        # Parse the body unless the user wants it on-demand
-        unless ( ref($c)->config->{parse_on_demand} ) {
-            $c->prepare_body;
+            # Parse the body unless the user wants it on-demand
+            unless ( ref($c)->config->{parse_on_demand} ) {
+                $c->prepare_body;
+            }
         }
     }
+    # VERY ugly and probably shouldn't rely on ->finalize actually working
+    catch {
+        # failed prepare is always due to an invalid request, right?
+        $c->response->status(400);
+        $c->response->content_type('text/plain');
+        $c->response->body('Bad Request');
+        $c->finalize;
+        die $_;
+    };
 
     my $method  = $c->req->method  || '';
     my $path    = $c->req->path;
@@ -2242,7 +2266,12 @@ Starts the engine.
 
 =cut
 
-sub run { my $c = shift; return $c->engine->run( $c, @_ ) }
+sub run {
+  my $app = shift;
+  $app->engine_loader->needs_psgi_engine_compat_hack ?
+    $app->engine->run($app, @_) :
+      $app->engine->run( $app, $app->_finalized_psgi_app, @_ );
+}
 
 =head2 $c->set_action( $action, $code, $namespace, $attrs )
 
@@ -2360,114 +2389,166 @@ Sets up engine.
 
 =cut
 
+sub engine_class {
+    my ($class, $requested_engine) = @_;
+
+    if (!$class->engine_loader || $requested_engine) {
+        $class->engine_loader(
+            Catalyst::EngineLoader->new({
+                application_name => $class,
+                (defined $requested_engine
+                     ? (requested_engine => $requested_engine) : ()),
+            }),
+        );
+    }
+    $class->engine_loader->catalyst_engine_class;
+}
+
 sub setup_engine {
-    my ( $class, $engine ) = @_;
+    my ($class, $requested_engine) = @_;
 
-    if ($engine) {
-        $engine = 'Catalyst::Engine::' . $engine;
-    }
+    my $engine = $class->engine_class($requested_engine);
 
-    if ( my $env = Catalyst::Utils::env_value( $class, 'ENGINE' ) ) {
-        $engine = 'Catalyst::Engine::' . $env;
-    }
-
-    if ( $ENV{MOD_PERL} ) {
-        my $meta = Class::MOP::get_metaclass_by_name($class);
-
-        # create the apache method
-        $meta->add_method('apache' => sub { shift->engine->apache });
-
-        my ( $software, $version ) =
-          $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
-
-        $version =~ s/_//g;
-        $version =~ s/(\.[^.]+)\./$1/g;
-
-        if ( $software eq 'mod_perl' ) {
-
-            if ( !$engine ) {
-
-                if ( $version >= 1.99922 ) {
-                    $engine = 'Catalyst::Engine::Apache2::MP20';
-                }
-
-                elsif ( $version >= 1.9901 ) {
-                    $engine = 'Catalyst::Engine::Apache2::MP19';
-                }
-
-                elsif ( $version >= 1.24 ) {
-                    $engine = 'Catalyst::Engine::Apache::MP13';
-                }
-
-                else {
-                    Catalyst::Exception->throw( message =>
-                          qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
-                }
-
-            }
-
-            # install the correct mod_perl handler
-            if ( $version >= 1.9901 ) {
-                *handler = sub  : method {
-                    shift->handle_request(@_);
-                };
-            }
-            else {
-                *handler = sub ($$) { shift->handle_request(@_) };
-            }
-
-        }
-
-        elsif ( $software eq 'Zeus-Perl' ) {
-            $engine = 'Catalyst::Engine::Zeus';
-        }
-
-        else {
-            Catalyst::Exception->throw(
-                message => qq/Unsupported mod_perl: $ENV{MOD_PERL}/ );
-        }
-    }
-
-    unless ($engine) {
-        $engine = $class->engine_class;
-    }
+    # Don't really setup_engine -- see _setup_psgi_app for explanation.
+    return if $class->loading_psgi_file;
 
     Class::MOP::load_class($engine);
 
-    # check for old engines that are no longer compatible
-    my $old_engine;
-    if ( $engine->isa('Catalyst::Engine::Apache')
-        && !Catalyst::Engine::Apache->VERSION )
-    {
-        $old_engine = 1;
+    if ($ENV{MOD_PERL}) {
+        my $apache = $class->engine_loader->auto;
+
+        my $meta = find_meta($class);
+        my $was_immutable = $meta->is_immutable;
+        my %immutable_options = $meta->immutable_options;
+        $meta->make_mutable if $was_immutable;
+
+        $meta->add_method(handler => sub {
+            my $r = shift;
+            my $psgi_app = $class->psgi_app;
+            $apache->call_app($r, $psgi_app);
+        });
+
+        $meta->make_immutable(%immutable_options) if $was_immutable;
     }
 
-    elsif ( $engine->isa('Catalyst::Engine::Server::Base')
-        && Catalyst::Engine::Server->VERSION le '0.02' )
-    {
-        $old_engine = 1;
-    }
-
-    elsif ($engine->isa('Catalyst::Engine::HTTP::POE')
-        && $engine->VERSION eq '0.01' )
-    {
-        $old_engine = 1;
-    }
-
-    elsif ($engine->isa('Catalyst::Engine::Zeus')
-        && $engine->VERSION eq '0.01' )
-    {
-        $old_engine = 1;
-    }
-
-    if ($old_engine) {
-        Catalyst::Exception->throw( message =>
-              qq/Engine "$engine" is not supported by this version of Catalyst/
-        );
-    }
-
-    # engine instance
     $class->engine( $engine->new );
+
+    return;
+}
+
+sub _finalized_psgi_app {
+    my ($app) = @_;
+
+    unless ($app->_psgi_app) {
+        my $psgi_app = $app->_setup_psgi_app;
+        $app->_psgi_app($psgi_app);
+    }
+
+    return $app->_psgi_app;
+}
+
+sub _setup_psgi_app {
+    my ($app) = @_;
+
+    for my $home (Path::Class::Dir->new($app->config->{home})) {
+        my $psgi_file = $home->file(
+            Catalyst::Utils::appprefix($app) . '.psgi',
+        );
+
+        next unless -e $psgi_file;
+
+        # If $psgi_file calls ->setup_engine, it's doing so to load
+        # Catalyst::Engine::PSGI. But if it does that, we're only going to
+        # throw away the loaded PSGI-app and load the 5.9 Catalyst::Engine
+        # anyway. So set a flag (ick) that tells setup_engine not to populate
+        # $c->engine or do any other things we might regret.
+
+        $app->loading_psgi_file(1);
+        my $psgi_app = Plack::Util::load_psgi($psgi_file);
+        $app->loading_psgi_file(0);
+
+        return $psgi_app
+            unless $app->engine_loader->needs_psgi_engine_compat_hack;
+
+        warn <<"EOW";
+Found a legacy Catalyst::Engine::PSGI .psgi file at ${psgi_file}.
+
+Its content has been ignored. Please consult the Catalyst::Upgrading
+documentation on how to upgrade from Catalyst::Engine::PSGI.
+EOW
+    }
+
+    return $app->apply_default_middlewares($app->psgi_app);
+}
+
+=head2 $c->apply_default_middlewares
+
+Adds the following L<Plack> middlewares to your application, since they are
+useful and commonly needed:
+
+L<Plack::Middleware::ReverseProxy>, (conditionally added based on the status
+of your $ENV{REMOTE_ADDR}, and can be forced on with C<using_frontend_proxy>
+or forced off with C<ignore_frontend_proxy>), L<Plack::Middleware::LighttpdScriptNameFix>
+(if you are using Lighttpd), L<Plack::Middleware::IIS6ScriptNameFix> (always
+applied since this middleware is smart enough to conditionally apply itself).
+
+Additionally if we detect we are using Nginx, we add a bit of custom middleware
+to solve some problems with the way that server handles $ENV{PATH_INFO} and
+$ENV{SCRIPT_NAME}
+
+=cut
+
+
+sub apply_default_middlewares {
+    my ($app, $psgi_app) = @_;
+
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
+        condition => sub {
+            my ($env) = @_;
+            return if $app->config->{ignore_frontend_proxy};
+            return $env->{REMOTE_ADDR} eq '127.0.0.1'
+                || $app->config->{using_frontend_proxy};
+        },
+    );
+
+    my $server_matches = sub {
+        my ($re) = @_;
+        return sub {
+            my ($env) = @_;
+            my $server = $env->{SERVER_SOFTWARE};
+            return unless $server;
+            return $server =~ $re ? 1 : 0;
+        };
+    };
+
+    # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
+    # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
+    $psgi_app = Plack::Middleware::LighttpdScriptNameFix->wrap($psgi_app);
+
+    # we're applying this unconditionally as the middleware itself already makes
+    # sure it doesn't fuck things up if it's not running under one of the right
+    # IIS versions
+    $psgi_app = Plack::Middleware::IIS6ScriptNameFix->wrap($psgi_app);
+
+    return $psgi_app;
+}
+
+=head2 $c->psgi_app
+
+Returns a PSGI application code reference for the catalyst application
+C<$c>. This is the bare application without any middlewares
+applied. C<${myapp}.psgi> is not taken into account.
+
+This is what you want to be using to retrieve the PSGI application code
+reference of your Catalyst application for use in F<.psgi> files.
+
+=cut
+
+sub psgi_app {
+    my ($app) = @_;
+    return $app->engine->build_psgi_app($app);
 }
 
 =head2 $c->setup_home
@@ -2739,8 +2820,46 @@ to be shown in hit debug tables in the test server.
 =item *
 
 C<use_request_uri_for_path> - Controlls if the C<REQUEST_URI> or C<PATH_INFO> environment
-variable should be used for determining the request path. See L<Catalyst::Engine::CGI/PATH DECODING>
-for more information.
+variable should be used for determining the request path. 
+
+Most web server environments pass the requested path to the application using environment variables,
+from which Catalyst has to reconstruct the request base (i.e. the top level path to / in the application,
+exposed as C<< $c->request->base >>) and the request path below that base.
+
+There are two methods of doing this, both of which have advantages and disadvantages. Which method is used
+is determined by the C<< $c->config(use_request_uri_for_path) >> setting (which can either be true or false).
+
+=over
+
+=item use_request_uri_for_path => 0
+
+This is the default (and the) traditional method that Catalyst has used for determining the path information.
+The path is synthesised from a combination of the C<PATH_INFO> and C<SCRIPT_NAME> environment variables.
+The allows the application to behave correctly when C<mod_rewrite> is being used to redirect requests
+into the application, as these variables are adjusted by mod_rewrite to take account for the redirect.
+
+However this method has the major disadvantage that it is impossible to correctly decode some elements
+of the path, as RFC 3875 says: "C<< Unlike a URI path, the PATH_INFO is not URL-encoded, and cannot
+contain path-segment parameters. >>" This means PATH_INFO is B<always> decoded, and therefore Catalyst
+can't distinguish / vs %2F in paths (in addition to other encoded values).
+
+=item use_request_uri_for_path => 1
+
+This method uses the C<REQUEST_URI> and C<SCRIPT_NAME> environment variables. As C<REQUEST_URI> is never
+decoded, this means that applications using this mode can correctly handle URIs including the %2F character
+(i.e. with C<AllowEncodedSlashes> set to C<On> in Apache).
+
+Given that this method of path resolution is provably more correct, it is recommended that you use
+this unless you have a specific need to deploy your application in a non-standard environment, and you are
+aware of the implications of not being able to handle encoded URI paths correctly.
+
+However it also means that in a number of cases when the app isn't installed directly at a path, but instead
+is having paths rewritten into it (e.g. as a .cgi/fcgi in a public_html directory, with mod_rewrite in a
+.htaccess file, or when SSI is used to rewrite pages into the app, or when sub-paths of the app are exposed
+at other URIs than that which the app is 'normally' based at with C<mod_rewrite>), the resolution of
+C<< $c->request->base >> will be incorrect.
+
+=back
 
 =item *
 
