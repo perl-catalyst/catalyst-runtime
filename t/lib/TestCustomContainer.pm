@@ -42,16 +42,40 @@ sub BUILD {
     is($app->config->{container_class}, $self->container_class, 'config is set properly');
     isa_ok($app->container, $self->container_class, 'and container isa our container class');
 
+    # RequestLifeCycle
     {
-        ok(my ($res, $c) = ctx_request('/'), 'request');
+        # just to be sure the app is not broken
+        ok(my ($res, $ctx) = ctx_request('/'), 'request');
         ok($res->is_success, 'request 2xx');
         is($res->content, 'foo', 'content is expected');
 
-        ok(my $model = $c->container->get_sub_container('model')->resolve(service => 'RequestLifeCycle', parameters => { ctx => $c, accept_context_args => [$c] } ), 'fetching RequestLifeCycle');
+        ok(my $model = $ctx->container->get_sub_container('model')->resolve(service => 'RequestLifeCycle', parameters => { ctx => $ctx, accept_context_args => [$ctx] } ), 'fetching RequestLifeCycle');
         isa_ok($model, 'TestAppCustomContainer::Model::RequestLifeCycle');
 
-        ok(my $model2 = $c->model('RequestLifeCycle'), 'fetching RequestLifeCycle again');
+        ok(my $model2 = $ctx->model('RequestLifeCycle'), 'fetching RequestLifeCycle again');
         is($model, $model2, 'object is not recreated during the same request');
+
+        # another request
+        my ($res2, $ctx2) = ctx_request('/');
+        ok($model2 = $ctx2->model('RequestLifeCycle'), 'fetching RequestLifeCycle again');
+        isnt($model, $model2, 'object is recreated in a different request');
+    }
+
+    # SingletonLifeCycle
+    {
+        # already tested, I only need the $ctx
+        my ($res, $ctx) = ctx_request('/');
+
+        ok(my $model = $ctx->container->get_sub_container('model')->resolve(service => 'SingletonLifeCycle', parameters => { ctx => $ctx, accept_context_args => [$ctx] } ), 'fetching SingletonLifeCycle');
+        isa_ok($model, 'TestAppCustomContainer::Model::SingletonLifeCycle');
+
+        ok(my $model2 = $ctx->model('SingletonLifeCycle'), 'fetching SingletonLifeCycle again');
+        is($model, $model2, 'object is not recreated during the same request');
+
+        # another request
+        my ($res2, $ctx2) = ctx_request('/');
+        ok($model2 = $ctx2->model('SingletonLifeCycle'), 'fetching SingletonLifeCycle again');
+        is($model, $model2, 'object is not recreated in a different request');
     }
 
     done_testing;
