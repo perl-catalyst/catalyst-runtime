@@ -37,8 +37,8 @@ around resolve_dependencies => sub {
 
 sub get {
     my $self = shift;
-    warn("In get $self");
     my $component   = $self->class;
+    warn("In get $component");
 
     my $params = $self->params;
     my %config = (%{ $self->config }, %{ $params });
