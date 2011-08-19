@@ -1,9 +1,7 @@
 package Catalyst::IOC::LifeCycle::Request;
 use Moose::Role;
 use namespace::autoclean;
-use Carp;
 with 'Bread::Board::LifeCycle';
-use Data::Dumper;
 
 around get => sub {
     my $orig   = shift;
@@ -14,6 +12,11 @@ around get => sub {
             ? $params->{ctx}
             : undef
             ;
+
+    # FIXME - this makes absolutely no sense
+    # dispatcher wants the object (through container->get_all_components)
+    # but doesn't have the context. Builder *needs* the context!!
+    # What to do???
     return $self->$orig(@_) unless $ctx;
 
     my $stash_key = "__Catalyst_IOC_LifeCycle_Request_" . $self->name;
