@@ -41,7 +41,7 @@ sub get {
     warn("In get $component");
 
     my $params = $self->params;
-    my %config = (%{ $self->config }, %{ $params });
+    my %config = (%{ $self->config || {} }, %{ $params });
 #    warn(Data::Dumper::Dumper(\%config));
     $self->_clear_config;
 
