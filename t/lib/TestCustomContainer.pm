@@ -39,7 +39,7 @@ sub BUILD {
     require Catalyst::Test;
     Catalyst::Test->import($app);
 
-    is($app->config('container_class'), $self->container_class, 'config is set properly');
+    is($app->config->{container_class}, $self->container_class, 'config is set properly');
     isa_ok($app->container, $self->container_class, 'and container isa our container class');
 
     {
