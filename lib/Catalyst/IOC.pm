@@ -29,14 +29,18 @@ sub container (&) {
     };
 }
 
-sub model (&) {
-    my $code = shift;
-    my $caller = caller;
-    local ${"${caller}::current_container"} = ${"${caller}::current_container"}->get_sub_container('model');
+sub model (&)      { _subcontainer( shift, caller, 'model' )      }
+sub view (&)       { _subcontainer( shift, caller, 'view' )       }
+sub controller (&) { _subcontainer( shift, caller, 'controller' ) }
+
+sub _subcontainer (&$$) {
+    my ( $code, $caller, $subcontainer ) = @_;
+    local ${"${caller}::current_container"} =
+        ${"${caller}::current_container"}->get_sub_container($subcontainer);
     $code->();
 }
 
-sub component {
+sub component ($;%) {
     my ($name, %args) = @_;
     my $caller = caller;
     $args{dependencies} ||= {};
@@ -115,6 +119,16 @@ Catalyst::IOC - IOC for Catalyst, based on Bread::Board
 =head1 DESCRIPTION
 
 =head1 METHODS
+
+=head2 container
+
+=head2 model
+
+=head2 view
+
+=head2 controller
+
+=head2 component
 
 =head1 AUTHORS
 
