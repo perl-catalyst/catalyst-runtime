@@ -465,6 +465,7 @@ sub setup_components {
     );
 
     if ($app_locate_components_addr != $cat_locate_components_addr) {
+        # FIXME - why not just say: @comps = $class->locate_components() ?
         $class->log->warn(qq{You have overridden locate_components. That } .
             qq{no longer works. Please refer to the documentation to achieve } .
             qq{similar results.\n}
@@ -735,7 +736,7 @@ Catalyst::Container - IOC for Catalyst components
 
 =head1 METHODS
 
-=head1 Building Containers
+=head1 Methods for Building Containers
 
 =head2 build_component_subcontainer
 
@@ -758,7 +759,7 @@ Same as L<build_model_subcontainer>, but for views.
 
 Same as L<build_model_subcontainer>, but for controllers.
 
-=head1 Building Services
+=head1 Methods for Building Services
 
 =head2 build_application_name_service
 
@@ -917,6 +918,9 @@ Components found by C<locate_components> will be passed to this method, which
 is expected to return a list of component (package) names to be set up.
 
 =head2 setup_components
+
+Uses locate_components service to list the components, and adds them to the
+appropriate subcontainers, using add_component().
 
 =head1 AUTHORS
 
