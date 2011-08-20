@@ -2334,10 +2334,6 @@ sub setup_components { shift->container->setup_components }
 
 =cut
 
-# FIXME - removed locate_components
-# don't people mess with this method directly?
-# what to do with that?
-
 sub locate_components {
     my $class = shift;
 
