@@ -10,12 +10,16 @@ use Sub::Exporter -setup => {
         depends_on
         component
         model
+        view
+        controller
         container
     /],
     groups  => { default => [qw/
         depends_on
         component
         model
+        view
+        controller
         container
     /]},
 };
@@ -82,53 +86,69 @@ Catalyst::IOC - IOC for Catalyst, based on Bread::Board
 =head1 SYNOPSIS
 
     package MyApp::Container;
+    use Moose;
     use Catalyst::IOC;
+    extends 'Catalyst::IOC::Container';
 
-    sub BUILD {
-        my $self = shift;
+    container {
+        model {
+            # default component
+            component Foo => ();
 
-        container $self => as {
-            container model => as {
+            # model Bar needs model Foo to be built before
+            # and Bar's constructor gets Foo as a parameter
+            component Bar => ( dependencies => [
+                depends_on('/model/Foo'),
+            ]);
 
-                # default component
-                component Foo => ();
+            # Baz is rebuilt once per HTTP request
+            component Baz => ( lifecycle => 'Request' );
 
-                # model Bar needs model Foo to be built before
-                # and Bar's constructor gets Foo as a parameter
-                component Bar => ( dependencies => [
-                    depends_on('/model/Foo'),
-                ]);
+            # built only once per application life time
+            component Quux => ( lifecycle => 'Singleton' );
 
-                # Baz is rebuilt once per HTTP request
-                component Baz => ( lifecycle => 'Request' );
-
-                # built only once per application life time
-                component Quux => ( lifecycle => 'Singleton' );
-
-                # built once per app life time and uses an external model,
-                # outside the default directory
-                # no need for wrappers or Catalyst::Model::Adaptor
-                component Fnar => (
-                    lifecycle => 'Singleton',
-                    class => 'My::External::Class',
-                );
-            };
-        }
+            # built once per app life time and uses an external model,
+            # outside the default directory
+            # no need for wrappers or Catalyst::Model::Adaptor
+            component Fnar => (
+                lifecycle => 'Singleton',
+                class => 'My::External::Class',
+            );
+        };
+        view {
+            component HTML => ();
+        };
+        controller {
+            component Root => ();
+        };
     }
 
 =head1 DESCRIPTION
+
+Catalyst::IOC provides "sugar" methods to extend the behavior of the default
+Catalyst container.
 
 =head1 METHODS
 
 =head2 container
 
+Sets up the root container to be customised.
+
 =head2 model
+
+Sets up the model container to be customised.
 
 =head2 view
 
+Sets up the view container to be customised.
+
 =head2 controller
 
+Sets up the controller container to be customised.
+
 =head2 component
+
+Adds a component to the subcontainer. Works like L<Bread::Board::service>.
 
 =head1 AUTHORS
 
