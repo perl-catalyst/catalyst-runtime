@@ -8,7 +8,6 @@ extends 'Catalyst::IOC::Container';
 sub BUILD {
     my $self = shift;
 
-    warn("Add SingletonLifeCycle to model");
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name             => 'SingletonLifeCycle',
@@ -21,7 +20,6 @@ sub BUILD {
         )
     );
 
-    warn("Add RequestLifeCycle to model");
     $self->get_sub_container('model')->add_service(
         Catalyst::IOC::ConstructorInjection->new(
             name         => 'RequestLifeCycle',
@@ -34,7 +32,6 @@ sub BUILD {
         )
     );
 
-#    warn("Add DependsOnDefaultSetup to model");
 #    $self->get_sub_container('model')->add_service(
 #        Catalyst::IOC::ConstructorInjection->new(
 #            name             => 'DependsOnDefaultSetup',

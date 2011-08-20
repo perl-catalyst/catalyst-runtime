@@ -8,8 +8,11 @@ extends 'Bread::Board::ConstructorInjection';
 
 sub BUILD {
     my $self = shift;
-    $self->add_dependency(__catalyst_config => Bread::Board::Dependency->new(service_path => '/config'));
-    warn("Added dependency for config in " . $self->class);
+    $self->add_dependency(
+        __catalyst_config => Bread::Board::Dependency->new(
+            service_path => '/config'
+        )
+    );
 }
 
 has catalyst_component_name => (
@@ -27,8 +30,6 @@ has config => (
 around resolve_dependencies => sub {
     my ($orig, $self, @args) = @_;
     my %deps = $self->$orig(@args);
-#    use Data::Dumper;
-#        warn("$self Resolve deps" . Data::Dumper::Dumper(\%deps));
     my $app_config = delete $deps{__catalyst_config};
     my $conf_key = Catalyst::Utils::class2classsuffix($self->catalyst_component_name);
     $self->_set_config($app_config->{$conf_key} || {});
@@ -38,11 +39,9 @@ around resolve_dependencies => sub {
 sub get {
     my $self = shift;
     my $component   = $self->class;
-    warn("In get $component");
 
     my $params = $self->params;
     my %config = (%{ $self->config || {} }, %{ $params });
-#    warn(Data::Dumper::Dumper(\%config));
     $self->_clear_config;
 
     # FIXME - Is depending on the application name to pass into constructors here a good idea?

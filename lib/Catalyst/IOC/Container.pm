@@ -114,7 +114,6 @@ sub BUILD {
         no strict 'refs';
         no warnings 'once';
         my $class = ref $self;
-        warn("In build $class");
         ${ $class . '::customise_container' }->($self)
             if ${ $class . '::customise_container' };
     }
@@ -453,7 +452,6 @@ sub build_locate_components_service {
 
 sub setup_components {
     my $self = shift;
-    warn("Setting up default components");
     my $class = $self->resolve( service => 'application_name' );
     my @comps = @{ $self->resolve( service => 'locate_components' ) };
     my %comps = map { $_ => 1 } @comps;
@@ -647,8 +645,6 @@ sub get_all_components {
 
         for my $component ($container->get_service_list) {
             my $comp_service = $container->get_service($component);
-
-            warn "getting  $component in $class, type $type";
 
             $components{$comp_service->catalyst_component_name} = $comp_service->get(ctx => $class);
         }

@@ -5,10 +5,6 @@ use Bread::Board qw/depends_on/;
 use Catalyst::IOC::ConstructorInjection;
 no strict 'refs';
 
-# FIXME - All of these imports need to get the importing package
-#         as the customise_container and current_container variables
-#         NEED to be in the containers package so there can be multiple
-#         containers..
 use Sub::Exporter -setup => {
     exports => [qw/
         depends_on
@@ -23,30 +19,11 @@ use Sub::Exporter -setup => {
         container
     /]},
 };
-#use Sub::Exporter -setup => [
-#    qw(
-#        Bread::Board::as
-#        Bread::Board::container
-#        Bread::Board::depends_on
-#        Bread::Board::service
-#        Bread::Board::alias
-#        Bread::Board::wire_names
-#        Bread::Board::include
-#        Bread::Board::typemap
-#        Bread::Board::infer
-#    )
-#];
-# I'm probably doing it wrong.
-# Anyway, I'll just use Moose::Exporter. Do I really have to use Sub::Exporter?
-#use Moose::Exporter;
-#Moose::Exporter->setup_import_methods(
-#    also => ['Bread::Board'],
-#);
+
 sub container (&) {
     my $code = shift;
     my $caller = caller;
     ${"${caller}::customise_container"} = sub {
-        warn("In customise container");
         local ${"${caller}::current_container"} = shift;
         $code->();
     };
@@ -89,8 +66,6 @@ sub component {
 }
 
 1;
-
-# FIXME - should the code example below be on this file or Catalyst::IOC::Container?
 
 __END__
 
