@@ -72,15 +72,9 @@ our $GO        = Catalyst::Exception::Go->new;
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
-<<<<<<< HEAD
   for qw/container arguments dispatcher engine log dispatcher_class
-  engine_class context_class request_class response_class stats_class
-  setup_finished/;
-=======
-  for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app loading_psgi_file/;
->>>>>>> master
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
