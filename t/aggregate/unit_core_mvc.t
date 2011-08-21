@@ -20,7 +20,6 @@ foreach my $comp (@complist) {
     );
 }
 our $warnings = 0;
-our $loaded   = 0;
 
 Moose::Meta::Class->create('Some::Test::Object');
 
@@ -49,17 +48,12 @@ Moose::Meta::Class->create(
         );
     };
     local *Catalyst::Log::warn = sub { $warnings++ };
-    *Class::MOP::load_class = sub {
-        my $class = shift;
-        $loaded++
-            if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestApp/
-    };
 
     __PACKAGE__->setup;
 }
 
 ok( $warnings, 'Issues deprecated warnings' );
-is( $loaded, scalar @complist + 1, 'Loaded all components' );
+is( @{[ MyMVCTestApp->component_list ]}, scalar @complist + 1, 'Loaded all components' );
 
 is( MyMVCTestApp->view('View'), 'MyMVCTestApp::V::View', 'V::View ok' );
 
@@ -161,11 +155,6 @@ our @complist_default_view =
         );
     };
     local *Catalyst::Log::warn = sub { $warnings++ };
-    *Class::MOP::load_class = sub {
-        my $class = shift;
-        $loaded++
-            if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultView/
-    };
 
     __PACKAGE__->config( default_view => 'V' );
 
@@ -197,11 +186,6 @@ our @complist_default_model =
         );
     };
     local *Catalyst::Log::warn = sub { $warnings++ };
-    *Class::MOP::load_class = sub {
-        my $class = shift;
-        $loaded++
-            if Class::MOP::is_class_loaded($class) && $class =~ /^MyMVCTestAppDefaultModel/
-    };
 
     __PACKAGE__->config( default_model => 'M' );
 
@@ -289,10 +273,6 @@ is( MyMVCTestAppDefaultModel->model , 'MyMVCTestAppDefaultModel::Model::M', 'def
     use base qw/Catalyst/;
 
     no warnings 'redefine';
-
-    *Class::MOP::load_class = sub {
-        $loaded++;
-    };
 
     __PACKAGE__->config( { disable_component_resolution_regex_fallback => 1 } );
 
