@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Bread::Board qw/depends_on/;
 use Catalyst::IOC::ConstructorInjection;
-no strict 'refs';
 
 use Sub::Exporter -setup => {
     exports => [qw/
@@ -27,18 +26,22 @@ use Sub::Exporter -setup => {
 sub container (&) {
     my $code = shift;
     my $caller = caller;
+
+    no strict 'refs';
     ${"${caller}::customise_container"} = sub {
         local ${"${caller}::current_container"} = shift;
         $code->();
     };
 }
 
-sub model (&)      { _subcontainer( shift, caller, 'model' )      }
-sub view (&)       { _subcontainer( shift, caller, 'view' )       }
-sub controller (&) { _subcontainer( shift, caller, 'controller' ) }
+sub model (&)      { _subcontainer( shift, (caller)[0], 'model' )      }
+sub view (&)       { _subcontainer( shift, (caller)[0], 'view' )       }
+sub controller (&) { _subcontainer( shift, (caller)[0], 'controller' ) }
 
 sub _subcontainer (&$$) {
     my ( $code, $caller, $subcontainer ) = @_;
+
+    no strict 'refs';
     local ${"${caller}::current_container"} =
         ${"${caller}::current_container"}->get_sub_container($subcontainer);
     $code->();
@@ -46,31 +49,38 @@ sub _subcontainer (&$$) {
 
 sub component ($;%) {
     my ($name, %args) = @_;
-    my $caller = caller;
+    my $current_container;
+
+    {
+        no strict 'refs';
+        my $caller = caller;
+        $current_container = ${"${caller}::current_container"};
+    }
+
     $args{dependencies} ||= {};
     $args{dependencies}{application_name} = depends_on( '/application_name' );
 
-    my $lifecycle = $args{lifecycle};
-    my %catalyst_lifecycles = map { $_ => 1 } qw/ COMPONENTSingleton Request /;
-    $args{lifecycle} = $lifecycle
-                     ? $catalyst_lifecycles{$lifecycle} ? "+Catalyst::IOC::LifeCycle::$lifecycle" : $lifecycle
-                     : 'Singleton'
+    my $lifecycle    = $args{lifecycle} || 'Singleton';
+    $args{lifecycle} = grep( m/^$lifecycle$/, qw/COMPONENTSingleton Request/)
+                     ? "+Catalyst::IOC::LifeCycle::$lifecycle"
+                     : $lifecycle
                      ;
 
     # FIXME - check $args{type} here!
 
     my $component_name = join '::', (
-        ${"${caller}::current_container"}->resolve(service => '/application_name'),
-        ucfirst(${"${caller}::current_container"}->name),
+        $current_container->resolve(service => '/application_name'),
+        ucfirst($current_container->name),
         $name
     );
 
-    my $service = Catalyst::IOC::ConstructorInjection->new(
-        %args,
-        name => $name,
-        catalyst_component_name => $component_name,
+    $current_container->add_service(
+        Catalyst::IOC::ConstructorInjection->new(
+            %args,
+            name => $name,
+            catalyst_component_name => $component_name,
+        )
     );
-    ${"${caller}::current_container"}->add_service($service);
 }
 
 1;
