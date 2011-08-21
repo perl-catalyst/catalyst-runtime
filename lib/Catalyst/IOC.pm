@@ -34,12 +34,15 @@ sub container (&) {
     };
 }
 
-sub model (&)      { _subcontainer( shift, (caller)[0], 'model' )      }
-sub view (&)       { _subcontainer( shift, (caller)[0], 'view' )       }
-sub controller (&) { _subcontainer( shift, (caller)[0], 'controller' ) }
+sub model (&)      { &_subcontainer }
+sub view (&)       { &_subcontainer }
+sub controller (&) { &_subcontainer }
 
-sub _subcontainer (&$$) {
-    my ( $code, $caller, $subcontainer ) = @_;
+sub _subcontainer {
+    my $code = shift;
+
+    my ( $caller, $f, $l, $subcontainer ) = caller(1);
+    $subcontainer =~ s/^Catalyst::IOC:://;
 
     no strict 'refs';
     local ${"${caller}::current_container"} =
