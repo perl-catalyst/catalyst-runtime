@@ -153,8 +153,6 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
   - make ACCEPT_CONTEXT and COMPONENT optional in Catalyst::IOC::BlockInjection and Catalyst::IOC::ConstructorInjection
     - Create COMPONENTSingleton life cycle
 
-  - Creating service()-like sugar for component
-
   - Test cases for extending the container in an application.
     - Using the sugar added in the previous item
     - Test when Model::Foo depends_on Model::Bar

@@ -64,7 +64,7 @@ sub component ($;%) {
     $args{dependencies}{application_name} = depends_on( '/application_name' );
 
     my $lifecycle    = $args{lifecycle} || 'Singleton';
-    $args{lifecycle} = grep( m/^$lifecycle$/, qw/COMPONENTSingleton Request/)
+    $args{lifecycle} = grep( m/^$lifecycle$/, qw/COMPONENTSingleton Request/ )
                      ? "+Catalyst::IOC::LifeCycle::$lifecycle"
                      : $lifecycle
                      ;
