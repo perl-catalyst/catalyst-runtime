@@ -63,31 +63,29 @@ EOW
 around guess => sub {
     my ($orig, $self) = (shift, shift);
     my $engine = $self->$orig(@_);
-    if ($engine eq 'Standalone') {
-        if ( $ENV{MOD_PERL} ) {
-            my ( $software, $version ) =
-              $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
-            $version =~ s/_//g;
-            $version =~ s/(\.[^.]+)\./$1/g;
+    if ( $ENV{MOD_PERL} ) {
+        my ( $software, $version ) =
+          $ENV{MOD_PERL} =~ /^(\S+)\/(\d+(?:[\.\_]\d+)+)/;
+        $version =~ s/_//g;
+        $version =~ s/(\.[^.]+)\./$1/g;
 
-            if ( $software eq 'mod_perl' ) {
-                if ( $version >= 1.99922 ) {
-                    $engine = 'Apache2';
-                }
+        if ( $software eq 'mod_perl' ) {
+            if ( $version >= 1.99922 ) {
+                $engine = 'Apache2';
+            }
 
-                elsif ( $version >= 1.9901 ) {
-                    Catalyst::Exception->throw( message => 'Plack does not have a mod_perl 1.99 handler' );
-                    $engine = 'Apache2::MP19';
-                }
+            elsif ( $version >= 1.9901 ) {
+                Catalyst::Exception->throw( message => 'Plack does not have a mod_perl 1.99 handler' );
+                $engine = 'Apache2::MP19';
+            }
 
-                elsif ( $version >= 1.24 ) {
-                    $engine = 'Apache1';
-                }
+            elsif ( $version >= 1.24 ) {
+                $engine = 'Apache1';
+            }
 
-                else {
-                    Catalyst::Exception->throw( message =>
-                          qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
-                }
+            else {
+                Catalyst::Exception->throw( message =>
+                      qq/Unsupported mod_perl version: $ENV{MOD_PERL}/ );
             }
         }
     }
