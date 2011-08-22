@@ -101,10 +101,8 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
     - expand_component_module
 
-    - sugar is still not completely implemented
-
     - Some back compat
-        - wrappers around setup_component, setup_components, locate_components in Catalyst.pm
+        - wrappers around setup_component, setup_components in Catalyst.pm
         - $instance->expand_modules
         - search_extra
         - Crazy tests for things such as:
@@ -119,6 +117,7 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
     - per request life cycle
 
     - sugar - we should discuss the syntax with rafl and edenc
+        - what's missing?
 
     - when / when not COMPONENT should be called
 
