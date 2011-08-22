@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90002 - 2011-08-22 21:44:00
   Backward compatibility fixes:
 
     - Deploying via mod_perl in some cases is fixed by making
