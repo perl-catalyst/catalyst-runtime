@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Backward compatibility fixes:
+
+    - Deploying via mod_perl in some cases is fixed by making
+      Catalyst::EngineLoader detect mod_perl in more generic
+      circumstances.
+      https://github.com/miyagawa/Plack/issues/239
+
   Documentation fixes:
 
     - Fix incorrect example in Catalyst::PSGI.
