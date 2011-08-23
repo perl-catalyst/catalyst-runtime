@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Documentation fixes:
+
+   - Document Catalyst::Plugin::Authentication fails tests unless
+     you use the latest version with Catalyst 5.9
+
 5.90002 - 2011-08-22 21:44:00
   Backward compatibility fixes:
 
