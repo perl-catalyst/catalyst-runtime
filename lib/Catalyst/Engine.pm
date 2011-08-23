@@ -10,7 +10,6 @@ use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
-use Moose::Util::TypeConstraints;
 use Plack::Loader;
 use Catalyst::EngineLoader;
 use Encode ();
@@ -18,8 +17,11 @@ use utf8;
 
 use namespace::clean -except => 'meta';
 
-has env => (is => 'ro', writer => '_set_env', clearer => '_clear_env');
+# Amount of data to read from input on each pass
+our $CHUNKSIZE = 64 * 1024;
 
+# XXX - this is only here for compat, do not use!
+has env => ( is => 'rw', writer => '_set_env' );
 my $WARN_ABOUT_ENV = 0;
 around env => sub {
   my ($orig, $self, @args) = @_;
@@ -30,33 +32,6 @@ around env => sub {
   }
   return $self->$orig;
 };
-
-# input position and length
-has read_length => (is => 'rw');
-has read_position => (is => 'rw');
-
-has _prepared_write => (is => 'rw');
-
-has _response_cb => (
-    is      => 'ro',
-    isa     => 'CodeRef',
-    writer  => '_set_response_cb',
-    clearer => '_clear_response_cb',
-    predicate => '_has_response_cb',
-);
-
-subtype 'Catalyst::Engine::Types::Writer',
-    as duck_type([qw(write close)]);
-
-has _writer => (
-    is      => 'ro',
-    isa     => 'Catalyst::Engine::Types::Writer',
-    writer  => '_set_writer',
-    clearer => '_clear_writer',
-);
-
-# Amount of data to read from input on each pass
-our $CHUNKSIZE = 64 * 1024;
 
 =head1 NAME
 
@@ -94,9 +69,9 @@ sub finalize_body {
         $self->write( $c, $body );
     }
 
-    $self->_writer->close;
-    $self->_clear_writer;
-    $self->_clear_env;
+    my $res = $c->response;
+    $res->_writer->close;
+    $res->_clear_writer;
 
     return;
 }
@@ -358,13 +333,14 @@ sub finalize_headers {
     # sets response_cb. So take the lack of a response_cb as a sign that we
     # don't need to set the headers.
 
-    return unless $self->_has_response_cb;
+    return unless ($ctx->response->_has_response_cb);
 
     my @headers;
     $ctx->response->headers->scan(sub { push @headers, @_ });
 
-    $self->_set_writer($self->_response_cb->([ $ctx->response->status, \@headers ]));
-    $self->_clear_response_cb;
+    my $writer = $ctx->response->_response_cb->([ $ctx->response->status, \@headers ]);
+    $ctx->response->_set_writer($writer);
+    $ctx->response->_clear_response_cb;
 
     return;
 }
@@ -405,8 +381,8 @@ sub prepare_body {
     my ( $self, $c ) = @_;
 
     my $appclass = ref($c) || $c;
-    if ( my $length = $self->read_length ) {
-        my $request = $c->request;
+    my $request = $c->request;
+    if ( my $length = $request->_read_length ) {
         unless ( $request->_body ) {
             my $type = $request->header('Content-Type');
             $request->_body(HTTP::Body->new( $type, $length ));
@@ -421,7 +397,7 @@ sub prepare_body {
         }
 
         # paranoia against wrong Content-Length header
-        my $remaining = $length - $self->read_position;
+        my $remaining = $length - $c->request->_read_position;
         if ( $remaining > 0 ) {
             $self->finalize_read($c);
             Catalyst::Exception->throw(
@@ -469,8 +445,8 @@ Abstract method implemented in engines.
 sub prepare_connection {
     my ($self, $ctx) = @_;
 
-    my $env = $self->env;
     my $request = $ctx->request;
+    my $env = $ctx->request->env;
 
     $request->address( $env->{REMOTE_ADDR} );
     $request->hostname( $env->{REMOTE_HOST} )
@@ -504,7 +480,7 @@ sub prepare_cookies {
 sub prepare_headers {
     my ($self, $ctx) = @_;
 
-    my $env = $self->env;
+    my $env = $ctx->request->env;
     my $headers = $ctx->request->headers;
 
     for my $header (keys %{ $env }) {
@@ -554,7 +530,7 @@ abstract method, implemented by engines.
 sub prepare_path {
     my ($self, $ctx) = @_;
 
-    my $env = $self->env;
+    my $env = $ctx->request->env;
 
     my $scheme    = $ctx->request->secure ? 'https' : 'http';
     my $host      = $env->{HTTP_HOST} || $env->{SERVER_NAME};
@@ -618,8 +594,9 @@ process the query string and extract query parameters.
 sub prepare_query_parameters {
     my ($self, $c) = @_;
 
-    my $query_string = exists $self->env->{QUERY_STRING}
-        ? $self->env->{QUERY_STRING}
+    my $env = $c->request->env;
+    my $query_string = exists $env->{QUERY_STRING}
+        ? $env->{QUERY_STRING}
         : '';
 
     # Check for keywords (no = signs)
@@ -669,11 +646,8 @@ prepare to read from the engine.
 sub prepare_read {
     my ( $self, $c ) = @_;
 
-    # Initialize the read position
-    $self->read_position(0);
-
     # Initialize the amount of data we think we need to read
-    $self->read_length( $c->request->header('Content-Length') || 0 );
+    $c->request->_read_length;
 }
 
 =head2 $self->prepare_request(@arguments)
@@ -684,7 +658,9 @@ Populate the context object from the request object.
 
 sub prepare_request {
     my ($self, $ctx, %args) = @_;
-    $self->_set_env($args{env});
+    $ctx->request->_set_env($args{env});
+    $self->_set_env($args{env}); # Nasty back compat!
+    $ctx->response->_set_response_cb($args{response_cb});
 }
 
 =head2 $self->prepare_uploads($c)
@@ -752,7 +728,8 @@ Maintains the read_length and read_position counters as data is read.
 sub read {
     my ( $self, $c, $maxlength ) = @_;
 
-    my $remaining = $self->read_length - $self->read_position;
+    my $request = $c->request;
+    my $remaining = $request->_read_length - $request->_read_position;
     $maxlength ||= $CHUNKSIZE;
 
     # Are we done reading?
@@ -769,7 +746,8 @@ sub read {
             $self->finalize_read;
             return;
         }
-        $self->read_position( $self->read_position + $rc );
+        my $request = $c->request;
+        $request->_read_position( $request->_read_position + $rc );
         return $buffer;
     }
     else {
@@ -788,7 +766,7 @@ there is no more data to be read.
 
 sub read_chunk {
     my ($self, $ctx) = (shift, shift);
-    return $self->env->{'psgi.input'}->read(@_);
+    return $ctx->request->env->{'psgi.input'}->read(@_);
 }
 
 =head2 $self->read_length
@@ -852,8 +830,7 @@ sub build_psgi_app {
 
         return sub {
             my ($respond) = @_;
-            $self->_set_response_cb($respond);
-            $app->handle_request(env => $env);
+            $app->handle_request(env => $env, response_cb => $respond);
         };
     };
 }
@@ -867,15 +844,16 @@ Writes the buffer to the client.
 sub write {
     my ( $self, $c, $buffer ) = @_;
 
-    unless ( $self->_prepared_write ) {
+    my $response = $c->response;
+    unless ( $response->_prepared_write ) {
         $self->prepare_write($c);
-        $self->_prepared_write(1);
+        $response->_set_prepared_write(1);
     }
 
     $buffer = q[] unless defined $buffer;
 
     my $len = length($buffer);
-    $self->_writer->write($buffer);
+    $c->res->_writer->write($buffer);
 
     return $len;
 }

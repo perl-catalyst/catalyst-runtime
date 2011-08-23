@@ -5,7 +5,7 @@ use base qw[TestApp::View::Dump];
 
 sub process {
     my ( $self, $c ) = @_;
-    my $env = $c->engine->env;
+    my $env = $c->stash->{env};
     return $self->SUPER::process($c, {
         map { ($_ => $env->{$_}) }
         grep { $_ ne 'psgi.input' }

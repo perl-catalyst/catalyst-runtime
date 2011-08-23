@@ -2,8 +2,33 @@ package Catalyst::Response;
 
 use Moose;
 use HTTP::Headers;
+use Moose::Util::TypeConstraints;
+use namespace::autoclean;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
+
+has _prepared_write => (is => 'ro', writer => '_set_prepared_write');
+
+has _response_cb => (
+    is      => 'ro',
+    isa     => 'CodeRef',
+    writer  => '_set_response_cb',
+    clearer => '_clear_response_cb',
+    predicate => '_has_response_cb',
+);
+
+subtype 'Catalyst::Engine::Types::Writer',
+    as duck_type([qw(write close)]);
+
+has _writer => (
+    is      => 'ro',
+    isa     => 'Catalyst::Engine::Types::Writer',
+    writer  => '_set_writer',
+    clearer => '_clear_writer',
+    predicate => '_has_writer',
+);
+
+sub DEMOLISH { $_[0]->_writer->close if $_[0]->_has_writer }
 
 has cookies   => (is => 'rw', default => sub { {} });
 has body      => (is => 'rw', default => undef);
@@ -30,8 +55,6 @@ has _context => (
 sub output { shift->body(@_) }
 
 sub code   { shift->status(@_) }
-
-no Moose;
 
 =head1 NAME
 
@@ -187,14 +210,19 @@ $res->code is an alias for this, to match HTTP::Response->code.
 
 Writes $data to the output stream.
 
-=head2 meta
-
-Provided by Moose
-
 =head2 $res->print( @data )
 
 Prints @data to the output stream, separated by $,.  This lets you pass
 the response object to functions that want to write to an L<IO::Handle>.
+
+=head2 DEMOLISH
+
+Ensures that the response is flushed and closed at the end of the
+request.
+
+=head2 meta
+
+Provided by Moose
 
 =cut
 

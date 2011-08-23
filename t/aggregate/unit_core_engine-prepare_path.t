@@ -126,13 +126,12 @@ sub get_req {
         PATH_INFO => '/',
     );
 
-    my $engine = Catalyst::Engine->new(
-        env => { %template, @_ },
-    );
+    my $engine = Catalyst::Engine->new();
     my $i = TestApp->new;
     $i->setup_finished(0);
     $i->config(use_request_uri_for_path => $use_request_uri_for_path);
     $i->setup_finished(1);
+    $engine->prepare_request($i, env => { %template, @_ }, response_cb => sub {});
     $engine->prepare_path($i);
     return $i->req;
 }

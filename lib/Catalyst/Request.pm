@@ -14,6 +14,17 @@ use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
+has env => (is => 'ro', writer => '_set_env');
+
+has _read_position => ( is => 'rw', default => 0 );
+has _read_length => ( is => 'ro',
+    default => sub {
+        my $self = shift;
+        $self->header('Content-Length') || 0;
+    },
+    lazy => 1,
+);
+
 has action => (is => 'rw');
 has address => (is => 'rw');
 has arguments => (is => 'rw', default => sub { [] });
