@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Enhancements:
+
+   - Set a matching Content-type for the redirect if Catalyst sets the
+     body. This is for compatibility with a WatchGuard Firewall.
+
   Documentation fixes:
 
    - Document Catalyst::Plugin::Authentication fails tests unless
