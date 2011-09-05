@@ -5,6 +5,11 @@
    - Set a matching Content-type for the redirect if Catalyst sets the
      body. This is for compatibility with a WatchGuard Firewall.
 
+  Backward compatibility fixes:
+
+   - Restore (an almost empty) Catalyst::Engine::HTTP to the dist for old
+     scripts which explictly require Catalyst::Engine::HTTP
+
   Documentation fixes:
 
    - Document Catalyst::Plugin::Authentication fails tests unless
