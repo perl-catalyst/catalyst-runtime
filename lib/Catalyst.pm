@@ -2727,16 +2727,6 @@ sub apply_default_middlewares {
         },
     );
 
-    my $server_matches = sub {
-        my ($re) = @_;
-        return sub {
-            my ($env) = @_;
-            my $server = $env->{SERVER_SOFTWARE};
-            return unless $server;
-            return $server =~ $re ? 1 : 0;
-        };
-    };
-
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
     $psgi_app = Plack::Middleware::LighttpdScriptNameFix->wrap($psgi_app);
