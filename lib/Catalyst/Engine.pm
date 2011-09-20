@@ -45,9 +45,12 @@ has _response_cb => (
     predicate => '_has_response_cb',
 );
 
+subtype 'Catalyst::Engine::Types::Writer',
+    as duck_type([qw(write close)]);
+
 has _writer => (
     is      => 'ro',
-    isa     => duck_type([qw(write close)]),
+    isa     => 'Catalyst::Engine::Types::Writer',
     writer  => '_set_writer',
     clearer => '_clear_writer',
 );

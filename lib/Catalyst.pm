@@ -83,7 +83,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90001';
+our $VERSION = '5.90002';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1713,6 +1713,7 @@ sub finalize_headers {
             $response->body(
                 qq{<html><body><p>This item has moved <a href="$location">here</a>.</p></body></html>}
             );
+            $response->content_type('text/html; charset=utf-8');
         }
     }
 
@@ -2502,16 +2503,6 @@ sub apply_default_middlewares {
                 || $app->config->{using_frontend_proxy};
         },
     );
-
-    my $server_matches = sub {
-        my ($re) = @_;
-        return sub {
-            my ($env) = @_;
-            my $server = $env->{SERVER_SOFTWARE};
-            return unless $server;
-            return $server =~ $re ? 1 : 0;
-        };
-    };
 
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html

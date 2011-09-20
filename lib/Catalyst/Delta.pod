@@ -61,6 +61,11 @@ function perfectly with this version of Catalyst).
 Has been updated to fix failing tests (although older versions still
 function perfectly with this version of Catalyst).
 
+=item Catalyst::Plugin::Authentication
+
+Has been updated to fix failing tests (although older versions still
+function perfectly with this version of Catalyst).
+
 =back
 
 =head1 PREVIOUS VERSIONS

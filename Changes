@@ -1,5 +1,28 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Enhancements:
+
+   - Set a matching Content-type for the redirect if Catalyst sets the
+     body. This is for compatibility with a WatchGuard Firewall.
+
+  Backward compatibility fixes:
+
+   - Restore (an almost empty) Catalyst::Engine::HTTP to the dist for old
+     scripts which explictly require Catalyst::Engine::HTTP
+
+  Documentation fixes:
+
+   - Document Catalyst::Plugin::Authentication fails tests unless
+     you use the latest version with Catalyst 5.9
+
+5.90002 - 2011-08-22 21:44:00
+  Backward compatibility fixes:
+
+    - Deploying via mod_perl in some cases is fixed by making
+      Catalyst::EngineLoader detect mod_perl in more generic
+      circumstances.
+      https://github.com/miyagawa/Plack/issues/239
+
   Documentation fixes:
 
     - Fix incorrect example in Catalyst::PSGI.
