@@ -60,8 +60,7 @@ sub result_ok {
     unlike( $result, qr/FATAL/, 'result is not an error' )
         or return;
 
-    my @result = split /$/m, $result;
-    $result = join q{}, @result[-4..-1];
+    $result =~ s/\r\n|\r/\n/g;
 
     return eval { Load($result) };
 }
