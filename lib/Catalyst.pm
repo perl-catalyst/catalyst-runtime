@@ -1977,7 +1977,7 @@ sub handle_request {
     return $status;
 }
 
-=head2 $c->prepare( @arguments )
+=head2 $class->prepare( @arguments )
 
 Creates a Catalyst context from an engine-specific request (Apache, CGI,
 etc.).
