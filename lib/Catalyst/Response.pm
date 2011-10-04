@@ -14,6 +14,7 @@ has status    => (is => 'rw', default => 200);
 has finalized_headers => (is => 'rw', default => 0);
 has headers   => (
   is      => 'rw',
+  isa => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header)],
   default => sub { HTTP::Headers->new() },
   required => 1,
