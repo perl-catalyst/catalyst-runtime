@@ -321,7 +321,9 @@ sub _parse_attrs {
 
     %raw_attributes = (
         %raw_attributes,
-        exists $actions_config->{$name} ? %{ $actions_config->{$name } } : (),
+        # Note we deep copy array refs here to stop crapping on config
+        # when attributes are parsed. RT#65463
+        exists $actions_config->{$name} ? map { ref($_) eq 'ARRAY' ? [ @$_ ] : $_ } %{ $actions_config->{$name } } : (),
     );
 
     # Private actions with additional attributes will raise a warning and then

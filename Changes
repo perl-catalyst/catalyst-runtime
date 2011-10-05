@@ -4,6 +4,13 @@
 
    - Make default body reponses for 302s W3C compliant. RT#71237
 
+   - Fix issue where groups of attributes to override controller actions
+     in config would be (incorrectly) overwritten, if the parser for that
+     attribute mangled the contents of the attribute. This was found
+     with Catalyst::Controller::ActionRole, where Does => [ '+Foo' ]
+     would be transformed to Does => [ 'Foo' ] and written back to config,
+     whereas Does => '+Foo' would not be changed in config. RT#65463
+
   Enhancements:
 
    - Set a matching Content-type for the redirect if Catalyst sets the
