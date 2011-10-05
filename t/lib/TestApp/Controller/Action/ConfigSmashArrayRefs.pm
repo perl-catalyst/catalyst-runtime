@@ -14,7 +14,6 @@ __PACKAGE__->config(
 
 sub _parse_CustomAttr_attr {
     my ($self, $app, $name, $value) = @_;
-    warn $value;
     return CustomAttr => "PoopInYourShoes";
 }
 
