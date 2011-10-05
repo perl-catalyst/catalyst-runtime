@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90003 - 2011-10-05 08:32:00
   Bug fixes:
 
    - Make default body reponses for 302s W3C compliant. RT#71237
