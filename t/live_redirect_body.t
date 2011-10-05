@@ -1,5 +1,5 @@
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestApp', {default_host => 'default.com'};
 use Catalyst::Request;
 
