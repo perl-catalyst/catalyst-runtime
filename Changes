@@ -25,7 +25,10 @@
 
    - Document Catalyst::Plugin::Authentication fails tests unless
      you use the latest version with Catalyst 5.9
+
    - Clarify that prepare is called as a class method
+
+   - Clarify use of uri_for further. RT#57011
 
 5.90002 - 2011-08-22 21:44:00
   Backward compatibility fixes:
