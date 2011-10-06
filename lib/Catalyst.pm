@@ -83,7 +83,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90002';
+our $VERSION = '5.90003';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1710,9 +1710,17 @@ sub finalize_headers {
 
         if ( !$response->has_body ) {
             # Add a default body if none is already present
-            $response->body(
-                qq{<html><body><p>This item has moved <a href="$location">here</a>.</p></body></html>}
-            );
+            $response->body(<<"EOF");
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+  <head>
+    <title>Moved</title>
+  </head>
+  <body>
+     <p>This item has moved <a href="$location">here</a>.</p>
+  </body>
+</html>
+EOF
             $response->content_type('text/html; charset=utf-8');
         }
     }
@@ -1824,7 +1832,7 @@ sub handle_request {
     return $status;
 }
 
-=head2 $c->prepare( @arguments )
+=head2 $class->prepare( @arguments )
 
 Creates a Catalyst context from an engine-specific request (Apache, CGI,
 etc.).

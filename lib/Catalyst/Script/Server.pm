@@ -163,7 +163,7 @@ has follow_symlinks => (
 
 sub _plack_engine_name {
     my $self = shift;
-    return $self->fork ? 'Starman' : $self->keepalive ? 'Starman' : 'Standalone';
+    return $self->fork || $self->keepalive ? 'Starman' : 'Standalone';
 }
 
 sub _restarter_args {

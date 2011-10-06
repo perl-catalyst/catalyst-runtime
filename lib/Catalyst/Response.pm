@@ -14,6 +14,7 @@ has status    => (is => 'rw', default => 200);
 has finalized_headers => (is => 'rw', default => 0);
 has headers   => (
   is      => 'rw',
+  isa => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header)],
   default => sub { HTTP::Headers->new() },
   required => 1,
@@ -147,6 +148,12 @@ This is a convenience method that sets the Location header to the
 redirect destination, and then sets the response status.  You will
 want to C< return > or C<< $c->detach() >> to interrupt the normal
 processing flow if you want the redirect to occur straight away.
+
+B<Note:> do not give a relative URL as $url, i.e: one that is not fully
+qualified (= C<http://...>, etc.) or that starts with a slash
+(= C</path/here>). While it may work, it is not guaranteed to do the right
+thing and is not a standard behaviour. You may opt to use uri_for() or
+uri_for_action() instead.
 
 =cut
 
