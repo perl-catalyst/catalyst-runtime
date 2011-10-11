@@ -2619,17 +2619,32 @@ sub engine_class {
             Catalyst::EngineLoader->new({
                 application_name => $class,
                 (defined $requested_engine
-                     ? (requested_engine => $requested_engine) : ()),
+                     ? (catalyst_engine_class => $requested_engine) : ()),
             }),
         );
     }
+
     $class->engine_loader->catalyst_engine_class;
 }
 
 sub setup_engine {
     my ($class, $requested_engine) = @_;
 
-    my $engine = $class->engine_class($requested_engine);
+    my $engine = do {
+        my $loader = $class->engine_loader;
+
+        if (!$loader || $requested_engine) {
+            $loader = Catalyst::EngineLoader->new({
+                application_name => $class,
+                (defined $requested_engine
+                     ? (requested_engine => $requested_engine) : ()),
+            }),
+
+            $class->engine_loader($loader);
+        }
+
+        $loader->catalyst_engine_class;
+    };
 
     # Don't really setup_engine -- see _setup_psgi_app for explanation.
     return if $class->loading_psgi_file;
