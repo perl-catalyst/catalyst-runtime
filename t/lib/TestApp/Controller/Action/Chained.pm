@@ -5,7 +5,7 @@ use warnings;
 
 use HTML::Entities;
 
-use base qw/Catalyst::Controller/;
+use base qw/Catalyst::Controller::ActionRole/;
 
 sub begin :Private { }
 
@@ -219,6 +219,13 @@ sub roundtrip_urifor_end : Chained('roundtrip_urifor') PathPart('') Args(1) {
     $c->res->body($c->uri_for($c->action, $c->req->captures, @{$c->req->args}, $c->req->parameters));
     $c->stash->{no_end} = 1;
 }
+
+sub match_captures : Chained('/') PathPart('chained/match_captures') CaptureArgs(1) Does('~TestMatchCaptures') {
+    my ($self, $c) = @_;
+    $c->res->header( 'X-TestAppActionTestMatchCapturesHasRan', 'yes');
+}
+
+sub match_captures_end : Chained('match_captures') PathPart('bar') Args(0) { }
 
 sub end :Private {
   my ($self, $c) = @_;

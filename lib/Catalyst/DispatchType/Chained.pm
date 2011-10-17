@@ -211,6 +211,9 @@ sub recurse_match {
                 # strip CaptureArgs into list
                 push(@captures, splice(@parts, 0, $capture_attr->[0]));
 
+                # check if the action may fit, depending on a given test by the app
+                if ($action->can('match_captures')) { next TRY_ACTION unless $action->match_captures($c, \@captures) }
+
                 # try the remaining parts against children of this action
                 my ($actions, $captures, $action_parts, $n_pathparts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts

@@ -1113,6 +1113,19 @@ sub run_tests {
         ok( index($content, $path) > 1, 'uri can round trip through uri_for' )
             or diag("Expected $path, got $content");
     }
+
+    #
+    #   match_captures
+    #
+    {
+
+        ok( my $response = request('http://localhost/chained/match_captures/foo/bar'), 'match_captures: falling through' );
+        is($response->header('X-TestAppActionTestMatchCaptures'), 'fallthrough', 'match_captures: fell through');
+
+        ok($response = request('http://localhost/chained/match_captures/force/bar'), 'match_captures: *not* falling through' );
+        is($response->header('X-TestAppActionTestMatchCaptures'), 'forcing', 'match_captures: forced');
+        is($response->header('X-TestAppActionTestMatchCapturesHasRan'), 'yes', 'match_captures: actually ran');
+    }
 }
 
 done_testing;
