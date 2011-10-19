@@ -1,7 +1,8 @@
-package TestApp::ActionRole::TestMatchCaptures;
+package TestApp::Action::TestMatchCaptures;
 
-use Moose::Role;
-use namespace::autoclean;
+use Moose;
+
+extends 'Catalyst::Action';
 
 sub match_captures {
     my ($self, $c, $cap) = @_;
