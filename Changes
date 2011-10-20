@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90004 - 2011-10-11 17:12:00
+
+  Bug fixes:
+
+   - Don't guess engine class names when setting an engine through
+     MyApp->engine_class.
+
 5.90003 - 2011-10-05 08:32:00
   Bug fixes:
 
