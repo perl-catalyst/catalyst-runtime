@@ -53,7 +53,7 @@ Catalyst::Component - Catalyst Component Base Class
 This is the universal base class for Catalyst components
 (Model/View/Controller).
 
-It provides you with a generic new() for instantiation through Catalyst's
+It provides you with a generic new() for component construction through Catalyst's
 component loader with config() support and a process() method placeholder.
 
 =cut
@@ -180,7 +180,7 @@ The arguments are expected to be a hashref and are merged with the
 C<< __PACKAGE__->config >> hashref before calling C<< ->new >>
 to instantiate the component.
 
-You can override it in your components to do custom instantiation, using
+You can override it in your components to do custom construction, using
 something like this:
 
   sub COMPONENT {
