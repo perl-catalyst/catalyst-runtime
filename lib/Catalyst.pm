@@ -202,7 +202,7 @@ fully qualify the name by using a unary plus:
         +Fully::Qualified::Plugin::Name
     /;
 
-Special flags like C<-Debug> and C<-Engine> can also be specified as
+Special flags like C<-Debug> can also be specified as
 arguments when Catalyst is loaded:
 
     use Catalyst qw/-Debug My::Module/;
@@ -221,13 +221,6 @@ priority.
 
 This sets the log level to 'debug' and enables full debug output on the
 error screen. If you only want the latter, see L<< $c->debug >>.
-
-=head2 -Engine
-
-Forces Catalyst to use a specific engine. Omit the
-C<Catalyst::Engine::> prefix of the engine name, i.e.:
-
-    use Catalyst qw/-Engine=CGI/;
 
 =head2 -Home
 
