@@ -3,40 +3,19 @@ use Moose;
 use FindBin;
 use lib;
 use File::Spec;
+use Class::Load qw/ load_first_existing_class load_optional_class /;
 use namespace::autoclean -also => 'subclass_with_traits';
 use Try::Tiny;
 
 sub find_script_class {
     my ($self, $app, $script) = @_;
-    my $class = "${app}::Script::${script}";
-
-    try {
-        Class::MOP::load_class($class);
-    }
-    catch {
-        confess $_ unless /Can't locate/;
-        $class = "Catalyst::Script::$script";
-    };
-
-    Class::MOP::load_class($class);
-    return $class;
+    return load_first_existing_class("${app}::Script::${script}", "Catalyst::Script::$script");
 }
 
 sub find_script_traits {
     my ($self, @try) = @_;
 
-    my @traits;
-    for my $try (@try) {
-        try {
-            Class::MOP::load_class($try);
-            push @traits, $try;
-        }
-        catch {
-            confess $_ unless /^Can't locate/;
-        };
-    }
-
-    return @traits;
+    return grep { load_optional_class($_) } @try;
 }
 
 sub subclass_with_traits {
