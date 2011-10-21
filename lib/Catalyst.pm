@@ -1354,9 +1354,9 @@ sub uri_for {
     $res;
 }
 
-=head2 $c->uri_for_action( $path, \@captures?, @args?, \%query_values? )
+=head2 $c->uri_for_action( $path, \@captures_and_args?, @args?, \%query_values? )
 
-=head2 $c->uri_for_action( $action, \@captures?, @args?, \%query_values? )
+=head2 $c->uri_for_action( $action, \@captures_and_args?, @args?, \%query_values? )
 
 =over
 
@@ -1384,6 +1384,30 @@ You can use:
  $c->uri_for_action('/users/lst')
 
 and it will create the URI /users/the-list.
+
+=item \@captures_and_args?
+
+Optional array reference of Captures (i.e. C<<CaptureArgs or $c->req->captures>)
+and arguments to the request. Usually used with L<Catalyst::DispatchType::Chained>
+to interpolate all the parameters in the URI.
+
+=item @args?
+
+Optional list of extra arguments - can be supplied in the C<< \@captures_and_args? >>
+array ref, or here - whichever is easier for your code..
+
+If your action may have a zero, a fixed or a variable number of args (e.g. C<< Args(1) >>
+for a fixed number or C<< Args() >> for a variable number)..
+
+=item \%query_values?
+
+Optional array reference of query parameters to append. E.g.
+
+  { foo => 'bar' }
+
+will generate
+
+  /rest/of/your/uri?foo=bar
 
 =back
 
