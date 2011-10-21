@@ -322,6 +322,10 @@ Catalyst::Script::Server - Catalyst test server
 
 Run a Catalyst test server for this application.
 
+=head1 SEE ALSO
+
+L<Catalyst::ScriptRunner>
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

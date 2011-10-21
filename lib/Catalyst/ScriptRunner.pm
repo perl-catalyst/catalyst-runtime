@@ -61,8 +61,21 @@ Catalyst::ScriptRunner - The Catalyst Framework script runner
 
 =head1 DESCRIPTION
 
-This class is responsible for running scripts, either in the application specific namespace
-(e.g. C<MyApp::Script::Server>), or the Catalyst namespace (e.g. C<Catalyst::Script::Server>)
+This class is responsible for loading and running scripts, either in the application specific namespace
+(e.g. C<MyApp::Script::Server>), or the Catalyst namespace (e.g. C<Catalyst::Script::Server>).
+
+If your application contains a custom script, then it will be used in preference to the generic
+script, and is expected to sub-class the standard script.
+
+=head1 TRAIT LOADING
+
+Catalyst will automatically load and apply roles to the scripts in your appliction.
+
+C<MyApp::TraitFor::Script> will be loaded if present, and will be applied to B<ALL>
+scripts.
+
+C<MyApp::TraitFor::Script::XXXX> will be loaded (if present) and for script
+individually.
 
 =head1 METHODS
 
