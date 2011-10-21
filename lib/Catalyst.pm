@@ -2821,7 +2821,7 @@ sub setup_stats {
 =head2 $c->registered_plugins
 
 Returns a sorted list of the plugins which have either been stated in the
-import list or which have been added via C<< MyApp->plugin(@args); >>.
+import list.
 
 If passed a given plugin name, it will report a boolean value indicating
 whether or not that plugin is loaded.  A fully qualified name is required if
