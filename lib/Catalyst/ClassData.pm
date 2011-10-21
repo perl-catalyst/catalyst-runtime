@@ -81,7 +81,11 @@ L<Class::Accessor::Grouped>;
 
 =head1 AUTHOR
 
+=begin stopwords
+
 Guillermo Roditi
+
+=end stopwords
 
 =head1 COPYRIGHT
 

@@ -41,7 +41,7 @@ This class is responsible for running scripts, either in the application specifi
 
 =head2 run ($application_class, $scriptclass)
 
-Called with two parameters, the application classs (e.g. MyApp)
+Called with two parameters, the application class (e.g. MyApp)
 and the script class, (i.e. one of Server/FastCGI/CGI/Create/Test)
 
 =head1 AUTHORS

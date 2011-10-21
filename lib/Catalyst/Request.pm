@@ -138,6 +138,8 @@ sub query_params    { shift->query_parameters(@_) }
 sub path_info       { shift->path(@_) }
 sub snippets        { shift->captures(@_) }
 
+=for stopwords param params
+
 =head1 NAME
 
 Catalyst::Request - provides information about the current client request
@@ -228,7 +230,7 @@ Shortcut for L</arguments>.
 =head2 $req->base
 
 Contains the URI base. This will always have a trailing slash. Note that the
-URI scheme (eg., http vs. https) must be determined through heuristics;
+URI scheme (e.g., http vs. https) must be determined through heuristics;
 depending on your server configuration, it may be incorrect. See $req->secure
 for more info.
 
@@ -487,7 +489,7 @@ Shortcut for $req->headers->referer. Returns the referring page.
 =head2 $req->secure
 
 Returns true or false, indicating whether the connection is secure
-(https). Note that the URI scheme (eg., http vs. https) must be determined
+(https). Note that the URI scheme (e.g., http vs. https) must be determined
 through heuristics, and therefore the reliability of $req->secure will depend
 on your server configuration. If you are serving secure pages on the standard
 SSL port (443) and/or setting the HTTPS environment variable, $req->secure
