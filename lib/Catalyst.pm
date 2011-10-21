@@ -148,7 +148,7 @@ documentation and tutorials.
     use Catalyst qw/-Debug/; # include plugins here as well
 
     ### In lib/MyApp/Controller/Root.pm (autocreated)
-    sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
+    sub foo : Chained('/') Args() { # called for /foo, /foo/1, /foo/1/2, etc.
         my ( $self, $c, @args ) = @_; # args are qw/1 2/ for /foo/1/2
         $c->stash->{template} = 'foo.tt'; # set the template
         # lookup something from db -- stash vars are passed to TT
@@ -166,48 +166,14 @@ documentation and tutorials.
     [% END %]
 
     # called for /bar/of/soap, /bar/of/soap/10, etc.
-    sub bar : Path('/bar/of/soap') { ... }
-
-    # called for all actions, from the top-most controller downwards
-    sub auto : Private {
-        my ( $self, $c ) = @_;
-        if ( !$c->user_exists ) { # Catalyst::Plugin::Authentication
-            $c->res->redirect( '/login' ); # require login
-            return 0; # abort request and go immediately to end()
-        }
-        return 1; # success; carry on to next action
-    }
+    sub bar : Chained('/') PathPart('/bar/of/soap') Args() { ... }
 
     # called after all actions are finished
-    sub end : Private {
+    sub end : Action {
         my ( $self, $c ) = @_;
         if ( scalar @{ $c->error } ) { ... } # handle errors
         return if $c->res->body; # already have a response
         $c->forward( 'MyApp::View::TT' ); # render template
-    }
-
-    ### in MyApp/Controller/Foo.pm
-    # called for /foo/bar
-    sub bar : Local { ... }
-
-    # called for /blargle
-    sub blargle : Global { ... }
-
-    # an index action matches /foo, but not /foo/1, etc.
-    sub index : Private { ... }
-
-    ### in MyApp/Controller/Foo/Bar.pm
-    # called for /foo/bar/baz
-    sub baz : Local { ... }
-
-    # first Root auto is called, then Foo auto, then this
-    sub auto : Private { ... }
-
-    # powerful regular expression paths are also possible
-    sub details : Regex('^product/(\w+)/details$') {
-        my ( $self, $c ) = @_;
-        # extract the (\w+) from the URI
-        my $product = $c->req->captures->[0];
     }
 
 See L<Catalyst::Manual::Intro> for additional information.
