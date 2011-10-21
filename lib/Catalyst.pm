@@ -3005,7 +3005,7 @@ to be shown in hit debug tables in the test server.
 
 =item *
 
-C<use_request_uri_for_path> - Controlls if the C<REQUEST_URI> or C<PATH_INFO> environment
+C<use_request_uri_for_path> - Controls if the C<REQUEST_URI> or C<PATH_INFO> environment
 variable should be used for determining the request path. 
 
 Most web server environments pass the requested path to the application using environment variables,
@@ -3020,7 +3020,7 @@ is determined by the C<< $c->config(use_request_uri_for_path) >> setting (which 
 =item use_request_uri_for_path => 0
 
 This is the default (and the) traditional method that Catalyst has used for determining the path information.
-The path is synthesised from a combination of the C<PATH_INFO> and C<SCRIPT_NAME> environment variables.
+The path is generated from a combination of the C<PATH_INFO> and C<SCRIPT_NAME> environment variables.
 The allows the application to behave correctly when C<mod_rewrite> is being used to redirect requests
 into the application, as these variables are adjusted by mod_rewrite to take account for the redirect.
 
