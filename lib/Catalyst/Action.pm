@@ -88,6 +88,19 @@ sub compare {
     return $a1_args <=> $a2_args;
 }
 
+sub number_of_args {
+    my ( $self ) = @_;
+    return 0 unless exists $self->attributes->{Args};
+    return $self->attributes->{Args}[0];
+}
+
+sub number_of_captures {
+    my ( $self ) = @_;
+
+    return 0 unless exists $self->attributes->{CaptureArgs};
+    return $self->attributes->{CaptureArgs}[0] || 0;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -146,6 +159,14 @@ C<private_path> of an action is always suitable for passing to C<forward>.
 =head2 name
 
 Returns the sub name of this action.
+
+=head2 number_of_args
+
+Returns the number of args this action expects. This is 0 if the action doesn't take any arguments and undef if it will take any number of arguments.
+
+=head2 number_of_captures
+
+Returns the number of captures this action expects for L<Chained|Catalyst::DispatchType::Chained> actions.
 
 =head2 meta
 
