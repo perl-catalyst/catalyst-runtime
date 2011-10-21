@@ -318,7 +318,7 @@ Returns an L<HTTP::Headers> object containing the headers for the current reques
 
 =head2 $req->hostname
 
-Returns the hostname of the client. Use $req->uri->host to get the hostname of the server.
+Returns the hostname of the client. Use C<< $req->uri->host >> to get the hostname of the server.
 
 =head2 $req->input
 
