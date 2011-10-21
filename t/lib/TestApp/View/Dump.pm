@@ -7,13 +7,15 @@ use Data::Dumper ();
 use Scalar::Util qw(blessed weaken);
 
 sub dump {
-    my ( $self, $reference ) = @_;
+    my ( $self, $reference, $purity ) = @_;
 
     return unless $reference;
 
+    $purity = defined $purity ? $purity : 1;
+
     my $dumper = Data::Dumper->new( [$reference] );
     $dumper->Indent(1);
-    $dumper->Purity(1);
+    $dumper->Purity($purity);
     $dumper->Useqq(0);
     $dumper->Deepcopy(1);
     $dumper->Quotekeys(0);
@@ -23,7 +25,7 @@ sub dump {
 }
 
 sub process {
-    my ( $self, $c, $reference ) = @_;
+    my ( $self, $c, $reference, $purity ) = @_;
 
     # Force processing of on-demand data
     $c->prepare_body;
@@ -37,7 +39,7 @@ sub process {
     my $context = delete $reference->{_context};
 
     if ( my $output =
-        $self->dump( $reference ) )
+        $self->dump( $reference, $purity ) )
     {
 
         $c->res->headers->content_type('text/plain');
