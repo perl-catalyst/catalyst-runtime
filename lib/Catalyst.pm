@@ -1028,6 +1028,9 @@ Catalyst> line.
     MyApp->setup;
     MyApp->setup( qw/-Debug/ );
 
+B<Note:> You B<should not> wrap this method with method modifiers
+or bad things will happen - wrap the C<setup_finalize> method instead.
+
 =cut
 
 sub setup {
