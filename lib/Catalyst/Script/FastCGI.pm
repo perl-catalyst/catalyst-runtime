@@ -153,6 +153,10 @@ Catalyst::Script::FastCGI - The FastCGI Catalyst Script
 
 Run a Catalyst application as fastcgi.
 
+=head1 SEE ALSO
+
+L<Catalyst::ScriptRunner>
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
