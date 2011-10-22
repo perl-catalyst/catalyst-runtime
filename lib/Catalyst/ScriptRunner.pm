@@ -86,6 +86,16 @@ individually.
 Called with two parameters, the application class (e.g. MyApp)
 and the script class, (i.e. one of Server/FastCGI/CGI/Create/Test)
 
+=head2 find_script_class ($appname, $script_name)
+
+Finds and loads the class for the script, trying the application specific
+script first, and falling back to the generic script. Returns the script
+which was loaded.
+
+=head2 find_script_traits ($appname, @try)
+
+Finds and loads a set of traits. Returns the list of traits which were loaded.
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
