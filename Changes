@@ -11,6 +11,15 @@
      easier for the application code to not have to differentiate between
      the two.
 
+   - Catalyst::ScriptRunner has been enhanced so that it will now
+     load and apply traits, making it easier to customise.
+     - MyApp::TraitFor::Script (if it exists) will be applied to all
+       scripts in the application.
+     - MyApp::TraitFor::Script::XXXX will be applied to the relevant script
+       (for example MyApp::TraitFor::Script::Server will be applied to
+       MyApp::Script::Server if it exists, or Catalyst::Script::Server
+       otherwise).
+
   Documentation:
 
    - Document how to get the vhost of the request in $c->req->hostname
