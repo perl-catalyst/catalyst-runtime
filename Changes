@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90005 - 2011-10-22 13:35:00
+
   New features:
 
    - $c->uri_for_action can now take an array of CaptureArgs and Args
