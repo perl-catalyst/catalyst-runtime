@@ -1393,11 +1393,12 @@ to interpolate all the parameters in the URI.
 
 =item @args?
 
-Optional list of extra arguments - can be supplied in the C<< \@captures_and_args? >>
-array ref, or here - whichever is easier for your code..
+Optional list of extra arguments - can be supplied in the
+C<< \@captures_and_args? >> array ref, or here - whichever is easier for your
+code.
 
-If your action may have a zero, a fixed or a variable number of args (e.g. C<< Args(1) >>
-for a fixed number or C<< Args() >> for a variable number)..
+Your action can have zero, a fixed or a variable number of args (e.g.
+C<< Args(1) >> for a fixed number or C<< Args() >> for a variable number)..
 
 =item \%query_values?
 
