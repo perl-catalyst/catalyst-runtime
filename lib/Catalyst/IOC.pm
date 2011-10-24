@@ -161,7 +161,7 @@ Sets up the controller container to be customised.
 
 =head2 component
 
-Adds a component to the subcontainer. Works like L<Bread::Board::service>.
+Adds a component to the sub-container. Works like L<Bread::Board::service>.
 
 =head1 AUTHORS
 

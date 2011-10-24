@@ -743,13 +743,13 @@ Catalyst::Container - IOC for Catalyst components
 Container that stores all components, i.e. all models, views and controllers
 together. Each service is an instance of the actual component, and by default
 it lives while the application is running. Retrieving components from this
-subcontainer will instantiate the component, if it hasn't been instantiated
+sub-container will instantiate the component, if it hasn't been instantiated
 already, but will not execute ACCEPT_CONTEXT.
 
 =head2 build_model_subcontainer
 
 Container that stores references for all models that are inside the components
-subcontainer. Retrieving a model triggers ACCEPT_CONTEXT, if it exists.
+sub-container. Retrieving a model triggers ACCEPT_CONTEXT, if it exists.
 
 =head2 build_view_subcontainer
 
@@ -810,7 +810,7 @@ Config::Any's available config file extensions (e.g. xml, json, pl, etc).
 
 =head2 build_prefix_service
 
-The prefix, based on the application name, that will be used to lookup the
+The prefix, based on the application name, that will be used to look-up the
 config files (which will be in the format $prefix.$extension). If the app is
 MyApp::Foo, the prefix will be myapp_foo.
 
@@ -887,7 +887,7 @@ to L<Module::Pluggable>.
 
 =head2 get_component_from_sub_container($sub_container, $name, $c, @args)
 
-Looks for components in a given subcontainer (such as controller, model or
+Looks for components in a given sub-container (such as controller, model or
 view), and returns the searched component. If $name is undef, it returns the
 default component (such as default_view, if $sub_container is 'view'). If
 $name is a regexp, it returns an array of matching components. Otherwise, it
@@ -896,19 +896,19 @@ looks for the component with name $name.
 =head2 get_all_components
 
 Fetches all the components, in each of the sub_containers model, view and
-controller, and returns a readonly hash. The keys are the class names, and
+controller, and returns a read-only hash. The keys are the class names, and
 the values are the blessed objects. This is what is returned by $c->components.
 
 =head2 add_component
 
-Adds a component to the appropriate subcontainer. The subcontainer is guessed
+Adds a component to the appropriate sub-container. The sub-container is guessed
 by the component name given.
 
 =head2 find_component
 
 Searches for components in all containers. If $component is the full class
-name, the subcontainer is guessed, and it gets the searched component in there.
-Otherwise, it looks for a component with that name in all subcontainers. If
+name, the sub-container is guessed, and it gets the searched component in there.
+Otherwise, it looks for a component with that name in all sub-containers. If
 $component is a regexp it calls _find_component_regexp and matches all
 components against that regexp.
 
@@ -920,7 +920,7 @@ is expected to return a list of component (package) names to be set up.
 =head2 setup_components
 
 Uses locate_components service to list the components, and adds them to the
-appropriate subcontainers, using add_component().
+appropriate sub-containers, using add_component().
 
 =head1 AUTHORS
 

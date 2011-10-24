@@ -6,7 +6,8 @@ use Test::Spelling;
 add_stopwords(qw(
     API CGI MVC PSGI Plack README SSI Starman XXXX URI htaccess middleware
     mixins namespace psgi startup Deprecations catamoose cataplack linearize
-    subclasses subdirectories refactoring adaptors
+    subclasses subdirectories refactoring adaptors ConfigLoader json xml
+    IOC conf myapp customised
     undef env regex unary rethrow rethrows stringifies CPAN STDERR SIGCHLD baz
     roadmap wishlist refactor refactored Runtime pluggable pluggability hoc apis
     fastcgi nginx Lighttpd IIS middlewares backend IRC
