@@ -238,7 +238,11 @@ eval "package $appclass; use Catalyst; __PACKAGE__->setup";
 is($@, '', "Didn't load component twice");
 is($appclass->model('TopLevel::Nested')->called,1, 'COMPONENT called once');
 
-# FIXME - OMG why should this even work?!!
+# FIXME we need a much better way of components being able to generate
+#       sub-components of themselves (e.g. bring back expand_component_modules?)
+#       as otherwise we _have_ to construct / call the COMPONENT method
+#       explicitly to get all the sub-components built for Devel::InnerPackage
+#       to find them. See FIXME in Catalyst::IOC::Container
 ok($appclass->model('TopLevel::GENERATED'), 'Have generated model');
 is(ref($appclass->model('TopLevel::GENERATED')), 'FooBarBazQuux',
     'ACCEPT_CONTEXT in generated inner package fired as expected');

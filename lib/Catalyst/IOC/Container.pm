@@ -683,8 +683,15 @@ sub add_component {
             dependencies => [
                 depends_on( '/application_name' ),
             ],
-        )
+        ),
     );
+    # XXX - FIXME - We have to explicitly build the service here,
+    #               causing the COMPONENT method to be called early here, as otherwise
+    #               if the component method defines other classes (e.g. the
+    #               ACCEPT_CONTEXT injection Model::DBIC::Schema does)
+    #               then they won't be found by Devel::InnerPackage
+    # see also t/aggregate/unit_core_component_loading.t
+    $instance_container->get_service($component_service_name)->get;
 
     $accept_context_container->add_service(
         Catalyst::IOC::BlockInjection->new(
