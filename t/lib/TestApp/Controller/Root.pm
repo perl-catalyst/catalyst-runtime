@@ -56,6 +56,7 @@ sub loop_test : Local {
 
 sub recursion_test : Local {
     my ( $self, $c ) = @_;
+    no warnings 'recursion';
     $c->forward( 'recursion_test' );
 }
 
