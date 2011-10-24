@@ -7,6 +7,7 @@ sub _plack_engine_name { 'CGI' }
 with 'Catalyst::ScriptRole';
 
 __PACKAGE__->meta->make_immutable;
+1;
 
 =head1 NAME
 

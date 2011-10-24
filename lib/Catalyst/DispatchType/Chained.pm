@@ -404,6 +404,7 @@ sub expand_action {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;
 
 =head1 USAGE
 

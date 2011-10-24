@@ -280,7 +280,6 @@ sub _application_args {
 }
 
 __PACKAGE__->meta->make_immutable;
-
 1;
 
 =head1 NAME
