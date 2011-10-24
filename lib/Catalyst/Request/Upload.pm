@@ -45,6 +45,8 @@ sub _build_basename {
 
 no Moose;
 
+=for stopwords uploadtmp
+
 =head1 NAME
 
 Catalyst::Request::Upload - handles file upload requests
@@ -129,9 +131,9 @@ Returns the size of the uploaded file in bytes.
 
 Returns a scalar containing the contents of the temporary file.
 
-Note that this method will cause the filehandle pointed to by
-C<< $upload->fh >> to be seeked to the start of the file,
-and the file handle to be put into binary mode.
+Note that this will cause the filehandle pointed to by C<< $upload->fh >> to
+be reset to the start of the file using seek and the file handle to be put
+into binary mode.
 
 =cut
 

@@ -65,7 +65,7 @@ script is upgraded to use L<Catalyst::Script::HTTP>.
 If you were using L<Catalyst::Engine::CGI> there is no upgrade needed if your
 myapp_cgi.pl script is already upgraded to use L<Catalyst::Script::CGI>.
 
-=head2 Upgrading the Preforking Engine
+=head2 Upgrading Catalyst::Engine::HTTP::Prefork
 
 If you were using L<Catalyst::Engine::HTTP::Prefork> then L<Starman>
 is automatically loaded. You should (at least) change your C<Makefile.PL>
@@ -223,7 +223,7 @@ been made which could cause incompatibilities. If your application or plugin
 is using deprecated code, or relying on side effects, then you could have
 issues upgrading to this release.
 
-Most issues found with pre-existing components have been easy to
+Most issues found with existing components have been easy to
 solve. This document provides a complete description of behavior changes
 which may cause compatibility issues, and of new Catalyst warnings which
 might be unclear.
@@ -281,7 +281,7 @@ replaces L<NEXT> with L<Class::C3::Adopt::NEXT>, forcing all components
 to resolve methods using C3, rather than the unpredictable dispatch
 order of L<NEXT>.
 
-This issue is characterised by your application failing to start due to an
+This issue manifests itself by your application failing to start due to an
 error message about having a non-linear @ISA.
 
 The Catalyst plugin most often causing this is
@@ -488,7 +488,7 @@ The following test demonstrates the problem:
     use Test::More;
     isnt(BaseClass->can('foo'), Child->can('foo'));
 
-=head2 Extending Catalyst::Request or other classes in an ad-hoc manner using mk_accessors
+=head2 Extending Catalyst::Request or other classes in an ad hoc manner using mk_accessors
 
 Previously, it was possible to add additional accessors to Catalyst::Request
 (or other classes) by calling the mk_accessors class method.

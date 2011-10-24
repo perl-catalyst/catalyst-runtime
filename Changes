@@ -1,5 +1,39 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90005 - 2011-10-22 13:35:00
+
+  New features:
+
+   - $c->uri_for_action can now take an array of CaptureArgs and Args
+     If you have an action which has both, then you can now say:
+     $c->uri_for_action('/myaction', [@captures, @args]);
+     whereas before you had to say:
+     $c->uri_for_action('/myaction', [@captures], @args);
+     The previous form is still supported, however in many cases it is
+     easier for the application code to not have to differentiate between
+     the two.
+
+   - Catalyst::ScriptRunner has been enhanced so that it will now
+     load and apply traits, making it easier to customise.
+     - MyApp::TraitFor::Script (if it exists) will be applied to all
+       scripts in the application.
+     - MyApp::TraitFor::Script::XXXX will be applied to the relevant script
+       (for example MyApp::TraitFor::Script::Server will be applied to
+       MyApp::Script::Server if it exists, or Catalyst::Script::Server
+       otherwise).
+
+  Documentation:
+
+   - Document how to get the vhost of the request in $c->req->hostname
+     to avoid confusion
+   - Remove documentation showing Global / Regex / Private actionsi
+     as whilst these still exist (and work), they are not recommended.
+   - Remove references to the -Engine flag.
+   - Remove references to the deprecated Catalyst->plugin method
+   - Spelling fixed (and tested) throughout the documentation
+   - Note that wrapping the setup method will not work with method modifiers
+     and provide an alternative.
+
 5.90004 - 2011-10-11 17:12:00
 
   Bug fixes:

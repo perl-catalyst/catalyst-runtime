@@ -83,7 +83,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90004';
+our $VERSION = '5.90005';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -158,7 +158,7 @@ documentation and tutorials.
     use Catalyst qw/-Debug/; # include plugins here as well
 
     ### In lib/MyApp/Controller/Root.pm (autocreated)
-    sub foo : Global { # called for /foo, /foo/1, /foo/1/2, etc.
+    sub foo : Chained('/') Args() { # called for /foo, /foo/1, /foo/1/2, etc.
         my ( $self, $c, @args ) = @_; # args are qw/1 2/ for /foo/1/2
         $c->stash->{template} = 'foo.tt'; # set the template
         # lookup something from db -- stash vars are passed to TT
@@ -176,48 +176,14 @@ documentation and tutorials.
     [% END %]
 
     # called for /bar/of/soap, /bar/of/soap/10, etc.
-    sub bar : Path('/bar/of/soap') { ... }
-
-    # called for all actions, from the top-most controller downwards
-    sub auto : Private {
-        my ( $self, $c ) = @_;
-        if ( !$c->user_exists ) { # Catalyst::Plugin::Authentication
-            $c->res->redirect( '/login' ); # require login
-            return 0; # abort request and go immediately to end()
-        }
-        return 1; # success; carry on to next action
-    }
+    sub bar : Chained('/') PathPart('/bar/of/soap') Args() { ... }
 
     # called after all actions are finished
-    sub end : Private {
+    sub end : Action {
         my ( $self, $c ) = @_;
         if ( scalar @{ $c->error } ) { ... } # handle errors
         return if $c->res->body; # already have a response
         $c->forward( 'MyApp::View::TT' ); # render template
-    }
-
-    ### in MyApp/Controller/Foo.pm
-    # called for /foo/bar
-    sub bar : Local { ... }
-
-    # called for /blargle
-    sub blargle : Global { ... }
-
-    # an index action matches /foo, but not /foo/1, etc.
-    sub index : Private { ... }
-
-    ### in MyApp/Controller/Foo/Bar.pm
-    # called for /foo/bar/baz
-    sub baz : Local { ... }
-
-    # first Root auto is called, then Foo auto, then this
-    sub auto : Private { ... }
-
-    # powerful regular expression paths are also possible
-    sub details : Regex('^product/(\w+)/details$') {
-        my ( $self, $c ) = @_;
-        # extract the (\w+) from the URI
-        my $product = $c->req->captures->[0];
     }
 
 See L<Catalyst::Manual::Intro> for additional information.
@@ -246,7 +212,7 @@ fully qualify the name by using a unary plus:
         +Fully::Qualified::Plugin::Name
     /;
 
-Special flags like C<-Debug> and C<-Engine> can also be specified as
+Special flags like C<-Debug> can also be specified as
 arguments when Catalyst is loaded:
 
     use Catalyst qw/-Debug My::Module/;
@@ -266,13 +232,6 @@ priority.
 This sets the log level to 'debug' and enables full debug output on the
 error screen. If you only want the latter, see L<< $c->debug >>.
 
-=head2 -Engine
-
-Forces Catalyst to use a specific engine. Omit the
-C<Catalyst::Engine::> prefix of the engine name, i.e.:
-
-    use Catalyst qw/-Engine=CGI/;
-
 =head2 -Home
 
 Forces Catalyst to use a specific home directory, e.g.:
@@ -286,11 +245,11 @@ the name will be replaced with underscores, e.g. MyApp::Web should use
 MYAPP_WEB_HOME. If both variables are set, the MYAPP_HOME one will be used.
 
 If none of these are set, Catalyst will attempt to automatically detect the
-home directory. If you are working in a development envirnoment, Catalyst
+home directory. If you are working in a development environment, Catalyst
 will try and find the directory containing either Makefile.PL, Build.PL or
 dist.ini. If the application has been installed into the system (i.e.
 you have done C<make install>), then Catalyst will use the path to your
-application module, without the .pm extension (ie, /foo/MyApp if your
+application module, without the .pm extension (e.g., /foo/MyApp if your
 application was installed at /foo/MyApp.pm)
 
 =head2 -Log
@@ -358,9 +317,10 @@ call to forward.
 
 Note that L<< forward|/"$c->forward( $action [, \@arguments ] )" >> implies
 an C<< eval { } >> around the call (actually
-L<< execute|/"$c->execute( $class, $coderef )" >> does), thus de-fatalizing
-all 'dies' within the called action. If you want C<die> to propagate you
-need to do something like:
+L<< execute|/"$c->execute( $class, $coderef )" >> does), thus rendering all
+exceptions thrown by the called action non-fatal and pushing them onto
+$c->error instead. If you want C<die> to propagate you need to do something
+like:
 
     $c->forward('foo');
     die join "\n", @{ $c->error } if @{ $c->error };
@@ -422,7 +382,7 @@ L<reverse|Catalyst::Action/reverse> return information for the visited action
 when they are invoked within the visited action.  This is different from the
 behavior of L<< forward|/"$c->forward( $action [, \@arguments ] )" >>, which
 continues to use the $c->action object from the caller action even when
-invoked from the callee.
+invoked from the called action.
 
 C<< $c->stash >> is kept unchanged.
 
@@ -872,26 +832,12 @@ sub path_to {
     else { return Path::Class::File->new( $c->config->{home}, @path ) }
 }
 
-=head2 $c->plugin( $name, $class, @args )
-
-Helper method for plugins. It creates a class data accessor/mutator and
-loads and instantiates the given class.
-
-    MyApp->plugin( 'prototype', 'HTML::Prototype' );
-
-    $c->prototype->define_javascript_functions;
-
-B<Note:> This method of adding plugins is deprecated. The ability
-to add plugins like this B<will be removed> in a Catalyst 5.81.
-Please do not use this functionality in new code.
-
-=cut
-
 sub plugin {
     my ( $class, $name, $plugin, @args ) = @_;
 
     # See block comment in t/aggregate/unit_core_plugin.t
-    $class->log->warn(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in Catalyst 5.81/);
+    # See block comment in t/unit_core_plugin.t
+    $class->log->warn(qq/Adding plugin using the ->plugin method is deprecated, and will be removed in a future release/);
 
     $class->_register_plugin( $plugin, 1 );
 
@@ -919,6 +865,9 @@ Catalyst> line.
 
     MyApp->setup;
     MyApp->setup( qw/-Debug/ );
+
+B<Note:> You B<should not> wrap this method with method modifiers
+or bad things will happen - wrap the C<setup_finalize> method instead.
 
 =cut
 
@@ -1177,7 +1126,15 @@ sub uri_for {
         }
 
         my $action = $path;
-        $path = $c->dispatcher->uri_for_action($action, $captures);
+        # ->uri_for( $action, \@captures_and_args, \%query_values? )
+        if( !@args && $action->number_of_args ) {
+            my $expanded_action = $c->dispatcher->expand_action( $action );
+
+            my $num_captures = $expanded_action->number_of_captures;
+            unshift @args, splice @$captures, $num_captures;
+        }
+
+       $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
             $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
                 if $c->debug;
@@ -1228,9 +1185,9 @@ sub uri_for {
     $res;
 }
 
-=head2 $c->uri_for_action( $path, \@captures?, @args?, \%query_values? )
+=head2 $c->uri_for_action( $path, \@captures_and_args?, @args?, \%query_values? )
 
-=head2 $c->uri_for_action( $action, \@captures?, @args?, \%query_values? )
+=head2 $c->uri_for_action( $action, \@captures_and_args?, @args?, \%query_values? )
 
 =over
 
@@ -1258,6 +1215,30 @@ You can use:
  $c->uri_for_action('/users/lst')
 
 and it will create the URI /users/the-list.
+
+=item \@captures_and_args?
+
+Optional array reference of Captures (i.e. C<<CaptureArgs or $c->req->captures>)
+and arguments to the request. Usually used with L<Catalyst::DispatchType::Chained>
+to interpolate all the parameters in the URI.
+
+=item @args?
+
+Optional list of extra arguments - can be supplied in the C<< \@captures_and_args? >>
+array ref, or here - whichever is easier for your code..
+
+If your action may have a zero, a fixed or a variable number of args (e.g. C<< Args(1) >>
+for a fixed number or C<< Args() >> for a variable number)..
+
+=item \%query_values?
+
+Optional array reference of query parameters to append. E.g.
+
+  { foo => 'bar' }
+
+will generate
+
+  /rest/of/your/uri?foo=bar
 
 =back
 
@@ -2105,7 +2086,7 @@ sub log_response_status_line {
 
 =head2 $c->log_response_headers($headers);
 
-Hook method which can be wrapped by plugins to log the responseheaders.
+Hook method which can be wrapped by plugins to log the response headers.
 No-op in the default implementation.
 
 =cut
@@ -2645,7 +2626,7 @@ sub setup_stats {
 =head2 $c->registered_plugins
 
 Returns a sorted list of the plugins which have either been stated in the
-import list or which have been added via C<< MyApp->plugin(@args); >>.
+import list.
 
 If passed a given plugin name, it will report a boolean value indicating
 whether or not that plugin is loaded.  A fully qualified name is required if
@@ -2808,7 +2789,7 @@ welcome screens
 
 C<parse_on_demand> - The request body (for example file uploads) will not be parsed
 until it is accessed. This allows you to (for example) check authentication (and reject
-the upload) before actually recieving all the data. See L</ON-DEMAND PARSER>
+the upload) before actually receiving all the data. See L</ON-DEMAND PARSER>
 
 =item *
 
@@ -2823,7 +2804,7 @@ to be shown in hit debug tables in the test server.
 
 =item *
 
-C<use_request_uri_for_path> - Controlls if the C<REQUEST_URI> or C<PATH_INFO> environment
+C<use_request_uri_for_path> - Controls if the C<REQUEST_URI> or C<PATH_INFO> environment
 variable should be used for determining the request path. 
 
 Most web server environments pass the requested path to the application using environment variables,
@@ -2838,7 +2819,7 @@ is determined by the C<< $c->config(use_request_uri_for_path) >> setting (which 
 =item use_request_uri_for_path => 0
 
 This is the default (and the) traditional method that Catalyst has used for determining the path information.
-The path is synthesised from a combination of the C<PATH_INFO> and C<SCRIPT_NAME> environment variables.
+The path is generated from a combination of the C<PATH_INFO> and C<SCRIPT_NAME> environment variables.
 The allows the application to behave correctly when C<mod_rewrite> is being used to redirect requests
 into the application, as these variables are adjusted by mod_rewrite to take account for the redirect.
 
@@ -2977,6 +2958,8 @@ Wiki:
 =head2 L<Catalyst::Response> - Response object
 
 =head2 L<Catalyst::Test> - The test suite.
+
+=begin stopwords
 
 =head1 PROJECT FOUNDER
 
@@ -3121,6 +3104,8 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
+
+=end stopwords
 
 =head1 COPYRIGHT
 

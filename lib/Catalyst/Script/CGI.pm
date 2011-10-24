@@ -23,6 +23,10 @@ Catalyst::Script::CGI - The CGI Catalyst Script
 
 This is a script to run the Catalyst engine specialized for the CGI environment.
 
+=head1 SEE ALSO
+
+L<Catalyst::ScriptRunner>
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

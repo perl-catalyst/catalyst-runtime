@@ -33,6 +33,10 @@ Catalyst::Script::Test - Test Catalyst application on the command line
 
 Script to perform a test hit against your application and display the output.
 
+=head1 SEE ALSO
+
+L<Catalyst::ScriptRunner>
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

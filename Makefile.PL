@@ -19,6 +19,7 @@ requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean' => '0.13';
 requires 'B::Hooks::EndOfScope' => '0.08';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
+requires 'Class::Load' => '0.08';
 requires 'Class::MOP' => '0.95';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
@@ -90,6 +91,7 @@ author_requires(map {; $_ => 0 } qw(
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
+  Test::Spelling
   Pod::Coverage::TrustPod
 ));
 
