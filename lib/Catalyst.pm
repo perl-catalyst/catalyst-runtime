@@ -2015,6 +2015,7 @@ sub prepare {
                 $c->prepare_body;
             }
         }
+        $c->prepare_action;
     }
     # VERY ugly and probably shouldn't rely on ->finalize actually working
     catch {
@@ -2026,14 +2027,7 @@ sub prepare {
         die $_;
     };
 
-    my $method  = $c->req->method  || '';
-    my $path    = $c->req->path;
-    $path       = '/' unless length $path;
-    my $address = $c->req->address || '';
-
     $c->log_request;
-
-    $c->prepare_action;
 
     return $c;
 }
