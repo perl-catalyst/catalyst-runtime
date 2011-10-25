@@ -3157,7 +3157,26 @@ headers.
 
 If you do not wish to use the proxy support at all, you may set:
 
-    MyApp->config(ignore_frontend_proxy => 1);
+    MyApp->config(ignore_frontend_proxy => 0);
+
+=head2 Note about psgi files
+
+Note that if you supply your own .psgi file, calling
+C<< MyApp->psgi_app(@_); >>, then B<this will not happen automatically>.
+
+You either need to apply L<Plack::Middleware::ReverseProxy> yourself
+in your psgi, for example:
+
+    builder {
+        enable "Plack::Middleware::ReverseProxy";
+        MyApp->psgi_app
+    };
+
+This will unconditionally add the ReverseProxy support, or you need to call
+C<< $app = MyApp->apply_default_middlewares($app) >> (to conditionally
+apply the support depending upon your config).
+
+See L<Catalyst::PSGI> for more information.
 
 =head1 THREAD SAFETY
 

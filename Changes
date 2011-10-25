@@ -6,6 +6,12 @@
      application authors to add custom options to their scripts then
      get them passed through to the application.
 
+  Doumentation:
+   - Clarify that if you manually write your own .psgi file, then optional
+     proxy support (via the using_frontend_proxy config value) will not be
+     enabled unless you explicitly apply the default middlewares from
+     Catalyst, or you apply the middleware manually.
+
   Bug fixes:
    - Add '1;' to all classes which were relying on the ->make_immutable
      call to return a true value. Due to perl internals bugs in 5.8 and
