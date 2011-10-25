@@ -13,14 +13,14 @@
      Catalyst, or you apply the middleware manually.
 
   Bug fixes:
-   - Add '1;' to all classes which were relying on the ->make_immutable
-     call to return a true value. Due to perl internals bugs in 5.8 and
-     5.10 (not present in other perl versions) require can pass the
-     context inappropriately, meaning that some methods of loading classes
-     can fail due to void context being passed throuh to make_immutable,
-     causing it to not return a value.
-     This bug is shown by trying to load Catalyst::Script::Create (for example)
-     with Module::Require and is fixed in core by commit 021f53de09926
+   - Fix issue due to perl internals bugs in 5.8 and 5.10 (not present in
+     other perl versions) require can pass the context inappropriately,
+     meaning that some methods of loading classes can fail due to void
+     context being passed throuh to make_immutable, causing it to not return
+     a value.
+     This bug caused loading Catalyst::Script::XXX to fail and is fixed
+     both by bumping the Class::Load dependency, and also adding an explicit
+     '1;' to the end of the classes, avoiding the context issue.
 
 5.90005 - 2011-10-22 13:35:00
 
