@@ -22,6 +22,9 @@
      both by bumping the Class::Load dependency, and also adding an explicit
      '1;' to the end of the classes, avoiding the context issue.
 
+   - Fix using_frontend_proxy support in mod_perl by using the psgi wrapped
+     in default middleware in mod_perl context, rather than the raw psgi.
+
 5.90005 - 2011-10-22 13:35:00
 
   New features:

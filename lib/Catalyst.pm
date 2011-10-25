@@ -2652,7 +2652,7 @@ sub setup_engine {
 
         $meta->add_method(handler => sub {
             my $r = shift;
-            my $psgi_app = $class->psgi_app;
+            my $psgi_app = $class->_finalized_psgi_app;
             $apache->call_app($r, $psgi_app);
         });
 
