@@ -1576,7 +1576,7 @@ EOF
 =head2 run_options
 
 Contains a hash of options passed from the application script, including
-the original ARGV the script receieved, the processed values from that
+the original ARGV the script received, the processed values from that
 ARGV and any extra arguments to the script which were not processed.
 
 This can be used to add custom options to your application's scripts
