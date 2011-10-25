@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  New features:
+   - A new 'run_options' class data method has been added to Catalyst.pm
+     This is used to store all the options passed by scripts, allowing
+     application authors to add custom options to their scripts then
+     get them passed through to the application.
+
   Bug fixes:
    - Add '1;' to all classes which were relying on the ->make_immutable
      call to return a true value. Due to perl internals bugs in 5.8 and
