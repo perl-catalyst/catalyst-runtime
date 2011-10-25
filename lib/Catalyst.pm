@@ -2023,6 +2023,13 @@ sub prepare {
         $c->response->status(400);
         $c->response->content_type('text/plain');
         $c->response->body('Bad Request');
+        # Note we call finalize and then die here, which escapes
+        # finalize being called in the enclosing block..
+        # It in fact couldn't be called, as we don't return $c..
+        # This is a mess - but I'm unsure you can fix this without
+        # breaking compat for people doing crazy things (we should set
+        # the 400 and just return the ctx here IMO, letting finalize get called
+        # above...
         $c->finalize;
         die $_;
     };
