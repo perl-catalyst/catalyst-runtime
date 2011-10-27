@@ -50,9 +50,14 @@ has headers => (
 has _context => (
   is => 'rw',
   weak_ref => 1,
-  handles => ['read'],
+  handles => ['read'], # XXX FIXME!
   clearer => '_clear_context',
 );
+
+sub read_chunk {
+    my $self = shift;
+    return $self->env->{'psgi.input'}->read(@_);
+}
 
 has body_parameters => (
   is => 'rw',
@@ -490,6 +495,10 @@ be either a scalar or an arrayref containing scalars.
 Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
+
+=head2 $req->read_chunk(\$buff, $max)
+
+Reads a chunk..
 
 You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 

@@ -739,7 +739,7 @@ sub read {
     }
 }
 
-=head2 $self->read_chunk($c, $buffer, $length)
+=head2 $self->read_chunk($c, \$buffer, $length)
 
 Each engine implements read_chunk as its preferred way of reading a chunk
 of data. Returns the number of bytes read. A return of 0 indicates that
@@ -749,7 +749,7 @@ there is no more data to be read.
 
 sub read_chunk {
     my ($self, $ctx) = (shift, shift);
-    return $ctx->request->env->{'psgi.input'}->read(@_);
+    return $ctx->request->read_chunk(@_);
 }
 
 =head2 $self->read_length
