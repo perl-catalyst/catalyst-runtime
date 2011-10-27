@@ -345,12 +345,6 @@ sub finalize_headers {
     return;
 }
 
-=head2 $self->finalize_read($c)
-
-=cut
-
-sub finalize_read { }
-
 =head2 $self->finalize_uploads($c)
 
 Clean up after uploads, deleting temp files.
@@ -399,7 +393,6 @@ sub prepare_body {
         # paranoia against wrong Content-Length header
         my $remaining = $length - $c->request->_read_position;
         if ( $remaining > 0 ) {
-            $self->finalize_read($c);
             Catalyst::Exception->throw(
                 "Wrong Content-Length value: $length" );
         }
@@ -726,7 +719,6 @@ sub read {
 
     # Are we done reading?
     if ( $remaining <= 0 ) {
-        $self->finalize_read($c);
         return;
     }
 
@@ -735,7 +727,6 @@ sub read {
     if ( defined $rc ) {
         if (0 == $rc) { # Nothing more to read even though Content-Length
                         # said there should be.
-            $self->finalize_read;
             return;
         }
         my $request = $c->request;
