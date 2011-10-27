@@ -709,14 +709,6 @@ sub prepare_uploads {
     }
 }
 
-=head2 $self->prepare_write($c)
-
-Abstract method. Implemented by the engines.
-
-=cut
-
-sub prepare_write { }
-
 =head2 $self->read($c, [$maxlength])
 
 Reads from the input stream by calling C<< $self->read_chunk >>.
@@ -845,10 +837,6 @@ sub write {
     my ( $self, $c, $buffer ) = @_;
 
     my $response = $c->response;
-    unless ( $response->_prepared_write ) {
-        $self->prepare_write($c);
-        $response->_set_prepared_write(1);
-    }
 
     $buffer = q[] unless defined $buffer;
 

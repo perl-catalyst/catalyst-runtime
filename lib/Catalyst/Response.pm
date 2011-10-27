@@ -7,8 +7,6 @@ use namespace::autoclean;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
-has _prepared_write => (is => 'ro', writer => '_set_prepared_write');
-
 has _response_cb => (
     is      => 'ro',
     isa     => 'CodeRef',
