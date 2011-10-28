@@ -28,7 +28,23 @@ has _read_length => ( is => 'ro',
 has action => (is => 'rw');
 has address => (is => 'rw');
 has arguments => (is => 'rw', default => sub { [] });
-has cookies => (is => 'rw', default => sub { {} });
+has cookies => (is => 'ro', builder => 'prepare_cookies', lazy => 1);
+
+=head2 $self->prepare_cookies($c)
+
+Parse cookies from header. Sets a L<CGI::Simple::Cookie> object.
+
+=cut
+
+sub prepare_cookies {
+    my ( $self ) = @_;
+
+    if ( my $header = $self->header('Cookie') ) {
+        return { CGI::Simple::Cookie->parse($header) };
+    }
+    {};
+}
+
 has query_keywords => (is => 'rw');
 has match => (is => 'rw');
 has method => (is => 'rw');
@@ -42,10 +58,28 @@ has headers => (
   is      => 'rw',
   isa     => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header referer user_agent)],
-  default => sub { HTTP::Headers->new() },
-  required => 1,
+  builder => 'prepare_headers',
   lazy => 1,
 );
+
+=head2 $self->prepare_headers($c)
+
+=cut
+
+sub prepare_headers {
+    my ($self) = @_;
+
+    my $env = $self->env;
+    my $headers = HTTP::Headers->new();
+
+    for my $header (keys %{ $env }) {
+        next unless $header =~ /^(HTTP|CONTENT|COOKIE)/i;
+        (my $field = $header) =~ s/^HTTPS?_//;
+        $field =~ tr/_/-/;
+        $headers->header($field => $env->{$header});
+    }
+    return $headers;
+}
 
 has _context => (
   is => 'rw',

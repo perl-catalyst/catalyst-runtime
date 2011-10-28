@@ -402,38 +402,6 @@ sub prepare_body_parameters {
     $c->request->prepare_body_parameters;
 }
 
-=head2 $self->prepare_cookies($c)
-
-Parse cookies from header. Sets a L<CGI::Simple::Cookie> object.
-
-=cut
-
-sub prepare_cookies {
-    my ( $self, $c ) = @_;
-
-    if ( my $header = $c->request->header('Cookie') ) {
-        $c->req->cookies( { CGI::Simple::Cookie->parse($header) } );
-    }
-}
-
-=head2 $self->prepare_headers($c)
-
-=cut
-
-sub prepare_headers {
-    my ($self, $ctx) = @_;
-
-    my $env = $ctx->request->env;
-    my $headers = $ctx->request->headers;
-
-    for my $header (keys %{ $env }) {
-        next unless $header =~ /^(HTTP|CONTENT|COOKIE)/i;
-        (my $field = $header) =~ s/^HTTPS?_//;
-        $field =~ tr/_/-/;
-        $headers->header($field => $env->{$header});
-    }
-}
-
 =head2 $self->prepare_parameters($c)
 
 sets up parameters from query and post parameters.

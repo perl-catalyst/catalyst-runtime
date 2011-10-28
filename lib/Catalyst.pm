@@ -2027,8 +2027,6 @@ sub prepare {
             $c->prepare_request(@arguments);
             $c->prepare_connection;
             $c->prepare_query_parameters;
-            $c->prepare_headers;
-            $c->prepare_cookies;
             $c->prepare_path;
 
             # Prepare the body for reading, either by prepare_body
@@ -2122,22 +2120,6 @@ sub prepare_connection {
     my $c = shift;
     $c->request->prepare_connection;
 }
-
-=head2 $c->prepare_cookies
-
-Prepares cookies.
-
-=cut
-
-sub prepare_cookies { my $c = shift; $c->engine->prepare_cookies( $c, @_ ) }
-
-=head2 $c->prepare_headers
-
-Prepares headers.
-
-=cut
-
-sub prepare_headers { my $c = shift; $c->engine->prepare_headers( $c, @_ ) }
 
 =head2 $c->prepare_parameters
 
