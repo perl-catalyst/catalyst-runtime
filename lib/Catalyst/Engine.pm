@@ -713,30 +713,7 @@ Maintains the read_length and read_position counters as data is read.
 sub read {
     my ( $self, $c, $maxlength ) = @_;
 
-    my $request = $c->request;
-    my $remaining = $request->_read_length - $request->_read_position;
-    $maxlength ||= $CHUNKSIZE;
-
-    # Are we done reading?
-    if ( $remaining <= 0 ) {
-        return;
-    }
-
-    my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
-    my $rc = $self->read_chunk( $c, my $buffer, $readlen );
-    if ( defined $rc ) {
-        if (0 == $rc) { # Nothing more to read even though Content-Length
-                        # said there should be.
-            return;
-        }
-        my $request = $c->request;
-        $request->_read_position( $request->_read_position + $rc );
-        return $buffer;
-    }
-    else {
-        Catalyst::Exception->throw(
-            message => "Unknown error reading input: $!" );
-    }
+    $c->request->read($maxlength);
 }
 
 =head2 $self->read_chunk($c, \$buffer, $length)

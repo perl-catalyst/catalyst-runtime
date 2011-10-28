@@ -2405,7 +2405,7 @@ $c->request.  You must handle all body parsing yourself.
 
 =cut
 
-sub read { my $c = shift; return $c->engine->read( $c, @_ ) }
+sub read { my $c = shift; return $c->request->read( @_ ) }
 
 =head2 $c->run
 

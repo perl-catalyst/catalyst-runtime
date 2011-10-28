@@ -50,9 +50,37 @@ has headers => (
 has _context => (
   is => 'rw',
   weak_ref => 1,
-  handles => ['read'], # XXX FIXME!
   clearer => '_clear_context',
 );
+
+# Amount of data to read from input on each pass
+our $CHUNKSIZE = 64 * 1024;
+
+sub read {
+    my ($self, $maxlength) = @_;
+    my $remaining = $self->_read_length - $self->_read_position;
+    $maxlength ||= $CHUNKSIZE;
+
+    # Are we done reading?
+    if ( $remaining <= 0 ) {
+        return;
+    }
+
+    my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
+    my $rc = $self->read_chunk( my $buffer, $readlen );
+    if ( defined $rc ) {
+        if (0 == $rc) { # Nothing more to read even though Content-Length
+                        # said there should be.
+            return;
+        }
+        $self->_read_position( $self->_read_position + $rc );
+        return $buffer;
+    }
+    else {
+        Catalyst::Exception->throw(
+            message => "Unknown error reading input: $!" );
+    }
+}
 
 sub read_chunk {
     my $self = shift;
