@@ -101,11 +101,9 @@ has uploads => (
 );
 
 has parameters => (
-  is => 'rw',
-  required => 1,
-  lazy => 1,
-  default => sub { {} },
-  predicate => '_has_prepared_parameters',
+    is => 'rw',
+    lazy => 1,
+    builder => 'prepare_parameters',
 );
 
 # TODO:
@@ -116,11 +114,31 @@ has parameters => (
 #  these lazy build from there and kill all the direct hash access
 #  in Catalyst.pm and Engine.pm?
 
-before parameters => sub {
-    my ($self) = @_;
+sub prepare_parameters {
+    my ( $self ) = @_;
+
     $self->prepare_body;
-    $self->_context->engine->prepare_parameters($self->_context);
-};
+    my $parameters = {};
+    my $body_parameters = $self->body_parameters;
+    my $query_parameters = $self->query_parameters;
+    # We copy, no references
+    foreach my $name (keys %$query_parameters) {
+        my $param = $query_parameters->{$name};
+        $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
+    }
+
+    # Merge query and body parameters
+    foreach my $name (keys %$body_parameters) {
+        my $param = $body_parameters->{$name};
+        my @values = ref $param eq 'ARRAY' ? @$param : ($param);
+        if ( my $existing = $parameters->{$name} ) {
+          unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
+        }
+        $parameters->{$name} = @values > 1 ? \@values : $values[0];
+    }
+    $parameters;
+}
+
 before body_parameters => sub {
     my ($self) = @_;
     $self->prepare_body;

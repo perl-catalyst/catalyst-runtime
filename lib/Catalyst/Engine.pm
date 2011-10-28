@@ -466,26 +466,7 @@ sets up parameters from query and post parameters.
 sub prepare_parameters {
     my ( $self, $c ) = @_;
 
-    my $request = $c->request;
-    my $parameters = {};
-    my $body_parameters = $request->body_parameters;
-    my $query_parameters = $request->query_parameters;
-    # We copy, no references
-    foreach my $name (keys %$query_parameters) {
-        my $param = $query_parameters->{$name};
-        $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
-    }
-
-    # Merge query and body parameters
-    foreach my $name (keys %$body_parameters) {
-        my $param = $body_parameters->{$name};
-        my @values = ref $param eq 'ARRAY' ? @$param : ($param);
-        if ( my $existing = $parameters->{$name} ) {
-          unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
-        }
-        $parameters->{$name} = @values > 1 ? \@values : $values[0];
-    }
-    $request->{parameters} = $parameters; # FIXME
+    $c->request->parameters;
 }
 
 =head2 $self->prepare_path($c)
