@@ -46,7 +46,16 @@ has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');
 has action => (is => 'rw');
 has counter => (is => 'rw', default => sub { {} });
-has request => (is => 'rw', default => sub { $_[0]->request_class->new({}) }, required => 1, lazy => 1);
+has request => (
+    is => 'rw',
+    default => sub {
+        my $self = shift;
+        my %p;
+        $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
+        $self->request_class->new(\%p);
+    },
+    lazy => 1,
+);
 has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
 has namespace => (is => 'rw');
 
@@ -1983,6 +1992,11 @@ etc.).
 
 =cut
 
+has _uploadtmp => (
+    is => 'ro',
+    predicate => '_has_uploadtmp',
+);
+
 sub prepare {
     my ( $class, @arguments ) = @_;
 
@@ -1991,7 +2005,8 @@ sub prepare {
     # into the application.
     $class->context_class( ref $class || $class ) unless $class->context_class;
 
-    my $c = $class->context_class->new({});
+    my $uploadtmp = $class->config->{uploadtmp};
+    my $c = $class->context_class->new({ $uploadtmp ? (_uploadtmp => $uploadtmp) : ()});
 
     # For on-demand data
     $c->request->_context($c);

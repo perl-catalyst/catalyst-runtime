@@ -105,6 +105,7 @@ has parameters => (
   required => 1,
   lazy => 1,
   default => sub { {} },
+  predicate => '_has_prepared_parameters',
 );
 
 # TODO:
@@ -115,11 +116,83 @@ has parameters => (
 #  these lazy build from there and kill all the direct hash access
 #  in Catalyst.pm and Engine.pm?
 
-before $_ => sub {
+before parameters => sub {
     my ($self) = @_;
-    my $context = $self->_context || return;
-    $context->prepare_body;
-} for qw/parameters body_parameters/;
+    $self->prepare_body;
+    $self->_context->engine->prepare_parameters($self->_context);
+};
+before body_parameters => sub {
+    my ($self) = @_;
+    $self->prepare_body;
+    $self->prepare_body_parameters;
+};
+
+=head2 $self->prepare_body()
+
+sets up the L<Catalyst::Request> object body using L<HTTP::Body>
+
+=cut
+
+has _uploadtmp => (
+    is => 'ro',
+    predicate => '_has_uploadtmp',
+);
+
+sub prepare_body {
+    my ( $self ) = @_;
+
+    if ( my $length = $self->_read_length ) {
+        unless ( $self->_body ) {
+            my $type = $self->header('Content-Type');
+            $self->_body(HTTP::Body->new( $type, $length ));
+            $self->_body->cleanup(1); # Make extra sure!
+            $self->_body->tmpdir( $self->_uploadtmp )
+              if $self->_has_uploadtmp;
+        }
+
+        # Check for definedness as you could read '0'
+        while ( defined ( my $buffer = $self->read() ) ) {
+            $self->prepare_body_chunk($buffer);
+        }
+
+        # paranoia against wrong Content-Length header
+        my $remaining = $length - $self->_read_position;
+        if ( $remaining > 0 ) {
+            Catalyst::Exception->throw(
+                "Wrong Content-Length value: $length" );
+        }
+    }
+    else {
+        # Defined but will cause all body code to be skipped
+        $self->_body(0);
+    }
+}
+
+=head2 $self->prepare_body_chunk()
+
+Add a chunk to the request body.
+
+=cut
+
+sub prepare_body_chunk {
+    my ( $self, $chunk ) = @_;
+
+    $self->_body->add($chunk);
+}
+
+=head2 $self->prepare_body_parameters()
+
+Sets up parameters from body.
+
+=cut
+
+sub prepare_body_parameters {
+    my ( $self ) = @_;
+
+    return unless $self->_body;
+
+    $self->{body_parameters} = $self->_body->param; # FIXME!! Recursion here.
+}
 
 around parameters => sub {
     my ($orig, $self, $params) = @_;
@@ -153,7 +226,7 @@ has _body => (
 #             and provide a custom reader..
 sub body {
   my $self = shift;
-  $self->_context->prepare_body();
+  $self->prepare_body();
   croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }

@@ -374,33 +374,7 @@ sets up the L<Catalyst::Request> object body using L<HTTP::Body>
 sub prepare_body {
     my ( $self, $c ) = @_;
 
-    my $appclass = ref($c) || $c;
-    my $request = $c->request;
-    if ( my $length = $request->_read_length ) {
-        unless ( $request->_body ) {
-            my $type = $request->header('Content-Type');
-            $request->_body(HTTP::Body->new( $type, $length ));
-            $request->_body->cleanup(1); # Make extra sure!
-            $request->_body->tmpdir( $appclass->config->{uploadtmp} )
-              if exists $appclass->config->{uploadtmp};
-        }
-
-        # Check for definedness as you could read '0'
-        while ( defined ( my $buffer = $self->read($c) ) ) {
-            $c->prepare_body_chunk($buffer);
-        }
-
-        # paranoia against wrong Content-Length header
-        my $remaining = $length - $c->request->_read_position;
-        if ( $remaining > 0 ) {
-            Catalyst::Exception->throw(
-                "Wrong Content-Length value: $length" );
-        }
-    }
-    else {
-        # Defined but will cause all body code to be skipped
-        $c->request->_body(0);
-    }
+    $c->request->prepare_body;
 }
 
 =head2 $self->prepare_body_chunk($c)
@@ -409,10 +383,11 @@ Add a chunk to the request body.
 
 =cut
 
+# XXX - Can this be deleted?
 sub prepare_body_chunk {
     my ( $self, $c, $chunk ) = @_;
 
-    $c->request->_body->add($chunk);
+    $c->request->prepare_body_chunk($chunk);
 }
 
 =head2 $self->prepare_body_parameters($c)
@@ -424,9 +399,7 @@ Sets up parameters from body.
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
 
-    return unless $c->request->_body;
-
-    $c->request->body_parameters( $c->request->_body->param );
+    $c->request->prepare_body_parameters;
 }
 
 =head2 $self->prepare_connection($c)
@@ -494,7 +467,7 @@ sub prepare_parameters {
     my ( $self, $c ) = @_;
 
     my $request = $c->request;
-    my $parameters = $request->parameters;
+    my $parameters = {};
     my $body_parameters = $request->body_parameters;
     my $query_parameters = $request->query_parameters;
     # We copy, no references
@@ -512,6 +485,7 @@ sub prepare_parameters {
         }
         $parameters->{$name} = @values > 1 ? \@values : $values[0];
     }
+    $request->{parameters} = $parameters; # FIXME
 }
 
 =head2 $self->prepare_path($c)
@@ -626,7 +600,6 @@ sub prepare_query_parameters {
             $query{$param} = $value;
         }
     }
-
     $c->request->query_parameters( \%query );
 }
 
