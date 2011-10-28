@@ -402,29 +402,6 @@ sub prepare_body_parameters {
     $c->request->prepare_body_parameters;
 }
 
-=head2 $self->prepare_connection($c)
-
-Abstract method implemented in engines.
-
-=cut
-
-sub prepare_connection {
-    my ($self, $ctx) = @_;
-
-    my $request = $ctx->request;
-    my $env = $ctx->request->env;
-
-    $request->address( $env->{REMOTE_ADDR} );
-    $request->hostname( $env->{REMOTE_HOST} )
-        if exists $env->{REMOTE_HOST};
-    $request->protocol( $env->{SERVER_PROTOCOL} );
-    $request->remote_user( $env->{REMOTE_USER} );
-    $request->method( $env->{REQUEST_METHOD} );
-    $request->secure( $env->{'psgi.url_scheme'} eq 'https' ? 1 : 0 );
-
-    return;
-}
-
 =head2 $self->prepare_cookies($c)
 
 Parse cookies from header. Sets a L<CGI::Simple::Cookie> object.

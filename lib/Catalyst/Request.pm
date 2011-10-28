@@ -212,6 +212,21 @@ sub prepare_body_parameters {
     $self->{body_parameters} = $self->_body->param; # FIXME!! Recursion here.
 }
 
+sub prepare_connection {
+    my ($self) = @_;
+
+    my $env = $self->env;
+
+    $self->address( $env->{REMOTE_ADDR} );
+    $self->hostname( $env->{REMOTE_HOST} )
+        if exists $env->{REMOTE_HOST};
+    $self->protocol( $env->{SERVER_PROTOCOL} );
+    $self->remote_user( $env->{REMOTE_USER} );
+    $self->method( $env->{REQUEST_METHOD} );
+    $self->secure( $env->{'psgi.url_scheme'} eq 'https' ? 1 : 0 );
+}
+
+# XXX - FIXME - method is here now, move this crap...
 around parameters => sub {
     my ($orig, $self, $params) = @_;
     if ($params) {

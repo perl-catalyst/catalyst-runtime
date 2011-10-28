@@ -2120,7 +2120,7 @@ Prepares connection.
 
 sub prepare_connection {
     my $c = shift;
-    $c->engine->prepare_connection( $c, @_ );
+    $c->request->prepare_connection;
 }
 
 =head2 $c->prepare_cookies
