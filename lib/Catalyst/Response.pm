@@ -43,11 +43,6 @@ has headers   => (
   required => 1,
   lazy => 1,
 );
-has _context => (
-  is => 'rw',
-  weak_ref => 1,
-  clearer => '_clear_context',
-);
 
 sub output { shift->body(@_) }
 

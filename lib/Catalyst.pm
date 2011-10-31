@@ -2010,7 +2010,6 @@ sub prepare {
 
     # For on-demand data
     $c->request->_context($c);
-    $c->response->_context($c);
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
