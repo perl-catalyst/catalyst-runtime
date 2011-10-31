@@ -2973,10 +2973,7 @@ your output data, if known.
 sub write {
     my $c = shift;
 
-    # Finalize headers if someone manually writes output
-    $c->finalize_headers;
-
-    return $c->engine->write( $c, @_ );
+    return $c->response->write( @_ );
 }
 
 =head2 version

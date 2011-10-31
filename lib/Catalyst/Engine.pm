@@ -325,29 +325,14 @@ sub finalize_error {
 
 =head2 $self->finalize_headers($c)
 
-Abstract method, allows engines to write headers to response
+Allows engines to write headers to response
 
 =cut
 
 sub finalize_headers {
     my ($self, $ctx) = @_;
 
-    # This is a less-than-pretty hack to avoid breaking the old
-    # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
-    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
-    # just pulls the headers out of $ctx->response in its run method and never
-    # sets response_cb. So take the lack of a response_cb as a sign that we
-    # don't need to set the headers.
-
-    return unless ($ctx->response->_has_response_cb);
-
-    my @headers;
-    $ctx->response->headers->scan(sub { push @headers, @_ });
-
-    my $writer = $ctx->response->_response_cb->([ $ctx->response->status, \@headers ]);
-    $ctx->response->_set_writer($writer);
-    $ctx->response->_clear_response_cb;
-
+    $ctx->response->finalize_headers;
     return;
 }
 
@@ -709,14 +694,7 @@ Writes the buffer to the client.
 sub write {
     my ( $self, $c, $buffer ) = @_;
 
-    my $response = $c->response;
-
-    $buffer = q[] unless defined $buffer;
-
-    my $len = length($buffer);
-    $c->res->_writer->write($buffer);
-
-    return $len;
+    $c->response->write($buffer);
 }
 
 =head2 $self->unescape_uri($uri)

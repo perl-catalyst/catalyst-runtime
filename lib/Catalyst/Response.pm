@@ -46,13 +46,63 @@ has headers   => (
 has _context => (
   is => 'rw',
   weak_ref => 1,
-  handles => ['write'],
   clearer => '_clear_context',
 );
 
 sub output { shift->body(@_) }
 
 sub code   { shift->status(@_) }
+
+=head2 $self->write($buffer)
+
+Writes the buffer to the client.
+
+=cut
+
+sub write {
+    my ( $self, $buffer ) = @_;
+
+    # Finalize headers if someone manually writes output
+    $self->finalize_headers;
+
+    $buffer = q[] unless defined $buffer;
+
+    my $len = length($buffer);
+    $self->_writer->write($buffer);
+
+    return $len;
+}
+
+=head2 $self->finalize_headers($c)
+
+Abstract method, allows engines to write headers to response
+
+=cut
+
+sub finalize_headers {
+    my ($self) = @_;
+
+    # This is a less-than-pretty hack to avoid breaking the old
+    # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
+    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
+    # just pulls the headers out of $ctx->response in its run method and never
+    # sets response_cb. So take the lack of a response_cb as a sign that we
+    # don't need to set the headers.
+
+    return unless $self->_has_response_cb;
+
+    # If we already have a writer, we already did this, so don't do it again
+    return if $self->_has_writer;
+
+    my @headers;
+    $self->headers->scan(sub { push @headers, @_ });
+
+    my $writer = $self->_response_cb->([ $self->status, \@headers ]);
+    $self->_set_writer($writer);
+    $self->_clear_response_cb;
+
+    return;
+}
 
 =head1 NAME
 
