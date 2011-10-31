@@ -50,13 +50,20 @@ has request => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        my %p;
+        my %p = ( _log => $self->log );
         $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
         $self->request_class->new(\%p);
     },
     lazy => 1,
 );
-has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
+has response => (
+    is => 'rw',
+    default => sub {
+        my $self = shift;
+        $self->response_class->new({ _log => $self->log });
+    },
+    lazy => 1,
+);
 has namespace => (is => 'rw');
 
 sub depth { scalar @{ shift->stack || [] }; }
@@ -2007,9 +2014,6 @@ sub prepare {
 
     my $uploadtmp = $class->config->{uploadtmp};
     my $c = $class->context_class->new({ $uploadtmp ? (_uploadtmp => $uploadtmp) : ()});
-
-    # For on-demand data
-    $c->request->_context($c);
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);

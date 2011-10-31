@@ -81,10 +81,10 @@ sub prepare_headers {
     return $headers;
 }
 
-has _context => (
-  is => 'rw',
-  weak_ref => 1,
-  clearer => '_clear_context',
+has _log => (
+    is => 'ro',
+    weak_ref => 1,
+    required => 1,
 );
 
 # Amount of data to read from input on each pass
@@ -265,7 +265,7 @@ around parameters => sub {
     my ($orig, $self, $params) = @_;
     if ($params) {
         if ( !ref $params ) {
-            $self->_context->log->warn(
+            $self->_log->warn(
                 "Attempt to retrieve '$params' with req->params(), " .
                 "you probably meant to call req->param('$params')"
             );
