@@ -33,6 +33,12 @@ around env => sub {
   return $self->$orig;
 };
 
+# XXX - Only here for Engine::PSGI compat
+sub prepare_connection {
+    my ($self, $ctx) = @_;
+    $ctx->request->prepare_connection;
+}
+
 =head1 NAME
 
 Catalyst::Engine - The Catalyst Engine
