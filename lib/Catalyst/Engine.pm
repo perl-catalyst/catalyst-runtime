@@ -592,6 +592,18 @@ sub prepare_uploads {
     }
 }
 
+=head2 $self->write($c, $buffer)
+
+Writes the buffer to the client.
+
+=cut
+
+sub write {
+    my ( $self, $c, $buffer ) = @_;
+
+    $c->response->write($buffer);
+}
+
 =head2 $self->read($c, [$maxlength])
 
 Reads from the input stream by calling C<< $self->read_chunk >>.
@@ -618,15 +630,6 @@ sub read_chunk {
     my ($self, $ctx) = (shift, shift);
     return $ctx->request->read_chunk(@_);
 }
-
-=head2 $self->read_length
-
-The length of input data to be read.  This is obtained from the Content-Length
-header.
-
-=head2 $self->read_position
-
-The amount of input data that has already been read.
 
 =head2 $self->run($app, $server)
 
@@ -683,18 +686,6 @@ sub build_psgi_app {
             $app->handle_request(env => $env, response_cb => $respond);
         };
     };
-}
-
-=head2 $self->write($c, $buffer)
-
-Writes the buffer to the client.
-
-=cut
-
-sub write {
-    my ( $self, $c, $buffer ) = @_;
-
-    $c->response->write($buffer);
 }
 
 =head2 $self->unescape_uri($uri)

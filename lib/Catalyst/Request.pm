@@ -25,7 +25,7 @@ has _read_length => ( is => 'ro',
     lazy => 1,
 );
 
-has action => (is => 'rw');
+has action => (is => 'rw'); # XXX Deprecated - warn?
 has address => (is => 'rw');
 has arguments => (is => 'rw', default => sub { [] });
 has cookies => (is => 'ro', builder => 'prepare_cookies', lazy => 1);
@@ -331,8 +331,7 @@ Catalyst::Request - provides information about the current client request
 =head1 SYNOPSIS
 
     $req = $c->request;
-    $req->action;
-    $req->address;
+    $req->address eq "127.0.0.1";
     $req->arguments;
     $req->args;
     $req->base;
@@ -375,14 +374,6 @@ current client request. The request object is prepared by L<Catalyst::Engine>,
 thus hiding the details of the particular engine implementation.
 
 =head1 METHODS
-
-=head2 $req->action
-
-[DEPRECATED] Returns the name of the requested action.
-
-
-Use C<< $c->action >> instead (which returns a
-L<Catalyst::Action|Catalyst::Action> object).
 
 =head2 $req->address
 
