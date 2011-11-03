@@ -15,9 +15,22 @@ use namespace::clean -except => 'meta';
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has env => (is => 'ro', writer => '_set_env');
+# XXX Deprecated crap here - warn?
+has action => (is => 'rw');
+# XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
+# to confusion between Engines and Plugin::Authentication. Remove in 5.8100?
+has user => (is => 'rw');
+sub snippets        { shift->captures(@_) }
 
-has _read_position => ( is => 'rw', default => 0 );
-has _read_length => ( is => 'ro',
+has _read_position => (
+    init_arg => undef,
+    is => 'ro',
+    writer => '_set_read_position',
+    default => 0,
+);
+has _read_length => (
+    init_arg => undef,
+    is => 'ro',
     default => sub {
         my $self = shift;
         $self->header('Content-Length') || 0;
@@ -25,16 +38,9 @@ has _read_length => ( is => 'ro',
     lazy => 1,
 );
 
-has action => (is => 'rw'); # XXX Deprecated - warn?
 has address => (is => 'rw');
 has arguments => (is => 'rw', default => sub { [] });
 has cookies => (is => 'ro', builder => 'prepare_cookies', lazy => 1);
-
-=head2 $self->prepare_cookies($c)
-
-Parse cookies from header. Sets a L<CGI::Simple::Cookie> object.
-
-=cut
 
 sub prepare_cookies {
     my ( $self ) = @_;
@@ -61,10 +67,6 @@ has headers => (
   builder => 'prepare_headers',
   lazy => 1,
 );
-
-=head2 $self->prepare_headers($c)
-
-=cut
 
 sub prepare_headers {
     my ($self) = @_;
@@ -107,7 +109,7 @@ sub read {
                         # said there should be.
             return;
         }
-        $self->_read_position( $self->_read_position + $rc );
+        $self->_set_read_position( $self->_read_position + $rc );
         return $buffer;
     }
     else {
@@ -179,12 +181,6 @@ before body_parameters => sub {
     $self->prepare_body_parameters;
 };
 
-=head2 $self->prepare_body()
-
-sets up the L<Catalyst::Request> object body using L<HTTP::Body>
-
-=cut
-
 has _uploadtmp => (
     is => 'ro',
     predicate => '_has_uploadtmp',
@@ -220,23 +216,11 @@ sub prepare_body {
     }
 }
 
-=head2 $self->prepare_body_chunk()
-
-Add a chunk to the request body.
-
-=cut
-
 sub prepare_body_chunk {
     my ( $self, $chunk ) = @_;
 
     $self->_body->add($chunk);
 }
-
-=head2 $self->prepare_body_parameters()
-
-Sets up parameters from body.
-
-=cut
 
 sub prepare_body_parameters {
     my ( $self ) = @_;
@@ -310,19 +294,14 @@ has hostname => (
 
 has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
 
-# XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
-# to confusion between Engines and Plugin::Authentication. Remove in 5.8100?
-has user => (is => 'rw');
-
 sub args            { shift->arguments(@_) }
 sub body_params     { shift->body_parameters(@_) }
 sub input           { shift->body(@_) }
 sub params          { shift->parameters(@_) }
 sub query_params    { shift->query_parameters(@_) }
 sub path_info       { shift->path(@_) }
-sub snippets        { shift->captures(@_) }
 
-=for stopwords param params
+=for stopwords param params snippets
 
 =head1 NAME
 
@@ -358,7 +337,7 @@ Catalyst::Request - provides information about the current client request
     $req->read;
     $req->referer;
     $req->secure;
-    $req->captures; # previously knows as snippets
+    $req->captures;
     $req->upload;
     $req->uploads;
     $req->uri;
@@ -681,11 +660,6 @@ actions or regex captures.
 
     my @captures = @{ $c->request->captures };
 
-=head2 $req->snippets
-
-C<captures> used to be called snippets. This is still available for backwards
-compatibility, but is considered deprecated.
-
 =head2 $req->upload
 
 A convenient method to access $req->uploads.
@@ -866,6 +840,31 @@ Returns the value of the C<REMOTE_USER> environment variable.
 
 Shortcut to $req->headers->user_agent. Returns the user agent (browser)
 version string.
+
+=head1 SETUP METHODS
+
+You should never need to call these yourself in application code,
+however they are useful if extending Catalyst by applying a request role.
+
+=head2 $self->prepare_headers()
+
+Sets up the C<< $res->headers >> accessor.
+
+=head2 $self->prepare_body()
+
+Sets up the body using L<HTTP::Body>
+
+=head2 $self->prepare_body_chunk()
+
+Add a chunk to the request body.
+
+=head2 $self->prepare_body_parameters()
+
+Sets up parameters from body.
+
+=head2 $self->prepare_cookies($c)
+
+Parse cookies from header. Sets up a L<CGI::Simple::Cookie> object.
 
 =head2 meta
 

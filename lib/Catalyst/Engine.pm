@@ -522,7 +522,7 @@ sub prepare_query_parameters {
 
 =head2 $self->prepare_read($c)
 
-prepare to read from the engine.
+Prepare to read by initializing the Content-Length from headers.
 
 =cut
 
