@@ -10,6 +10,9 @@ our @private = ( 'BUILD' );
 foreach my $module (@modules) {
     local @private = (@private, 'run') if $module =~ /^Catalyst::Script::/;
     local @private = (@private, 'plugin') if $module =~ /^Catalyst$/;
+    local @private = (@private, 'snippets') if $module =~ /^Catalyst::Request$/;
+    local @private = (@private, 'prepare_connection') if $module =~ /^Catalyst::Engine$/;
+
     pod_coverage_ok($module, {
         also_private   => \@private,
         coverage_class => 'Pod::Coverage::TrustPod',

@@ -48,12 +48,6 @@ sub output { shift->body(@_) }
 
 sub code   { shift->status(@_) }
 
-=head2 $self->write($buffer)
-
-Writes the buffer to the client.
-
-=cut
-
 sub write {
     my ( $self, $buffer ) = @_;
 
@@ -67,12 +61,6 @@ sub write {
 
     return $len;
 }
-
-=head2 $self->finalize_headers($c)
-
-Abstract method, allows engines to write headers to response
-
-=cut
 
 sub finalize_headers {
     my ($self) = @_;
@@ -257,6 +245,10 @@ Writes $data to the output stream.
 
 Prints @data to the output stream, separated by $,.  This lets you pass
 the response object to functions that want to write to an L<IO::Handle>.
+
+=head2 $self->finalize_headers($c)
+
+Writes headers to response if not already written
 
 =head2 DEMOLISH
 

@@ -301,7 +301,7 @@ sub params          { shift->parameters(@_) }
 sub query_params    { shift->query_parameters(@_) }
 sub path_info       { shift->path(@_) }
 
-=for stopwords param params snippets
+=for stopwords param params
 
 =head1 NAME
 
@@ -862,9 +862,21 @@ Add a chunk to the request body.
 
 Sets up parameters from body.
 
-=head2 $self->prepare_cookies($c)
+=head2 $self->prepare_cookies()
 
 Parse cookies from header. Sets up a L<CGI::Simple::Cookie> object.
+
+=head2 $self->prepare_connection()
+
+Sets up various fields in the request like the local and remote addresses,
+request method, vhost requested etc.
+
+=head2 $self->prepare_parameters()
+
+Ensures that the body has been parsed, then builds the parameters, which are
+combined from those in the request and those in the body.
+
+This method is the builder for the 'parameters' attribute.
 
 =head2 meta
 
