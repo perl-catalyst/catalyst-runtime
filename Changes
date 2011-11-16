@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  Bug fixes:
+   - Lighttpd script name fix is only applied for lighttpd versions
+     < 1.4.23
+
 5.90006 - 2011-10-25 09:18:00
 
   New features:

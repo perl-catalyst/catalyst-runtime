@@ -2743,7 +2743,16 @@ sub apply_default_middlewares {
 
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
-    $psgi_app = Plack::Middleware::LighttpdScriptNameFix->wrap($psgi_app);
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder   => sub { Plack::Middleware::LighttpdScriptNameFix->wrap($_[0]) },
+        condition => sub {
+            my ($env) = @_;
+            return unless $env->{SERVER_SOFTWARE} && $env->{SERVER_SOFTWARE} =~ m!lighttpd[-/]1\.(\d+\.\d+)!;
+            return unless $env < 4.23;
+            1;
+        },
+    );
 
     # we're applying this unconditionally as the middleware itself already makes
     # sure it doesn't fuck things up if it's not running under one of the right
