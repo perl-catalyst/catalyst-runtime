@@ -2030,6 +2030,8 @@ sub prepare {
             $c->prepare_request(@arguments);
             $c->prepare_connection;
             $c->prepare_query_parameters;
+            $c->prepare_headers; # Just hooks, no longer needed - they just
+            $c->prepare_cookies; # cause the lazy attribute on req to build
             $c->prepare_path;
 
             # Prepare the body for reading, either by prepare_body
@@ -2125,6 +2127,24 @@ sub prepare_connection {
     #       Engine::PSGI back compat.
     $c->engine->prepare_connection($c);
 }
+
+=head2 $c->prepare_cookies
+
+Prepares cookies by ensuring that the attribute on the request
+object has been built.
+
+=cut
+
+sub prepare_cookies { my $c = shift; $c->request->cookies }
+
+=head2 $c->prepare_headers
+
+Prepares request headers by ensuring that the attribute on the request
+object has been built.
+
+=cut
+
+sub prepare_headers { my $c = shift; $c->request->headers }
 
 =head2 $c->prepare_parameters
 
@@ -2975,6 +2995,9 @@ your output data, if known.
 
 sub write {
     my $c = shift;
+
+    # Finalize headers if someone manually writes output (for compat)
+    $c->finalize_headers;
 
     return $c->response->write( @_ );
 }
