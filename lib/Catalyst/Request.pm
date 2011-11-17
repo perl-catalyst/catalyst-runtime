@@ -869,7 +869,7 @@ Parse cookies from header. Sets up a L<CGI::Simple::Cookie> object.
 =head2 $self->prepare_connection()
 
 Sets up various fields in the request like the local and remote addresses,
-request method, vhost requested etc.
+request method, hostname requested etc.
 
 =head2 $self->prepare_parameters()
 
