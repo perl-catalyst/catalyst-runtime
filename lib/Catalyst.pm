@@ -2025,6 +2025,7 @@ sub prepare {
                 $c->prepare_body;
             }
         }
+        $c->prepare_action;
     }
     # VERY ugly and probably shouldn't rely on ->finalize actually working
     catch {
@@ -2032,18 +2033,18 @@ sub prepare {
         $c->response->status(400);
         $c->response->content_type('text/plain');
         $c->response->body('Bad Request');
+        # Note we call finalize and then die here, which escapes
+        # finalize being called in the enclosing block..
+        # It in fact couldn't be called, as we don't return $c..
+        # This is a mess - but I'm unsure you can fix this without
+        # breaking compat for people doing crazy things (we should set
+        # the 400 and just return the ctx here IMO, letting finalize get called
+        # above...
         $c->finalize;
         die $_;
     };
 
-    my $method  = $c->req->method  || '';
-    my $path    = $c->req->path;
-    $path       = '/' unless length $path;
-    my $address = $c->req->address || '';
-
     $c->log_request;
-
-    $c->prepare_action;
 
     return $c;
 }
