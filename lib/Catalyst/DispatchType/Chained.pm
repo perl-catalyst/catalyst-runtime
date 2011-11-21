@@ -670,9 +670,11 @@ of the endpoint of the chain, not on the chained actions way. The
 C<auto> actions will be run before the chain dispatching begins. In
 every other aspect, C<auto> actions behave as documented.
 
-The C<forward>ing to other actions does just what you would expect. But if
-you C<detach> out of a chain, the rest of the chain will not get called
-after the C<detach>.
+The C<forward>ing to other actions does just what you would expect. ie
+only the target action is run. The actions that that action is chained
+to are not run.
+If you C<detach> out of a chain, the rest of the chain will not get
+called after the C<detach>.
 
 =head1 AUTHORS
 
