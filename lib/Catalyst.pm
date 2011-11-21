@@ -2750,7 +2750,7 @@ sub apply_default_middlewares {
         condition => sub {
             my ($env) = @_;
             return unless $env->{SERVER_SOFTWARE} && $env->{SERVER_SOFTWARE} =~ m!lighttpd[-/]1\.(\d+\.\d+)!;
-            return unless $env < 4.23;
+            return unless $1 < 4.23;
             1;
         },
     );
