@@ -677,6 +677,13 @@ The C<forward>ing to other actions does just what you would expect. But if
 you C<detach> out of a chain, the rest of the chain will not get called
 after the C<detach>.
 
+=head2 match_captures
+
+A method which can optionally be implemented by actions to
+stop chain matching.
+
+See L<Catalyst::Action> for further details.
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
