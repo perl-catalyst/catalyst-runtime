@@ -2,7 +2,8 @@
 
   Bug fixes:
    - Lighttpd script name fix is only applied for lighttpd versions
-     < 1.4.23
+     < 1.4.23. This should fix non-root installs of lighttpd in versions
+     over that.
    - Prepare_action is now inside a try {} block, so that requests containing
      bad unicode can be appropriately trapped by
      Catalyst::Plugin::Unicode::Encoding
