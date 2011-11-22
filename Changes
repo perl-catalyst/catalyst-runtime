@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  New features:
+   - Implement a match_captures hook which, if it exists on an action,
+     is called with the $ctx and \@captures and is expected to return
+     true to continue the chain matching and false to stop matching.
+     This can be used to implement action classes or roles which match
+     conditionally (for example only matching captures which are integers).
+
   Bug fixes:
    - Lighttpd script name fix is only applied for lighttpd versions
      < 1.4.23. This should fix non-root installs of lighttpd in versions
