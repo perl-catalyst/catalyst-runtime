@@ -8,7 +8,13 @@ __PACKAGE__->config->{namespace} = '';
 sub view_no_args : Local {
     my ( $self, $c ) = @_;
 
-    my $v = $c->view;
+    my $v;
+    {
+        # silence warning for test suite
+        no warnings 'redefine';
+        local *Catalyst::Log::warn = sub { };
+        $v = $c->view;
+    }
 
     $c->res->body(Scalar::Util::blessed($v));
 }

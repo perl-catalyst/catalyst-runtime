@@ -1,4 +1,4 @@
-use Test::More tests => 51;
+use Test::More tests => 48;
 use strict;
 use warnings;
 
@@ -61,12 +61,8 @@ is_deeply( [ sort MyMVCTestApp->models ],
            'models ok');
 
 {
-    my $warnings = 0;
-    no warnings 'redefine';
-    local *Catalyst::Log::warn = sub { $warnings++ };
-
-    like (MyMVCTestApp->view , qr/^MyMVCTestApp\::(V|View)\::/ , 'view() with no defaults returns *something*');
-    ok( $warnings, 'view() w/o a default is random, warnings thrown' );
+    eval { MyMVCTestApp->view; };
+    ok( $@, 'view() with no defaults and multiple choices dies' );
 }
 
 is ( bless ({stash=>{current_view=>'V'}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'current_view ok');
@@ -78,17 +74,8 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp:
   'current_view_instance precedes current_view ok');
 
 {
-    my $warnings = 0;
-    no warnings 'redefine';
-    local *Catalyst::Log::warn = sub { $warnings++ };
-
-    ok( my $model = MyMVCTestApp->model );
-
-    ok( (($model =~ /^MyMVCTestApp\::(M|Model)\::/) ||
-        $model->isa('Some::Test::Object')),
-        'model() with no defaults returns *something*' );
-
-    ok( $warnings, 'model() w/o a default is random, warnings thrown' );
+    eval { MyMVCTestApp->model; };
+    ok( $@, 'model() with no defaults and multiple choices dies' );
 }
 
 is ( bless ({stash=>{current_model=>'M'}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'current_model ok');

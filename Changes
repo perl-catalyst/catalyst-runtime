@@ -1,5 +1,17 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+TO BE RELEASED
+
+  Deprecated features:
+   - Calling model() and view() with no args when only one model or view is
+     available has been deprecated. You should explicitly pass the name of 
+     the component.
+
+  Removed features:
+   - Calling model() and view() with no args when more than one model or view
+     was available no longer returns a random model/view and will croak() 
+     instead.
+
 5.90007 - 2011-11-22 20:35:00
 
   New features:

@@ -676,15 +676,19 @@ sub model {
 
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/Model M/);
 
-    if( $rest ) {
-        $c->log->warn( Carp::shortmess('Calling $c->model() will return a random model unless you specify one of:') );
-        $c->log->warn( '* $c->config(default_model => "the name of the default model to use")' );
-        $c->log->warn( '* $c->stash->{current_model} # the name of the model to use for this request' );
-        $c->log->warn( '* $c->stash->{current_model_instance} # the instance of the model to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
+    if( !$rest ) {
+        ( my $name = ref $comp ) =~ s{$appclass\::M(odel)?::}{};
+        $c->log->warn( Carp::shortmess('Calling $c->model() with no arguments has been deprecated and will be removed.') );
+        $c->log->warn( "You could change the method call to \$c->model('$name') to retrieve this component." );
+        return $c->_filter_component( $comp );
     }
 
-    return $c->_filter_component( $comp );
+    croak( join( "\n", 
+        'Calling $c->model() will fail unless you specify one of:',
+        '* $c->config(default_model => "the name of the default model to use")',
+        '* $c->stash->{current_model} # the name of the model to use for this request',
+        '* $c->stash->{current_model_instance} # the instance of the model to use for this request' )
+    );
 }
 
 
@@ -740,15 +744,19 @@ sub view {
 
     my( $comp, $rest ) = $c->_comp_search_prefixes( undef, qw/View V/);
 
-    if( $rest ) {
-        $c->log->warn( 'Calling $c->view() will return a random view unless you specify one of:' );
-        $c->log->warn( '* $c->config(default_view => "the name of the default view to use")' );
-        $c->log->warn( '* $c->stash->{current_view} # the name of the view to use for this request' );
-        $c->log->warn( '* $c->stash->{current_view_instance} # the instance of the view to use for this request' );
-        $c->log->warn( 'NB: in version 5.81, the "random" behavior will not work at all.' );
+    if( !$rest ) {
+        ( my $name = ref $comp ) =~ s{$appclass\::V(iew)?\::}{};
+        $c->log->warn( Carp::shortmess('Calling $c->view() with no arguments has been deprecated and will be removed.') );
+        $c->log->warn( "You could change the method call to \$c->view('$name') to retrieve this component." );
+        return $c->_filter_component( $comp );
     }
 
-    return $c->_filter_component( $comp );
+    croak( join( "\n", 
+        'Calling $c->view() will fail unless you specify one of:',
+        '* $c->config(default_view => "the name of the default view to use")',
+        '* $c->stash->{current_view} # the name of the view to use for this request',
+        '* $c->stash->{current_view_instance} # the instance of the view to use for this request' )
+    );
 }
 
 =head2 $c->controllers
