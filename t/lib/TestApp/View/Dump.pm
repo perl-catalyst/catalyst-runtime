@@ -21,6 +21,7 @@ sub dump {
     $dumper->Quotekeys(0);
     $dumper->Terse(1);
 
+    local $SIG{ __WARN__ } = sub { warn unless $_[ 0 ] =~ m{dummy} };
     return $dumper->Dump;
 }
 
