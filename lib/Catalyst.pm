@@ -679,11 +679,12 @@ sub model {
     if( !$rest ) {
         ( my $name = ref $comp ) =~ s{$appclass\::M(odel)?::}{};
         $c->log->warn( Carp::shortmess('Calling $c->model() with no arguments has been deprecated and will be removed.') );
-        $c->log->warn( "You could change the method call to \$c->model('$name') to retrieve this component." );
+        $c->log->warn( "You could change the method call to \$c->model('$name') to retrieve this component" );
+        $c->log->warn( "or you should set \$c->config(default_model => '$name')." );
         return $c->_filter_component( $comp );
     }
 
-    croak( join( "\n", 
+    croak( join( "\n",
         'Calling $c->model() will fail unless you specify one of:',
         '* $c->config(default_model => "the name of the default model to use")',
         '* $c->stash->{current_model} # the name of the model to use for this request',
@@ -747,11 +748,12 @@ sub view {
     if( !$rest ) {
         ( my $name = ref $comp ) =~ s{$appclass\::V(iew)?\::}{};
         $c->log->warn( Carp::shortmess('Calling $c->view() with no arguments has been deprecated and will be removed.') );
-        $c->log->warn( "You could change the method call to \$c->view('$name') to retrieve this component." );
+        $c->log->warn( "You could change the method call to \$c->view('$name') to retrieve this component," );
+        $c->log->warn( "or you should set \$c->config(default_view => '$name')." );
         return $c->_filter_component( $comp );
     }
 
-    croak( join( "\n", 
+    croak( join( "\n",
         'Calling $c->view() will fail unless you specify one of:',
         '* $c->config(default_view => "the name of the default view to use")',
         '* $c->stash->{current_view} # the name of the view to use for this request',
