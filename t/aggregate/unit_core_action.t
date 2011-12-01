@@ -4,6 +4,7 @@ use warnings;
 use Moose::Meta::Class;
 #use Moose::Meta::Attribute;
 use Catalyst::Request;
+use Catalyst::Log;
 
 use_ok('Catalyst::Action');
 
