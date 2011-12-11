@@ -678,7 +678,7 @@ sub prepare_read {
 
 =head2 $self->prepare_request(@arguments)
 
-Sets up the PSGI environment in the Engine (just for back compat).
+Sets up the PSGI environment in the Engine.
 
 =cut
 
