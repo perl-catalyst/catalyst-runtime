@@ -839,8 +839,7 @@ sub run {
 
 =head2 build_psgi_app ($app, @args)
 
-Builds and returns a PSGI application closure, wrapping it in the reverse proxy
-middleware if the using_frontend_proxy config setting is set.
+Builds and returns a PSGI application closure. (Raw, not wrapped in middleware)
 
 =cut
 
