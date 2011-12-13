@@ -1,5 +1,49 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90007 - 2011-11-22 20:35:00
+
+  New features:
+   - Implement a match_captures hook which, if it exists on an action,
+     is called with the $ctx and \@captures and is expected to return
+     true to continue the chain matching and false to stop matching.
+     This can be used to implement action classes or roles which match
+     conditionally (for example only matching captures which are integers).
+
+  Bug fixes:
+   - Lighttpd script name fix is only applied for lighttpd versions
+     < 1.4.23. This should fix non-root installs of lighttpd in versions
+     over that.
+   - Prepare_action is now inside a try {} block, so that requests containing
+     bad unicode can be appropriately trapped by
+     Catalyst::Plugin::Unicode::Encoding
+
+5.90006 - 2011-10-25 09:18:00
+
+  New features:
+   - A new 'run_options' class data method has been added to Catalyst.pm
+     This is used to store all the options passed by scripts, allowing
+     application authors to add custom options to their scripts then
+     get them passed through to the application.
+
+  Doumentation:
+   - Clarify that if you manually write your own .psgi file, then optional
+     proxy support (via the using_frontend_proxy config value) will not be
+     enabled unless you explicitly apply the default middlewares from
+     Catalyst, or you apply the middleware manually.
+
+  Bug fixes:
+   - Fix issue due to perl internals bugs in 5.8 and 5.10 (not present in
+     other perl versions) require can pass the context inappropriately,
+     meaning that some methods of loading classes can fail due to void
+     context being passed throuh to make_immutable, causing it to not return
+     a value.
+     This bug caused loading Catalyst::Script::XXX to fail and is fixed
+     both by bumping the Class::Load dependency, and also adding an explicit
+     '1;' to the end of the classes, avoiding the context issue.
+
+   - Fix using_frontend_proxy support in mod_perl by using the psgi wrapped
+     in default middleware in mod_perl context, rather than the raw psgi.
+
 5.90005 - 2011-10-22 13:35:00
 
   New features:

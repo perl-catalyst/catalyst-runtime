@@ -211,6 +211,9 @@ sub recurse_match {
                 # strip CaptureArgs into list
                 push(@captures, splice(@parts, 0, $capture_attr->[0]));
 
+                # check if the action may fit, depending on a given test by the app
+                if ($action->can('match_captures')) { next TRY_ACTION unless $action->match_captures($c, \@captures) }
+
                 # try the remaining parts against children of this action
                 my ($actions, $captures, $action_parts, $n_pathparts) = $self->recurse_match(
                                              $c, '/'.$action->reverse, \@parts
@@ -404,6 +407,7 @@ sub expand_action {
 }
 
 __PACKAGE__->meta->make_immutable;
+1;
 
 =head1 USAGE
 
@@ -672,6 +676,13 @@ every other aspect, C<auto> actions behave as documented.
 The C<forward>ing to other actions does just what you would expect. But if
 you C<detach> out of a chain, the rest of the chain will not get called
 after the C<detach>.
+
+=head2 match_captures
+
+A method which can optionally be implemented by actions to
+stop chain matching.
+
+See L<Catalyst::Action> for further details.
 
 =head1 AUTHORS
 

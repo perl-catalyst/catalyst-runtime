@@ -25,19 +25,19 @@ testOption( [ qw// ], ['3000', undef, opthash()] );
 # help           -? -help --help           -? --help
 # debug          -d -debug --debug         -d --debug
 # host           -host --host              --host
-testOption( [ qw/--host testhost/ ], ['3000', 'testhost', opthash()] );
-testOption( [ qw/-h testhost/ ], ['3000', 'testhost', opthash()] );
+testOption( [ qw/--host testhost/ ], ['3000', 'testhost', opthash(host => 'testhost')] );
+testOption( [ qw/-h testhost/ ], ['3000', 'testhost', opthash(host => 'testhost')] );
 
 # port           -p -port --port           -l --listen
-testOption( [ qw/-p 3001/ ], ['3001', undef, opthash()] );
-testOption( [ qw/--port 3001/ ], ['3001', undef, opthash()] );
+testOption( [ qw/-p 3001/ ], ['3001', undef, opthash(port => 3001)] );
+testOption( [ qw/--port 3001/ ], ['3001', undef, opthash(port => 3001)] );
 {
     local $ENV{TESTAPPTOTESTSCRIPTS_PORT} = 5000;
-    testOption( [ qw// ], [5000, undef, opthash()] );
+    testOption( [ qw// ], [5000, undef, opthash(port => 5000)] );
 }
 {
     local $ENV{CATALYST_PORT} = 5000;
-    testOption( [ qw// ], [5000, undef, opthash()] );
+    testOption( [ qw// ], [5000, undef, opthash(port => 5000)] );
 }
 
 if (try { require Starman; 1; }) {
@@ -127,9 +127,9 @@ sub testOption {
     $run_args[-1]->{pidfile} = $run_args[-1]->{pidfile}->file->stringify
       if scalar(@run_args) && $run_args[-1]->{pidfile};
 
-
     # Mangle argv into the options..
     $resultarray->[-1]->{argv} = $argstring;
+    $resultarray->[-1]->{extra_argv} = [];
     is_deeply \@run_args, $resultarray, "is_deeply comparison " . join(' ', @$argstring);
 }
 
@@ -190,6 +190,8 @@ sub opthash {
         'follow_symlinks' => 0,
         'background' => 0,
         'keepalive' => 0,
+        port => 3000,
+        host => undef,
         @_,
     };
 }

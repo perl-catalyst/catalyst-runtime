@@ -14,9 +14,10 @@ add_stopwords(qw(
     ctx _application MyApp restarter httponly Utils stash's unescapes
     dispatchtype dispatchtypes redispatch redispatching
     CaptureArgs ChainedParent PathPart PathPrefix
-    BUILDARGS metaclass namespaces pre
+    BUILDARGS metaclass namespaces pre ARGV ReverseProxy
     filename tempname request's subdirectory ini uninstalled uppercased
     wiki bitmask uri url urls dir hostname proxied http https IP SSL
+    inline INLINE plugins
 ));
 set_spell_cmd('aspell list -l en');
 all_pod_files_spelling_ok();

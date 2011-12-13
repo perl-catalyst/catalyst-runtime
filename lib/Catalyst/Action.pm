@@ -172,6 +172,17 @@ Returns the number of captures this action expects for L<Chained|Catalyst::Dispa
 
 Provided by Moose.
 
+=head1 OPTIONAL METHODS
+
+=head2 match_captures
+
+Can be implemented by action class and action role authors. If the method
+exists, then it will be called with the request context and an array reference
+of the captures for this action.
+
+Returning true from this method causes the chain match to continue, returning
+makes the chain not match (and alternate, less preferred chains will be attempted).
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm

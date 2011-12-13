@@ -74,8 +74,6 @@ in:
 
 =item L<Plack::Middleware::IIS6ScriptNameFix>
 
-=item nginx - local to Catalyst
-
 =back
 
 If you override the default by providing your own C<< .psgi >> file,
@@ -87,6 +85,15 @@ C<< .psgi >> file yourself.
 An apply_default_middlewares method is supplied to wrap your application
 in the default middlewares if you want this behaviour and you are providing
 your own .psgi file.
+
+This means that the auto-generated (no .psgi file) code looks something
+like this:
+
+    use strict;
+    use warnings;
+    use TestApp;
+
+    my $app = TestApp->apply_default_middlewares(TestApp->psgi_app(@_));
 
 =head1 SEE ALSO
 

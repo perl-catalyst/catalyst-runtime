@@ -260,13 +260,13 @@ sub _plack_loader_args {
     );
 }
 
-sub _application_args {
-    my ($self) = shift;
+around _application_args => sub {
+    my ($orig, $self) = @_;
     return (
         $self->port,
         $self->host,
         {
-           argv => $self->ARGV,
+           %{ $self->$orig },
            map { $_ => $self->$_ } qw/
                 fork
                 keepalive
@@ -274,13 +274,14 @@ sub _application_args {
                 pidfile
                 keepalive
                 follow_symlinks
+                port
+                host
             /,
         },
     );
-}
+};
 
 __PACKAGE__->meta->make_immutable;
-
 1;
 
 =head1 NAME

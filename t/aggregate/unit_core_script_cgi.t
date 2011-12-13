@@ -17,6 +17,8 @@ lives_ok {
 shift @TestAppToTestScripts::RUN_ARGS;
 my $server = pop @TestAppToTestScripts::RUN_ARGS;
 like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';
-is_deeply \@TestAppToTestScripts::RUN_ARGS, [], "no args";
+is ref(delete($TestAppToTestScripts::RUN_ARGS[0]->{argv})), 'ARRAY';
+is ref(delete($TestAppToTestScripts::RUN_ARGS[0]->{extra_argv})), 'ARRAY';
+is_deeply \@TestAppToTestScripts::RUN_ARGS, [{}], "no args";
 
 done_testing;

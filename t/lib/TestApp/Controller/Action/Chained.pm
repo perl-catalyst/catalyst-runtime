@@ -220,6 +220,13 @@ sub roundtrip_urifor_end : Chained('roundtrip_urifor') PathPart('') Args(1) {
     $c->stash->{no_end} = 1;
 }
 
+sub match_captures : Chained('/') PathPart('chained/match_captures') CaptureArgs(1) ActionClass('+TestApp::Action::TestMatchCaptures') {
+    my ($self, $c) = @_;
+    $c->res->header( 'X-TestAppActionTestMatchCapturesHasRan', 'yes');
+}
+
+sub match_captures_end : Chained('match_captures') PathPart('bar') Args(0) { }
+
 sub end :Private {
   my ($self, $c) = @_;
   return if $c->stash->{no_end};

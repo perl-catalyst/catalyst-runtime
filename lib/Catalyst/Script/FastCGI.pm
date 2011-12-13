@@ -105,11 +105,12 @@ sub _plack_loader_args {
     return %args;
 }
 
-sub _application_args {
-    my ($self) = shift;
+around _application_args => sub {
+    my ($orig, $self) = @_;
     return (
         $self->listen,
         {
+            %{ $self->$orig },
             nproc       => $self->nproc,
             pidfile     => $self->pidfile,
             manager     => $self->manager,
@@ -118,9 +119,10 @@ sub _application_args {
             proc_title  => $self->proc_title,
         }
     );
-}
+};
 
 __PACKAGE__->meta->make_immutable;
+1;
 
 =head1 NAME
 

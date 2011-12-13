@@ -678,7 +678,7 @@ sub prepare_read {
 
 =head2 $self->prepare_request(@arguments)
 
-Populate the context object from the request object.
+Sets up the PSGI environment in the Engine.
 
 =cut
 
@@ -833,13 +833,13 @@ sub run {
         # instead the $app->handle method is called per request.
         $app->log->warn("Not supplied a Plack engine, falling back to engine auto-loader (are your scripts ancient?)")
     }
+    $app->run_options($options);
     $server->run($psgi, $options);
 }
 
 =head2 build_psgi_app ($app, @args)
 
-Builds and returns a PSGI application closure, wrapping it in the reverse proxy
-middleware if the using_frontend_proxy config setting is set.
+Builds and returns a PSGI application closure. (Raw, not wrapped in middleware)
 
 =cut
 
