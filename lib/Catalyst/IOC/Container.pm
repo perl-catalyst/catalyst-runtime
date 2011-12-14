@@ -160,6 +160,7 @@ sub build_home_service {
         block => sub {
             my $self = shift;
             my $class = $self->param('application_name');
+            my $home;
 
             if ( my $env = Catalyst::Utils::env_value( $class, 'HOME' ) ) {
                 $home = $env;
