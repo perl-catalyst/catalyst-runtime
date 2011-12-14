@@ -151,6 +151,44 @@ sub build_component_subcontainer {
     );
 }
 
+sub build_home_service {
+    my $self = shift;
+
+    return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
+        name => 'home',
+        block => sub {
+            my $self = shift;
+            my $class = $self->param('application_name');
+
+            if ( my $env = Catalyst::Utils::env_value( $class, 'HOME' ) ) {
+                $home = $env;
+            }
+
+            $home ||= Catalyst::Utils::home($class);
+
+            return $home;
+        },
+        dependencies => [ depends_on('application_name') ],
+    );
+}
+
+# FIXME: very ambiguous - maybe root_dir?
+sub build_root_service {
+    my $self = shift;
+
+    return Bread::Board::BlockInjection->new(
+        lifecycle => 'Singleton',
+        name => 'root',
+        block => sub {
+            my $self = shift;
+
+            return Path::Class::Dir->new( $self->param('home') )->subdir('root');
+        },
+        dependencies => [ depends_on('home') ],
+    );
+}
+
 sub build_application_name_service {
     my $self = shift;
 
