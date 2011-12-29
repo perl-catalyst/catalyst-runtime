@@ -356,7 +356,11 @@ When called with no arguments it escapes the processing chain entirely.
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
+=head2 $c->visit( $action [, \@arguments ] )
+
 =head2 $c->visit( $action [, \@captures, \@arguments ] )
+
+=head2 $c->visit( $class, $method, [, \@arguments ] )
 
 =head2 $c->visit( $class, $method, [, \@captures, \@arguments ] )
 
@@ -386,7 +390,11 @@ transfer control to another action as if it had been reached directly from a URL
 
 sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
+=head2 $c->go( $action [, \@arguments ] )
+
 =head2 $c->go( $action [, \@captures, \@arguments ] )
+
+=head2 $c->go( $class, $method, [, \@arguments ] )
 
 =head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
