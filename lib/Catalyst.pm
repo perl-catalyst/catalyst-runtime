@@ -3243,8 +3243,6 @@ Wiki:
 
 =head2 L<Catalyst::Test> - The test suite.
 
-=begin stopwords
-
 =head1 PROJECT FOUNDER
 
 sri: Sebastian Riedel <sri@cpan.org>
@@ -3386,8 +3384,6 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
-
-=end stopwords
 
 =head1 COPYRIGHT
 

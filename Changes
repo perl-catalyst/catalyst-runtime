@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Documentation:
+  - Fix the display of PROJECT FOUNDER and CONTRIBUTORS sections in the
+    documentation. These were erroneously being emitted when the Pod
+    was converted to HTML for search.cpan.org
+
 5.90007 - 2011-11-22 20:35:00
 
   New features:
