@@ -22,10 +22,8 @@ TestApp->psgi_app;
 close($psgi);
 
 my ($saved_stdout, $saved_stderr);
-open( $saved_stdout, '>&'. STDOUT->fileno )
-            or croak("Can't dup stdout: $!");
-open( $saved_stderr, '>&'. STDERR->fileno )
-            or croak("Can't dup stderr: $!");
+my $stdout = !open( $saved_stdout, '>&'. STDOUT->fileno );
+my $stderr = !open( $saved_stderr, '>&'. STDERR->fileno );
 open( STDOUT, '+>', undef )
             or croak("Can't reopen stdout to /dev/null");
 open( STDERR, '+>', undef )
@@ -35,10 +33,12 @@ system($^X, '-I', "$FindBin::Bin/../lib", '-c', $path)
     ? fail('.psgi does not compile')
     : pass('.psgi compiles');
 
-open( STDOUT, '>&'. fileno($saved_stdout) )
-            or croak("Can't restore stdout: $!");
-open( STDERR, '>&'. fileno($saved_stderr) )
-            or croak("Can't restore stderr: $!");
+if ($stdout) {
+    open( STDOUT, '>&'. fileno($saved_stdout) );
+}
+if ($stderr) {
+    open( STDERR, '>&'. fileno($saved_stderr) );
+}
 
 # NOTE - YOU *CANNOT* do something like:
 #my $psgi_ref = require $path;
