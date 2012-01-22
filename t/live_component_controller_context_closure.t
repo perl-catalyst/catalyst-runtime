@@ -14,7 +14,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 BEGIN { $::setup_leakchecker = 1 }
-
+local $SIG{__WARN__} = sub { return if $_[0] =~ /Unhandled type: GLOB/; warn $_[0] };
 use Catalyst::Test 'TestApp';
 
 {
