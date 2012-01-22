@@ -10,21 +10,29 @@
     (for applications such as multi-part XML HTTPRequests, and Websockets).
 
  Deprecations:
-    This means that the $c->engine->env method to access the PSGI environment
+  - This means that the $c->engine->env method to access the PSGI environment
     is now deprecated. The accessor for the PSGI env is now on Catalyst::Request
     as per applications which were using Catalyst::Engine::PSGI
 
     Catalyst::Engine::PSGI is now considered fully deprecated.
 
  Back compatibility fixes:
-    Applications still using Catalyst::Engine::PSGI as they rely on
+  - Applications still using Catalyst::Engine::PSGI as they rely on
     $c->request->env - this is now the provided (and recommended) way of
     accessing the raw PSGI environment.
+
+ Tests:
+  - Some of the spurious warnings have been removed from the test suite
+    (although the test suite is not yet warning free)
 
  Documentation:
   - Fix the display of PROJECT FOUNDER and CONTRIBUTORS sections in the
     documentation. These were erroneously being emitted when the Pod
     was converted to HTML for search.cpan.org
+
+  - Fix documentation for the build_psgi_app app method. Previously the
+    documentation advised that it provided the psgi app already wrapped
+    in default middleware. This is not the case - it is the raw app psgi
 
 5.90007 - 2011-11-22 20:35:00
 
