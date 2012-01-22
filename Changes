@@ -1,5 +1,26 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ New features and refactoring:
+  - Much of the Catalyst::Engine code has been moved into Catalyst::Reqiest
+    and Catalyst::Response, to be able to better support asynchronous web
+    servers such as Twiggy, by making the application engine more reenterant.
+
+    This change is as a prequel to full asynchronous support inside Catalyst
+    for AnyEvent and IO::Async backends, which allow highly scaleable streaming
+    (for applications such as multi-part XML HTTPRequests, and Websockets).
+
+ Deprecations:
+    This means that the $c->engine->env method to access the PSGI environment
+    is now deprecated. The accessor for the PSGI env is now on Catalyst::Request
+    as per applications which were using Catalyst::Engine::PSGI
+
+    Catalyst::Engine::PSGI is now considered fully deprecated.
+
+ Back compatibility fixes:
+    Applications still using Catalyst::Engine::PSGI as they rely on
+    $c->request->env - this is now the provided (and recommended) way of
+    accessing the raw PSGI environment.
+
  Documentation:
   - Fix the display of PROJECT FOUNDER and CONTRIBUTORS sections in the
     documentation. These were erroneously being emitted when the Pod
