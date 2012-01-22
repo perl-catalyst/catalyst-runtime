@@ -30,6 +30,7 @@ add_stopwords(qw(
     Dhanani
     Dhaval
     Diment
+    Doran
     Edvinsson
     Florian
     Geoff
