@@ -1,7 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
  New features and refactoring:
-  - Much of the Catalyst::Engine code has been moved into Catalyst::Reqiest
+  - Much of the Catalyst::Engine code has been moved into Catalyst::Request
     and Catalyst::Response, to be able to better support asynchronous web
     servers such as Twiggy, by making the application engine more reenterant.
 
