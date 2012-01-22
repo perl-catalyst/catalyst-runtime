@@ -22,8 +22,7 @@
     accessing the raw PSGI environment.
 
  Tests:
-  - Some of the spurious warnings have been removed from the test suite
-    (although the test suite is not yet warning free)
+  - Spurious warnings have been removed from the test suite
 
  Documentation:
   - Fix the display of PROJECT FOUNDER and CONTRIBUTORS sections in the
