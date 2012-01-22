@@ -4,6 +4,7 @@ use warnings;
 use Moose::Meta::Class;
 #use Moose::Meta::Attribute;
 use Catalyst::Request;
+use Catalyst::Log;
 
 use_ok('Catalyst::Action');
 
@@ -38,7 +39,7 @@ my $anon_meta = Moose::Meta::Class->create_anon_class(
       request => (
         reader => 'request',
         required => 1,
-        default => sub { Catalyst::Request->new(arguments => [qw/one two/]) },
+        default => sub { Catalyst::Request->new(_log => Catalyst::Log->new, arguments => [qw/one two/]) },
       ),
     ),
   ],

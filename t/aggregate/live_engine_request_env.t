@@ -16,15 +16,15 @@ BEGIN {
     $EXPECTED_ENV_VAL = "Test env value " . rand(100000);
 }
 
-use Test::More tests => 7;
+use Test::More;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
 use HTTP::Headers;
 use HTTP::Request::Common;
 
-{
-    my $response = request("http://localhost/dump/env", {
+foreach my $path (qw/ env env_on_engine /) {
+    my $response = request("http://localhost/dump/${path}", {
         extra_env => { $EXPECTED_ENV_VAR => $EXPECTED_ENV_VAL },
     });
 
@@ -35,7 +35,7 @@ use HTTP::Request::Common;
     my $env;
     ok( eval '$env = ' . $response->content, 'Unserialize Catalyst::Request' );
     is ref($env), 'HASH';
-    ok exists($env->{PATH_INFO}), 'Have a PATH_INFO env var';
+    ok exists($env->{PATH_INFO}), 'Have a PATH_INFO env var for ' . $path;
 
     SKIP:
     {
@@ -43,7 +43,9 @@ use HTTP::Request::Common;
             skip 'Using remote server', 1;
         }
         is $env->{$EXPECTED_ENV_VAR}, $EXPECTED_ENV_VAL,
-            'Value we set as expected';
+            'Value we set as expected for ' . $path;
     }
 }
+
+done_testing;
 

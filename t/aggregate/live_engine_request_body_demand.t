@@ -59,7 +59,6 @@ SKIP:
 
         ok( my $response = request($request), 'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
-
         {
             no strict 'refs';
             ok(

@@ -5,7 +5,10 @@ use base qw[TestApp::View::Dump];
 
 sub process {
     my ( $self, $c ) = @_;
-    return $self->SUPER::process( $c, $c->response );
+    my $r = $c->response;
+    local $r->{_writer};
+    local $r->{_reponse_cb};
+    return $self->SUPER::process( $c, $r );
 }
 
 1;

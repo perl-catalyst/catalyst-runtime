@@ -102,6 +102,7 @@ is($dispatcher->uri_for_action($chained_action, [ 1 ]),
 #   Tests with Context
 #
 my $request = Catalyst::Request->new( {
+                _log => Catalyst::Log->new,
                 base => URI->new('http://127.0.0.1/foo')
               } );
 
