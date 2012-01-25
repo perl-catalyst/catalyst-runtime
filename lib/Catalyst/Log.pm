@@ -5,6 +5,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Data::Dump;
 use Class::MOP ();
+use Carp qw/ cluck /;
 
 our %LEVELS = (); # Levels stored as bit field, ergo debug = 1, warn = 2 etc
 our %LEVEL_MATCH = (); # Stored as additive, thus debug = 31, warn = 30 etc
@@ -77,8 +78,12 @@ sub disable {
     $self->level($level);
 }
 
+our $HAS_DUMPED;
 sub _dump {
     my $self = shift;
+    unless ($HAS_DUMPED++) {
+        cluck("Catalyst::Log::_dump is deprecated and will be removed. Please change to using your own Dumper.\n");
+    }
     $self->info( Data::Dump::dump(@_) );
 }
 
