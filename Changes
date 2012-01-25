@@ -16,7 +16,7 @@
 
     Catalyst::Engine::PSGI is now considered fully deprecated.
 
-  - The private _dump method in Catalyst::Log is now depreated. The dumper is
+  - The private _dump method in Catalyst::Log is now deprecated. The dumper is
     not pluggable and which dumper to use should be a user choice. Using
     an imported Dump() or Dumper() function is less typing than $c->log->_dump
     and as this method is unused anywhere else in Catalyst, it has been scheduled
