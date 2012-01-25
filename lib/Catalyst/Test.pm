@@ -295,6 +295,11 @@ sub _local_request {
 
             # HTML head parsing based on LWP::UserAgent
             #
+            # This is because if you make a remote request with LWP, then the
+            # <BASE HREF="..."> from the returned HTML document will be used
+            # to fill in $res->base, as documented in HTTP::Response. We need
+            # to support this in local test requests so that they work 'the same'.
+            #
             # This is not just horrible and possibly broken, but also really
             # doesn't belong here. Whoever wants this should be working on
             # getting it into Plack::Test, or make a middleware out of it, or
