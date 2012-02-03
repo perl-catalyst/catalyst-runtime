@@ -1,12 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More;
 use URI;
+use Catalyst::Log;
 
 use_ok('Catalyst::Request');
 
 my $request = Catalyst::Request->new( {
+                _log => Catalyst::Log->new,
                 uri => URI->new('http://127.0.0.1/foo/bar/baz')
               } );
 
@@ -23,6 +25,7 @@ is(
 );
 
 my $request2 = Catalyst::Request->new( {
+                _log => Catalyst::Log->new,
                 uri => URI->new('http://127.0.0.1/foo/bar/baz?bar=gorch')
               } );
 is(
@@ -66,4 +69,6 @@ is(
     'http://127.0.0.1/foo/bar/baz?bar=gorch&bar=snort&bar=ewok',
     'append mode URI appends arrayref param'
 );
+
+done_testing;
 

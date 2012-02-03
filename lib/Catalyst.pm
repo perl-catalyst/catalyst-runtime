@@ -45,8 +45,24 @@ has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');
 has action => (is => 'rw');
 has counter => (is => 'rw', default => sub { {} });
-has request => (is => 'rw', default => sub { $_[0]->request_class->new({}) }, required => 1, lazy => 1);
-has response => (is => 'rw', default => sub { $_[0]->response_class->new({}) }, required => 1, lazy => 1);
+has request => (
+    is => 'rw',
+    default => sub {
+        my $self = shift;
+        my %p = ( _log => $self->log );
+        $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
+        $self->request_class->new(\%p);
+    },
+    lazy => 1,
+);
+has response => (
+    is => 'rw',
+    default => sub {
+        my $self = shift;
+        $self->response_class->new({ _log => $self->log });
+    },
+    lazy => 1,
+);
 has namespace => (is => 'rw');
 
 sub depth { scalar @{ shift->stack || [] }; }
@@ -366,7 +382,11 @@ When called with no arguments it escapes the processing chain entirely.
 
 sub detach { my $c = shift; $c->dispatcher->detach( $c, @_ ) }
 
+=head2 $c->visit( $action [, \@arguments ] )
+
 =head2 $c->visit( $action [, \@captures, \@arguments ] )
+
+=head2 $c->visit( $class, $method, [, \@arguments ] )
 
 =head2 $c->visit( $class, $method, [, \@captures, \@arguments ] )
 
@@ -396,7 +416,11 @@ transfer control to another action as if it had been reached directly from a URL
 
 sub visit { my $c = shift; $c->dispatcher->visit( $c, @_ ) }
 
+=head2 $c->go( $action [, \@arguments ] )
+
 =head2 $c->go( $action [, \@captures, \@arguments ] )
+
+=head2 $c->go( $class, $method, [, \@arguments ] )
 
 =head2 $c->go( $class, $method, [, \@captures, \@arguments ] )
 
@@ -1831,6 +1855,11 @@ etc.).
 
 =cut
 
+has _uploadtmp => (
+    is => 'ro',
+    predicate => '_has_uploadtmp',
+);
+
 sub prepare {
     my ( $class, @arguments ) = @_;
 
@@ -1839,11 +1868,8 @@ sub prepare {
     # into the application.
     $class->context_class( ref $class || $class ) unless $class->context_class;
 
-    my $c = $class->context_class->new({});
-
-    # For on-demand data
-    $c->request->_context($c);
-    $c->response->_context($c);
+    my $uploadtmp = $class->config->{uploadtmp};
+    my $c = $class->context_class->new({ $uploadtmp ? (_uploadtmp => $uploadtmp) : ()});
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
@@ -1860,8 +1886,8 @@ sub prepare {
             $c->prepare_request(@arguments);
             $c->prepare_connection;
             $c->prepare_query_parameters;
-            $c->prepare_headers;
-            $c->prepare_cookies;
+            $c->prepare_headers; # Just hooks, no longer needed - they just
+            $c->prepare_cookies; # cause the lazy attribute on req to build
             $c->prepare_path;
 
             # Prepare the body for reading, either by prepare_body
@@ -1954,24 +1980,28 @@ Prepares connection.
 
 sub prepare_connection {
     my $c = shift;
-    $c->engine->prepare_connection( $c, @_ );
+    # XXX - This is called on the engine (not the request) to maintain
+    #       Engine::PSGI back compat.
+    $c->engine->prepare_connection($c);
 }
 
 =head2 $c->prepare_cookies
 
-Prepares cookies.
+Prepares cookies by ensuring that the attribute on the request
+object has been built.
 
 =cut
 
-sub prepare_cookies { my $c = shift; $c->engine->prepare_cookies( $c, @_ ) }
+sub prepare_cookies { my $c = shift; $c->request->cookies }
 
 =head2 $c->prepare_headers
 
-Prepares headers.
+Prepares request headers by ensuring that the attribute on the request
+object has been built.
 
 =cut
 
-sub prepare_headers { my $c = shift; $c->engine->prepare_headers( $c, @_ ) }
+sub prepare_headers { my $c = shift; $c->request->headers }
 
 =head2 $c->prepare_parameters
 
@@ -2254,7 +2284,7 @@ $c->request.  You must handle all body parsing yourself.
 
 =cut
 
-sub read { my $c = shift; return $c->engine->read( $c, @_ ) }
+sub read { my $c = shift; return $c->request->read( @_ ) }
 
 =head2 $c->run
 
@@ -2762,10 +2792,10 @@ your output data, if known.
 sub write {
     my $c = shift;
 
-    # Finalize headers if someone manually writes output
+    # Finalize headers if someone manually writes output (for compat)
     $c->finalize_headers;
 
-    return $c->engine->write( $c, @_ );
+    return $c->response->write( @_ );
 }
 
 =head2 version
@@ -2999,8 +3029,6 @@ Wiki:
 
 =head2 L<Catalyst::Test> - The test suite.
 
-=begin stopwords
-
 =head1 PROJECT FOUNDER
 
 sri: Sebastian Riedel <sri@cpan.org>
@@ -3144,8 +3172,6 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
-
-=end stopwords
 
 =head1 COPYRIGHT
 

@@ -14,7 +14,7 @@ Please update your application's scripts with:
 
   catalyst.pl -force -scripts MyApp
 
-to update your scripts to not do this.\n");
+to update your scripts to not do this.\n") unless $ENV{HARNESS_ACTIVE};
 
 1;
 

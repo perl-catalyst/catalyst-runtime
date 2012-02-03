@@ -10,7 +10,6 @@ use HTML::Entities;
 use HTTP::Body;
 use HTTP::Headers;
 use URI::QueryParam;
-use Moose::Util::TypeConstraints;
 use Plack::Loader;
 use Catalyst::EngineLoader;
 use Encode ();
@@ -18,8 +17,11 @@ use utf8;
 
 use namespace::clean -except => 'meta';
 
-has env => (is => 'ro', writer => '_set_env', clearer => '_clear_env');
+# Amount of data to read from input on each pass
+our $CHUNKSIZE = 64 * 1024;
 
+# XXX - this is only here for compat, do not use!
+has env => ( is => 'rw', writer => '_set_env' );
 my $WARN_ABOUT_ENV = 0;
 around env => sub {
   my ($orig, $self, @args) = @_;
@@ -31,32 +33,11 @@ around env => sub {
   return $self->$orig;
 };
 
-# input position and length
-has read_length => (is => 'rw');
-has read_position => (is => 'rw');
-
-has _prepared_write => (is => 'rw');
-
-has _response_cb => (
-    is      => 'ro',
-    isa     => 'CodeRef',
-    writer  => '_set_response_cb',
-    clearer => '_clear_response_cb',
-    predicate => '_has_response_cb',
-);
-
-subtype 'Catalyst::Engine::Types::Writer',
-    as duck_type([qw(write close)]);
-
-has _writer => (
-    is      => 'ro',
-    isa     => 'Catalyst::Engine::Types::Writer',
-    writer  => '_set_writer',
-    clearer => '_clear_writer',
-);
-
-# Amount of data to read from input on each pass
-our $CHUNKSIZE = 64 * 1024;
+# XXX - Only here for Engine::PSGI compat
+sub prepare_connection {
+    my ($self, $ctx) = @_;
+    $ctx->request->prepare_connection;
+}
 
 =head1 NAME
 
@@ -94,9 +75,9 @@ sub finalize_body {
         $self->write( $c, $body );
     }
 
-    $self->_writer->close;
-    $self->_clear_writer;
-    $self->_clear_env;
+    my $res = $c->response;
+    $res->_writer->close;
+    $res->_clear_writer;
 
     return;
 }
@@ -344,36 +325,16 @@ sub finalize_error {
 
 =head2 $self->finalize_headers($c)
 
-Abstract method, allows engines to write headers to response
+Allows engines to write headers to response
 
 =cut
 
 sub finalize_headers {
     my ($self, $ctx) = @_;
 
-    # This is a less-than-pretty hack to avoid breaking the old
-    # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
-    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
-    # just pulls the headers out of $ctx->response in its run method and never
-    # sets response_cb. So take the lack of a response_cb as a sign that we
-    # don't need to set the headers.
-
-    return unless $self->_has_response_cb;
-
-    my @headers;
-    $ctx->response->headers->scan(sub { push @headers, @_ });
-
-    $self->_set_writer($self->_response_cb->([ $ctx->response->status, \@headers ]));
-    $self->_clear_response_cb;
-
+    $ctx->response->finalize_headers;
     return;
 }
-
-=head2 $self->finalize_read($c)
-
-=cut
-
-sub finalize_read { }
 
 =head2 $self->finalize_uploads($c)
 
@@ -404,34 +365,7 @@ sets up the L<Catalyst::Request> object body using L<HTTP::Body>
 sub prepare_body {
     my ( $self, $c ) = @_;
 
-    my $appclass = ref($c) || $c;
-    if ( my $length = $self->read_length ) {
-        my $request = $c->request;
-        unless ( $request->_body ) {
-            my $type = $request->header('Content-Type');
-            $request->_body(HTTP::Body->new( $type, $length ));
-            $request->_body->cleanup(1); # Make extra sure!
-            $request->_body->tmpdir( $appclass->config->{uploadtmp} )
-              if exists $appclass->config->{uploadtmp};
-        }
-
-        # Check for definedness as you could read '0'
-        while ( defined ( my $buffer = $self->read($c) ) ) {
-            $c->prepare_body_chunk($buffer);
-        }
-
-        # paranoia against wrong Content-Length header
-        my $remaining = $length - $self->read_position;
-        if ( $remaining > 0 ) {
-            $self->finalize_read($c);
-            Catalyst::Exception->throw(
-                "Wrong Content-Length value: $length" );
-        }
-    }
-    else {
-        # Defined but will cause all body code to be skipped
-        $c->request->_body(0);
-    }
+    $c->request->prepare_body;
 }
 
 =head2 $self->prepare_body_chunk($c)
@@ -440,10 +374,11 @@ Add a chunk to the request body.
 
 =cut
 
+# XXX - Can this be deleted?
 sub prepare_body_chunk {
     my ( $self, $c, $chunk ) = @_;
 
-    $c->request->_body->add($chunk);
+    $c->request->prepare_body_chunk($chunk);
 }
 
 =head2 $self->prepare_body_parameters($c)
@@ -455,64 +390,7 @@ Sets up parameters from body.
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
 
-    return unless $c->request->_body;
-
-    $c->request->body_parameters( $c->request->_body->param );
-}
-
-=head2 $self->prepare_connection($c)
-
-Abstract method implemented in engines.
-
-=cut
-
-sub prepare_connection {
-    my ($self, $ctx) = @_;
-
-    my $env = $self->env;
-    my $request = $ctx->request;
-
-    $request->address( $env->{REMOTE_ADDR} );
-    $request->hostname( $env->{REMOTE_HOST} )
-        if exists $env->{REMOTE_HOST};
-    $request->protocol( $env->{SERVER_PROTOCOL} );
-    $request->remote_user( $env->{REMOTE_USER} );
-    $request->method( $env->{REQUEST_METHOD} );
-    $request->secure( $env->{'psgi.url_scheme'} eq 'https' ? 1 : 0 );
-
-    return;
-}
-
-=head2 $self->prepare_cookies($c)
-
-Parse cookies from header. Sets a L<CGI::Simple::Cookie> object.
-
-=cut
-
-sub prepare_cookies {
-    my ( $self, $c ) = @_;
-
-    if ( my $header = $c->request->header('Cookie') ) {
-        $c->req->cookies( { CGI::Simple::Cookie->parse($header) } );
-    }
-}
-
-=head2 $self->prepare_headers($c)
-
-=cut
-
-sub prepare_headers {
-    my ($self, $ctx) = @_;
-
-    my $env = $self->env;
-    my $headers = $ctx->request->headers;
-
-    for my $header (keys %{ $env }) {
-        next unless $header =~ /^(HTTP|CONTENT|COOKIE)/i;
-        (my $field = $header) =~ s/^HTTPS?_//;
-        $field =~ tr/_/-/;
-        $headers->header($field => $env->{$header});
-    }
+    $c->request->prepare_body_parameters;
 }
 
 =head2 $self->prepare_parameters($c)
@@ -524,25 +402,7 @@ sets up parameters from query and post parameters.
 sub prepare_parameters {
     my ( $self, $c ) = @_;
 
-    my $request = $c->request;
-    my $parameters = $request->parameters;
-    my $body_parameters = $request->body_parameters;
-    my $query_parameters = $request->query_parameters;
-    # We copy, no references
-    foreach my $name (keys %$query_parameters) {
-        my $param = $query_parameters->{$name};
-        $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
-    }
-
-    # Merge query and body parameters
-    foreach my $name (keys %$body_parameters) {
-        my $param = $body_parameters->{$name};
-        my @values = ref $param eq 'ARRAY' ? @$param : ($param);
-        if ( my $existing = $parameters->{$name} ) {
-          unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
-        }
-        $parameters->{$name} = @values > 1 ? \@values : $values[0];
-    }
+    $c->request->parameters;
 }
 
 =head2 $self->prepare_path($c)
@@ -554,7 +414,7 @@ abstract method, implemented by engines.
 sub prepare_path {
     my ($self, $ctx) = @_;
 
-    my $env = $self->env;
+    my $env = $ctx->request->env;
 
     my $scheme    = $ctx->request->secure ? 'https' : 'http';
     my $host      = $env->{HTTP_HOST} || $env->{SERVER_NAME};
@@ -618,8 +478,9 @@ process the query string and extract query parameters.
 sub prepare_query_parameters {
     my ($self, $c) = @_;
 
-    my $query_string = exists $self->env->{QUERY_STRING}
-        ? $self->env->{QUERY_STRING}
+    my $env = $c->request->env;
+    my $query_string = exists $env->{QUERY_STRING}
+        ? $env->{QUERY_STRING}
         : '';
 
     # Check for keywords (no = signs)
@@ -656,35 +517,33 @@ sub prepare_query_parameters {
             $query{$param} = $value;
         }
     }
-
     $c->request->query_parameters( \%query );
 }
 
 =head2 $self->prepare_read($c)
 
-prepare to read from the engine.
+Prepare to read by initializing the Content-Length from headers.
 
 =cut
 
 sub prepare_read {
     my ( $self, $c ) = @_;
 
-    # Initialize the read position
-    $self->read_position(0);
-
     # Initialize the amount of data we think we need to read
-    $self->read_length( $c->request->header('Content-Length') || 0 );
+    $c->request->_read_length;
 }
 
 =head2 $self->prepare_request(@arguments)
 
-Sets up the PSGI environment in the Engine.
+Populate the context object from the request object.
 
 =cut
 
 sub prepare_request {
     my ($self, $ctx, %args) = @_;
-    $self->_set_env($args{env});
+    $ctx->request->_set_env($args{env});
+    $self->_set_env($args{env}); # Nasty back compat!
+    $ctx->response->_set_response_cb($args{response_cb});
 }
 
 =head2 $self->prepare_uploads($c)
@@ -733,13 +592,17 @@ sub prepare_uploads {
     }
 }
 
-=head2 $self->prepare_write($c)
+=head2 $self->write($c, $buffer)
 
-Abstract method. Implemented by the engines.
+Writes the buffer to the client.
 
 =cut
 
-sub prepare_write { }
+sub write {
+    my ( $self, $c, $buffer ) = @_;
+
+    $c->response->write($buffer);
+}
 
 =head2 $self->read($c, [$maxlength])
 
@@ -752,33 +615,10 @@ Maintains the read_length and read_position counters as data is read.
 sub read {
     my ( $self, $c, $maxlength ) = @_;
 
-    my $remaining = $self->read_length - $self->read_position;
-    $maxlength ||= $CHUNKSIZE;
-
-    # Are we done reading?
-    if ( $remaining <= 0 ) {
-        $self->finalize_read($c);
-        return;
-    }
-
-    my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
-    my $rc = $self->read_chunk( $c, my $buffer, $readlen );
-    if ( defined $rc ) {
-        if (0 == $rc) { # Nothing more to read even though Content-Length
-                        # said there should be.
-            $self->finalize_read;
-            return;
-        }
-        $self->read_position( $self->read_position + $rc );
-        return $buffer;
-    }
-    else {
-        Catalyst::Exception->throw(
-            message => "Unknown error reading input: $!" );
-    }
+    $c->request->read($maxlength);
 }
 
-=head2 $self->read_chunk($c, $buffer, $length)
+=head2 $self->read_chunk($c, \$buffer, $length)
 
 Each engine implements read_chunk as its preferred way of reading a chunk
 of data. Returns the number of bytes read. A return of 0 indicates that
@@ -788,17 +628,8 @@ there is no more data to be read.
 
 sub read_chunk {
     my ($self, $ctx) = (shift, shift);
-    return $self->env->{'psgi.input'}->read(@_);
+    return $ctx->request->read_chunk(@_);
 }
-
-=head2 $self->read_length
-
-The length of input data to be read.  This is obtained from the Content-Length
-header.
-
-=head2 $self->read_position
-
-The amount of input data that has already been read.
 
 =head2 $self->run($app, $server)
 
@@ -851,32 +682,9 @@ sub build_psgi_app {
 
         return sub {
             my ($respond) = @_;
-            $self->_set_response_cb($respond);
-            $app->handle_request(env => $env);
+            $app->handle_request(env => $env, response_cb => $respond);
         };
     };
-}
-
-=head2 $self->write($c, $buffer)
-
-Writes the buffer to the client.
-
-=cut
-
-sub write {
-    my ( $self, $c, $buffer ) = @_;
-
-    unless ( $self->_prepared_write ) {
-        $self->prepare_write($c);
-        $self->_prepared_write(1);
-    }
-
-    $buffer = q[] unless defined $buffer;
-
-    my $len = length($buffer);
-    $self->_writer->write($buffer);
-
-    return $len;
 }
 
 =head2 $self->unescape_uri($uri)

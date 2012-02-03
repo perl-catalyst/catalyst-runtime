@@ -1,5 +1,45 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ New features and refactoring:
+  - Much of the Catalyst::Engine code has been moved into Catalyst::Request
+    and Catalyst::Response, to be able to better support asynchronous web
+    servers such as Twiggy, by making the application engine more reenterant.
+
+    This change is as a prequel to full asynchronous support inside Catalyst
+    for AnyEvent and IO::Async backends, which allow highly scaleable streaming
+    (for applications such as multi-part XML HTTPRequests, and Websockets).
+
+ Deprecations:
+  - This means that the $c->engine->env method to access the PSGI environment
+    is now deprecated. The accessor for the PSGI env is now on Catalyst::Request
+    as per applications which were using Catalyst::Engine::PSGI
+
+    Catalyst::Engine::PSGI is now considered fully deprecated.
+
+  - The private _dump method in Catalyst::Log is now deprecated. The dumper is
+    not pluggable and which dumper to use should be a user choice. Using
+    an imported Dump() or Dumper() function is less typing than $c->log->_dump
+    and as this method is unused anywhere else in Catalyst, it has been scheduled
+    for removal as a cleanup. Calling this method will now emit a stack trace
+    on first call (but not on subsequent calls).
+
+ Back compatibility fixes:
+  - Applications still using Catalyst::Engine::PSGI as they rely on
+    $c->request->env - this is now the provided (and recommended) way of
+    accessing the raw PSGI environment.
+
+ Tests:
+  - Spurious warnings have been removed from the test suite
+
+ Documentation:
+  - Fix the display of PROJECT FOUNDER and CONTRIBUTORS sections in the
+    documentation. These were erroneously being emitted when the Pod
+    was converted to HTML for search.cpan.org
+
+  - Fix documentation for the build_psgi_app app method. Previously the
+    documentation advised that it provided the psgi app already wrapped
+    in default middleware. This is not the case - it is the raw app psgi
+
 5.90007 - 2011-11-22 20:35:00
 
   New features:

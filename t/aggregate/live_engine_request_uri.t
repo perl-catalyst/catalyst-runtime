@@ -14,7 +14,8 @@ my $creq;
 {
     ok( my $response = request('http://localhost/engine/request/uri/change_path'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
+    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' )
+        or diag("Exception '$@', content " . $response->content);
     like( $creq->uri, qr{/my/app/lives/here$}, 'URI contains new path' );
 }
 

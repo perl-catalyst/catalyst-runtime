@@ -14,10 +14,43 @@ use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
+has env => (is => 'ro', writer => '_set_env');
+# XXX Deprecated crap here - warn?
 has action => (is => 'rw');
+# XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
+# to confusion between Engines and Plugin::Authentication. Remove in 5.8100?
+has user => (is => 'rw');
+sub snippets        { shift->captures(@_) }
+
+has _read_position => (
+    init_arg => undef,
+    is => 'ro',
+    writer => '_set_read_position',
+    default => 0,
+);
+has _read_length => (
+    init_arg => undef,
+    is => 'ro',
+    default => sub {
+        my $self = shift;
+        $self->header('Content-Length') || 0;
+    },
+    lazy => 1,
+);
+
 has address => (is => 'rw');
 has arguments => (is => 'rw', default => sub { [] });
-has cookies => (is => 'rw', default => sub { {} });
+has cookies => (is => 'ro', builder => 'prepare_cookies', lazy => 1);
+
+sub prepare_cookies {
+    my ( $self ) = @_;
+
+    if ( my $header = $self->header('Cookie') ) {
+        return { CGI::Simple::Cookie->parse($header) };
+    }
+    {};
+}
+
 has query_keywords => (is => 'rw');
 has match => (is => 'rw');
 has method => (is => 'rw');
@@ -31,17 +64,64 @@ has headers => (
   is      => 'rw',
   isa     => 'HTTP::Headers',
   handles => [qw(content_encoding content_length content_type header referer user_agent)],
-  default => sub { HTTP::Headers->new() },
-  required => 1,
+  builder => 'prepare_headers',
   lazy => 1,
 );
 
-has _context => (
-  is => 'rw',
-  weak_ref => 1,
-  handles => ['read'],
-  clearer => '_clear_context',
+sub prepare_headers {
+    my ($self) = @_;
+
+    my $env = $self->env;
+    my $headers = HTTP::Headers->new();
+
+    for my $header (keys %{ $env }) {
+        next unless $header =~ /^(HTTP|CONTENT|COOKIE)/i;
+        (my $field = $header) =~ s/^HTTPS?_//;
+        $field =~ tr/_/-/;
+        $headers->header($field => $env->{$header});
+    }
+    return $headers;
+}
+
+has _log => (
+    is => 'ro',
+    weak_ref => 1,
+    required => 1,
 );
+
+# Amount of data to read from input on each pass
+our $CHUNKSIZE = 64 * 1024;
+
+sub read {
+    my ($self, $maxlength) = @_;
+    my $remaining = $self->_read_length - $self->_read_position;
+    $maxlength ||= $CHUNKSIZE;
+
+    # Are we done reading?
+    if ( $remaining <= 0 ) {
+        return;
+    }
+
+    my $readlen = ( $remaining > $maxlength ) ? $maxlength : $remaining;
+    my $rc = $self->read_chunk( my $buffer, $readlen );
+    if ( defined $rc ) {
+        if (0 == $rc) { # Nothing more to read even though Content-Length
+                        # said there should be.
+            return;
+        }
+        $self->_set_read_position( $self->_read_position + $rc );
+        return $buffer;
+    }
+    else {
+        Catalyst::Exception->throw(
+            message => "Unknown error reading input: $!" );
+    }
+}
+
+sub read_chunk {
+    my $self = shift;
+    return $self->env->{'psgi.input'}->read(@_);
+}
 
 has body_parameters => (
   is => 'rw',
@@ -57,10 +137,9 @@ has uploads => (
 );
 
 has parameters => (
-  is => 'rw',
-  required => 1,
-  lazy => 1,
-  default => sub { {} },
+    is => 'rw',
+    lazy => 1,
+    builder => 'prepare_parameters',
 );
 
 # TODO:
@@ -71,17 +150,106 @@ has parameters => (
 #  these lazy build from there and kill all the direct hash access
 #  in Catalyst.pm and Engine.pm?
 
-before $_ => sub {
-    my ($self) = @_;
-    my $context = $self->_context || return;
-    $context->prepare_body;
-} for qw/parameters body_parameters/;
+sub prepare_parameters {
+    my ( $self ) = @_;
 
+    $self->prepare_body;
+    my $parameters = {};
+    my $body_parameters = $self->body_parameters;
+    my $query_parameters = $self->query_parameters;
+    # We copy, no references
+    foreach my $name (keys %$query_parameters) {
+        my $param = $query_parameters->{$name};
+        $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
+    }
+
+    # Merge query and body parameters
+    foreach my $name (keys %$body_parameters) {
+        my $param = $body_parameters->{$name};
+        my @values = ref $param eq 'ARRAY' ? @$param : ($param);
+        if ( my $existing = $parameters->{$name} ) {
+          unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
+        }
+        $parameters->{$name} = @values > 1 ? \@values : $values[0];
+    }
+    $parameters;
+}
+
+before body_parameters => sub {
+    my ($self) = @_;
+    $self->prepare_body;
+    $self->prepare_body_parameters;
+};
+
+has _uploadtmp => (
+    is => 'ro',
+    predicate => '_has_uploadtmp',
+);
+
+sub prepare_body {
+    my ( $self ) = @_;
+
+    if ( my $length = $self->_read_length ) {
+        unless ( $self->_body ) {
+            my $type = $self->header('Content-Type');
+            $self->_body(HTTP::Body->new( $type, $length ));
+            $self->_body->cleanup(1); # Make extra sure!
+            $self->_body->tmpdir( $self->_uploadtmp )
+              if $self->_has_uploadtmp;
+        }
+
+        # Check for definedness as you could read '0'
+        while ( defined ( my $buffer = $self->read() ) ) {
+            $self->prepare_body_chunk($buffer);
+        }
+
+        # paranoia against wrong Content-Length header
+        my $remaining = $length - $self->_read_position;
+        if ( $remaining > 0 ) {
+            Catalyst::Exception->throw(
+                "Wrong Content-Length value: $length" );
+        }
+    }
+    else {
+        # Defined but will cause all body code to be skipped
+        $self->_body(0);
+    }
+}
+
+sub prepare_body_chunk {
+    my ( $self, $chunk ) = @_;
+
+    $self->_body->add($chunk);
+}
+
+sub prepare_body_parameters {
+    my ( $self ) = @_;
+
+    return unless $self->_body;
+
+    $self->{body_parameters} = $self->_body->param; # FIXME!! Recursion here.
+}
+
+sub prepare_connection {
+    my ($self) = @_;
+
+    my $env = $self->env;
+
+    $self->address( $env->{REMOTE_ADDR} );
+    $self->hostname( $env->{REMOTE_HOST} )
+        if exists $env->{REMOTE_HOST};
+    $self->protocol( $env->{SERVER_PROTOCOL} );
+    $self->remote_user( $env->{REMOTE_USER} );
+    $self->method( $env->{REQUEST_METHOD} );
+    $self->secure( $env->{'psgi.url_scheme'} eq 'https' ? 1 : 0 );
+}
+
+# XXX - FIXME - method is here now, move this crap...
 around parameters => sub {
     my ($orig, $self, $params) = @_;
     if ($params) {
         if ( !ref $params ) {
-            $self->_context->log->warn(
+            $self->_log->warn(
                 "Attempt to retrieve '$params' with req->params(), " .
                 "you probably meant to call req->param('$params')"
             );
@@ -109,7 +277,7 @@ has _body => (
 #             and provide a custom reader..
 sub body {
   my $self = shift;
-  $self->_context->prepare_body();
+  $self->prepare_body();
   croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
@@ -126,17 +294,12 @@ has hostname => (
 
 has _path => ( is => 'rw', predicate => '_has_path', clearer => '_clear_path' );
 
-# XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
-# to confusion between Engines and Plugin::Authentication. Remove in 5.8100?
-has user => (is => 'rw');
-
 sub args            { shift->arguments(@_) }
 sub body_params     { shift->body_parameters(@_) }
 sub input           { shift->body(@_) }
 sub params          { shift->parameters(@_) }
 sub query_params    { shift->query_parameters(@_) }
 sub path_info       { shift->path(@_) }
-sub snippets        { shift->captures(@_) }
 
 =for stopwords param params
 
@@ -147,8 +310,7 @@ Catalyst::Request - provides information about the current client request
 =head1 SYNOPSIS
 
     $req = $c->request;
-    $req->action;
-    $req->address;
+    $req->address eq "127.0.0.1";
     $req->arguments;
     $req->args;
     $req->base;
@@ -175,7 +337,7 @@ Catalyst::Request - provides information about the current client request
     $req->read;
     $req->referer;
     $req->secure;
-    $req->captures; # previously knows as snippets
+    $req->captures;
     $req->upload;
     $req->uploads;
     $req->uri;
@@ -191,14 +353,6 @@ current client request. The request object is prepared by L<Catalyst::Engine>,
 thus hiding the details of the particular engine implementation.
 
 =head1 METHODS
-
-=head2 $req->action
-
-[DEPRECATED] Returns the name of the requested action.
-
-
-Use C<< $c->action >> instead (which returns a
-L<Catalyst::Action|Catalyst::Action> object).
 
 =head2 $req->address
 
@@ -480,6 +634,10 @@ Reads a chunk of data from the request body. This method is intended to be
 used in a while loop, reading $maxlength bytes on every call. $maxlength
 defaults to the size of the request if not specified.
 
+=head2 $req->read_chunk(\$buff, $max)
+
+Reads a chunk..
+
 You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 
 =head2 $req->referer
@@ -501,11 +659,6 @@ Returns a reference to an array containing captured args from chained
 actions or regex captures.
 
     my @captures = @{ $c->request->captures };
-
-=head2 $req->snippets
-
-C<captures> used to be called snippets. This is still available for backwards
-compatibility, but is considered deprecated.
 
 =head2 $req->upload
 
@@ -687,6 +840,43 @@ Returns the value of the C<REMOTE_USER> environment variable.
 
 Shortcut to $req->headers->user_agent. Returns the user agent (browser)
 version string.
+
+=head1 SETUP METHODS
+
+You should never need to call these yourself in application code,
+however they are useful if extending Catalyst by applying a request role.
+
+=head2 $self->prepare_headers()
+
+Sets up the C<< $res->headers >> accessor.
+
+=head2 $self->prepare_body()
+
+Sets up the body using L<HTTP::Body>
+
+=head2 $self->prepare_body_chunk()
+
+Add a chunk to the request body.
+
+=head2 $self->prepare_body_parameters()
+
+Sets up parameters from body.
+
+=head2 $self->prepare_cookies()
+
+Parse cookies from header. Sets up a L<CGI::Simple::Cookie> object.
+
+=head2 $self->prepare_connection()
+
+Sets up various fields in the request like the local and remote addresses,
+request method, hostname requested etc.
+
+=head2 $self->prepare_parameters()
+
+Ensures that the body has been parsed, then builds the parameters, which are
+combined from those in the request and those in the body.
+
+This method is the builder for the 'parameters' attribute.
 
 =head2 meta
 

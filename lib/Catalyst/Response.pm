@@ -2,8 +2,31 @@ package Catalyst::Response;
 
 use Moose;
 use HTTP::Headers;
+use Moose::Util::TypeConstraints;
+use namespace::autoclean;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
+
+has _response_cb => (
+    is      => 'ro',
+    isa     => 'CodeRef',
+    writer  => '_set_response_cb',
+    clearer => '_clear_response_cb',
+    predicate => '_has_response_cb',
+);
+
+subtype 'Catalyst::Engine::Types::Writer',
+    as duck_type([qw(write close)]);
+
+has _writer => (
+    is      => 'ro',
+    isa     => 'Catalyst::Engine::Types::Writer',
+    writer  => '_set_writer',
+    clearer => '_clear_writer',
+    predicate => '_has_writer',
+);
+
+sub DEMOLISH { $_[0]->_writer->close if $_[0]->_has_writer }
 
 has cookies   => (is => 'rw', default => sub { {} });
 has body      => (is => 'rw', default => undef);
@@ -20,18 +43,49 @@ has headers   => (
   required => 1,
   lazy => 1,
 );
-has _context => (
-  is => 'rw',
-  weak_ref => 1,
-  handles => ['write'],
-  clearer => '_clear_context',
-);
 
 sub output { shift->body(@_) }
 
 sub code   { shift->status(@_) }
 
-no Moose;
+sub write {
+    my ( $self, $buffer ) = @_;
+
+    # Finalize headers if someone manually writes output
+    $self->finalize_headers;
+
+    $buffer = q[] unless defined $buffer;
+
+    my $len = length($buffer);
+    $self->_writer->write($buffer);
+
+    return $len;
+}
+
+sub finalize_headers {
+    my ($self) = @_;
+
+    # This is a less-than-pretty hack to avoid breaking the old
+    # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
+    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
+    # just pulls the headers out of $ctx->response in its run method and never
+    # sets response_cb. So take the lack of a response_cb as a sign that we
+    # don't need to set the headers.
+
+    return unless $self->_has_response_cb;
+
+    # If we already have a writer, we already did this, so don't do it again
+    return if $self->_has_writer;
+
+    my @headers;
+    $self->headers->scan(sub { push @headers, @_ });
+
+    my $writer = $self->_response_cb->([ $self->status, \@headers ]);
+    $self->_set_writer($writer);
+    $self->_clear_response_cb;
+
+    return;
+}
 
 =head1 NAME
 
@@ -187,14 +241,23 @@ $res->code is an alias for this, to match HTTP::Response->code.
 
 Writes $data to the output stream.
 
-=head2 meta
-
-Provided by Moose
-
 =head2 $res->print( @data )
 
 Prints @data to the output stream, separated by $,.  This lets you pass
 the response object to functions that want to write to an L<IO::Handle>.
+
+=head2 $self->finalize_headers($c)
+
+Writes headers to response if not already written
+
+=head2 DEMOLISH
+
+Ensures that the response is flushed and closed at the end of the
+request.
+
+=head2 meta
+
+Provided by Moose
 
 =cut
 

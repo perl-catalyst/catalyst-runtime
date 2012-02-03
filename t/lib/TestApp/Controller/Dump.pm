@@ -10,6 +10,13 @@ sub default : Action {
 
 sub env : Action Relative {
     my ( $self, $c ) = @_;
+    $c->stash(env => $c->req->env);
+    $c->forward('TestApp::View::Dump::Env');
+}
+
+sub env_on_engine : Action Relative {
+    my ( $self, $c ) = @_;
+    $c->stash(env => $c->engine->env);
     $c->forward('TestApp::View::Dump::Env');
 }
 

@@ -10,6 +10,7 @@ use_ok('TestApp');
 my $base = 'http://127.0.0.1';
 
 my $request = Catalyst::Request->new({
+    _log => Catalyst::Log->new,
     base => URI->new($base),
     uri  => URI->new("$base/"),
 });

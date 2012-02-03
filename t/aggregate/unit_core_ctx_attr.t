@@ -8,6 +8,7 @@ use URI;
 use_ok('TestApp');
 
 my $request = Catalyst::Request->new( {
+                _log => Catalyst::Log->new,
                 base => URI->new('http://127.0.0.1/foo')
               } );
 my $dispatcher = TestApp->dispatcher;
