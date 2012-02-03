@@ -18,6 +18,7 @@ add_stopwords(qw(
     filename tempname request's subdirectory ini uninstalled uppercased
     wiki bitmask uri url urls dir hostname proxied http https IP SSL
     inline INLINE plugins
+    André
     Andreas
     Ashton
     Axel
