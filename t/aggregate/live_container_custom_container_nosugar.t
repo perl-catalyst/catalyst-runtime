@@ -12,4 +12,4 @@ BEGIN {
 }
 use TestCustomContainer;
 
-TestCustomContainer->new(sugar => 0);
+TestCustomContainer->new(app_name => 'TestAppCustomContainerSugar');

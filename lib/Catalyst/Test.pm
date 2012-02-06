@@ -25,6 +25,7 @@ sub _build_request_export {
     return sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'" }
         unless $class;
 
+    warn "LOAD $class " . Class::MOP::is_class_loaded($class);
     Class::MOP::load_class($class) unless Class::MOP::is_class_loaded($class);
     $class->import;
 

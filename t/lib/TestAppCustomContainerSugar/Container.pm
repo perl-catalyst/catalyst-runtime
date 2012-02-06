@@ -1,4 +1,4 @@
-package TestAppCustomContainer::SugarContainer;
+package TestAppCustomContainerSugar::Container;
 use Moose;
 use namespace::autoclean;
 use Catalyst::IOC;
