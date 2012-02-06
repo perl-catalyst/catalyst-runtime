@@ -89,58 +89,81 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
              ...
            }
 
-##### Need planning, have questions:
+##### Items for discussion and planning
+# (in no particular order, just numbered to be more easily refered to)
 
-    - per request life cycle
+  1) per request life cycle
 
-    - sugar - we should discuss the syntax with rafl and edenc
-        - what's missing?
+  2) sugar syntax
 
-    - when / when not COMPONENT should be called
+  3) when / when not COMPONENT should be called
 
-    - locate_components service vs setup_components method
-      - can we be more lazy?
-      - should setup_components be a service that things like the ->component lookup
-        can depend on?
+  4) problems when get_all_components() is called when there is no 'context' yet
 
-    - There are a few more FIXMEs, idk if any relevant here
+  5) Back compat problems:
+     - expand_component_module
+     - $instance->expand_modules
+     - search_extra
+     - what to do when a user overrides the locate_components method?
 
-### Next steps - planned:
+  6) locate_components service vs setup_components method
+     - can we be more lazy?
+     - should setup_components be a service that things like the ->component lookup
+       can depend on?
 
-  - some imports need to get the importing package in Catalyst::IOC
-    - done - needs testing
+  7) $class->log->warn is being used to give warnings, but maybe there is a
+     better way to do it
 
-  - Back compat for Catalyst.pm moved methods (locate_components)
-    - done - needs testing
+  8) the ConstructorInjection depends on the application_name, which probably
+     makes app/ctx split harder. We need a way to get the application instance
+     passed properly.
 
-  - Test custom container
-    - writing some tests which verify that the models you think should be
-      there are there, and that they received their dependencies as arguments
-    - i.e. Model::Bar should get params { foo => $model_foo } when being
-      constructed, etc
-    - Need to test that if you have a standard component Frotz
-      and a customized component Fnar, and Fnar depends on Frotz
-    - And yeah, some tests that the customised components actually work via
-      $c->model('Foo'), and that COMPONENT is called (or not called)
-      as appropiate and that ACCEPT_CONTEXT is called (or not) as appropriate
+  9) there is a call in Catalyst::Controller to catalyst_component_name class
+     accessor (which doesn't exist anymore).
 
-### Next steps - less planned:
+ 10) make ACCEPT_CONTEXT and COMPONENT optional in Catalyst::IOC::BlockInjection and Catalyst::IOC::ConstructorInjection
+     - Create COMPONENTSingleton life cycle
 
-  - make ACCEPT_CONTEXT and COMPONENT optional in Catalyst::IOC::BlockInjection and Catalyst::IOC::ConstructorInjection
-    - Create COMPONENTSingleton life cycle
+ 11) we build the service too early, causing the COMPONENT method to be
+     called early, breaking components which build other components (e.g.
+     Model::DBIC::Schema).
 
-  - Test cases for extending the container in an application.
-    - Using the sugar added in the previous item
-    - Test when Model::Foo depends_on Model::Bar
-    - Test for component Foo => ( lifecycle => 'Singleton', class => 'My::External::Class', dependencies => { config => depends_on("config") } )
-    - Fix ^^ so that you can get your component's namespaced config nicely.
+ 12) root service has a very ambiguous name - maybe root_dir?
 
-  - Tests for using the container outside of Catalyst
-    - Custom container which adds some (very simple) services which are initialized from
-      the application config file (note plain services, not components)
-    - Depend on (and test) these inside Catalyst
-    - Test loading container outside Catalyst, and these services working
-    - Test Catalyst / MyApp is not loaded
+ 13) should _get_component_type_name (in Catalyst::IOC::Container) exist?
+
+ 14) Test cases for extending the container in an application.
+     - Using the sugar added in the previous item
+     - Test when Model::Foo depends_on Model::Bar
+     - Test for component Foo => ( lifecycle => 'Singleton', class => 'My::External::Class', dependencies => { config => depends_on("config") } )
+     - Fix ^^ so that you can get your component's namespaced config nicely.
+
+ 15) Tests for using the container outside of Catalyst
+     - Custom container which adds some (very simple) services which are initialized from
+       the application config file (note plain services, not components)
+     - Depend on (and test) these inside Catalyst
+     - Test loading container outside Catalyst, and these services working
+     - Test Catalyst / MyApp is not loaded
+
+### Next steps
+
+  - Improve validation on the 'component' methods in  Catalyst::IOC
+    (check the type of the component, etc)
+
+  - Thigs to test:
+    - Imports getting the importing package in Catalyst::IOC
+    - Back compat for Catalyst.pm moved methods (locate_components)
+    - Custom container
+      - writing some tests which verify that the models you think should be
+        there are there, and that they received their dependencies as arguments
+      - i.e. Model::Bar should get params { foo => $model_foo } when being
+        constructed, etc
+      - Need to test that if you have a standard component Frotz
+        and a customized component Fnar, and Fnar depends on Frotz
+      - And yeah, some tests that the customised components actually work via
+        $c->model('Foo'), and that COMPONENT is called (or not called)
+        as appropiate and that ACCEPT_CONTEXT is called (or not) as appropriate
+
 
 #### Extending my app, notes
 
@@ -151,7 +174,7 @@ and what needs to be done to fix it!
 
 package MyApp::Container;
 use Catalyst::IOC;
-    
+
     container $self, as {
             container model => as {
                 component Foo => (); # As per default!
@@ -159,11 +182,11 @@ use Catalyst::IOC;
                 component Baz => ( lifecycle => 'InstancePerContext );
                 component Quux => ( lifecycle => 'Singleton' ); # ACCEPT_CONTEXT not called
                 # Catalyst::Model::Adaptor example
-                conponent Fnar => ( lifecycle => 'Singleton', class => 'My::External::Class', dependencies => { config => depends_on('config')} );
+                component Fnar => ( lifecycle => 'Singleton', class => 'My::External::Class', dependencies => { config => depends_on('config')} );
                 #                                                                                               ^^ FIXME - gets whole config, not Model::Foo
                 #                                                                                                  There should be a 'nice' way to get the 'standard' config
-            };                    
-            # Note - implementation of BB may need to be changed to support making sure existing 
+            };
+            # Note - implementation of BB may need to be changed to support making sure existing
             # services actually get overridden. not sure how the default container behaves when doing that
             # above code would build the constructor injection as it currently does,
             # defaulting to the class name in the right namespace as declared by the surrounding container
