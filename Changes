@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90008 - TRIAL 2012-02-06 20:49:00
+
  New features and refactoring:
   - Much of the Catalyst::Engine code has been moved into Catalyst::Request
     and Catalyst::Response, to be able to better support asynchronous web
