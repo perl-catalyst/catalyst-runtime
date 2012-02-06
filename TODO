@@ -147,6 +147,11 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
 
 ### Next steps
 
+  - Push the config built in the container back up onto the app
+
+  - Find a better way to make path_to work. Current fix is in
+    Catalyst::IOC::Container, subs build_home_service, build_root_service.
+
   - Improve validation on the 'component' methods in  Catalyst::IOC
     (check the type of the component, etc)
 
