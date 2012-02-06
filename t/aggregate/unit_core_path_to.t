@@ -5,6 +5,11 @@ use Test::More;
 use FindBin;
 use Path::Class;
 use File::Basename;
+BEGIN {
+    delete $ENV{CATALYST_HOME}; # otherwise it'll set itself up to the wrong place
+}
+use lib "$FindBin::Bin/../lib";
+use TestApp;
 
 my %non_unix = (
     MacOS   => 1,
@@ -25,25 +30,16 @@ if ( $os ne 'Unix' ) {
 
 use_ok('Catalyst');
 
-my $context = 'Catalyst';
+my $context = 'TestApp';
+my $base;
 
-delete $ENV{CATALYST_HOME}; # otherwise it'll set itself up to the wrong place
-
-$context->setup_home;
-my $base = dir($FindBin::Bin)->relative->stringify;
-
-isa_ok( Catalyst::path_to( $context, $base ), 'Path::Class::Dir' );
-isa_ok( Catalyst::path_to( $context, $base, basename $0 ), 'Path::Class::File' );
+isa_ok( $base = Catalyst::path_to( $context, '' ), 'Path::Class::Dir' );
 
 my $config = Catalyst->config;
 
-$config->{home} = '/home/sri/my-app/';
-
-is( Catalyst::path_to( $context, 'foo' ), '/home/sri/my-app/foo', 'Unix path' );
-
-$config->{home} = '/Users/sri/myapp/';
+is( Catalyst::path_to( $context, 'foo' ), "$base/foo", 'Unix path' );
 
 is( Catalyst::path_to( $context, 'foo', 'bar' ),
-    '/Users/sri/myapp/foo/bar', 'deep Unix path' );
+    "$base/foo/bar", 'deep Unix path' );
 
 done_testing;
