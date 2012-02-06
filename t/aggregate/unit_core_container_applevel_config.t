@@ -16,4 +16,10 @@ $applevel_config = TestAppContainer->config->{applevel_config};
 ok($applevel_config, 'applevel_config exists in the config accessor');
 is($applevel_config, 'foo', 'and has the correct value');
 
+my $home = TestAppContainer->container->resolve(service => 'config')->{home};
+ok( $home );
+
+$home = TestAppContainer->config->{home};
+ok( $home );
+
 done_testing;

@@ -167,7 +167,7 @@ sub build_home_service {
             }
 
             $home ||= Catalyst::Utils::home($class);
-            $class->config(home => $home); # FIXME - Needed to make path_to work.
+#            $class->config(home => $home); # FIXME - Needed to make path_to work.
             return $home;
         },
         dependencies => [ depends_on('application_name') ],
