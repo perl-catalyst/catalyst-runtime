@@ -4,6 +4,7 @@ use FindBin;
 use lib;
 use File::Spec;
 use Class::Load qw/ load_first_existing_class load_optional_class /;
+use Catalyst::Utils;
 use namespace::autoclean -also => 'subclass_with_traits';
 use Try::Tiny;
 
@@ -34,7 +35,9 @@ sub subclass_with_traits {
 sub run {
     my ($self, $appclass, $scriptclass) = @_;
 
-    lib->import(File::Spec->catdir($FindBin::Bin, '..', 'lib'));
+    if (my $home = Catalyst::Utils::home($appclass)) {
+        lib->import(File::Spec->catdir($home, 'lib'));
+    }
 
     my $class = $self->find_script_class($appclass, $scriptclass);
 

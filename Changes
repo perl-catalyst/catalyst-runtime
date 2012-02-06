@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - The Catalyst::Utils::home function is used to find if the application
+    is a checkout in Catalyst::ScriptRunner. This means that a non-existant
+    lib directory that is relative to the script install location is not
+    included when not running from a checkout.
+
 5.90008 - TRIAL 2012-02-06 20:49:00
 
  New features and refactoring:
