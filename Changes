@@ -6,6 +6,8 @@
     lib directory that is relative to the script install location is not
     included when not running from a checkout.
 
+  - Fix dead links to cpansearch.perl.org to point to metacpan.org.
+
 5.90008 - TRIAL 2012-02-06 20:49:00
 
  New features and refactoring:
