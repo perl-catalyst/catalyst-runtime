@@ -38,7 +38,7 @@ use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 
-BEGIN { require 5.008004; }
+BEGIN { require 5.008003; }
 
 has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });

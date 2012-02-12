@@ -8,7 +8,7 @@ use Module::Install::AuthorRequires;
 use Module::Install::CheckConflicts;
 use Module::Install::AuthorTests;
 
-perl_version '5.008004';
+perl_version '5.008003';
 
 name 'Catalyst-Runtime';
 all_from 'lib/Catalyst/Runtime.pm';
