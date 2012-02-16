@@ -169,6 +169,8 @@ sub dist_indicator_file_list {
 
 Returns home directory for given class.
 
+Note that the class must be loaded for the home directory to be found using this function.
+
 =cut
 
 sub home {
@@ -183,26 +185,8 @@ sub home {
 
             # find the @INC entry in which $file was found
             (my $path = $inc_entry) =~ s/$file$//;
-            $path ||= cwd() if !defined $path || !length $path;
-            my $home = dir($path)->absolute->cleanup;
-
-            # pop off /lib and /blib if they're there
-            $home = $home->parent while $home =~ /b?lib$/;
-
-            # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
-            if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
-
-                # clean up relative path:
-                # MyApp/script/.. -> MyApp
-
-                my $dir;
-                my @dir_list = $home->dir_list();
-                while (($dir = pop(@dir_list)) && $dir eq '..') {
-                    $home = dir($home)->parent->parent;
-                }
-
-                return $home->stringify;
-            }
+            my $home = find_home_unloaded_in_checkout($path);
+            return $home if $home;
         }
 
         {
@@ -219,6 +203,31 @@ sub home {
 
     # we found nothing
     return 0;
+}
+
+sub find_home_unloaded_in_checkout {
+    my ($path) = @_;
+    $path ||= cwd() if !defined $path || !length $path;
+    my $home = dir($path)->absolute->cleanup;
+
+    # pop off /lib and /blib if they're there
+    $home = $home->parent while $home =~ /b?lib$/;
+
+    # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
+    if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
+
+        # clean up relative path:
+        # MyApp/script/.. -> MyApp
+
+        my $dir;
+        my @dir_list = $home->dir_list();
+        while (($dir = pop(@dir_list)) && $dir eq '..') {
+            $home = dir($home)->parent->parent;
+        }
+
+        return $home->stringify;
+    }
+
 }
 
 =head2 prefix($class, $name);
