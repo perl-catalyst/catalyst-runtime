@@ -13,11 +13,16 @@
 
   - Require the latest version of B::Hooks::EndOfScope (0.10) to avoid an
     issue where new versions of Module::Runtime (0.012) cause %^H to be
-    localised, which makes the scope end hook fire (and so clean things)
-    before the end of compile time. This causes Catalyst::Controller to
-    not compile as expected, and therefore breaks installs and applications.
-    This issue only affects some perl versions, including 5.10,
-    but not including 5.8 or 5.14.
+    localised on perl 5.10 to avoid a bug on that release.
+    This localisation causes the scope hook which cleans the namespace of
+    a module to be copied into the local scope of the module being
+    required, so when Module A uses Module B, the end of compilation for
+    Module B fires the cleaning hook for Module A.
+    This causes the cleanup of the first module before the end of it's
+    compilation, which causes that compilation to subsequently fail.
+    This causes Catalyst::Controller to not compile, and therefore
+    breaks installs and applications on perl 5.10 where new Module::Runtime
+    is installed.
 
 5.90008 - TRIAL 2012-02-06 20:49:00
 
