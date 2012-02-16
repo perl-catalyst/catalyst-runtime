@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90009 - 2012-02-16 09:06:00
+
  Bug fixes:
   - Fix the debug page so that it works as expected with the latest
     refactoring.
