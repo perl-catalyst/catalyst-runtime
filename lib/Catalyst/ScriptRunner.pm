@@ -35,7 +35,7 @@ sub subclass_with_traits {
 sub run {
     my ($self, $appclass, $scriptclass) = @_;
 
-    if (my $home = Catalyst::Utils::home($appclass)) {
+    if (my $home = Catalyst::Utils::find_home_unloaded_in_checkout()) {
         lib->import(File::Spec->catdir($home, 'lib'));
     }
 
