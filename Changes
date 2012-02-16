@@ -11,6 +11,14 @@
 
   - Fix dead links to cpansearch.perl.org to point to metacpan.org.
 
+  - Require the latest version of B::Hooks::EndOfScope (0.10) to avoid an
+    issue where new versions of Module::Runtime (0.012) cause %^H to be
+    localised, which makes the scope end hook fire (and so clean things)
+    before the end of compile time. This causes Catalyst::Controller to
+    not compile as expected, and therefore breaks installs and applications.
+    This issue only affects some perl versions, including 5.10,
+    but not including 5.8 or 5.14.
+
 5.90008 - TRIAL 2012-02-06 20:49:00
 
  New features and refactoring:
