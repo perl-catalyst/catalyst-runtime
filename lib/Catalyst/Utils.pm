@@ -9,6 +9,7 @@ use Carp qw/croak/;
 use Cwd;
 use Class::MOP;
 use String::RewritePrefix;
+use List::MoreUtils qw/ any /;
 
 use namespace::clean;
 
@@ -154,6 +155,16 @@ sub class2tempdir {
     return $tmpdir->stringify;
 }
 
+=head2 dist_indicator_file_list
+
+Returns a list of files which can be tested to check if you're inside a checkout
+
+=cut
+
+sub dist_indicator_file_list {
+    qw/ Makefile.PL Build.PL dist.init /;
+}
+
 =head2 home($class)
 
 Returns home directory for given class.
@@ -179,8 +190,7 @@ sub home {
             $home = $home->parent while $home =~ /b?lib$/;
 
             # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
-            if (-f $home->file("Makefile.PL") or -f $home->file("Build.PL")
-                or -f $home->file("dist.ini")) {
+            if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
 
                 # clean up relative path:
                 # MyApp/script/.. -> MyApp
