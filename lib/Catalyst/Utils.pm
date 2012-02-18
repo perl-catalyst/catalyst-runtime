@@ -210,7 +210,7 @@ sub home {
 Tries to determine if C<$path> (or cwd if not supplied)
 looks like a checkout. Any leading lib or blib components
 will be removed, then the directory produced will be checked
-for the existance of a C<< dist_indicator_file_list() >>.
+for the existence of a C<< dist_indicator_file_list() >>.
 
 If one is found, the directory will be returned, otherwise false.
 
