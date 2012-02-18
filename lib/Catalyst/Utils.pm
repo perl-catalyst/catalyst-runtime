@@ -207,7 +207,7 @@ sub home {
 
 =head2 find_home_unloaded_in_checkout ($path)
 
-Tries to determine if C<$path> (or cwd if not supplied)
+Tries to determine if C<$path> (or the current directory if not supplied)
 looks like a checkout. Any leading lib or blib components
 will be removed, then the directory produced will be checked
 for the existence of a C<< dist_indicator_file_list() >>.
