@@ -6,7 +6,7 @@ use HTTP::Request;
 use Path::Class;
 use URI;
 use Carp qw/croak/;
-use Cwd;
+use FindBin qw/ $Bin /;
 use Class::MOP;
 use String::RewritePrefix;
 use List::MoreUtils qw/ any /;
@@ -162,7 +162,7 @@ Returns a list of files which can be tested to check if you're inside a checkout
 =cut
 
 sub dist_indicator_file_list {
-    qw/ Makefile.PL Build.PL dist.init /;
+    qw/ Makefile.PL Build.PL dist.ini /;
 }
 
 =head2 home($class)
@@ -207,8 +207,8 @@ sub home {
 
 =head2 find_home_unloaded_in_checkout ($path)
 
-Tries to determine if C<$path> (or the current directory if not supplied)
-looks like a checkout. Any leading lib or blib components
+Tries to determine if C<$path> (or $FindBin::Bin if not supplied)
+looks like a checkout. Any leading lib, script or blib components
 will be removed, then the directory produced will be checked
 for the existence of a C<< dist_indicator_file_list() >>.
 
@@ -218,11 +218,13 @@ If one is found, the directory will be returned, otherwise false.
 
 sub find_home_unloaded_in_checkout {
     my ($path) = @_;
-    $path ||= cwd() if !defined $path || !length $path;
+    $path ||= $Bin if !defined $path || !length $path;
     my $home = dir($path)->absolute->cleanup;
 
     # pop off /lib and /blib if they're there
     $home = $home->parent while $home =~ /b?lib$/;
+    # pop off /script if it's there.
+    $home = $home->parent while $home =~ /b?script$/;
 
     # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
     if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
