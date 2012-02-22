@@ -37,7 +37,7 @@ use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 
-BEGIN { require 5.008004; }
+BEGIN { require 5.008003; }
 
 has stack => (is => 'ro', default => sub { [] });
 has stash => (is => 'rw', default => sub { {} });
@@ -99,7 +99,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90007';
+our $VERSION = '5.90010';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1384,18 +1384,18 @@ sub welcome_message {
                     We do, however, provide you with a few starting points.</p>
                  <p>If you want to jump right into web development with Catalyst
                     you might want to start with a tutorial.</p>
-<pre>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst-Manual/lib/Catalyst/Manual/Tutorial.pod">Catalyst::Manual::Tutorial</a></code>
+<pre>perldoc <a href="https://metacpan.org/module/Catalyst::Manual::Tutorial">Catalyst::Manual::Tutorial</a></code>
 </pre>
 <p>Afterwards you can go on to check out a more complete look at our features.</p>
 <pre>
-<code>perldoc <a href="http://cpansearch.perl.org/dist/Catalyst-Manual/lib/Catalyst/Manual/Intro.pod">Catalyst::Manual::Intro</a>
+<code>perldoc <a href="https://metacpan.org/module/Catalyst::Manual::Intro">Catalyst::Manual::Intro</a>
 <!-- Something else should go here, but the Catalyst::Manual link seems unhelpful -->
 </code></pre>
                  <h2>What to do next?</h2>
                  <p>Next it's time to write an actual application. Use the
-                    helper scripts to generate <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AController%3A%3A&amp;mode=all">controllers</a>,
-                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AModel%3A%3A&amp;mode=all">models</a>, and
-                    <a href="http://cpansearch.perl.org/search?query=Catalyst%3A%3AView%3A%3A&amp;mode=all">views</a>;
+                    helper scripts to generate <a href="https://metacpan.org/search?q=Catalyst%3A%3AController">controllers</a>,
+                    <a href="https://metacpan.org/search?q=Catalyst%3A%3AModel">models</a>, and
+                    <a href="https://metacpan.org/search?q=Catalyst%3A%3AView">views</a>;
                     they can save you a lot of work.</p>
                     <pre><code>script/${prefix}_create.pl --help</code></pre>
                     <p>Also, be sure to check out the vast and growing
