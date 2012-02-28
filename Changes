@@ -3,8 +3,8 @@
  Bug fixes:
   - Yet another fix to the previous fix to Catalyst::ScriptRunner which
     was resulting in the lib directory not being pushed onto @INC.
-    When you were in a directory in your checkout below the root
-    of the application.
+    This bug occurred when you were in a directory in your checkout
+    below the root of the application.
   - Bug fix to again correctly detect checkouts in dist zilla using
     applications.
 
