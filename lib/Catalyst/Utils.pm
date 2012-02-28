@@ -202,7 +202,7 @@ sub home {
     }
 
     # we found nothing
-    return 0;
+    return;
 }
 
 =head2 find_home_unloaded_in_checkout ($path)
@@ -222,7 +222,7 @@ sub find_home_unloaded_in_checkout {
     my $home = dir($path)->absolute->cleanup;
     # pop off /lib and /blib if they're there
     # pop off /script if it's there.
-
+    my $last_home;
     do {
         # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
         if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
@@ -236,10 +236,11 @@ sub find_home_unloaded_in_checkout {
             }
             return $home->stringify;
         }
+        $last_home = $home;
         $home = $home->parent;
     }
     while # pop off /lib and /blib or /script or /t/ if they're there
-        ($home =~ /b?lib$/ || $home =~ /script$/ || $home =~ /\/t(\/|$)/);
+        ($last_home =~ /b?lib$/ || $last_home =~ /script$/ || $last_home =~ /\/t(\/|$)/);
 }
 
 =head2 prefix($class, $name);
