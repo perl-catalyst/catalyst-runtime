@@ -6,10 +6,10 @@ use HTTP::Request;
 use Path::Class;
 use URI;
 use Carp qw/croak/;
-use FindBin qw/ $Bin /;
 use Class::MOP;
 use String::RewritePrefix;
 use List::MoreUtils qw/ any /;
+use Cwd qw/ cwd /;
 
 use namespace::clean;
 
@@ -207,7 +207,7 @@ sub home {
 
 =head2 find_home_unloaded_in_checkout ($path)
 
-Tries to determine if C<$path> (or $FindBin::Bin if not supplied)
+Tries to determine if C<$path> (or cwd if not supplied)
 looks like a checkout. Any leading lib, script or blib components
 will be removed, then the directory produced will be checked
 for the existence of a C<< dist_indicator_file_list() >>.
@@ -218,29 +218,28 @@ If one is found, the directory will be returned, otherwise false.
 
 sub find_home_unloaded_in_checkout {
     my ($path) = @_;
-    $path ||= $Bin if !defined $path || !length $path;
+    $path ||= cwd() if !defined $path || !length $path;
     my $home = dir($path)->absolute->cleanup;
-
     # pop off /lib and /blib if they're there
-    $home = $home->parent while $home =~ /b?lib$/;
     # pop off /script if it's there.
-    $home = $home->parent while $home =~ /b?script$/;
 
-    # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
-    if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
+    do {
+        # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
+        if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
+            # clean up relative path:
+            # MyApp/script/.. -> MyApp
 
-        # clean up relative path:
-        # MyApp/script/.. -> MyApp
-
-        my $dir;
-        my @dir_list = $home->dir_list();
-        while (($dir = pop(@dir_list)) && $dir eq '..') {
-            $home = dir($home)->parent->parent;
+            my $dir;
+            my @dir_list = $home->dir_list();
+            while (($dir = pop(@dir_list)) && $dir eq '..') {
+                $home = dir($home)->parent->parent;
+            }
+            return $home->stringify;
         }
-
-        return $home->stringify;
+        $home = $home->parent;
     }
-
+    while # pop off /lib and /blib or /script or /t/ if they're there
+        ($home =~ /b?lib$/ || $home =~ /script$/ || $home =~ /\/t(\/|$)/);
 }
 
 =head2 prefix($class, $name);
