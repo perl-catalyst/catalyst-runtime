@@ -8,8 +8,8 @@ __PACKAGE__->config->{namespace} = '';
 
 sub binary : Local {
     my ($self, $c) = @_;
-    $c->res->body(do { 
-        open(my $fh, '<', $c->path_to('..', '..', 'catalyst_130pix.gif')) or die $!; 
+    $c->res->body(do {
+        open(my $fh, '<', $c->path_to('..', 'catalyst_130pix.gif')) or die $!; 
         binmode($fh); 
         local $/ = undef; <$fh>;
     });

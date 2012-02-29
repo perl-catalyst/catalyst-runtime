@@ -207,7 +207,7 @@ sub home {
 
 =head2 find_home_unloaded_in_checkout ($path)
 
-Tries to determine if C<$path> (or cwd if not supplied)
+Tries to determine if C<$path> (or the current working directory if not supplied)
 looks like a checkout. Any leading lib, script or blib components
 will be removed, then the directory produced will be checked
 for the existence of a C<< dist_indicator_file_list() >>.
@@ -216,12 +216,12 @@ If one is found, the directory will be returned, otherwise false.
 
 =cut
 
+# XXX - Is this actually sane - should we just split into two simpler routines
+#       one for when we do have an @INC entry and one for when we don't?
 sub find_home_unloaded_in_checkout {
     my ($path) = @_;
     $path ||= cwd() if !defined $path || !length $path;
     my $home = dir($path)->absolute->cleanup;
-    # pop off /lib and /blib if they're there
-    # pop off /script if it's there.
     my $last_home;
     do {
         # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
