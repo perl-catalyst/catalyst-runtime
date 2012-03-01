@@ -14,7 +14,7 @@ BEGIN {
     $temp = tempdir( CLEANUP => 1 );
 
     $ENV{CATALYST_HOME} = $temp;
-    open(my $psgi, '>', File::Spec->catdir($temp, 'testapp.psgi')) or die;
+    open(my $psgi, '>', File::Spec->catfile($temp, 'testapp.psgi')) or die;
     print $psgi q{
         use strict;
         use TestApp;
