@@ -1,10 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
  Bug fixes:
-  - Yet another fix to the previous fix to Catalyst::ScriptRunner which
-    was resulting in the lib directory not being pushed onto @INC.
-    This bug occurred when you were in a directory in your checkout
-    below the root of the application.
+  - Simplification of the previous changes to Catalyst::ScriptRunner
+    We now just push $FindBin::Bin/../lib to the @INC path again, but
+    only if one of the dist indicator files (Makefile.PL Build.PL or
+    dist.ini) can be found in $FindBin::Bin/../$_
+    This avoids heuristics when the app is unloaded and therefore
+    works better for extensions which have entire applications in
+    their test suites.
   - Bug fix to again correctly detect checkouts in dist zilla using
     applications.
 

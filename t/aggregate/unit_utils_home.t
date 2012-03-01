@@ -30,15 +30,6 @@ foreach my $inc ('', 'lib', 'blib'){
     is Catalyst::Utils::home('MyApp'), dir($d, 'MyApp')->absolute->cleanup;
 }
 
-{
-    my $d = tempdir(CLEANUP => 1);
-    chdir($d);
-    ok !Catalyst::Utils::find_home_unloaded_in_checkout();
-    open(my $fh, '>', "Makefile.PL");
-    close($fh);
-    is Catalyst::Utils::find_home_unloaded_in_checkout(), cwd(), "Did find home_unloaded_in_checkout"
-}
-
 chdir($cwd);
 
 done_testing;
