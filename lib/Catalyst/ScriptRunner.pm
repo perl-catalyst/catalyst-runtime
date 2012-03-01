@@ -35,7 +35,7 @@ sub subclass_with_traits {
 sub run {
     my ($self, $appclass, $scriptclass) = @_;
 
-    if (grep { -f File::Spec->catdir($FindBin::Bin, '..', $_) } Catalyst::Utils::dist_indicator_file_list()) {
+    if (grep { -f File::Spec->catfile($FindBin::Bin, '..', $_) } Catalyst::Utils::dist_indicator_file_list()) {
         lib->import(File::Spec->catdir($FindBin::Bin, '..', 'lib'));
     }
 
