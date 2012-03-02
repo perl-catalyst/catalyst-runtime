@@ -10,6 +10,9 @@
     their test suites.
   - Bug fix to again correctly detect checkouts in dist zilla using
     applications.
+  - --background option for the server script now only closes
+    STDIN, STDOUT and STDERR. This fixes issues with Log::Dispatch
+    and other loggers which open a file handle when
 
 5.90010 - 2012-02-18 00:01:00
 

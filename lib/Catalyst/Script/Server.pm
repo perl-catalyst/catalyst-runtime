@@ -71,17 +71,20 @@ has pidfile => (
     predicate     => '_has_pidfile',
 );
 
+# Override MooseX::Daemonize
+sub dont_close_all_files { 1 }
 sub BUILD {
     my $self = shift;
 
     if ($self->background) {
         # FIXME - This is evil. Should we just add MX::Daemonize to the deps?
-        try { Class::MOP::load_class('MooseX::Daemonize::Core') }
+        try { Class::MOP::load_class('MooseX::Daemonize::Core'); Class::MOP::load_class('POSIX') }
         catch {
             warn("MooseX::Daemonize is needed for the --background option\n");
             exit 1;
         };
         MooseX::Daemonize::Core->meta->apply($self);
+        POSIX::close($_) foreach (0..2);
     }
 }
 
