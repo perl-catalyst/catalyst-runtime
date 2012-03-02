@@ -13,6 +13,8 @@
   - --background option for the server script now only closes
     STDIN, STDOUT and STDERR. This fixes issues with Log::Dispatch
     and other loggers which open a file handle when
+  - Change incorrect use of File::Spec->catdir to File::Spec->catfile
+    so that we work on platforms which care about this (VMS?)
 
 5.90010 - 2012-02-18 00:01:00
 
