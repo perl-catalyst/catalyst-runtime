@@ -15,6 +15,8 @@
     and other loggers which open a file handle when
   - Change incorrect use of File::Spec->catdir to File::Spec->catfile
     so that we work on platforms which care about this (VMS?)
+  - Make it more obvious if our PSGI server doesn't pass in a response
+    callback.
 
 5.90010 - 2012-02-18 00:01:00
 
