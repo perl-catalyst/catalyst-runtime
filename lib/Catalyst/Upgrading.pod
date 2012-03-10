@@ -515,6 +515,13 @@ The correct fix is to re-arrange your class's inheritance hierarchy so that the
 COMPONENT method you would like to inherit is the first (left-hand most)
 COMPONENT method in your @ISA.
 
+=head2 Development server relying on environment variables
+
+Previously, the development server would allow propagation of system
+environment variables into the request environment, this has changed with the
+adoption of Plack. You can use L<Plack::Middleware::ForceEnv> to achieve the
+same effect.
+
 =head1 WARNINGS
 
 =head2 Actions in your application class

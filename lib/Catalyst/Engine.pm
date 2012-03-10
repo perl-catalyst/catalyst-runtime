@@ -180,10 +180,6 @@ sub finalize_error {
         $title = $name = "$name on Catalyst $Catalyst::VERSION";
         $name  = "<h1>$name</h1>";
 
-        # Don't show context in the dump
-        $c->req->_clear_context;
-        $c->res->_clear_context;
-
         # Don't show body parser in the dump
         $c->req->_clear_body;
 
@@ -682,6 +678,7 @@ sub build_psgi_app {
 
         return sub {
             my ($respond) = @_;
+            confess("Did not get a response callback for writer, cannot continiue") unless $respond;
             $app->handle_request(env => $env, response_cb => $respond);
         };
     };

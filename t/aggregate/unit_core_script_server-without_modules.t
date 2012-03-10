@@ -1,6 +1,12 @@
 use strict;
 use warnings;
 use FindBin qw/$Bin/;
+
+# Package::Stash::XS has a weird =~ XS invocation during its compilation
+# This interferes with @INC hooks that do rematcuing on their own on
+# perls before 5.8.7. Just use the PP version to work around this.
+BEGIN { $ENV{PACKAGE_STASH_IMPLEMENTATION} = 'PP' if $] < '5.008007' }
+
 use Test::More;
 use Try::Tiny;
 

@@ -7,7 +7,7 @@ use base 'Catalyst::Engine';
 
 warn("You are loading Catalyst::Engine::HTTP explicitly.
 
-This is almost certainally a bad idea, as Catalyst::Engine::HTTP
+This is almost certainly a bad idea, as Catalyst::Engine::HTTP
 has been removed in this version of Catalyst.
 
 Please update your application's scripts with:
