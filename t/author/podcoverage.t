@@ -8,7 +8,7 @@ use Test::Pod::Coverage 1.04;
 my @modules = all_modules;
 our @private = ( 'BUILD' );
 foreach my $module (@modules) {
-    local @private = (@private, 'run') if $module =~ /^Catalyst::Script::/;
+    local @private = (@private, 'run', 'dont_close_all_files') if $module =~ /^Catalyst::Script::/;
     local @private = (@private, 'plugin') if $module =~ /^Catalyst$/;
     local @private = (@private, 'snippets') if $module =~ /^Catalyst::Request$/;
     local @private = (@private, 'prepare_connection') if $module =~ /^Catalyst::Engine$/;

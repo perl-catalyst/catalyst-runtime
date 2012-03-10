@@ -28,14 +28,18 @@ Catalyst::Component - Catalyst Component Base Class
 
     __PACKAGE__->config( foo => 'bar' );
 
+    has foo => (
+        is => 'ro',
+    );
+
     sub test {
         my $self = shift;
-        return $self->{foo};
+        return $self->foo;
     }
 
     sub forward_to_me {
         my ( $self, $c ) = @_;
-        $c->response->output( $self->{foo} );
+        $c->response->output( $self->foo );
     }
 
     1;
@@ -46,7 +50,7 @@ Catalyst::Component - Catalyst Component Base Class
     # Or just methods
     print $c->comp('MyApp::Model::Something')->test;
 
-    print $c->comp('MyApp::Model::Something')->{foo};
+    print $c->comp('MyApp::Model::Something')->foo;
 
 =head1 DESCRIPTION
 
@@ -55,6 +59,13 @@ This is the universal base class for Catalyst components
 
 It provides you with a generic new() for component construction through Catalyst's
 component loader with config() support and a process() method placeholder.
+
+B<Note> that calling C<< $self->config >> inside a component is strongly
+disrecommended - the correctly merged config should have already been
+passed to the constructor and stored in attributes - accessing
+the config accessor directly from an instance is likely to get the
+wrong values (as it only holds the class wide config, not things loaded
+from the config file!)
 
 =cut
 
@@ -200,7 +211,7 @@ a Catalyst application has its own config hash.
 
 The component's config hash is merged with any config entry on the
 application for this component and passed to C<new()> (as mentioned
-above at L</COMPONENT>). The common practice to access the merged
+above at L</COMPONENT>). The recommended practice to access the merged
 config is to use a Moose attribute for each config entry on the
 receiving component.
 

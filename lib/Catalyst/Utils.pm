@@ -6,10 +6,9 @@ use HTTP::Request;
 use Path::Class;
 use URI;
 use Carp qw/croak/;
-use FindBin qw/ $Bin /;
+use Cwd;
 use Class::MOP;
 use String::RewritePrefix;
-use List::MoreUtils qw/ any /;
 
 use namespace::clean;
 
@@ -169,23 +168,20 @@ sub class2tempdir {
     return $tmpdir->stringify;
 }
 
-=head2 dist_indicator_file_list
-
-Returns a list of files which can be tested to check if you're inside a checkout
-
-=cut
-
-sub dist_indicator_file_list {
-    qw/ Makefile.PL Build.PL dist.ini /;
-}
-
 =head2 home($class)
 
 Returns home directory for given class.
 
-Note that the class must be loaded for the home directory to be found using this function.
+=head2 dist_indicator_file_list
+
+Returns a list of files which can be tested to check if you're inside
+a checkout
 
 =cut
+
+sub dist_indicator_file_list {
+    qw{Makefile.PL Build.PL dist.ini};
+}
 
 sub home {
     my $class = shift;
@@ -199,8 +195,25 @@ sub home {
 
             # find the @INC entry in which $file was found
             (my $path = $inc_entry) =~ s/$file$//;
-            my $home = find_home_unloaded_in_checkout($path);
-            return $home if $home;
+            $path ||= cwd() if !defined $path || !length $path;
+            my $home = dir($path)->absolute->cleanup;
+
+            # pop off /lib and /blib if they're there
+            $home = $home->parent while $home =~ /b?lib$/;
+
+            # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
+            if (grep { -f $home->file($_) } dist_indicator_file_list()) {
+                # clean up relative path:
+                # MyApp/script/.. -> MyApp
+
+                my $dir;
+                my @dir_list = $home->dir_list();
+                while (($dir = pop(@dir_list)) && $dir eq '..') {
+                    $home = dir($home)->parent->parent;
+                }
+
+                return $home->stringify;
+            }
         }
 
         {
@@ -217,44 +230,6 @@ sub home {
 
     # we found nothing
     return 0;
-}
-
-=head2 find_home_unloaded_in_checkout ($path)
-
-Tries to determine if C<$path> (or $FindBin::Bin if not supplied)
-looks like a checkout. Any leading lib, script or blib components
-will be removed, then the directory produced will be checked
-for the existence of a C<< dist_indicator_file_list() >>.
-
-If one is found, the directory will be returned, otherwise false.
-
-=cut
-
-sub find_home_unloaded_in_checkout {
-    my ($path) = @_;
-    $path ||= $Bin if !defined $path || !length $path;
-    my $home = dir($path)->absolute->cleanup;
-
-    # pop off /lib and /blib if they're there
-    $home = $home->parent while $home =~ /b?lib$/;
-    # pop off /script if it's there.
-    $home = $home->parent while $home =~ /b?script$/;
-
-    # only return the dir if it has a Makefile.PL or Build.PL or dist.ini
-    if (any { $_ } map { -f $home->file($_) } dist_indicator_file_list()) {
-
-        # clean up relative path:
-        # MyApp/script/.. -> MyApp
-
-        my $dir;
-        my @dir_list = $home->dir_list();
-        while (($dir = pop(@dir_list)) && $dir eq '..') {
-            $home = dir($home)->parent->parent;
-        }
-
-        return $home->stringify;
-    }
-
 }
 
 =head2 prefix($class, $name);

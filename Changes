@@ -1,12 +1,30 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Documentation:
+  - Fix documentation in Catalyst::Component to show attributes and
+    calling readers, rather than accessing elements in the $self->{} hash
+    directly.
+  - Add note in Catalyst::Component to strongly disrecommend $self->config
+
+5.90011 - 2012-03-08 16:43:00
+
  Bug fixes:
-  - Yet another fix to the previous fix to Catalyst::ScriptRunner which
-    was resulting in the lib directory not being pushed onto @INC.
-    When you were in a directory in your checkout below the root
-    of the application.
+  - Simplification of the previous changes to Catalyst::ScriptRunner
+    We now just push $FindBin::Bin/../lib to the @INC path again, but
+    only if one of the dist indicator files (Makefile.PL Build.PL or
+    dist.ini) can be found in $FindBin::Bin/../$_
+    This avoids heuristics when the app is unloaded and therefore
+    works better for extensions which have entire applications in
+    their test suites.
   - Bug fix to again correctly detect checkouts in dist zilla using
     applications.
+  - --background option for the server script now only closes
+    STDIN, STDOUT and STDERR. This fixes issues with Log::Dispatch
+    and other loggers which open a file handle when
+  - Change incorrect use of File::Spec->catdir to File::Spec->catfile
+    so that we work on platforms which care about this (VMS?)
+  - Make it more obvious if our PSGI server doesn't pass in a response
+    callback.
 
 5.90010 - 2012-02-18 00:01:00
 
