@@ -61,7 +61,7 @@ It provides you with a generic new() for component construction through Catalyst
 component loader with config() support and a process() method placeholder.
 
 B<Note> that calling C<< $self->config >> inside a component is strongly
-disrecommended - the correctly merged config should have already been
+not recommended - the correctly merged config should have already been
 passed to the constructor and stored in attributes - accessing
 the config accessor directly from an instance is likely to get the
 wrong values (as it only holds the class wide config, not things loaded
