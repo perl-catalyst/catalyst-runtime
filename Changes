@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Fix request body parameters being multiply rebuilt. Fixes both
+    RT#75607 and CatalystX::DebugFilter
+
  Documentation:
   - Fix documentation in Catalyst::Component to show attributes and
     calling readers, rather than accessing elements in the $self->{} hash
