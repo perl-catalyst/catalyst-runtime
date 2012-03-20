@@ -360,7 +360,7 @@ sub uri_for_action {
     my $curr = $action;
     while ($curr) {
         if (my $cap = $curr->attributes->{CaptureArgs}) {
-            return undef unless @captures >= $cap->[0]; # not enough captures
+            return undef unless @captures >= ($cap->[0]||0); # not enough captures
             if ($cap->[0]) {
                 unshift(@parts, splice(@captures, -$cap->[0]));
             }
