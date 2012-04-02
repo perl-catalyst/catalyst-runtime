@@ -5,6 +5,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestApp', {default_host => 'default.com'};
 use Catalyst::Request;
+use HTTP::Request::Common;
 
 use Test::More;
 
@@ -42,6 +43,11 @@ my $req = '/dump/request';
     my %opts = ( host => 'opthash.com' );
     eval '$creq = ' . request($req, \%opts)->content;
     is( $creq->uri->host, $opts{host}, 'target host is mutable via options hashref' );
+}
+
+{
+	my $response = request( POST( '/bodyparams', { override => 'this' } ) )->content;
+    is($response, 'that', 'body param overridden');
 }
 
 done_testing;

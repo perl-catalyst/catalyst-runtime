@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 53;
+use Test::More tests => 54;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -71,8 +71,6 @@ use HTTP::Request::Common;
         'Content-Type' => 'application/x-www-form-urlencoded'
     );
 
-    unshift( @{ $parameters->{a} }, 1, 2, 3 );
-
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
@@ -84,6 +82,9 @@ use HTTP::Request::Common;
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     isa_ok( $creq, 'Catalyst::Request' );
     is( $creq->method, 'POST', 'Catalyst::Request method' );
+    is_deeply( $creq->body_parameters, $parameters,
+               'Catalyst::Request body_parameters' );
+    unshift( @{ $parameters->{a} }, 1, 2, 3 );
     is_deeply( $creq->parameters, $parameters,
         'Catalyst::Request parameters' );
     is_deeply( $creq->arguments, [qw(a b)], 'Catalyst::Request arguments' );

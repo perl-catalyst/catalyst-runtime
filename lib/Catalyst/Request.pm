@@ -127,7 +127,7 @@ has body_parameters => (
   is => 'rw',
   required => 1,
   lazy => 1,
-  default => sub { {} },
+  builder => 'prepare_body_parameters',
 );
 
 has uploads => (
@@ -152,8 +152,6 @@ has parameters => (
 
 sub prepare_parameters {
     my ( $self ) = @_;
-
-    $self->prepare_body;
     my $parameters = {};
     my $body_parameters = $self->body_parameters;
     my $query_parameters = $self->query_parameters;
@@ -174,12 +172,6 @@ sub prepare_parameters {
     }
     $parameters;
 }
-
-before body_parameters => sub {
-    my ($self) = @_;
-    $self->prepare_body;
-    $self->prepare_body_parameters;
-};
 
 has _uploadtmp => (
     is => 'ro',
@@ -225,9 +217,10 @@ sub prepare_body_chunk {
 sub prepare_body_parameters {
     my ( $self ) = @_;
 
+    $self->prepare_body if ! $self->_has_body;
     return unless $self->_body;
 
-    $self->{body_parameters} = $self->_body->param; # FIXME!! Recursion here.
+    return $self->_body->param;
 }
 
 sub prepare_connection {
@@ -277,7 +270,7 @@ has _body => (
 #             and provide a custom reader..
 sub body {
   my $self = shift;
-  $self->prepare_body();
+  $self->prepare_body unless ! $self->_has_body;
   croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
