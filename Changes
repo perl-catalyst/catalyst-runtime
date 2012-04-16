@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Distribution META.yml changes:
+  - author key is now correct, rather than what Module::Install
+    mis-parses from the documentation.
+  - x_authority key added.
+
  Bug fixes:
   - Fix request body parameters being multiply rebuilt. Fixes both
     RT#75607 and CatalystX::DebugFilter

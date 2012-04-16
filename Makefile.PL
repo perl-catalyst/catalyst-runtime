@@ -7,10 +7,13 @@ use inc::Module::Install 0.91;
 use Module::Install::AuthorRequires;
 use Module::Install::CheckConflicts;
 use Module::Install::AuthorTests;
+use Module::Install::Authority;
 
 perl_version '5.008003';
 
 name 'Catalyst-Runtime';
+author 'Sebastian Riedel <sri@cpan.org>';
+authority 'MSTROUT';
 all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'List::MoreUtils';
