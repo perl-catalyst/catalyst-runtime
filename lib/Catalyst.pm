@@ -2928,11 +2928,11 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         Class::MOP::load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is deprecated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
-        $proto->_plugins->{$plugin} = 1;
-        unless ($instant) {
+        if (!$instant && !$proto->_plugins->{$plugin}) {
             my $meta = Class::MOP::get_metaclass_by_name($class);
             $meta->superclasses($plugin, $meta->superclasses);
         }
+        $proto->_plugins->{$plugin} = 1;
         return $class;
     }
 

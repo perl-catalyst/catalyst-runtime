@@ -9,6 +9,10 @@
   - Fix request body parameters being multiply rebuilt. Fixes both
     RT#75607 and CatalystX::DebugFilter
 
+  - Make plugin de-duplication work as intended originally, as whilst
+    duplicate plugins are totally unwise, the C3 error given to the user
+    is less than helpful.
+
  Documentation:
   - Fix documentation in Catalyst::Component to show attributes and
     calling readers, rather than accessing elements in the $self->{} hash
