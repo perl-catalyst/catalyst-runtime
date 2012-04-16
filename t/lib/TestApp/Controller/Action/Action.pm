@@ -58,4 +58,8 @@ sub action_action_eight : Global  {
     $c->forward('TestApp::View::Dump::Action');
 }
 
+sub action_action_nine : Global : ActionClass('~TestActionArgsFromConstructor') {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Request');
+}
 1;

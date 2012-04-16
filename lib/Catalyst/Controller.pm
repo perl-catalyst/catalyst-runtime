@@ -36,6 +36,8 @@ has actions =>
      init_arg => undef,
     );
 
+has action_args => (is => 'ro');
+
 # ->config(actions => { '*' => ...
 has _all_actions_attributes => (
     is       => 'ro',
@@ -279,7 +281,11 @@ sub create_action {
     my %args = @_;
 
     my $class = $self->action_class(%args);
-    my $action_args = $self->config->{action_args};
+    my $action_args = (
+        ref($self)
+            ? $self->action_args
+            : $self->config->{action_args}
+    );
 
     my %extra_args = (
         %{ $action_args->{'*'}           || {} },
