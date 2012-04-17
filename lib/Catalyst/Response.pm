@@ -57,7 +57,7 @@ sub write {
     $buffer = q[] unless defined $buffer;
 
     my $len = length($buffer);
-    $self->_writer->write($buffer);
+    $self->_writer->write($buffer);  # ignore PerlIO's LEN, [OFFSET] params
 
     return $len;
 }
@@ -67,7 +67,7 @@ sub finalize_headers {
 
     # This is a less-than-pretty hack to avoid breaking the old
     # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
-    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
+    # expects us to pass headers to it here, whereas Catalyst::Engine::PSGI
     # just pulls the headers out of $ctx->response in its run method and never
     # sets response_cb. So take the lack of a response_cb as a sign that we
     # don't need to set the headers.
@@ -241,11 +241,6 @@ $res->code is an alias for this, to match HTTP::Response->code.
 
 Writes $data to the output stream.
 
-=head2 $res->print( @data )
-
-Prints @data to the output stream, separated by $,.  This lets you pass
-the response object to functions that want to write to an L<IO::Handle>.
-
 =head2 $self->finalize_headers($c)
 
 Writes headers to response if not already written
@@ -259,22 +254,94 @@ request.
 
 Provided by Moose
 
+=head1 IO::Handle METHODS
+
+Certain other methods are provided to ensure (reasonable) compatibility
+to other functions expecting a L<IO::Handle> object:
+
+    $res->open    # ignores all params and calls $res->finalize_headers
+    $res->close
+    $res->opened  # auto-opens
+    $res->fileno
+    $res->print( ARGS )  # uses $, & $\
+    $res->printf( FMT, [ARGS] )
+    $res->say( ARGS )
+    $res->printflush( ARGS )
+    
+    # these are checked for similar methods within the writer
+    $res->autoflush( [BOOL] )  # echos BOOL or 0 if method not found
+    $res->blocking( [BOOL] )   # echos BOOL or 1 if method not found
+    $res->binmode( [BOOL] )    # echos BOOL or 1 if method not found
+    $res->error                # returns $! if method not found
+    $res->clearerr             # clears $! and returns 0 if method not found
+    $res->sync                 # tries $res->flush if method not found
+    $res->flush                # returns "0 but true" if method not found
+
+=for Pod::Coverage open(ed)?|close|fileno|print(f?|flush)|say
+
 =cut
 
-sub print {
-    my $self = shift;
-    my $data = shift;
-
-    defined $self->write($data) or return;
-
-    for (@_) {
-        defined $self->write($,) or return;
-        defined $self->write($_) or return;
-    }
-    defined $self->write($\) or return;
-
+sub open   {
+    # We are just going to blissfully ignore the params
+    my ($self) = shift;
+    
+    $self->finalize_headers;
     return 1;
 }
+sub close  { return shift->_has_writer && shift->_writer->close(); }
+sub opened { return shift->open(); }          # if it's asking, just open up the writer
+sub fileno { return scalar shift->_writer; }  # scalar reference comparison should be good enough
+sub print  {
+    my ($self, @data) = (shift, @_);
+    
+    # (var usage per Perl print docs)
+    @data = map { ($_, $,) } @data;       # poor man's "array join"
+    splice(@data, -1, 1, $\) if (@data);  # remove trailing sep + add $\
+    
+    for (@data) { defined $self->write($_) or return; }
+    
+    return 1;
+}
+sub printf {
+    my ($self) = shift;
+    return $self->write( sprintf(@_) );  # per docs, printf doesn't use $/
+}
+sub say {
+    my ($self) = shift;
+    local $\ = "\n";
+    return $self->print(@_);
+}
+sub printflush {
+    my ($self) = shift;
+    my $af  = $self->autoflush(1);
+    my $ret = $self->print(@_);
+    $self->autoflush($af);
+    return $ret;
+}
+
+# I/O method checking
+sub _attempt {
+   my ($self, $method, $default, @data) = @_;
+   no strict 'refs';  # no complainy at CODEREFs
+
+    return $self->_has_writer && $self->_writer->can($method) ?
+        $self->_writer->$method(@data) :
+        ref $default eq 'CODE' ?
+            &$default($self) :  # (kinda janky, but $self->$default isn't right either)
+            defined $data[0] ? $data[0] : $default  # can't tell, but don't error on it, either (default action for booleans)
+   ;
+}   
+   
+foreach my $pair (
+    [autoflush => 0],
+    [blocking  => 1],
+    [binmode   => 1],
+    [error     => sub { $!             }],
+    [clearerr  => sub { undef $! || 0  }],  # 0 = don't error
+    [sync      => sub { shift->flush() }],  # fallback
+    [flush     => sub { "0 but true"   }],  # don't error (but don't echo either, hence a CODEREF)
+)                                #  $method           $self           @([$method, $default]), @data 
+    { __PACKAGE__->meta->add_method($pair->[0], sub { shift->_attempt(@$pair, @_); }); }
 
 =head1 AUTHORS
 
