@@ -23,7 +23,7 @@ BEGIN {
 
 my $tests = Test::Aggregate->new({
     (@ARGV ? (tests => \@ARGV) : (dirs => 't/aggregate')),
-    verbose       => 0,
+    verbose       => 1,  # failures only
     set_filenames => 1,
     findbin       => 1,
 });
