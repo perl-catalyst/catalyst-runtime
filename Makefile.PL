@@ -1,13 +1,30 @@
 use strict;
 use warnings;
-use inc::Module::Install 0.91;
+use inc::Module::Install 1.06;
 # Ensure that these get used - yes, M::I loads them for us, but if you're
 # in author mode and don't have them installed, then the error is tres
 # cryptic.
-use Module::Install::AuthorRequires;
 use Module::Install::CheckConflicts;
-use Module::Install::AuthorTests;
 use Module::Install::Authority;
+
+# (Stolen from DBIC)
+# nasty hook into both M::AI init and the prompter, so that the optdep message
+# comes at the right places (on top and then right above the prompt)
+my $optdep_msg = '';
+{
+  require Module::AutoInstall;
+  no warnings 'redefine';
+  no strict 'refs';
+
+  for (qw/_prompt import/) {
+    my $meth = "Module::AutoInstall::$_";
+    my $orig = \&{$meth};
+    *{$meth} = sub {
+      print $optdep_msg;
+      goto $orig;
+    };
+  }
+}
 
 perl_version '5.008003';
 
@@ -67,35 +84,71 @@ test_requires 'Test::More' => '0.88';
 test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';
 
-# aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
-if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
-    author_requires('Test::Aggregate', '0.364');
-    author_requires('Test::Simple', '0.88');
-    open my $fh, '>', '.aggregating';
-}
-else {
-    unlink '.aggregating';
-    tests 't/*.t t/aggregate/*.t';
-}
-
-author_requires 'CatalystX::LeakChecker', '0.05';
-author_requires 'File::Copy::Recursive'; # For http server test
-author_requires 'Catalyst::Devel', '1.0'; # For http server test
-author_requires 'Catalyst::Engine::PSGI';
-author_requires 'Test::Without::Module';
-author_requires 'Starman';
-author_requires 'MooseX::Daemonize';
-
-author_tests 't/author';
-author_requires(map {; $_ => 0 } qw(
-  Test::NoTabs
-  Test::Pod
-  Test::Pod::Coverage
-  Test::Spelling
-  Pod::Coverage::TrustPod
-));
-
+# No fatal author_* BS!  This is the sole AUTHOR block
 if ($Module::Install::AUTHOR) {
+    $optdep_msg .= <<'EOW';
+
+******************************************************************************
+******************************************************************************
+***                                                                        ***
+*** AUTHOR MODE: all optional test dependencies converted to hard requires ***
+***                                                                        ***
+******************************************************************************
+******************************************************************************
+
+EOW
+    # This is now default to on unless it is explicitly set to zero
+    #my $aggregate_tests = exists $ENV{AGGREGATE_TESTS} ? $ENV{AGGREGATE_TESTS} : 1;
+
+    #### This is NOT default until Test::Aggregate fixes their Test::Builder monkey patching!
+    #### Remove this code and uncomment the above when it's fixed!
+    my $aggregate_tests = $ENV{AGGREGATE_TESTS};
+
+    # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
+    if ($aggregate_tests && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
+        test_requires('Test::Aggregate', '0.364');
+        test_requires('Test::Simple', '0.88');
+        open my $fh, '>', '.aggregating';
+    }
+    else {
+        if ($aggregate_tests) {
+            # Friendly Reminder...
+            # There's no such thing as test_recommends (which wouldn't even end
+            # up on the module list, anyway), so we just print.
+            $optdep_msg .= <<'EOW';
+******************************************************************************
+* Author-level aggregate testing can go a lot smoother with Test::Aggregate  *
+* and Test::Simple installed.  Resorting to old-style multi-processed tests. *
+*                                                                            *
+* (This notice can be silenced by explicitly setting AGGREGATE_TESTS=0.)     *
+******************************************************************************
+EOW
+            #recommends('Test::Aggregate', '0.364');
+            #recommends('Test::Simple', '0.88');
+        }
+        unlink '.aggregating';
+        tests 't/*.t t/aggregate/*.t';
+    }
+ 
+    test_requires 'CatalystX::LeakChecker', '0.05';
+    test_requires 'File::Copy::Recursive'; # For http server test
+    test_requires 'Catalyst::Devel', '1.0'; # For http server test
+    test_requires 'Catalyst::Engine::PSGI';
+    test_requires 'Test::Without::Module';
+    unless ($^O eq 'MSWin32') {
+        test_requires 'Starman';
+        test_requires 'MooseX::Daemonize';
+    }
+    
+    tests ('t/*.t t/author/*.t');
+    test_requires(map {; $_ => 0 } qw(
+        Test::NoTabs
+        Test::Pod
+        Test::Pod::Coverage
+        Test::Spelling
+        Pod::Coverage::TrustPod
+    ));
+
     darwin_check_no_resource_forks();
 }
 
