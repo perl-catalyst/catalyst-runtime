@@ -765,6 +765,8 @@ sub expand_component_module {
     return Devel::InnerPackage::list_packages( $module );
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
