@@ -1,5 +1,5 @@
 package Catalyst::IOC::Container;
-use Bread::Board;
+use Bread::Board qw/depends_on/;
 use Moose;
 use Config::Any;
 use Data::Visitor::Callback;
