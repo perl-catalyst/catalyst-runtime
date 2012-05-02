@@ -142,6 +142,15 @@ sub MODIFY_CODE_ATTRIBUTES {
     );
 }
 
+sub BUILD {
+    my $self = shift;
+    my $class = ref $self;
+
+    Catalyst::Exception->throw("You can't run the application before $class" . "->setup")
+        unless $class->setup_finished;
+
+    $self->container->_set_application($self);
+}
 
 sub _application { $_[0] }
 

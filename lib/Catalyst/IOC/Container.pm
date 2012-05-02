@@ -45,6 +45,8 @@ has application => (
     is       => 'ro',
     isa      => 'Catalyst|Str',
     lazy     => 1,
+    weak_ref => 1,
+    writer   => '_set_application',
     default  => sub { shift->application_name },
 );
 
