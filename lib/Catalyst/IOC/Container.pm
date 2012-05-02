@@ -41,6 +41,13 @@ has substitutions => (
     default => sub { +{} },
 );
 
+has application => (
+    is       => 'ro',
+    isa      => 'Catalyst|Str',
+    lazy     => 1,
+    default  => sub { shift->application_name },
+);
+
 has application_name => (
     is       => 'ro',
     isa      => 'Str',
@@ -66,6 +73,7 @@ sub BUILD {
         substitutions
         file
         driver
+        application
         application_name
         prefix
         extensions
@@ -186,6 +194,15 @@ sub build_root_service {
             return Path::Class::Dir->new( $self->param('home') )->subdir('root');
         },
         dependencies => [ depends_on('home') ],
+    );
+}
+
+sub build_application_service {
+    my $self = shift;
+
+    return Bread::Board::Literal->new(
+        name  => 'application',
+        value => $self->application,
     );
 }
 
@@ -719,7 +736,7 @@ sub add_component {
             class     => $component,
             lifecycle => 'Singleton',
             dependencies => [
-                depends_on( '/application_name' ),
+                depends_on( '/application' ),
             ],
         ),
     );

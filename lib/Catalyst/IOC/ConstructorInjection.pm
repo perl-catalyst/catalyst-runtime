@@ -44,12 +44,7 @@ sub get {
     my %config = (%{ $self->config || {} }, %{ $params });
     $self->_clear_config;
 
-    # FIXME - Is depending on the application name to pass into constructors here a good idea?
-    #         This makes app/ctx split harder I think.. Need to think more here, but I think
-    #         we want to pass the application in as a parameter when building the service
-    #         rather than depending on the app name, so that later, when the app becomes an instance
-    #         then it'll get passed in, and components can stash themselves 'per app instance'
-    my $app_name    = $self->param('application_name');
+    my $app_name = $self->param('application');
 
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it.
