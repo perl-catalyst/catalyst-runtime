@@ -4,7 +4,7 @@ use Moose;
 use Moose::Meta::Class ();
 extends 'Catalyst::Component';
 use Moose::Util qw/find_meta/;
-use B::Hooks::EndOfScope ();
+use namespace::clean -except => 'meta';
 use Catalyst::Exception;
 use Catalyst::Exception::Detach;
 use Catalyst::Exception::Go;
@@ -1183,29 +1183,6 @@ EOF
         my $name = $class->config->{name} || 'Application';
         $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
     }
-
-    # Make sure that the application class becomes immutable at this point,
-    B::Hooks::EndOfScope::on_scope_end {
-        return if $@;
-        my $meta = Class::MOP::get_metaclass_by_name($class);
-        if (
-            $meta->is_immutable
-            && ! { $meta->immutable_options }->{replace_constructor}
-            && (
-                   $class->isa('Class::Accessor::Fast')
-                || $class->isa('Class::Accessor')
-            )
-        ) {
-            warn "You made your application class ($class) immutable, "
-                . "but did not inline the\nconstructor. "
-                . "This will break catalyst, as your app \@ISA "
-                . "Class::Accessor(::Fast)?\nPlease pass "
-                . "(replace_constructor => 1)\nwhen making your class immutable.\n";
-        }
-        $meta->make_immutable(
-            replace_constructor => 1,
-        ) unless $meta->is_immutable;
-    };
 
     if ($class->config->{case_sensitive}) {
         $class->log->warn($class . "->config->{case_sensitive} is set.");
@@ -2446,9 +2423,33 @@ Starts the engine.
 
 sub run {
   my $app = shift;
+  $app->_make_immutable_if_needed;
   $app->engine_loader->needs_psgi_engine_compat_hack ?
     $app->engine->run($app, @_) :
       $app->engine->run( $app, $app->_finalized_psgi_app, @_ );
+}
+
+sub _make_immutable_if_needed {
+    my $class = shift;
+    my $meta = Class::MOP::get_metaclass_by_name($class);
+    my $isa_ca = $class->isa('Class::Accessor::Fast') || $class->isa('Class::Accessor');
+    if (
+        $meta->is_immutable
+        && ! { $meta->immutable_options }->{replace_constructor}
+        && $isa_ca
+    ) {
+        warn("You made your application class ($class) immutable, "
+            . "but did not inline the\nconstructor. "
+            . "This will break catalyst, as your app \@ISA "
+            . "Class::Accessor(::Fast)?\nPlease pass "
+            . "(replace_constructor => 1)\nwhen making your class immutable.\n");
+    }
+    unless ($meta->is_immutable) {
+        # XXX - FIXME warning here as you should make your app immutable yourself.
+        $meta->make_immutable(
+            replace_constructor => 1,
+        );
+    }
 }
 
 =head2 $c->set_action( $action, $code, $namespace, $attrs )
@@ -2928,6 +2929,11 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         Class::MOP::load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is deprecated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
+        my $plugin_meta = Moose::Meta::Class->create($plugin);
+        if (!$plugin_meta->has_method('new')
+            && ( $plugin->isa('Class::Accessor::Fast') || $plugin->isa('Class::Accessor') ) ) {
+            $plugin_meta->add_method('new', Moose::Object->meta->get_method('new'))
+        }
         if (!$instant && !$proto->_plugins->{$plugin}) {
             my $meta = Class::MOP::get_metaclass_by_name($class);
             $meta->superclasses($plugin, $meta->superclasses);

@@ -13,6 +13,10 @@
     duplicate plugins are totally unwise, the C3 error given to the user
     is less than helpful.
 
+  - Remove dependence on obscure behaviour in B::Hooks::EndOfScope
+    for backward compatibility. This fixes issues with behaviour changes
+    in bleadperl. RT#76437
+
  Documentation:
   - Fix documentation in Catalyst::Component to show attributes and
     calling readers, rather than accessing elements in the $self->{} hash
