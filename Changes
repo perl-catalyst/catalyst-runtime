@@ -18,6 +18,7 @@
     calling readers, rather than accessing elements in the $self->{} hash
     directly.
   - Add note in Catalyst::Component to strongly disrecommend $self->config
+  - Fix vague 'checkout' wording in Catalyst::Utils. RT#77000
 
 5.90011 - 2012-03-08 16:43:00
 

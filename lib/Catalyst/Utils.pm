@@ -161,7 +161,19 @@ Returns home directory for given class.
 =head2 dist_indicator_file_list
 
 Returns a list of files which can be tested to check if you're inside
-a checkout
+a CPAN distribution which is not yet installed.
+
+These are:
+
+=over
+
+=item Makefile.PL
+
+=item Build.PL
+
+=item dist.ini
+
+=back
 
 =cut
 
