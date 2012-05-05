@@ -112,6 +112,23 @@ use Catalyst::Engine;
 }
 
 
+# IIS 7.5 RT#76522
+{
+    my $r = get_req (0,
+        PATH_INFO => '/testme/try.html',
+        SCRIPT_NAME => '/testme/try.html',
+        PATH_TRANSLATED => 'C:\Sites\Test\root\testme\try.html'
+    );
+    is $r->uri."", "http://www.foo.com/testme/try.html";
+
+    $r = get_req (0,
+        PATH_INFO => '/testme/test/',
+        SCRIPT_NAME => '/testme/test/',
+        PATH_TRANSLATED => q{C:\Sites\Test\root\testme\test\\},
+    );
+    is $r->uri."", "http://www.foo.com/testme/test";
+}
+
 # FIXME - Test proxy logic
 #       - Test query string
 #       - Test non standard port numbers
