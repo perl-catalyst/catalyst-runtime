@@ -117,14 +117,14 @@ use Catalyst::Engine;
     my $r = get_req (0,
         PATH_INFO => '/testme/try.html',
         SCRIPT_NAME => '/testme/try.html',
-        PATH_TRANSLATED => 'C:\Sites\Test\root\testme\try.html'
+        PATH_TRANSLATED => 'C:\\Sites\\Test\\root\\testme\\try.html'
     );
     is $r->uri."", "http://www.foo.com/testme/try.html";
 
     $r = get_req (0,
         PATH_INFO => '/testme/test/',
         SCRIPT_NAME => '/testme/test/',
-        PATH_TRANSLATED => q{C:\Sites\Test\root\testme\test\\},
+        PATH_TRANSLATED => 'C:\\Sites\\Test\\root\\testme\\test\\',
     );
     is $r->uri."", "http://www.foo.com/testme/test";
 }
