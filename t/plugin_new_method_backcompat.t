@@ -8,7 +8,7 @@
 # that plugins don't get it wrong for us.
 
 # Also tests method modifiers and etc in MyApp.pm still work as expected.
-use Test::More tests => 8;
+use Test::More;
 use Test::Exception;
 use Moose::Util qw/find_meta/;
 use FindBin;
@@ -30,4 +30,6 @@ TestAppBadlyImmutable->_make_immutable_if_needed;
 
 like $warning, qr/\QYou made your application class (TestAppBadlyImmutable) immutable/,
     'An application class that is already immutable but does not inline the constructor warns at ->setup';
+
+done_testing;
 
