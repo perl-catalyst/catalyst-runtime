@@ -17,6 +17,9 @@
     for backward compatibility. This fixes issues with behaviour changes
     in bleadperl. RT#76437
 
+  - Work around Moose bug RT#7536 which breaks
+    Catalyst::Controller::DBIC::API.
+
  Documentation:
   - Fix documentation in Catalyst::Component to show attributes and
     calling readers, rather than accessing elements in the $self->{} hash

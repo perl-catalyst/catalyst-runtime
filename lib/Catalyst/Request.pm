@@ -23,13 +23,15 @@ has user => (is => 'rw');
 sub snippets        { shift->captures(@_) }
 
 has _read_position => (
-    init_arg => undef,
+    # FIXME: work around Moose bug RT#75367
+    # init_arg => undef,
     is => 'ro',
     writer => '_set_read_position',
     default => 0,
 );
 has _read_length => (
-    init_arg => undef,
+    # FIXME: work around Moose bug RT#75367
+    # init_arg => undef,
     is => 'ro',
     default => sub {
         my $self = shift;
