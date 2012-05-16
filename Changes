@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90012 - 2012-05-16 09:59:00
+
  Distribution META.yml changes:
   - author key is now correct, rather than what Module::Install
     mis-parses from the documentation.
