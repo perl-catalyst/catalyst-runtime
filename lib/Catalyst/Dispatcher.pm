@@ -320,9 +320,9 @@ sub _invoke_as_component {
     my ( $self, $c, $component_or_class, $method ) = @_;
 
     my $component = $self->_find_component($c, $component_or_class);
-    my $component_class = blessed $component || return 0;
+    my $component_class = blessed($component) || $component || return 0;
 
-    if (my $code = $component_class->can('action_for')) {
+    if ( blessed $component and my $code = $component_class->can('action_for') ) {
         my $possible_action = $component->$code($method);
         return $possible_action if $possible_action;
     }
