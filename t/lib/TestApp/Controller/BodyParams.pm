@@ -10,4 +10,11 @@ sub default : Private {
     $c->res->status(200);
 }
 
+sub no_params : Local {
+    my ( $self, $c ) = @_;
+    my $params = $c->req->body_parameters;
+    $c->res->output(ref $params);
+    $c->res->status(200);
+}
+
 1;

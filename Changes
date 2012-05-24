@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+ Bug fixes:
+  - Fix request body parameters is undef with no parameters
+
 5.90012 - 2012-05-16 09:59:00
 
  Distribution META.yml changes:

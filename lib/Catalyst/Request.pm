@@ -220,7 +220,7 @@ sub prepare_body_parameters {
     my ( $self ) = @_;
 
     $self->prepare_body if ! $self->_has_body;
-    return unless $self->_body;
+    return {} unless $self->_body;
 
     return $self->_body->param;
 }

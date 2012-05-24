@@ -50,5 +50,10 @@ my $req = '/dump/request';
     is($response, 'that', 'body param overridden');
 }
 
+{
+	my $response = request( POST( '/bodyparams/no_params' ) )->content;
+    is($response, 'HASH', 'empty body param is hashref');
+}
+
 done_testing;
 
