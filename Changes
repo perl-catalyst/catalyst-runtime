@@ -1,7 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
  Bug fixes:
-  - Fix request body parameters is undef with no parameters
+  - Fix request body parameters to not be undef if no parameters
+    are supplied.
+
+  - Fix action_args config so that it can be specified in the
+    top level config.
 
 5.90012 - 2012-05-16 09:59:00
 
