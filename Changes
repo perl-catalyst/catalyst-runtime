@@ -1,6 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
  Bug fixes:
+  - Fix warnings in some matching cases for Action methods with
+    Args(), when using Catalyst::DispatchType::Chained
+
   - Fix request body parameters to not be undef if no parameters
     are supplied.
 
