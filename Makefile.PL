@@ -4,16 +4,26 @@ use inc::Module::Install 0.91;
 # Ensure that these get used - yes, M::I loads them for us, but if you're
 # in author mode and don't have them installed, then the error is tres
 # cryptic.
-use Module::Install::AuthorRequires;
-use Module::Install::CheckConflicts;
-use Module::Install::AuthorTests;
-use Module::Install::Authority;
+if ($Module::Install::AUTHOR) { # We could just use them, but telling
+    my @fail;                   # people the set of things they need nicer
+    foreach my $module (qw/
+        Module::Install::AuthorRequires
+        Module::Install::CheckConflicts
+        Module::Install::AuthorTests
+        Module::Install::Authority
+    /) {
+        push(@fail, $module)
+            unless eval qq{require $module; 1;};
+    }
+    die("Module::Install extensions failed, not installed? \n"
+        . join("\n", map { "  $_" } @fail) . "\n") if @fail;
+}
 
 perl_version '5.008003';
 
 name 'Catalyst-Runtime';
 author 'Sebastian Riedel <sri@cpan.org>';
-authority 'MSTROUT';
+authority('MSTROUT');
 all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'List::MoreUtils';
@@ -68,9 +78,10 @@ test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
+my @author_requires;
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
-    author_requires('Test::Aggregate', '0.364');
-    author_requires('Test::Simple', '0.88');
+    push(@author_requires, 'Test::Aggregate', '0.364');
+    push(@author_requires, 'Test::Simple', '0.88');
     open my $fh, '>', '.aggregating';
 }
 else {
@@ -78,16 +89,18 @@ else {
     tests 't/*.t t/aggregate/*.t';
 }
 
-author_requires 'CatalystX::LeakChecker', '0.05';
-author_requires 'File::Copy::Recursive'; # For http server test
-author_requires 'Catalyst::Devel', '1.0'; # For http server test
-author_requires 'Catalyst::Engine::PSGI';
-author_requires 'Test::Without::Module';
-author_requires 'Starman';
-author_requires 'MooseX::Daemonize';
+push(@author_requires, 'CatalystX::LeakChecker', '0.05');
+push(@author_requires, 'Catalyst::Devel', '1.0'); # For http server test
 
-author_tests 't/author';
-author_requires(map {; $_ => 0 } qw(
+author_tests('t/author');
+author_requires(
+  @author_requires,
+  map {; $_ => 0 } qw(
+  File::Copy::Recursive
+  Catalyst::Engine::PSGI
+  Test::Without::Module
+  Starman
+  MooseX::Daemonize
   Test::NoTabs
   Test::Pod
   Test::Pod::Coverage
