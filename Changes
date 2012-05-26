@@ -10,6 +10,10 @@
   - Fix action_args config so that it can be specified in the
     top level config.
 
+  - Fix t/author/http-server.t on Win32
+
+  - Fix use of Test::Aggregate to make tests faster.
+
 5.90012 - 2012-05-16 09:59:00
 
  Distribution META.yml changes:
