@@ -13,28 +13,25 @@ use Catalyst::Utils;
 
 with 'Catalyst::Component::ApplicationAttribute';
 
-has path_prefix =>
-    (
-     is => 'rw',
-     isa => 'Str',
-     init_arg => 'path',
-     predicate => 'has_path_prefix',
-    );
+has path_prefix => (
+    is        => 'rw',
+    isa       => 'Str',
+    init_arg  => 'path',
+    predicate => 'has_path_prefix',
+);
 
-has action_namespace =>
-    (
-     is => 'rw',
-     isa => 'Str',
-     init_arg => 'namespace',
-     predicate => 'has_action_namespace',
-    );
+has action_namespace => (
+    is        => 'rw',
+    isa       => 'Str',
+    init_arg  => 'namespace',
+    predicate => 'has_action_namespace',
+);
 
-has actions =>
-    (
-     accessor => '_controller_actions',
-     isa => 'HashRef',
-     init_arg => undef,
-    );
+has actions => (
+    accessor => '_controller_actions',
+    isa      => 'HashRef',
+    init_arg => undef,
+);
 
 has action_args => (is => 'ro');
 
