@@ -1,5 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90013 - 2012-06-21 10:40:00
+
+  - Release previous TRIAL as stable.
+  - We failed to note in the previous changelog that the Makefile.PL has been
+    improved to make it easier for authors to bootstrap a developer install
+    of Catalyst.
+
+5.90013 - TRIAL 2012-06-07 20:21:00
+
  New features:
   - Merge Catalyst::Controller::ActionRole into Catalyst::Controller.
 
