@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Fix calling finalize_headers before writing body when using $c->write /
+    $c->res->write (fixes RT#76179).
+
 5.90013 - 2012-06-21 10:40:00
 
   - Release previous TRIAL as stable.
