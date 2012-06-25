@@ -124,6 +124,16 @@ sub finalize_error {
     sub Catalyst::Log::error { }
 }
 
+# Pretend to be Plugin::Session and hook finalize_headers to send a header
+
+sub finalize_headers {
+    my $c = shift;
+
+    $c->res->header('X-Test-Header', 'valid');
+
+    return $c->maybe::next::method(@_);
+}
+
 # Make sure we can load Inline plugins. 
 
 package Catalyst::Plugin::Test::Inline;

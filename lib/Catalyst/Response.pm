@@ -43,6 +43,11 @@ has headers   => (
   required => 1,
   lazy => 1,
 );
+has _context => (
+  is => 'rw',
+  weak_ref => 1,
+  clearer => '_clear_context',
+);
 
 sub output { shift->body(@_) }
 
@@ -52,7 +57,7 @@ sub write {
     my ( $self, $buffer ) = @_;
 
     # Finalize headers if someone manually writes output
-    $self->finalize_headers;
+    $self->_context->finalize_headers;
 
     $buffer = q[] unless defined $buffer;
 

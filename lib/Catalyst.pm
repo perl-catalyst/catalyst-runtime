@@ -2000,6 +2000,8 @@ sub prepare {
     my $uploadtmp = $class->config->{uploadtmp};
     my $c = $class->context_class->new({ $uploadtmp ? (_uploadtmp => $uploadtmp) : ()});
 
+    $c->response->_context($c);
+
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
     if ( $c->debug || $c->config->{enable_catalyst_header} ) {
