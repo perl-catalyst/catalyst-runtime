@@ -41,12 +41,6 @@ has substitutions => (
     default => sub { +{} },
 );
 
-has application_name => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
-);
-
 has sub_container_class => (
     isa     => LoadableClass,
     is      => 'ro',
@@ -192,7 +186,7 @@ sub build_root_service {
 sub build_application_name_service {
     my $self = shift;
 
-    return Bread::Board::Literal->new( name => 'application_name', value => $self->application_name );
+    return Bread::Board::Literal->new( name => 'application_name', value => $self->name );
 }
 
 sub build_driver_service {

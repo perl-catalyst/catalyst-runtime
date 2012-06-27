@@ -2337,7 +2337,7 @@ sub setup_config {
         $container_class = Class::MOP::load_first_existing_class("${class}::Container", 'Catalyst::IOC::Container');
     }
 
-    my $container = $container_class->new( %args, application_name => "$class", name => "$class" );
+    my $container = $container_class->new( %args, name => $class );
     $class->container($container);
 
     my $config = $container->resolve( service => 'config' );
