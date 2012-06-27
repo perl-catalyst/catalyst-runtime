@@ -1,14 +1,65 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90014 - 2012-06-26 10:00:00
+
+  - Fix calling finalize_headers before writing body when using $c->write /
+    $c->res->write (fixes RT#76179).
+
+5.90013 - 2012-06-21 10:40:00
+
+  - Release previous TRIAL as stable.
+  - We failed to note in the previous changelog that the Makefile.PL has been
+    improved to make it easier for authors to bootstrap a developer install
+    of Catalyst.
+
+5.90013 - TRIAL 2012-06-07 20:21:00
+
+ New features:
+  - Merge Catalyst::Controller::ActionRole into Catalyst::Controller.
+
+ Bug fixes:
+  - Fix warnings in some matching cases for Action methods with
+    Args(), when using Catalyst::DispatchType::Chained
+
+  - Fix request body parameters to not be undef if no parameters
+    are supplied.
+
+  - Fix action_args config so that it can be specified in the
+    top level config.
+
+  - Fix t/author/http-server.t on Win32
+
+  - Fix use of Test::Aggregate to make tests faster.
+
+5.90012 - 2012-05-16 09:59:00
+
+ Distribution META.yml changes:
+  - author key is now correct, rather than what Module::Install
+    mis-parses from the documentation.
+  - x_authority key added.
+
  Bug fixes:
   - Fix request body parameters being multiply rebuilt. Fixes both
     RT#75607 and CatalystX::DebugFilter
+
+  - Make plugin de-duplication work as intended originally, as whilst
+    duplicate plugins are totally unwise, the C3 error given to the user
+    is less than helpful.
+
+  - Remove dependence on obscure behaviour in B::Hooks::EndOfScope
+    for backward compatibility. This fixes issues with behaviour changes
+    in bleadperl. RT#76437
+
+  - Work around Moose bug RT#75367 which breaks
+    Catalyst::Controller::DBIC::API.
 
  Documentation:
   - Fix documentation in Catalyst::Component to show attributes and
     calling readers, rather than accessing elements in the $self->{} hash
     directly.
   - Add note in Catalyst::Component to strongly disrecommend $self->config
+  - Fix vague 'checkout' wording in Catalyst::Utils. RT#77000
+  - Fix documentation for the 'secure' method in Catalyst:Request. RT#76710
 
 5.90011 - 2012-03-08 16:43:00
 

@@ -3,7 +3,7 @@ use warnings;
 
 use Carp qw(croak);
 use FindBin qw/$Bin/;
-use lib "$Bin/../lib";
+use lib "$Bin/lib";
 
 use Test::More;
 use Test::Exception;

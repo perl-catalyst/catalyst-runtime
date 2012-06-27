@@ -23,13 +23,15 @@ has user => (is => 'rw');
 sub snippets        { shift->captures(@_) }
 
 has _read_position => (
-    init_arg => undef,
+    # FIXME: work around Moose bug RT#75367
+    # init_arg => undef,
     is => 'ro',
     writer => '_set_read_position',
     default => 0,
 );
 has _read_length => (
-    init_arg => undef,
+    # FIXME: work around Moose bug RT#75367
+    # init_arg => undef,
     is => 'ro',
     default => sub {
         my $self = shift;
@@ -218,7 +220,7 @@ sub prepare_body_parameters {
     my ( $self ) = @_;
 
     $self->prepare_body if ! $self->_has_body;
-    return unless $self->_body;
+    return {} unless $self->_body;
 
     return $self->_body->param;
 }
@@ -642,9 +644,8 @@ Shortcut for $req->headers->referer. Returns the referring page.
 Returns true or false, indicating whether the connection is secure
 (https). Note that the URI scheme (e.g., http vs. https) must be determined
 through heuristics, and therefore the reliability of $req->secure will depend
-on your server configuration. If you are serving secure pages on the standard
-SSL port (443) and/or setting the HTTPS environment variable, $req->secure
-should be valid.
+on your server configuration. If you are setting the HTTPS environment variable, 
+$req->secure should be valid.
 
 =head2 $req->captures
 

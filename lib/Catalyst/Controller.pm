@@ -1,7 +1,11 @@
 package Catalyst::Controller;
 
 use Moose;
+use Class::MOP;
+use Class::Load ':all';
+use String::RewritePrefix;
 use Moose::Util qw/find_meta/;
+use List::Util qw/first/;
 use List::MoreUtils qw/uniq/;
 use namespace::clean -except => 'meta';
 
@@ -13,28 +17,48 @@ use Catalyst::Utils;
 
 with 'Catalyst::Component::ApplicationAttribute';
 
-has path_prefix =>
-    (
-     is => 'rw',
-     isa => 'Str',
-     init_arg => 'path',
-     predicate => 'has_path_prefix',
-    );
+has path_prefix => (
+    is        => 'rw',
+    isa       => 'Str',
+    init_arg  => 'path',
+    predicate => 'has_path_prefix',
+);
 
-has action_namespace =>
-    (
-     is => 'rw',
-     isa => 'Str',
-     init_arg => 'namespace',
-     predicate => 'has_action_namespace',
-    );
+has action_namespace => (
+    is        => 'rw',
+    isa       => 'Str',
+    init_arg  => 'namespace',
+    predicate => 'has_action_namespace',
+);
 
-has actions =>
-    (
-     accessor => '_controller_actions',
-     isa => 'HashRef',
-     init_arg => undef,
-    );
+has actions => (
+    accessor => '_controller_actions',
+    isa      => 'HashRef',
+    init_arg => undef,
+);
+
+has _action_role_args => (
+    traits     => [qw(Array)],
+    isa        => 'ArrayRef[Str]',
+    init_arg   => 'action_roles',
+    default    => sub { [] },
+    handles    => {
+        _action_role_args => 'elements',
+    },
+);
+
+has _action_roles => (
+    traits     => [qw(Array)],
+    isa        => 'ArrayRef[RoleName]',
+    init_arg   => undef,
+    lazy       => 1,
+    builder    => '_build__action_roles',
+    handles    => {
+        _action_roles => 'elements',
+    },
+);
+
+has action_args => (is => 'ro');
 
 # ->config(actions => { '*' => ...
 has _all_actions_attributes => (
@@ -54,6 +78,14 @@ sub BUILD {
 
     # trigger lazy builder
     $self->_all_actions_attributes;
+    $self->_action_roles;
+}
+
+sub _build__action_roles {
+    my $self = shift;
+    my @roles = $self->_expand_role_shortname($self->_action_role_args);
+    load_class($_) for @roles;
+    return \@roles;
 }
 
 sub _build__all_actions_attributes {
@@ -86,10 +118,11 @@ for more info about how Catalyst dispatches to actions.
 
 #I think both of these could be attributes. doesn't really seem like they need
 #to ble class data. i think that attributes +default would work just fine
-__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class/;
+__PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class _action_role_prefix/;
 
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
 __PACKAGE__->_action_class('Catalyst::Action');
+__PACKAGE__->_action_role_prefix([ 'Catalyst::ActionRole::' ]);
 
 
 sub _DISPATCH : Private {
@@ -268,6 +301,20 @@ sub register_action_methods {
     }
 }
 
+sub _apply_action_class_roles {
+    my ($self, $class, @roles) = @_;
+
+    load_class($_) for @roles;
+    my $meta = Moose::Meta::Class->initialize($class)->create_anon_class(
+        superclasses => [$class],
+        roles        => \@roles,
+        cache        => 1,
+    );
+    $meta->add_method(meta => sub { $meta });
+
+    return $meta->name;
+}
+
 sub action_class {
     my $self = shift;
     my %args = @_;
@@ -285,7 +332,21 @@ sub create_action {
     my %args = @_;
 
     my $class = $self->action_class(%args);
-    my $action_args = $self->config->{action_args};
+
+    load_class($class);
+    Moose->init_meta(for_class => $class)
+        unless Class::MOP::does_metaclass_exist($class);
+
+    unless ($args{name} =~ /^_(DISPATCH|BEGIN|AUTO|ACTION|END)$/) {
+       my @roles = $self->gather_action_roles(%args);
+       $class = $self->_apply_action_class_roles($class, @roles) if @roles;
+    }
+
+    my $action_args = (
+        ref($self)
+            ? $self->action_args
+            : $self->config->{action_args}
+    );
 
     my %extra_args = (
         %{ $action_args->{'*'}           || {} },
@@ -293,6 +354,15 @@ sub create_action {
     );
 
     return $class->new({ %extra_args, %args });
+}
+
+sub gather_action_roles {
+   my ($self, %args) = @_;
+
+   return (
+      (blessed $self ? $self->_action_roles : ()),
+      @{ $args{attributes}->{Does} || [] },
+   );
 }
 
 sub _parse_attrs {
@@ -460,6 +530,32 @@ sub _parse_MyAction_attr {
     return ( 'ActionClass', $value );
 }
 
+sub _parse_Does_attr {
+    my ($self, $app, $name, $value) = @_;
+    return Does => $self->_expand_role_shortname($value);
+}
+
+sub _expand_role_shortname {
+    my ($self, @shortnames) = @_;
+    my $app = $self->_application;
+
+    my $prefix = $self->can('_action_role_prefix') ? $self->_action_role_prefix : ['Catalyst::ActionRole::'];
+    my @prefixes = (qq{${app}::ActionRole::}, @$prefix);
+
+    return String::RewritePrefix->rewrite(
+        { ''  => sub {
+            my $loaded = load_first_existing_class(
+                map { "$_$_[0]" } @prefixes
+            );
+            return first { $loaded =~ /^$_/ }
+              sort { length $b <=> length $a } @prefixes;
+          },
+          '~' => $prefixes[0],
+          '+' => '' },
+        @shortnames,
+    );
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -576,6 +672,10 @@ action class to use.
 
 Called with a hash of data to be use for construction of a new
 Catalyst::Action (or appropriate sub/alternative class) object.
+
+=head2 $self->gather_action_roles(\%action_args)
+
+Gathers the list of roles to apply to an action with the given %action_args.
 
 =head2 $self->_application
 

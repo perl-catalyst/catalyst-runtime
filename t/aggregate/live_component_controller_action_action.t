@@ -193,6 +193,25 @@ sub run_tests {
         is_deeply $action->attributes->{extra_attribute}, [13];
         is_deeply $action->attributes->{another_extra_attribute}, ['foo'];
     }
+    {
+        ok( my $response = request('http://localhost/action_action_nine'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            'action_action_nine', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Action',
+            'Test Class'
+        );
+        is( $response->header('X-TestExtraArgsAction'), '42,13', 'Extra args get passed to action constructor' );
+        like(
+            $response->content,
+            qr/^bless\( .* 'Catalyst::Request' \)$/s,
+            'Content is a serialized Catalyst::Request'
+        );
+    }
 }
 
 done_testing;

@@ -29,6 +29,7 @@ sub run_tests {
         ok( my $response = request('http://localhost/streaming'), 'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Test-Header'), 'valid', 'Headers sent properly' );
 
         SKIP:
         {
@@ -67,6 +68,7 @@ EOF
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->content_length, -s $file, 'Response Content-Length' );
+        is( $response->header('X-Test-Header'), 'valid', 'Headers sent properly' );
         is( $response->content, $buffer, 'Content is read from filehandle' );
 
         ok( $response = request('http://localhost/action/streaming/body_glob'),
@@ -74,6 +76,7 @@ EOF
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
         is( $response->content_length, -s $file, 'Response Content-Length' );
+        is( $response->header('X-Test-Header'), 'valid', 'Headers sent properly' );
         is( $response->content, $buffer, 'Content is read from filehandle' );
     }
 
@@ -83,6 +86,7 @@ EOF
         ok( my $response = request('http://localhost/action/streaming/body_large'), 'Request' );
         ok( $response->is_success, 'Response Successful 2xx' );
         is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Test-Header'), 'valid', 'Headers sent properly' );
         is( $response->content_length, $size, 'Response Content-Length' );
         is( $response->content, "\0" x $size, 'Content is read from filehandle' );
     }

@@ -8,13 +8,14 @@
 # that plugins don't get it wrong for us.
 
 # Also tests method modifiers and etc in MyApp.pm still work as expected.
-use Test::More tests => 8;
+use Test::More;
 use Test::Exception;
 use Moose::Util qw/find_meta/;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use Catalyst::Test qw/TestAppPluginWithConstructor/;
+TestAppPluginWithConstructor->_make_immutable_if_needed;
 ok find_meta('TestAppPluginWithConstructor')->is_immutable,
     'Am immutable after use';
 
@@ -22,8 +23,13 @@ ok request('/foo')->is_success, 'Can get /foo';
 is $TestAppPluginWithConstructor::MODIFIER_FIRED, 1, 'Before modifier was fired correctly.';
 
 my $warning;
-local $SIG{__WARN__} = sub { $warning = $_[0] };
-eval "use TestAppBadlyImmutable;";
+eval "use TestAppBadlyImmutable";
+local $SIG{__WARN__} = sub { $warning .= $_[0] };
+
+TestAppBadlyImmutable->_make_immutable_if_needed;
+
 like $warning, qr/\QYou made your application class (TestAppBadlyImmutable) immutable/,
     'An application class that is already immutable but does not inline the constructor warns at ->setup';
+
+done_testing;
 
