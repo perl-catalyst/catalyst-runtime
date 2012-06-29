@@ -15,7 +15,7 @@ sub BUILD {
             class            => 'TestAppCustomContainer::Model::SingletonLifeCycle',
             catalyst_component_name => 'TestAppCustomContainer::Model::SingletonLifeCycle',
             dependencies     => {
-                application_name => depends_on( '/application_name' ),
+                catalyst_application => depends_on( '/catalyst_application' ),
             },
         )
     );
@@ -27,7 +27,7 @@ sub BUILD {
             class        => 'TestAppCustomContainer::Model::RequestLifeCycle',
             catalyst_component_name => 'TestAppCustomContainer::Model::RequestLifeCycle',
             dependencies => {
-                application_name => depends_on( '/application_name' ),
+                catalyst_application => depends_on( '/catalyst_application' ),
             },
         )
     );
@@ -38,7 +38,7 @@ sub BUILD {
 #            class            => 'TestAppCustomContainer::Model::DependsOnDefaultSetup',
 #            catalyst_component_name => 'TestAppCustomContainer::Model::DependsOnDefaultSetup',
 #            dependencies     => {
-#                application_name => depends_on( '/application_name' ),
+#                catalyst_application => depends_on( '/catalyst_application' ),
 #                # FIXME - this is what is blowing up everything:
 #                # DefaultSetup needs the context. It's not getting it here!
 #                foo => depends_on('/model/DefaultSetup'),
@@ -65,7 +65,7 @@ sub BUILD {
 #            lifecycle    => 'Singleton',
 #            class        => 'TestAppCustomContainer::External::Class',
 #            dependencies => [
-#                depends_on( '/application_name' ),
+#                depends_on( '/catalyst_application' ),
 #            ],
 #            config => $fnar_config,
 #        )

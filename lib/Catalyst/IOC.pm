@@ -61,7 +61,7 @@ sub component ($;%) {
     }
 
     $args{dependencies} ||= {};
-    $args{dependencies}{application_name} = depends_on( '/application_name' );
+    $args{dependencies}{catalyst_application} = depends_on( '/catalyst_application' );
 
     my $lifecycle    = $args{lifecycle} || 'Singleton';
     $args{lifecycle} = grep( m/^$lifecycle$/, qw/COMPONENTSingleton Request/ )
@@ -72,7 +72,7 @@ sub component ($;%) {
     # FIXME - check $args{type} here!
 
     my $component_name = join '::', (
-        $current_container->resolve(service => '/application_name'),
+        $current_container->resolve(service => '/catalyst_application'),
         ucfirst($current_container->name),
         $name
     );

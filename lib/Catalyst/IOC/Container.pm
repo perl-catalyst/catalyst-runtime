@@ -60,7 +60,7 @@ sub BUILD {
         substitutions
         file
         driver
-        application_name
+        catalyst_application
         prefix
         extensions
         path
@@ -153,7 +153,7 @@ sub build_home_service {
         name => 'home',
         block => sub {
             my $self = shift;
-            my $class = $self->param('application_name');
+            my $class = $self->param('catalyst_application');
             my $home;
 
             if ( my $env = Catalyst::Utils::env_value( $class, 'HOME' ) ) {
@@ -163,7 +163,7 @@ sub build_home_service {
             $home ||= Catalyst::Utils::home($class);
             return $home;
         },
-        dependencies => [ depends_on('application_name') ],
+        dependencies => [ depends_on('catalyst_application') ],
     );
 }
 
@@ -182,10 +182,10 @@ sub build_root_dir_service {
     );
 }
 
-sub build_application_name_service {
+sub build_catalyst_application_service {
     my $self = shift;
 
-    return Bread::Board::Literal->new( name => 'application_name', value => $self->name );
+    return Bread::Board::Literal->new( name => 'catalyst_application', value => $self->name );
 }
 
 sub build_driver_service {
@@ -225,9 +225,9 @@ sub build_prefix_service {
         lifecycle => 'Singleton',
         name => 'prefix',
         block => sub {
-            return Catalyst::Utils::appprefix( shift->param('application_name') );
+            return Catalyst::Utils::appprefix( shift->param('catalyst_application') );
         },
-        dependencies => [ depends_on('application_name') ],
+        dependencies => [ depends_on('catalyst_application') ],
     );
 }
 
@@ -240,11 +240,11 @@ sub build_path_service {
         block => sub {
             my $s = shift;
 
-            return Catalyst::Utils::env_value( $s->param('application_name'), 'CONFIG' )
+            return Catalyst::Utils::env_value( $s->param('catalyst_application'), 'CONFIG' )
             || $s->param('file')
-            || $s->param('application_name')->path_to( $s->param('prefix') );
+            || $s->param('catalyst_application')->path_to( $s->param('prefix') );
         },
-        dependencies => [ depends_on('file'), depends_on('application_name'), depends_on('prefix') ],
+        dependencies => [ depends_on('file'), depends_on('catalyst_application'), depends_on('prefix') ],
     );
 }
 
@@ -260,13 +260,13 @@ sub build_config_service {
             my $v = Data::Visitor::Callback->new(
                 plain_value => sub {
                     return unless defined $_;
-                    return $self->_config_substitutions( $s->param('application_name'), $s->param('substitutions'), $_ );
+                    return $self->_config_substitutions( $s->param('catalyst_application'), $s->param('substitutions'), $_ );
                 }
 
             );
             $v->visit( $s->param('raw_config') );
         },
-        dependencies => [ depends_on('application_name'), depends_on('raw_config'), depends_on('substitutions') ],
+        dependencies => [ depends_on('catalyst_application'), depends_on('raw_config'), depends_on('substitutions') ],
     );
 }
 
@@ -358,7 +358,7 @@ sub build_class_config_service {
         name => 'class_config',
         block => sub {
             my $s   = shift;
-            my $app = $s->param('application_name');
+            my $app = $s->param('catalyst_application');
 
             # Container might be called outside Catalyst context
             return {} unless Class::MOP::is_class_loaded($app);
@@ -366,7 +366,7 @@ sub build_class_config_service {
             # config might not have been defined
             return $app->config || {};
         },
-        dependencies => [ depends_on('application_name') ],
+        dependencies => [ depends_on('catalyst_application') ],
     );
 }
 
@@ -443,11 +443,11 @@ sub build_config_local_suffix_service {
         name => 'config_local_suffix',
         block => sub {
             my $s = shift;
-            my $suffix = Catalyst::Utils::env_value( $s->param('application_name'), 'CONFIG_LOCAL_SUFFIX' ) || $self->config_local_suffix;
+            my $suffix = Catalyst::Utils::env_value( $s->param('catalyst_application'), 'CONFIG_LOCAL_SUFFIX' ) || $self->config_local_suffix;
 
             return $suffix;
         },
-        dependencies => [ depends_on('application_name') ],
+        dependencies => [ depends_on('catalyst_application') ],
     );
 }
 
@@ -459,7 +459,7 @@ sub build_locate_components_service {
         name      => 'locate_components',
         block     => sub {
             my $s      = shift;
-            my $class  = $s->param('application_name');
+            my $class  = $s->param('catalyst_application');
             my $config = $s->param('config')->{ setup_components };
 
             Catalyst::Exception->throw(
@@ -477,13 +477,13 @@ sub build_locate_components_service {
 
             return [ $locator->plugins ];
         },
-        dependencies => [ depends_on('application_name'), depends_on('config') ],
+        dependencies => [ depends_on('catalyst_application'), depends_on('config') ],
     );
 }
 
 sub setup_components {
     my $self = shift;
-    my $class = $self->resolve( service => 'application_name' );
+    my $class = $self->resolve( service => 'catalyst_application' );
     my @comps = @{ $self->resolve( service => 'locate_components' ) };
     my %comps = map { $_ => 1 } @comps;
     my $deprecatedcatalyst_component_names = 0;
@@ -712,7 +712,7 @@ sub add_component {
             class     => $component,
             lifecycle => 'Singleton',
             dependencies => [
-                depends_on( '/application_name' ),
+                depends_on( '/catalyst_application' ),
             ],
         ),
     );
@@ -801,7 +801,7 @@ Same as L<build_model_subcontainer>, but for controllers.
 
 =head1 Methods for Building Services
 
-=head2 build_application_name_service
+=head2 build_catalyst_application_service
 
 Name of the application (such as MyApp).
 
