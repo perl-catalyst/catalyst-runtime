@@ -167,13 +167,12 @@ sub build_home_service {
     );
 }
 
-# FIXME: very ambiguous - maybe root_dir?
-sub build_root_service {
+sub build_root_dir_service {
     my $self = shift;
 
     return Bread::Board::BlockInjection->new(
         lifecycle => 'Singleton',
-        name => 'root',
+        name => 'root_dir',
         block => sub {
             my $self = shift;
 
