@@ -125,9 +125,6 @@ sub finalize_error {
     sub Catalyst::Log::error { }
 }
 
-<<<<<<< HEAD
-# Make sure we can load Inline plugins.
-=======
 # Pretend to be Plugin::Session and hook finalize_headers to send a header
 
 sub finalize_headers {
@@ -138,8 +135,7 @@ sub finalize_headers {
     return $c->maybe::next::method(@_);
 }
 
-# Make sure we can load Inline plugins. 
->>>>>>> origin/master
+# Make sure we can load Inline plugins.
 
 package Catalyst::Plugin::Test::Inline;
 
