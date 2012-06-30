@@ -331,7 +331,7 @@ Allows engines to write headers to response
 sub finalize_headers {
     my ($self, $ctx) = @_;
 
-    $ctx->response->finalize_headers;
+    $ctx->finalize_headers unless $ctx->response->finalized_headers;
     return;
 }
 

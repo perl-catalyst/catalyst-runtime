@@ -131,6 +131,11 @@ sub finalize_headers {
 
     $c->res->header('X-Test-Header', 'valid');
 
+    my $call_count = $c->stash->{finalize_headers_call_count} || 0;
+    $call_count++;
+    $c->stash(finalize_headers_call_count => $call_count);
+    $c->res->header('X-Test-Header-Call-Count' => $call_count);
+
     return $c->maybe::next::method(@_);
 }
 

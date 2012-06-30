@@ -1788,7 +1788,7 @@ sub finalize {
             $c->finalize_error;
         }
 
-        $c->finalize_headers;
+        $c->finalize_headers unless $c->response->finalized_headers;
 
         # HEAD request
         if ( $c->request->method eq 'HEAD' ) {
@@ -1898,7 +1898,7 @@ EOF
 
     $c->finalize_cookies;
 
-    $c->engine->finalize_headers( $c, @_ );
+    $c->response->finalize_headers();
 
     # Done
     $response->finalized_headers(1);
