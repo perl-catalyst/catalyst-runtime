@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90015 - 2012-06-30 16:57:00
+  - Fix $c->finalize_headers getting called twice. RT#78090
+  - Fix test fails in Catalyst-Plugin-Session-State-Cookie. RT#76179
+  - Fix test fails in Catalyst-Plugin-StackTrace
+  - Fix test fails in Test-WWW-Mechanize-Catalyst
+
 5.90014 - 2012-06-26 10:00:00
 
   - Fix calling finalize_headers before writing body when using $c->write /

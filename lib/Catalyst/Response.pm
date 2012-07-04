@@ -57,7 +57,7 @@ sub write {
     my ( $self, $buffer ) = @_;
 
     # Finalize headers if someone manually writes output
-    $self->_context->finalize_headers;
+    $self->_context->finalize_headers unless $self->finalized_headers;
 
     $buffer = q[] unless defined $buffer;
 
