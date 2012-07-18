@@ -36,6 +36,7 @@ use Try::Tiny;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
+use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 
 BEGIN { require 5.008003; }
@@ -2792,6 +2793,16 @@ sub apply_default_middlewares {
     # sure it doesn't fuck things up if it's not running under one of the right
     # IIS versions
     $psgi_app = Plack::Middleware::IIS6ScriptNameFix->wrap($psgi_app);
+
+    # And another IIS issue, this time with IIS7.
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder => sub { Plack::Middleware::IIS7KeepAliveFix->wrap($_[0]) },
+        condition => sub {
+            my ($env) = @_;
+            return unless $env->{SERVER_SOFTWARE} && $env->{SERVER_SOFTWARE} =~ m!IIS\/7\.[0-9]!; 1; }, );
+        },
+    );
 
     return $psgi_app;
 }
