@@ -669,6 +669,47 @@ sub _find_component_regexp {
     return @result;
 }
 
+# FIXME
+# what exactly should this method return?
+# By default, for back-compatibility, we have two services for each component:
+#   - one in the model|view|controller sub-container
+#   - and another in the component sub-container
+# the latter is a Singleton, it executes the COMPONENT method, and the first
+# is executed at every call, executing ACCEPT_CONTEXT. It's just a layer.
+#
+# So the one in $type sub-container is pretty useless by default. But when the
+# user overrides the container (which is what we want), the sub-container they
+# will use is precisely $type, not 'component'. So for now, I'm returning both
+# services, to decide later what to do.
+sub get_all_component_services {
+    my ($self, $class) = @_;
+    my %components;
+    my $components_container = $self->get_sub_container('component');
+
+    foreach my $type (qw/model view controller /) {
+        my $container = $self->get_sub_container($type);
+
+        for my $component ($container->get_service_list) {
+            my $comp_service = $container->get_service($component);
+
+            my $key    = $comp_service->catalyst_component_name;
+            my %values = (
+                type    => $type,
+                service => $comp_service,
+            );
+
+            my $comp_name = "${type}_${component}";
+            if ($components_container->has_service($comp_name)) {
+                $values{backcompat_service} = $components_container->get_service($comp_name);
+            }
+
+            $components{$key} = \%values;
+        }
+    }
+
+    return lock_hash %components;
+}
+
 sub get_all_components {
     my ($self, $class) = @_;
     my %components;
