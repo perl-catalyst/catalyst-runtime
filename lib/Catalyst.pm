@@ -1020,11 +1020,20 @@ EOF
 
     if (
         $class->debug and
-        my $comps = $class->container->get_all_components($class)
+        my $comps = $class->container->get_all_component_services($class)
     ) {
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
-        my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
-        $t->row( $_ => ref($comps->{$_}) ? 'instance' : 'class' ) for keys %$comps;
+        my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Lifecycle' ] );
+
+        # FIXME
+        # I don't really know what we're going to show here
+        while (my ($class, $info) = each %$comps) {
+            my $lifecycle = $info->{backcompat_service}
+                          ? $info->{backcompat_service}->lifecycle
+                          : $info->{service}->lifecycle
+                          ;
+            $t->row( $class, $lifecycle );
+        }
 
         $class->log->debug( "Loaded components:\n" . $t->draw . "\n" );
     }
