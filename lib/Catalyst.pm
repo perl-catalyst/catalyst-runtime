@@ -1458,12 +1458,18 @@ Returns a hash of components.
 sub components {
     my ( $class, $comps ) = @_;
 
+    # FIXME
+    # this is very wrong
     # people create components calling this sub directly, before setup
+    # also, $class->log doesn't work before setup_log
     $class->setup_config unless $class->container;
 
     my $container = $class->container;
 
     if ( $comps ) {
+        $class->log->warn(q{You are adding components using Catalyst's components method.});
+        $class->log->warn(q{This behaviour is deprecated, please read});
+        $class->log->warn(q{Catalyst::IOC::Container's documentation for better ways to do that.});
         $container->add_component( $_ ) for keys %$comps;
     }
 

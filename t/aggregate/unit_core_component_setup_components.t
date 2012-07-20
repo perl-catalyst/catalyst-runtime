@@ -10,13 +10,13 @@ Moose::Meta::Class->create( TestAppComponents => (
     },
 ));
 
-TestAppComponents->components( {} );
-
 # this is so TestAppComponents->container will work
 TestAppComponents->setup_config;
 
 # this is so TestAppComponents->log->warn will work
 TestAppComponents->setup_log;
+
+TestAppComponents->components( {} );
 
 my @comps = TestAppComponents->locate_components;
 

@@ -294,11 +294,11 @@ is( MyMVCTestAppDefaultModel->model , 'MyMVCTestAppDefaultModel::Model::M', 'def
 
     __PACKAGE__->config( { disable_component_resolution_regex_fallback => 1 } );
 
-    __PACKAGE__->components( { map { ( ref($_)||$_ , $_ ) }
-        qw/MyApp::WithoutRegexFallback::Controller::Another::Foo/ } );
-
     # allow $c->log->warn to work
     __PACKAGE__->setup_log;
+
+    __PACKAGE__->components( { map { ( ref($_)||$_ , $_ ) }
+        qw/MyApp::WithoutRegexFallback::Controller::Another::Foo/ } );
 }
 
 {
