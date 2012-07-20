@@ -1022,8 +1022,8 @@ EOF
         $class->debug and
         my $comps = $class->container->get_all_component_services($class)
     ) {
-        my $column_width = Catalyst::Utils::term_width() - 8 - 9;
-        my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Lifecycle' ] );
+        my $column_width = Catalyst::Utils::term_width() - 16 - 9;
+        my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 16, 'Lifecycle' ] );
 
         # FIXME
         # I don't really know what we're going to show here
