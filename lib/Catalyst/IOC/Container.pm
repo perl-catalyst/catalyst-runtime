@@ -805,6 +805,17 @@ Same as L<build_model_subcontainer>, but for controllers.
 
 Name of the application (such as MyApp).
 
+=head2 build_home_service
+
+The application home directory. All the files (including classes, scripts, etc)
+created for this application are in this directory, or in a sub-directory below
+this one.
+
+=head2 build_root_dir_service
+
+Inside the application home (as explained in L</build_home_service>), there is
+a root directory. This is where all templates and static files are.
+
 =head2 build_driver_service
 
 Config options passed directly to the driver being used.
