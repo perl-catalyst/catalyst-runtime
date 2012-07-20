@@ -145,6 +145,8 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub _application { $_[0] }
 
+=encoding utf8
+
 =head1 NAME
 
 Catalyst - The Elegant MVC Web Application Framework
