@@ -19,6 +19,7 @@ use warnings;
 # }
 
 use Test::More;
+use Scalar::Util 'blessed';
 use Test::Moose;
 use FindBin '$Bin';
 use lib "$Bin/../lib";
@@ -76,15 +77,15 @@ while (my ($class, $info) = each %$expected) {
 
 my %singleton_component_classes;
 can_ok($c, 'get_all_singleton_lifecycle_components');
-ok(my @singleton_comps = $c->get_all_singleton_lifecycle_components, 'singleton components are fetched');
-foreach my $comp (@singleton_comps) {
-    blessed_ok($comp, "it's an object");
-    my $class = ref $comp;
+ok(my $singleton_comps = $c->get_all_singleton_lifecycle_components, 'singleton components are fetched');
+while (my ($class, $comp) = each %$singleton_comps) {
+    ok(blessed $comp, "it's an object"); # it just happens this particular app has all components as objects, so I test it remains true
+    is($class, ref $comp, "of class $class");
 
     ok(exists $expected->{$class}, "it's one of the existing components");
     ok(!exists $singleton_component_classes{$class}, "it's the first instance of class $class");
     $singleton_component_classes{$class} = 1;
 }
-is_deeply([ keys %$expected ], [ keys %singleton_component_classes ]);
+is_deeply([ sort keys %$expected ], [ sort keys %singleton_component_classes ], 'all components returned');
 
 done_testing;

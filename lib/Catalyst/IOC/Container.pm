@@ -710,6 +710,34 @@ sub get_all_component_services {
     return lock_hash %components;
 }
 
+sub get_all_singleton_lifecycle_components {
+    my $self = shift;
+
+    my %components;
+    my $components_container = $self->get_sub_container('component');
+
+    foreach my $type (qw/model view controller /) {
+        my $container = $self->get_sub_container($type);
+
+        for my $component ($container->get_service_list) {
+            my $comp_service = $container->get_service($component);
+
+            my $key       = $comp_service->catalyst_component_name;
+            my $lifecycle = $comp_service->lifecycle;
+            my $comp_name = "${type}_${component}";
+
+            if (defined $lifecycle && $lifecycle eq 'Singleton') {
+                $components{$key} = $comp_service->get;
+            }
+            elsif ($components_container->has_service($comp_name)) {
+                $components{$key} = $components_container->get_service($comp_name)->get;
+            }
+        }
+    }
+
+    return lock_hash %components;
+}
+
 sub get_all_components {
     my ($self, $class) = @_;
     my %components;
