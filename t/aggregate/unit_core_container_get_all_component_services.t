@@ -74,4 +74,17 @@ while (my ($class, $info) = each %$expected) {
     isa_ok($received_info->{backcompat_service}, $info->{bcpt_service_isa}, 'backcompat_service');
 }
 
+my %singleton_component_classes;
+can_ok($c, 'get_all_singleton_lifecycle_components');
+ok(my @singleton_comps = $c->get_all_singleton_lifecycle_components, 'singleton components are fetched');
+foreach my $comp (@singleton_comps) {
+    blessed_ok($comp, "it's an object");
+    my $class = ref $comp;
+
+    ok(exists $expected->{$class}, "it's one of the existing components");
+    ok(!exists $singleton_component_classes{$class}, "it's the first instance of class $class");
+    $singleton_component_classes{$class} = 1;
+}
+is_deeply([ keys %$expected ], [ keys %singleton_component_classes ]);
+
 done_testing;
