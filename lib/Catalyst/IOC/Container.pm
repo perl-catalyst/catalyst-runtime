@@ -682,7 +682,8 @@ sub _find_component_regexp {
 # will use is precisely $type, not 'component'. So for now, I'm returning both
 # services, to decide later what to do.
 sub get_all_component_services {
-    my ($self, $class) = @_;
+    my $self = shift;
+
     my %components;
     my $components_container = $self->get_sub_container('component');
 
