@@ -75,6 +75,8 @@ while (my ($class, $info) = each %$expected) {
     isa_ok($received_info->{backcompat_service}, $info->{bcpt_service_isa}, 'backcompat_service');
 }
 
+# TODO
+# move this somewhere else, or rename the test
 my %singleton_component_classes;
 can_ok($c, 'get_all_singleton_lifecycle_components');
 ok(my $singleton_comps = $c->get_all_singleton_lifecycle_components, 'singleton components are fetched');

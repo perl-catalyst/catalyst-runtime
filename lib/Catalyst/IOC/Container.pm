@@ -681,6 +681,8 @@ sub _find_component_regexp {
 # user overrides the container (which is what we want), the sub-container they
 # will use is precisely $type, not 'component'. So for now, I'm returning both
 # services, to decide later what to do.
+# TODO
+# add pod, remove code repetition
 sub get_all_component_services {
     my $self = shift;
 
@@ -711,6 +713,8 @@ sub get_all_component_services {
     return lock_hash %components;
 }
 
+# TODO
+# add pod, remove code repetition
 sub get_all_singleton_lifecycle_components {
     my $self = shift;
 
@@ -739,6 +743,8 @@ sub get_all_singleton_lifecycle_components {
     return lock_hash %components;
 }
 
+# TODO
+# remove code repetition
 sub get_all_components {
     my ($self, $class) = @_;
     my %components;
