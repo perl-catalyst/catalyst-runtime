@@ -743,12 +743,6 @@ sub get_all_components {
     my ($self, $class) = @_;
     my %components;
 
-    # FIXME - if we're getting from these containers, we need to either:
-    #   - pass 'ctx' and 'accept_context_args' OR
-    #   - make these params optional
-    # big problem when setting up the dispatcher - this method is called
-    # as $container->get_all_components('MyApp'). What to do with Request
-    # life cycles?
     foreach my $type (qw/model view controller /) {
         my $container = $self->get_sub_container($type);
 
