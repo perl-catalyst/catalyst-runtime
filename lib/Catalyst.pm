@@ -2800,7 +2800,7 @@ sub apply_default_middlewares {
         builder => sub { Plack::Middleware::IIS7KeepAliveFix->wrap($_[0]) },
         condition => sub {
             my ($env) = @_;
-            return unless $env->{SERVER_SOFTWARE} && $env->{SERVER_SOFTWARE} =~ m!IIS\/7\.[0-9]!; 1; }, );
+            return $env->{SERVER_SOFTWARE} && $env->{SERVER_SOFTWARE} =~ m!IIS/7\.[0-9]!;
         },
     );
 
