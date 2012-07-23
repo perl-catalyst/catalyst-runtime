@@ -136,6 +136,8 @@ sub import {
 
 sub _application { $_[0] }
 
+=encoding UTF-8
+
 =head1 NAME
 
 Catalyst - The Elegant MVC Web Application Framework
