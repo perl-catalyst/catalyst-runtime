@@ -1473,13 +1473,10 @@ sub components {
         $container->add_component( $_ ) for keys %$comps;
     }
 
-    # FIXME:
-    # t0m says should be "ref($c) ? $c->container->get_all_singleton_lifecycle_components : $c->container->get_all_components($c)".
-    # are you sure? isn't it the other way around?
-    # i.e. ref($c) ? get_all_components($c) : get_all_singleton_lifecycle_components()
     return
-        ref($class) ? $container->get_all_singleton_lifecycle_components
-                    : $container->get_all_components($class);
+        ref($class) ? $container->get_all_components($class)
+                    : $container->get_all_singleton_lifecycle_components
+                    ;
 }
 
 =head2 $c->context_class
