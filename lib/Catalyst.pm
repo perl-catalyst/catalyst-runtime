@@ -131,6 +131,13 @@ sub import {
     }
 
     $caller->arguments( [@arguments] );
+
+    # FIXME
+    # what is this for?
+    # we call setup_home on import AND on ->setup
+    # is there a reason for it?
+    # anyway there is no point for setup_home without setup_config() so...
+    $caller->setup_config;
     $caller->setup_home;
 }
 
@@ -2599,18 +2606,19 @@ Sets up the home directory.
 =cut
 
 sub setup_home {
-    my ( $class, $home ) = @_;
+    my ( $class, $home_flag ) = @_;
 
-    if ( my $env = Catalyst::Utils::env_value( $class, 'HOME' ) ) {
-        $home = $env;
-    }
-
-    $home ||= Catalyst::Utils::home($class);
+    my $home = $class->container->resolve(
+        service    => 'home',
+        parameters => {
+            home_flag => $home_flag
+        },
+    );
 
     if ($home) {
         #I remember recently being scolded for assigning config values like this
         $class->config->{home} ||= $home;
-        $class->config->{root} ||= Path::Class::Dir->new($home)->subdir('root');
+        $class->config->{root} ||= $class->container->resolve(service => 'root_dir');
     }
 }
 

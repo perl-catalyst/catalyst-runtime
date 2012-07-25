@@ -74,6 +74,8 @@ sub BUILD {
         config_local_suffix
         config_path
         locate_components
+        home
+        root_dir
     /;
 
     my $config = $self->resolve( service => 'config' );
@@ -152,16 +154,21 @@ sub build_home_service {
         lifecycle => 'Singleton',
         name => 'home',
         block => sub {
-            my $self = shift;
+            my $self  = shift;
             my $class = $self->param('catalyst_application');
-            my $home;
 
             if ( my $env = Catalyst::Utils::env_value( $class, 'HOME' ) ) {
-                $home = $env;
+                return $env;
             }
 
-            $home ||= Catalyst::Utils::home($class);
-            return $home;
+            if ( my $home = $self->param('home_flag') ) {
+                return $home;
+            }
+
+            return Catalyst::Utils::home($class);
+        },
+        parameters   => {
+            home_flag => { is => 'ro', isa => 'Str|Undef', required => 0 }
         },
         dependencies => [ depends_on('catalyst_application') ],
     );
