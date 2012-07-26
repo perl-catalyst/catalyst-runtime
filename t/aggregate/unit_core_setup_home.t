@@ -69,9 +69,9 @@ for my $home_and_root (@homes_and_roots) {
 
     my $c = Catalyst::IOC::Container->new(name => 'TestAppSetupHome');
     ok(my $home = $c->resolve(service => 'home', parameters => { home_flag => $home_flag }), 'home service returns ok');
-    is($home, $homes_and_roots[2][0], 'value is expected');
+    is($home, $homes_and_roots[1][0], 'value is expected');
     ok(my $root = $c->resolve(service => 'root_dir'), 'root service returns ok');
-    is($root, $homes_and_roots[2][1], 'value is expected');
+    is($root, $homes_and_roots[1][1], 'value is expected');
 }
 
 for my $home_and_root (@homes_and_roots) {
