@@ -137,7 +137,7 @@ sub import {
     # we call setup_home on import AND on ->setup
     # is there a reason for it?
     # anyway there is no point for setup_home without setup_config() so...
-    $caller->setup_config;
+    $caller->setup_config($caller->arguments);
     $caller->setup_home;
 }
 
@@ -919,25 +919,9 @@ sub setup {
         @arguments = ( @arguments, @{ $class->arguments } );
     }
 
-    # Process options
-    my $flags = {};
-
-    foreach (@arguments) {
-
-        if (/^-Debug$/) {
-            $flags->{log} =
-              ( $flags->{log} ) ? 'debug,' . $flags->{log} : 'debug';
-        }
-        elsif (/^-(\w+)=?(.*)$/) {
-            $flags->{ lc $1 } = $2;
-        }
-        else {
-            push @{ $flags->{plugins} }, $_;
-        }
-    }
-
-    $class->setup_config();
-    $class->setup_home( delete $flags->{home} );
+    $class->setup_config(\@arguments);
+    my $flags = $class->container->resolve(service => 'flags');
+    $class->setup_home();
 
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
@@ -2332,7 +2316,7 @@ sub setup_actions { my $c = shift; $c->dispatcher->setup_actions( $c, @_ ) }
 =cut
 
 sub setup_config {
-    my $class = shift;
+    my ($class, $flags) = @_;
 
     my %args = %{ $class->config || {} };
 
@@ -2346,7 +2330,7 @@ sub setup_config {
         $container_class = Class::MOP::load_first_existing_class("${class}::Container", 'Catalyst::IOC::Container');
     }
 
-    my $container = $container_class->new( %args, name => $class );
+    my $container = $container_class->new( %args, name => $class, flags => $flags );
     $class->container($container);
 
     my $config = $container->resolve( service => 'config' );
@@ -2606,13 +2590,10 @@ Sets up the home directory.
 =cut
 
 sub setup_home {
-    my ( $class, $home_flag ) = @_;
+    my ( $class ) = @_;
 
     my $home = $class->container->resolve(
         service    => 'home',
-        parameters => {
-            home_flag => $home_flag
-        },
     );
 
     if ($home) {

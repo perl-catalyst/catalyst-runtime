@@ -17,6 +17,12 @@ use namespace::autoclean;
 
 extends 'Bread::Board::Container';
 
+has flags => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+);
+
 has config_local_suffix => (
     is      => 'ro',
     isa     => 'Str',
@@ -74,6 +80,7 @@ sub BUILD {
         config_local_suffix
         config_path
         locate_components
+        flags
         home
         root_dir
     /;
@@ -147,6 +154,36 @@ sub build_component_subcontainer {
     );
 }
 
+sub build_flags_service {
+    my $self = shift;
+
+    return Bread::Board::Literal->new(
+        lifecycle => 'Singleton',
+        name      => 'flags',
+        value     => $self->get_flags,
+    );
+}
+
+sub get_flags {
+    my $self = shift;
+    my $flags = {};
+
+    foreach (@{ $self->flags }) {
+        if (/^-Debug$/) {
+            $flags->{log} =
+              ( $flags->{log} ) ? 'debug,' . $flags->{log} : 'debug';
+        }
+        elsif (/^-(\w+)=?(.*)$/) {
+            $flags->{ lc $1 } = $2;
+        }
+        else {
+            push @{ $flags->{plugins} }, $_;
+        }
+    }
+
+    return $flags;
+}
+
 sub build_home_service {
     my $self = shift;
 
@@ -161,16 +198,13 @@ sub build_home_service {
                 return $env;
             }
 
-            if ( my $home = $self->param('home_flag') ) {
+            if ( my $home = $self->param('flags')->{home} ) {
                 return $home;
             }
 
             return Catalyst::Utils::home($class);
         },
-        parameters   => {
-            home_flag => { is => 'ro', isa => 'Str|Undef', required => 0 }
-        },
-        dependencies => [ depends_on('catalyst_application') ],
+        dependencies => [ depends_on('flags'), depends_on('catalyst_application') ],
     );
 }
 
