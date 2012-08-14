@@ -59,6 +59,7 @@ requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'Try::Tiny';
+requires 'Safe::Isa';
 requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness

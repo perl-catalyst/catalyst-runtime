@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Fix model/view/controller methods to handle stringifiable objects
   - Fix RT#78377 - IIS7 ignores response body for 3xx requests, which
     causes (a different) response to be broken when using keepalive.
     Fixed by applying Middleware which removes the response body and

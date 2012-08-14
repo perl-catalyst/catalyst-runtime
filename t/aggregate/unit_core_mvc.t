@@ -1,4 +1,4 @@
-use Test::More tests => 51;
+use Test::More;
 use strict;
 use warnings;
 
@@ -22,6 +22,12 @@ my @complist =
 
     # allow $c->log->warn to work
     __PACKAGE__->setup_log;
+}
+
+{
+    package MyStringThing;
+
+    use overload '""' => sub { $_[0]->{string} }, fallback => 1;
 }
 
 is( MyMVCTestApp->view('View'), 'MyMVCTestApp::V::View', 'V::View ok' );
@@ -116,6 +122,18 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
 
     # object w/ qr{}
     is_deeply( [ MyMVCTestApp->model( qr{Test} ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
+
+    is_deeply([ MyMVCTestApp->model( bless({ string => 'Model' }, 'MyStringThing') ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::M::Model'} ], 'Explicit model search with overloaded object');
+
+    {
+        my $warnings = 0;
+        no warnings 'redefine';
+        local *Catalyst::Log::warn = sub { $warnings++ };
+
+        # object w/ regexp fallback
+        is_deeply( [ MyMVCTestApp->model( bless({ string => 'Test' }, 'MyStringThing') ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
+        ok( $warnings, 'regexp fallback warnings' );
+    }
 
     {
         my $warnings = 0;
@@ -225,3 +243,5 @@ is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class met
     is( MyApp::WithoutRegexFallback->controller('Foo'), undef, 'no controller Foo found');
     ok( !$warnings, 'no regexp fallback warnings' );
 }
+
+done_testing;
