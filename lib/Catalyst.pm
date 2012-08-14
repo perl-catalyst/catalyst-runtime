@@ -1270,7 +1270,7 @@ path, use C<< $c->uri_for_action >> instead.
 sub uri_for {
     my ( $c, $path, @args ) = @_;
 
-    if (blessed($path) && $path->isa('Catalyst::Controller')) {
+    if ( $path->$_isa('Catalyst::Controller') ) {
         $path = $path->path_prefix;
         $path =~ s{/+\z}{};
         $path .= '/';
@@ -1287,7 +1287,7 @@ sub uri_for {
         $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     }
 
-    if ( blessed($path) ) { # action object
+    if ( $path->$_isa('Catalyst::Action') ) { # action object
         s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'

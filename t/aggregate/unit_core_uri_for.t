@@ -181,5 +181,16 @@ TODO: {
     );
 }
 
-done_testing;
+{
+    package MyStringThing;
 
+    use overload '""' => sub { $_[0]->{string} }, fallback => 1;
+}
+
+is(
+    Catalyst::uri_for( $context, bless( { string => 'test' }, 'MyStringThing' ) ),
+    'http://127.0.0.1/test',
+    'overloaded object handled correctly'
+);
+
+done_testing;
