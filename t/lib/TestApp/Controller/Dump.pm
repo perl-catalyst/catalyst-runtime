@@ -27,6 +27,20 @@ sub request : Action Relative {
     $c->forward('TestApp::View::Dump::Request');
 }
 
+sub prepare_parameters : Action Relative {
+    my ( $self, $c ) = @_;
+
+    die 'Must pass in parameters' unless keys %{$c->req->parameters};
+
+    $c->req->parameters( {} );
+    die 'parameters are not empty' if keys %{$c->req->parameters};
+
+    # Now reset and reload
+    $c->prepare_parameters;
+    die 'Parameters were not reset' unless keys %{$c->req->parameters};
+
+    $c->forward('TestApp::View::Dump::Request');
+}
 sub response : Action Relative {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Response');

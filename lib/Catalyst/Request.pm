@@ -141,7 +141,8 @@ has uploads => (
 has parameters => (
     is => 'rw',
     lazy => 1,
-    builder => 'prepare_parameters',
+    builder => '_build_parameters',
+    clearer => '_clear_parameters',
 );
 
 # TODO:
@@ -153,6 +154,14 @@ has parameters => (
 #  in Catalyst.pm and Engine.pm?
 
 sub prepare_parameters {
+    my ( $self ) = @_;
+    $self->_clear_parameters;
+    return $self->parameters;
+}
+
+
+
+sub _build_parameters {
     my ( $self ) = @_;
     my $parameters = {};
     my $body_parameters = $self->body_parameters;
@@ -870,7 +879,8 @@ request method, hostname requested etc.
 Ensures that the body has been parsed, then builds the parameters, which are
 combined from those in the request and those in the body.
 
-This method is the builder for the 'parameters' attribute.
+If parameters have already been set will clear the parameters and build them again.
+
 
 =head2 meta
 
