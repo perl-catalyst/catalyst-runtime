@@ -123,6 +123,8 @@
     issue with new versions of Module::Runtime (0.012) on perl 5.10
     which stopped Catalyst::Controller from compiling.
 
+  - In Catalyst::Test, don't mangle headers of non-HTML responses. RT#79043
+
 5.90008 - TRIAL 2012-02-06 20:49:00
 
  New features and refactoring:
