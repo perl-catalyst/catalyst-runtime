@@ -275,7 +275,7 @@ sub register_action_methods {
         my $attributes = $method->can('attributes') ? $method->attributes : [];
         my $attrs = $self->_parse_attrs( $c, $name, @{ $attributes } );
         if ( $attrs->{Private} && ( keys %$attrs > 1 ) ) {
-            $c->log->debug( 'Bad action definition "'
+            $c->log->warn( 'Bad action definition "'
                   . join( ' ', @{ $attributes } )
                   . qq/" for "$class->$name"/ )
               if $c->debug;
