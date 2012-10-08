@@ -52,20 +52,30 @@ has request => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        my %p = ( _log => $self->log );
-        $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
-        $self->request_class->new(\%p);
+        $self->request_class->new($self->_build_request_class_construction_parameters);
     },
     lazy => 1,
 );
+sub _build_request_class_construction_parameters {
+    my $self = shift;
+    my %p = ( _log => $self->log );
+    $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
+    \%p;
+}
+
 has response => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        $self->response_class->new({ _log => $self->log });
+        $self->response_class->new($self->_build_response_class_construction_parameters);
     },
     lazy => 1,
 );
+sub _build_response_class_construction_parameters {
+    my $self = shift;
+    { _log => $self->log };
+}
+
 has namespace => (is => 'rw');
 
 sub depth { scalar @{ shift->stack || [] }; }
