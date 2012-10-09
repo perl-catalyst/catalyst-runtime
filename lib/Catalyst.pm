@@ -52,11 +52,11 @@ has request => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        $self->request_class->new($self->_build_request_class_construction_parameters);
+        $self->request_class->new($self->_build_request_constructor_args);
     },
     lazy => 1,
 );
-sub _build_request_class_construction_parameters {
+sub _build_request_constructor_args {
     my $self = shift;
     my %p = ( _log => $self->log );
     $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
@@ -67,11 +67,11 @@ has response => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        $self->response_class->new($self->_build_response_class_construction_parameters);
+        $self->response_class->new($self->_build_response_constructor_args);
     },
     lazy => 1,
 );
-sub _build_response_class_construction_parameters {
+sub _build_response_constructor_args {
     my $self = shift;
     { _log => $self->log };
 }
