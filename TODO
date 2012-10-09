@@ -145,6 +145,9 @@ http://github.com/willert/catalyst-plugin-log4perl-simple/tree
      - Test loading container outside Catalyst, and these services working
      - Test Catalyst / MyApp is not loaded
 
+    16) _build_(request|response)_constructor_args need replicating in
+        this branch.
+
 ### Next steps
 
   - Push the config built in the container back up onto the app
