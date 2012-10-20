@@ -1,5 +1,22 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90017 - 2012-10-19 22:33:00
+  - Change Catalsyt _parse_attrs so that when sub attr handlers:
+
+    1) Can return multiple pairs of new attributes.
+    2) Get their returned attributes passed through the correct attribute handler.
+
+    e.g sub _parse_Whatever_attr { return Chained => 'foo', PathPart => 'bar' }
+
+    Will now work because both new attributes are respected, and the Chained
+    attribute is passed to _parse_Chained_attr and fixed up correctly by that.
+
+  - In Catalyst::Test, don't mangle headers of non-HTML responses. RT#79043
+
+  - Refactor request and response class construction to add methods
+    that roles can hook to feed extra parameters into the constructor
+    of request or response classes.
+
 5.90016 - 2012-08-16 15:35:00
   - prepare_parameters is no longer an attribute builder.  It is now a method
     that calls the correct underlying functionality (Bill Moseley++)

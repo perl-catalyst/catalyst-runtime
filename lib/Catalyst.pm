@@ -51,20 +51,30 @@ has request => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        my %p = ( _log => $self->log );
-        $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
-        $self->request_class->new(\%p);
+        $self->request_class->new($self->_build_request_constructor_args);
     },
     lazy => 1,
 );
+sub _build_request_constructor_args {
+    my $self = shift;
+    my %p = ( _log => $self->log );
+    $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
+    \%p;
+}
+
 has response => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        $self->response_class->new({ _log => $self->log });
+        $self->response_class->new($self->_build_response_constructor_args);
     },
     lazy => 1,
 );
+sub _build_response_constructor_args {
+    my $self = shift;
+    { _log => $self->log };
+}
+
 has namespace => (is => 'rw');
 
 sub depth { scalar @{ shift->stack || [] }; }
@@ -101,7 +111,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90016';
+our $VERSION = '5.90017';
 
 sub import {
     my ( $class, @arguments ) = @_;
