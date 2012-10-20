@@ -305,16 +305,18 @@ sub _local_request {
             # getting it into Plack::Test, or make a middleware out of it, or
             # whatever. Seriously - horrible.
 
-            require HTML::HeadParser;
+            if (!$resp->content_type || $resp->content_is_html) {
+                require HTML::HeadParser;
 
-            my $parser = HTML::HeadParser->new();
-            $parser->xml_mode(1) if $resp->content_is_xhtml;
-            $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
+                my $parser = HTML::HeadParser->new();
+                $parser->xml_mode(1) if $resp->content_is_xhtml;
+                $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
 
-            $parser->parse( $resp->content );
-            my $h = $parser->header;
-            for my $f ( $h->header_field_names ) {
-                $resp->init_header( $f, [ $h->header($f) ] );
+                $parser->parse( $resp->content );
+                my $h = $parser->header;
+                for my $f ( $h->header_field_names ) {
+                    $resp->init_header( $f, [ $h->header($f) ] );
+                }
             }
             # Another horrible hack to make the response headers have a
             # 'status' field. This is for back-compat, but you should

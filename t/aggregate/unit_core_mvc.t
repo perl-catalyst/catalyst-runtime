@@ -55,6 +55,12 @@ Moose::Meta::Class->create(
 ok( $warnings, 'Issues deprecated warnings' );
 is( @{[ MyMVCTestApp->component_list ]}, scalar @complist + 1, 'Loaded all components' );
 
+{
+    package MyStringThing;
+
+    use overload '""' => sub { $_[0]->{string} }, fallback => 1;
+}
+
 is( MyMVCTestApp->view('View'), 'MyMVCTestApp::V::View', 'V::View ok' );
 
 is( MyMVCTestApp->controller('Controller'),
@@ -204,6 +210,18 @@ is( MyMVCTestAppDefaultModel->model , 'MyMVCTestAppDefaultModel::Model::M', 'def
 
     # object w/ qr{}
     is_deeply( [ MyMVCTestApp->model( qr{Test} ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
+
+    is_deeply([ MyMVCTestApp->model( bless({ string => 'Model' }, 'MyStringThing') ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::M::Model'} ], 'Explicit model search with overloaded object');
+
+    {
+        my $warnings = 0;
+        no warnings 'redefine';
+        local *Catalyst::Log::warn = sub { $warnings++ };
+
+        # object w/ regexp fallback
+        is_deeply( [ MyMVCTestApp->model( bless({ string => 'Test' }, 'MyStringThing') ) ], [ MyMVCTestApp->components->{'MyMVCTestApp::Model::Test::Object'} ], 'Object returned' );
+        ok( $warnings, 'regexp fallback warnings' );
+    }
 
     {
         my $warnings = 0;

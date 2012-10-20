@@ -60,6 +60,7 @@ requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'Try::Tiny';
+requires 'Safe::Isa';
 requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
@@ -69,7 +70,7 @@ requires 'MooseX::Types';
 requires 'MooseX::Types::Common::Numeric';
 requires 'MooseX::Types::LoadableClass';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
-requires 'Plack' => '0.9974'; # IIS6 fix middleware
+requires 'Plack' => '0.9991'; # IIS6+7 fix middleware
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
 requires 'Plack::Test::ExternalServer';
 
@@ -194,8 +195,7 @@ sub darwin_check_no_resource_forks {
 
         # TAR on 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE
         # On 10.5 (Leopard) it wants COPYFILE_DISABLE
-         die("Oh, you got Ceiling Cat, snazzy. Please read the man page for tar or Google to find out if Apple renamed COPYFILE_DISABLE (it was COPY_EXTENDED_ATTRIBUTES_DISABLE originally) again and fix this Makefile.PL please?\n") if $osx_ver =~ /^10.8/;
-        my $attr = $osx_ver =~ /^10.(5|6|7)/  ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
+        my $attr = $osx_ver =~ /^10.(5|6|7|8)/  ? 'COPYFILE_DISABLE' : 'COPY_EXTENDED_ATTRIBUTES_DISABLE';
 
         makemaker_args(dist => { PREOP => qq{\@if [ "\$\$$attr" != "true" ]; then}.
                                           qq{ echo "You must set the ENV variable $attr to 'true',"; }.

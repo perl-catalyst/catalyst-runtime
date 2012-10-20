@@ -394,14 +394,17 @@ sub prepare_body_parameters {
 
 =head2 $self->prepare_parameters($c)
 
-sets up parameters from query and post parameters.
+Sets up parameters from query and post parameters.
+If parameters have already been set up will clear
+existing parameters and set up again.
 
 =cut
 
 sub prepare_parameters {
     my ( $self, $c ) = @_;
 
-    $c->request->parameters;
+    $c->request->_clear_parameters;
+    return $c->request->parameters;
 }
 
 =head2 $self->prepare_path($c)

@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90016 - 2012-08-16 15:35:00
+  - prepare_parameters is no longer an attribute builder.  It is now a method
+    that calls the correct underlying functionality (Bill Moseley++)
+  - Updated Makefile.PL to handle MacOXS tar
+  - Fix uri_for to handle a stringifiable object
+  - Fix model/view/controller methods to handle stringifiable objects
+  - Fix RT#78377 - IIS7 ignores response body for 3xx requests, which
+    causes (a different) response to be broken when using keepalive.
+    Fixed by applying Middleware which removes the response body and
+    content length that Catalyst supplies with redirects.
+
 5.90015 - 2012-06-30 16:57:00
   - Fix $c->finalize_headers getting called twice. RT#78090
   - Fix test fails in Catalyst-Plugin-Session-State-Cookie. RT#76179
@@ -111,6 +122,8 @@
   - Require the latest version of B::Hooks::EndOfScope (0.10) to avoid an
     issue with new versions of Module::Runtime (0.012) on perl 5.10
     which stopped Catalyst::Controller from compiling.
+
+  - In Catalyst::Test, don't mangle headers of non-HTML responses. RT#79043
 
 5.90008 - TRIAL 2012-02-06 20:49:00
 

@@ -413,16 +413,30 @@ sub _parse_attrs {
 
     my %final_attributes;
 
-    foreach my $key (keys %raw_attributes) {
+    while (my ($key, $value) = each %raw_attributes){
+        my $new_attrs = $self->_parse_attr($c, $name, $key => $value );
+        push @{ $final_attributes{$_} }, @{ $new_attrs->{$_} } for keys %$new_attrs;
+    }
 
-        my $raw = $raw_attributes{$key};
+    return \%final_attributes;
+}
 
-        foreach my $value (ref($raw) eq 'ARRAY' ? @$raw : $raw) {
+sub _parse_attr {
+    my ($self, $c, $name, $key, $values) = @_;
 
-            my $meth = "_parse_${key}_attr";
-            if ( my $code = $self->can($meth) ) {
-                ( $key, $value ) = $self->$code( $c, $name, $value );
+    my %final_attributes;
+    foreach my $value (ref($values) eq 'ARRAY' ? @$values : $values) {
+        my $meth = "_parse_${key}_attr";
+        if ( my $code = $self->can($meth) ) {
+            my %new_attrs = $self->$code( $c, $name, $value );
+            while (my ($new_key, $value) = each %new_attrs){
+                my $new_attrs = $key eq $new_key ?
+                    { $new_key => [$value] } :
+                    $self->_parse_attr($c, $name, $new_key => $value );
+                push @{ $final_attributes{$_} }, @{ $new_attrs->{$_} } for keys %$new_attrs;
             }
+        }
+        else {
             push( @{ $final_attributes{$key} }, $value );
         }
     }
@@ -432,14 +446,16 @@ sub _parse_attrs {
 
 sub _parse_Global_attr {
     my ( $self, $c, $name, $value ) = @_;
-    return $self->_parse_Path_attr( $c, $name, "/$name" );
+    # _parse_attr will call _parse_Path_attr for us
+    return Path => "/$name";
 }
 
 sub _parse_Absolute_attr { shift->_parse_Global_attr(@_); }
 
 sub _parse_Local_attr {
     my ( $self, $c, $name, $value ) = @_;
-    return $self->_parse_Path_attr( $c, $name, $name );
+    # _parse_attr will call _parse_Path_attr for us
+    return Path => $name;
 }
 
 sub _parse_Relative_attr { shift->_parse_Local_attr(@_); }
@@ -525,7 +541,7 @@ sub _parse_MyAction_attr {
     my ( $self, $c, $name, $value ) = @_;
 
     my $appclass = Catalyst::Utils::class2appclass($self);
-    $value = "${appclass}::Action::${value}";
+    $value = "+${appclass}::Action::${value}";
 
     return ( 'ActionClass', $value );
 }

@@ -32,9 +32,11 @@ use Catalyst::EngineLoader;
 use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
+use Safe::Isa;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
+use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 
 BEGIN { require 5.008003; }
@@ -99,7 +101,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90015';
+our $VERSION = '5.90016';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -152,7 +154,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub _application { $_[0] }
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -1106,7 +1108,7 @@ path, use C<< $c->uri_for_action >> instead.
 sub uri_for {
     my ( $c, $path, @args ) = @_;
 
-    if (blessed($path) && $path->isa('Catalyst::Controller')) {
+    if ( $path->$_isa('Catalyst::Controller') ) {
         $path = $path->path_prefix;
         $path =~ s{/+\z}{};
         $path .= '/';
@@ -1123,7 +1125,7 @@ sub uri_for {
         $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     }
 
-    if ( blessed($path) ) { # action object
+    if ( $path->$_isa('Catalyst::Action') ) { # action object
         s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
                         ( scalar @args && ref $args[0] eq 'ARRAY'
@@ -2579,6 +2581,16 @@ sub apply_default_middlewares {
     # sure it doesn't fuck things up if it's not running under one of the right
     # IIS versions
     $psgi_app = Plack::Middleware::IIS6ScriptNameFix->wrap($psgi_app);
+
+    # And another IIS issue, this time with IIS7.
+    $psgi_app = Plack::Middleware::Conditional->wrap(
+        $psgi_app,
+        builder => sub { Plack::Middleware::IIS7KeepAliveFix->wrap($_[0]) },
+        condition => sub {
+            my ($env) = @_;
+            return $env->{SERVER_SOFTWARE} && $env->{SERVER_SOFTWARE} =~ m!IIS/7\.[0-9]!;
+        },
+    );
 
     return $psgi_app;
 }
