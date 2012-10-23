@@ -8,7 +8,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Test::More tests => 105;
 use Catalyst::Test 'TestApp';
-
+use Scalar::Util qw/ blessed /;
 use Catalyst::Request;
 use Catalyst::Request::Upload;
 use HTTP::Body::OctetStream;
@@ -197,9 +197,17 @@ use Path::Class::Dir;
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
-    like( $response->content, qr/file1 => bless/, 'Upload with name file1');
-    like( $response->content, qr/file2 => bless/, 'Upload with name file2');
-    
+    {
+        local $@;
+        my $request = eval $response->content;
+        if ($@) {
+            fail("Could not inflate response: $@ " . $response->content);
+        }
+        else {
+            ok blessed($request->uploads->{file1}), 'Upload with name file1';
+            ok blessed($request->uploads->{file2}),'Upload with name file2';
+        }
+    }
     my $creq;
     {
         no strict 'refs';
