@@ -18,7 +18,7 @@ sub dump {
     $dumper->Purity($purity);
     $dumper->Useqq(0);
     $dumper->Deepcopy(1);
-    $dumper->Quotekeys(0);
+    $dumper->Quotekeys(1);
     $dumper->Terse(1);
 
     local $SIG{ __WARN__ } = sub { warn unless $_[ 0 ] =~ m{dummy} };
