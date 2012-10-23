@@ -129,11 +129,17 @@ sub run_tests {
             'TestApp::Controller::Action::Local',
             'Test Class'
         );
-        like(
-            $response->content,
-            qr~arguments => \[\s*'foo/bar'\s*\]~,
-            "Parameters don't split on %2F"
-        );
+        my $content = $response->content;
+        {
+            local $@;
+            my $request = eval $content;
+            if ($@) {
+                fail("Content cannot be unserialized: $@ $content");
+            }
+            else {
+                is_deeply $request->arguments, ['foo/bar'], "Parameters don't split on %2F";
+            }
+        }
     }
 
     {
