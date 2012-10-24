@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90018 - 2012-10-23 20:55:00
+  - Changed code in test suite so it no longer trips up on recent changes to
+    HTTP::Message.
+
 5.90017 - 2012-10-19 22:33:00
   - Change Catalsyt _parse_attrs so that when sub attr handlers:
 
