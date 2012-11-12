@@ -66,7 +66,7 @@ sub run_tests {
         ok(
             eval '$creq = ' . $response->content,
             'Unserialize Catalyst::Request'
-        );
+        ) or fail("EXCEPTION $@ DESERIALIZING " . $response->content);
         is_deeply( $creq->{arguments}, $expected, 'Arguments ok' );
     }
     

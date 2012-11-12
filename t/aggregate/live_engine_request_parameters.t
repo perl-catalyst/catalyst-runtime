@@ -30,12 +30,12 @@ use HTTP::Request::Common;
         'Content is a serialized Catalyst::Request'
     );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
-    isa_ok( $creq, 'Catalyst::Request' );
+    isa_ok( $creq, 'Catalyst::Request' )
+      or fail("EXCEPTION: $@");
     is( $creq->method, 'GET', 'Catalyst::Request method' );
     is_deeply( $creq->parameters, $parameters,
         'Catalyst::Request parameters' );
 }
-
 {
     my $creq;
     ok( my $response = request("http://localhost/dump/request?q=foo%2bbar"),

@@ -32,7 +32,8 @@ use HTTP::Request::Common;
         ok(
             eval '$creq = ' . $response->content,
             'Unserialize Catalyst::Request'
-        );
+        )
+        or fail("Failed to deserialize $@ from " . $response->content);
     }
 
     isa_ok( $creq, 'Catalyst::Request' );

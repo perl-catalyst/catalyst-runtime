@@ -29,7 +29,7 @@ use HTTP::Request::Common;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     like( $response->content, qr/^bless\( .* 'Catalyst::Request' \)$/s, 'Content is a serialized Catalyst::Request' );
-    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
+    ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' ) or fail("Exception deseializing $@ from content " . $response->content);
     isa_ok( $creq, 'Catalyst::Request' );
     ok( $creq->secure, 'Forwarded port sets secure' );
     isa_ok( $creq->headers, 'HTTP::Headers', 'Catalyst::Request->headers' );
