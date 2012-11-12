@@ -1,11 +1,17 @@
 package Catalyst::ScriptRole;
 use Moose::Role;
-use MooseX::Types::Moose qw/Str Bool/;
 use Pod::Usage;
 use MooseX::Getopt;
 use Catalyst::EngineLoader;
-use MooseX::Types::LoadableClass qw/LoadableClass/;
+use Moose::Util::TypeConstraints;
+use Catalyst::Utils qw/ ensure_class_loaded /;
 use namespace::autoclean;
+
+subtype 'Catalyst::ScriptRole::LoadableClass',
+  as 'ClassName';
+coerce 'Catalyst::ScriptRole::LoadableClass',
+  from 'Str',
+  via { ensure_class_loaded($_); 1 };
 
 with 'MooseX::Getopt' => {
     -excludes => [qw/
@@ -17,13 +23,13 @@ with 'MooseX::Getopt' => {
 
 has application_name => (
     traits   => ['NoGetopt'],
-    isa      => Str,
+    isa      => 'Str',
     is       => 'ro',
     required => 1,
 );
 
 has loader_class => (
-    isa => LoadableClass,
+    isa => 'Catalyst::ScriptRole::LoadableClass',
     is => 'ro',
     coerce => 1,
     default => 'Catalyst::EngineLoader',

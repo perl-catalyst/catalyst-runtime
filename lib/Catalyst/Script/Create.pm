@@ -1,6 +1,5 @@
 package Catalyst::Script::Create;
 use Moose;
-use MooseX::Types::Moose qw/Bool Str/;
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -8,7 +7,7 @@ with 'Catalyst::ScriptRole';
 has force => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'nonew',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     documentation => 'Force new scripts',
 );
@@ -16,7 +15,7 @@ has force => (
 has debug => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'd',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     documentation => 'Force debug mode',
 );
@@ -24,13 +23,13 @@ has debug => (
 has mechanize => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'mech',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     documentation => 'use WWW::Mechanize',
 );
 
 has helper_class => (
-    isa     => Str,
+    isa     => 'Str',
     is      => 'ro',
     builder => '_build_helper_class',
 );

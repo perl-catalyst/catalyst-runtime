@@ -1,6 +1,5 @@
 package Catalyst::Script::FastCGI;
 use Moose;
-use MooseX::Types::Moose qw/Str Bool Int/;
 use Data::OptList;
 use namespace::autoclean;
 
@@ -11,7 +10,7 @@ with 'Catalyst::ScriptRole';
 has listen => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'l',
-    isa           => Str,
+    isa           => 'Str',
     is            => 'ro',
     documentation => 'Specify a listening port/socket',
 );
@@ -19,14 +18,14 @@ has listen => (
 has pidfile => (
     traits        => [qw(Getopt)],
     cmd_aliases   => [qw/pid p/],
-    isa           => Str,
+    isa           => 'Str',
     is            => 'ro',
     documentation => 'Specify a pidfile',
 );
 
 has daemon => (
     traits        => [qw(Getopt)],
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     cmd_aliases   => [qw/d detach/], # Eww, detach is here as we fucked it up.. Deliberately not documented
     documentation => 'Daemonize (go into the background)',
@@ -34,7 +33,7 @@ has daemon => (
 
 has manager => (
     traits        => [qw(Getopt)],
-    isa           => Str,
+    isa           => 'Str',
     is            => 'ro',
     cmd_aliases   => 'M',
     documentation => 'Use a different FastCGI process manager class',
@@ -43,7 +42,7 @@ has manager => (
 has keeperr => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'e',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     documentation => 'Log STDERR',
 );
@@ -51,14 +50,14 @@ has keeperr => (
 has nproc => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'n',
-    isa           => Int,
+    isa           => 'Int',
     is            => 'ro',
     documentation => 'Specify a number of child processes',
 );
 
 has proc_title => (
     traits        => [qw(Getopt)],
-    isa           => Str,
+    isa           => 'Str',
     is            => 'ro',
     lazy          => 1,
     builder       => '_build_proc_title',

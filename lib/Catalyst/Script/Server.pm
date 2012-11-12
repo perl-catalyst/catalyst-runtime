@@ -1,7 +1,5 @@
 package Catalyst::Script::Server;
 use Moose;
-use MooseX::Types::Common::Numeric qw/PositiveInt/;
-use MooseX::Types::Moose qw/ArrayRef Str Bool Int RegexpRef/;
 use Catalyst::Utils;
 use Try::Tiny;
 use namespace::autoclean;
@@ -11,7 +9,7 @@ with 'Catalyst::ScriptRole';
 has debug => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'd',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     documentation => q{Force debug mode},
 );
@@ -19,7 +17,7 @@ has debug => (
 has host => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'h',
-    isa           => Str,
+    isa           => 'Str',
     is            => 'ro',
     # N.B. undef (the default) means we bind on all interfaces on the host.
     documentation => 'Specify a hostname or IP on this host for the server to bind to',
@@ -28,7 +26,7 @@ has host => (
 has fork => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'f',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     default       => 0,
     documentation => 'Fork the server to be able to serve multiple requests at once',
@@ -37,7 +35,7 @@ has fork => (
 has port => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'p',
-    isa           => PositiveInt,
+    isa           => 'Int',
     is            => 'ro',
     default       => sub {
         Catalyst::Utils::env_value(shift->application_name, 'port') || 3000
@@ -50,7 +48,7 @@ class_type 'MooseX::Daemonize::Pid::File';
 subtype 'Catalyst::Script::Server::Types::Pidfile',
     as 'MooseX::Daemonize::Pid::File';
 
-coerce 'Catalyst::Script::Server::Types::Pidfile', from Str, via {
+coerce 'Catalyst::Script::Server::Types::Pidfile', from 'Str', via {
     try { Class::MOP::load_class("MooseX::Daemonize::Pid::File") }
     catch {
         warn("Could not load MooseX::Daemonize::Pid::File, needed for --pid option\n");
@@ -91,7 +89,7 @@ sub BUILD {
 has keepalive => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'k',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     default       => 0,
     documentation => 'Support keepalive',
@@ -100,7 +98,7 @@ has keepalive => (
 has background => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'bg',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     default       => 0,
     documentation => 'Run in the background',
@@ -109,7 +107,7 @@ has background => (
 has restart => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'r',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     default       => sub {
         Catalyst::Utils::env_value(shift->application_name, 'reload') || 0;
@@ -120,7 +118,7 @@ has restart => (
 has restart_directory => (
     traits        => [qw(Getopt)],
     cmd_aliases   => [ 'rdir', 'restartdirectory' ],
-    isa           => ArrayRef[Str],
+    isa           => 'ArrayRef[Str]',
     is            => 'ro',
     documentation => 'Restarter directory to watch',
     predicate     => '_has_restart_directory',
@@ -129,7 +127,7 @@ has restart_directory => (
 has restart_delay => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'rd',
-    isa           => Int,
+    isa           => 'Int',
     is            => 'ro',
     documentation => 'Set a restart delay',
     predicate     => '_has_restart_delay',
@@ -138,8 +136,8 @@ has restart_delay => (
 {
     use Moose::Util::TypeConstraints;
 
-    my $tc = subtype 'Catalyst::Script::Server::Types::RegexpRef', as RegexpRef;
-    coerce $tc, from Str, via { qr/$_/ };
+    my $tc = subtype 'Catalyst::Script::Server::Types::RegexpRef', as 'RegexpRef';
+    coerce $tc, from 'Str', via { qr/$_/ };
 
     MooseX::Getopt::OptionTypeMap->add_option_type_to_map($tc => '=s');
 
@@ -157,7 +155,7 @@ has restart_delay => (
 has follow_symlinks => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'sym',
-    isa           => Bool,
+    isa           => 'Bool',
     is            => 'ro',
     default       => 0,
     documentation => 'Follow symbolic links',
@@ -187,7 +185,7 @@ sub _restarter_args {
 
 has restarter_class => (
     is => 'ro',
-    isa => Str,
+    isa => 'Str',
     lazy => 1,
     default => sub {
         my $self = shift;
