@@ -17,7 +17,7 @@ sub ok_actions {
         (map { "TestApp::Controller::Attributes->$_" } @$actions),
         'TestApp::Controller::Root->end';
     is( $response->header('x-catalyst-executed') => $expected,
-        $msg//'Executed correct acitons');
+        $msg || 'Executed correct acitons');
     }
 
 ok( my $response = request('http://localhost/attributes/view'),
