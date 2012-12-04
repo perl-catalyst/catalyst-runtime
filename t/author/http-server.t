@@ -9,8 +9,15 @@ use Test::TCP;
 use Try::Tiny;
 use Plack::Builder;
 
-use Catalyst::Devel 1.0;
-use File::Copy::Recursive;
+eval { require Catalyst::Devel; Catalyst::Devel->VERSION(1.0); 1; } || do {
+    fail("Could not load Catalyst::Devel: $@");
+    exit 1;
+};
+
+eval { require File::Copy::Recursive; 1 } || do {
+    fail("Could not load File::Copy::Recursive: $@");
+    exit 1;
+};
 
 # Run a single test by providing it as the first arg
 my $single_test = shift;
