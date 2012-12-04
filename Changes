@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90019 - 2012-12-04 21:31:00
   - Fix for perl 5.17.6 (commit g7dc8663). RT#81601
   - Fix for perl 5.8. RT#61122
   - Remove use of MooseX::Types as MooseX::Types is broken on perl5.8
