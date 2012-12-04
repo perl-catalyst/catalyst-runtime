@@ -1109,7 +1109,8 @@ sub run_tests {
             get('http://localhost/' . $path),
             'request ' . $path . ' ok');
         my $exp = URI->new('http://localhost:3000' . $path);
-        my $got = URI->new($content);
+        my ($want) = $content =~ m{/chained/(.*)};
+        my $got = URI->new('http://localhost:3000/chained/' . $want);
         # Just check that the path matches, as who the hell knows or cares
         # where the app is based (live tests etc)
         is $got->path, $exp->path, "uri $path can round trip through uri_for (path)"
