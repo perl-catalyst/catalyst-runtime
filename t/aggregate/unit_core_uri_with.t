@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use URI;
+use URI::QueryParam;
 use Catalyst::Log;
 
 use_ok('Catalyst::Request');
@@ -14,9 +15,7 @@ sub cmp_uri {
     foreach my $thing (qw/ scheme host path /) {
         is $exp->$thing, $got->$thing, "$comment: $thing";
     }
-    my %got_q = map { split /=/ } split /\&/, ($got->query||'');
-    my %exp_q = map { split /=/ } split /\&/, ($exp->query||'');
-    is_deeply \%got_q, \%exp_q, "$comment: query";
+    is_deeply $got->query_form_hash, $exp->query_form_hash, "$comment: query";
 }
 
 my $request = Catalyst::Request->new( {

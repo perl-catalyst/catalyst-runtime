@@ -11,6 +11,8 @@ our $iters;
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
 use Test::More;
+use URI;
+use URI::QueryParam;
 use Catalyst::Test 'TestApp';
 
 if ( $ENV{CAT_BENCHMARK} ) {
@@ -1115,9 +1117,7 @@ sub run_tests {
         # where the app is based (live tests etc)
         is $got->path, $exp->path, "uri $path can round trip through uri_for (path)"
             or diag("Expected $path, got $content");
-        my %got_q = map { split /=/ } split /\&/, ($got->query||'');
-        my %exp_q = map { split /=/ } split /\&/, ($exp->query||'');
-        is_deeply \%got_q, \%exp_q, "uri $path can round trip through uri_for (query)"
+        is_deeply $got->query_form_hash, $exp->query_form_hash, "uri $path can round trip through uri_for (query)"
             or diag("Expected $path, got $content");
     }
 
