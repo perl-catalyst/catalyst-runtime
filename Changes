@@ -11,7 +11,7 @@
     HTTP::Message.
 
 5.90017 - 2012-10-19 22:33:00
-  - Change Catalsyt _parse_attrs so that when sub attr handlers:
+  - Change Catalyst _parse_attrs so that when sub attr handlers:
 
     1) Can return multiple pairs of new attributes.
     2) Get their returned attributes passed through the correct attribute handler.
