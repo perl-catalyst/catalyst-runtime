@@ -12,7 +12,7 @@ use lib "$Bin/../lib";
     use Moose;
     with 'Catalyst::ScriptRole';
     our $help;
-    sub _getopt_full_usage { $help++ }
+    sub print_usage_text { $help++ }
 }
 
 test('--help');
