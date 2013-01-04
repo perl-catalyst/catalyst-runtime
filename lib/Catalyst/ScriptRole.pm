@@ -17,7 +17,7 @@ with 'MooseX::Getopt' => {
     -excludes => [qw/
         _getopt_spec_warnings
         _getopt_spec_exception
-        print_usage_text
+        _getopt_full_usage
     /],
 };
 
@@ -56,7 +56,7 @@ sub _getopt_spec_warnings {
     warn @_;
 }
 
-sub print_usage_text {
+sub _getopt_full_usage {
     my $self = shift;
     pod2usage();
     exit 0;
