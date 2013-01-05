@@ -14,10 +14,11 @@ coerce 'Catalyst::ScriptRole::LoadableClass',
   via { ensure_class_loaded($_); 1 };
 
 with 'MooseX::Getopt' => {
+    -version => 0.48,
     -excludes => [qw/
         _getopt_spec_warnings
         _getopt_spec_exception
-        _getopt_full_usage
+        print_usage_text
     /],
 };
 
@@ -56,7 +57,10 @@ sub _getopt_spec_warnings {
     warn @_;
 }
 
-sub _getopt_full_usage {
+=for Pod::Coverage
+    print_usage_text
+=cut
+sub print_usage_text {
     my $self = shift;
     pod2usage();
     exit 0;
