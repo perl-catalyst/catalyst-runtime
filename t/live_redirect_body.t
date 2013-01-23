@@ -44,5 +44,20 @@ use Test::More;
     like( $response->content, qr/kind sir/, 'Content contains content set by the Controller' );
 }
 
+# test redirect with dodgy host
+{
+    local $Catalyst::Test::default_host = "-->\">'>'\"<sfi000003v407412>";
+    my $request  =
+      HTTP::Request->new( GET => 'http://localhost:3000/test_redirect_uri_for');
+
+    ok( my $response = request($request), 'Request' );
+    is( $response->code, 302, 'Response Code' );
+
+    # When no body and no content_type has been set, redirecting should set both.
+    is( $response->header( 'Content-Type' ), 'text/html; charset=utf-8', 'Content Type' );
+    like( $response->content, qr/<body>/, 'Content contains HTML body' );
+    like( $response->content, qr/href="[^"]+">here<\/a>/, 'link doesn\'t have xss' );
+}
+
 done_testing;
 

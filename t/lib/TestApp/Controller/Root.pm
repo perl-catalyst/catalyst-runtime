@@ -91,6 +91,13 @@ sub test_redirect :Global {
     $c->res->redirect('/go_here');
 }
 
+sub test_redirect_uri_for :Global {
+    my ($self, $c) = @_;
+    # Don't set content_type
+    # Don't set body
+    $c->res->redirect($c->uri_for('/go_here'));
+}
+
 sub test_redirect_with_contenttype :Global {
     my ($self, $c) = @_;
     # set content_type but don't set body
