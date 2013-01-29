@@ -57,9 +57,6 @@ sub _getopt_spec_warnings {
     warn @_;
 }
 
-=for Pod::Coverage
-    print_usage_text
-=cut
 sub print_usage_text {
     my $self = shift;
     pod2usage();
@@ -126,6 +123,10 @@ Role with the common functionality of Catalyst scripts.
 =head2 run
 
 The method invoked to run the application.
+
+=head2 print_usage_text
+
+Prints out the useage text for the script you tried to invoke.
 
 =head1 ATTRIBUTES
 
