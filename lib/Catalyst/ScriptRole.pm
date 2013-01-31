@@ -126,7 +126,7 @@ The method invoked to run the application.
 
 =head2 print_usage_text
 
-Prints out the useage text for the script you tried to invoke.
+Prints out the usage text for the script you tried to invoke.
 
 =head1 ATTRIBUTES
 
