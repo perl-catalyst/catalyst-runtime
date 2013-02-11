@@ -1,6 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90020 - TBA
+  ! Catalyst::Action now defines 'match_captures' so it is no long considered
+    an optional method.  This might break you code if you have made custom
+    action roles/classes where you define 'match_captures'.  You must change
+    your code to use a method modifier (such as 'around').
+  - New match method "Method($HTTP_METHOD)" where $HTTP_METHOD in (GET, POST,
+    PUT, HEAD, DELETE, OPTION) and shortcuts in controllers called "GET, POST
+    PUT, HEAD, DELETE, OPTION").  Tests and superficial docs (sorry)
+  - security fixes in the way we handle redirects
   - Make Catalyst::Engine and Catalyst::Base immutable
+  - Some test and documentation improvements
 
 5.90019 - 2012-12-04 21:31:00
   - Fix for perl 5.17.6 (commit g7dc8663). RT#81601
