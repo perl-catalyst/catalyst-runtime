@@ -88,13 +88,13 @@ sub _match_has_expected_args {
   return scalar( @{$req_args} ) == $args;
 }
 
-sub _match_has_expected_capture_args {
-  my ($self, $req_args) = @_;
-  return 1 unless exists $self->attributes->{CaptureArgs};
-  my $args = $self->attributes->{CaptureArgs}[0];
-  return 1 unless defined($args) && length($args);
-  return scalar( @{$req_args} ) == $args;
-}
+#sub _match_has_expected_capture_args {
+#  my ($self, $req_args) = @_;
+#  return 1 unless exists $self->attributes->{CaptureArgs};
+#  my $args = $self->attributes->{CaptureArgs}[0];
+#  return 1 unless defined($args) && length($args);
+#  return scalar( @{$req_args} ) == $args;
+#}
 
 sub _match_has_expected_http_method {
   my ($self, $method) = @_;
