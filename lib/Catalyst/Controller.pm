@@ -784,8 +784,12 @@ preferred to use L</Does>.
 
 =head2 MyAction
 
-Set the ActionClass using a custom Action in your project namespace (such as
-C<MyApp::Action::MyAction> => MyAction('MyAction').
+Set the ActionClass using a custom Action in your project namespace.
+
+The following is exactly the same:
+
+    sub foo_action1 : Local ActionClass('+MyApp::Action::Bar') { ... }
+    sub foo_action2 : Local MyAction('Bar') { ... }
 
 =head2 Does
 
