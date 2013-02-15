@@ -2,7 +2,7 @@ package Catalyst::ActionRole::HTTPMethods;
 
 use Moose::Role;
 
-requires 'match', 'match_captures';
+requires 'match', 'match_captures', 'list_extra_info';
 
 around ['match','match_captures'], sub {
   my ($orig, $self, $ctx, @args) = @_;
@@ -28,6 +28,8 @@ sub _has_expected_http_method {
 }
 
 sub allowed_http_methods { @{shift->attributes->{Method}||[]} }
+
+sub list_extra_info { sort shift->allowed_http_methods }
 
 1;
 
@@ -111,6 +113,10 @@ allowed methods (see L</http_methods>) and zero otherwise.
 
 An array of strings that are the allowed http methods for matching this action
 normalized as noted above (using X-Method* overrides).
+
+=head2 list_extra_info
+
+Returns an array of the allowed HTTP Methods, sorted.
 
 =head2 _has_expected_http_method ($expected)
 

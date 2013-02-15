@@ -103,6 +103,8 @@ sub number_of_captures {
     return $self->attributes->{CaptureArgs}[0] || 0;
 }
 
+sub list_extra_info { } 
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -179,6 +181,10 @@ Returns the number of args this action expects. This is 0 if the action doesn't 
 =head2 number_of_captures
 
 Returns the number of captures this action expects for L<Chained|Catalyst::DispatchType::Chained> actions.
+
+=head2 list_extra_info
+
+An array of values useful to improve debugging
 
 =head2 meta
 
