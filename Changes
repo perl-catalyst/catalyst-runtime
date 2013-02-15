@@ -7,7 +7,10 @@
     your code to use a method modifier (such as 'around').
   - New match method "Method($HTTP_METHOD)" where $HTTP_METHOD in (GET, POST,
     PUT, HEAD, DELETE, OPTION) and shortcuts in controllers called "GET, POST
-    PUT, HEAD, DELETE, OPTION").  Tests and superficial docs (sorry)
+    PUT, HEAD, DELETE, OPTION").  Tests and documentation.  Please note if you
+    are currently using Catalyst::ActionRole::MatchRequestMethods there may
+    be compatibility issues.  You should remove that actionrole since the built
+    in behavior is compatible on its own.
   - security fixes in the way we handle redirects
   - Make Catalyst::Engine and Catalyst::Base immutable
   - Some test and documentation improvements

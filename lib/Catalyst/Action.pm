@@ -65,48 +65,18 @@ sub execute {
   $self->code->(@_);
 }
 
-sub match_captures { 
-  my ( $self, $c, $captures ) = @_;
-  ## It would seem that now that we can match captures, we could remove a lot
-  ## of the capture_args to args mapping all around.  I gave it a go, but was
-  ## not trival, contact jnap on irc for what I tried if you want to try.
-  ##  return $self->_match_has_expected_capture_args($captures) &&
-    return $self->_match_has_expected_http_method($c->req->method);
-}
-
 sub match {
-  my ( $self, $c ) = @_;
-  return $self->_match_has_expected_args($c->req->args) &&
-    $self->_match_has_expected_http_method($c->req->method);
+    my ( $self, $c ) = @_;
+    #would it be unreasonable to store the number of arguments
+    #the action has as its own attribute?
+    #it would basically eliminate the code below.  ehhh. small fish
+    return 1 unless exists $self->attributes->{Args};
+    my $args = $self->attributes->{Args}[0];
+    return 1 unless defined($args) && length($args);
+    return scalar( @{ $c->req->args } ) == $args;
 }
 
-sub _match_has_expected_args {
-  my ($self, $req_args) = @_;
-  return 1 unless exists $self->attributes->{Args};
-  my $args = $self->attributes->{Args}[0];
-  return 1 unless defined($args) && length($args);
-  return scalar( @{$req_args} ) == $args;
-}
-
-#sub _match_has_expected_capture_args {
-#  my ($self, $req_args) = @_;
-#  return 1 unless exists $self->attributes->{CaptureArgs};
-#  my $args = $self->attributes->{CaptureArgs}[0];
-#  return 1 unless defined($args) && length($args);
-#  return scalar( @{$req_args} ) == $args;
-#}
-
-sub _match_has_expected_http_method {
-  my ($self, $method) = @_;
-  my @methods = @{ $self->attributes->{Method} || [] };
-  if(scalar @methods) {
-    my $result = scalar(grep { lc($_) eq lc($method) } @methods) ? 1:0;
-    return $result;
-  } else {
-    ## No HTTP Methods to check
-    return 1;
-  }
-}
+sub match_captures { 1 }
 
 sub compare {
     my ($a1, $a2) = @_;

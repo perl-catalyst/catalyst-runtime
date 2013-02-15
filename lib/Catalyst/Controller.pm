@@ -333,6 +333,8 @@ sub create_action {
 
     unless ($args{name} =~ /^_(DISPATCH|BEGIN|AUTO|ACTION|END)$/) {
        my @roles = $self->gather_action_roles(%args);
+       push @roles, $self->gather_default_action_roles(%args);
+
        $class = $self->_apply_action_class_roles($class, @roles) if @roles;
     }
 
@@ -352,11 +354,18 @@ sub create_action {
 
 sub gather_action_roles {
    my ($self, %args) = @_;
-
    return (
       (blessed $self ? $self->_action_roles : ()),
       @{ $args{attributes}->{Does} || [] },
    );
+}
+
+sub gather_default_action_roles {
+  my ($self, %args) = @_;
+  my @roles = ();
+  push @roles, 'Catalyst::ActionRole::HTTPMethods'
+    if $args{attributes}->{Method};
+  return @roles;
 }
 
 sub _parse_attrs {
@@ -694,6 +703,12 @@ Catalyst::Action (or appropriate sub/alternative class) object.
 
 Gathers the list of roles to apply to an action with the given %action_args.
 
+=head2 $self->gather_default_action_roles(\%action_args)
+
+returns a list of action roles to be applied based on core, builtin rules.
+Currently only the L<Catalyst::ActionRole::HTTPMethods> role is applied
+this way.
+
 =head2 $self->_application
 
 =head2 $self->_app
@@ -811,7 +826,13 @@ The following is exactly the same:
 
 =head2 HEAD
 
-Sets the give action path to match the specified HTTP method.
+=head2 PATCH
+
+=head2 Method('...')
+
+Sets the give action path to match the specified HTTP method, or via one of the
+broadly accepted methods of overriding the 'true' method (see
+L<Catalyst::ActionRole::HTTPMethods>).
 
 =head2 Args
 
