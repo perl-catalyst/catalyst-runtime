@@ -29,13 +29,7 @@ sub _has_expected_http_method {
 
 sub allowed_http_methods { @{shift->attributes->{Method}||[]} }
 
-around 'list_extra_info', sub {
-  my ($orig, $self, @args) = @_;
-  return {
-    %{ $self->$orig(@args) }, 
-    +{ HTTP_METHODS => [sort $self->allowed_http_methods] }
-  };
-};
+sub list_extra_info { sort shift->allowed_http_methods }
 
 1;
 
@@ -122,9 +116,7 @@ normalized as noted above (using X-Method* overrides).
 
 =head2 list_extra_info
 
-Adds a key => [@values] "HTTP_METHODS" whose value is an ArrayRef of sorted
-allowed methods to the ->list_extra_info HashRef.  This is used primarily for
-debugging output.
+Returns an array of the allowed HTTP Methods, sorted.
 
 =head2 _has_expected_http_method ($expected)
 

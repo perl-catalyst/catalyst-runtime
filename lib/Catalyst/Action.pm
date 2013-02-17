@@ -103,7 +103,13 @@ sub number_of_captures {
     return $self->attributes->{CaptureArgs}[0] || 0;
 }
 
-sub list_extra_info { } 
+sub list_extra_info {
+  my $self = shift;
+  return {
+    Args => $self->attributes->{Args}[0],
+    CaptureArgs => $self->number_of_captures,
+  }
+} 
 
 __PACKAGE__->meta->make_immutable;
 
@@ -184,7 +190,7 @@ Returns the number of captures this action expects for L<Chained|Catalyst::Dispa
 
 =head2 list_extra_info
 
-An array of values useful to improve debugging
+A HashRef of key-values that an action can provide to a debugging screen
 
 =head2 meta
 

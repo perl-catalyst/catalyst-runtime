@@ -96,14 +96,14 @@ sub list {
                   sort { $a->reverse cmp $b->reverse }
                            @{ $self->_endpoints }
                   ) {
-        my $args = $endpoint->attributes->{Args}->[0];
+        my $args = $endpoint->list_extra_info->{Args};
         my @parts = (defined($args) ? (("*") x $args) : '...');
         my @parents = ();
         my $parent = "DUMMY";
         my $curr = $endpoint;
         while ($curr) {
-            if (my $cap = $curr->attributes->{CaptureArgs}) {
-                unshift(@parts, (("*") x $cap->[0]));
+            if (my $cap = $curr->list_extra_info->{CaptureArgs}) {
+                unshift(@parts, (("*") x $cap));
             }
             if (my $pp = $curr->attributes->{PathPart}) {
                 unshift(@parts, $pp->[0])
@@ -121,8 +121,8 @@ sub list {
         my @rows;
         foreach my $p (@parents) {
             my $name = "/${p}";
-            if (my $cap = $p->attributes->{CaptureArgs}) {
-                $name .= ' ('.$cap->[0].')';
+            if (defined(my $cap = $p->list_extra_info->{CaptureArgs})) {
+                $name .= ' ('.$cap.')';
             }
             unless ($p eq $parents[0]) {
                 $name = "-> ${name}";
