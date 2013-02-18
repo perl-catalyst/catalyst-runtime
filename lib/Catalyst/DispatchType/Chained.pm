@@ -127,6 +127,9 @@ sub list {
             unless ($p eq $parents[0]) {
                 $name = "-> ${name}";
             }
+            if (defined(my $extra = $p->list_extra_info->{HTTP_METHODS})) {
+                $name .= ' ('.join(', ', @$extra).')';
+            }
             push(@rows, [ '', $name ]);
         }
         push(@rows, [ '', (@rows ? "=> " : '')."/${endpoint}" ]);
