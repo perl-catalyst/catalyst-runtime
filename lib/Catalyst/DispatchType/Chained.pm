@@ -100,6 +100,7 @@ sub list {
         my @parts = (defined($args) ? (("*") x $args) : '...');
         my @parents = ();
         my $parent = "DUMMY";
+        my $extra  = $self->_list_extra_http_methods($endpoint);
         my $curr = $endpoint;
         while ($curr) {
             if (my $cap = $curr->list_extra_info->{CaptureArgs}) {
@@ -121,18 +122,19 @@ sub list {
         my @rows;
         foreach my $p (@parents) {
             my $name = "/${p}";
+
+            if (defined(my $extra = $self->_list_extra_http_methods($p))) {
+                $name = "${extra} ${name}";
+            }
             if (defined(my $cap = $p->list_extra_info->{CaptureArgs})) {
                 $name .= ' ('.$cap.')';
             }
             unless ($p eq $parents[0]) {
                 $name = "-> ${name}";
             }
-            if (defined(my $extra = $p->list_extra_info->{HTTP_METHODS})) {
-                $name .= ' ('.join(', ', @$extra).')';
-            }
             push(@rows, [ '', $name ]);
         }
-        push(@rows, [ '', (@rows ? "=> " : '')."/${endpoint}" ]);
+        push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : '')."/${endpoint}" ]);
         $rows[0][0] = join('/', '', @parts) || '/';
         $paths->row(@$_) for @rows;
     }
@@ -140,6 +142,12 @@ sub list {
     $c->log->debug( "Loaded Chained actions:\n" . $paths->draw . "\n" );
     $c->log->debug( "Unattached Chained actions:\n", $unattached_actions->draw . "\n" )
         if $has_unattached_actions;
+}
+
+sub _list_extra_http_methods {
+    my ( $self, $action ) = @_;
+    return unless defined $action->list_extra_info->{HTTP_METHODS};
+    return join(', ', @{$action->list_extra_info->{HTTP_METHODS}});
 }
 
 =head2 $self->match( $c, $path )
