@@ -11,6 +11,7 @@
     are currently using Catalyst::ActionRole::MatchRequestMethods there may
     be compatibility issues.  You should remove that actionrole since the built
     in behavior is compatible on its own.
+  - Initial debug screen now shows HTTP Method Match info
   - security fixes in the way we handle redirects
   - Make Catalyst::Engine and Catalyst::Base immutable
   - Some test and documentation improvements
