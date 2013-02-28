@@ -92,13 +92,13 @@ sub _log {
     my $self    = shift;
     my $level   = shift;
     my $message = join( "\n", @_ );
-    $message .= "\n" unless $message =~ /\n$/;
     if ($self->can('has_psgienv') and $self->has_psgienv and $self->psgienv->{'psgix.logger'}) {
         $self->psgienv->{'psgix.logger'}->({
                 level => $level,
                 message => $message,
             });
     } else {
+        $message .= "\n" unless $message =~ /\n$/;
         my $body = $self->_body;
         $body .= sprintf( "[%s] %s", $level, $message );
         $self->_body($body);
