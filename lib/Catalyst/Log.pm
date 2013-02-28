@@ -13,6 +13,7 @@ our %LEVEL_MATCH = (); # Stored as additive, thus debug = 31, warn = 30 etc
 has level => (is => 'rw');
 has _body => (is => 'rw');
 has abort => (is => 'rw');
+has psgienv => (is => 'rw', predicate => 'has_psgienv', clearer => 'clear_psgienv');
 
 {
     my @levels = qw[ debug info warn error fatal ];
@@ -92,9 +93,16 @@ sub _log {
     my $level   = shift;
     my $message = join( "\n", @_ );
     $message .= "\n" unless $message =~ /\n$/;
-    my $body = $self->_body;
-    $body .= sprintf( "[%s] %s", $level, $message );
-    $self->_body($body);
+    if ($self->can('has_psgienv') and $self->has_psgienv and $self->psgienv->{'psgix.logger'}) {
+        $self->psgienv->{'psgix.logger'}->({
+                level => $level,
+                message => $message,
+            });
+    } else {
+        my $body = $self->_body;
+        $body .= sprintf( "[%s] %s", $level, $message );
+        $self->_body($body);
+    }
 }
 
 sub _flush {
@@ -110,7 +118,11 @@ sub _flush {
 
 sub _send_to_log {
     my $self = shift;
-    print STDERR @_;
+    if ($self->can('has_psgienv') and $self->has_psgienv) {
+        $self->psgienv->{'psgi.errors'}->print(@_);
+    } else {
+        print STDERR @_;
+    }
 }
 
 # 5.7 compat code.

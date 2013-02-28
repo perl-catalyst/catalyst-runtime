@@ -543,6 +543,7 @@ Populate the context object from the request object.
 
 sub prepare_request {
     my ($self, $ctx, %args) = @_;
+    $ctx->log->psgienv($args{env}) if $ctx->log->can('psgienv');
     $ctx->request->_set_env($args{env});
     $self->_set_env($args{env}); # Nasty back compat!
     $ctx->response->_set_response_cb($args{response_cb});

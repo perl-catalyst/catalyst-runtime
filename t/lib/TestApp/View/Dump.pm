@@ -39,6 +39,10 @@ sub process {
     # Remove context from reference if needed
     my $context = delete $reference->{_context};
 
+    if (my $log = $reference->{_log}) {
+        $log->clear_psgienv if $log->can('psgienv');
+    }
+
     if ( my $output =
         $self->dump( $reference, $purity ) )
     {
