@@ -1,3 +1,20 @@
+=head1 PROBLEM
+
+In https://github.com/plack/Plack/commit/cafa5db84921f020183a9c834fd6a4541e5a6b84
+chansen made a change to the FCGI handler in Plack, in which he replaced
+STDERR, STDOUT and STDIN with proper IO::Handle objects.
+
+The side effect of that change is that catalyst outputing logs on STDERR will
+no longer end up by default in the error log of the webserver when running
+under FCGI. This test tries to make sure we use the propper parts of the psgi
+environment when we output things from Catalyst::Log.
+
+There is one more "regression", and that is warnings. By using
+Catalyst::Plugin::LogWarnings, you also get those in the right place if this
+test passes :)
+
+=cut
+
 use strict;
 use warnings;
 no warnings 'once';
