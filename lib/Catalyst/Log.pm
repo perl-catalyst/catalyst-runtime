@@ -13,7 +13,22 @@ our %LEVEL_MATCH = (); # Stored as additive, thus debug = 31, warn = 30 etc
 has level => (is => 'rw');
 has _body => (is => 'rw');
 has abort => (is => 'rw');
-has psgienv => (is => 'rw', predicate => 'has_psgienv', clearer => 'clear_psgienv');
+has psgi_logger => (is => 'rw', predicate => 'has_psgi_logger', clearer => '_clear_psgi_logger');
+has psgi_errors => (is => 'rw', predicate => 'has_psgi_errors', clearer => '_clear_psgi_errors');
+
+sub clear_psgi {
+    my $self = shift;
+    $self->_clear_psgi_logger;
+    $self->_clear_psgi_errors;
+}
+
+sub psgienv {
+    my ($self, $env) = @_;
+
+    $self->psgi_logger($env->{'psgix.logger'}) if $env->{'psgix.logger'};
+    $self->psgi_errors($env->{'psgi.errors'}) if $env->{'psgi.errors'};
+}
+
 
 {
     my @levels = qw[ debug info warn error fatal ];
@@ -92,8 +107,8 @@ sub _log {
     my $self    = shift;
     my $level   = shift;
     my $message = join( "\n", @_ );
-    if ($self->can('has_psgienv') and $self->has_psgienv and $self->psgienv->{'psgix.logger'}) {
-        $self->psgienv->{'psgix.logger'}->({
+    if ($self->can('has_psgi_logger') and $self->has_psgi_logger) {
+        $self->psgi_logger->({
                 level => $level,
                 message => $message,
             });
@@ -118,8 +133,8 @@ sub _flush {
 
 sub _send_to_log {
     my $self = shift;
-    if ($self->can('has_psgienv') and $self->has_psgienv) {
-        $self->psgienv->{'psgi.errors'}->print(@_);
+    if ($self->can('has_psgi_errors') and $self->has_psgi_errors) {
+        $self->psgi_errors->print(@_);
     } else {
         print STDERR @_;
     }
