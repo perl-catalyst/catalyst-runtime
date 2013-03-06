@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90020 - TBA
+5.90021 - TBA
+  - Added 'x-tunneled-method' HTTP Header method override to match features in
+    Catalyst::Action::REST and in other similar systems on CPAN
+
+5.90020 - 2013-02-22
   ! Catalyst::Action now defines 'match_captures' so it is no long considered
     an optional method.  This might break you code if you have made custom
     action roles/classes where you define 'match_captures'.  You must change
