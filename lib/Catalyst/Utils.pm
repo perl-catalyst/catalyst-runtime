@@ -173,12 +173,14 @@ These are:
 
 =item dist.ini
 
+=item L<cpanfile>
+
 =back
 
 =cut
 
 sub dist_indicator_file_list {
-    qw{Makefile.PL Build.PL dist.ini};
+    qw{Makefile.PL Build.PL dist.ini cpanfile};
 }
 
 sub home {
