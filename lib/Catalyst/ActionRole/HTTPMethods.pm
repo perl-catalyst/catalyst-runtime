@@ -17,6 +17,7 @@ sub _normalize_expected_http_method {
   return $req->header('X-HTTP-Method') ||
     $req->header('X-HTTP-Method-Override') ||
     $req->header('X-METHOD-OVERRIDE') ||
+    $req->header('x-tunneled-method') ||
     $req->method;
 }
 
@@ -86,6 +87,8 @@ work well with existing systems and common client side tools.
 =item X-HTTP-Method-Override (Google/GData)
 
 =item X-METHOD-OVERRIDE (IBM)
+
+=item x-tunneled-method (used in many other similar systems on CPAN
 
 =back 
 
