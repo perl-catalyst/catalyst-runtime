@@ -46,8 +46,8 @@ use HTTP::Request::Common;
     no Moose;
 }
 
-
-subtest "psgi.errors" => sub{
+#subtest "psgi.errors" => sub
+{
 
     my $handle = MockHandle->new();
     my $app = builder {
@@ -69,12 +69,13 @@ subtest "psgi.errors" => sub{
         my $cb = shift;
         my $res = $cb->(GET "/log/debug");
         my @logs = $handle->logs;
-        is(scalar(@logs), 1, "one event output");
-        like($logs[0], qr/debug$/, "event matches test data");
+        is(scalar(@logs), 1, "psgi.errors: one event output");
+        like($logs[0], qr/debug$/, "psgi.errors: event matches test data");
     };
 };
 
-subtest "psgix.logger" => sub {
+#subtest "psgix.logger" => sub
+{
 
     my @logs;
     my $logger = sub {
@@ -95,8 +96,8 @@ subtest "psgix.logger" => sub {
     test_psgi $app, sub {
         my $cb = shift;
         my $res = $cb->(GET "/log/debug");
-        is(scalar(@logs), 1, "one event logged");
-        is_deeply($logs[0], { level => 'debug', message => "debug" }, "right stuff");
+        is(scalar(@logs), 1, "psgix.logger: one event logged");
+        is_deeply($logs[0], { level => 'debug', message => "debug" }, "psgix.logger: right stuff");
     };
 };
 
