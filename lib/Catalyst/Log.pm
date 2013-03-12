@@ -290,6 +290,17 @@ This protected method is what actually sends the log information to STDERR.
 You may subclass this module and override this method to get finer control
 over the log output.
 
+=head2 psgienv $env
+
+    $log->psgienv($env);
+
+NOTE: This is not meant for public consumption.
+
+Set the PSGI environment for this request. This ensures logs will be sent to
+the right place. If the environment has a C<psgix.logger>, it will be used. If
+not, we will send logs to C<psgi.errors> if that exists. As a last fallback, we
+will send to STDERR as before.
+
 =head2 meta
 
 =head1 SEE ALSO
