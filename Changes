@@ -1,6 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90021 - TBA
+  - Added cpanfile as a way to notice we are a dev checkout
   - Added 'x-tunneled-method' HTTP Header method override to match features in
     Catalyst::Action::REST and in other similar systems on CPAN
 
