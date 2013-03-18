@@ -212,16 +212,16 @@ sub recurse_match {
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
             if (my $capture_attr = $action->attributes->{CaptureArgs}) {
-                $capture_attr ||= 0;
+                my $capture_count = $capture_attr->[0] || 0;
 
                 # Short-circuit if not enough remaining parts
-                next TRY_ACTION unless @parts >= $capture_attr->[0];
+                next TRY_ACTION unless @parts >= $capture_count;
 
                 my @captures;
                 my @parts = @parts; # localise
 
                 # strip CaptureArgs into list
-                push(@captures, splice(@parts, 0, $capture_attr->[0]));
+                push(@captures, splice(@parts, 0, $capture_count));
 
                 # check if the action may fit, depending on a given test by the app
                 if ($action->can('match_captures')) { next TRY_ACTION unless $action->match_captures($c, \@captures) }
