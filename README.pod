@@ -38,4 +38,4 @@ app.
 
 If you would like to contribute to Catalyst, please 
 L<join us|http://chat.mibbit.com/#catalyst@irc.perl.org> on IRC,
-or visit the L<maillist|http://lists.scsys.co.uk/mailman/listinfo/catalyst>.
+or visit the L<mailing list|http://lists.scsys.co.uk/mailman/listinfo/catalyst>.
