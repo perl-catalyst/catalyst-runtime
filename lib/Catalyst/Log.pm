@@ -13,6 +13,22 @@ our %LEVEL_MATCH = (); # Stored as additive, thus debug = 31, warn = 30 etc
 has level => (is => 'rw');
 has _body => (is => 'rw');
 has abort => (is => 'rw');
+has _psgi_logger => (is => 'rw', predicate => '_has_psgi_logger', clearer => '_clear_psgi_logger');
+has _psgi_errors => (is => 'rw', predicate => '_has_psgi_errors', clearer => '_clear_psgi_errors');
+
+sub clear_psgi {
+    my $self = shift;
+    $self->_clear_psgi_logger;
+    $self->_clear_psgi_errors;
+}
+
+sub psgienv {
+    my ($self, $env) = @_;
+
+    $self->_psgi_logger($env->{'psgix.logger'}) if $env->{'psgix.logger'};
+    $self->_psgi_errors($env->{'psgi.errors'}) if $env->{'psgi.errors'};
+}
+
 
 {
     my @levels = qw[ debug info warn error fatal ];
@@ -91,10 +107,17 @@ sub _log {
     my $self    = shift;
     my $level   = shift;
     my $message = join( "\n", @_ );
-    $message .= "\n" unless $message =~ /\n$/;
-    my $body = $self->_body;
-    $body .= sprintf( "[%s] %s", $level, $message );
-    $self->_body($body);
+    if ($self->can('_has_psgi_logger') and $self->_has_psgi_logger) {
+        $self->_psgi_logger->({
+                level => $level,
+                message => $message,
+            });
+    } else {
+        $message .= "\n" unless $message =~ /\n$/;
+        my $body = $self->_body;
+        $body .= sprintf( "[%s] %s", $level, $message );
+        $self->_body($body);
+    }
 }
 
 sub _flush {
@@ -110,7 +133,11 @@ sub _flush {
 
 sub _send_to_log {
     my $self = shift;
-    print STDERR @_;
+    if ($self->can('_has_psgi_errors') and $self->_has_psgi_errors) {
+        $self->_psgi_errors->print(@_);
+    } else {
+        print STDERR @_;
+    }
 }
 
 # 5.7 compat code.
@@ -262,6 +289,17 @@ to use Log4Perl or another logger, you should call it like this:
 This protected method is what actually sends the log information to STDERR.
 You may subclass this module and override this method to get finer control
 over the log output.
+
+=head2 psgienv $env
+
+    $log->psgienv($env);
+
+NOTE: This is not meant for public consumption.
+
+Set the PSGI environment for this request. This ensures logs will be sent to
+the right place. If the environment has a C<psgix.logger>, it will be used. If
+not, we will send logs to C<psgi.errors> if that exists. As a last fallback, we
+will send to STDERR as before.
 
 =head2 meta
 
