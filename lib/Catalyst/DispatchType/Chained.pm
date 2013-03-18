@@ -341,7 +341,7 @@ sub register {
             $args = Data::Dumper::Dumper($args);
             Catalyst::Exception->throw(
               "Invalid Args($args) for action " . $action->reverse() .
-              " (use 'Args' or 'Args(<number>)'"
+              " (use 'Args' or 'Args(<number>)')"
             );
         }
     }
