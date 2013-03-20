@@ -162,6 +162,8 @@ __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 __END__
 
+=for stopwords psgienv
+
 =head1 NAME
 
 Catalyst::Log - Catalyst Log Class
@@ -300,6 +302,10 @@ Set the PSGI environment for this request. This ensures logs will be sent to
 the right place. If the environment has a C<psgix.logger>, it will be used. If
 not, we will send logs to C<psgi.errors> if that exists. As a last fallback, we
 will send to STDERR as before.
+
+=head2 clear_psgi
+
+Clears the PSGI environment attributes set by L</psgienv>.
 
 =head2 meta
 

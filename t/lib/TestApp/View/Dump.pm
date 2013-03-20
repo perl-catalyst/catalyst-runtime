@@ -40,7 +40,7 @@ sub process {
     my $context = delete $reference->{_context};
 
     if (my $log = $reference->{_log}) {
-        $log->clear_psgienv if $log->can('psgienv');
+        $log->clear_psgi if ($log->can('psgienv'));
     }
 
     if ( my $output =
