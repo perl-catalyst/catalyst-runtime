@@ -16,7 +16,7 @@ add_stopwords(qw(
     BUILDARGS metaclass namespaces pre ARGV ReverseProxy
     filename tempname request's subdirectory ini uninstalled uppercased
     wiki bitmask uri url urls dir hostname proxied http https IP SSL
-    inline INLINE plugins
+    inline INLINE plugins cpanfile
     FastCGI Stringifies Rethrows DispatchType Wishlist Refactor ROADMAP HTTPS Unescapes Restarter Nginx Refactored
     ActionClass LocalRegex LocalRegexp MyAction metadata
     Andreas

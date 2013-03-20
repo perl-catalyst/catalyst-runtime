@@ -9,7 +9,7 @@ use Path::Class qw/ dir /;
 use Cwd qw/ cwd /;
 
 my @dists = Catalyst::Utils::dist_indicator_file_list();
-is(scalar(@dists), 3, 'Makefile.PL Build.PL dist.ini');
+is(scalar(@dists), 4, 'Makefile.PL Build.PL dist.ini cpanfile');
 
 my $cwd = cwd();
 foreach my $inc ('', 'lib', 'blib'){
