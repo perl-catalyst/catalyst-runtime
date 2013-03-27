@@ -36,38 +36,6 @@ ok(!defined($dispatcher->uri_for_action($path_action, [ 'foo' ])),
    "no URI returned for Path action when snippets are given");
 
 #
-#   Regex Action
-#
-my $regex_action = $dispatcher->get_action_by_path(
-                     '/action/regexp/one'
-                   );
-
-ok(!defined($dispatcher->uri_for_action($regex_action)),
-   "Regex action without captures returns undef");
-
-ok(!defined($dispatcher->uri_for_action($regex_action, [ 1, 2, 3 ])),
-   "Regex action with too many captures returns undef");
-
-is($dispatcher->uri_for_action($regex_action, [ 'foo', 123 ]),
-   "/action/regexp/foo/123",
-   "Regex action interpolates captures correctly");
-
-my $regex_action_bs = $dispatcher->get_action_by_path(
-                     '/action/regexp/one_backslashes'
-                   );
-
-ok(!defined($dispatcher->uri_for_action($regex_action_bs)),
-   "Regex action without captures returns undef");
-
-ok(!defined($dispatcher->uri_for_action($regex_action_bs, [ 1, 2, 3 ])),
-   "Regex action with too many captures returns undef");
-
-is($dispatcher->uri_for_action($regex_action_bs, [ 'foo', 123 ]),
-   "/action/regexp/foo/123.html",
-   "Regex action interpolates captures correctly");
-
-
-#
 #   Index Action
 #
 my $index_action = $dispatcher->get_action_by_path(
@@ -125,10 +93,6 @@ is($context->uri_for($path_action, qw/one two/, { q => 1 }),
 
 ok(!defined($context->uri_for($path_action, [ 'blah' ])),
    "no URI returned by uri_for for Path action with snippets");
-
-is($context->uri_for($regex_action, [ 'foo', 123 ], qw/bar baz/, { q => 1 }),
-   "http://127.0.0.1/foo/action/regexp/foo/123/bar/baz?q=1",
-   "uri_for correct for regex with captures, args and query");
 
 is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
    "http://127.0.0.1/foo/chained/foo/1/end/2?q=1",

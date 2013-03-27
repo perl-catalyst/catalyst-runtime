@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 28;
+use Test::More tests => 14;
 use Catalyst::Test 'TestApp';
 
 local $^W = 0;
@@ -15,18 +15,11 @@ my $uri_base = 'http://localhost/priorities';
 my @tests = (
 
     #   Simple
-    'Regex vs. Local',      { path => '/re_vs_loc',      expect => 'local' },
-    'Regex vs. LocalRegex', { path => '/re_vs_locre',    expect => 'regex' },
-    'Regex vs. Path',       { path => '/re_vs_path',     expect => 'path' },
-    'Local vs. LocalRegex', { path => '/loc_vs_locre',   expect => 'local' },
     'Local vs. Path 1',     { path => '/loc_vs_path1',   expect => 'local' },
     'Local vs. Path 2',     { path => '/loc_vs_path2',   expect => 'path' },
-    'Path  vs. LocalRegex', { path => '/path_vs_locre',  expect => 'path' },
 
     #   index
-    'index vs. Regex',      { path => '/re_vs_index',    expect => 'index' },
     'index vs. Local',      { path => '/loc_vs_index',   expect => 'index' },
-    'index vs. LocalRegex', { path => '/locre_vs_index', expect => 'index' },
     'index vs. Path',       { path => '/path_vs_index',  expect => 'index' },
 
     'multimethod zero',     { path => '/multimethod',    expect => 'zero' },

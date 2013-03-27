@@ -477,25 +477,6 @@ sub _parse_Path_attr {
     }
 }
 
-sub _parse_Regex_attr {
-    my ( $self, $c, $name, $value ) = @_;
-    return ( 'Regex', $value );
-}
-
-sub _parse_Regexp_attr { shift->_parse_Regex_attr(@_); }
-
-sub _parse_LocalRegex_attr {
-    my ( $self, $c, $name, $value ) = @_;
-    unless ( $value =~ s/^\^// ) { $value = "(?:.*?)$value"; }
-
-    my $prefix = $self->path_prefix( $c );
-    $prefix .= '/' if length( $prefix );
-
-    return ( 'Regex', "^${prefix}${value}" );
-}
-
-sub _parse_LocalRegexp_attr { shift->_parse_LocalRegex_attr(@_); }
-
 sub _parse_Chained_attr {
     my ($self, $c, $name, $value) = @_;
 
