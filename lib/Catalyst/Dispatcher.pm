@@ -22,7 +22,7 @@ use namespace::clean -except => 'meta';
 # See Catalyst-Plugin-Server for them being added to, which should be much less ugly.
 
 # Preload these action types
-our @PRELOAD = qw/Index Path Regex/;
+our @PRELOAD = qw/Index Path/;
 
 # Postload these action types
 our @POSTLOAD = qw/Default/;

@@ -24,13 +24,6 @@ sub emptybody : Local {
     $c->res->body('');
 }
 
-sub localregex : LocalRegex('^localregex$') {
-    my ( $self, $c ) = @_;
-    $c->res->header( 'X-Test-Class' => ref($self) );
-    $c->response->content_type('text/plain; charset=utf-8');
-    $c->forward('TestApp::View::Dump::Request');
-}
-
 sub index : Private {
     my ( $self, $c ) = @_;
     $c->res->body('root index');
