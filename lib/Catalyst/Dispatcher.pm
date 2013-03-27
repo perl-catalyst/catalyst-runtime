@@ -517,7 +517,14 @@ sub register {
             # FIXME - Some error checking and re-throwing needed here, as
             #         we eat exceptions loading dispatch types.
             eval { Class::MOP::load_class($class) };
-            push( @{ $self->dispatch_types }, $class->new ) unless $@;
+            if( $@ ){
+                warn( "Attempt to use deprecated $key dispatch type.\n"
+                    . "  Use Chained methods instead or install\n"
+                    . "  Catalyst::DispatchType::Regex if necessary.\n")
+                    if $key =~ /^(Local)?Regex$/;
+            } else {
+                push( @{ $self->dispatch_types }, $class->new );
+            }
             $registered->{$class} = 1;
         }
     }
