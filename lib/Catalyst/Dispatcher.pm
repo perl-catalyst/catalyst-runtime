@@ -702,7 +702,7 @@ sub _check_depreciated_dispatch_type {
               . "  Use Chained methods or install the standalone\n"
               . "  Catalyst::DispatchType::Regex if necessary.\n" );
     } elsif ( !defined $Catalyst::DispatchType::Regex::VERSION
-        || $Catalyst::DispatchType::Regex::VERSION <= 5.90020 ) {
+        || $Catalyst::DispatchType::Regex::VERSION le '5.90020' ) {
         # We loaded the old core version of the Regex module this will break
         warn(   "The $key DispatchType has been removed from Catalyst core.\n"
               . "  An old version of the core Catalyst::DispatchType::Regex\n"
