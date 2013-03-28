@@ -707,7 +707,7 @@ sub _check_depreciated_dispatch_type {
         warn(   "The $key DispatchType has been removed from Catalyst core.\n"
               . "  An old version of the core Catalyst::DispatchType::Regex\n"
               . "  has been loaded and will likely fail. Please remove\n"
-              . "  $INC{'Catalyst::DispatchType::Regex'}\n"
+              . "   $INC{'Catalyst/DispatchType/Regex.pm'}\n"
               . "  and use Chained methods or install the standalone\n"
               . "  Catalyst::DispatchType::Regex if necessary.\n" );
     }
