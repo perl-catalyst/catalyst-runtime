@@ -751,7 +751,7 @@ This is a general toolbox for attaching your action to a give path.
 
 =head2 Regexp
 
-Status: Deprecated.  Use Chained methods or other techniques.
+B<Status: Deprecated.>  Use Chained methods or other techniques.
 If you really depend on this, install the standalone 
 L<Catalyst::DispatchType::Regex> distribution.
 
@@ -761,7 +761,7 @@ A global way to match a give regular expression in the incoming request path.
 
 =head2 LocalRegexp
 
-Status: Deprecated.  Use Chained methods or other techniques.
+B<Status: Deprecated.>  Use Chained methods or other techniques.
 If you really depend on this, install the standalone 
 L<Catalyst::DispatchType::Regex> distribution.
 

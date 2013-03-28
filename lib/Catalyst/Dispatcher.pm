@@ -517,14 +517,9 @@ sub register {
             # FIXME - Some error checking and re-throwing needed here, as
             #         we eat exceptions loading dispatch types.
             eval { Class::MOP::load_class($class) };
-            if( $@ ){
-                warn( "Attempt to use deprecated $key dispatch type.\n"
-                    . "  Use Chained methods instead or install\n"
-                    . "  Catalyst::DispatchType::Regex if necessary.\n")
-                    if $key =~ /^(Local)?Regex$/;
-            } else {
-                push( @{ $self->dispatch_types }, $class->new );
-            }
+            my $load_failed = $@;
+            $self->_check_depreciated_dispatch_type( $key, $load_failed );
+            push( @{ $self->dispatch_types }, $class->new ) unless $load_failed;
             $registered->{$class} = 1;
         }
     }
@@ -694,6 +689,28 @@ sub dispatch_type {
         return $_ if ref($_) eq $name;
     }
     return undef;
+}
+
+sub _check_depreciated_dispatch_type {
+    my ($self, $key, $load_failed) = @_;
+
+    return unless $key =~ /^(Local)?Regexp?/;
+
+    # TODO: Should these throw an exception rather than just warning?
+    if ($load_failed) {
+        warn(   "Attempt to use deprecated $key dispatch type.\n"
+              . "  Use Chained methods or install the standalone\n"
+              . "  Catalyst::DispatchType::Regex if necessary.\n" );
+    } elsif ( !defined $Catalyst::DispatchType::Regex::VERSION
+        || $Catalyst::DispatchType::Regex::VERSION <= 5.90020 ) {
+        # We loaded the old core version of the Regex module this will break
+        warn(   "The $key DispatchType has been removed from Catalyst core.\n"
+              . "  An old version of the core Catalyst::DispatchType::Regex\n"
+              . "  has been loaded and will likely fail. Please remove\n"
+              . "  $INC{'Catalyst::DispatchType::Regex'}\n"
+              . "  and use Chained methods or install the standalone\n"
+              . "  Catalyst::DispatchType::Regex if necessary.\n" );
+    }
 }
 
 use Moose;
