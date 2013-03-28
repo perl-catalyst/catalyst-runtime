@@ -3393,6 +3393,8 @@ marcus: Marcus Ramberg <mramberg@cpan.org>
 
 miyagawa: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
+mgrimes: Mark Grimes <mgrimes@cpan.org>
+
 mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
 
 mugwump: Sam Vilain
