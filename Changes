@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90021 - TBA
+  - make $app->uri_for and related methods return something sane, when called
+    as an application method, instead of a context method.  Now if you call
+    MyApp::Web->uri_for(...) you will get a generic URI object that you need to
+    resolve manually.
   - documentation updates around forwarding to chained actions
   - Fixed bug when a PSGI engine need to use psgix logger
   - Added cpanfile as a way to notice we are a dev checkout
