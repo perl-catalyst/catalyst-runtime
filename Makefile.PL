@@ -23,7 +23,7 @@ perl_version '5.008003';
 
 name 'Catalyst-Runtime';
 author 'Sebastian Riedel <sri@cpan.org>';
-authority('MSTROUT');
+authority('cpan:MSTROUT');
 all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'List::MoreUtils';
