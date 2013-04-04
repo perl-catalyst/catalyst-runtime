@@ -69,6 +69,10 @@ requires 'Plack' => '0.9991'; # IIS6+7 fix middleware
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
 requires 'Plack::Test::ExternalServer';
 
+# Install the standalone Regex dispatch modules in order to ease the
+# depreciation transition
+requires 'Catalyst::DispatchType::Regex' => '5.90021';
+
 test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
 test_requires 'Test::More' => '0.88';
