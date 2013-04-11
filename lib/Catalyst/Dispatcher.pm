@@ -518,7 +518,7 @@ sub register {
             #         we eat exceptions loading dispatch types.
             eval { Class::MOP::load_class($class) };
             my $load_failed = $@;
-            $self->_check_depreciated_dispatch_type( $key, $load_failed );
+            $self->_check_deprecated_dispatch_type( $key, $load_failed );
             push( @{ $self->dispatch_types }, $class->new ) unless $load_failed;
             $registered->{$class} = 1;
         }
@@ -691,7 +691,7 @@ sub dispatch_type {
     return undef;
 }
 
-sub _check_depreciated_dispatch_type {
+sub _check_deprecated_dispatch_type {
     my ($self, $key, $load_failed) = @_;
 
     return unless $key =~ /^(Local)?Regexp?/;
