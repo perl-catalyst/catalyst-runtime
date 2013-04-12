@@ -8,11 +8,12 @@
     as an application method, instead of a context method.  Now if you call
     MyApp::Web->uri_for(...) you will get a generic URI object that you need to
     resolve manually.
-  - documentation updates around forwarding to chained actions
-  - Fixed bug when a PSGI engine need to use psgix logger
-  - Added cpanfile as a way to notice we are a dev checkout
+  - documentation updates around forwarding to chained actions.
+  - Fixed bug when a PSGI engine need to use psgix logger.
+  - Added cpanfile as a way to notice we are a dev checkout.
   - Added 'x-tunneled-method' HTTP Header method override to match features in
-    Catalyst::Action::REST and in other similar systems on CPAN
+    Catalyst::Action::REST and in other similar systems on CPAN.
+  - smarter valiation around action attributes.
 
 5.90020 - 2013-02-22
   ! Catalyst::Action now defines 'match_captures' so it is no long considered
