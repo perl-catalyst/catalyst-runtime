@@ -1,6 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90021 - TBA
+5.90030 - 2013-04-12
+  ! POSSIBLE BREAKING CHANGE: Removed Regexp dispatch type from core, and put
+    it in an external package.  If you need Regexp dispatch types you should
+    add "Catalyst-DispatchType-Regex" as a distribution to your build system.
   - make $app->uri_for and related methods return something sane, when called
     as an application method, instead of a context method.  Now if you call
     MyApp::Web->uri_for(...) you will get a generic URI object that you need to
