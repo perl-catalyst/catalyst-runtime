@@ -65,6 +65,7 @@ requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
 requires 'MooseX::Getopt' => '0.48';
 requires 'String::RewritePrefix' => '0.004'; # Catalyst::Utils::resolve_namespace
+requires 'Devel::InnerPackage'; # No longer core in blead
 requires 'Plack' => '0.9991'; # IIS6+7 fix middleware
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
 requires 'Plack::Test::ExternalServer';
