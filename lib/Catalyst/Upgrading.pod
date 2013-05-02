@@ -2,6 +2,44 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90040
+
+This version of L<Catalyst> offers some support for using L<AnyEvent> and
+L<IO::Async> event loops in your application.  In order to achieve this goal
+we needed to make some changes to the way the we finalize the HTTP response
+such that sloppy code that closed over $c and leaked memory will no longer
+work in some manner.  For example you might accidently have:
+
+    $c->stash(my_model => sub { $c->model->find(shift) });
+
+If you have old code that leaks memory in this way but otherwise seemed to
+work, it will no longer complete the response properly.
+
+If you don't want to fix your code, you can force the old behavior with the
+global configuration key C<aggressively_close_writer_on_finalize_body>.  This
+of course will still leave you with a leaky application and you lose the new
+event loop support, but your application will go back to completing its
+response output.  For example:
+
+    package MyApp::Web;
+
+    use Moose;
+    use Catalyst;
+
+    __PACKAGE__->config(
+      name => 'MyApp::Web',
+      enable_catalyst_header => 1,
+      disable_component_resolution_regex_fallback => 1,
+      aggressively_close_writer_on_finalize_body => 1,
+    );
+
+    __PACKAGE__->setup;
+
+See L<Catalyst::Component::ContextClosure> for help on how to close over the
+context safely, should you need to do this.  See L<CatalystX::LeakChecker>
+and L<Catalyst::Controller::LeakTracker> for help if you want to solve your
+memory leak issues.
+
 =head1 Upgrading to Catalyst 5.9
 
 The major change is that L<Plack>, a toolkit for using the L<PSGI>

@@ -54,7 +54,22 @@ See L<Catalyst>.
 
 =head2 $self->finalize_body($c)
 
-Finalize body.  Prints the response output.
+Finalize body.  Prints the response output as blocking stream if it looks like
+a filehandle, otherwise write it out all in one go.  If there is no body in
+the response, we assume you are handling it 'manually', such as for nonblocking
+style or asynchronous streaming responses.
+
+By default we do not close the writer object in case we are in an event loop
+and there is deferred activity.  However if you have some sloppy code that is
+closing over an unweakened context ($c) this could lead to the writer NEVER
+being closed.  In versions of Catalyst 5.90030 and older, we used to forcibly
+close the writer in this method, but we no longer do that since it prevented us
+from introducing proper asynchronous support in Catalyst core.  If you have old
+code that is leaking context but was otherwise working and you don't want to fix
+your memory leaks (is really the best idea) you can force enable the old
+behavior (and lose asynchronous support) by setting the global configuration key
+C<aggressively_close_writer_on_finalize_body> to true.  See L<Catalyst::Upgrading>
+for more if you have this issue.
 
 =cut
 
@@ -75,9 +90,11 @@ sub finalize_body {
         $self->write( $c, $body );
     }
 
-    my $res = $c->response;
-    $res->_writer->close;
-    $res->_clear_writer;
+    if($c->config->{aggressively_close_writer_on_finalize_body}) {
+      my $res = $c->response;
+      $res->_writer->close;
+      $res->_clear_writer;
+    }
 
     return;
 }
