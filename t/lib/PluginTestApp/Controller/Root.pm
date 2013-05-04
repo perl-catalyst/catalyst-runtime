@@ -49,6 +49,7 @@ sub run_time_plugins : Local {
     is_deeply [ $c->registered_plugins ],
     [
         qw/Catalyst::Plugin::Test::Plugin
+        Catalyst::Plugin::Unicode::Encoding
         Faux::Plugin
         TestApp::Plugin::FullyQualified/
         ],
