@@ -2974,10 +2974,22 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         return $class;
     }
 
+    sub _default_plugins { return qw(Unicode::Encoding) }
+
     sub setup_plugins {
         my ( $class, $plugins ) = @_;
 
         $class->_plugins( {} ) unless $class->_plugins;
+        $plugins = [ grep {
+            m/Unicode::Encoding/ ? do {
+                $class->log->warn(
+                    'Unicode::Encoding plugin is now part of core,'
+                    . ' please remove this from your appclass'
+                );
+                () }
+                : $_
+        } @$plugins ];
+        unshift @$plugins, $class->_default_plugins;
         $plugins = Data::OptList::mkopt($plugins || []);
 
         my @plugins = map {
