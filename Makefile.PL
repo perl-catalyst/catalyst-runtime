@@ -120,6 +120,7 @@ resources(
     'IRC'         => 'irc://irc.perl.org/#catalyst',
     'license',    => 'http://dev.perl.org/licenses/',
     'homepage',   => 'http://dev.catalyst.perl.org/',
+    # r/w: catagits@git.shadowcat.co.uk:Catalyst-Runtime.git
     'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
 );
 
