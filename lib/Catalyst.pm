@@ -3451,7 +3451,7 @@ Will Hawes C<info@whawes.co.uk>
 
 willert: Sebastian Willert <willert@cpan.org>
 
-wreis: Wallace Reis <wallace@reis.org.br>
+wreis: Wallace Reis <wreis@cpan.org>
 
 Yuval Kogman, C<nothingmuch@woobling.org>
 
