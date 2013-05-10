@@ -249,7 +249,7 @@ The value which was not able to be decoded.
 
 =item error_msg
 
-The exception recieved from L<Encode>.
+The exception received from L<Encode>.
 
 =item encoding_step
 
