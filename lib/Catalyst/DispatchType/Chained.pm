@@ -361,7 +361,8 @@ sub register {
 
     if (exists $action->attributes->{Args} and exists $action->attributes->{CaptureArgs}) {
         Catalyst::Exception->throw(
-          "Combining Args and CaptureArgs not allowed registering " . $action->reverse()
+          "Combining Args and CaptureArgs attributes not supported registering " .
+          $action->reverse()
         );
     }
 
