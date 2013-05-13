@@ -57,24 +57,17 @@ See L<Catalyst>.
 Finalize body.  Prints the response output as blocking stream if it looks like
 a filehandle, otherwise write it out all in one go.  If there is no body in
 the response, we assume you are handling it 'manually', such as for nonblocking
-style or asynchronous streaming responses.
+style or asynchronous streaming responses.  You do this by calling L<\write>
+several times (which sends HTTP headers if needed) or you close over L<\write_fh>.
 
-By default we do not close the writer object in case we are in an event loop
-and there is deferred activity.  However if you have some sloppy code that is
-closing over an unweakened context ($c) this could lead to the writer NEVER
-being closed.  In versions of Catalyst 5.90030 and older, we used to forcibly
-close the writer in this method, but we no longer do that since it prevented us
-from introducing proper asynchronous support in Catalyst core.  If you have old
-code that is leaking context but was otherwise working and you don't want to fix
-your memory leaks (is really the best idea) you can force enable the old
-behavior (and lose asynchronous support) by setting the global configuration key
-C<aggressively_close_writer_on_finalize_body> to true.  See L<Catalyst::Upgrading>
-for more if you have this issue.
+See L<Catalyst::Response\write> and L<Catalyst::Response\write_fh> for more.
 
 =cut
 
 sub finalize_body {
     my ( $self, $c ) = @_;
+    return if $c->response->has_write_fh;
+
     my $body = $c->response->body;
     no warnings 'uninitialized';
     if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
@@ -90,11 +83,9 @@ sub finalize_body {
         $self->write( $c, $body );
     }
 
-    if($c->config->{aggressively_close_writer_on_finalize_body}) {
-      my $res = $c->response;
-      $res->_writer->close;
-      $res->_clear_writer;
-    }
+    my $res = $c->response;
+    $res->_writer->close;
+    $res->_clear_writer;
 
     return;
 }
