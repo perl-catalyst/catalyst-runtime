@@ -773,7 +773,7 @@ sub run_tests {
     }
 
     #
-    #
+    # Test throwing an error in the middle of a chain.
     #
     {
         my @expected = qw[
