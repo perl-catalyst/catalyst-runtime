@@ -34,6 +34,9 @@ sub dispatch {
         }
         local $c->request->{arguments} = \@args;
         $action->dispatch( $c );
+
+        # break the chain if exception occurs in the middle of chain
+        return if (@{$c->error} && $c->config->{detach_on_die});
     }
     $last->dispatch( $c );
 }

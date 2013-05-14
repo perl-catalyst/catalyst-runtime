@@ -143,6 +143,15 @@ sub chain_dt_a :Chained :PathPart('chained/chain_dt') :CaptureArgs(1) {
 sub chain_dt_b :Chained('chain_dt_a') :PathPart('end') :Args(1) { }
 
 #
+#   Die in the middle of a chain
+#
+sub chain_die_a :Chained :PathPart('chained/chain_die') :CaptureArgs(1) {
+    $_[1]->error( 'break in the middle of a chain' );
+}
+
+sub chain_die_b :Chained('chain_die_a') :PathPart('end') :Args(1) {}
+
+#
 #   Target for former forward and chain tests.
 #
 sub fw_dt_target :Private { }
