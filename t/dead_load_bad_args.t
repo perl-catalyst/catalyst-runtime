@@ -12,6 +12,7 @@ for my $fail (
     "(' ')",
     "('')",
     "('1.23')",
+    "(-1)",
 ) {
     for my $type (qw(Args CaptureArgs)) {
         eval <<"END";
