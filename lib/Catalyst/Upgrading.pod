@@ -2,15 +2,15 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
-=head1 Upgrading to Catalyst 5.90040
+=head1 Upgrading to Catalyst TBA
 
 This version of L<Catalyst> offers some support for using L<AnyEvent> and
 L<IO::Async> event loops in your application.  These changes should work
 fine for most applications however if you are already trying to perform
 some streaming, minor changes in this area of the code might affect your
-functionality.
-
-  TDB: more on streaming, transfer encoding chunked, etc.
+functionality.  Please see L<Catalyst::Response\write_fh> for more and for a
+basic example.
+ 
 
 =head1 Upgrading to Catalyst 5.9
 

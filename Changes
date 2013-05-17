@@ -1,7 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+TBA
   - Add Devel::InnerPackage to dependencies, fixing tests on perl 5.17.11
     as it's been removed from core. RT#84787
+  - New support for closing over the PSGI $writer object, useful for working
+    with event loops.
+
 
 5.90030 - 2013-04-12
   ! POSSIBLE BREAKING CHANGE: Removed Regexp dispatch type from core, and put
