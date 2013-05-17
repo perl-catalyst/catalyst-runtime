@@ -640,7 +640,7 @@ defaults to the size of the request if not specified.
 
 =head2 $req->read_chunk(\$buff, $max)
 
-Reads a chunk..
+Reads a chunk.
 
 You have to set MyApp->config(parse_on_demand => 1) to use this directly.
 
@@ -651,10 +651,12 @@ Shortcut for $req->headers->referer. Returns the referring page.
 =head2 $req->secure
 
 Returns true or false, indicating whether the connection is secure
-(https). Note that the URI scheme (e.g., http vs. https) must be determined
-through heuristics, and therefore the reliability of $req->secure will depend
-on your server configuration. If you are setting the HTTPS environment variable, 
-$req->secure should be valid.
+(https). The reliability of $req->secure may depend on your server
+configuration; Catalyst relies on PSGI to determine whether or not a
+request is secure (Catalyst looks at psgi.url_scheme), and different
+PSGI servers may make this determination in different ways (as by
+directly passing along information from the server, interpreting any of
+several HTTP headers, or using heuristics of their own).
 
 =head2 $req->captures
 
