@@ -91,6 +91,19 @@ has _log => (
     required => 1,
 );
 
+has io_fh => (
+  is=>'ro',
+  predicate=>'has_io_fh',
+  lazy=>1,
+  builder=>'_build_io_fh');
+
+  sub _build_io_fh {
+    my $self = shift;
+    return $self->env->{'psgix.io'}
+      || die "Your Server does not support psgix.io";
+  };
+
+
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 
@@ -845,6 +858,12 @@ Returns the value of the C<REMOTE_USER> environment variable.
 
 Shortcut to $req->headers->user_agent. Returns the user agent (browser)
 version string.
+
+=head2 $req->io_fh
+
+Returns a psgix.io bidirectional socket, if your server supports one.  Used for
+when you want to jailbreak out of PSGI and handle bidirectional client server
+communication manually, such as when you are using cometd or websockets.
 
 =head1 SETUP METHODS
 

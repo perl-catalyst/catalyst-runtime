@@ -8,7 +8,8 @@ TBA
     as it's been removed from core. RT#84787
   - New support for closing over the PSGI $writer object, useful for working
     with event loops.
-
+  - lets you access a psgix.io socket, if your server supports it, for manual
+    handling of the client - server communication, such as for websockets.
 
 5.90030 - 2013-04-12
   ! POSSIBLE BREAKING CHANGE: Removed Regexp dispatch type from core, and put

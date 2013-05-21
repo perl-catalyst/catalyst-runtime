@@ -29,7 +29,8 @@ has _writer => (
 has write_fh => (
   is=>'ro',
   predicate=>'has_write_fh',
-  lazy_build=>1);
+  lazy=>1,
+  builder=>'_build_write_fh');
 
   sub _build_write_fh {
     my $self = shift;
