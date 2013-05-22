@@ -1796,7 +1796,10 @@ sub finalize {
     # Support skipping finalize for psgix.io style 'jailbreak'.  Used to support
     # stuff like cometd and websockets
     
-    return if $c->request->has_io_fh;
+    if($c->request->has_io_fh) {
+      $c->log_response;
+      return;
+    }
 
     # Allow engine to handle finalize flow (for POE)
     my $engine = $c->engine;
