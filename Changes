@@ -4,6 +4,7 @@ TBA
   ! Stricter checking of attributes in Catalyst::DispatchType::Chained:
     1) Only allow one of either :CaptureArgs or :Args
     2) :CaptureArgs() argument must be numeric
+    3) :CaptureArgs() and :Args() arguments cannot be negative
   - Add Devel::InnerPackage to dependencies, fixing tests on perl 5.17.11
     as it's been removed from core. RT#84787
   - New support for closing over the PSGI $writer object, useful for working

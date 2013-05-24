@@ -298,7 +298,7 @@ sub _check_args_attr {
     my $args = $action->attributes->{$name}->[0];
     if (defined($args) and not (
         Scalar::Util::looks_like_number($args) and
-        int($args) == $args
+        int($args) == $args and $args >= 0
     )) {
         require Data::Dumper;
         local $Data::Dumper::Terse = 1;
