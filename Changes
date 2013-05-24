@@ -11,6 +11,7 @@ TBA
     with event loops.
   - lets you access a psgix.io socket, if your server supports it, for manual
     handling of the client - server communication, such as for websockets.
+  - Fix waiting for the server to start in t/author/http-server.t
 
 5.90030 - 2013-04-12
   ! POSSIBLE BREAKING CHANGE: Removed Regexp dispatch type from core, and put
