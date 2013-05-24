@@ -3187,6 +3187,10 @@ C<< $c->request->base >> will be incorrect.
 
 C<using_frontend_proxy> - See L</PROXY SUPPORT>.
 
+=item *
+
+C<encoding> - See L</ENCODING>
+
 =back
 
 =head1 INTERNAL ACTIONS
@@ -3277,6 +3281,53 @@ believe the Catalyst core to be thread-safe.
 If you plan to operate in a threaded environment, remember that all other
 modules you are using must also be thread-safe. Some modules, most notably
 L<DBD::SQLite>, are not thread-safe.
+
+=head1 ENCODING
+
+On request, decodes all params from encoding into a sequence of
+logical characters. On response, encodes body into encoding.
+
+=head2 Methods
+
+=over 4
+
+=item encoding
+
+Returns an instance of an C<Encode> encoding
+
+    print $c->encoding->name
+
+=item handle_unicode_encoding_exception ($exception_context)
+
+Method called when decoding process for a request fails.
+
+An C<$exception_context> hashref is provided to allow you to override the
+behaviour of your application when given data with incorrect encodings.
+
+The default method throws exceptions in the case of invalid request parameters
+(resulting in a 500 error), but ignores errors in upload filenames.
+
+The keys passed in the C<$exception_context> hash are:
+
+=over
+
+=item param_value
+
+The value which was not able to be decoded.
+
+=item error_msg
+
+The exception received from L<Encode>.
+
+=item encoding_step
+
+What type of data was being decoded. Valid values are (currently)
+C<params> - for request parameters / arguments / captures
+and C<uploads> - for request upload filenames.
+
+=back
+
+=back
 
 =head1 SUPPORT
 

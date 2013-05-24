@@ -185,97 +185,24 @@ Catalyst::Plugin::Unicode::Encoding - Unicode aware Catalyst
 
 =head1 SYNOPSIS
 
-    use Catalyst qw[Unicode::Encoding];
+    use Catalyst;
 
     MyApp->config( encoding => 'UTF-8' ); # A valid Encode encoding
 
 
 =head1 DESCRIPTION
 
-On request, decodes all params from encoding into a sequence of
-logical characters. On response, encodes body into encoding.
-
-=head1 METHODS
-
-=over 4
-
-=item encoding
-
-Returns an instance of an C<Encode> encoding
-
-    print $c->encoding->name
-
-=back
-
-=head1 OVERLOADED METHODS
-
-=over
-
-=item finalize_headers
-
-Encodes body into encoding.
-
-=item prepare_uploads
-
-Decodes parameters, query_parameters, body_parameters and filenames
-in file uploads into a sequence of logical characters.
-
-=item prepare_action
-
-Decodes request arguments (i.e. C<< $c->request->arguments >>) and
-captures (i.e. C<< $c->request->captures >>).
-
-=item setup
-
-Setups C<< $c->encoding >> with encoding specified in C<< $c->config->{encoding} >>.
-
-=item handle_unicode_encoding_exception ($exception_context)
-
-Method called when decoding process for a request fails.
-
-An C<$exception_context> hashref is provided to allow you to override the
-behaviour of your application when given data with incorrect encodings.
-
-The default method throws exceptions in the case of invalid request parameters
-(resulting in a 500 error), but ignores errors in upload filenames.
-
-The keys passed in the C<$exception_context> hash are:
-
-=over
-
-=item param_value
-
-The value which was not able to be decoded.
-
-=item error_msg
-
-The exception received from L<Encode>.
-
-=item encoding_step
-
-What type of data was being decoded. Valid values are (currently)
-C<params> - for request parameters / arguments / captures
-and C<uploads> - for request upload filenames.
-
-=back
-
-=back
-
-=head1 SEE ALSO
-
-L<Encode>, L<Encode::Encoding>, L<Catalyst::Plugin::Unicode>, L<Catalyst>.
+This plugin is automatically loaded by apps. Even though is not a core component
+yet, it will vanish as soon as the code is fully integrated. For more
+information, please refer to C<ENCODING> section at L<Catalyst>.
 
 =head1 AUTHORS
 
-Christian Hansen, C<ch@ngmedia.com>
+Catalyst Contributors, see Catalyst.pm
 
-Masahiro Chiba
+=head1 COPYRIGHT
 
-Tomas Doran, C<bobtfish@bobtfish.net>
-
-=head1 LICENSE
-
-This library is free software . You can redistribute it and/or modify
-it under the same terms as perl itself.
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
