@@ -773,6 +773,25 @@ sub run_tests {
     }
 
     #
+    # Test throwing an error in the middle of a chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->chain_die_a
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/chain_die/1/end/2'),
+            "Break a chain in the middle" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'FATAL ERROR: break in the middle of a chain', 'Content OK' );
+    }
+
+    #
     #   Tests that an uri_for to a chained root index action
     #   returns the right value.
     #
