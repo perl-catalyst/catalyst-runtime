@@ -5,10 +5,9 @@ use base qw/Catalyst/;
 use Catalyst qw/Params::Nested/;
 
 __PACKAGE__->config(
-  encoding => 'UTF-8'
+  'name' => 'TestApp2',
+  encoding => 'UTF-8',
 );
-
-__PACKAGE__->config('name' => 'TestApp2');
 
 __PACKAGE__->setup;
 

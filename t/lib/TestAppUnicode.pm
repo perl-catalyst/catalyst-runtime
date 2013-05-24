@@ -6,10 +6,9 @@ use base qw/Catalyst/;
 use Catalyst qw/Unicode::Encoding Params::Nested/;
 
 __PACKAGE__->config(
-  encoding => $ENV{TESTAPP_ENCODING}
-) if $ENV{TESTAPP_ENCODING};
-
-__PACKAGE__->config('name' => 'TestAppUnicode');
+  'name' => 'TestAppUnicode',
+  $ENV{TESTAPP_ENCODING} ? ( encoding => $ENV{TESTAPP_ENCODING} ) : (),
+);
 
 __PACKAGE__->log(TestLogger->new);
 
