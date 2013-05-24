@@ -27,6 +27,6 @@ is scalar(@TestLogger::LOGS), 1
     or diag Dumper(\@TestLogger::LOGS);
 like $TestLogger::LOGS[0], qr/content type is 'iso-8859-1'/;
 
-like $TestLogger::ELOGS[0], qr/plugin is now part of core/;
+like $TestLogger::ELOGS[0], qr/Unicode::Encoding plugin/;
 
 done_testing;

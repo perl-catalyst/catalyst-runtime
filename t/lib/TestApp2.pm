@@ -5,8 +5,8 @@ use base qw/Catalyst/;
 use Catalyst qw/Params::Nested/;
 
 __PACKAGE__->config(
-  encoding => $ENV{TESTAPP_ENCODING}
-) if $ENV{TESTAPP_ENCODING};
+  encoding => 'UTF-8'
+);
 
 __PACKAGE__->config('name' => 'TestApp2');
 

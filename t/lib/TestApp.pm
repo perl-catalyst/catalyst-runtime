@@ -50,6 +50,7 @@ TestApp->config(
             action_action_nine => { another_extra_arg => 13 }
         }
     },
+    encoding => 'UTF-8',
 );
 
 # Test bug found when re-adjusting the metaclass compat code in Moose

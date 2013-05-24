@@ -2983,9 +2983,13 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         $plugins = [ grep {
             m/Unicode::Encoding/ ? do {
                 $class->log->warn(
-                    'Unicode::Encoding plugin is now part of core,'
+                    'Unicode::Encoding plugin is auto-applied,'
                     . ' please remove this from your appclass'
+                    . ' and make sure to define "encoding" config'
                 );
+                unless (exists $class->config->{'encoding'}) {
+                  $class->config->{'encoding'} = 'UTF-8';
+                }
                 () }
                 : $_
         } @$plugins ];
