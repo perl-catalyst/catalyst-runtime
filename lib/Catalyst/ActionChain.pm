@@ -36,7 +36,7 @@ sub dispatch {
         $action->dispatch( $c );
 
         # break the chain if exception occurs in the middle of chain
-        return if (@{$c->error} && $c->config->{detach_on_die});
+        return if (@{$c->error} && $c->config->{abort_chain_on_error_fix});
     }
     $last->dispatch( $c );
 }
