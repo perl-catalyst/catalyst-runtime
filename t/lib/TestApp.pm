@@ -50,7 +50,7 @@ TestApp->config(
             action_action_nine => { another_extra_arg => 13 }
         }
     },
-    detach_on_die => 1,
+    abort_chain_on_error_fix => 1,
 );
 
 # Test bug found when re-adjusting the metaclass compat code in Moose
