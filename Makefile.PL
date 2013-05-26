@@ -48,7 +48,6 @@ requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
 requires 'HTTP::Request::AsCGI' => '1.0';
-requires 'LWP::UserAgent';
 requires 'Module::Pluggable' => '3.9';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
@@ -59,7 +58,6 @@ requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
 requires 'Try::Tiny';
 requires 'Safe::Isa';
-requires 'URI' => '1.35';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
 requires 'MRO::Compat';
@@ -69,16 +67,21 @@ requires 'Devel::InnerPackage'; # No longer core in blead
 requires 'Plack' => '0.9991'; # IIS6+7 fix middleware
 requires 'Plack::Middleware::ReverseProxy' => '0.04';
 requires 'Plack::Test::ExternalServer';
+requires 'Class::Data::Inheritable';
+requires 'Encode' => '2.49';
+requires 'LWP' => '5.837'; # LWP had unicode fail in 5.8.26
+requires 'URI' => '1.36';
 
 # Install the standalone Regex dispatch modules in order to ease the
 # depreciation transition
 requires 'Catalyst::DispatchType::Regex' => '5.90021';
 
-test_requires 'Class::Data::Inheritable';
 test_requires 'Test::Exception';
 test_requires 'Test::More' => '0.88';
 test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';
+test_requires 'IO::Scalar';
+test_requires 'HTTP::Status';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 my @author_requires;
@@ -94,6 +97,7 @@ else {
 
 push(@author_requires, 'CatalystX::LeakChecker', '0.05');
 push(@author_requires, 'Catalyst::Devel', '1.0'); # For http server test
+push(@author_requires, 'Test::WWW::Mechanize::Catalyst', '0.51');
 
 author_tests('t/author');
 author_requires(
@@ -109,6 +113,7 @@ author_requires(
   Test::Pod::Coverage
   Test::Spelling
   Pod::Coverage::TrustPod
+  Catalyst::Plugin::Params::Nested
 ));
 
 if ($Module::Install::AUTHOR) {

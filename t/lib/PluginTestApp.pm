@@ -14,8 +14,9 @@ sub _test_plugins {
     is_deeply [ $c->registered_plugins ],
     [
         qw/Catalyst::Plugin::Test::Plugin
+        Catalyst::Plugin::Unicode::Encoding
         TestApp::Plugin::FullyQualified/
-        ],
+    ],
     '... and it should report the correct plugins';
     ok $c->registered_plugins('Catalyst::Plugin::Test::Plugin'),
     '... or if we have a particular plugin';

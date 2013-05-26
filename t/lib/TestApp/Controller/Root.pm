@@ -2,6 +2,7 @@ package TestApp::Controller::Root;
 use strict;
 use warnings;
 use base 'Catalyst::Controller';
+use utf8;
 
 __PACKAGE__->config->{namespace} = '';
 

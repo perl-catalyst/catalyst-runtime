@@ -18,6 +18,27 @@ to update your scripts to not do this.\n") unless $ENV{HARNESS_ACTIVE};
 
 1;
 
-# This is here only as some old generated scripts require Catalyst::Engine::HTTP
+__END__
 
+=head1 NAME
 
+Catalyst::Engine::HTTP
+
+=head1 SYNOPSIS
+
+See L<Catalyst>.
+
+=head1 DESCRIPTION
+
+This is here only as some old generated scripts require Catalyst::Engine::HTTP
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

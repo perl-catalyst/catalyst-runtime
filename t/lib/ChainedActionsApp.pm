@@ -1,6 +1,7 @@
 package ChainedActionsApp;
 use Moose;
 use namespace::autoclean;
+use TestLogger;
 
 use Catalyst::Runtime 5.80;
 
@@ -15,6 +16,8 @@ __PACKAGE__->config(
   name => 'ChainedActionsApp',
   disable_component_regex_fallback => 1,
 );
+
+__PACKAGE__->log(TestLogger->new);
 
 __PACKAGE__->setup;
 

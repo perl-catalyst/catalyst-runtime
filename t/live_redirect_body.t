@@ -40,7 +40,7 @@ use Test::More;
     is( $response->code, 302, 'Response Code' );
 
     # When the developer sets both the content body and content type, the set content body and content_type should get through.
-    is( $response->header( 'Content-Type' ), 'text/plain', 'Content Type' );
+    like( $response->header( 'Content-Type' ), qr{text/plain}, 'Content Type' );
     like( $response->content, qr/kind sir/, 'Content contains content set by the Controller' );
 }
 

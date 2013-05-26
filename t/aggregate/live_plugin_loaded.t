@@ -15,6 +15,7 @@ my @expected = qw[
   Catalyst::Plugin::Test::Inline
   Catalyst::Plugin::Test::MangleDollarUnderScore
   Catalyst::Plugin::Test::Plugin
+  Catalyst::Plugin::Unicode::Encoding
   TestApp::Plugin::AddDispatchTypes
   TestApp::Plugin::FullyQualified
 ];
