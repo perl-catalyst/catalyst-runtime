@@ -3,6 +3,7 @@ use warnings;
 
 package TestAppDoubleAutoBug;
 
+use TestLogger;
 use Catalyst qw/
     Test::Errors
     Test::Headers
@@ -12,6 +13,8 @@ use Catalyst qw/
 our $VERSION = '0.01';
 
 __PACKAGE__->config( name => 'TestAppDoubleAutoBug', root => '/some/dir' );
+
+__PACKAGE__->log(TestLogger->new);
 
 __PACKAGE__->setup;
 

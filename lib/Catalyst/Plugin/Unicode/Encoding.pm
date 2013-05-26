@@ -172,7 +172,8 @@ sub _handle_param_unicode_decoding {
 
 sub handle_unicode_encoding_exception {
     my ( $self, $exception_ctx ) = @_;
-    die $exception_ctx->{error_msg};
+    $self->log->warn($exception_ctx->{error_msg});
+    return $exception_ctx->{'param_value'};
 }
 
 1;
