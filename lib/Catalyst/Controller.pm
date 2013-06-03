@@ -458,9 +458,11 @@ sub _parse_Absolute_attr { shift->_parse_Global_attr(@_); }
 sub _parse_Local_attr {
     my ( $self, $c, $name, $value ) = @_;
     # _parse_attr will call _parse_Path_attr for us
+    $name = join( '/', $self->path_prefix($c), $name);
+    $name =~ s!^/!!;
     return (
         'Chained' => '/',
-        'PathPart' => join( '/', $self->path_prefix($c), $name)
+        'PathPart' => $name
     );
 }
 
@@ -469,24 +471,19 @@ sub _parse_Relative_attr { shift->_parse_Local_attr(@_); }
 sub _parse_Path_attr {
     my ( $self, $c, $name, $value ) = @_;
     $value = '' if !defined $value;
-    if ( $value =~ s!^/!! ) {
-        return (
-            'Chained' => '/',
-            'PathPart' => $value
-        );
+    if ( $value =~ m!^/! ) {
     }
     elsif ( length $value ) {
-        return (
-            'Chained' => '/',
-            'PathPart' => join( '/', $self->path_prefix($c), $value )
-        );
+        $value = join( '/', $self->path_prefix($c), $value )
     }
     else {
-        return (
-            'Chained' => '/',
-            'PathPart' => $self->path_prefix($c)
-        );
+        $value = $self->path_prefix($c)
     }
+    $value =~ s!^/!!;
+    return (
+        'Chained'  => '/',
+        'PathPart' => $value
+    );
 }
 
 sub _parse_Chained_attr {
