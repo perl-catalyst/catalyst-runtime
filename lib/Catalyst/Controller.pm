@@ -740,7 +740,7 @@ Handle various types of paths:
     ...
 
     sub myaction1 :Path { ... }  # -> /baz
-    sub myaction2 :Path('foo') { ... } # -> /baz/bar
+    sub myaction2 :Path('foo') { ... } # -> /baz/foo
     sub myaction2 :Path('/bar') { ... } # -> /bar
   }
 
