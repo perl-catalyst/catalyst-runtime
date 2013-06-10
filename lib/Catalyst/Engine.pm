@@ -693,7 +693,7 @@ sub build_psgi_app {
 
         return sub {
             my ($respond) = @_;
-            confess("Did not get a response callback for writer, cannot continiue") unless $respond;
+            confess("Did not get a response callback for writer, cannot continue") unless $respond;
             $app->handle_request(env => $env, response_cb => $respond);
         };
     };
