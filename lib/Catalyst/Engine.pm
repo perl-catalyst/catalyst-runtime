@@ -54,12 +54,20 @@ See L<Catalyst>.
 
 =head2 $self->finalize_body($c)
 
-Finalize body.  Prints the response output.
+Finalize body.  Prints the response output as blocking stream if it looks like
+a filehandle, otherwise write it out all in one go.  If there is no body in
+the response, we assume you are handling it 'manually', such as for nonblocking
+style or asynchronous streaming responses.  You do this by calling L<\write>
+several times (which sends HTTP headers if needed) or you close over C<$response->write_fh>.
+
+See L<Catalyst::Response\write> and L<Catalyst::Response\write_fh> for more.
 
 =cut
 
 sub finalize_body {
     my ( $self, $c ) = @_;
+    return if $c->response->has_write_fh;
+
     my $body = $c->response->body;
     no warnings 'uninitialized';
     if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
@@ -685,7 +693,7 @@ sub build_psgi_app {
 
         return sub {
             my ($respond) = @_;
-            confess("Did not get a response callback for writer, cannot continiue") unless $respond;
+            confess("Did not get a response callback for writer, cannot continue") unless $respond;
             $app->handle_request(env => $env, response_cb => $respond);
         };
     };

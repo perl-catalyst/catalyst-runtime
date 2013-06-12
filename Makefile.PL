@@ -98,6 +98,7 @@ else {
 push(@author_requires, 'CatalystX::LeakChecker', '0.05');
 push(@author_requires, 'Catalyst::Devel', '1.0'); # For http server test
 push(@author_requires, 'Test::WWW::Mechanize::Catalyst', '0.51');
+push(@author_requires, 'Test::TCP', '1.27'); # ditto, ships Net::EmptyPort
 
 author_tests('t/author');
 author_requires(
@@ -125,6 +126,7 @@ resources(
     'IRC'         => 'irc://irc.perl.org/#catalyst',
     'license',    => 'http://dev.perl.org/licenses/',
     'homepage',   => 'http://dev.catalyst.perl.org/',
+    # r/w: catagits@git.shadowcat.co.uk:Catalyst-Runtime.git
     'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
 );
 

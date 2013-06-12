@@ -5,7 +5,7 @@ use Test::More tests => 1;
 
 use File::Path;
 use FindBin;
-use Test::TCP;
+use Net::EmptyPort qw(wait_port empty_port);
 use Try::Tiny;
 use Plack::Builder;
 
@@ -96,10 +96,7 @@ if ($^O eq 'MSWin32') {
 sub wait_port_timeout {
     my ($port, $timeout) = @_;
 
-    # wait_port waits for 10 seconds
-    for (1 .. int($timeout / 10)) { # meh, good enough.
-        try { wait_port $port; 1 } and return;
-    }
+    wait_port($port, 0.1, $timeout * 10) and return;
 
     die "Server did not start within $timeout seconds";
 }

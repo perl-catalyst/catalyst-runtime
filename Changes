@@ -1,7 +1,29 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+TBA
+  ! Stricter checking of attributes in Catalyst::DispatchType::Chained:
+    1) Only allow one of either :CaptureArgs or :Args
+    2) :CaptureArgs() argument must be numeric
+    3) :CaptureArgs() and :Args() arguments cannot be negative
   - Add Devel::InnerPackage to dependencies, fixing tests on perl 5.17.11
     as it's been removed from core. RT#84787
+  - New support for closing over the PSGI $writer object, useful for working
+    with event loops.
+  - lets you access a psgix.io socket, if your server supports it, for manual
+    handling of the client - server communication, such as for websockets.
+  - Fix waiting for the server to start in t/author/http-server.t
+  - new config flag 'abort_chain_on_error_fix' that exits immediately when a
+    action in an action chain throws and error (fixes issues where currently
+    the remaining actions are processed and the error is handled at chain
+    termination).
+  - Cored the Encoding plugin.  Now get unicode out of the box by just setting
+    $c->config->{encoding} = 'UTF-8'.  BACKCOMPAT WARNING: If you are using 
+    the Encoding plugin on CPAN, we skip it to avoid double encoding issues, so
+    you should remove it from your plugin list, HOWEVER the 'encoding' config
+    setting is now undef, rather than 'UTF-8' (this was done to avoid breaking
+    people's existing applications) so you should add the encoding setting to 
+    you global config (See Catalyst::Upgrading for more).
+  - minor documentation typo fixes and updates
 
 5.90030 - 2013-04-12
   ! POSSIBLE BREAKING CHANGE: Removed Regexp dispatch type from core, and put

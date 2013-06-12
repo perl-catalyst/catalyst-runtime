@@ -285,6 +285,32 @@ Calls register_path for every Path attribute for the given $action.
 
 =cut
 
+sub _check_args_attr {
+    my ( $self, $action, $name ) = @_;
+
+    return unless exists $action->attributes->{$name};
+
+    if (@{$action->attributes->{$name}} > 1) {
+        Catalyst::Exception->throw(
+          "Multiple $name attributes not supported registering " . $action->reverse()
+        );
+    }
+    my $args = $action->attributes->{$name}->[0];
+    if (defined($args) and not (
+        Scalar::Util::looks_like_number($args) and
+        int($args) == $args and $args >= 0
+    )) {
+        require Data::Dumper;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 0;
+        $args = Data::Dumper::Dumper($args);
+        Catalyst::Exception->throw(
+          "Invalid $name($args) for action " . $action->reverse() .
+          " (use '$name' or '$name(<number>)')"
+        );
+    }
+}
+
 sub register {
     my ( $self, $c, $action ) = @_;
 
@@ -329,21 +355,15 @@ sub register {
 
     $self->_actions->{'/'.$action->reverse} = $action;
 
-    if (exists $action->attributes->{Args}) {
-        my $args = $action->attributes->{Args}->[0];
-        if (defined($args) and not (
-            Scalar::Util::looks_like_number($args) and
-            int($args) == $args
-        )) {
-            require Data::Dumper;
-            local $Data::Dumper::Terse = 1;
-            local $Data::Dumper::Indent = 0;
-            $args = Data::Dumper::Dumper($args);
-            Catalyst::Exception->throw(
-              "Invalid Args($args) for action " . $action->reverse() .
-              " (use 'Args' or 'Args(<number>)')"
-            );
-        }
+    foreach my $name (qw(Args CaptureArgs)) {
+        $self->_check_args_attr($action, $name);
+    }
+
+    if (exists $action->attributes->{Args} and exists $action->attributes->{CaptureArgs}) {
+        Catalyst::Exception->throw(
+          "Combining Args and CaptureArgs attributes not supported registering " .
+          $action->reverse()
+        );
     }
 
     unless ($action->attributes->{CaptureArgs}) {

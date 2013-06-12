@@ -51,6 +51,7 @@ TestApp->config(
         }
     },
     encoding => 'UTF-8',
+    abort_chain_on_error_fix => 1,
 );
 
 # Test bug found when re-adjusting the metaclass compat code in Moose

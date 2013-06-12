@@ -18,7 +18,7 @@ add_stopwords(qw(
     wiki bitmask uri url urls dir hostname proxied http https IP SSL
     inline INLINE plugins cpanfile
     FastCGI Stringifies Rethrows DispatchType Wishlist Refactor ROADMAP HTTPS Unescapes Restarter Nginx Refactored
-    ActionClass LocalRegex LocalRegexp MyAction metadata
+    ActionClass LocalRegex LocalRegexp MyAction metadata cometd io psgix websockets
     Andreas
     Ashton
     Axel

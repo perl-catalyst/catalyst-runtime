@@ -26,7 +26,27 @@ has _writer => (
     predicate => '_has_writer',
 );
 
-sub DEMOLISH { $_[0]->_writer->close if $_[0]->_has_writer }
+has write_fh => (
+  is=>'ro',
+  predicate=>'has_write_fh',
+  lazy=>1,
+  builder=>'_build_write_fh',
+);
+
+sub _build_write_fh {
+  my $self = shift;
+  $self->_context->finalize_headers unless
+    $self->finalized_headers;
+  $self->_writer;
+};
+
+sub DEMOLISH {
+  my $self = shift;
+  return if $self->has_write_fh;
+  if($self->_has_writer) {
+    $self->_writer->close
+  }
+}
 
 has cookies   => (is => 'rw', default => sub { {} });
 has body      => (is => 'rw', default => undef);
@@ -245,6 +265,40 @@ $res->code is an alias for this, to match HTTP::Response->code.
 =head2 $res->write( $data )
 
 Writes $data to the output stream.
+
+=head2 $res->write_fh
+
+Returns a PSGI $writer object that has two methods, write and close.  You can
+close over this object for asynchronous and nonblocking applications.  For
+example (assuming you are using a supporting server, like L<Twiggy>
+
+    package AsyncExample::Controller::Root;
+
+    use Moose;
+
+    BEGIN { extends 'Catalyst::Controller' }
+
+    sub prepare_cb {
+      my $write_fh = pop;
+      return sub {
+        my $message = shift;
+        $write_fh->write("Finishing: $message\n");
+        $write_fh->close;
+      };
+    }
+
+    sub anyevent :Local :Args(0) {
+      my ($self, $c) = @_;
+      my $cb = $self->prepare_cb($c->res->write_fh);
+
+      my $watcher;
+      $watcher = AnyEvent->timer(
+        after => 5,
+        cb => sub {
+          $cb->(scalar localtime);
+          undef $watcher; # cancel circular-ref
+        });
+    }
 
 =head2 $res->print( @data )
 
