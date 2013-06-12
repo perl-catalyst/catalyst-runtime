@@ -30,14 +30,15 @@ has write_fh => (
   is=>'ro',
   predicate=>'has_write_fh',
   lazy=>1,
-  builder=>'_build_write_fh');
+  builder=>'_build_write_fh',
+);
 
-  sub _build_write_fh {
-    my $self = shift;
-    $self->_context->finalize_headers unless
-      $self->finalized_headers;
-    $self->_writer;
-  };
+sub _build_write_fh {
+  my $self = shift;
+  $self->_context->finalize_headers unless
+    $self->finalized_headers;
+  $self->_writer;
+};
 
 sub DEMOLISH {
   my $self = shift;
