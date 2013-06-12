@@ -22,7 +22,9 @@ TBA
     you should remove it from your plugin list, HOWEVER the 'encoding' config
     setting is now undef, rather than 'UTF-8' (this was done to avoid breaking
     people's existing applications) so you should add the encoding setting to 
-    you global config (See Catalyst::Upgrading for more).
+    you global config.  There's some other changes between the stand alone
+    plugin and the cored version, if you use it be sure to see Catalyst::Upgrading
+    for more.
   - minor documentation typo fixes and updates
 
 5.90030 - 2013-04-12

@@ -3193,7 +3193,7 @@ is having paths rewritten into it (e.g. as a .cgi/fcgi in a public_html director
 at other URIs than that which the app is 'normally' based at with C<mod_rewrite>), the resolution of
 C<< $c->request->base >> will be incorrect.
 
-=back
+=back 
 
 =item *
 
@@ -3203,9 +3203,9 @@ C<using_frontend_proxy> - See L</PROXY SUPPORT>.
 
 C<encoding> - See L</ENCODING>
 
-=back
+=item *
 
-=item abort_chain_on_error_fix => 1
+C<abort_chain_on_error_fix>
 
 When there is an error in an action chain, the default behavior is to continue
 processing the remaining actions and then catch the error upon chain end.  This
@@ -3214,7 +3214,13 @@ you have this issue, setting this config value to true will promptly exit a
 chain when there is an error raised in any action (thus terminating the chain 
 early.)
 
+use like:
+
+    __PACKAGE__->config(abort_chain_on_error_fix => 1);
+
 In the future this might become the default behavior.
+
+=back
 
 =head1 INTERNAL ACTIONS
 

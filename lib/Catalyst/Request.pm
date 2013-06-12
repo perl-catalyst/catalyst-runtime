@@ -97,12 +97,22 @@ has io_fh => (
   lazy=>1,
   builder=>'_build_io_fh');
 
-  sub _build_io_fh {
+sub _build_io_fh {
     my $self = shift;
     return $self->env->{'psgix.io'}
       || die "Your Server does not support psgix.io";
-  };
+};
 
+has body_fh => (
+  is=>'ro',
+  predicate=>'has_body_fh',
+  lazy=>1,
+  builder=>'_build_body_fh');
+
+sub _build_body_fh {
+    (my $input_fh = shift->env->{'psgi.input'})->seek(0, 0);
+    return $input_fh;
+};
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
