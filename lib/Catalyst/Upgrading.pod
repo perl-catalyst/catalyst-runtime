@@ -4,13 +4,49 @@ Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
 =head1 Upgrading to Catalyst TBA
 
+=head2 Catalyst::Plugin::Unicode::Encoding is now core
+
+The previously stand alone Unicode support module L<Catalyst::Plugin::Unicode::Encoding>
+has been brought into core as a default plugin.  Going forward, all you need is
+to add a configuration setting for the encoding type.  For example:
+
+    package Myapp::Web;
+
+    use Catalyst;
+
+    __PACKAGE__->config( encoding => 'UTF-8' );
+
+Please note that this is different from the old stand alone plugin which applied
+C<UTF-8> encoding by default (that is, if you did not set an explicit
+C<encoding> configuration value, it assumed you wanted UTF-8).  In order to 
+preserve backwards compatibility you will need to explicitly turn it on via the
+configuration setting.  THIS MIGHT CHANGE IN THE FUTURE, so please consider
+starting to test your application with proper UTF-8 support and remove all those
+crappy hacks you munged into the code because you didn't know the Plugin
+existed :)
+
+For people that are using the Plugin, you will note a startup warning suggesting
+that you can remove it from the plugin list.  When you do so, please remember to
+add the configuration setting, since you can no longer rely on the default being
+UTF-8.  We'll add it for you if you continue to use the stand alone plugin and
+we detect this, but this backwards compatibility shim will likely be removed in
+a few releases (trying to clean up the codebase after all).
+
+If you have trouble with any of this, please bring it to the attention of the
+Catalyst maintainer group.
+
+=head2 basic async and event loop support
+
 This version of L<Catalyst> offers some support for using L<AnyEvent> and
 L<IO::Async> event loops in your application.  These changes should work
 fine for most applications however if you are already trying to perform
 some streaming, minor changes in this area of the code might affect your
 functionality.  Please see L<Catalyst::Response\write_fh> for more and for a
 basic example.
- 
+
+We consider this feature experimental.  We will try not to break it, but we
+reserve the right to make necessary changes to fix major issues that people
+run into when the use this functionality in the wild.
 
 =head1 Upgrading to Catalyst 5.9
 

@@ -16,6 +16,13 @@ TBA
     action in an action chain throws and error (fixes issues where currently
     the remaining actions are processed and the error is handled at chain
     termination).
+  - Cored the Encoding plugin.  Now get unicode out of the box by just setting
+    $c->config->{encoding} = 'UTF-8'.  BACKCOMPAT WARNING: If you are using 
+    the Encoding plugin on CPAN, we skip it to avoid double encoding issues, so
+    you should remove it from your plugin list, HOWEVER the 'encoding' config
+    setting is now undef, rather than 'UTF-8' (this was done to avoid breaking
+    people's existing applications) so you should add the encoding setting to 
+    you global config (See Catalyst::Upgrading for more).
   - minor documentation typo fixes and updates
 
 5.90030 - 2013-04-12
