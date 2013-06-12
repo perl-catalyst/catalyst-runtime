@@ -3185,6 +3185,17 @@ C<using_frontend_proxy> - See L</PROXY SUPPORT>.
 
 =back
 
+=item abort_chain_on_error_fix => 1
+
+When there is an error in an action chain, the default behavior is to continue
+processing the remaining actions and then catch the error upon chain end.  This
+can lead to running actions when the application is in an unexpected state.  If
+you have this issue, setting this config value to true will promptly exit a
+chain when there is an error raised in any action (thus terminating the chain 
+early.)
+
+In the future this might become the default behavior.
+
 =head1 INTERNAL ACTIONS
 
 Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,

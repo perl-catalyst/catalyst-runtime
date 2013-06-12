@@ -12,6 +12,11 @@ TBA
   - lets you access a psgix.io socket, if your server supports it, for manual
     handling of the client - server communication, such as for websockets.
   - Fix waiting for the server to start in t/author/http-server.t
+  - new config flag 'abort_chain_on_error_fix' that exits immediately when a
+    action in an action chain throws and error (fixes issues where currently
+    the remaining actions are processed and the error is handled at chain
+    termination).
+  - minor documentation typo fixes and updates
 
 5.90030 - 2013-04-12
   ! POSSIBLE BREAKING CHANGE: Removed Regexp dispatch type from core, and put
