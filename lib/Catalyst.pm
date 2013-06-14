@@ -3001,7 +3001,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
                 () }
                 : $_
         } @$plugins ];
-        unshift @$plugins, $class->_default_plugins;
+        push @$plugins, $class->_default_plugins;
         $plugins = Data::OptList::mkopt($plugins || []);
 
         my @plugins = map {

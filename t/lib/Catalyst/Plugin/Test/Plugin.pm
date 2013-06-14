@@ -11,6 +11,8 @@ use base qw/Class::Data::Inheritable/;
 sub setup {
    my $c = shift;
    $c->ran_setup('1');
+
+   return $c->next::method( @_ );
 }
 
 sub prepare {
