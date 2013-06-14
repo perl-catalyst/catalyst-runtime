@@ -82,7 +82,6 @@ test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';
 test_requires 'IO::Scalar';
 test_requires 'HTTP::Status';
-test_requires 'Catalyst::Plugin::Params::Nested';
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 my @author_requires;
