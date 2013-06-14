@@ -1828,7 +1828,7 @@ sub finalize {
     $c->log_response;
 
     if ($c->use_stats) {
-        my $elapsed = sprintf '%f', $c->stats->elapsed;
+        my $elapsed = $c->stats->elapsed;
         my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
         $c->log->info(
             "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
