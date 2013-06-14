@@ -2,7 +2,7 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
-=head1 Upgrading to Catalyst TBA
+=head1 Upgrading to Catalyst 5.90040
 
 =head2 Catalyst::Plugin::Unicode::Encoding is now core
 
@@ -53,6 +53,17 @@ basic example.
 We consider this feature experimental.  We will try not to break it, but we
 reserve the right to make necessary changes to fix major issues that people
 run into when the use this functionality in the wild.
+
+=head1 Upgrading to Catalyst 5.90030
+
+=head2 Regex dispatch type is deprecated.
+
+The Regex dispatchtype (L<Catalyst::DispatchType::Regex>) has been deprecated.
+
+You are encouraged to move your application to Chained dispatch (L<Catalyst::DispatchType::Chained>).
+
+If you cannot do so, please add a dependency to Catalyst::DispatchType::Regex to your application's
+Makefile.PL
 
 =head1 Upgrading to Catalyst 5.9
 
@@ -265,15 +276,6 @@ exception propagated into the test.
 This behavior has been removed, and now a 500 response will be returned
 to the test. This change standardizes behavior, so that local test
 requests behave similarly to remote requests.
-
-=head2 Regex dispatch type is deprecated.
-
-The Regex dispatchtype (L<Catalyst::DispatchType::Regex>) has been deprecated.
-
-You are encouraged to move your application to Chained dispatch (L<Catalyst::DispatchType::Chained>).
-
-If you cannot do so, please add a dependency to Catalyst::DispatchType::Regex to your application's
-Makefile.PL
 
 =head1 Upgrading to Catalyst 5.80
 
