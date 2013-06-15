@@ -113,7 +113,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90041';
+our $VERSION = '5.90042';
 
 sub import {
     my ( $class, @arguments ) = @_;

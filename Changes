@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90042 - 2013-06-14
+  - Removed more places where an optional dependency shows up in the test
+    suite. Hopefully really fixed the unicode regression introduced in 5.90040
+
 5.90041 - 2013-06-14
   - Bug fix release to fix regressions introduced in previous.  I would consider
     this a likely upgrade and if you are having trouble with the previous I hope
