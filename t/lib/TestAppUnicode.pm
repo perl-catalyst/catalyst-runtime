@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use TestLogger;
 use base qw/Catalyst/;
-use Catalyst qw/Unicode::Encoding Params::Nested/;
+use Catalyst qw/Unicode::Encoding/;
 
 __PACKAGE__->config(
   'name' => 'TestAppUnicode',
