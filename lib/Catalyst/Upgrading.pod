@@ -32,12 +32,6 @@ UTF-8.  We'll add it for you if you continue to use the stand alone plugin and
 we detect this, but this backwards compatibility shim will likely be removed in
 a few releases (trying to clean up the codebase after all).
 
-B<NOTE>: One other difference between the cored plugin and the stand alone one
-is that in core we no longer throw an exception when there's a decode failure
-but instead log a warning.  If you rely on exceptions for control flow, you 
-will need to override method C<handle_unicode_encoding_exception> to die instead
-of warning.  Please let the dev team know if this is a problem for you.
-
 If you have trouble with any of this, please bring it to the attention of the
 Catalyst maintainer group.
 
