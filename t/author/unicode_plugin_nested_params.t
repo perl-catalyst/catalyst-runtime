@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 use utf8;
+use FindBin;
+use lib "$FindBin::Bin/../../t/lib";
 
 # setup library path
 use FindBin qw($Bin);
