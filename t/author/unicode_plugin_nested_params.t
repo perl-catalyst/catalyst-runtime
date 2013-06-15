@@ -4,12 +4,10 @@ use strict;
 use warnings;
 use Test::More;
 use utf8;
-use FindBin;
-use lib "$FindBin::Bin/../../t/lib";
 
 # setup library path
 use FindBin qw($Bin);
-use lib "$Bin/lib";
+use lib "$Bin/../lib";
 
 BEGIN { eval { require Catalyst::Plugin::Params::Nested; 1; } ||
     plan skip_all => 'Need Catalyst::Plugin::Params::Nested' }
