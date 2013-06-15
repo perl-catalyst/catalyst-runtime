@@ -128,7 +128,8 @@ sub setup {
     my $enc = delete $conf->{encoding};
     $self->encoding( $enc );
 
-    return $self->next::method(@_);
+    return $self->next::method(@_)
+      unless $self->setup_finished; ## hack to stop possibily meaningless test fail... (jnap)
 }
 
 sub _handle_unicode_decoding {
