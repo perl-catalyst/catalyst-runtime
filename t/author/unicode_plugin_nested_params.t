@@ -22,11 +22,6 @@ my $encode_str = "\x{e3}\x{81}\x{82}"; # e38182 is japanese 'あ'
 my $decode_str = Encode::decode('utf-8' => $encode_str);
 my $escape_str = uri_escape_utf8($decode_str);
 
-BEGIN {
-    eval 'require Catalyst::Plugin::Params::Nested';
-    plan skip_all => 'Catalyst::Plugin::Params::Nested is required' if $@;
-}
-
 {
     my ($res, $c) = ctx_request("/?foo.1=bar&foo.2=$escape_str");
     is( $c->res->output, '<h1>It works</h1>', 'Content displayed' );
