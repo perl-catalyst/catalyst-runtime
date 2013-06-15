@@ -20,14 +20,25 @@ my $decode_str = Encode::decode('utf-8' => $encode_str);
 my $escape_str = uri_escape_utf8($decode_str);
 
 check_parameter(GET "/?myparam=$escape_str");
+check_parameter(POST '/',
+    Content_Type => 'form-data',
+    Content => [
+        'myparam' => [
+            "$Bin/unicode_plugin_no_encoding.t",
+            "$Bin/unicode_plugin_request_decode.t",
+        ]
+    ],
+);
 
 sub check_parameter {
     my ( undef, $c ) = ctx_request(shift);
-    is $c->res->output => $encode_str;
 
     my $myparam = $c->req->param('myparam');
     ok !utf8::is_utf8($myparam);
-    is $myparam => $encode_str;
+    unless ( $c->request->method eq 'POST' ) {
+        is $c->res->output => $encode_str;
+        is $myparam => $encode_str;
+    }
 
     is scalar(@TestLogger::ELOGS), 2
         or diag Dumper(\@TestLogger::ELOGS);

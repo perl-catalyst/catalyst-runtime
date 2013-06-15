@@ -95,15 +95,17 @@ sub prepare_uploads {
     for my $value ( values %{ $c->request->uploads } ) {
         # skip if it fails for uploads, as we don't usually want uploads touched
         # in any way
-        $_->{filename} = try {
-        $enc->decode( $_->{filename}, $CHECK )
-    } catch {
-        $c->handle_unicode_encoding_exception({
-            param_value => $_->{filename},
-            error_msg => $_,
-            encoding_step => 'uploads',
-        });
-    } for ( ref($value) eq 'ARRAY' ? @{$value} : $value );
+        for my $inner_value ( ref($value) eq 'ARRAY' ? @{$value} : $value ) {
+            $inner_value->{filename} = try {
+                $enc->decode( $inner_value->{filename}, $CHECK )
+            } catch {
+                $c->handle_unicode_encoding_exception({
+                    param_value => $inner_value->{filename},
+                    error_msg => $_,
+                    encoding_step => 'uploads',
+                });
+            };
+        }
     }
 }
 
