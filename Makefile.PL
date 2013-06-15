@@ -115,6 +115,7 @@ author_requires(
   Test::Spelling
   Pod::Coverage::TrustPod
   Catalyst::Plugin::Params::Nested
+  Catalyst::Plugin::ConfigLoader
 ));
 
 if ($Module::Install::AUTHOR) {
