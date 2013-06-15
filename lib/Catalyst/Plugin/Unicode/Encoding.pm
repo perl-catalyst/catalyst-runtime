@@ -81,6 +81,7 @@ sub prepare_uploads {
     $c->next::method(@_);
 
     my $enc = $c->encoding;
+    return unless $enc;
 
     for my $key (qw/ parameters query_parameters body_parameters /) {
         for my $value ( values %{ $c->request->{$key} } ) {
@@ -111,6 +112,9 @@ sub prepare_action {
     my $c = shift;
 
     my $ret = $c->next::method(@_);
+
+    my $enc = $c->encoding;
+    return $ret unless $enc;
 
     foreach (@{$c->req->arguments}, @{$c->req->captures}) {
       $_ = $c->_handle_param_unicode_decoding($_);
