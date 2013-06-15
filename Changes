@@ -1,5 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90041 - 2013-06-14
+  - Bug fix release to fix regressions introduced in previous.  I would consider
+    this a likely upgrade and if you are having trouble with the previous I hope
+    this fixes all of them.
+  - Fix regression with the cored Unicode plugin that broke systems where you are
+    setting encoding type in an external configuration file
+  - Fixed circular dependency introduced when we cored the unicode plugin tests
+  - Fixed a longstanding problem with stats when locale uses , instead of . for
+    number decimals
+  - Fixed some docs that didn't properly date the previous release.
+
 5.90040 - 2013-06-12
   ! Stricter checking of attributes in Catalyst::DispatchType::Chained:
     1) Only allow one of either :CaptureArgs or :Args
