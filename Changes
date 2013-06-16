@@ -3,6 +3,13 @@
 5.90042 - 2013-06-14
   - Removed more places where an optional dependency shows up in the test
     suite. Hopefully really fixed the unicode regression introduced in 5.90040
+  - reverted the change we introduced in 5.90040 where a unicode conversion
+    error warned instead of died.  Now it dies again, like in the stand alone
+    plugin
+  - More work to make sure nothing happens with encoding unless you explicitly
+    ask for encoding
+  - Code to hopefully fix an issue where file uploads using the unicode plugin
+    caused trouble.
 
 5.90041 - 2013-06-14
   - Bug fix release to fix regressions introduced in previous.  I would consider
