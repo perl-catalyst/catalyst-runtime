@@ -2726,6 +2726,11 @@ sub setup_engine {
     return;
 }
 
+## This exists just to supply a prebuild psgi app for mod_perl and for the 
+## build in server support (back compat support for pre psgi port behavior).
+## This is so that we don't build a new psgi app for each request when using
+## the mod_perl handler or the built in servers (http and fcgi, etc).
+
 sub _finalized_psgi_app {
     my ($app) = @_;
 
@@ -2736,6 +2741,12 @@ sub _finalized_psgi_app {
 
     return $app->_psgi_app;
 }
+
+## Look for a psgi file like 'myapp_web.psgi' (if the app is MyApp::Web) in the
+## home directory and load that and return it (just assume it is doing the 
+## right thing :) ).  If that does not exist, call $app->psgi_app, wrap that
+## in default_middleware and return it ( this is for backward compatibility
+## with pre psgi port behavior ).
 
 sub _setup_psgi_app {
     my ($app) = @_;
