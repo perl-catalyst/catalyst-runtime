@@ -3044,6 +3044,27 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
     }
 }
 
+sub setup_middleware { }
+
+our @registered_middlewares = ();
+
+## A normalized read only list of PSGI Middleware
+sub registered_middlewares { @registered_middlewares }
+
+## Normalize incoming middleware and hold it
+sub register_middleware {
+    my($self, $mw, @args) = @_;
+
+    if (ref $mw ne 'CODE') {
+        my $mw_class = Plack::Util::load_class($mw, 'Plack::Middleware');
+        $mw = sub { $mw_class->wrap($_[0], @args) };
+    }
+
+    push @registered_middlewares, $mw;
+}
+
+sub apply_registered_middleware { }
+
 =head2 $c->stack
 
 Returns an arrayref of the internal execution stack (actions that are

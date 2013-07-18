@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90XXX - TBA
+  - Declare PSGI compliant Middleware as part of your Catalyst Application
+
 5.90042 - 2013-06-14
   - Removed more places where an optional dependency shows up in the test
     suite. Hopefully really fixed the unicode regression introduced in 5.90040
