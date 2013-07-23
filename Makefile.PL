@@ -101,7 +101,7 @@ else {
 push(@author_requires, 'CatalystX::LeakChecker', '0.05');
 push(@author_requires, 'Catalyst::Devel', '1.0'); # For http server test
 push(@author_requires, 'Test::WWW::Mechanize::Catalyst', '0.51');
-push(@author_requires, 'Test::TCP', '1.27'); # ditto, ships Net::EmptyPort
+push(@author_requires, 'Test::TCP', '2.00'); # ditto, ships Net::EmptyPort
 
 author_tests('t/author');
 author_requires(

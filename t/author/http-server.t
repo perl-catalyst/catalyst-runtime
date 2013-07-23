@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 1;
+use Test::TCP;
 
 use File::Path;
 use FindBin;
@@ -96,7 +97,7 @@ if ($^O eq 'MSWin32') {
 sub wait_port_timeout {
     my ($port, $timeout) = @_;
 
-    wait_port($port, 0.1, $timeout * 10) and return;
+    wait_port($port, $timeout * 10) and return;
 
     die "Server did not start within $timeout seconds";
 }
