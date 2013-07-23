@@ -3362,6 +3362,10 @@ use like:
 
 In the future this might become the default behavior.
 
+=item *
+
+C<psgi_middleware> - See L<PSGI MIDDLEWARE>.
+
 =back
 
 =head1 INTERNAL ACTIONS
@@ -3452,6 +3456,131 @@ believe the Catalyst core to be thread-safe.
 If you plan to operate in a threaded environment, remember that all other
 modules you are using must also be thread-safe. Some modules, most notably
 L<DBD::SQLite>, are not thread-safe.
+
+=head1 PSGI MIDDLEWARE
+
+You can define middleware, defined as L<Plack::Middleware> or a compatible
+interface in configuration.  Your middleware definitions are in the form of an
+arrayref under the configuration key C<psgi_middleware>.  Here's an example
+with details to follow:
+
+    package MyApp::Web;
+ 
+    use Catalyst;
+    use Plack::Middleware::StackTrace;
+ 
+    my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
+ 
+    __PACKAGE__->config(
+      'psgi_middleware', [
+        'Debug',
+        '+MyApp::Custom',
+        $stacktrace_middleware,
+        'Session' => {store => 'File'},
+        sub {
+          my $app = shift;
+          return sub {
+            my $env = shift;
+            $env->{myapp.customkey} = 'helloworld';
+            $app->($env);
+          },
+        },
+      ],
+    );
+ 
+    __PACKAGE__->setup;
+
+So the general form is:
+
+    __PACKAGE__->config(psgi_middleware => \@middleware_definitions);
+
+Where C<@middleware> is one or more of the following, applied in the REVERSE of
+the order listed (to make it function similarly to L<Plack::Builder>:
+ 
+=over4
+ 
+=item Middleware Object
+ 
+An already initialized object that conforms to the L<Plack::Middleware>
+specification:
+ 
+    my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
+ 
+    __PACKAGE__->config(
+      'psgi_middleware', [
+        $stacktrace_middleware,
+      ]);
+ 
+ 
+=item coderef
+ 
+A coderef that is an inlined middleware:
+ 
+    __PACKAGE__->config(
+      'psgi_middleware', [
+        sub {
+          my $app = shift;
+          return sub {
+            my $env = shift;
+            if($env->{PATH_INFO} =~m/forced/) {
+              Plack::App::File
+                ->new(file=>TestApp->path_to(qw/share static forced.txt/))
+                ->call($env);
+            } else {
+              return $app->($env);
+            }
+         },
+      },
+    ]);
+ 
+ 
+ 
+=item a scalar
+ 
+We assume the scalar refers to a namespace after normalizing it using the
+following rules:
+
+(1) If the scalar is prefixed with a "+" (as in C<+MyApp::Foo>) then the full string
+is assumed to be 'as is', and we just install and use the middleware.
+
+(2) If the scalar begins with "Plack::Middleware" or your application namespace
+(the package name of your Catalyst application subclass), we also assume then
+that it is a full namespace, and use it.
+
+(3) Lastly, we then assume that the scalar is a partial namespace, and attempt to
+resolve it first by looking for it under your application namespace (for example
+if you application is "MyApp::Web" and the scalar is "MyMiddleware", we'd look
+under "MyApp::Web::Middleware::MyMiddleware") and if we don't find it there, we
+will then look under the regular L<Plack::Middleware> namespace (i.e. for the
+previous we'd try "Plack::Middleware::MyMiddleware").  We look under your application
+namespace first to let you 'override' common L<Plack::Middleware> locally, should
+you find that a good idea.
+
+Examples:
+
+    package MyApp::Web;
+
+    __PACKAGE__->config(
+      'psgi_middleware', [
+        'Debug',  ## MyAppWeb::Middleware::Debug->wrap or Plack::Middleware::Debug->wrap
+        'Plack::Middleware::Stacktrace', ## Plack::Middleware::Stacktrace->wrap
+        '+MyApp::Custom',  ## MyApp::Custom->wrap
+      ],
+    );
+ 
+=item a scalar followed by a hashref
+ 
+Just like the previous, except the following C<HashRef> is used as arguments
+to initialize the middleware object.
+ 
+    __PACKAGE__->config(
+      'psgi_middleware', [
+         'Session' => {store => 'File'},
+    ]);
+
+=back
+
+Please see L<PSGI> for more on middleware.
 
 =head1 ENCODING
 
