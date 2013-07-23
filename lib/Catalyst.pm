@@ -40,6 +40,8 @@ use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
+use Plack::Util;
+use Class::Load;
 
 BEGIN { require 5.008003; }
 
@@ -3044,26 +3046,134 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
     }
 }
 
-sub setup_middleware { }
+has '_registered_middlewares' => (
+    traits => ['Array'],
+    is => 'bare',
+    isa => 'ArrayRef[Object|CodeRef]',
+    default => sub { [] },
+    handles => {
+        registered_middlewares => 'elements',
+        _register_middleware => 'push',
+    });
+    
 
-our @registered_middlewares = ();
+=head2 setup_middleware
 
-## A normalized read only list of PSGI Middleware
-sub registered_middlewares { @registered_middlewares }
+Read configuration information stored in configuration key 'psgi_middleware'
+and invoke L</register_middleware> for each middleware prototype found.  See
+under L</CONFIGURATION> information regarding L</psgi_middleware> and how to
+use it to enable L<Plack::Middleware>
 
-## Normalize incoming middleware and hold it
-sub register_middleware {
-    my($self, $mw, @args) = @_;
+This method is automatically called during 'setup' of your application, so
+you really don't need to invoke it.
 
-    if (ref $mw ne 'CODE') {
-        my $mw_class = Plack::Util::load_class($mw, 'Plack::Middleware');
-        $mw = sub { $mw_class->wrap($_[0], @args) };
+When we read middleware definitions from configuration, we reverse the list
+which sounds odd but is likely how you expect it to work if you have prior
+experience with L<Plack::Builder> or if you previously used the plugin
+L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
+
+=head2 register_middleware (@args)
+
+Given @args that represent the definition of some L<Plack::Middleware> or 
+middleware with a compatible interface, register it with your L<Catalyst>
+application.
+
+This is called by L</setup_middleware>.  the behaior of invoking it yourself
+at runtime is currently undefined, and anything that works or doesn't work
+as a result of doing so is considered a side effect subject to change.
+
+=head2 _register_middleware (@args)
+
+Internal details of how registered middleware is stored by the application.
+
+=head2 _build_middleware_from_args (@args)
+
+Internal application that converts a single middleware definition (see
+L</psgi_middleware>) into an actual instance of middleware.
+
+=head2 registered_middlewares
+
+Read only accessor that returns an array of all the middleware in the order
+that they were added (which is the REVERSE of the order they will be applied).
+
+The values returned will be either instances of L<Plack::Middleware> or of a
+compatible interface, or a coderef, which is assumed to be inlined middleware
+
+=head2 apply_registered_middleware ($psgi)
+
+Given a $psgi reference, wrap all the L<registered_middlewares> around it and
+return the wrapped version.
+
+=cut
+
+sub setup_middleware {
+    my ($self) = @_;
+    my @middleware_definitions = reverse
+      @{$self->config->{'psgi_middleware'}||[]};
+
+    while(my $next = shift(@middleware_definitions)) {
+        if(ref $next) {
+            if(Scalar::Util::blessed $next && $next->can('wrap')) {
+                $self->register_middleware($next);
+            } elsif(ref $next eq 'CODE') {
+                $self->register_middleware($next);
+            } elsif(ref $next eq 'HASH') {
+                my $namespace = shift @middleware_definitions;
+                $self->register_middleware($namespace, %$next);
+            } else {
+                $self->register_middleware($next);
+            }
+        }
     }
-
-    push @registered_middlewares, $mw;
 }
 
-sub apply_registered_middleware { }
+sub register_middleware {
+    my($self, @args) = @_;
+    my $middleware = $self->_build_middleware_from_args(@args);
+    $self->_register_middleware($middleware);
+    return $middleware;
+}
+
+sub _build_middleware_from_args {
+    my ($self, $proto, @args) = @_;
+
+    if(ref $proto) { ## Either an object or coderef
+      if(Scalar::Util::blessed $proto && $proto->can('wrap')) {  ## Its already an instance of middleware
+        return $proto;
+      } elsif(ref $proto eq 'CODE') { ## Its inlined coderef
+        return $proto;
+      }
+    } else { ## We assume its a string aiming to load Plack Middleware
+        my $class = ref($self) || $self;
+        if(
+          $proto =~s/^\+// ||
+          $proto =~/^Plack::Middleware/ ||
+          $proto =~/^$class/
+        ) {  ## the string is a full namespace
+            require "$proto";
+            return $proto->new(@args);
+        } else { ## the string is a partial namespace
+            if(Class::Load::try_load_class("Plack::Middleware::$proto")) { ## Act like Plack::Builder
+                return "Plack::Middleware::$proto"->new(@args);
+            } elsif(Class::Load::try_load_class("$class::$proto")) { ## Load Middleware from Project namespace
+                return "$class::$proto"->new(@args);
+            }
+        }
+    }
+
+    die "I don't know how to build $proto into valid Plack Middleware";
+}
+
+sub apply_registered_middleware {
+    my ($self, $psgi) = @_;
+    my $new_psgi = $psgi;
+    foreach my $middleware ($self->registered_middlewares) {
+        $new_psgi = Scalar::Util::blessed $middleware ?
+          $middleware->wrap($new_psgi) :
+            $middleware->($new_psgi);
+    }
+    return $new_psgi;
+}
 
 =head2 $c->stack
 
