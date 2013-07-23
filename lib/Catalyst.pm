@@ -3078,8 +3078,8 @@ Given @args that represent the definition of some L<Plack::Middleware> or
 middleware with a compatible interface, register it with your L<Catalyst>
 application.
 
-This is called by L</setup_middleware>.  the behaior of invoking it yourself
-at runtime is currently undefined, and anything that works or doesn't work
+This is called by L</setup_middleware>.  the behavior of invoking it yourself
+at run time is currently undefined, and anything that works or doesn't work
 as a result of doing so is considered a side effect subject to change.
 
 =head2 _register_middleware (@args)
@@ -3497,7 +3497,7 @@ So the general form is:
 Where C<@middleware> is one or more of the following, applied in the REVERSE of
 the order listed (to make it function similarly to L<Plack::Builder>:
  
-=over4
+=over 4
  
 =item Middleware Object
  
