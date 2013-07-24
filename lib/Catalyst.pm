@@ -106,7 +106,7 @@ our $GO        = Catalyst::Exception::Go->new;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
-  setup_finished _psgi_app loading_psgi_file run_options/;
+  setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1110,6 +1110,7 @@ sub setup {
 
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
+    $class->setup_middleware();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
     if (my $engine = delete $flags->{engine}) {
         $class->log->warn("Specifying the engine in ->setup is no longer supported, see Catalyst::Upgrading");
@@ -1149,6 +1150,16 @@ EOF
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @plugins;
             $class->log->debug( "Loaded plugins:\n" . $t->draw . "\n" );
+        }
+
+        my @middleware = map { ref $_ eq 'CODE' ? "Inline Coderef" : (ref($_) .'  '. $_->VERSION || '')  }
+          $class->registered_middlewares;
+
+        if (@middleware) {
+            my $column_width = Catalyst::Utils::term_width() - 6;
+            my $t = Text::SimpleTable->new($column_width);
+            $t->row($_) for @middleware;
+            $class->log->debug( "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
         }
 
         my $dispatcher = $class->dispatcher;
@@ -2860,7 +2871,8 @@ reference of your Catalyst application for use in F<.psgi> files.
 
 sub psgi_app {
     my ($app) = @_;
-    return $app->engine->build_psgi_app($app);
+    my $psgi = $app->engine->build_psgi_app($app);
+    return $app->apply_registered_middleware($psgi);
 }
 
 =head2 $c->setup_home
@@ -3044,20 +3056,9 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
             $class => @roles
         ) if @roles;
     }
-}
+}    
 
-has '_registered_middlewares' => (
-    traits => ['Array'],
-    is => 'bare',
-    isa => 'ArrayRef[Object|CodeRef]',
-    default => sub { [] },
-    handles => {
-        registered_middlewares => 'elements',
-        _register_middleware => 'push',
-    });
-    
-
-=head2 setup_middleware
+=head2 setup_middleware (?@middleware)
 
 Read configuration information stored in configuration key 'psgi_middleware'
 and invoke L</register_middleware> for each middleware prototype found.  See
@@ -3072,6 +3073,9 @@ which sounds odd but is likely how you expect it to work if you have prior
 experience with L<Plack::Builder> or if you previously used the plugin
 L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
 
+You can pass middleware definitions to this as well, from the application
+class if you like.
+
 =head2 register_middleware (@args)
 
 Given @args that represent the definition of some L<Plack::Middleware> or 
@@ -3082,11 +3086,7 @@ This is called by L</setup_middleware>.  the behavior of invoking it yourself
 at run time is currently undefined, and anything that works or doesn't work
 as a result of doing so is considered a side effect subject to change.
 
-=head2 _register_middleware (@args)
-
-Internal details of how registered middleware is stored by the application.
-
-=head2 _build_middleware_from_args (@args)
+=head2 _build_middleware (@args)
 
 Internal application that converts a single middleware definition (see
 L</psgi_middleware>) into an actual instance of middleware.
@@ -3106,68 +3106,68 @@ return the wrapped version.
 
 =cut
 
+sub registered_middlewares { @{shift->_psgi_middleware || []} }
+
 sub setup_middleware {
-    my ($self) = @_;
-    my @middleware_definitions = reverse
-      @{$self->config->{'psgi_middleware'}||[]};
+    my ($class, @middleware_definitions) = @_;
+    push @middleware_definitions, reverse(
+      @{$class->config->{'psgi_middleware'}||[]});
 
     while(my $next = shift(@middleware_definitions)) {
         if(ref $next) {
             if(Scalar::Util::blessed $next && $next->can('wrap')) {
-                $self->register_middleware($next);
+                $class->register_middleware($next);
             } elsif(ref $next eq 'CODE') {
-                $self->register_middleware($next);
+                $class->register_middleware($next);
             } elsif(ref $next eq 'HASH') {
                 my $namespace = shift @middleware_definitions;
-                $self->register_middleware($namespace, %$next);
+                my $mw = $class->_build_middleware($namespace, %$next);
+                $class->register_middleware($mw);
             } else {
-                $self->register_middleware($next);
+              die "I can't handle middleware definition ${\ref $next}";
             }
+        } else {
+          my $mw = $class->_build_middleware($next);
+          $class->register_middleware($mw);
         }
     }
 }
 
 sub register_middleware {
-    my($self, @args) = @_;
-    my $middleware = $self->_build_middleware_from_args(@args);
-    $self->_register_middleware($middleware);
-    return $middleware;
+  my ($class, @middleware) = @_;
+  if($class->_psgi_middleware) {
+    push @{$class->_psgi_middleware}, @middleware;
+  } else {
+    $class->_psgi_middleware(\@middleware);
+  }
 }
 
-sub _build_middleware_from_args {
-    my ($self, $proto, @args) = @_;
+sub _build_middleware {
+    my ($class, $namespace, @init_args) = @_;
 
-    if(ref $proto) { ## Either an object or coderef
-      if(Scalar::Util::blessed $proto && $proto->can('wrap')) {  ## Its already an instance of middleware
-        return $proto;
-      } elsif(ref $proto eq 'CODE') { ## Its inlined coderef
-        return $proto;
-      }
-    } else { ## We assume its a string aiming to load Plack Middleware
-        my $class = ref($self) || $self;
-        if(
-          $proto =~s/^\+// ||
-          $proto =~/^Plack::Middleware/ ||
-          $proto =~/^$class/
-        ) {  ## the string is a full namespace
-            require "$proto";
-            return $proto->new(@args);
-        } else { ## the string is a partial namespace
-            if(Class::Load::try_load_class("Plack::Middleware::$proto")) { ## Act like Plack::Builder
-                return "Plack::Middleware::$proto"->new(@args);
-            } elsif(Class::Load::try_load_class("$class::$proto")) { ## Load Middleware from Project namespace
-                return "$class::$proto"->new(@args);
-            }
+    if(
+      $namespace =~s/^\+// ||
+      $namespace =~/^Plack::Middleware/ ||
+      $namespace =~/^$class/
+    ) {  ## the string is a full namespace
+        return Class::Load::try_load_class($namespace) ?
+          $namespace->new(@init_args) :
+            die "Can't load class $namespace";
+    } else { ## the string is a partial namespace
+        if(Class::Load::try_load_class("Plack::Middleware::$namespace")) { ## Act like Plack::Builder
+            return "Plack::Middleware::$namespace"->new(@init_args);
+        } elsif(Class::Load::try_load_class("$class::$namespace")) { ## Load Middleware from Project namespace
+            return "$class::$namespace"->new(@init_args);
         }
     }
 
-    die "I don't know how to build $proto into valid Plack Middleware";
+    return; ## be sure we can count on a proper return when valid
 }
 
 sub apply_registered_middleware {
-    my ($self, $psgi) = @_;
+    my ($class, $psgi) = @_;
     my $new_psgi = $psgi;
-    foreach my $middleware ($self->registered_middlewares) {
+    foreach my $middleware ($class->registered_middlewares) {
         $new_psgi = Scalar::Util::blessed $middleware ?
           $middleware->wrap($new_psgi) :
             $middleware->($new_psgi);

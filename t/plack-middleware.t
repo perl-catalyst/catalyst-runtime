@@ -1,11 +1,14 @@
 #!/usr/bin/env perl
 
+use warnings;
+use strict;
+
 use FindBin;
-use Test::Most;
+use Test::More;
 use HTTP::Request::Common;
 
 use lib "$FindBin::Bin/lib";
-use Catalyst::Test 'TestApp';
+use Catalyst::Test 'TestMiddleware';
 
 ok my($res, $c) = ctx_request('/');
 
@@ -47,5 +50,8 @@ ok my($res, $c) = ctx_request('/');
 
   like $response->content, qr'forced message',
     'expected content body';
+
+  ok $response->headers->{"x-runtime"}, "Got value for expected middleware";
 }
+
 done_testing;
