@@ -130,12 +130,12 @@ sub setup {
 
     my $conf = $self->config;
 
-    # Allow an explict undef encoding to disable default of utf-8
+    # Allow an explicit undef encoding to disable default of utf-8
     my $enc = delete $conf->{encoding};
     $self->encoding( $enc );
 
     return $self->next::method(@_)
-      unless $self->setup_finished; ## hack to stop possibily meaningless test fail... (jnap)
+      unless $self->setup_finished; ## hack to stop possibly meaningless test fail... (jnap)
 }
 
 sub _handle_unicode_decoding {
