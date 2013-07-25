@@ -223,7 +223,7 @@ sub home {
             ( my $path = $inc_entry) =~ s/\.pm$//;
             my $home = dir($path)->absolute->cleanup;
 
-            # return if if it's a valid directory
+            # return if it's a valid directory
             return $home->stringify if -d $home;
         }
     }
