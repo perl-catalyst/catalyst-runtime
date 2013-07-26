@@ -9,6 +9,7 @@ use Carp qw/croak/;
 use Cwd;
 use Class::MOP;
 use String::RewritePrefix;
+use Class::Load ();
 
 use namespace::clean;
 
@@ -433,6 +434,55 @@ sub resolve_namespace {
     }, @classes);
 }
 
+=head2 build_middleware (@args)
+
+Internal application that converts a single middleware definition (see
+L<Catalyst/psgi_middleware>) into an actual instance of middleware.
+
+=cut
+
+sub build_middleware {
+    my ($class, $namespace, @init_args) = @_;
+
+    if(
+      $namespace =~s/^\+// ||
+      $namespace =~/^Plack::Middleware/ ||
+      $namespace =~/^$class/
+    ) {  ## the string is a full namespace
+        return Class::Load::try_load_class($namespace) ?
+          $namespace->new(@init_args) :
+            die "Can't load class $namespace";
+    } else { ## the string is a partial namespace
+        if(Class::Load::try_load_class("Plack::Middleware::$namespace")) { ## Act like Plack::Builder
+            return "Plack::Middleware::$namespace"->new(@init_args);
+        } elsif(Class::Load::try_load_class("$class::$namespace")) { ## Load Middleware from Project namespace
+            return "$class::$namespace"->new(@init_args);
+        }
+    }
+
+    return; ## be sure we can count on a proper return when valid
+}
+
+=head2 apply_registered_middleware ($psgi)
+
+Given a $psgi reference, wrap all the L<Catalyst/registered_middlewares>
+around it and return the wrapped version.
+
+This exists to deal with the fact Catalyst registered middleware can be
+either an object with a wrap method or a coderef.
+
+=cut
+
+sub apply_registered_middleware {
+    my ($class, $psgi) = @_;
+    my $new_psgi = $psgi;
+    foreach my $middleware ($class->registered_middlewares) {
+        $new_psgi = Scalar::Util::blessed $middleware ?
+          $middleware->wrap($new_psgi) :
+            $middleware->($new_psgi);
+    }
+    return $new_psgi;
+}
 
 =head1 AUTHORS
 
