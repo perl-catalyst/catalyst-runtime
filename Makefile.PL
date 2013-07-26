@@ -48,7 +48,7 @@ requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
 requires 'HTTP::Request::AsCGI' => '1.0';
-requires 'Module::Pluggable' => '3.9';
+requires 'Module::Pluggable' => '4.7';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
