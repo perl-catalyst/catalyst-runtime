@@ -453,10 +453,10 @@ sub build_middleware {
           $namespace->new(@init_args) :
             die "Can't load class $namespace";
     } else { ## the string is a partial namespace
-        if(Class::Load::try_load_class("Plack::Middleware::$namespace")) { ## Act like Plack::Builder
-            return "Plack::Middleware::$namespace"->new(@init_args);
-        } elsif(Class::Load::try_load_class("$class::$namespace")) { ## Load Middleware from Project namespace
-            return "$class::$namespace"->new(@init_args);
+        if(Class::Load::try_load_class("$class::$namespace")) { ## Load Middleware from Project namespace
+          return "$class::$namespace"->new(@init_args);
+        } elsif(Class::Load::try_load_class("Plack::Middleware::$namespace")) { ## Act like Plack::Builder
+          return "Plack::Middleware::$namespace"->new(@init_args);
         }
     }
 

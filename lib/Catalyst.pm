@@ -3067,10 +3067,11 @@ compatible interface, or a coderef, which is assumed to be inlined middleware
 
 =head2 setup_middleware (?@middleware)
 
-Read configuration information stored in configuration key 'psgi_middleware'
-and invoke L</register_middleware> for each middleware prototype found.  See
-under L</CONFIGURATION> information regarding L</psgi_middleware> and how to
-use it to enable L<Plack::Middleware>
+Read configuration information stored in configuration key C<psgi_middleware> or
+from passed @args.
+
+See under L</CONFIGURATION> information regarding C<psgi_middleware> and how
+to use it to enable L<Plack::Middleware>
 
 This method is automatically called during 'setup' of your application, so
 you really don't need to invoke it.
