@@ -41,7 +41,6 @@ use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 use Plack::Util;
-use Class::Load;
 
 BEGIN { require 5.008003; }
 
@@ -115,7 +114,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90042';
+our $VERSION = '5.90049_001';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -2872,7 +2871,7 @@ reference of your Catalyst application for use in F<.psgi> files.
 sub psgi_app {
     my ($app) = @_;
     my $psgi = $app->engine->build_psgi_app($app);
-    return $app->apply_registered_middleware($psgi);
+    return $app->Catalyst::Utils::apply_registered_middleware($psgi);
 }
 
 =head2 $c->setup_home
@@ -3058,6 +3057,14 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
     }
 }    
 
+=head2 registered_middlewares
+
+Read only accessor that returns an array of all the middleware in the order
+that they were added (which is the REVERSE of the order they will be applied).
+
+The values returned will be either instances of L<Plack::Middleware> or of a
+compatible interface, or a coderef, which is assumed to be inlined middleware
+
 =head2 setup_middleware (?@middleware)
 
 Read configuration information stored in configuration key 'psgi_middleware'
@@ -3076,103 +3083,43 @@ L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
 You can pass middleware definitions to this as well, from the application
 class if you like.
 
-=head2 register_middleware (@args)
-
-Given @args that represent the definition of some L<Plack::Middleware> or 
-middleware with a compatible interface, register it with your L<Catalyst>
-application.
-
-This is called by L</setup_middleware>.  the behavior of invoking it yourself
-at run time is currently undefined, and anything that works or doesn't work
-as a result of doing so is considered a side effect subject to change.
-
-=head2 _build_middleware (@args)
-
-Internal application that converts a single middleware definition (see
-L</psgi_middleware>) into an actual instance of middleware.
-
-=head2 registered_middlewares
-
-Read only accessor that returns an array of all the middleware in the order
-that they were added (which is the REVERSE of the order they will be applied).
-
-The values returned will be either instances of L<Plack::Middleware> or of a
-compatible interface, or a coderef, which is assumed to be inlined middleware
-
-=head2 apply_registered_middleware ($psgi)
-
-Given a $psgi reference, wrap all the L<registered_middlewares> around it and
-return the wrapped version.
-
 =cut
 
-sub registered_middlewares { @{shift->_psgi_middleware || []} }
+sub registered_middlewares {
+    my $class = shift;
+    if(my $middleware = $class->_psgi_middleware) {
+        return @$middleware;
+    } else {
+        die "You cannot call ->registered_middlewares until middleware has been setup";
+    }
+}
 
 sub setup_middleware {
     my ($class, @middleware_definitions) = @_;
     push @middleware_definitions, reverse(
       @{$class->config->{'psgi_middleware'}||[]});
 
+    my @middleware = ();
     while(my $next = shift(@middleware_definitions)) {
         if(ref $next) {
             if(Scalar::Util::blessed $next && $next->can('wrap')) {
-                $class->register_middleware($next);
+                push @middleware, $next;
             } elsif(ref $next eq 'CODE') {
-                $class->register_middleware($next);
+                push @middleware, $next;
             } elsif(ref $next eq 'HASH') {
                 my $namespace = shift @middleware_definitions;
-                my $mw = $class->_build_middleware($namespace, %$next);
-                $class->register_middleware($mw);
+                my $mw = $class->Catalyst::Utils::build_middleware($namespace, %$next);
+                push @middleware, $mw;
             } else {
               die "I can't handle middleware definition ${\ref $next}";
             }
         } else {
-          my $mw = $class->_build_middleware($next);
-          $class->register_middleware($mw);
+          my $mw = $class->Catalyst::Utils::build_middleware($next);
+          push @middleware, $mw;
         }
     }
-}
 
-sub register_middleware {
-  my ($class, @middleware) = @_;
-  if($class->_psgi_middleware) {
-    push @{$class->_psgi_middleware}, @middleware;
-  } else {
     $class->_psgi_middleware(\@middleware);
-  }
-}
-
-sub _build_middleware {
-    my ($class, $namespace, @init_args) = @_;
-
-    if(
-      $namespace =~s/^\+// ||
-      $namespace =~/^Plack::Middleware/ ||
-      $namespace =~/^$class/
-    ) {  ## the string is a full namespace
-        return Class::Load::try_load_class($namespace) ?
-          $namespace->new(@init_args) :
-            die "Can't load class $namespace";
-    } else { ## the string is a partial namespace
-        if(Class::Load::try_load_class("Plack::Middleware::$namespace")) { ## Act like Plack::Builder
-            return "Plack::Middleware::$namespace"->new(@init_args);
-        } elsif(Class::Load::try_load_class("$class::$namespace")) { ## Load Middleware from Project namespace
-            return "$class::$namespace"->new(@init_args);
-        }
-    }
-
-    return; ## be sure we can count on a proper return when valid
-}
-
-sub apply_registered_middleware {
-    my ($class, $psgi) = @_;
-    my $new_psgi = $psgi;
-    foreach my $middleware ($class->registered_middlewares) {
-        $new_psgi = Scalar::Util::blessed $middleware ?
-          $middleware->wrap($new_psgi) :
-            $middleware->($new_psgi);
-    }
-    return $new_psgi;
 }
 
 =head2 $c->stack
