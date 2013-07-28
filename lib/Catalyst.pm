@@ -3081,9 +3081,6 @@ which sounds odd but is likely how you expect it to work if you have prior
 experience with L<Plack::Builder> or if you previously used the plugin
 L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
 
-You can pass middleware definitions to this as well, from the application
-class if you like.
-
 =cut
 
 sub registered_middlewares {
