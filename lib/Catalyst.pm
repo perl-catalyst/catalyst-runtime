@@ -1151,8 +1151,11 @@ EOF
             $class->log->debug( "Loaded plugins:\n" . $t->draw . "\n" );
         }
 
-        my @middleware = map { ref $_ eq 'CODE' ? "Inline Coderef" : (ref($_) .'  '. $_->VERSION || '')  }
-          $class->registered_middlewares;
+        my @middleware = map {
+          ref $_ eq 'CODE' ? 
+            "Inline Coderef" : 
+              (ref($_) .'  '. ($_->can('VERSION') ? $_->VERSION : '') 
+                || '')  } $class->registered_middlewares;
 
         if (@middleware) {
             my $column_width = Catalyst::Utils::term_width() - 6;
