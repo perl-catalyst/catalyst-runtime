@@ -9,7 +9,10 @@ use List::Util qw/first/;
 use List::MoreUtils qw/uniq/;
 use namespace::clean -except => 'meta';
 
-BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
+BEGIN {
+    extends qw/Catalyst::Component/;
+    with qw/MooseX::MethodAttributes::Role::AttrContainer::Inheritable/;
+}
 
 use MooseX::MethodAttributes;
 use Catalyst::Exception;

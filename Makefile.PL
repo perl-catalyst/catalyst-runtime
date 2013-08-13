@@ -34,7 +34,7 @@ requires 'Class::Load' => '0.12';
 requires 'Class::MOP' => '0.95';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.24';
+requires 'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24';
 requires 'MooseX::Role::WithOverloading' => '0.09';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
