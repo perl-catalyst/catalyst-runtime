@@ -1,5 +1,3 @@
-#!perl
-
 # Run all tests against FastCGI mode under Apache
 #
 # Note, to get this to run properly, you may need to give it the path to your

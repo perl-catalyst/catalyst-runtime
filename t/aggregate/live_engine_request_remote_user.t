@@ -1,5 +1,3 @@
-#!perl
-
 # This tests to make sure the REMOTE_USER environment variable is properly passed through by the engine.
 
 use strict;

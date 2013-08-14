@@ -1,4 +1,3 @@
-#!/usr/bin/evn perl
 use strict;
 use warnings;
 
