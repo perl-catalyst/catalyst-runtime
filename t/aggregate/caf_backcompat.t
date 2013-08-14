@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
 use Class::MOP ();
 use Moose::Util ();
 

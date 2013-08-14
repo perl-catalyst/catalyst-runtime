@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Test::More tests => 30;
-use Test::Exception;
 
 use Catalyst ();
 

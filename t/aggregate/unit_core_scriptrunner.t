@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use FindBin qw/$Bin/;
-use Test::Exception;
+use Test::Fatal;
 use lib "$Bin/../lib";
 
 use_ok('Catalyst::ScriptRunner');
@@ -15,8 +15,8 @@ is Catalyst::ScriptRunner->run('ScriptTestApp', 'Baz'), 'mooCatalyst::Script::Ba
     'Script existing only in Catalyst';
 # +1 test for the params passed to new_with_options in t/lib/Catalyst/Script/Baz.pm
 
-throws_ok(sub {
+like exception {
     Catalyst::ScriptRunner->run('ScriptTestApp', 'CompileTest');
-}, qr/Couldn't load class/);
+}, qr/Couldn't load class/;
 
 done_testing;

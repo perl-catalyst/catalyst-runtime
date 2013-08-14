@@ -8,7 +8,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 use Catalyst::Utils;
 use HTTP::Request::Common;
-use Test::Exception;
+use Test::Fatal;
 
 my $Class   = 'Catalyst::Test';
 my $App     = 'TestApp';
@@ -88,7 +88,7 @@ use Catalyst::Test ();
         ok( $c->stash,          "               Stash accessible" );
         ok( $c->action,         "               Action object accessible" );
         ok( $res->request,      "               Response has request object" );
-        lives_and { is( $res->request->uri, $Url) }
+        is exception { is( $res->request->uri, $Url) }, undef,
                                 "               Request object has correct url";
     } }
 }
@@ -146,12 +146,12 @@ sub customize { Catalyst::Test::_customize_request($_[0], {}, @_[1 .. $#_]) }
 use_ok('Catalyst::Test', 'TestApp', 'foobar');
 
 # Back compat test, ensure that request ignores anything which isn't a hash.
-lives_ok {
+is exception {
     request(GET('/dummy'), 'foo');
-} 'scalar additional param to request method ignored';
-lives_ok {
+}, undef, 'scalar additional param to request method ignored';
+is exception {
     request(GET('/dummy'), []);
-} 'array additional param to request method ignored';
+}, undef, 'array additional param to request method ignored';
 
 my $res = request(GET('/'));
 is $res->code, 200, 'Response code 200';

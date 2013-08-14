@@ -12,9 +12,9 @@ use Catalyst ();
     package TestApp::Controller::Other;
     use Moose;
     use Test::More tests => 1;
-    use Test::Exception;
-    lives_ok {
+    use Test::Fatal;
+    is exception {
         extends 'TestApp::Controller::Base';
-    };
+    }, undef;
 }
 

@@ -76,7 +76,7 @@ requires 'URI' => '1.36';
 # depreciation transition
 requires 'Catalyst::DispatchType::Regex' => '5.90021';
 
-test_requires 'Test::Exception';
+test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';
 test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';

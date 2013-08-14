@@ -9,7 +9,6 @@
 
 # Also tests method modifiers and etc in MyApp.pm still work as expected.
 use Test::More;
-use Test::Exception;
 use Moose::Util qw/find_meta/;
 use FindBin;
 use lib "$FindBin::Bin/lib";
