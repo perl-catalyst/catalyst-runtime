@@ -83,6 +83,9 @@ test_requires 'HTTP::Request::Common';
 test_requires 'IO::Scalar';
 test_requires 'HTTP::Status';
 
+# see also cpanfile for authordeps -- install via
+# cpanm --installdeps --with-develop .
+
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 my @author_requires;
 if ($ENV{AGGREGATE_TESTS} && can_use('Test::Simple', '0.88') && can_use('Test::Aggregate', '0.364')) {
