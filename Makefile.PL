@@ -56,7 +56,7 @@ requires 'Text::SimpleTable' => '0.03';
 requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
-requires 'Try::Tiny';
+requires 'Try::Tiny' => '0.17';
 requires 'Safe::Isa';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
