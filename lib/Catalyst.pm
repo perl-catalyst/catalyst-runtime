@@ -1158,7 +1158,7 @@ EOF
         my @middleware = map {
           ref $_ eq 'CODE' ? 
             "Inline Coderef" : 
-              (ref($_) .'  '. ($_->can('VERSION') ? $_->VERSION : '') 
+              (ref($_) .'  '. ($_->can('VERSION') ? $_->VERSION || '' : '') 
                 || '')  } $class->registered_middlewares;
 
         if (@middleware) {
@@ -1168,10 +1168,8 @@ EOF
             $class->log->debug( "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
         }
 
-        my %dh = $class->registered_data_handlers || ();
-        my @data_handlers = keys %dh;
-
-        if (@data_handlers) {
+        my %dh = $class->registered_data_handlers;
+        if (my @data_handlers = keys %dh) {
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @data_handlers;
