@@ -41,6 +41,7 @@ use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 use Plack::Util;
+use JSON::MaybeXS qw(decode_json);
 
 BEGIN { require 5.008003; }
 
@@ -62,6 +63,7 @@ sub _build_request_constructor_args {
     my $self = shift;
     my %p = ( _log => $self->log );
     $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
+    $p{data_handlers} = {$self->registered_data_handlers};
     \%p;
 }
 
@@ -105,7 +107,8 @@ our $GO        = Catalyst::Exception::Go->new;
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
-  setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware/;
+  setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware
+  _data_handlers/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1110,6 +1113,7 @@ sub setup {
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
     $class->setup_middleware();
+    $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
     if (my $engine = delete $flags->{engine}) {
         $class->log->warn("Specifying the engine in ->setup is no longer supported, see Catalyst::Upgrading");
@@ -1162,6 +1166,16 @@ EOF
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @middleware;
             $class->log->debug( "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
+        }
+
+        my %dh = $class->registered_data_handlers || ();
+        my @data_handlers = keys %dh;
+
+        if (@data_handlers) {
+            my $column_width = Catalyst::Utils::term_width() - 6;
+            my $t = Text::SimpleTable->new($column_width);
+            $t->row($_) for @data_handlers;
+            $class->log->debug( "Loaded Request Data Handlers:\n" . $t->draw . "\n" );
         }
 
         my $dispatcher = $class->dispatcher;
@@ -3123,6 +3137,59 @@ sub setup_middleware {
     $class->_psgi_middleware(\@middleware);
 }
 
+=head2 registered_data_handlers
+
+A read only copy of registered Data Handlers returned as a Hash, where each key
+is a content type and each value is a subref that attempts to decode that content
+type.
+
+=head2 setup_data_handlers (?@data_handler)
+
+Read configuration information stored in configuration key C<data_handlers> or
+from passed @args.
+
+See under L</CONFIGURATION> information regarding C<data_handlers>.
+
+This method is automatically called during 'setup' of your application, so
+you really don't need to invoke it.
+
+=head2 default_data_handlers
+
+Default Data Handler that come bundled with L<Catalyst>.  Currently there is
+only one default data handler, for 'application/json'.  This uses L<JSON::MaybeXS>
+which uses the dependency free L<JSON::PP> OR L<Cpanel::JSON::XS> if you have
+installed it.  If you don't mind the XS dependency, you should add the faster
+L<Cpanel::JSON::XS> to you dependency list (in your Makefile.PL or dist.ini, or
+cpanfile, etc.)
+
+=cut
+
+sub registered_data_handlers {
+    my $class = shift;
+    if(my $data_handlers = $class->_data_handlers) {
+        return %$data_handlers;
+    } else {
+        die "You cannot call ->registered_data_handlers until data_handers has been setup";
+    }
+}
+
+sub setup_data_handlers {
+    my ($class, %data_handler_callbacks) = @_;
+    %data_handler_callbacks = (
+      %{$class->default_data_handlers},
+      %{$class->config->{'data_handlers'}||+{}},
+      %data_handler_callbacks);
+
+    $class->_data_handlers(\%data_handler_callbacks);
+}
+
+sub default_data_handlers {
+    my ($class) = @_;
+    return +{
+      'application/json' => sub { local $/; decode_json $_->getline },
+    };
+}
+
 =head2 $c->stack
 
 Returns an arrayref of the internal execution stack (actions that are
@@ -3314,6 +3381,10 @@ In the future this might become the default behavior.
 
 C<psgi_middleware> - See L<PSGI MIDDLEWARE>.
 
+=item *
+
+C<data_handlers> - See L<DATA HANDLERS>.
+
 =back
 
 =head1 INTERNAL ACTIONS
@@ -3404,6 +3475,46 @@ believe the Catalyst core to be thread-safe.
 If you plan to operate in a threaded environment, remember that all other
 modules you are using must also be thread-safe. Some modules, most notably
 L<DBD::SQLite>, are not thread-safe.
+
+=head1 DATA HANDLERS
+
+The L<Catalyst::Request> object uses L<HTTP::Body> to populate 'classic' HTML
+form parameters and URL search query fields.  However it has become common
+for various alternative content types to be PUT or POSTed to your controllers
+and actions.  People working on RESTful APIs, or using AJAX often use JSON,
+XML and other content types when communicating with an application server.  In
+order to better support this use case, L<Catalyst> defines a global configuration
+option, C<data_handlers>, which lets you associate a content type with a coderef
+that parses that content type into something Perl can readily access.
+
+    package MyApp::Web;
+ 
+    use Catalyst;
+    use JSON::Maybe;
+ 
+    __PACKAGE__->config(
+      data_handlers => {
+        'application/json' => sub { local $/; decode_json $_->getline },
+      },
+      ## Any other configuration.
+    );
+ 
+    __PACKAGE__->setup;
+
+By default L<Catalyst> comes with a generic JSON data handler similar to the
+example given above, which uses L<JSON::Maybe> to provide either L<JSON::PP>
+(a pure Perl, dependency free JSON parser) or L<Cpanel::JSON::XS> if you have
+it installed (if you want the faster XS parser, add it to you project Makefile.PL
+or dist.ini, cpanfile, etc.)
+
+The C<data_handlers> configuation is a hashref whose keys are HTTP Content-Types
+(matched against the incoming request type using a regexp such as to be case
+insensitive) and whose values are coderefs that receive a localized version of
+C<$_> which is a filehandle object pointing to received body.
+
+This feature is considered an early access release and we reserve the right
+to alter the interface in order to provide a performant and secure solution to
+alternative request body content.  Your reports welcomed!
 
 =head1 PSGI MIDDLEWARE
 

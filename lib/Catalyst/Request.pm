@@ -92,10 +92,10 @@ has _log => (
 );
 
 has io_fh => (
-  is=>'ro',
-  predicate=>'has_io_fh',
-  lazy=>1,
-  builder=>'_build_io_fh');
+    is=>'ro',
+    predicate=>'has_io_fh',
+    lazy=>1,
+    builder=>'_build_io_fh');
 
 sub _build_io_fh {
     my $self = shift;
@@ -103,16 +103,27 @@ sub _build_io_fh {
       || die "Your Server does not support psgix.io";
 };
 
-has body_fh => (
-  is=>'ro',
-  predicate=>'has_body_fh',
-  lazy=>1,
-  builder=>'_build_body_fh');
+has data_handlers => ( is=>'ro', isa=>'HashRef', default=>sub { +{} } );
 
-sub _build_body_fh {
-    (my $input_fh = shift->env->{'psgi.input'})->seek(0, 0);
-    return $input_fh;
-};
+has body_data => (
+    is=>'ro',
+    lazy=>1,
+    builder=>'_build_body_data');
+
+sub _build_body_data {
+    my ($self) = @_;
+    my $content_type = $self->content_type;
+    my ($match) = grep { $content_type =~/$_/i }
+      keys(%{$self->data_handlers});
+
+    if($match) {
+      my $fh = $self->body;
+      local $_ = $fh;
+      return $self->data_handlers->{$match}->($fh, $self);
+    } else { 
+      return undef;
+    }
+}
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
@@ -181,8 +192,6 @@ sub prepare_parameters {
     $self->_clear_parameters;
     return $self->parameters;
 }
-
-
 
 sub _build_parameters {
     my ( $self ) = @_;
