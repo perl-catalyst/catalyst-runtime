@@ -5,7 +5,9 @@
   - Fixed some pointless warnings when middleware class lacked VERSION
   - NEW FEATURE: Declare global 'data_handlers' for parsing HTTP POST/PUT
     alternative content, and created default JSON handler.  Yes, now Catalyst
-    handles JSON request content out of the box!
+    handles JSON request content out of the box!  More docs eventually but
+    for now see the DATA HANDLERS section in Catalyst.pm (or review the test
+    case t/data_handler.t
 
 5.90049_001 - 2013-07-26
   - Declare PSGI compliant Middleware as part of your Catalyst Application via
