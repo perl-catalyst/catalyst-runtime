@@ -41,7 +41,7 @@ use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 use Plack::Util;
-use JSON::MaybeXS qw(decode_json);
+use Class::Load;
 
 BEGIN { require 5.008003; }
 
@@ -3184,7 +3184,10 @@ sub setup_data_handlers {
 sub default_data_handlers {
     my ($class) = @_;
     return +{
-      'application/json' => sub { local $/; decode_json $_->getline },
+      'application/json' => sub {
+          local $/;
+          Class::Load::load_class("JSON::MaybeXS");
+          JSON::MaybeXS::decode_json $_->getline },
     };
 }
 
