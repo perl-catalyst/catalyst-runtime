@@ -322,7 +322,18 @@ cookies, HTTP headers, etc.). See L<Catalyst::Request>.
 
 =head2 $c->forward( $class, $method, [, \@arguments ] )
 
-Forwards processing to another action, by its private name. If you give a
+This is one way of calling another action (method) in the same or
+a different controller. You can also use C<< $self->my_method($c, @args) >>
+in the same controller or C<< $c->controller('MyController')->my_method($c, @args) >>
+in a different controller.
+The main difference is that 'forward' uses some of the Catalyst request
+cycle overhead, including debugging, which may be useful to you. On the
+other hand, there are some complications to using 'forward', restrictions
+on values returned from 'forward', and it may not handle errors as you prefer.
+Whether you use 'forward' or not is up to you; it is not considered superior to
+the other ways to call a method.
+
+'forward' calls  another action, by its private name. If you give a
 class name but no method, C<process()> is called. You may also optionally
 pass arguments in an arrayref. The action will receive the arguments in
 C<@_> and C<< $c->req->args >>. Upon returning from the function,
