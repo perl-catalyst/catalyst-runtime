@@ -73,7 +73,7 @@ requires 'LWP' => '5.837'; # LWP had unicode fail in 5.8.26
 requires 'URI' => '1.36';
 
 # Install the standalone Regex dispatch modules in order to ease the
-# depreciation transition
+# deprecation transition
 requires 'Catalyst::DispatchType::Regex' => '5.90021';
 
 test_requires 'Test::Fatal';
