@@ -320,7 +320,7 @@ sub action_class {
         ? $args{attributes}{ActionClass}[0]
         : $self->_action_class);
 
-    Class::MOP::load_class($class);
+    load_class($class);
     return $class;
 }
 

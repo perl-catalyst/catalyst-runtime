@@ -40,6 +40,7 @@ use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
+use Class::Load 'load_class';
 
 BEGIN { require 5.008003; }
 
@@ -2663,7 +2664,7 @@ sub setup_dispatcher {
         $dispatcher = $class->dispatcher_class;
     }
 
-    Class::MOP::load_class($dispatcher);
+    load_class($dispatcher);
 
     # dispatcher instance
     $class->dispatcher( $dispatcher->new );
@@ -2713,7 +2714,7 @@ sub setup_engine {
     # Don't really setup_engine -- see _setup_psgi_app for explanation.
     return if $class->loading_psgi_file;
 
-    Class::MOP::load_class($engine);
+    load_class($engine);
 
     if ($ENV{MOD_PERL}) {
         my $apache = $class->engine_loader->auto;
@@ -2977,7 +2978,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        Class::MOP::load_class( $plugin );
+        load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is deprecated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
         my $plugin_meta = Moose::Meta::Class->create($plugin);
@@ -3025,7 +3026,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
          } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            Class::MOP::load_class($plugin->[0], $plugin->[1]);
+            load_class($plugin->[0], $plugin->[1]);
             my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 

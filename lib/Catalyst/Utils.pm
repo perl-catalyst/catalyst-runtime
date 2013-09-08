@@ -7,7 +7,7 @@ use Path::Class;
 use URI;
 use Carp qw/croak/;
 use Cwd;
-use Class::MOP;
+use Class::Load 'is_class_loaded';
 use String::RewritePrefix;
 
 use namespace::clean;
@@ -297,7 +297,7 @@ sub ensure_class_loaded {
     # if it already has symbol table entries. This is to support things like Schema::Loader, which
     # part-generate classes in memory, but then also load some of their contents from disk.
     return if !$opts->{ ignore_loaded }
-        && Class::MOP::is_class_loaded($class); # if a symbol entry exists we don't load again
+        && is_class_loaded($class); # if a symbol entry exists we don't load again
 
     # this hack is so we don't overwrite $@ if the load did not generate an error
     my $error;
@@ -312,7 +312,7 @@ sub ensure_class_loaded {
     die $error if $error;
 
     warn "require $class was successful but the package is not defined."
-        unless Class::MOP::is_class_loaded($class);
+        unless is_class_loaded($class);
 
     return 1;
 }

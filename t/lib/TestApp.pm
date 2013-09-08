@@ -11,6 +11,7 @@ use Catalyst qw/
     +TestApp::Role
 /;
 use Catalyst::Utils;
+use Class::Load 'try_load_class';
 
 use Moose;
 use namespace::autoclean;
@@ -59,7 +60,7 @@ TestApp->config(
 # above ->setup so we have some generated methods to be double sure.
 has an_attribute_before_we_change_base_classes => ( is => 'ro');
 
-if ($::setup_leakchecker && eval { Class::MOP::load_class('CatalystX::LeakChecker'); 1 }) {
+if ($::setup_leakchecker && try_load_class('CatalystX::LeakChecker')) {
     with 'CatalystX::LeakChecker';
 
     has leaks => (

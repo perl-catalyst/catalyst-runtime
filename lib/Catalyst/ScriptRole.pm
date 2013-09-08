@@ -5,6 +5,7 @@ use MooseX::Getopt;
 use Catalyst::EngineLoader;
 use Moose::Util::TypeConstraints;
 use Catalyst::Utils qw/ ensure_class_loaded /;
+use Class::Load 'load_class';
 use namespace::autoclean;
 
 subtype 'Catalyst::ScriptRole::LoadableClass',
@@ -87,7 +88,7 @@ sub _plack_engine_name {}
 sub _run_application {
     my $self = shift;
     my $app = $self->application_name;
-    Class::MOP::load_class($app);
+    load_class($app);
     my $server;
     if (my $e = $self->_plack_engine_name ) {
         $server = $self->load_engine($e, $self->_plack_loader_args);

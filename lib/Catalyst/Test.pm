@@ -7,7 +7,7 @@ use Test::More ();
 use Plack::Test;
 use Catalyst::Exception;
 use Catalyst::Utils;
-use Class::MOP;
+use Class::Load qw(load_class is_class_loaded);
 use Sub::Exporter;
 use Carp 'croak', 'carp';
 
@@ -25,7 +25,7 @@ sub _build_request_export {
     return sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'" }
         unless $class;
 
-    Class::MOP::load_class($class) unless Class::MOP::is_class_loaded($class);
+    load_class($class) unless is_class_loaded($class);
     $class->import;
 
     return sub { _local_request( $class, @_ ) };

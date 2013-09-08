@@ -14,6 +14,7 @@ use Catalyst::Utils;
 use Text::SimpleTable;
 use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
+use Class::Load qw(load_class try_load_class);
 
 use namespace::clean -except => 'meta';
 
@@ -516,7 +517,8 @@ sub register {
         unless ( $registered->{$class} ) {
             # FIXME - Some error checking and re-throwing needed here, as
             #         we eat exceptions loading dispatch types.
-            eval { Class::MOP::load_class($class) };
+            # see also try_load_class
+            eval { load_class($class) };
             my $load_failed = $@;
             $self->_check_deprecated_dispatch_type( $key, $load_failed );
             push( @{ $self->dispatch_types }, $class->new ) unless $load_failed;
@@ -660,9 +662,8 @@ sub _load_dispatch_types {
         # first param is undef because we cannot get the appclass
         my $class = Catalyst::Utils::resolve_namespace(undef, 'Catalyst::DispatchType', $type);
 
-        eval { Class::MOP::load_class($class) };
-        Catalyst::Exception->throw( message => qq/Couldn't load "$class"/ )
-          if $@;
+        my ($success, $error) = try_load_class($class);
+        Catalyst::Exception->throw( message => $error ) if not $success;
         push @{ $self->dispatch_types }, $class->new;
 
         push @loaded, $class;

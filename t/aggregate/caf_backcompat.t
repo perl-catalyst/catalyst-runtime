@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Class::MOP ();
+use Class::Load 'load_class';
 use Moose::Util ();
 
 # List of everything which used Class::Accessor::Fast in 5.70.
@@ -21,7 +21,7 @@ my @modules = qw/
 plan tests => scalar @modules;
 
 foreach my $module (@modules) {
-    Class::MOP::load_class($module);
+    load_class($module);
     ok Moose::Util::does_role($module => 'MooseX::Emulate::Class::Accessor::Fast'),
         "$module has Class::Accessor::Fast back-compat";
 }

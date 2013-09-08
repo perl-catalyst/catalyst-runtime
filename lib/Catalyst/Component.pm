@@ -9,6 +9,7 @@ use Devel::InnerPackage ();
 use MRO::Compat;
 use mro 'c3';
 use Scalar::Util 'blessed';
+use Class::Load 'is_class_loaded';
 use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
@@ -93,7 +94,7 @@ sub BUILDARGS {
     } elsif (@_ == 2) { # is it ($app, $args) or foo => 'bar' ?
         if (blessed($_[0])) {
             $args = $_[1] if ref($_[1]) eq 'HASH';
-        } elsif (Class::MOP::is_class_loaded($_[0]) &&
+        } elsif (is_class_loaded($_[0]) &&
                 $_[0]->isa('Catalyst') && ref($_[1]) eq 'HASH') {
             $args = $_[1];
         } else {

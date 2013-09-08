@@ -1,7 +1,7 @@
 package Catalyst::Script::Server;
 use Moose;
 use Catalyst::Utils;
-use Try::Tiny;
+use Class::Load qw(try_load_class load_class);
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -49,11 +49,9 @@ subtype 'Catalyst::Script::Server::Types::Pidfile',
     as 'MooseX::Daemonize::Pid::File';
 
 coerce 'Catalyst::Script::Server::Types::Pidfile', from 'Str', via {
-    try { Class::MOP::load_class("MooseX::Daemonize::Pid::File") }
-    catch {
-        warn("Could not load MooseX::Daemonize::Pid::File, needed for --pid option\n");
-        exit 1;
-    };
+    my ($success, $error) = try_load_class("MooseX::Daemonize::Pid::File");
+    warn("Could not load MooseX::Daemonize::Pid::File, needed for --pid option: $error\n"),
+        exit 1 if not $success;
     MooseX::Daemonize::Pid::File->new( file => $_ );
 };
 MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
@@ -76,11 +74,11 @@ sub BUILD {
 
     if ($self->background) {
         # FIXME - This is evil. Should we just add MX::Daemonize to the deps?
-        try { Class::MOP::load_class('MooseX::Daemonize::Core'); Class::MOP::load_class('POSIX') }
-        catch {
-            warn("MooseX::Daemonize is needed for the --background option\n");
-            exit 1;
-        };
+        my ($success, $error) = try_load_class("MooseX::Daemonize::Core");
+        warn("MooseX::Daemonize is needed for the --background option: $error\n"),
+            exit 1 if not $success;
+        my ($success, $error) = try_load_class("POSIX");
+        warn("$error\n"), exit 1 if not $success;
         MooseX::Daemonize::Core->meta->apply($self);
         POSIX::close($_) foreach (0..2);
     }
@@ -229,7 +227,7 @@ sub run {
 
             return 1 unless $self->is_daemon;
 
-            Class::MOP::load_class($self->application_name);
+            load_class($self->application_name);
 
             $self->daemon_detach;
         }
