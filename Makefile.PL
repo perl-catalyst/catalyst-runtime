@@ -31,7 +31,6 @@ requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean' => '0.23';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::Load' => '0.12';
-requires 'Class::MOP' => '0.95';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24';
