@@ -4,7 +4,7 @@ use Moose;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Data::Dump;
-use Class::MOP ();
+use Moose::Util 'find_meta';
 use Carp qw/ cluck /;
 
 our %LEVELS = (); # Levels stored as bit field, ergo debug = 1, warn = 2 etc
@@ -33,7 +33,7 @@ sub psgienv {
 {
     my @levels = qw[ debug info warn error fatal ];
 
-    my $meta = Class::MOP::get_metaclass_by_name(__PACKAGE__);
+    my $meta = find_meta(__PACKAGE__);
     my $summed_level = 0;
     for ( my $i = $#levels ; $i >= 0 ; $i-- ) {
 

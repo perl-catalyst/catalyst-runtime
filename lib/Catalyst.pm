@@ -35,6 +35,7 @@ use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
 use Safe::Isa;
+use Moose::Util 'find_meta';
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
@@ -2473,7 +2474,7 @@ sub run {
 
 sub _make_immutable_if_needed {
     my $class = shift;
-    my $meta = Class::MOP::get_metaclass_by_name($class);
+    my $meta = find_meta($class);
     my $isa_ca = $class->isa('Class::Accessor::Fast') || $class->isa('Class::Accessor');
     if (
         $meta->is_immutable
