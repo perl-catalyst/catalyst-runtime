@@ -747,7 +747,7 @@ Handle various types of paths:
     sub myaction2 :Path('/bar') { ... } # -> /bar
   }
 
-This is a general toolbox for attaching your action to a give path.
+This is a general toolbox for attaching your action to a given path.
 
 
 =head2 Regex
