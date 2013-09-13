@@ -136,9 +136,8 @@ sub class2tempdir {
 
     if ( $create && !-e $tmpdir ) {
 
-        eval { $tmpdir->mkpath };
-
-        if ($@) {
+        eval { $tmpdir->mkpath; 1 }
+        or do {
             # don't load Catalyst::Exception as a BEGIN in Utils,
             # because Utils often gets loaded before MyApp.pm, and if
             # Catalyst::Exception is loaded before MyApp.pm, it does
@@ -391,17 +390,17 @@ my $_term_width;
 sub term_width {
     return $_term_width if $_term_width;
 
-    my $width = eval '
-        use Term::Size::Any;
+    my $width;
+    eval '
+        require Term::Size::Any;
         my ($columns, $rows) = Term::Size::Any::chars;
-        return $columns;
-    ';
-
-    if ($@) {
+        $width = $columns;
+        1;
+    ' or do {
         $width = $ENV{COLUMNS}
             if exists($ENV{COLUMNS})
             && $ENV{COLUMNS} =~ m/^\d+$/;
-    }
+    };
 
     $width = 80 unless ($width && $width >= 80);
     return $_term_width = $width;
