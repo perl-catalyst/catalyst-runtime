@@ -1,5 +1,18 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90049_003 - 2013-09-20
+  - Documented the new body_data method added in the previous release
+  - Merged from master many important bugfixes and forward compatiblity
+    updates, including:
+    - Use modern preferred method for Moose metaclass access and many other
+      small changes to how we use Moose for better forward compat (ether++)
+    - Killed some evil use of $@ (ether++)
+    - spelling fixes and documentation updates (ether++), (gerda++)
+    - use Test::Fatal over Test::Exception (ether++)
+    - Misc. test case fixes to modernize code (ether++)
+    - Added a first pass cpanfile, to try and make it easier to bootstrap
+      a development setup (ether++)
+
 5.90049_002 - 2013-08-20
   - Fixed loading middleware from project directory
   - Fixed some pointless warnings when middleware class lacked VERSION
