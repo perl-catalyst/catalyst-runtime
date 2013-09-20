@@ -3160,6 +3160,9 @@ installed it.  If you don't mind the XS dependency, you should add the faster
 L<Cpanel::JSON::XS> to you dependency list (in your Makefile.PL or dist.ini, or
 cpanfile, etc.)
 
+L<JSON::MaybeXS> is loaded the first time you ask for it (so if you never ask
+for it, its never used).
+
 =cut
 
 sub registered_data_handlers {

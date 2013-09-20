@@ -351,6 +351,7 @@ Catalyst::Request - provides information about the current client request
     $req->args;
     $req->base;
     $req->body;
+    $req->body_data;
     $req->body_parameters;
     $req->content_encoding;
     $req->content_length;
@@ -432,6 +433,14 @@ C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 Returns the message body of the request, as returned by L<HTTP::Body>: a string,
 unless Content-Type is C<application/x-www-form-urlencoded>, C<text/xml>, or
 C<multipart/form-data>, in which case a L<File::Temp> object is returned.
+
+=head2 $req->body_data
+
+Returns a Perl representation of POST/PUT body data that is not classic HTML
+form data, such as JSON, XML, etc.  By default, Catalyst will parse incoming
+data of the type 'application/json' and return access to that data via this
+method.  You may define addition data_handlers via a global configuration
+setting.  See L<Catalyst\DATA HANDLERS> for more information.
 
 =head2 $req->body_parameters
 
