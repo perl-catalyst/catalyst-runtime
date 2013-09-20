@@ -1,8 +1,7 @@
-#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
@@ -21,9 +20,9 @@ test('-?');
 sub test {
     local $TestHelpScript::help;
     local @ARGV = (@_);
-    lives_ok {
+    is exception {
         TestHelpScript->new_with_options(application_name => 'TestAppToTestScripts')->run;
-    } 'Lives';
+    }, undef, 'Lives';
     ok $TestHelpScript::help, 'Got help';
 }
 

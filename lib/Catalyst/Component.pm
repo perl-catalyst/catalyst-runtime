@@ -9,6 +9,8 @@ use Devel::InnerPackage ();
 use MRO::Compat;
 use mro 'c3';
 use Scalar::Util 'blessed';
+use Class::Load 'is_class_loaded';
+use Moose::Util 'find_meta';
 use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
@@ -93,7 +95,7 @@ sub BUILDARGS {
     } elsif (@_ == 2) { # is it ($app, $args) or foo => 'bar' ?
         if (blessed($_[0])) {
             $args = $_[1] if ref($_[1]) eq 'HASH';
-        } elsif (Class::MOP::is_class_loaded($_[0]) &&
+        } elsif (is_class_loaded($_[0]) &&
                 $_[0]->isa('Catalyst') && ref($_[1]) eq 'HASH') {
             $args = $_[1];
         } else {
@@ -137,7 +139,7 @@ sub config {
         # work in a subclass.
         # TODO maybe this should be a ClassData option?
         my $class = blessed($self) || $self;
-        my $meta = Class::MOP::get_metaclass_by_name($class);
+        my $meta = find_meta($class);
         unless (${ $meta->get_or_add_package_symbol('$_config') }) {
             # Call merge_hashes to ensure we deep copy the parent
             # config onto the subclass

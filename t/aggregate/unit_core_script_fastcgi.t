@@ -5,7 +5,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use Catalyst::Script::FastCGI;
 
@@ -32,9 +32,9 @@ sub testOption {
 
     local @ARGV = @$argstring;
     local @TestAppToTestScripts::RUN_ARGS;
-    lives_ok {
+    is exception {
         TestFastCGIScript->new_with_options(application_name => 'TestAppToTestScripts')->run;
-    } "new_with_options";
+    }, undef, "new_with_options";
     # First element of RUN_ARGS will be the script name, which we don't care about
     shift @TestAppToTestScripts::RUN_ARGS;
 

@@ -7,7 +7,7 @@ use Path::Class;
 use URI;
 use Carp qw/croak/;
 use Cwd;
-use Class::MOP;
+use Class::Load 'is_class_loaded';
 use String::RewritePrefix;
 use Class::Load ();
 
@@ -137,9 +137,8 @@ sub class2tempdir {
 
     if ( $create && !-e $tmpdir ) {
 
-        eval { $tmpdir->mkpath };
-
-        if ($@) {
+        eval { $tmpdir->mkpath; 1 }
+        or do {
             # don't load Catalyst::Exception as a BEGIN in Utils,
             # because Utils often gets loaded before MyApp.pm, and if
             # Catalyst::Exception is loaded before MyApp.pm, it does
@@ -298,7 +297,7 @@ sub ensure_class_loaded {
     # if it already has symbol table entries. This is to support things like Schema::Loader, which
     # part-generate classes in memory, but then also load some of their contents from disk.
     return if !$opts->{ ignore_loaded }
-        && Class::MOP::is_class_loaded($class); # if a symbol entry exists we don't load again
+        && is_class_loaded($class); # if a symbol entry exists we don't load again
 
     # this hack is so we don't overwrite $@ if the load did not generate an error
     my $error;
@@ -313,7 +312,7 @@ sub ensure_class_loaded {
     die $error if $error;
 
     warn "require $class was successful but the package is not defined."
-        unless Class::MOP::is_class_loaded($class);
+        unless is_class_loaded($class);
 
     return 1;
 }
@@ -392,17 +391,17 @@ my $_term_width;
 sub term_width {
     return $_term_width if $_term_width;
 
-    my $width = eval '
-        use Term::Size::Any;
+    my $width;
+    eval '
+        require Term::Size::Any;
         my ($columns, $rows) = Term::Size::Any::chars;
-        return $columns;
-    ';
-
-    if ($@) {
+        $width = $columns;
+        1;
+    ' or do {
         $width = $ENV{COLUMNS}
             if exists($ENV{COLUMNS})
             && $ENV{COLUMNS} =~ m/^\d+$/;
-    }
+    };
 
     $width = 80 unless ($width && $width >= 80);
     return $_term_width = $width;

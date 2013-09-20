@@ -1,8 +1,7 @@
-#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
@@ -41,9 +40,9 @@ use lib "$Bin/../lib";
 {
     local $TestCreateScript::help;
     local @ARGV;
-    lives_ok {
+    is exception {
         TestCreateScript->new_with_options(application_name => 'TestAppToTestScripts', helper_class => 'TestHelperClass')->run;
-    } "no argv";
+    }, undef, "no argv";
     ok $TestCreateScript::help, 'Exited with usage info';
 }
 {
@@ -51,9 +50,9 @@ use lib "$Bin/../lib";
     local @ARGV = 'foo';
     local @TestHelperClass::ARGS;
     local %TestHelperClass::p;
-    lives_ok {
+    is exception {
         TestCreateScript->new_with_options(application_name => 'TestAppToTestScripts', helper_class => 'TestHelperClass')->run;
-    } "with argv";
+    }, undef, "with argv";
     ok !$TestCreateScript::help, 'Did not exit with usage into';
     is_deeply \@TestHelperClass::ARGS, ['TestAppToTestScripts', 'foo'], 'Args correct';
     is_deeply \%TestHelperClass::p, { '.newfiles' => 1, mech => undef }, 'Params correct';
@@ -64,9 +63,9 @@ use lib "$Bin/../lib";
     local @ARGV = 'foo';
     local @TestHelperClass::ARGS;
     local %TestHelperClass::p;
-    lives_ok {
+    is exception {
         TestCreateScript->new_with_options(application_name => 'TestAppToTestScripts', helper_class => 'TestHelperClass::False')->run;
-    } "with argv";
+    }, undef, "with argv";
     ok $TestCreateScript::help, 'Did exit with usage into as mk_component returned false';
     is_deeply \@TestHelperClass::ARGS, ['TestAppToTestScripts', 'foo'], 'Args correct';
     is_deeply \%TestHelperClass::p, { '.newfiles' => 1, mech => undef }, 'Params correct';

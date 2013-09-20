@@ -1,20 +1,18 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 use Test::More tests => 2;
-use Test::Exception;
+use Test::Fatal;
 
-lives_ok {
+is exception {
     require TestAppClassExceptionSimpleTest;
-} 'Can load application';
+}, undef, 'Can load application';
 
 
-lives_ok {
+is exception {
     Catalyst::Exception->throw
-} 'throw is properly stubbed out';
+}, undef, 'throw is properly stubbed out';
 
 
 

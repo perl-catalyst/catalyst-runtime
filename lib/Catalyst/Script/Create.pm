@@ -1,5 +1,6 @@
 package Catalyst::Script::Create;
 use Moose;
+use Class::Load 'load_class';
 use namespace::autoclean;
 
 with 'Catalyst::ScriptRole';
@@ -42,7 +43,7 @@ sub run {
     $self->print_usage_text if !$self->ARGV->[0];
 
     my $helper_class = $self->helper_class;
-    Class::MOP::load_class($helper_class);
+    load_class($helper_class);
     my $helper = $helper_class->new( { '.newfiles' => !$self->force, mech => $self->mechanize } );
 
     $self->print_usage_text unless $helper->mk_component( $self->application_name, @{$self->extra_argv} );

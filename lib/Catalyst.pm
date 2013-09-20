@@ -35,13 +35,14 @@ use utf8;
 use Carp qw/croak carp shortmess/;
 use Try::Tiny;
 use Safe::Isa;
+use Moose::Util 'find_meta';
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 use Plack::Util;
-use Class::Load;
+use Class::Load 'load_class';
 
 BEGIN { require 5.008003; }
 
@@ -326,7 +327,18 @@ cookies, HTTP headers, etc.). See L<Catalyst::Request>.
 
 =head2 $c->forward( $class, $method, [, \@arguments ] )
 
-Forwards processing to another action, by its private name. If you give a
+This is one way of calling another action (method) in the same or
+a different controller. You can also use C<< $self->my_method($c, @args) >>
+in the same controller or C<< $c->controller('MyController')->my_method($c, @args) >>
+in a different controller.
+The main difference is that 'forward' uses some of the Catalyst request
+cycle overhead, including debugging, which may be useful to you. On the
+other hand, there are some complications to using 'forward', restrictions
+on values returned from 'forward', and it may not handle errors as you prefer.
+Whether you use 'forward' or not is up to you; it is not considered superior to
+the other ways to call a method.
+
+'forward' calls  another action, by its private name. If you give a
 class name but no method, C<process()> is called. You may also optionally
 pass arguments in an arrayref. The action will receive the arguments in
 C<@_> and C<< $c->req->args >>. Upon returning from the function,
@@ -2488,7 +2500,7 @@ sub run {
 
 sub _make_immutable_if_needed {
     my $class = shift;
-    my $meta = Class::MOP::get_metaclass_by_name($class);
+    my $meta = find_meta($class);
     my $isa_ca = $class->isa('Class::Accessor::Fast') || $class->isa('Class::Accessor');
     if (
         $meta->is_immutable
@@ -2679,7 +2691,7 @@ sub setup_dispatcher {
         $dispatcher = $class->dispatcher_class;
     }
 
-    Class::MOP::load_class($dispatcher);
+    load_class($dispatcher);
 
     # dispatcher instance
     $class->dispatcher( $dispatcher->new );
@@ -2729,7 +2741,7 @@ sub setup_engine {
     # Don't really setup_engine -- see _setup_psgi_app for explanation.
     return if $class->loading_psgi_file;
 
-    Class::MOP::load_class($engine);
+    load_class($engine);
 
     if ($ENV{MOD_PERL}) {
         my $apache = $class->engine_loader->auto;
@@ -3005,7 +3017,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
         my ( $proto, $plugin, $instant ) = @_;
         my $class = ref $proto || $proto;
 
-        Class::MOP::load_class( $plugin );
+        load_class( $plugin );
         $class->log->warn( "$plugin inherits from 'Catalyst::Component' - this is deprecated and will not work in 5.81" )
             if $plugin->isa( 'Catalyst::Component' );
         my $plugin_meta = Moose::Meta::Class->create($plugin);
@@ -3053,7 +3065,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
          } @{ $plugins };
 
         for my $plugin ( reverse @plugins ) {
-            Class::MOP::load_class($plugin->[0], $plugin->[1]);
+            load_class($plugin->[0], $plugin->[1]);
             my $meta = find_meta($plugin->[0]);
             next if $meta && $meta->isa('Moose::Meta::Role');
 

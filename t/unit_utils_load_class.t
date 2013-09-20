@@ -1,10 +1,8 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
 use Test::More tests => 18;
-use Class::MOP;
+use Class::Load 'is_class_loaded';
 
 use lib "t/lib";
 
@@ -21,11 +19,11 @@ $SIG{__WARN__} = sub {
     $warnings++;
 };
 
-ok( !Class::MOP::is_class_loaded("TestApp::View::Dump"), "component not yet loaded" );
+ok( !is_class_loaded("TestApp::View::Dump"), "component not yet loaded" );
 
 Catalyst::Utils::ensure_class_loaded("TestApp::View::Dump");
 
-ok( Class::MOP::is_class_loaded("TestApp::View::Dump"), "loaded ok" );
+ok( is_class_loaded("TestApp::View::Dump"), "loaded ok" );
 is( $warnings, 0, "no warnings emitted" );
 
 $warnings = 0;
@@ -33,10 +31,10 @@ $warnings = 0;
 Catalyst::Utils::ensure_class_loaded("TestApp::View::Dump");
 is( $warnings, 0, "calling again doesn't reaload" );
 
-ok( !Class::MOP::is_class_loaded("TestApp::View::Dump::Request"), "component not yet loaded" );
+ok( !is_class_loaded("TestApp::View::Dump::Request"), "component not yet loaded" );
 
 Catalyst::Utils::ensure_class_loaded("TestApp::View::Dump::Request");
-ok( Class::MOP::is_class_loaded("TestApp::View::Dump::Request"), "loaded ok" );
+ok( is_class_loaded("TestApp::View::Dump::Request"), "loaded ok" );
 
 is( $warnings, 0, "calling again doesn't reaload" );
 

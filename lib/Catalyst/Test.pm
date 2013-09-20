@@ -7,8 +7,9 @@ use Test::More ();
 use Plack::Test;
 use Catalyst::Exception;
 use Catalyst::Utils;
-use Class::MOP;
+use Class::Load qw(load_class is_class_loaded);
 use Sub::Exporter;
+use Moose::Util 'find_meta';
 use Carp 'croak', 'carp';
 
 sub _build_request_export {
@@ -25,7 +26,7 @@ sub _build_request_export {
     return sub { croak "Must specify a test app: use Catalyst::Test 'TestApp'" }
         unless $class;
 
-    Class::MOP::load_class($class) unless Class::MOP::is_class_loaded($class);
+    load_class($class) unless is_class_loaded($class);
     $class->import;
 
     return sub { _local_request( $class, @_ ) };
@@ -58,7 +59,7 @@ sub _build_ctx_request_export {
 
         # hook into 'dispatch' -- the function gets called after all plugins
         # have done their work, and it's an easy place to capture $c.
-        my $meta = Class::MOP::get_metaclass_by_name($class);
+        my $meta = find_meta($class);
         $meta->make_mutable;
         $meta->add_after_method_modifier( "dispatch", sub {
             $ctx_closed_over = shift;

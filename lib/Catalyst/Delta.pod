@@ -167,7 +167,7 @@ classes are better implemented as Moose roles.
 
 =item *
 
-L<MooseX::MethodAttributes::Inheritable> is used to contain action
+L<MooseX::MethodAttributes::Role::AttrContainer::Inheritable> is used to contain action
 attributes. This means that attributes are represented in the MOP, and
 decouples action creation from attributes.
 

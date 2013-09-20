@@ -21,10 +21,10 @@ use Test::More tests => 1;
     /;
 }
 
-use Test::Exception;
-lives_ok {
+use Test::Fatal;
+is exception {
     TestAppC3ErrorUseMoose->setup();
-} 'No C3 error';
+}, undef, 'No C3 error';
 
 1;
 

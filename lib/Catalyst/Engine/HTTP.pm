@@ -22,7 +22,7 @@ __END__
 
 =head1 NAME
 
-Catalyst::Engine::HTTP
+Catalyst::Engine::HTTP - removed module
 
 =head1 SYNOPSIS
 

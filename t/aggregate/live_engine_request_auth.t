@@ -1,5 +1,3 @@
-#!perl
-
 # This tests to make sure the Authorization header is passed through by the engine.
 
 use strict;

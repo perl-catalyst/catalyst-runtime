@@ -31,10 +31,9 @@ requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean' => '0.23';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::Load' => '0.12';
-requires 'Class::MOP' => '0.95';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
-requires 'MooseX::MethodAttributes::Inheritable' => '0.24';
+requires 'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24';
 requires 'MooseX::Role::WithOverloading' => '0.09';
 requires 'Carp';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
@@ -56,7 +55,7 @@ requires 'Text::SimpleTable' => '0.03';
 requires 'Time::HiRes';
 requires 'Tree::Simple' => '1.15';
 requires 'Tree::Simple::Visitor::FindByPath';
-requires 'Try::Tiny';
+requires 'Try::Tiny' => '0.17';
 requires 'Safe::Isa';
 requires 'Task::Weaken';
 requires 'Text::Balanced'; # core in 5.8.x but mentioned for completeness
@@ -74,16 +73,19 @@ requires 'URI' => '1.36';
 requires 'JSON::MaybeXS' => '1.000000',
 
 # Install the standalone Regex dispatch modules in order to ease the
-# depreciation transition
+# deprecation transition
 requires 'Catalyst::DispatchType::Regex' => '5.90021';
 
-test_requires 'Test::Exception';
+test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';
 test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';
 test_requires 'IO::Scalar';
 test_requires 'HTTP::Status';
 test_requires 'JSON::MaybeXS';
+
+# see also cpanfile for authordeps -- install via
+# cpanm --installdeps --with-develop .
 
 # aggregate tests if AGGREGATE_TESTS is set and a recent Test::Aggregate and a Test::Simple it works with is available
 my @author_requires;

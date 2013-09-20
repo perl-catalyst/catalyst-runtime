@@ -9,7 +9,10 @@ use List::Util qw/first/;
 use List::MoreUtils qw/uniq/;
 use namespace::clean -except => 'meta';
 
-BEGIN { extends qw/Catalyst::Component MooseX::MethodAttributes::Inheritable/; }
+BEGIN {
+    extends qw/Catalyst::Component/;
+    with qw/MooseX::MethodAttributes::Role::AttrContainer::Inheritable/;
+}
 
 use MooseX::MethodAttributes;
 use Catalyst::Exception;
@@ -317,7 +320,7 @@ sub action_class {
         ? $args{attributes}{ActionClass}[0]
         : $self->_action_class);
 
-    Class::MOP::load_class($class);
+    load_class($class);
     return $class;
 }
 
@@ -744,7 +747,7 @@ Handle various types of paths:
     sub myaction2 :Path('/bar') { ... } # -> /bar
   }
 
-This is a general toolbox for attaching your action to a give path.
+This is a general toolbox for attaching your action to a given path.
 
 
 =head2 Regex

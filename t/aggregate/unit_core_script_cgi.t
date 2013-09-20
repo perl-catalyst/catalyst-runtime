@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use strict;
 use warnings;
 
@@ -6,14 +5,14 @@ use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use Catalyst::Script::CGI;
 
 local @ARGV;
-lives_ok {
+is exception {
     Catalyst::Script::CGI->new_with_options(application_name => 'TestAppToTestScripts')->run;
-} "new_with_options";
+}, undef, "new_with_options";
 shift @TestAppToTestScripts::RUN_ARGS;
 my $server = pop @TestAppToTestScripts::RUN_ARGS;
 like ref($server), qr/^Plack::Handler/, 'Is a Plack::Handler';

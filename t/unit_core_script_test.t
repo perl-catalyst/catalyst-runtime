@@ -6,7 +6,7 @@ use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use Catalyst::Script::Test;
 use File::Temp qw/tempfile/;
@@ -28,9 +28,9 @@ sub run_test {
     {
         local @ARGV = ($url);
         my $i;
-        lives_ok {
+        is exception {
             $i = Catalyst::Script::Test->new_with_options(application_name => 'TestApp');
-        } "new_with_options";
+        }, undef, "new_with_options";
         ok $i;
         my $saved;
         open( $saved, '>&'. STDOUT->fileno )
