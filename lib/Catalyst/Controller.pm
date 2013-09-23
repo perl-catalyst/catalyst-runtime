@@ -708,7 +708,7 @@ similar to how annotations work in other languages you might have heard of.
 Generally L<Catalyst> uses these to influence how the dispatcher sees your
 action and when it will run it in response to an incoming request.  They can
 also be used for other things.  Here's a summary, but you should refer to the
-liked manual page for additional help.
+linked manual page for additional help.
 
 =head2 Global
 
