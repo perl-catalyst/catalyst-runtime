@@ -201,7 +201,7 @@ Catalyst::Plugin::Unicode::Encoding - Unicode aware Catalyst
 
 This plugin is automatically loaded by apps. Even though is not a core component
 yet, it will vanish as soon as the code is fully integrated. For more
-information, please refer to C<ENCODING> section at L<Catalyst>.
+information, please refer to L<Catalyst/ENCODING>.
 
 =head1 AUTHORS
 
