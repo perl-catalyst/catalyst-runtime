@@ -3165,15 +3165,17 @@ you really don't need to invoke it.
 
 =head2 default_data_handlers
 
-Default Data Handler that come bundled with L<Catalyst>.  Currently there is
-only one default data handler, for 'application/json'.  This uses L<JSON::MaybeXS>
-which uses the dependency free L<JSON::PP> OR L<Cpanel::JSON::XS> if you have
-installed it.  If you don't mind the XS dependency, you should add the faster
-L<Cpanel::JSON::XS> to you dependency list (in your Makefile.PL or dist.ini, or
-cpanfile, etc.)
+Default Data Handlers that come bundled with L<Catalyst>.  Currently there is
+only one default data handler, for 'application/json'.  This is used to parse
+incoming JSON into a Perl data structure.  It used either L<JSON::MaybeXS> or
+L<JSON>, depending on which is installed.  This allows you to fail back to
+L<JSON:PP>, which is a Pure Perl JSON decoder, and has the smallest dependency
+impact.
 
-L<JSON::MaybeXS> is loaded the first time you ask for it (so if you never ask
-for it, its never used).
+Because we don't wish to add more dependencies to L<Catalyst>, if you wish to
+use this new feature we recommend installing L<JSON> or L<JSON::MaybeXS> in
+order to get the best performance.  You should add either to your dependency
+list (Makefile.PL, dist.ini, cpanfile, etc.)
 
 =cut
 
@@ -3200,9 +3202,9 @@ sub default_data_handlers {
     my ($class) = @_;
     return +{
       'application/json' => sub {
-          local $/;
-          Class::Load::load_class("JSON::MaybeXS");
-          JSON::MaybeXS::decode_json $_->getline },
+          Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON')
+            ->can('decode_json')->(do { local $/; $_->getline });
+      },
     };
 }
 
