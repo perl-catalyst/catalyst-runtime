@@ -14,7 +14,7 @@ use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
-has env => (is => 'ro', writer => '_set_env');
+has env => (is => 'ro', writer => '_set_env', predicate => 'has_env');
 # XXX Deprecated crap here - warn?
 has action => (is => 'rw');
 # XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
@@ -224,6 +224,18 @@ has _uploadtmp => (
 sub prepare_body {
     my ( $self ) = @_;
 
+    #warn "XXX ${\$self->_uploadtmp}" if $self->_has_uploadtmp;
+
+    if(my $plack_body = $self->env->{'plack.request.http.body'}) {
+      warn "wtF" x 100;
+        $self->_body($plack_body);
+        $self->_body->cleanup(1); # Make extra sure!
+        $self->_body->tmpdir( $self->_uploadtmp )
+          if $self->_has_uploadtmp;
+    } else {
+
+    }
+
     if ( my $length = $self->_read_length ) {
         unless ( $self->_body ) {
             my $type = $self->header('Content-Type');
@@ -250,6 +262,59 @@ sub prepare_body {
         $self->_body(0);
     }
 }
+
+sub prepare_bodyXXX {
+    my ( $self ) = @_;
+    if(my $plack_body = $self->env->{'plack.request.http.body'}) {
+    
+
+    } else {
+
+    }
+
+    die "XXX ${\$self->_uploadtmp}" x1000; $self->_has_uploadtmp;
+
+    if ( my $length = $self->_read_length ) {
+        unless ( $self->_body ) {
+            
+            ## If something plack middle already ready the body, just use
+            ## that.
+
+            my $body;
+            if(my $plack_body = $self->env->{'plack.request.http.body'}) {
+                $body = $plack_body;
+            } else {
+                my $type = $self->header('Content-Type');
+                $body = HTTP::Body->new($type, $length);
+
+                ## Play nice with Plak Middleware that looks for a body
+                $self->env->{'plack.request.http.body'} = $body;
+                $self->_body($body);
+
+                $body->cleanup(1); # Make extra sure!
+                $body->tmpdir( $self->_uploadtmp )
+                  if $self->_has_uploadtmp;
+            }
+        }
+
+        # Check for definedness as you could read '0'
+        while ( defined ( my $buffer = $self->read() ) ) {
+            $self->prepare_body_chunk($buffer);
+        }
+
+        # paranoia against wrong Content-Length header
+        my $remaining = $length - $self->_read_position;
+        if ( $remaining > 0 ) {
+            Catalyst::Exception->throw(
+                "Wrong Content-Length value: $length" );
+        }
+    }
+    else {
+        # Defined but will cause all body code to be skipped
+        $self->_body(0);
+    }
+}
+
 
 sub prepare_body_chunk {
     my ( $self, $chunk ) = @_;
@@ -313,7 +378,7 @@ has _body => (
 #             and provide a custom reader..
 sub body {
   my $self = shift;
-  $self->prepare_body unless ! $self->_has_body;
+  $self->prepare_body unless $self->_has_body;
   croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
