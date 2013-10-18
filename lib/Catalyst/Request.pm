@@ -103,6 +103,9 @@ has io_fh => (
 sub _build_io_fh {
     my $self = shift;
     return $self->env->{'psgix.io'}
+      || (
+        $self->env->{'net.async.http.server.req'} &&
+        $self->env->{'net.async.http.server.req'}->stream)   ## Until I can make ioasync cabal see the value of supportin psgix.io (jnap)
       || die "Your Server does not support psgix.io";
 };
 
