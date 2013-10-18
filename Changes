@@ -22,6 +22,12 @@
   - NEW FEATURE: Catalyst::Response can now pull response from a PSGI
     specification response.  This makes it easier to host external Plack
     applications under Catalyst.  See Catalyst::Response->from_psgi_response
+  - NEW FEATURE: New configuration option 'use_hash_multivalue_in_request'
+    will populate $request methods 'parameters', 'body_parameters' and
+    'query_parameters' with an instance of Hash::MultiValue instead of a
+    HashRef.  This is used by Plack and is intended to reduce the need to
+    write defensive logic since you are never sure if an incoming parameter
+    is a scalar or arrayref.
 
 5.90049_003 - 2013-09-20
   - Documented the new body_data method added in the previous release

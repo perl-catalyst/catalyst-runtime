@@ -492,7 +492,10 @@ sub prepare_query_parameters {
     my $env = $c->request->env;
 
     if(my $query_obj = $env->{'plack.request.query'}) {
-         $c->request->query_parameters($query_obj->as_hashref_mixed);
+         $c->request->query_parameters(
+           $c->request->_use_hash_multivalue ?
+              $query_obj->clone :
+              $query_obj->as_hashref_mixed);
          return;
     }
 
@@ -540,7 +543,10 @@ sub prepare_query_parameters {
     }
 
     $env->{'plack.request.query'} ||= Hash::MultiValue->from_mixed(\%query);
-    $c->request->query_parameters( \%query );
+    $c->request->query_parameters( 
+      $c->request->_use_hash_multivalue ?
+        $env->{'plack.request.query'}->clone :
+        \%query);
 }
 
 =head2 $self->prepare_read($c)

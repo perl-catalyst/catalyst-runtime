@@ -65,6 +65,8 @@ sub _build_request_constructor_args {
     my %p = ( _log => $self->log );
     $p{_uploadtmp} = $self->_uploadtmp if $self->_has_uploadtmp;
     $p{data_handlers} = {$self->registered_data_handlers};
+    $p{_use_hash_multivalue} = $self->config->{use_hash_multivalue_in_request}
+      if $self->config->{use_hash_multivalue_in_request};
     \%p;
 }
 
@@ -3394,6 +3396,26 @@ use like:
     __PACKAGE__->config(abort_chain_on_error_fix => 1);
 
 In the future this might become the default behavior.
+
+=item *
+
+C<use_hash_multivalue_in_request>
+
+In L<Catalyst::Request> the methods C<query_parameters>, C<body_parametes>
+and C<parameters> return a hashref where values might be scalar or an arrayref
+depending on the incoming data.  In many cases this can be undesirable as it
+leads one to writing defensive code like the following:
+
+    my ($val) = ref($c->req->parameters->{a}) ?
+      @{$c->req->parameters->{a}} :
+        $c->req->parameters->{a};
+
+Setting this configuration item to true will make L<Catalyst> populate the
+attributes underlying these methods with an instance of L<Hash::MultiValue>
+which is used by L<Plack::Request> and others to solve this very issue.  You
+may prefer this behavior to the default, if so enable this option (be warned
+if you enable it in a legacy application we are not sure if it is completely
+backwardly compatible).
 
 =item *
 

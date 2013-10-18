@@ -131,6 +131,11 @@ sub _build_body_data {
     }
 }
 
+has _use_hash_multivalue => (
+    is=>'ro', 
+    required=>1, 
+    default=> sub {0});
+
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 
@@ -211,6 +216,10 @@ sub _build_parameters {
         my $body  = $self->env->{'plack.request.body'} || Hash::MultiValue->new;
         Hash::MultiValue->new($query->flatten, $body->flatten);
     };
+
+    if($self->_use_hash_multivalue) {
+        return $self->env->{'plack.request.merged'}->clone; # We want a copy, in case your App is evil
+    }
 
     # We copy, no references
     foreach my $name (keys %$query_parameters) {
@@ -325,7 +334,9 @@ sub prepare_body_parameters {
     $self->prepare_body if ! $self->_has_body;
     return {} unless $self->_body;
 
-    return $self->_body->param;
+    return $self->_use_hash_multivalue ?
+        $self->env->{'plack.request.body'}->clone :
+        $self->_body->param;
 }
 
 sub prepare_connection {
