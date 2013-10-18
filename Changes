@@ -4,6 +4,21 @@
   - JSON Data handler looks for both JSON::MaybeXS and JSON, and uses
     whichever is first (prefering to find JSON::MaybeXS).  This should
     improve compatibility as you likely already have one installed.
+  - Fixed a warning in the server script (bokutin++)
+  - We now populate various Plack $env keys in order to play nice with
+    downstream middleware or plack apps (and to reduce processing if
+    those keys already exist).  Keys added:
+      - plack.request.query
+      - plack.request.body
+      - plack.request.merged
+      - plack.request.http.body
+  - If incoming input (from a POST or PUT) is not buffered, create the
+    buffer and set the correct psgi env keys to note this for downstream
+    psgi apps / middleware.  This should solve some issues where Catalyst
+    sucks up the body input but its not buffered so downstream apps can't
+    read it (for example FCGI does not buffer).  We now also try to make
+    sure the body content input is reset to the start of the filehandle
+    so that we are polite to downstream middleware /apps.
 
 5.90049_003 - 2013-09-20
   - Documented the new body_data method added in the previous release
