@@ -7,6 +7,9 @@ use URI::http;
 use URI::https;
 use URI::QueryParam;
 use HTTP::Headers;
+use Stream::Buffered;
+use Hash::MultiValue;
+use Scalar::Util;
 
 use Moose;
 
@@ -224,97 +227,80 @@ has _uploadtmp => (
 sub prepare_body {
     my ( $self ) = @_;
 
-    #warn "XXX ${\$self->_uploadtmp}" if $self->_has_uploadtmp;
+    # If previously applied middleware created the HTTP::Body object, then we
+    # just use that one.  
 
     if(my $plack_body = $self->env->{'plack.request.http.body'}) {
-      warn "wtF" x 100;
         $self->_body($plack_body);
-        $self->_body->cleanup(1); # Make extra sure!
+        $self->_body->cleanup(1);
+        return;
+    }
+
+    # Define PSGI ENV placeholders, or for empty should there be no content
+    # body (typical in HEAD or GET).  Looks like from Plack::Request that
+    # middleware would probably expect to see this, even if empty
+
+    $self->env->{'plack.request.body'}   = Hash::MultiValue->new;
+    $self->env->{'plack.request.upload'} = Hash::MultiValue->new;
+
+    # If there is nothing to read, set body to naught and return.  This
+    # will cause all body code to be skipped
+
+    return $self->_body(0) unless my $length = $self->_read_length;
+
+    # Unless the body has already been set, create it.  Not sure about this
+    # code, how else might it be set, but this was existing logic.
+
+    unless ($self->_body) {
+        my $type = $self->header('Content-Type');
+        $self->_body(HTTP::Body->new( $type, $length ));
+        $self->_body->cleanup(1);
+
+        # JNAP: I'm not sure this is doing what we expect, but it also doesn't
+        # seem to be hurting (seems ->_has_uploadtmp is true more than I would
+        # expect.
+
         $self->_body->tmpdir( $self->_uploadtmp )
           if $self->_has_uploadtmp;
+    }
+
+    # Ok if we get this far, we have to read psgi.input into the new body
+    # object.  Lets play nice with any plack app or other downstream, so
+    # we create a buffer unless one exists.
+     
+    my $stream_buffer;
+    if ($self->env->{'psgix.input.buffered'}) {
+        # Be paranoid about previous psgi middleware or apps that read the
+        # input but didn't return the buffer to the start.
+        $self->env->{'psgi.input'}->seek(0, 0);
     } else {
-
+        $stream_buffer = Stream::Buffered->new($length);
     }
 
-    if ( my $length = $self->_read_length ) {
-        unless ( $self->_body ) {
-            my $type = $self->header('Content-Type');
-            $self->_body(HTTP::Body->new( $type, $length ));
-            $self->_body->cleanup(1); # Make extra sure!
-            $self->_body->tmpdir( $self->_uploadtmp )
-              if $self->_has_uploadtmp;
-        }
-
-        # Check for definedness as you could read '0'
-        while ( defined ( my $buffer = $self->read() ) ) {
-            $self->prepare_body_chunk($buffer);
-        }
-
-        # paranoia against wrong Content-Length header
-        my $remaining = $length - $self->_read_position;
-        if ( $remaining > 0 ) {
-            Catalyst::Exception->throw(
-                "Wrong Content-Length value: $length" );
-        }
+    # Check for definedness as you could read '0'
+    while ( defined ( my $chunk = $self->read() ) ) {
+        $self->prepare_body_chunk($chunk);
+        $stream_buffer->print($chunk) if $stream_buffer;
     }
-    else {
-        # Defined but will cause all body code to be skipped
-        $self->_body(0);
+
+    # Ok, we read the body.  Lets play nice for any PSGI app down the pipe
+
+    if ($stream_buffer) {
+        $self->env->{'psgix.input.buffered'} = 1;
+        $self->env->{'psgi.input'} = $stream_buffer->rewind;
+    } else {
+        $self->env->{'psgi.input'}->seek(0, 0); # Reset the buffer for downstream middleware or apps
+    }
+
+    $self->env->{'plack.request.http.body'} = $self->_body;
+    $self->env->{'plack.request.body'} = Hash::MultiValue->from_mixed($self->_body->param);
+
+    # paranoia against wrong Content-Length header
+    my $remaining = $length - $self->_read_position;
+    if ( $remaining > 0 ) {
+        Catalyst::Exception->throw("Wrong Content-Length value: $length" );
     }
 }
-
-sub prepare_bodyXXX {
-    my ( $self ) = @_;
-    if(my $plack_body = $self->env->{'plack.request.http.body'}) {
-    
-
-    } else {
-
-    }
-
-    die "XXX ${\$self->_uploadtmp}" x1000; $self->_has_uploadtmp;
-
-    if ( my $length = $self->_read_length ) {
-        unless ( $self->_body ) {
-            
-            ## If something plack middle already ready the body, just use
-            ## that.
-
-            my $body;
-            if(my $plack_body = $self->env->{'plack.request.http.body'}) {
-                $body = $plack_body;
-            } else {
-                my $type = $self->header('Content-Type');
-                $body = HTTP::Body->new($type, $length);
-
-                ## Play nice with Plak Middleware that looks for a body
-                $self->env->{'plack.request.http.body'} = $body;
-                $self->_body($body);
-
-                $body->cleanup(1); # Make extra sure!
-                $body->tmpdir( $self->_uploadtmp )
-                  if $self->_has_uploadtmp;
-            }
-        }
-
-        # Check for definedness as you could read '0'
-        while ( defined ( my $buffer = $self->read() ) ) {
-            $self->prepare_body_chunk($buffer);
-        }
-
-        # paranoia against wrong Content-Length header
-        my $remaining = $length - $self->_read_position;
-        if ( $remaining > 0 ) {
-            Catalyst::Exception->throw(
-                "Wrong Content-Length value: $length" );
-        }
-    }
-    else {
-        # Defined but will cause all body code to be skipped
-        $self->_body(0);
-    }
-}
-
 
 sub prepare_body_chunk {
     my ( $self, $chunk ) = @_;

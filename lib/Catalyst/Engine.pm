@@ -13,6 +13,8 @@ use URI::QueryParam;
 use Plack::Loader;
 use Catalyst::EngineLoader;
 use Encode ();
+use Plack::Request::Upload;
+use Hash::MultiValue;
 use utf8;
 
 use namespace::clean -except => 'meta';
@@ -569,6 +571,7 @@ sub prepare_uploads {
 
     my $uploads = $request->_body->upload;
     my $parameters = $request->parameters;
+    my @plack_uploads;
     foreach my $name (keys %$uploads) {
         my $files = $uploads->{$name};
         my @uploads;
@@ -583,8 +586,13 @@ sub prepare_uploads {
                filename => $upload->{filename},
               );
             push @uploads, $u;
+
+            # Plack compatibility.
+            my %copy = (%$upload, headers=>$headers);
+            push @plack_uploads, $name, Plack::Request::Upload->new(%copy);
         }
         $request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
+
 
         # support access to the filename as a normal param
         my @filenames = map { $_->{filename} } @uploads;
@@ -601,6 +609,8 @@ sub prepare_uploads {
             $parameters->{$name} = @filenames > 1 ? \@filenames : $filenames[0];
         }
     }
+
+    $self->env->{'plack.request.upload'} ||= Hash::MultiValue->new(@plack_uploads);
 }
 
 =head2 $self->write($c, $buffer)

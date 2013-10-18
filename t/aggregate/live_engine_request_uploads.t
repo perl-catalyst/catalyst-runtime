@@ -332,6 +332,14 @@ use Path::Class::Dir;
         if ( $ENV{CATALYST_SERVER} ) {
             skip 'Not testing for deleted file on remote server', 1;
         }
+
+        # JNAP, I added the following line in order to properly let
+        # the $env go out of scope so that the associated tempfile
+        # would be deleted.  I think somewhere Catalyst::Test closed
+        # over ENV and holds state until a new command is issues but 
+        # I can't find it.
+
+        request GET  'http://localhost/';
         ok( !-e $body->body->filename, 'Upload temp file was deleted' );
     }
 }
