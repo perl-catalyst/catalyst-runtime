@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90049_004 - TBA
+5.90049_004 - 2013-10-18
   - JSON Data handler looks for both JSON::MaybeXS and JSON, and uses
     whichever is first (prefering to find JSON::MaybeXS).  This should
     improve compatibility as you likely already have one installed.
