@@ -201,6 +201,14 @@ sub _build_parameters {
     my $parameters = {};
     my $body_parameters = $self->body_parameters;
     my $query_parameters = $self->query_parameters;
+
+    ## setup for downstream plack
+    $self->env->{'plack.request.merged'} ||= do {
+        my $query = $self->env->{'plack.request.query'} || Hash::MultiValue->new;
+        my $body  = $self->env->{'plack.request.body'} || Hash::MultiValue->new;
+        Hash::MultiValue->new($query->flatten, $body->flatten);
+    };
+
     # We copy, no references
     foreach my $name (keys %$query_parameters) {
         my $param = $query_parameters->{$name};

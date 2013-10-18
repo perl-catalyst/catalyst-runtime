@@ -489,8 +489,13 @@ process the query string and extract query parameters.
 
 sub prepare_query_parameters {
     my ($self, $c) = @_;
-
     my $env = $c->request->env;
+
+    if(my $query_obj = $env->{'plack.request.query'}) {
+         $c->request->query_parameters($query_obj->as_hashref_mixed);
+         return;
+    }
+
     my $query_string = exists $env->{QUERY_STRING}
         ? $env->{QUERY_STRING}
         : '';
@@ -498,7 +503,11 @@ sub prepare_query_parameters {
     # Check for keywords (no = signs)
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
-        $c->request->query_keywords( $self->unescape_uri($query_string) );
+        $c->request->query_keywords($self->unescape_uri($query_string));
+        $env->{'plack.request.query'} ||= Hash::MultiValue->new(
+          map { (URI::Escape::uri_unescape($_), '') }
+            split(/\+/, $query_string, -1));
+
         return;
     }
 
@@ -529,6 +538,8 @@ sub prepare_query_parameters {
             $query{$param} = $value;
         }
     }
+
+    $env->{'plack.request.query'} ||= Hash::MultiValue->from_mixed(\%query);
     $c->request->query_parameters( \%query );
 }
 
