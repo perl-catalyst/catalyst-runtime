@@ -112,6 +112,37 @@ sub finalize_headers {
     return;
 }
 
+sub from_psgi_response {
+    my ($self, $psgi_res) = @_;
+    if(ref $psgi_res eq 'ARRAY') {
+        my ($status, $headers, $body) = @$psgi_res;
+        $self->status($status);
+        $self->headers($headers);
+        if(ref $body eq 'ARRAY') {
+          $self->body(join '', grep defined, @$body);
+        } else {
+          $self->body($body);
+        }
+    } elsif(ref $psgi_res eq 'CODE') {
+        $psgi_res->(sub {
+            my ($status, $headers, $maybe_body) = @_;
+            $self->status($status);
+            $self->headers($headers);
+            if($maybe_body) {
+                if(ref $maybe_body eq 'ARRAY') {
+                  $self->body(join '', grep defined, @$maybe_body);
+                } else {
+                  $self->body($maybe_body);
+                }
+            } else {
+                return $self->write_fh;
+            }
+        });        
+    } else {
+        die "You can't set a Catalyst response from that, expect a valid PSGI response";
+    }
+}
+
 =head1 NAME
 
 Catalyst::Response - stores output responding to the current client request
@@ -308,6 +339,33 @@ the response object to functions that want to write to an L<IO::Handle>.
 =head2 $self->finalize_headers($c)
 
 Writes headers to response if not already written
+
+=head2 from_psgi_response
+
+Given a PSGI response (either three element ARRAY reference OR coderef expecting
+a $responder) set the response from it.
+
+Properly supports streaming and delayed response and / or async IO if running
+under an expected event loop.
+
+Example:
+
+    package MyApp::Web::Controller::Test;
+
+    use base 'Catalyst::Controller';
+    use Plack::App::Directory;
+
+
+    my $app = Plack::App::Directory->new({ root => "/path/to/htdocs" })
+      ->to_app;
+
+    sub myaction :Local Args {
+      my ($self, $c) = @_;
+      $c->res->from_psgi_response($app->($self->env));
+    }
+
+Please note this does not attempt to map or nest your PSGI application under
+the Controller and Action namespace or path.  
 
 =head2 DEMOLISH
 
