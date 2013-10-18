@@ -19,6 +19,9 @@
     read it (for example FCGI does not buffer).  We now also try to make
     sure the body content input is reset to the start of the filehandle
     so that we are polite to downstream middleware /apps.
+  - NEW FEATURE: Catalyst::Response can now pull response from a PSGI
+    specification response.  This makes it easier to host external Plack
+    applications under Catalyst.  See Catalyst::Response->from_psgi_response
 
 5.90049_003 - 2013-09-20
   - Documented the new body_data method added in the previous release
