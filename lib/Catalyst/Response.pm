@@ -117,7 +117,7 @@ sub from_psgi_response {
     if(ref $psgi_res eq 'ARRAY') {
         my ($status, $headers, $body) = @$psgi_res;
         $self->status($status);
-        $self->headers($headers);
+        $self->headers(HTTP::Headers->new(@$headers));
         if(ref $body eq 'ARRAY') {
           $self->body(join '', grep defined, @$body);
         } else {
@@ -125,9 +125,10 @@ sub from_psgi_response {
         }
     } elsif(ref $psgi_res eq 'CODE') {
         $psgi_res->(sub {
-            my ($status, $headers, $maybe_body) = @_;
+            my $response = shift;
+            my ($status, $headers, $maybe_body) = @$response;
             $self->status($status);
-            $self->headers($headers);
+            $self->headers(HTTP::Headers->new(@$headers));
             if($maybe_body) {
                 if(ref $maybe_body eq 'ARRAY') {
                   $self->body(join '', grep defined, @$maybe_body);
@@ -137,8 +138,8 @@ sub from_psgi_response {
             } else {
                 return $self->write_fh;
             }
-        });        
-    } else {
+        });  
+     } else {
         die "You can't set a Catalyst response from that, expect a valid PSGI response";
     }
 }
