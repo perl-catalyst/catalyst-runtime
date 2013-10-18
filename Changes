@@ -28,6 +28,8 @@
     HashRef.  This is used by Plack and is intended to reduce the need to
     write defensive logic since you are never sure if an incoming parameter
     is a scalar or arrayref.
+  - NEW FEATURE: We now experimentally support Net::Async::HTTP::Server
+    and IO-Async based event loops.  Examples will follow.
 
 5.90049_003 - 2013-09-20
   - Documented the new body_data method added in the previous release
