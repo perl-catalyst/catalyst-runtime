@@ -51,6 +51,16 @@ use Catalyst::Test 'TestFromPSGI';
   is $merged->get('d'), 4;
   is $merged->get('a'), 1;
   is $merged->get('b'), 2;
+
+  is $c->req->parameters->get('c'), 3;
+  is $c->req->parameters->get('d'), 4;
+  is $c->req->parameters->get('a'), 1;
+  is $c->req->parameters->get('b'), 2;
+
+  is $c->req->body_parameters->get('c'), 3;
+  is $c->req->body_parameters->get('d'), 4;
+  is $c->req->query_parameters->get('a'), 1;
+  is $c->req->query_parameters->get('b'), 2;
 }
 
 done_testing;
