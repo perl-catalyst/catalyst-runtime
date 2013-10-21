@@ -102,7 +102,7 @@ to use L<Catalyst::Script::FastCGI>.
 The engines that are built upon the various iterations of mod_perl,
 L<Catalyst::Engine::Apache::MP13> (for mod_perl 1, and Apache 1.x) and
 L<Catalyst::Engine::Apache2::MP20> (for mod_perl 2, and Apache 2.x),
-should be seamless upgrades and will work using using L<Plack::Handler::Apache1>
+should be seamless upgrades and will work using L<Plack::Handler::Apache1>
 or L<Plack::Handler::Apache2> as required.
 
 L<Catalyst::Engine::Apache2::MP19>, however, is no longer supported, as

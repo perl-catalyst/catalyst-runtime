@@ -120,7 +120,7 @@ for more info about how Catalyst dispatches to actions.
 =cut
 
 #I think both of these could be attributes. doesn't really seem like they need
-#to ble class data. i think that attributes +default would work just fine
+#to be class data. i think that attributes +default would work just fine
 __PACKAGE__->mk_classdata($_) for qw/_dispatch_steps _action_class _action_role_prefix/;
 
 __PACKAGE__->_dispatch_steps( [qw/_BEGIN _AUTO _ACTION/] );
