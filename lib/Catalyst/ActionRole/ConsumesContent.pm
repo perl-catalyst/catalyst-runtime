@@ -102,6 +102,11 @@ allowed content types (see L</http_methods>) and zero otherwise.
 
 An array of strings that are the allowed content types for matching this action.
 
+=head2 can_consume
+
+Boolean.  Does the current request match content type with what this actionrole
+can consume?
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
