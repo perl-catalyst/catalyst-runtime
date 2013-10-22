@@ -368,7 +368,11 @@ sub gather_default_action_roles {
   my @roles = ();
   push @roles, 'Catalyst::ActionRole::HTTPMethods'
     if $args{attributes}->{Method};
-  return @roles;
+
+  push @roles, 'Catalyst::ActionRole::ConsumesContent'
+    if $args{attributes}->{Consumes};
+
+    return @roles;
 }
 
 sub _parse_attrs {
