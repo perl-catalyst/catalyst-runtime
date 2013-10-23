@@ -12,7 +12,39 @@ has allowed_content_types => (
   auto_deref=>1,
   builder=>'_build_allowed_content_types');
 
-sub _build_allowed_content_types { shift->attributes->{Consumes} }
+has normalized => (
+  is=>'ro',
+  required=>1,
+  lazy=>1,
+  isa=>'HashRef',
+  builder=>'_build_normalized');
+
+
+sub _build_normalized {
+  return +{
+    JSON => 'application/json',
+    JS => 'application/javascript',
+    PERL => 'application/perl',
+    HTML => 'text/html',
+    XML => 'text/XML',
+    Plain => 'text/plain',
+    UrlEncoded => 'application/x-www-form-urlencoded',
+    Multipart => 'multipart/form-data',
+    HTMLForm => ['application/x-www-form-urlencoded','multipart/form-data'],
+  };
+}
+
+sub _build_allowed_content_types {
+    my $self = shift;
+    my @proto = split ',', @{$self->attributes->{Consumes}};
+    return map {
+      if(my $normalized = $self->normalized->{$_}) {
+        ref $normalized ? @$normalized : ($normalized);
+      } else {
+        $_;
+      }
+    } @proto;
+}
 
 around ['match','match_captures'] => sub {
     my ($orig, $self, $ctx, @args) = @_;
@@ -49,9 +81,9 @@ Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
       
       ## Alternatively, for common types...
 
-      sub is_json       : Chained('start') JSON { ... }
-      sub is_urlencoded : Chained('start') URLEncoded { ... }
-      sub is_multipart  : Chained('start') FormData { ... }
+      sub is_json       : Chained('start') Consume(JSON) { ... }
+      sub is_urlencoded : Chained('start') Consume(HTMLForm)URLEncoded { ... }
+      sub is_multipart  : Chained('start') ConsumeFormData { ... }
 
       ## Or allow more than one type
       
