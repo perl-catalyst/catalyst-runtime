@@ -74,6 +74,7 @@ requires 'JSON::MaybeXS' => '1.000000';
 requires 'Stream::Buffered';
 requires 'Hash::MultiValue';
 requires 'Plack::Request::Upload';
+requires 'CGI::Struct';
 
 # Install the standalone Regex dispatch modules in order to ease the
 # deprecation transition

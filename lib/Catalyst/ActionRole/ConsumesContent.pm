@@ -2,7 +2,7 @@ package Catalyst::ActionRole::ConsumesContent;
 
 use Moose::Role;
 
-requires 'match', 'match_captures';
+requires 'match', 'match_captures', 'list_extra_info';
 
 has allowed_content_types => (
   is=>'ro',
@@ -147,6 +147,10 @@ An array of strings that are the allowed content types for matching this action.
 
 Boolean.  Does the current request match content type with what this actionrole
 can consume?
+
+=head2 list_extra_info
+
+Add the accepted content type to the debug screen.
 
 =head1 AUTHORS
 
