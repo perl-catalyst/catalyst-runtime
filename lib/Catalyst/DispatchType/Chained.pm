@@ -101,6 +101,7 @@ sub list {
         my @parents = ();
         my $parent = "DUMMY";
         my $extra  = $self->_list_extra_http_methods($endpoint);
+        my $consumes = $self->_list_extra_consumes($endpoint);
         my $curr = $endpoint;
         while ($curr) {
             if (my $cap = $curr->list_extra_info->{CaptureArgs}) {
@@ -129,12 +130,16 @@ sub list {
             if (defined(my $cap = $p->list_extra_info->{CaptureArgs})) {
                 $name .= ' ('.$cap.')';
             }
+            if (defined(my $ct = $p->list_extra_info->{Consumes})) {
+                $name .= ' :'.$ct;
+            }
+
             unless ($p eq $parents[0]) {
                 $name = "-> ${name}";
             }
             push(@rows, [ '', $name ]);
         }
-        push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : '')."/${endpoint}" ]);
+        push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : '')."/${endpoint}". ($consumes ? " :$consumes":"" ) ]);
         $rows[0][0] = join('/', '', @parts) || '/';
         $paths->row(@$_) for @rows;
     }
@@ -148,7 +153,15 @@ sub _list_extra_http_methods {
     my ( $self, $action ) = @_;
     return unless defined $action->list_extra_info->{HTTP_METHODS};
     return join(', ', @{$action->list_extra_info->{HTTP_METHODS}});
+
 }
+
+sub _list_extra_consumes {
+    my ( $self, $action ) = @_;
+    return unless defined $action->list_extra_info->{CONSUMES};
+    return join(', ', @{$action->list_extra_info->{CONSUMES}});
+}
+
 
 =head2 $self->match( $c, $path )
 

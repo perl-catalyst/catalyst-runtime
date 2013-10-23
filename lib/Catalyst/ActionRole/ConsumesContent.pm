@@ -9,7 +9,6 @@ has allowed_content_types => (
   required=>1,
   lazy=>1,
   isa=>'ArrayRef',
-  auto_deref=>1,
   builder=>'_build_allowed_content_types');
 
 has normalized => (
@@ -36,14 +35,16 @@ sub _build_normalized {
 
 sub _build_allowed_content_types {
     my $self = shift;
-    my @proto = split ',', @{$self->attributes->{Consumes}};
-    return map {
+    my @proto = map {split ',', $_ } @{$self->attributes->{Consumes}};
+    my @converted = map {
       if(my $normalized = $self->normalized->{$_}) {
         ref $normalized ? @$normalized : ($normalized);
       } else {
         $_;
       }
     } @proto;
+
+    return \@converted;
 }
 
 around ['match','match_captures'] => sub {
@@ -57,9 +58,17 @@ around ['match','match_captures'] => sub {
 sub can_consume {
     my ($self, $request_content_type) = @_;
     my @matches = grep { lc($_) eq lc($request_content_type) }
-      $self->allowed_content_types;
+      @{$self->allowed_content_types};
     return @matches ? 1:0;
 }
+
+around 'list_extra_info' => sub {
+  my ($orig, $self, @args) = @_;
+  return {
+    %{ $self->$orig(@args) }, 
+    CONSUMES => $self->allowed_content_types,
+  };
+};
 
 1;
 
