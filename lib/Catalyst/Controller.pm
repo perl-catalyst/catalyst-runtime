@@ -884,7 +884,7 @@ list of available shortcuts:
     HTMLForm => ['application/x-www-form-urlencoded','multipart/form-data'],
 
 Please keep in mind that when dispatching, L<Catalyst> will match the first most
-relevent case, so if you use the C<Consumes> attribute, you should place your
+relevant case, so if you use the C<Consumes> attribute, you should place your
 most accurate matches early in the Chain, and your 'catchall' actions last.
 
 See L<Catalyst::ActionRole::ConsumesContent> for more.
