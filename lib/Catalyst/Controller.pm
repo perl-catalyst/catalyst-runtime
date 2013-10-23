@@ -834,6 +834,61 @@ When used with L</Path> indicates the number of arguments expected in
 the path.  However if no Args value is set, assumed to 'slurp' all
 remaining path pars under this namespace.
 
+=head2 Consumes('...')
+
+Matches the current action against the content-type of the request.  Typically
+this is used when the request is a POST or PUT and you want to restrict the
+submitted content type.  For example, you might have an HTML for that either
+returns classic url encoded form data, or JSON when Javascript is enabled.  In
+this case you may wish to match either incoming type to one of two different
+actions, for properly processing.
+
+Examples:
+
+    sub is_json       : Chained('start') Consumes('application/json') { ... }
+    sub is_urlencoded : Chained('start') Consumes('application/x-www-form-urlencoded') { ... }
+    sub is_multipart  : Chained('start') Consumes('multipart/form-data') { ... }
+
+To reduce boilerplate, we include the following content type shortcuts:
+
+Examples
+
+      sub is_json       : Chained('start') Consume(JSON) { ... }
+      sub is_urlencoded : Chained('start') Consumes(UrlEncoded) { ... }
+      sub is_multipart  : Chained('start') Consumes(Multipart) { ... }
+
+You may specify more than one match:
+
+      sub is_more_than_one
+        : Chained('start')
+        : Consumes('application/x-www-form-urlencoded')
+        : Consumes('multipart/form-data')
+
+      sub is_more_than_one
+        : Chained('start')
+        : Consumes(UrlEncoded)
+        : Consumes(Multipart)
+
+Since it is a common case the shortcut C<HTMLForm> matches both
+'application/x-www-form-urlencoded' and 'multipart/form-data'.  Here's the full
+list of available shortcuts:
+
+    JSON => 'application/json',
+    JS => 'application/javascript',
+    PERL => 'application/perl',
+    HTML => 'text/html',
+    XML => 'text/XML',
+    Plain => 'text/plain',
+    UrlEncoded => 'application/x-www-form-urlencoded',
+    Multipart => 'multipart/form-data',
+    HTMLForm => ['application/x-www-form-urlencoded','multipart/form-data'],
+
+Please keep in mind that when dispatching, L<Catalyst> will match the first most
+relevent case, so if you use the C<Consumes> attribute, you should place your
+most accurate matches early in the Chain, and your 'catchall' actions last.
+
+See L<Catalyst::ActionRole::ConsumesContent> for more.
+
 =head1 OPTIONAL METHODS
 
 =head2 _parse_[$name]_attr

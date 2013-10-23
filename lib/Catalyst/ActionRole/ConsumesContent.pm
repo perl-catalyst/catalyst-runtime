@@ -91,8 +91,8 @@ Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
       ## Alternatively, for common types...
 
       sub is_json       : Chained('start') Consume(JSON) { ... }
-      sub is_urlencoded : Chained('start') Consume(HTMLForm)URLEncoded { ... }
-      sub is_multipart  : Chained('start') ConsumeFormData { ... }
+      sub is_urlencoded : Chained('start') Consumes(UrlEncoded) { ... }
+      sub is_multipart  : Chained('start') Consumes(Multipart) { ... }
 
       ## Or allow more than one type
       
