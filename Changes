@@ -1,5 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90049_005 - TBA
+  - NEW FEATURE:  New Controller action attribute 'Consumes', which allows you
+    to specify the content type of the incoming request.  This makes it easier
+    to create actions that only handle certain content type POST or PUT, such
+    as actions that only handle JSON or actions that only understand classic
+    HTML forms.
+  - TODO: body_data should slurp classic formdata
+  - TODO: remove non public Plack::Request $env keys added in previous release
+
 5.90049_004 - 2013-10-18
   - JSON Data handler looks for both JSON::MaybeXS and JSON, and uses
     whichever is first (prefering to find JSON::MaybeXS).  This should
