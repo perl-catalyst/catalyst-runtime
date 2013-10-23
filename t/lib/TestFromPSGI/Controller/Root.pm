@@ -5,9 +5,9 @@ use MooseX::MethodAttributes;
 
 extends 'Catalyst::Controller';
 
-sub test_psgi_keys :Local Args(1) {
-  my ($self, $c, $key) = @_;
-  $c->res->body($c->req->env->{$key});
+sub test_psgi_keys :Local {
+  my ($self, $c) = @_;
+  $c->res->body('ok');
 }
 
 sub from_psgi_array : Local {

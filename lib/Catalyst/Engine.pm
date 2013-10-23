@@ -507,10 +507,6 @@ sub prepare_query_parameters {
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
         $c->request->query_keywords($self->unescape_uri($query_string));
-        $env->{'plack.request.query'} ||= Hash::MultiValue->new(
-          map { (URI::Escape::uri_unescape($_), '') }
-            split(/\+/, $query_string, -1));
-
         return;
     }
 
@@ -542,10 +538,9 @@ sub prepare_query_parameters {
         }
     }
 
-    $env->{'plack.request.query'} ||= Hash::MultiValue->from_mixed(\%query);
     $c->request->query_parameters( 
       $c->request->_use_hash_multivalue ?
-        $env->{'plack.request.query'}->clone :
+        Hash::MultiValue->from_mixed(\%query) :
         \%query);
 }
 
@@ -588,7 +583,6 @@ sub prepare_uploads {
 
     my $uploads = $request->_body->upload;
     my $parameters = $request->parameters;
-    my @plack_uploads;
     foreach my $name (keys %$uploads) {
         my $files = $uploads->{$name};
         my @uploads;
@@ -603,13 +597,8 @@ sub prepare_uploads {
                filename => $upload->{filename},
               );
             push @uploads, $u;
-
-            # Plack compatibility.
-            my %copy = (%$upload, headers=>$headers);
-            push @plack_uploads, $name, Plack::Request::Upload->new(%copy);
         }
         $request->uploads->{$name} = @uploads > 1 ? \@uploads : $uploads[0];
-
 
         # support access to the filename as a normal param
         my @filenames = map { $_->{filename} } @uploads;
@@ -626,8 +615,6 @@ sub prepare_uploads {
             $parameters->{$name} = @filenames > 1 ? \@filenames : $filenames[0];
         }
     }
-
-    $self->env->{'plack.request.upload'} ||= Hash::MultiValue->new(@plack_uploads);
 }
 
 =head2 $self->write($c, $buffer)

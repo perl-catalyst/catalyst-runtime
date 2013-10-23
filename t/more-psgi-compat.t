@@ -38,19 +38,6 @@ use Catalyst::Test 'TestFromPSGI';
   ok my($res, $c) = ctx_request(POST '/test_psgi_keys?a=1&b=2', [c=>3,d=>4]);
 
   ok $c->req->env->{"psgix.input.buffered"}, "input is buffered";
-  ok $c->req->env->{"plack.request.http.body"};
-  ok my $body = $c->req->env->{"plack.request.body"};
-  ok my $query = $c->req->env->{"plack.request.query"};
-  ok my $merged = $c->req->env->{"plack.request.merged"};
-
-  is $body->get('c'), 3;
-  is $body->get('d'), 4;
-  is $query->get('a'), 1;
-  is $query->get('b'), 2;
-  is $merged->get('c'), 3;
-  is $merged->get('d'), 4;
-  is $merged->get('a'), 1;
-  is $merged->get('b'), 2;
 
   is $c->req->parameters->get('c'), 3;
   is $c->req->parameters->get('d'), 4;

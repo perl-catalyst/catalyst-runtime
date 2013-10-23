@@ -7,7 +7,11 @@
     as actions that only handle JSON or actions that only understand classic
     HTML forms.
   - TODO: body_data should slurp classic formdata
-  - TODO: remove non public Plack::Request $env keys added in previous release
+  - Removed PSGI $env keys that are added on the 'plack.request.*' namespace
+    since after discussion it was clear those keys are not part of the public
+    API.  Keys removed: 'plack.request.query', 'plack.request.body', 
+    'plack.request.merged' and 'plack.request.http.body'. Altered some test
+    cases to reflect this change.
 
 5.90049_004 - 2013-10-18
   - JSON Data handler looks for both JSON::MaybeXS and JSON, and uses

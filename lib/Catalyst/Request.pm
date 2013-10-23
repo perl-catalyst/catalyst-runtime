@@ -60,7 +60,7 @@ has query_keywords => (is => 'rw');
 has match => (is => 'rw');
 has method => (is => 'rw');
 has protocol => (is => 'rw');
-has query_parameters  => (is => 'rw', default => sub { {} });
+has query_parameters  => (is => 'rw', lazy=>1, default => sub { shift->_use_hash_multivalue ? Hash::MultiValue->new : +{} });
 has secure => (is => 'rw', default => 0);
 has captures => (is => 'rw', default => sub { [] });
 has uri => (is => 'rw', predicate => 'has_uri');
@@ -210,15 +210,8 @@ sub _build_parameters {
     my $body_parameters = $self->body_parameters;
     my $query_parameters = $self->query_parameters;
 
-    ## setup for downstream plack
-    $self->env->{'plack.request.merged'} ||= do {
-        my $query = $self->env->{'plack.request.query'} || Hash::MultiValue->new;
-        my $body  = $self->env->{'plack.request.body'} || Hash::MultiValue->new;
-        Hash::MultiValue->new($query->flatten, $body->flatten);
-    };
-
     if($self->_use_hash_multivalue) {
-        return $self->env->{'plack.request.merged'}->clone; # We want a copy, in case your App is evil
+        return Hash::MultiValue->new($query_parameters->flatten, $body_parameters->flatten);
     }
 
     # We copy, no references
@@ -255,13 +248,6 @@ sub prepare_body {
         $self->_body->cleanup(1);
         return;
     }
-
-    # Define PSGI ENV placeholders, or for empty should there be no content
-    # body (typical in HEAD or GET).  Looks like from Plack::Request that
-    # middleware would probably expect to see this, even if empty
-
-    $self->env->{'plack.request.body'}   = Hash::MultiValue->new;
-    $self->env->{'plack.request.upload'} = Hash::MultiValue->new;
 
     # If there is nothing to read, set body to naught and return.  This
     # will cause all body code to be skipped
@@ -312,9 +298,6 @@ sub prepare_body {
         $self->env->{'psgi.input'}->seek(0, 0); # Reset the buffer for downstream middleware or apps
     }
 
-    $self->env->{'plack.request.http.body'} = $self->_body;
-    $self->env->{'plack.request.body'} = Hash::MultiValue->from_mixed($self->_body->param);
-
     # paranoia against wrong Content-Length header
     my $remaining = $length - $self->_read_position;
     if ( $remaining > 0 ) {
@@ -332,10 +315,13 @@ sub prepare_body_parameters {
     my ( $self ) = @_;
 
     $self->prepare_body if ! $self->_has_body;
-    return {} unless $self->_body;
+
+    unless($self->_body) {
+      return $self->_use_hash_multivalue ? Hash::MultiValue->new : {};
+    }
 
     return $self->_use_hash_multivalue ?
-        $self->env->{'plack.request.body'}->clone :
+        Hash::MultiValue->from_mixed($self->_body->param) :
         $self->_body->param;
 }
 

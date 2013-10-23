@@ -3203,6 +3203,12 @@ sub setup_data_handlers {
 sub default_data_handlers {
     my ($class) = @_;
     return +{
+      'application/x-www-form-urlencoded' => sub {
+          my ($fh, $req) = @_;
+          my $params = $req->_use_hash_multivalue ? $self->body_parameters->mixed : $self->body_parameters;
+          Class::Load::load_first_existing_class('CGI::Struct::XS', 'CGI::Struct')
+            ->('build_cgi_struct')->($params)
+      },
       'application/json' => sub {
           Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON')
             ->can('decode_json')->(do { local $/; $_->getline });
