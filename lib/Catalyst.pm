@@ -3210,7 +3210,7 @@ sub default_data_handlers {
           my ($fh, $req) = @_;
           my $params = $req->_use_hash_multivalue ? $req->body_parameters->mixed : $req->body_parameters;
           Class::Load::load_first_existing_class('CGI::Struct::XS', 'CGI::Struct')
-            ->('build_cgi_struct')->($params);
+            ->can('build_cgi_struct')->($params);
       },
       'application/json' => sub {
           Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON')
