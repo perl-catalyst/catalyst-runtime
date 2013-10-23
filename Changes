@@ -6,7 +6,9 @@
     to create actions that only handle certain content type POST or PUT, such
     as actions that only handle JSON or actions that only understand classic
     HTML forms.
-  - TODO: body_data should slurp classic formdata
+  - NEW FEATURE: Request->body_data is now also populated from classic HTML 
+    Forms using CGI::Struct to support nested data.  For non nested data you
+    should use the classic ->body_parameters method.
   - Removed PSGI $env keys that are added on the 'plack.request.*' namespace
     since after discussion it was clear those keys are not part of the public
     API.  Keys removed: 'plack.request.query', 'plack.request.body', 
