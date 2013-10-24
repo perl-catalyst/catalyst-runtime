@@ -27,6 +27,7 @@
       - plack.request.body
       - plack.request.merged
       - plack.request.http.body
+    (NOTE: REMOVED IN 5.90049_005)
   - If incoming input (from a POST or PUT) is not buffered, create the
     buffer and set the correct psgi env keys to note this for downstream
     psgi apps / middleware.  This should solve some issues where Catalyst
