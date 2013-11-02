@@ -1,5 +1,6 @@
 language: perl
 perl:
+   - "5.18"
    - "5.16"
    - "5.14"
    - "5.12"
@@ -32,9 +33,10 @@ install:
    - cpanm --metacpan --skip-satisfied Module::Install Module::Install::AuthorRequires Module::Install::CheckConflicts Module::Install::AuthorTests Module::Install::Authority
 
    # author deps -- wish there was a better way
-   - cpanm --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize
+   - cpanm --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize Test::WWW::Mechanize::Catalyst Catalyst::Plugin::Params::Nested
    - cpanm --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod
    - cpanm --metacpan --skip-satisfied --installdeps .
+   - echo y | perl Makefile.PL
 
    # we want these for our tests, but not for any others
    - export AUTHOR_TESTING=1
