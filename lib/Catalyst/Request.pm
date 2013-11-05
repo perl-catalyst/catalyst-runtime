@@ -96,7 +96,7 @@ has _log => (
 
 has io_fh => (
     is=>'ro',
-    predicate=>'has_io_fh',
+    predicate=>'_has_io_fh',
     lazy=>1,
     builder=>'_build_io_fh');
 

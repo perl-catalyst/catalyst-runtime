@@ -1837,7 +1837,7 @@ sub finalize {
     # Support skipping finalize for psgix.io style 'jailbreak'.  Used to support
     # stuff like cometd and websockets
     
-    if($c->request->has_io_fh) {
+    if($c->request->_has_io_fh) {
       $c->log_response;
       return;
     }
