@@ -28,7 +28,7 @@ has _writer => (
 
 has write_fh => (
   is=>'ro',
-  predicate=>'has_write_fh',
+  predicate=>'_has_write_fh',
   lazy=>1,
   builder=>'_build_write_fh',
 );
@@ -42,7 +42,7 @@ sub _build_write_fh {
 
 sub DEMOLISH {
   my $self = shift;
-  return if $self->has_write_fh;
+  return if $self->_has_write_fh;
   if($self->_has_writer) {
     $self->_writer->close
   }

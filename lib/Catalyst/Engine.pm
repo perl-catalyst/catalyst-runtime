@@ -68,7 +68,7 @@ See L<Catalyst::Response\write> and L<Catalyst::Response\write_fh> for more.
 
 sub finalize_body {
     my ( $self, $c ) = @_;
-    return if $c->response->has_write_fh;
+    return if $c->response->_has_write_fh;
 
     my $body = $c->response->body;
     no warnings 'uninitialized';
