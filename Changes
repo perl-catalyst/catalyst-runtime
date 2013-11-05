@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90049_005 - TBA
+5.90049_006 - 2013-11-04
+  - Fixed case where test could fail when Starman was partly installed (n0body++)
+  - Fixed missing data information in previous release
+
+5.90049_005 - 2013-10-31
   - NEW FEATURE:  New Controller action attribute 'Consumes', which allows you
     to specify the content type of the incoming request.  This makes it easier
     to create actions that only handle certain content type POST or PUT, such
