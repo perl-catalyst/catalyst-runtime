@@ -1,23 +1,22 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 TBA
-  - make predicate on ->io_fh private.  Potentially breaking change, but this 
-    method was never documented and is new so this should not be scary.  If you
-    were using $request->has_io_fh, change to ->_has_io_fh (but please consider
-    a different way to do what you are doing...)
-  - make predicate on ->write_fh private.  Potentially breaking change, but this 
-    method was never documented and is new so this should not be scary.  If you
-    were using $response->has_write_fh, change to ->_has_write_fh (but please consider
-    a different way to do what you are doing...)
-  - make predicate on $req->env private.  Potentially breaking change, but this 
-    method was never documented and is new so this should not be scary.  If you
-    were using $request->has_env, change to ->_has_env (but please consider
-    a different way to do what you are doing...)
+  - Previously public predicates on the following attributes are now considered
+    private and their method names have been changed to follow Perl convention
+    for internal methods:
 
+      -- Catalyst::Request->has_io_fh ==> _has_io_fh
+      -- Catalyst::Request->has_env ==> _has_env
+      -- Catalyst::Response->has_write_fh ==> _has_write_fh
+
+    These are breaking changes but these methods were never documented and serve
+    no use for external code.  If you are using thing, you need to make the noted
+    change (but please consider finding another way to do what you are trying to
+    do).  t0m++ for code review of Hamburg branch.
 
 5.90049_006 - 2013-11-04
   - Fixed case where test could fail when Starman was partly installed (n0body++)
-  - Fixed missing data information in previous release
+  - Fixed missing date information in previous release
 
 5.90049_005 - 2013-10-31
   - NEW FEATURE:  New Controller action attribute 'Consumes', which allows you
