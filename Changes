@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-TBA
+5.90050 - 2013-11-05
   - Previously public predicates on the following attributes are now considered
     private and their method names have been changed to follow Perl convention
     for internal methods:
