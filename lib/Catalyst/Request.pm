@@ -17,7 +17,7 @@ use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
-has env => (is => 'ro', writer => '_set_env', predicate => 'has_env');
+has env => (is => 'ro', writer => '_set_env', predicate => '_has_env');
 # XXX Deprecated crap here - warn?
 has action => (is => 'rw');
 # XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due

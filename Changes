@@ -9,6 +9,10 @@ TBA
     method was never documented and is new so this should not be scary.  If you
     were using $response->has_write_fh, change to ->_has_write_fh (but please consider
     a different way to do what you are doing...)
+  - make predicate on $req->env private.  Potentially breaking change, but this 
+    method was never documented and is new so this should not be scary.  If you
+    were using $request->has_env, change to ->_has_env (but please consider
+    a different way to do what you are doing...)
 
 
 5.90049_006 - 2013-11-04
