@@ -40,7 +40,7 @@ testOption( [ qw/--port 3001/ ], ['3001', undef, opthash(port => 3001)] );
     testOption( [ qw// ], [5000, undef, opthash(port => 5000)] );
 }
 
-if (try { require Starman; 1; }) {
+if (try { require Plack::Handler::Starman; 1; }) {
     # fork           -f -fork --fork           -f --fork
     testOption( [ qw/--fork/ ], ['3000', undef, opthash(fork => 1)] );
     testOption( [ qw/-f/ ], ['3000', undef, opthash(fork => 1)] );
@@ -52,7 +52,7 @@ if (try { require MooseX::Daemonize; 1; }) {
     testOption( [ qw/--pid cat.pid/ ], ['3000', undef, opthash(pidfile => "cat.pid")] );
 }
 
-if (try { require Starman; 1; }) {
+if (try { require Plack::Handler::Starman; 1; }) {
     # keepalive      -k -keepalive --keepalive -k --keepalive
     testOption( [ qw/-k/ ], ['3000', undef, opthash(keepalive => 1)] );
     testOption( [ qw/--keepalive/ ], ['3000', undef, opthash(keepalive => 1)] );

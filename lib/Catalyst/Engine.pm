@@ -13,6 +13,8 @@ use URI::QueryParam;
 use Plack::Loader;
 use Catalyst::EngineLoader;
 use Encode ();
+use Plack::Request::Upload;
+use Hash::MultiValue;
 use utf8;
 
 use namespace::clean -except => 'meta';
@@ -66,7 +68,7 @@ See L<Catalyst::Response\write> and L<Catalyst::Response\write_fh> for more.
 
 sub finalize_body {
     my ( $self, $c ) = @_;
-    return if $c->response->has_write_fh;
+    return if $c->response->_has_write_fh;
 
     my $body = $c->response->body;
     no warnings 'uninitialized';
@@ -487,8 +489,16 @@ process the query string and extract query parameters.
 
 sub prepare_query_parameters {
     my ($self, $c) = @_;
-
     my $env = $c->request->env;
+
+    if(my $query_obj = $env->{'plack.request.query'}) {
+         $c->request->query_parameters(
+           $c->request->_use_hash_multivalue ?
+              $query_obj->clone :
+              $query_obj->as_hashref_mixed);
+         return;
+    }
+
     my $query_string = exists $env->{QUERY_STRING}
         ? $env->{QUERY_STRING}
         : '';
@@ -496,7 +506,7 @@ sub prepare_query_parameters {
     # Check for keywords (no = signs)
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
-        $c->request->query_keywords( $self->unescape_uri($query_string) );
+        $c->request->query_keywords($self->unescape_uri($query_string));
         return;
     }
 
@@ -527,7 +537,11 @@ sub prepare_query_parameters {
             $query{$param} = $value;
         }
     }
-    $c->request->query_parameters( \%query );
+
+    $c->request->query_parameters( 
+      $c->request->_use_hash_multivalue ?
+        Hash::MultiValue->from_mixed(\%query) :
+        \%query);
 }
 
 =head2 $self->prepare_read($c)

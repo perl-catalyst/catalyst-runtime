@@ -77,7 +77,7 @@ sub BUILD {
         my ($success, $error) = try_load_class("MooseX::Daemonize::Core");
         warn("MooseX::Daemonize is needed for the --background option: $error\n"),
             exit 1 if not $success;
-        my ($success, $error) = try_load_class("POSIX");
+        ($success, $error) = try_load_class("POSIX");
         warn("$error\n"), exit 1 if not $success;
         MooseX::Daemonize::Core->meta->apply($self);
         POSIX::close($_) foreach (0..2);

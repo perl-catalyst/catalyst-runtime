@@ -47,7 +47,7 @@ requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
 requires 'HTTP::Request::AsCGI' => '1.0';
-requires 'Module::Pluggable' => '3.9';
+requires 'Module::Pluggable' => '4.7';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
@@ -70,6 +70,11 @@ requires 'Class::Data::Inheritable';
 requires 'Encode' => '2.49';
 requires 'LWP' => '5.837'; # LWP had unicode fail in 5.8.26
 requires 'URI' => '1.36';
+requires 'JSON::MaybeXS' => '1.000000';
+requires 'Stream::Buffered';
+requires 'Hash::MultiValue';
+requires 'Plack::Request::Upload';
+requires 'CGI::Struct';
 
 # Install the standalone Regex dispatch modules in order to ease the
 # deprecation transition
@@ -81,6 +86,7 @@ test_requires 'Data::Dump';
 test_requires 'HTTP::Request::Common';
 test_requires 'IO::Scalar';
 test_requires 'HTTP::Status';
+test_requires 'JSON::MaybeXS';
 
 # see also cpanfile for authordeps -- install via
 # cpanm --installdeps --with-develop .

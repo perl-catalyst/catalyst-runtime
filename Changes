@@ -1,5 +1,98 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+TBA
+  - Previously public predicates on the following attributes are now considered
+    private and their method names have been changed to follow Perl convention
+    for internal methods:
+
+      -- Catalyst::Request->has_io_fh ==> _has_io_fh
+      -- Catalyst::Request->has_env ==> _has_env
+      -- Catalyst::Response->has_write_fh ==> _has_write_fh
+
+    These are breaking changes but these methods were never documented and serve
+    no use for external code.  If you are using thing, you need to make the noted
+    change (but please consider finding another way to do what you are trying to
+    do).  t0m++ for code review of Hamburg branch.
+
+5.90049_006 - 2013-11-04
+  - Fixed case where test could fail when Starman was partly installed (n0body++)
+  - Fixed missing date information in previous release
+
+5.90049_005 - 2013-10-31
+  - NEW FEATURE:  New Controller action attribute 'Consumes', which allows you
+    to specify the content type of the incoming request.  This makes it easier
+    to create actions that only handle certain content type POST or PUT, such
+    as actions that only handle JSON or actions that only understand classic
+    HTML forms.
+  - NEW FEATURE: Request->body_data is now also populated from classic HTML 
+    Forms using CGI::Struct to support nested data.  For non nested data you
+    should use the classic ->body_parameters method.
+  - Removed PSGI $env keys that are added on the 'plack.request.*' namespace
+    since after discussion it was clear those keys are not part of the public
+    API.  Keys removed: 'plack.request.query', 'plack.request.body', 
+    'plack.request.merged' and 'plack.request.http.body'. Altered some test
+    cases to reflect this change.
+
+5.90049_004 - 2013-10-18
+  - JSON Data handler looks for both JSON::MaybeXS and JSON, and uses
+    whichever is first (prefering to find JSON::MaybeXS).  This should
+    improve compatibility as you likely already have one installed.
+  - Fixed a warning in the server script (bokutin++)
+  - We now populate various Plack $env keys in order to play nice with
+    downstream middleware or plack apps (and to reduce processing if
+    those keys already exist).  Keys added:
+      - plack.request.query
+      - plack.request.body
+      - plack.request.merged
+      - plack.request.http.body
+    (NOTE: REMOVED IN 5.90049_005)
+  - If incoming input (from a POST or PUT) is not buffered, create the
+    buffer and set the correct psgi env keys to note this for downstream
+    psgi apps / middleware.  This should solve some issues where Catalyst
+    sucks up the body input but its not buffered so downstream apps can't
+    read it (for example FCGI does not buffer).  We now also try to make
+    sure the body content input is reset to the start of the filehandle
+    so that we are polite to downstream middleware /apps.
+  - NEW FEATURE: Catalyst::Response can now pull response from a PSGI
+    specification response.  This makes it easier to host external Plack
+    applications under Catalyst.  See Catalyst::Response->from_psgi_response
+  - NEW FEATURE: New configuration option 'use_hash_multivalue_in_request'
+    will populate $request methods 'parameters', 'body_parameters' and
+    'query_parameters' with an instance of Hash::MultiValue instead of a
+    HashRef.  This is used by Plack and is intended to reduce the need to
+    write defensive logic since you are never sure if an incoming parameter
+    is a scalar or arrayref.
+  - NEW FEATURE: We now experimentally support Net::Async::HTTP::Server
+    and IO-Async based event loops.  Examples will follow.
+
+5.90049_003 - 2013-09-20
+  - Documented the new body_data method added in the previous release
+  - Merged from master many important bugfixes and forward compatiblity
+    updates, including:
+    - Use modern preferred method for Moose metaclass access and many other
+      small changes to how we use Moose for better forward compat (ether++)
+    - Killed some evil use of $@ (ether++)
+    - spelling fixes and documentation updates (ether++), (gerda++)
+    - use Test::Fatal over Test::Exception (ether++)
+    - Misc. test case fixes to modernize code (ether++)
+    - Added a first pass cpanfile, to try and make it easier to bootstrap
+      a development setup (ether++)
+
+5.90049_002 - 2013-08-20
+  - Fixed loading middleware from project directory
+  - Fixed some pointless warnings when middleware class lacked VERSION
+  - NEW FEATURE: Declare global 'data_handlers' for parsing HTTP POST/PUT
+    alternative content, and created default JSON handler.  Yes, now Catalyst
+    handles JSON request content out of the box!  More docs eventually but
+    for now see the DATA HANDLERS section in Catalyst.pm (or review the test
+    case t/data_handler.t
+
+5.90049_001 - 2013-07-26
+  - Declare PSGI compliant Middleware as part of your Catalyst Application via
+    a new configuration key, "psgi_middleware".
+  - Increased lowest allowed module version for Module::Pluggable to be 4.7 (up
+    from 3.4) to solve the fact this is no longer bundled with Perl in v5.18.
+
 5.90042 - 2013-06-14
   - Removed more places where an optional dependency shows up in the test
     suite. Hopefully really fixed the unicode regression introduced in 5.90040

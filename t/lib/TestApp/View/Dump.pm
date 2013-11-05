@@ -39,6 +39,8 @@ sub process {
     # Remove context from reference if needed
     my $context = delete $reference->{_context};
 
+    my $env = delete $reference->{env};
+
     if (my $log = $reference->{_log}) {
         $log->clear_psgi if ($log->can('psgienv'));
     }
@@ -61,6 +63,8 @@ sub process {
             delete $reference->{__body_type};
             $reference->{_body} = $body;
         }
+
+        if($env) { $reference->{env} = $env }
 
         return 1;
     }

@@ -28,7 +28,7 @@ has _writer => (
 
 has write_fh => (
   is=>'ro',
-  predicate=>'has_write_fh',
+  predicate=>'_has_write_fh',
   lazy=>1,
   builder=>'_build_write_fh',
 );
@@ -42,7 +42,7 @@ sub _build_write_fh {
 
 sub DEMOLISH {
   my $self = shift;
-  return if $self->has_write_fh;
+  return if $self->_has_write_fh;
   if($self->_has_writer) {
     $self->_writer->close
   }
@@ -110,6 +110,38 @@ sub finalize_headers {
     $self->_clear_response_cb;
 
     return;
+}
+
+sub from_psgi_response {
+    my ($self, $psgi_res) = @_;
+    if(ref $psgi_res eq 'ARRAY') {
+        my ($status, $headers, $body) = @$psgi_res;
+        $self->status($status);
+        $self->headers(HTTP::Headers->new(@$headers));
+        if(ref $body eq 'ARRAY') {
+          $self->body(join '', grep defined, @$body);
+        } else {
+          $self->body($body);
+        }
+    } elsif(ref $psgi_res eq 'CODE') {
+        $psgi_res->(sub {
+            my $response = shift;
+            my ($status, $headers, $maybe_body) = @$response;
+            $self->status($status);
+            $self->headers(HTTP::Headers->new(@$headers));
+            if($maybe_body) {
+                if(ref $maybe_body eq 'ARRAY') {
+                  $self->body(join '', grep defined, @$maybe_body);
+                } else {
+                  $self->body($maybe_body);
+                }
+            } else {
+                return $self->write_fh;
+            }
+        });  
+     } else {
+        die "You can't set a Catalyst response from that, expect a valid PSGI response";
+    }
 }
 
 =head1 NAME
@@ -308,6 +340,33 @@ the response object to functions that want to write to an L<IO::Handle>.
 =head2 $self->finalize_headers($c)
 
 Writes headers to response if not already written
+
+=head2 from_psgi_response
+
+Given a PSGI response (either three element ARRAY reference OR coderef expecting
+a $responder) set the response from it.
+
+Properly supports streaming and delayed response and / or async IO if running
+under an expected event loop.
+
+Example:
+
+    package MyApp::Web::Controller::Test;
+
+    use base 'Catalyst::Controller';
+    use Plack::App::Directory;
+
+
+    my $app = Plack::App::Directory->new({ root => "/path/to/htdocs" })
+      ->to_app;
+
+    sub myaction :Local Args {
+      my ($self, $c) = @_;
+      $c->res->from_psgi_response($app->($self->env));
+    }
+
+Please note this does not attempt to map or nest your PSGI application under
+the Controller and Action namespace or path.  
 
 =head2 DEMOLISH
 

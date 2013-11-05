@@ -7,6 +7,9 @@ use URI::http;
 use URI::https;
 use URI::QueryParam;
 use HTTP::Headers;
+use Stream::Buffered;
+use Hash::MultiValue;
+use Scalar::Util;
 
 use Moose;
 
@@ -14,7 +17,7 @@ use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
-has env => (is => 'ro', writer => '_set_env');
+has env => (is => 'ro', writer => '_set_env', predicate => '_has_env');
 # XXX Deprecated crap here - warn?
 has action => (is => 'rw');
 # XXX: Deprecated in docs ages ago (2006), deprecated with warning in 5.8000 due
@@ -57,7 +60,7 @@ has query_keywords => (is => 'rw');
 has match => (is => 'rw');
 has method => (is => 'rw');
 has protocol => (is => 'rw');
-has query_parameters  => (is => 'rw', default => sub { {} });
+has query_parameters  => (is => 'rw', lazy=>1, default => sub { shift->_use_hash_multivalue ? Hash::MultiValue->new : +{} });
 has secure => (is => 'rw', default => 0);
 has captures => (is => 'rw', default => sub { [] });
 has uri => (is => 'rw', predicate => 'has_uri');
@@ -92,27 +95,46 @@ has _log => (
 );
 
 has io_fh => (
-  is=>'ro',
-  predicate=>'has_io_fh',
-  lazy=>1,
-  builder=>'_build_io_fh');
+    is=>'ro',
+    predicate=>'_has_io_fh',
+    lazy=>1,
+    builder=>'_build_io_fh');
 
 sub _build_io_fh {
     my $self = shift;
     return $self->env->{'psgix.io'}
+      || (
+        $self->env->{'net.async.http.server.req'} &&
+        $self->env->{'net.async.http.server.req'}->stream)   ## Until I can make ioasync cabal see the value of supportin psgix.io (jnap)
       || die "Your Server does not support psgix.io";
 };
 
-has body_fh => (
-  is=>'ro',
-  predicate=>'has_body_fh',
-  lazy=>1,
-  builder=>'_build_body_fh');
+has data_handlers => ( is=>'ro', isa=>'HashRef', default=>sub { +{} } );
 
-sub _build_body_fh {
-    (my $input_fh = shift->env->{'psgi.input'})->seek(0, 0);
-    return $input_fh;
-};
+has body_data => (
+    is=>'ro',
+    lazy=>1,
+    builder=>'_build_body_data');
+
+sub _build_body_data {
+    my ($self) = @_;
+    my $content_type = $self->content_type;
+    my ($match) = grep { $content_type =~/$_/i }
+      keys(%{$self->data_handlers});
+
+    if($match) {
+      my $fh = $self->body;
+      local $_ = $fh;
+      return $self->data_handlers->{$match}->($fh, $self);
+    } else { 
+      return undef;
+    }
+}
+
+has _use_hash_multivalue => (
+    is=>'ro', 
+    required=>1, 
+    default=> sub {0});
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
@@ -182,13 +204,16 @@ sub prepare_parameters {
     return $self->parameters;
 }
 
-
-
 sub _build_parameters {
     my ( $self ) = @_;
     my $parameters = {};
     my $body_parameters = $self->body_parameters;
     my $query_parameters = $self->query_parameters;
+
+    if($self->_use_hash_multivalue) {
+        return Hash::MultiValue->new($query_parameters->flatten, $body_parameters->flatten);
+    }
+
     # We copy, no references
     foreach my $name (keys %$query_parameters) {
         my $param = $query_parameters->{$name};
@@ -215,30 +240,68 @@ has _uploadtmp => (
 sub prepare_body {
     my ( $self ) = @_;
 
-    if ( my $length = $self->_read_length ) {
-        unless ( $self->_body ) {
-            my $type = $self->header('Content-Type');
-            $self->_body(HTTP::Body->new( $type, $length ));
-            $self->_body->cleanup(1); # Make extra sure!
-            $self->_body->tmpdir( $self->_uploadtmp )
-              if $self->_has_uploadtmp;
-        }
+    # If previously applied middleware created the HTTP::Body object, then we
+    # just use that one.  
 
-        # Check for definedness as you could read '0'
-        while ( defined ( my $buffer = $self->read() ) ) {
-            $self->prepare_body_chunk($buffer);
-        }
-
-        # paranoia against wrong Content-Length header
-        my $remaining = $length - $self->_read_position;
-        if ( $remaining > 0 ) {
-            Catalyst::Exception->throw(
-                "Wrong Content-Length value: $length" );
-        }
+    if(my $plack_body = $self->env->{'plack.request.http.body'}) {
+        $self->_body($plack_body);
+        $self->_body->cleanup(1);
+        return;
     }
-    else {
-        # Defined but will cause all body code to be skipped
-        $self->_body(0);
+
+    # If there is nothing to read, set body to naught and return.  This
+    # will cause all body code to be skipped
+
+    return $self->_body(0) unless my $length = $self->_read_length;
+
+    # Unless the body has already been set, create it.  Not sure about this
+    # code, how else might it be set, but this was existing logic.
+
+    unless ($self->_body) {
+        my $type = $self->header('Content-Type');
+        $self->_body(HTTP::Body->new( $type, $length ));
+        $self->_body->cleanup(1);
+
+        # JNAP: I'm not sure this is doing what we expect, but it also doesn't
+        # seem to be hurting (seems ->_has_uploadtmp is true more than I would
+        # expect.
+
+        $self->_body->tmpdir( $self->_uploadtmp )
+          if $self->_has_uploadtmp;
+    }
+
+    # Ok if we get this far, we have to read psgi.input into the new body
+    # object.  Lets play nice with any plack app or other downstream, so
+    # we create a buffer unless one exists.
+     
+    my $stream_buffer;
+    if ($self->env->{'psgix.input.buffered'}) {
+        # Be paranoid about previous psgi middleware or apps that read the
+        # input but didn't return the buffer to the start.
+        $self->env->{'psgi.input'}->seek(0, 0);
+    } else {
+        $stream_buffer = Stream::Buffered->new($length);
+    }
+
+    # Check for definedness as you could read '0'
+    while ( defined ( my $chunk = $self->read() ) ) {
+        $self->prepare_body_chunk($chunk);
+        $stream_buffer->print($chunk) if $stream_buffer;
+    }
+
+    # Ok, we read the body.  Lets play nice for any PSGI app down the pipe
+
+    if ($stream_buffer) {
+        $self->env->{'psgix.input.buffered'} = 1;
+        $self->env->{'psgi.input'} = $stream_buffer->rewind;
+    } else {
+        $self->env->{'psgi.input'}->seek(0, 0); # Reset the buffer for downstream middleware or apps
+    }
+
+    # paranoia against wrong Content-Length header
+    my $remaining = $length - $self->_read_position;
+    if ( $remaining > 0 ) {
+        Catalyst::Exception->throw("Wrong Content-Length value: $length" );
     }
 }
 
@@ -252,9 +315,14 @@ sub prepare_body_parameters {
     my ( $self ) = @_;
 
     $self->prepare_body if ! $self->_has_body;
-    return {} unless $self->_body;
 
-    return $self->_body->param;
+    unless($self->_body) {
+      return $self->_use_hash_multivalue ? Hash::MultiValue->new : {};
+    }
+
+    return $self->_use_hash_multivalue ?
+        Hash::MultiValue->from_mixed($self->_body->param) :
+        $self->_body->param;
 }
 
 sub prepare_connection {
@@ -304,7 +372,7 @@ has _body => (
 #             and provide a custom reader..
 sub body {
   my $self = shift;
-  $self->prepare_body unless ! $self->_has_body;
+  $self->prepare_body unless $self->_has_body;
   croak 'body is a reader' if scalar @_;
   return blessed $self->_body ? $self->_body->body : $self->_body;
 }
@@ -342,6 +410,7 @@ Catalyst::Request - provides information about the current client request
     $req->args;
     $req->base;
     $req->body;
+    $req->body_data;
     $req->body_parameters;
     $req->content_encoding;
     $req->content_length;
@@ -423,6 +492,14 @@ C<http://localhost:3000/some/path> then C<base> is C<http://localhost:3000/>.
 Returns the message body of the request, as returned by L<HTTP::Body>: a string,
 unless Content-Type is C<application/x-www-form-urlencoded>, C<text/xml>, or
 C<multipart/form-data>, in which case a L<File::Temp> object is returned.
+
+=head2 $req->body_data
+
+Returns a Perl representation of POST/PUT body data that is not classic HTML
+form data, such as JSON, XML, etc.  By default, Catalyst will parse incoming
+data of the type 'application/json' and return access to that data via this
+method.  You may define addition data_handlers via a global configuration
+setting.  See L<Catalyst\DATA HANDLERS> for more information.
 
 =head2 $req->body_parameters
 
