@@ -243,7 +243,7 @@ sub prepare_body {
     # If previously applied middleware created the HTTP::Body object, then we
     # just use that one.  
 
-    if(my $plack_body = $self->env->{'plack.request.http.body'}) {
+    if(my $plack_body = $self->_has_env ? $self->env->{'plack.request.http.body'} : undef) {
         $self->_body($plack_body);
         $self->_body->cleanup(1);
         return;
