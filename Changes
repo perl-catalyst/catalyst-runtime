@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90051 - 2013-11-06
+  - Be more skeptical of the existance of $request->env to fix a regression
+    introduced in Catalyst::Action::REST by the previous release
+
 5.90050 - 2013-11-05
   - Previously public predicates on the following attributes are now considered
     private and their method names have been changed to follow Perl convention
