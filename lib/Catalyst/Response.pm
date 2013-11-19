@@ -362,7 +362,7 @@ Example:
 
     sub myaction :Local Args {
       my ($self, $c) = @_;
-      $c->res->from_psgi_response($app->($self->env));
+      $c->res->from_psgi_response($app->($c->req->env));
     }
 
 Please note this does not attempt to map or nest your PSGI application under
