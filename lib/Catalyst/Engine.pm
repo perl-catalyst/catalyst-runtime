@@ -59,10 +59,11 @@ See L<Catalyst>.
 Finalize body.  Prints the response output as blocking stream if it looks like
 a filehandle, otherwise write it out all in one go.  If there is no body in
 the response, we assume you are handling it 'manually', such as for nonblocking
-style or asynchronous streaming responses.  You do this by calling L<\write>
-several times (which sends HTTP headers if needed) or you close over C<$response->write_fh>.
+style or asynchronous streaming responses.  You do this by calling L</write>
+several times (which sends HTTP headers if needed) or you close over
+C<< $response->write_fh >>.
 
-See L<Catalyst::Response\write> and L<Catalyst::Response\write_fh> for more.
+See L<Catalyst::Response/write> and L<Catalyst::Response/write_fh> for more.
 
 =cut
 
