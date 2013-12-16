@@ -1159,6 +1159,19 @@ You are running an old script!
 EOF
     }
 
+    # Call plugins setup, this is stupid and evil.
+    # Also screws C3 badly on 5.10, hack to avoid.
+    {
+        no warnings qw/redefine/;
+        local *setup = sub { };
+        $class->setup unless $Catalyst::__AM_RESTARTING;
+    }
+
+    # Initialize our data structure
+    $class->components( {} );
+
+    $class->setup_components;
+
     if ( $class->debug ) {
         my @plugins = map { "$_  " . ( $_->VERSION || '' ) } $class->registered_plugins;
 
@@ -1202,22 +1215,7 @@ EOF
           ? $class->log->debug(qq/Found home "$home"/)
           : $class->log->debug(qq/Home "$home" doesn't exist/)
           : $class->log->debug(q/Couldn't find home/);
-    }
 
-    # Call plugins setup, this is stupid and evil.
-    # Also screws C3 badly on 5.10, hack to avoid.
-    {
-        no warnings qw/redefine/;
-        local *setup = sub { };
-        $class->setup unless $Catalyst::__AM_RESTARTING;
-    }
-
-    # Initialize our data structure
-    $class->components( {} );
-
-    $class->setup_components;
-
-    if ( $class->debug ) {
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
         for my $comp ( sort keys %{ $class->components } ) {

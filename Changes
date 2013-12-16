@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Fixed first block of startup debug messages missing when using a custom
+    logger that gets set at runtime, for example by overriding finalize_config
+
 5.90051 - 2013-11-06
   - Be more skeptical of the existance of $request->env to fix a regression
     introduced in Catalyst::Action::REST by the previous release
