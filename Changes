@@ -18,6 +18,8 @@
   - You may now also call 'setup_middleware' as a package method if you think
     that loading middleware via configuration is a weird or broken idea.
   - Various POD formating fixed.
+  - Improved some documentation about what type of filehandles that ->body can
+    accept and issues that might arise.
 
 5.90051 - 2013-11-06
   - Be more skeptical of the existance of $request->env to fix a regression
