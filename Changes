@@ -15,6 +15,8 @@
     late to have effect might now take effect.  Please test you code carefully and
     be aware of this possible issue </NOTE>.
 
+  - You may now also call 'setup_middleware' as a package method if you think
+    that loading middleware via configuration is a weird or broken idea.
   - Various POD formating fixed.
 
 5.90051 - 2013-11-06
