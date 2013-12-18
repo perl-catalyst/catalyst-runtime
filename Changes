@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90052 - TBD
+5.90052 - 2013-12-18
 
   - Fixed first block of startup debug messages missing when using a custom
     logger that gets set at runtime, for example by overriding finalize_config
