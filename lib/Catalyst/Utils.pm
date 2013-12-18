@@ -457,6 +457,8 @@ sub build_middleware {
           return $ns->new(@init_args);
         } elsif(Class::Load::try_load_class("Plack::Middleware::$namespace")) { ## Act like Plack::Builder
           return "Plack::Middleware::$namespace"->new(@init_args);
+        } else {
+          die "Can't load middleware via '$namespace'.  It's not ".$class."::Middleware::".$namespace." or Plack::Middleware::$namespace";
         }
     }
 
