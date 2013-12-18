@@ -1124,8 +1124,17 @@ sub setup {
 
     $class->setup_home( delete $flags->{home} );
 
-    $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
+
+    # Call plugins setup, this is stupid and evil.
+    # Also screws C3 badly on 5.10, hack to avoid.
+    {
+        no warnings qw/redefine/;
+        local *setup = sub { };
+        $class->setup unless $Catalyst::__AM_RESTARTING;
+    }
+
+    $class->setup_log( delete $flags->{log} );
     $class->setup_middleware();
     $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
@@ -1157,14 +1166,6 @@ You are running an old script!
     catalyst.pl -scripts $class
 
 EOF
-    }
-
-    # Call plugins setup, this is stupid and evil.
-    # Also screws C3 badly on 5.10, hack to avoid.
-    {
-        no warnings qw/redefine/;
-        local *setup = sub { };
-        $class->setup unless $Catalyst::__AM_RESTARTING;
     }
 
     # Initialize our data structure
@@ -3101,7 +3102,15 @@ See under L</CONFIGURATION> information regarding C<psgi_middleware> and how
 to use it to enable L<Plack::Middleware>
 
 This method is automatically called during 'setup' of your application, so
-you really don't need to invoke it.
+you really don't need to invoke it.  However you may do so if you find the idea
+of loading middleware via configuration weird :).  For example:
+
+    package MyApp;
+
+    use Catalyst;
+
+    __PACKAGE__->setup_middleware('Head');
+    __PACKAGE__->setup;
 
 When we read middleware definitions from configuration, we reverse the list
 which sounds odd but is likely how you expect it to work if you have prior
@@ -3120,9 +3129,9 @@ sub registered_middlewares {
 }
 
 sub setup_middleware {
-    my ($class, @middleware_definitions) = @_;
-    push @middleware_definitions, reverse(
-      @{$class->config->{'psgi_middleware'}||[]});
+    my $class = shift;
+    my @middleware_definitions = @_ ? 
+      @_ : reverse(@{$class->config->{'psgi_middleware'}||[]});
 
     my @middleware = ();
     while(my $next = shift(@middleware_definitions)) {
@@ -3144,7 +3153,8 @@ sub setup_middleware {
         }
     }
 
-    $class->_psgi_middleware(\@middleware);
+    my @existing = @{$class->_psgi_middleware || []};
+    $class->_psgi_middleware([@middleware,@existing,]);
 }
 
 =head2 registered_data_handlers
