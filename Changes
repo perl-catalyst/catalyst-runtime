@@ -1,7 +1,21 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90052 - TBD
+
   - Fixed first block of startup debug messages missing when using a custom
     logger that gets set at runtime, for example by overriding finalize_config
+  - Give a more descriptive error message when trying to load middleware that
+    does not exist.
+  - Change the way we initialize plugins to fix a bug where when using the 
+    populare ConfigLoader plugin, configs merged are not available for setting
+    up middleware and data handlers (and probably other things as well).
+
+    NOTE: This change might cause issues if you had code that was relying on the
+    broken behavior.  For example external configuration that was being loaded to
+    late to have effect might now take effect.  Please test you code carefully and
+    be aware of this possible issue </NOTE>.
+
+  - Various POD formating fixed.
 
 5.90051 - 2013-11-06
   - Be more skeptical of the existance of $request->env to fix a regression
