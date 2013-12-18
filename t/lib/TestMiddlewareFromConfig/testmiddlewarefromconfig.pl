@@ -6,7 +6,6 @@ my $static = Plack::Middleware::Static->new(
 my $conf = +{
   'Controller::Root', { namespace => '' },
   'psgi_middleware', [
-    'Head',
     $static,
     'Static', { path => qr{^/static2/}, root => TestMiddlewareFromConfig->path_to('share') },
     'Runtime',
