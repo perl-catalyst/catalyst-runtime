@@ -76,10 +76,6 @@ requires 'Hash::MultiValue';
 requires 'Plack::Request::Upload';
 requires 'CGI::Struct';
 
-# Install the standalone Regex dispatch modules in order to ease the
-# deprecation transition
-requires 'Catalyst::DispatchType::Regex' => '5.90021';
-
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';
 test_requires 'Data::Dump';

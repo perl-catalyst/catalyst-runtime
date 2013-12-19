@@ -1,5 +1,15 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Announcing the repo is not open for development of Perl Catalyst 'Runner'
+  - http://questhub.io/realm/perl/explore/latest/tag/runner
+
+5.90059_001 - 2013-12-19
+  - Removed deprecated Regexp dispatch type from dependency list.  If you are
+    using Regex[p] type dispatching you need to add the standalone distribution
+   'Catalyst::DispatchType::Regex' to you build system NOW or you application
+   will be broken.
+
+
 5.90052 - 2013-12-18
 
   - Fixed first block of startup debug messages missing when using a custom
