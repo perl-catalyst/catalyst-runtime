@@ -21,6 +21,7 @@ add_stopwords(qw(
     ActionClass LocalRegex LocalRegexp MyAction metadata cometd io psgix websockets
     UTF async codebase dev filenames params MyMiddleware
     JSON POSTed RESTful configuation performant subref actionrole
+    chunked chunking codewise distingush equivilent plack Javascript
     Andreas
     Ashton
     Axel
