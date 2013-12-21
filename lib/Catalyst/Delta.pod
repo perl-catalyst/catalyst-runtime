@@ -40,6 +40,9 @@ where a supporting server will start chunking output.  If this is an
 issue you can apply the middleware L<Plack::Middleware::BufferedStreaming>
 or report specific problems to the dev team.
 
+Also, we have started migrating code in Catalyst to equivilent Plack
+Middleware when such exists and is correct to do so. 
+
 =head2 VERSION 5.9XXXX 'cataplack'
 
 The Catalyst::Engine sub-classes have all been removed and deprecated,

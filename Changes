@@ -12,7 +12,16 @@
     properly non blocking streaming when running under a supporting server like
     Twiggy.  See Catalyst::Delta for more.  This change might cause issues if
     you are making heaving use of streaming (although in general we expect things
-    to work much better.  
+    to work much better.
+  - In the case when we remove a content body from the response because you set
+    an information status or a no content type status, warn that we are doing so
+    when in debug mode.  You might see additional debugging information to help
+    you find and remove unneeded response bodies.
+  - Updated the code where Catalyst tries to guess a content length when you
+    fail to provide one.  This should cause less issues when trying to guess the
+    length of a funky filehandle.  This now uses Plack::Middleware::ContentLength
+  - Removed custom code to remove body content when the request is HEAD and
+    swapped it for Plack::Middleware::Head.
 
 5.90059_001 - 2013-12-19
   - Removed deprecated Regexp dispatch type from dependency list.  If you are
