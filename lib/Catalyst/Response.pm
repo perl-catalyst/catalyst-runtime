@@ -9,7 +9,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has _response_cb => (
     is      => 'ro',
-    isa     => 'CodeRef',
+    isa     => 'CodeRef', 
     writer  => '_set_response_cb',
     clearer => '_clear_response_cb',
     predicate => '_has_response_cb',
@@ -20,11 +20,29 @@ subtype 'Catalyst::Engine::Types::Writer',
 
 has _writer => (
     is      => 'ro',
-    isa     => 'Catalyst::Engine::Types::Writer',
-    writer  => '_set_writer',
+    isa     => 'Catalyst::Engine::Types::Writer', #Pointless since we control how this is built
+    #writer  => '_set_writer', Now that its lazy I think this is safe to remove
     clearer => '_clear_writer',
     predicate => '_has_writer',
+    lazy      => 1,
+    builder => '_build_writer',
 );
+
+sub _build_writer {
+    my $self = shift;
+
+    ## These two lines are probably crap now...
+    $self->_context->finalize_headers unless
+      $self->finalized_headers;
+
+    my @headers;
+    $self->headers->scan(sub { push @headers, @_ });
+
+    my $writer = $self->_response_cb->([ $self->status, \@headers ]);
+    $self->_clear_response_cb;
+
+    return $writer;
+}
 
 has write_fh => (
   is=>'ro',
@@ -33,12 +51,7 @@ has write_fh => (
   builder=>'_build_write_fh',
 );
 
-sub _build_write_fh {
-  my $self = shift;
-  $self->_context->finalize_headers unless
-    $self->finalized_headers;
-  $self->_writer;
-};
+sub _build_write_fh { shift ->_writer }
 
 sub DEMOLISH {
   my $self = shift;
@@ -89,26 +102,6 @@ sub write {
 
 sub finalize_headers {
     my ($self) = @_;
-
-    # This is a less-than-pretty hack to avoid breaking the old
-    # Catalyst::Engine::PSGI. 5.9 Catalyst::Engine sets a response_cb and
-    # expects us to pass headers to it here, whereas Catalyst::Enngine::PSGI
-    # just pulls the headers out of $ctx->response in its run method and never
-    # sets response_cb. So take the lack of a response_cb as a sign that we
-    # don't need to set the headers.
-
-    return unless $self->_has_response_cb;
-
-    # If we already have a writer, we already did this, so don't do it again
-    return if $self->_has_writer;
-
-    my @headers;
-    $self->headers->scan(sub { push @headers, @_ });
-
-    my $writer = $self->_response_cb->([ $self->status, \@headers ]);
-    $self->_set_writer($writer);
-    $self->_clear_response_cb;
-
     return;
 }
 

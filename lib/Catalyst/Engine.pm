@@ -69,26 +69,70 @@ See L<Catalyst::Response/write> and L<Catalyst::Response/write_fh> for more.
 
 sub finalize_body {
     my ( $self, $c ) = @_;
-    return if $c->response->_has_write_fh;
+    my $res = $c->response; # We use this all over
 
-    my $body = $c->response->body;
-    no warnings 'uninitialized';
-    if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
-        my $got;
-        do {
-            $got = read $body, my ($buffer), $CHUNKSIZE;
-            $got = 0 unless $self->write( $c, $buffer );
-        } while $got > 0;
+    ## If we've asked for the write 'filehandle' that means the application is
+    ## doing something custom and is expected to close the response
+    return if $res->_has_write_fh;
 
-        close $body;
+    if($res->_has_response_cb) {
+        ## we have not called the response callback yet, so we are safe to send
+        ## the whole body to PSGI
+        
+        my @headers;
+        $res->headers->scan(sub { push @headers, @_ });
+
+        ## We need to figure out what kind of body we have...
+        my $body = $res->body;
+        if(defined $body) {
+            if(blessed($body) && $body->can('read') or ref($body) eq 'GLOB') {
+              # Body is a filehandle like thingy.  We can jusrt send this along
+              # to plack without changing it.
+            } else {
+              # Looks like for  backcompat reasons we need to be able to deal
+              # with stringyfiable objects.
+              $body = "$body" if blessed($body); # Assume there's some sort of overloading..
+              $body = [$body];  
+            }
+        } else {
+          $body = [undef];
+        }
+
+        $res->_response_cb->([ $res->status, \@headers, $body]);
+        $res->_clear_response_cb;
+
+    } else {
+        ## Now, if there's no response callback anymore, that means someone has
+        ## called ->write in order to stream 'some stuff along the way'.  I think
+        ## for backcompat we still need to handle a ->body.  I guess I could see
+        ## someone calling ->write to presend some stuff, and then doing the rest
+        ## via ->body, like in a template.
+        
+        ## We'll just use the old, existing code for this (or most of it)
+
+        if(my $body = $res->body) {
+          no warnings 'uninitialized';
+          if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
+
+              ## In this case we have no choice and will fall back on the old
+              ## manual streaming stuff.
+
+              my $got;
+              do {
+                  $got = read $body, my ($buffer), $CHUNKSIZE;
+                  $got = 0 unless $self->write($c, $buffer );
+              } while $got > 0;
+
+              close $body;
+          }
+          else {
+              $self->write($c, $body );
+          }
+        }
+
+        $res->_writer->close;
+        $res->_clear_writer;
     }
-    else {
-        $self->write( $c, $body );
-    }
-
-    my $res = $c->response;
-    $res->_writer->close;
-    $res->_clear_writer;
 
     return;
 }

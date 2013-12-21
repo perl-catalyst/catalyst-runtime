@@ -4,7 +4,41 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 
 =head1 DESCRIPTION
 
-This is an overview of the user-visible changes to Catalyst between major Catalyst releases.
+This is an overview of the user-visible changes to Catalyst between major
+Catalyst releases.
+
+=head2 VERSION 5.90060+
+
+We changed the way we return body content (from response) to whatever
+Plack handler you are using (Starman, FastCGI, etc.)  We no longer
+always use the streaming interface for the cases when the body is a
+simple scalar, object or filehandle like.  In those cases we now just
+pass the simple response on to the plack handler.  This might lead to
+some minor differences in how streaming is handled.  For example, you
+might notice that streaming starts using chunked encoding when running
+on a server that supports that, or that previously missing headers
+(possible content-length) might appear suddenly correct.  Also, if you
+are using middleware like L<Plack::Middleware::XSendfile> and are using
+a filehandle that sets a readable path, your server might now correctly
+handle the file (rather than as before where Catalyst would stream it
+very likely very slowly).
+
+In other words, some things might be meaninglessly different and some
+things that were broken codewise but worked because of Catalyst being
+incorrect might suddenly be really broken.  The behavior is now more
+correct in that Catalyst plays better with features that Plack offers
+but if you are making heavy use of the streaming interface there could
+be some differences so you should test carefully (this is probably not
+the vast majority of people).  In particular if you are developing
+using one server but deploying using a different one, differences in
+what those server do with streaming should be noted.
+
+We also now more carefully distingush the different between a body set
+to '' and a body that is undef.  This might lead to situations where
+again you'll get a content-length were you didn't get one before or
+where a supporting server will start chunking output.  If this is an
+issue you can apply the middleware L<Plack::Middleware::BufferedStreaming>
+or report specific problems to the dev team.
 
 =head2 VERSION 5.9XXXX 'cataplack'
 
