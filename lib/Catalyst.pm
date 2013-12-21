@@ -1958,10 +1958,15 @@ EOF
         }
     }
 
-    # Errors
+    # Remove incorrectly added body and content related meta data when returning
+    # an information response, or a response the is required to not include a body
+
     if ( $response->status =~ /^(1\d\d|[23]04)$/ ) {
-        $response->headers->remove_header("Content-Length");
-        $response->body('');
+        if($response->has_body) {
+          $c->log->debug('Removing body for informational or no content http responses');
+          $response->body('');
+          $response->headers->remove_header("Content-Length");
+        }
     }
 
     $c->finalize_cookies;
