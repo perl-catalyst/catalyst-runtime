@@ -3,7 +3,7 @@
   - Announcing the repo is not open for development of Perl Catalyst 'Runner'
   - http://questhub.io/realm/perl/explore/latest/tag/runner
 
-5.90059_002 - TBA
+5.90059_002 - 2013-12-21
   - We now pass a scalar or filehandle directly to you Plack handler, rather
     than always use the streaming interface (we are still always using a
     delayed response callback).  This means that you can make use of Plack
