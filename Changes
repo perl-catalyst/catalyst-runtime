@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90053 - 2013-12-21
+  - Reverted a change in the previous release that moved the setup_log phase
+    to after setup_config.  This change was made to allow people to use
+    configuration that is late loaded (such as via the ConfigLoader Plugin)
+    to setup the plugin.  However it also broke the ability to use the log
+    during plugin setup (ie, it breaks lots of plugins).  Reverting the 
+    change.  See Catalyst::Delta for workarounds.
+
 5.90052 - 2013-12-18
 
   - Fixed first block of startup debug messages missing when using a custom

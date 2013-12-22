@@ -6,6 +6,51 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 
 This is an overview of the user-visible changes to Catalyst between major Catalyst releases.
 
+=head2 VERSION 5.90053
+
+We are now clarifying the behavior of log, plugins and configuration during
+the setup phase.  Since Plugins might require a log during setup, setup_log
+must run BEFORE setup_plugins.   This has the unfortunate side effect that
+anyone using the popular ConfigLoader plugin will not be able to supply
+configuration to custom logs since the configuration is not yet finalized
+when setup_log is run (when using ConfigLoader, which is a plugin and is
+not loaded until later.)
+
+As a workaround, you can supply custom log configuration directly into
+the configuration:
+
+    package MyApp;
+    use Catalyst;
+
+    __PACKAGE__->config(
+      my_custom_log_info => { %custom_args },
+    );
+
+    __PACKAGE__->setup;
+
+If you wish to configure the custom logger differently based on ENV, you can
+try:
+
+    package MyApp;
+
+    use Catalyst;
+    use Catalyst::Utils;
+
+    __PACKAGE__->config(
+      Catalyst::Utils::merge_hashes(
+        +{ my_custom_log_info => { %base_custom_args } },
+        +{ do __PACKAGE__->path_to( $ENV{WHICH_CONF}."_conf.pl") },
+      ),
+    );
+
+    __PACKAGE__->setup;
+
+Or create a standalone Configuration class that does the right thing.
+
+Basically if you want to configure a logger via Catalyst global configuration
+you can't use ConfigLoader because it will always be loaded too late to be of
+any use.  Patches and workaround options welcomed!
+
 =head2 VERSION 5.9XXXX 'cataplack'
 
 The Catalyst::Engine sub-classes have all been removed and deprecated,
