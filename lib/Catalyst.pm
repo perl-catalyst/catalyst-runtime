@@ -1126,6 +1126,7 @@ sub setup {
 
     $class->setup_home( delete $flags->{home} );
 
+    $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
 
     # Call plugins setup, this is stupid and evil.
@@ -1136,7 +1137,6 @@ sub setup {
         $class->setup unless $Catalyst::__AM_RESTARTING;
     }
 
-    $class->setup_log( delete $flags->{log} );
     $class->setup_middleware();
     $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );

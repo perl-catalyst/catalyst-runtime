@@ -21,7 +21,8 @@
     fail to provide one.  This should cause less issues when trying to guess the
     length of a funky filehandle.  This now uses Plack::Middleware::ContentLength
   - Removed custom code to remove body content when the request is HEAD and
-    swapped it for Plack::Middleware::Head.
+    swapped it for Plack::Middleware::Head
+  - Merged fix for regressions from stable..
 
 5.90059_001 - 2013-12-19
   - Removed deprecated Regexp dispatch type from dependency list.  If you are
@@ -29,6 +30,13 @@
    'Catalyst::DispatchType::Regex' to you build system NOW or you application
    will be broken.
 
+5.90053 - 2013-12-21
+  - Reverted a change in the previous release that moved the setup_log phase
+    to after setup_config.  This change was made to allow people to use
+    configuration that is late loaded (such as via the ConfigLoader Plugin)
+    to setup the plugin.  However it also broke the ability to use the log
+    during plugin setup (ie, it breaks lots of plugins).  Reverting the 
+    change.  See Catalyst::Delta for workarounds.
 
 5.90052 - 2013-12-18
 
