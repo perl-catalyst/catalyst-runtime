@@ -3597,6 +3597,23 @@ So the general form is:
 
 Where C<@middleware> is one or more of the following, applied in the REVERSE of
 the order listed (to make it function similarly to L<Plack::Builder>:
+
+Alternatively, you may also define middleware by calling the L</setup_middleware>
+package method:
+
+    package MyApp::Web;
+
+    use Catalyst;
+
+    __PACKAGE__->setup_middleware( \@middleware_definitions);
+    __PACKAGE__->setup;
+
+In the case where you do both (use 'setup_middleware' and configuration) the
+package call to setup_middleware will be applied earlier (in other words its
+middleware will wrap closer to the application).  Keep this in mind since in
+some cases the order of middleware is important.
+
+The two approaches are not exclusive.
  
 =over 4
  
