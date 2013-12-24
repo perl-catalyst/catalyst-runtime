@@ -4,7 +4,10 @@ use Test::More;
 use HTTP::Request::Common;
 use HTTP::Message::PSGI;
 use Plack::Util;
-use Devel::Dwarn;
+
+# Test case to check that we now send scalar and filehandle like
+# bodys directly to the PSGI engine, rather than call $writer->write
+# or unroll the filehandle ourselves.
 
 {
   package MyApp::Controller::Root;
