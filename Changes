@@ -7,6 +7,9 @@
   - More documentation about alternative ways to setup middleware.
   - removed unneeded use of Devel::Dwarn in test case that was causing
     fails to install (sorry).
+  - When finalizing caught errors, if the error conforms to the interface as
+    described by Plack::Middleware::HTTPExceptions, rethrow it and let the
+    middleware deal with it.
 
 5.90059_002 - 2013-12-21
   - We now pass a scalar or filehandle directly to you Plack handler, rather
