@@ -43,6 +43,7 @@ use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
 use Plack::Middleware::ContentLength;
 use Plack::Middleware::Head;
+use Plack::Middleware::HTTPExceptions;
 use Plack::Util;
 use Class::Load 'load_class';
 
@@ -1896,7 +1897,25 @@ Finalizes error.
 
 =cut
 
-sub finalize_error { my $c = shift; $c->engine->finalize_error( $c, @_ ) }
+sub finalize_error {
+    my $c = shift;
+    if($#{$c->error} > 0) {
+        $c->engine->finalize_error( $c, @_ );
+    } else {
+        my ($error) = @{$c->error};
+        if(
+          blessed $error &&
+          ($error->can('as_psgi') || $error->can('code'))
+        ) {
+            # In the case where the error 'knows what it wants', becauses its PSGI
+            # aware, just rethow and let middleware catch it
+            $error->can('rethrow') ? $error->rethrow : croak $error;
+            croak $error;
+        } else {
+            $c->engine->finalize_error( $c, @_ )
+        }
+    }
+}
 
 =head2 $c->finalize_headers
 
@@ -2013,10 +2032,13 @@ sub handle_request {
         my $c = $class->prepare(@arguments);
         $c->dispatch;
         $status = $c->finalize;
-    }
-    catch {
+    } catch {
         chomp(my $error = $_);
         $class->log->error(qq/Caught exception in engine "$error"/);
+        #rethow if this can be handled by middleware
+        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
+            $error->can('rethrow') ? $error->rethrow : croak $error;
+        }
     };
 
     $COUNT++;
@@ -3105,6 +3127,7 @@ sub registered_middlewares {
     my $class = shift;
     if(my $middleware = $class->_psgi_middleware) {
         return (
+          Plack::Middleware::HTTPExceptions->new,
           Plack::Middleware::ContentLength->new,
           Plack::Middleware::Head->new,
           @$middleware);
