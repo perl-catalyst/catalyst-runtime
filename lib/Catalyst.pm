@@ -2603,18 +2603,15 @@ sub locate_components {
     my $class  = shift;
     my $config = shift;
 
-    my @paths   = qw( ::Controller ::C ::Model ::M ::View ::V );
+    my @paths   = qw( ::Model ::M ::View ::V ::Controller ::C );
     my $extra   = delete $config->{ search_extra } || [];
 
-    push @paths, @$extra;
+    unshift @paths, @$extra;
 
-    my $locator = Module::Pluggable::Object->new(
-        search_path => [ map { s/^(?=::)/$class/; $_; } @paths ],
-        %$config
-    );
-
-    # XXX think about ditching this sort entirely
-    my @comps = sort { length $a <=> length $b } $locator->plugins;
+    my @comps = map { sort { $a cmp $b } Module::Pluggable::Object->new(
+      search_path => [ map { s/^(?=::)/$class/; $_; } ($_) ],
+      %$config
+    )->plugins } @paths;
 
     return @comps;
 }
