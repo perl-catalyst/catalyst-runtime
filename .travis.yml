@@ -7,18 +7,6 @@ perl:
    - "5.10"
 
 install:
-   # git bits sometimes needed...
-   - git config user.name 'Travis-CI'
-   - git config user.email 'travis@nowhere.dne'
-
-   # ensure we have the latest cpanm
-   - echo y | perlbrew install-cpanm
-
-   # see if we can't speed things up a bit
-   - rm -rf ~/.cpanm
-   - mkdir ~/.cpanm
-   - sudo mount tmpfs -t tmpfs ~/.cpanm
-
    # these fail on parallel test runs
    #    Net::Server:  https://rt.cpan.org/Ticket/Display.html?id=84126
    - cpanm --metacpan --skip-satisfied Net::Server Template File::Remove Filesys::Notify::Simple Config::Any CGI::Simple Plack
