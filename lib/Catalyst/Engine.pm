@@ -86,7 +86,7 @@ sub finalize_body {
         my $body = $res->body;
         if(defined $body) {
             if(blessed($body) && $body->can('read') or ref($body) eq 'GLOB') {
-              # Body is a filehandle like thingy.  We can jusrt send this along
+              # Body is a filehandle like thingy.  We can just send this along
               # to plack without changing it.
             } elsif ( ref $body eq 'CODE' ) {
               # Body is a coderef that we can pass a writer into 
