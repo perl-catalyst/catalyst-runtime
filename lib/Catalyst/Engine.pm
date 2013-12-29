@@ -88,6 +88,12 @@ sub finalize_body {
             if(blessed($body) && $body->can('read') or ref($body) eq 'GLOB') {
               # Body is a filehandle like thingy.  We can jusrt send this along
               # to plack without changing it.
+            } elsif ( ref $body eq 'CODE' ) {
+              # Body is a coderef that we can pass a writer into 
+              my $writer = $res->_response_cb->([$res->status, \@headers]);
+              $res->_clear_response_cb;
+              $body->($writer);
+              return;
             } else {
               # Looks like for  backcompat reasons we need to be able to deal
               # with stringyfiable objects.
