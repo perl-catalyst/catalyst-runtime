@@ -3,6 +3,16 @@
   - Announcing the repo is not open for development of Perl Catalyst 'Runner'
   - http://questhub.io/realm/perl/explore/latest/tag/runner
 
+5.90059_004 - TBA
+  - Make sure IO handle objects do 'getline' before sending them to the
+    response callback, to properly support the PSGI specification.
+  - Added some backcompat code when setting a response body to an object
+    that does 'read' but not 'getline'.  Added deprecation notice for this
+    case.  Added docs to Catalyst::Delta.
+  - Official warning that Catalyst::Engine::PSGI is no longer supported and
+    we will be removing any existing backcompat code for this engine in a
+    future release.
+
 5.90059_003 - 2013-12-24
   - More documentation about alternative ways to setup middleware.
   - removed unneeded use of Devel::Dwarn in test case that was causing

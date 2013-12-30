@@ -103,6 +103,11 @@ sub finalize_body {
                     $got = 0 unless $self->write($c, $buffer );
                 } while $got > 0;
 
+                # I really am guessing this case is pathological.  I'd like to remove it
+                # but need to give people a bit of heads up
+                $c->log->warn('!!! Setting $response->body to an object that supports "read" but not "getline" is deprecated. !!!')
+                  unless $self->{__FH_READ_DEPRECATION_NOTICE_qwvsretf43}++;
+
                 close $body;
                 return;
             } else {
