@@ -86,6 +86,7 @@ sub finalize_body {
         my $body = $res->body;
         if(defined $body) {
             if(blessed($body) && $body->can('read') or ref($body) eq 'GLOB') {
+<<<<<<< HEAD
               # Body is a filehandle like thingy.  We can just send this along
               # to plack without changing it.
             } elsif ( ref $body eq 'CODE' ) {
@@ -94,6 +95,10 @@ sub finalize_body {
               $res->_clear_response_cb;
               $body->($writer);
               return;
+=======
+              # Body is a filehandle like thingy.  We can jusrt send this along
+              # to plack without changing it.
+>>>>>>> first pass at not streaming via the catalyst app, but instead allow the underlying server to handle it most optimally;
             } else {
               # Looks like for  backcompat reasons we need to be able to deal
               # with stringyfiable objects.

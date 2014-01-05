@@ -4,10 +4,14 @@ use Test::More;
 use HTTP::Request::Common;
 use HTTP::Message::PSGI;
 use Plack::Util;
+<<<<<<< HEAD
 
 # Test case to check that we now send scalar and filehandle like
 # bodys directly to the PSGI engine, rather than call $writer->write
 # or unroll the filehandle ourselves.
+=======
+use Devel::Dwarn;
+>>>>>>> first pass at not streaming via the catalyst app, but instead allow the underlying server to handle it most optimally;
 
 {
   package MyApp::Controller::Root;

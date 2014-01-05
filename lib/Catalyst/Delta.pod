@@ -39,6 +39,7 @@ again you'll get a content-length were you didn't get one before or
 where a supporting server will start chunking output.  If this is an
 issue you can apply the middleware L<Plack::Middleware::BufferedStreaming>
 or report specific problems to the dev team.
+<<<<<<< HEAD
 
 Also, we have started migrating code in Catalyst to equivilent Plack
 Middleware when such exists and is correct to do so. 
@@ -87,6 +88,8 @@ Or create a standalone Configuration class that does the right thing.
 Basically if you want to configure a logger via Catalyst global configuration
 you can't use ConfigLoader because it will always be loaded too late to be of
 any use.  Patches and workaround options welcomed!
+=======
+>>>>>>> first pass at not streaming via the catalyst app, but instead allow the underlying server to handle it most optimally;
 
 =head2 VERSION 5.9XXXX 'cataplack'
 
