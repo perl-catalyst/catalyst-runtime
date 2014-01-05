@@ -3,16 +3,12 @@
   - Announcing the repo is not open for development of Perl Catalyst 'Runner'
   - http://questhub.io/realm/perl/explore/latest/tag/runner
 
-<<<<<<< HEAD
 5.90059_003 - 2013-12-24
   - More documentation about alternative ways to setup middleware.
   - removed unneeded use of Devel::Dwarn in test case that was causing
     fails to install (sorry).
 
 5.90059_002 - 2013-12-21
-=======
-5.90059_002 - TBA
->>>>>>> first pass at not streaming via the catalyst app, but instead allow the underlying server to handle it most optimally;
   - We now pass a scalar or filehandle directly to you Plack handler, rather
     than always use the streaming interface (we are still always using a
     delayed response callback).  This means that you can make use of Plack
@@ -21,7 +17,6 @@
     properly non blocking streaming when running under a supporting server like
     Twiggy.  See Catalyst::Delta for more.  This change might cause issues if
     you are making heaving use of streaming (although in general we expect things
-<<<<<<< HEAD
     to work much better.
   - In the case when we remove a content body from the response because you set
     an information status or a no content type status, warn that we are doing so
@@ -33,9 +28,6 @@
   - Removed custom code to remove body content when the request is HEAD and
     swapped it for Plack::Middleware::Head
   - Merged fix for regressions from stable..
-=======
-    to work much better.  
->>>>>>> first pass at not streaming via the catalyst app, but instead allow the underlying server to handle it most optimally;
 
 5.90059_001 - 2013-12-19
   - Removed deprecated Regexp dispatch type from dependency list.  If you are
