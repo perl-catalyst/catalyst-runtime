@@ -86,7 +86,6 @@ sub finalize_body {
         my $body = $res->body;
         if(defined $body) {
             if(blessed($body) && $body->can('read') or ref($body) eq 'GLOB') {
-<<<<<<< HEAD
               # Body is a filehandle like thingy.  We can just send this along
               # to plack without changing it.
             } elsif ( ref $body eq 'CODE' ) {
@@ -95,19 +94,6 @@ sub finalize_body {
               $res->_clear_response_cb;
               $body->($writer);
               return;
-=======
-              # Body is a filehandle like thingy.  We can jusrt send this along
-              # to plack without changing it.
-<<<<<<< HEAD
->>>>>>> first pass at not streaming via the catalyst app, but instead allow the underlying server to handle it most optimally;
-=======
-            } elsif ( ref $body eq 'CODE' ) {
-              # Body is a coderef that we can pass a writer into 
-              my $writer = $res->_response_cb->([$res->status, \@headers]);
-              $res->_clear_response_cb;
-              $body->($writer);
-              return;
->>>>>>> 38d7792... Simple patch allowing CodeRef in Body. Will get a 'writer' from _response_cb
             } else {
               # Looks like for  backcompat reasons we need to be able to deal
               # with stringyfiable objects.
