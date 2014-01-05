@@ -42,7 +42,20 @@ or report specific problems to the dev team.
 <<<<<<< HEAD
 
 Also, we have started migrating code in Catalyst to equivilent Plack
-Middleware when such exists and is correct to do so. 
+Middleware when such exists and is correct to do so.
+
+We also deprecated setting the response body to an object that does 'read'
+but not 'getline'.  If you are using a custom IO-Handle like object for
+response you should verify that 'getline' is supported in your interface.
+You will get a first use warning for this error in your logs.  Unless we
+here this case is a major issue for people, we will be removing support
+in a near future release of Catalyst.
+
+L<Catalyst::Engine::PSGI> is also officially no longer supported.  We will
+no long run test cases against this and can remove backcompat code for it
+as deemed necessary for the evolution of the platform.  You should simple
+discontinue use of this engine, as L<Catalyst> has been PSGI at the core
+for several years.
 
 =head2 VERSION 5.90053
 

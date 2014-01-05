@@ -85,15 +85,31 @@ sub finalize_body {
         ## We need to figure out what kind of body we have...
         my $body = $res->body;
         if(defined $body) {
-            if(blessed($body) && $body->can('read') or ref($body) eq 'GLOB') {
-              # Body is a filehandle like thingy.  We can just send this along
-              # to plack without changing it.
-            } elsif ( ref $body eq 'CODE' ) {
-              # Body is a coderef that we can pass a writer into 
-              my $writer = $res->_response_cb->([$res->status, \@headers]);
-              $res->_clear_response_cb;
-              $body->($writer);
-              return;
+            if( 
+                (blessed($body) && $body->can('getline'))
+                or ref($body) eq 'GLOB'
+            ) {
+              # Body is an IO handle that meets the PSGI spec
+            } elsif(blessed($body) && $body->can('read')) {
+                # In the past, Catalyst only looked for read not getline.  It is very possible
+                # that one might have an object that respected read but did not have getline.
+                # As a result, we need to handle this case for backcompat.
+                
+                # We will just do the old loop for now but someone could write a proxy
+                # object to wrap getline and proxy read
+                my $got;
+                do {
+                    $got = read $body, my ($buffer), $CHUNKSIZE;
+                    $got = 0 unless $self->write($c, $buffer );
+                } while $got > 0;
+
+                # I really am guessing this case is pathological.  I'd like to remove it
+                # but need to give people a bit of heads up
+                $c->log->warn('!!! Setting $response->body to an object that supports "read" but not "getline" is deprecated. !!!')
+                  unless $self->{__FH_READ_DEPRECATION_NOTICE_qwvsretf43}++;
+
+                close $body;
+                return;
             } else {
               # Looks like for  backcompat reasons we need to be able to deal
               # with stringyfiable objects.
