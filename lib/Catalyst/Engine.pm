@@ -90,12 +90,6 @@ sub finalize_body {
                 or ref($body) eq 'GLOB'
             ) {
               # Body is an IO handle that meets the PSGI spec
-            } elsif ( ref $body eq 'CODE' ) {
-              # Body is a coderef we can pass a writer into
-              my $writer = $res->_response_cb->([$res->status, \@headers]);
-              $res->_clear_response_cb;
-              $body->($writer);
-              return;
             } elsif(blessed($body) && $body->can('read')) {
                 # In the past, Catalyst only looked for read not getline.  It is very possible
                 # that one might have an object that respected read but did not have getline.
