@@ -117,7 +117,7 @@ sub finalize_body {
               $body = [$body];  
             }
         } else {
-          $body = [undef];
+          $body = [];
         }
 
         $res->_response_cb->([ $res->status, \@headers, $body]);
