@@ -3936,6 +3936,8 @@ rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
 
+Upasana <me@upasana.me>
+
 =head1 COPYRIGHT
 
 Copyright (c) 2005, the above named PROJECT FOUNDER and CONTRIBUTORS.
