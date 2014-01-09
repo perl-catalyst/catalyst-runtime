@@ -45,6 +45,7 @@ use Plack::Middleware::ContentLength;
 use Plack::Middleware::Head;
 use Plack::Middleware::HTTPExceptions;
 use Plack::Middleware::FixMissingBodyInRedirect;
+use Plack::Middleware::RemoveRedundantBody;
 use Plack::Util;
 use Class::Load 'load_class';
 
@@ -1941,14 +1942,6 @@ sub finalize_headers {
     # Remove incorrectly added body and content related meta data when returning
     # an information response, or a response the is required to not include a body
 
-    if ( $response->status =~ /^(1\d\d|[23]04)$/ ) {
-        if($response->has_body) {
-          $c->log->debug('Removing body for informational or no content http responses');
-          $response->body('');
-          $response->headers->remove_header("Content-Length");
-        }
-    }
-
     $c->finalize_cookies;
 
     $c->response->finalize_headers();
@@ -3115,6 +3108,7 @@ sub registered_middlewares {
           Plack::Middleware::FixMissingBodyInRedirect->new,
           Plack::Middleware::ContentLength->new,
           Plack::Middleware::Head->new,
+          Plack::Middleware::RemoveRedundantBody->new,
           @$middleware);
     } else {
         die "You cannot call ->registered_middlewares until middleware has been setup";
