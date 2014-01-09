@@ -83,7 +83,8 @@ requires "Plack::Middleware::ContentLength";
 requires "Plack::Middleware::Head";
 requires "Plack::Middleware::HTTPExceptions";
 requires "Plack::Middleware::FixMissingBodyInRedirect";
-requires "Plack::Middleware::MethodOverride;
+requires "Plack::Middleware::MethodOverride";
+requires "Plack::Middleware::RemoveRedundantBody";
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';
