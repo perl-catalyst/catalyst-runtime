@@ -114,6 +114,32 @@ sub test_redirect_with_content :Global {
     # it is only for checking HTTP response code, content-type etc.
 }
 
+sub test_remove_body_with_304 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(304);
+    $c->res->content_type('text/html');
+    $c->res->body("<html><body>Body should not be set</body></html>");
+}
+
+sub test_remove_body_with_204 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(204);
+    $c->res->content_type('text/html');
+    $c->res->body("<html><body>Body should not be set</body></html>");
+}
+
+sub test_remove_body_with_100 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(100);
+    $c->res->body("<html><body>Body should not be set</body></html>");
+    $c->res->content_type('text/html');
+}
+
+sub test_nobody_with_100 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(100);
+}
+
 sub end : Private {
     my ($self,$c) = @_;
 }
