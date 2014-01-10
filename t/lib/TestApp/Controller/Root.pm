@@ -132,7 +132,6 @@ sub test_remove_body_with_100 :Global {
     my ($self, $c) = @_;
     $c->res->status(100);
     $c->res->body("<html><body>Body should not be set</body></html>");
-    $c->res->content_type('text/html');
 }
 
 sub test_nobody_with_100 :Global {
