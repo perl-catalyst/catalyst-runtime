@@ -111,23 +111,15 @@ sub from_psgi_response {
         my ($status, $headers, $body) = @$psgi_res;
         $self->status($status);
         $self->headers(HTTP::Headers->new(@$headers));
-        if(ref $body eq 'ARRAY') {
-          $self->body(join '', grep defined, @$body);
-        } else {
-          $self->body($body);
-        }
+        $self->body($body);
     } elsif(ref $psgi_res eq 'CODE') {
         $psgi_res->(sub {
             my $response = shift;
             my ($status, $headers, $maybe_body) = @$response;
             $self->status($status);
             $self->headers(HTTP::Headers->new(@$headers));
-            if($maybe_body) {
-                if(ref $maybe_body eq 'ARRAY') {
-                  $self->body(join '', grep defined, @$maybe_body);
-                } else {
-                  $self->body($maybe_body);
-                }
+            if(defined $maybe_body) {
+                $self->body($maybe_body);
             } else {
                 return $self->write_fh;
             }
