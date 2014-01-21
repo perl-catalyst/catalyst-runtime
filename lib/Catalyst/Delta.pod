@@ -9,13 +9,15 @@ Catalyst releases.
 
 =head2 VERSION 5.90060+
 
+=head3 Support passing Bpdy filehandles directly to your Plack server.
+
 We changed the way we return body content (from response) to whatever
 Plack handler you are using (Starman, FastCGI, etc.)  We no longer
 always use the streaming interface for the cases when the body is a
 simple scalar, object or filehandle like.  In those cases we now just
 pass the simple response on to the plack handler.  This might lead to
 some minor differences in how streaming is handled.  For example, you
-might notice that streaming starts using chunked encoding when running
+might notice that streaming starts properly supportubg chunked encoding when
 on a server that supports that, or that previously missing headers
 (possible content-length) might appear suddenly correct.  Also, if you
 are using middleware like L<Plack::Middleware::XSendfile> and are using
@@ -33,6 +35,11 @@ the vast majority of people).  In particular if you are developing
 using one server but deploying using a different one, differences in
 what those server do with streaming should be noted.
 
+Please see note below about changes to filehandle support and existing
+Plack middleware to aid in back compatibility.
+
+=head3 Distinguish between body null versus undef.
+
 We also now more carefully distingush the different between a body set
 to '' and a body that is undef.  This might lead to situations where
 again you'll get a content-length were you didn't get one before or
@@ -40,21 +47,48 @@ where a supporting server will start chunking output.  If this is an
 issue you can apply the middleware L<Plack::Middleware::BufferedStreaming>
 or report specific problems to the dev team.
 
-Also, we have started migrating code in Catalyst to equivilent Plack
-Middleware when such exists and is correct to do so.
+=head3 More Catalyst Middleware
+
+We have started migrating code in Catalyst to equivilent Plack
+Middleware when such exists and is correct to do so.  For example we now use
+L<Plack::Middleware::ContentLength> to determine content length of a response
+when none is provided.  This replaces similar code inlined with L<Catalyst>
+The main advantages to doing this is 1) more similar Catalyst core that is 
+focused on the Catalyst special sauce, 2) Middleware is more broadly shared
+so we benefit from better collaboration with developers outside Catalyst, 3)
+In the future you'll be able to change or trim the middleware stack to get
+additional performance when you don't need all the checks and constraints.
+
+=head3 Deprecation of Filehandle like objects that do read but not getline
 
 We also deprecated setting the response body to an object that does 'read'
 but not 'getline'.  If you are using a custom IO-Handle like object for
 response you should verify that 'getline' is supported in your interface.
 You will get a first use warning for this error in your logs.  Unless we
 here this case is a major issue for people, we will be removing support
-in a near future release of Catalyst.
+in a near future release of Catalyst.  When the code encounters this it
+will issue a warning.  You also may run into this issue with L<MogileFS::Client>
+which does read but not getline.  For now we will just warn when encountering
+such an object and fallback to the previous behavior (where L<Catalyst::Engine>
+itself unrolls the filehandle and performs blocking streams).  However
+this backcompat will be removed in an upcoming release so you should either
+rewrite your custom filehandle objects to support getline or start using the 
+middleware that adapts read for getline L<Plack::Middleware::AdaptFilehandleRead>.
+
+=head3 Offically deprecation of L<Catalyst::Engine::PSGI>
 
 L<Catalyst::Engine::PSGI> is also officially no longer supported.  We will
 no long run test cases against this and can remove backcompat code for it
 as deemed necessary for the evolution of the platform.  You should simple
 discontinue use of this engine, as L<Catalyst> has been PSGI at the core
 for several years.
+
+=head2 Officially deprecate finding the PSGI $env anyplace other than Request
+
+A few early releases of Cataplack had the PSGI $env in L<Catalyst::Engine>.
+Code has been maintained here for backcompat reasons.  This is no longer
+supported and will be removed in upcoming release, so you should update
+your code and / or upgrade to a newer version of L<Catalyst>
 
 =head2 VERSION 5.90053
 
