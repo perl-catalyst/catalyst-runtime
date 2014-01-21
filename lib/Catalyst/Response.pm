@@ -82,6 +82,17 @@ has _context => (
   clearer => '_clear_context',
 );
 
+before [qw(status headers content_encoding content_length content_type header)] => sub {
+  my $self = shift;
+
+  $self->_context->log->warn( 
+    "Useless setting a header value after finalize_headers called." .
+    " Not what you want." )
+      if ( $self->finalized_headers && @_ );
+};
+
+
+
 sub output { shift->body(@_) }
 
 sub code   { shift->status(@_) }
