@@ -100,7 +100,9 @@ your code and / or upgrade to a newer version of L<Catalyst>
 Setting $c->res->body to a filehandle after using $c->res->write or
 $c->res->write_fh is no longer considered allowed, since we can't send
 the filehandle to the underlying Plack handler.  For now we will continue
-to support setting body to a simple value since 
+to support setting body to a simple value since this is possible, but at
+some future release a choice to use streaming indicates that you will do
+so for the rest of the request.
 
 =head2 VERSION 5.90053
 

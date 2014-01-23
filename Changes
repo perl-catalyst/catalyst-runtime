@@ -9,11 +9,11 @@
   - Added some backcompat code when setting a response body to an object
     that does 'read' but not 'getline'.  Added deprecation notice for this
     case.  Added docs to Catalyst::Delta.
-  - Official warning that Catalyst::Engine::PSGI is no longer supported and
-    we will be removing any existing backcompat code for this engine in a
-    future release.  Other deprecations noted, see Catalyst::Delta.
-  - $c->res->has_body is now considered true if you've even once requested a
-    $c->res->write_fh or called $c->res->write.
+  - Catalyst::Delta contains a list of behaviors which will be considered
+    deprecated immediatelty.  Most items have workarounds and tweaks you can
+    make to avoid issues.  These deprecations are targeted for removal/enforcement
+    in the Catalyst 6 release.  Please review and give your feedback.
+  - More middleware to replace inline code (upasana++)  
 
 5.90059_003 - 2013-12-24
   - More documentation about alternative ways to setup middleware.

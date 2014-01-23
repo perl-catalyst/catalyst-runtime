@@ -6,20 +6,12 @@ requires 'match', 'match_captures', 'list_extra_info';
 
 around ['match','match_captures'] => sub {
   my ($orig, $self, $ctx, @args) = @_;
-  my $expected = $self->_normalize_expected_http_method($ctx->req);
+  my $expected = $ctx->req->method;
   return $self->_has_expected_http_method($expected) ?
     $self->$orig($ctx, @args) :
     0;
 };
 
-sub _normalize_expected_http_method {
-  my ($self, $req) = @_;
-  return $req->header('X-HTTP-Method') ||
-    $req->header('X-HTTP-Method-Override') ||
-    $req->header('X-METHOD-OVERRIDE') ||
-    $req->header('x-tunneled-method') ||
-    $req->method;
-}
 
 sub _has_expected_http_method {
   my ($self, $expected) = @_;
@@ -75,27 +67,12 @@ This is an action role that lets your L<Catalyst::Action> match on standard
 HTTP methods, such as GET, POST, etc.
 
 Since most web browsers have limited support for rich HTTP Method vocabularies
-we also support setting the expected match method via the follow non standard
-but widely used http extensions.  Our support for these should not be taken as
-an endorsement of the technique.   Rt is merely a reflection of our desire to
-work well with existing systems and common client side tools.
-
-=over 4
-
-=item X-HTTP-Method (Microsoft)
-
-=item X-HTTP-Method-Override (Google/GData)
-
-=item X-METHOD-OVERRIDE (IBM)
-
-=item x-tunneled-method (used in many other similar systems on CPAN
-
-=back 
-
-Please note the insanity of overriding a GET request with a DELETE override...
-Rational practices suggest that using POST with overrides to emulate PUT and
-DELETE can be an acceptable way to deal with client limitations and security
-rules on your proxy server. I recommend going no further.
+we use L<Plack::Middleware::MethodOverride> which allows you to 'tunnel' your
+request method over POST  This works in two ways.  You can set an extension
+HTTP header C<X-HTTP-Method-Override> which will contain the value of the
+desired request method, or you may set a search query parameter
+C<x-tunneled-method>.  Remember, these only work over HTTP Request type
+POST.  See L<Plack::Middleware::MethodOverride> for more.
 
 =head1 REQUIRES
 

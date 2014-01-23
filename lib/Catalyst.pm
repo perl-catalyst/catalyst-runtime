@@ -45,6 +45,7 @@ use Plack::Middleware::ContentLength;
 use Plack::Middleware::Head;
 use Plack::Middleware::HTTPExceptions;
 use Plack::Middleware::FixMissingBodyInRedirect;
+use Plack::Middleware::MethodOverride;
 use Plack::Util;
 use Class::Load 'load_class';
 
@@ -3114,6 +3115,7 @@ sub registered_middlewares {
           Plack::Middleware::HTTPExceptions->new,
           Plack::Middleware::FixMissingBodyInRedirect->new,
           Plack::Middleware::ContentLength->new,
+          Plack::Middleware::MethodOverride->new,
           Plack::Middleware::Head->new,
           @$middleware);
     } else {
