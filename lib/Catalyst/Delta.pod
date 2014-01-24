@@ -9,7 +9,7 @@ Catalyst releases.
 
 =head2 VERSION 5.90060+
 
-=head3 Support passing Bpdy filehandles directly to your Plack server.
+=head3 Support passing Body filehandles directly to your Plack server.
 
 We changed the way we return body content (from response) to whatever
 Plack handler you are using (Starman, FastCGI, etc.)  We no longer
