@@ -64,8 +64,7 @@ additional performance when you don't need all the checks and constraints.
 We also deprecated setting the response body to an object that does 'read'
 but not 'getline'.  If you are using a custom IO-Handle like object for
 response you should verify that 'getline' is supported in your interface.
-You will get a first use warning for this error in your logs.  Unless we
-here this case is a major issue for people, we will be removing support
+Unless we here this case is a major issue for people, we will be removing support
 in a near future release of Catalyst.  When the code encounters this it
 will issue a warning.  You also may run into this issue with L<MogileFS::Client>
 which does read but not getline.  For now we will just warn when encountering
@@ -103,6 +102,7 @@ the filehandle to the underlying Plack handler.  For now we will continue
 to support setting body to a simple value since this is possible, but at
 some future release a choice to use streaming indicates that you will do
 so for the rest of the request.
+
 
 =head2 VERSION 5.90053
 

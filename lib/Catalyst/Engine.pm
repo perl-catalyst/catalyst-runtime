@@ -162,6 +162,11 @@ sub finalize_body {
               close $body;
           }
           else {
+              
+              # Case where body was set afgter calling ->write.  We'd prefer not to
+              # support this, but I can see some use cases with the way most of the
+              # views work.
+
               $self->write($c, $body );
           }
         }
