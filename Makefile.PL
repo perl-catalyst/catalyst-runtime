@@ -75,10 +75,15 @@ requires 'Stream::Buffered';
 requires 'Hash::MultiValue';
 requires 'Plack::Request::Upload';
 requires 'CGI::Struct';
-
-# Install the standalone Regex dispatch modules in order to ease the
-# deprecation transition
-requires 'Catalyst::DispatchType::Regex' => '5.90021';
+requires "Plack::Middleware::Conditional";
+requires "Plack::Middleware::IIS6ScriptNameFix";
+requires "Plack::Middleware::IIS7KeepAliveFix";
+requires "Plack::Middleware::LighttpdScriptNameFix";
+requires "Plack::Middleware::ContentLength";
+requires "Plack::Middleware::Head";
+requires "Plack::Middleware::HTTPExceptions";
+requires "Plack::Middleware::FixMissingBodyInRedirect";
+requires "Plack::Middleware::RemoveRedundantBody";
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';

@@ -83,6 +83,8 @@ sub test_redirect :Global {
     # Don't set content_type
     # Don't set body
     $c->res->redirect('/go_here');
+    # route for /go_here doesn't exist
+    # it is only for checking HTTP response code, content-type etc.
 }
 
 sub test_redirect_uri_for :Global {
@@ -90,6 +92,8 @@ sub test_redirect_uri_for :Global {
     # Don't set content_type
     # Don't set body
     $c->res->redirect($c->uri_for('/go_here'));
+    # route for /go_here doesn't exist
+    # it is only for checking HTTP response code, content-type etc.
 }
 
 sub test_redirect_with_contenttype :Global {
@@ -97,6 +101,8 @@ sub test_redirect_with_contenttype :Global {
     # set content_type but don't set body
     $c->res->content_type('image/jpeg');
     $c->res->redirect('/go_here');
+    # route for /go_here doesn't exist
+    # it is only for checking HTTP response code, content-type etc.
 }
 
 sub test_redirect_with_content :Global {
@@ -104,6 +110,33 @@ sub test_redirect_with_content :Global {
     $c->res->content_type('text/plain');
     $c->res->body('Please kind sir, I beg you to go to /go_here.');
     $c->res->redirect('/go_here');
+    # route for /go_here doesn't exist
+    # it is only for checking HTTP response code, content-type etc.
+}
+
+sub test_remove_body_with_304 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(304);
+    $c->res->content_type('text/html');
+    $c->res->body("<html><body>Body should not be set</body></html>");
+}
+
+sub test_remove_body_with_204 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(204);
+    $c->res->content_type('text/html');
+    $c->res->body("<html><body>Body should not be set</body></html>");
+}
+
+sub test_remove_body_with_100 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(100);
+    $c->res->body("<html><body>Body should not be set</body></html>");
+}
+
+sub test_nobody_with_100 :Global {
+    my ($self, $c) = @_;
+    $c->res->status(100);
 }
 
 sub end : Private {

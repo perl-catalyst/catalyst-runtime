@@ -1,5 +1,53 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Announcing the repo is not open for development of Perl Catalyst 'Runner'
+  - http://questhub.io/realm/perl/explore/latest/tag/runner
+
+5.90059_004 - TBA
+  - Make sure IO handle objects do 'getline' before sending them to the
+    response callback, to properly support the PSGI specification.
+  - Added some backcompat code when setting a response body to an object
+    that does 'read' but not 'getline'.  Added deprecation notice for this
+    case.  Added docs to Catalyst::Delta.
+  - Official warning that Catalyst::Engine::PSGI is no longer supported and
+    we will be removing any existing backcompat code for this engine in a
+    future release.
+
+5.90059_003 - 2013-12-24
+  - More documentation about alternative ways to setup middleware.
+  - removed unneeded use of Devel::Dwarn in test case that was causing
+    fails to install (sorry).
+  - When finalizing caught errors, if the error conforms to the interface as
+    described by Plack::Middleware::HTTPExceptions, rethrow it and let the
+    middleware deal with it.
+
+5.90059_002 - 2013-12-21
+  - We now pass a scalar or filehandle directly to you Plack handler, rather
+    than always use the streaming interface (we are still always using a
+    delayed response callback).  This means that you can make use of Plack
+    middleware like Plack::Middleware::XSendfile and we expect better use of
+    server features (when they exist) like correct use of chunked encoding or
+    properly non blocking streaming when running under a supporting server like
+    Twiggy.  See Catalyst::Delta for more.  This change might cause issues if
+    you are making heaving use of streaming (although in general we expect things
+    to work much better.
+  - In the case when we remove a content body from the response because you set
+    an information status or a no content type status, warn that we are doing so
+    when in debug mode.  You might see additional debugging information to help
+    you find and remove unneeded response bodies.
+  - Updated the code where Catalyst tries to guess a content length when you
+    fail to provide one.  This should cause less issues when trying to guess the
+    length of a funky filehandle.  This now uses Plack::Middleware::ContentLength
+  - Removed custom code to remove body content when the request is HEAD and
+    swapped it for Plack::Middleware::Head
+  - Merged fix for regressions from stable..
+
+5.90059_001 - 2013-12-19
+  - Removed deprecated Regexp dispatch type from dependency list.  If you are
+    using Regex[p] type dispatching you need to add the standalone distribution
+   'Catalyst::DispatchType::Regex' to you build system NOW or you application
+   will be broken.
+
 5.90053 - 2013-12-21
   - Reverted a change in the previous release that moved the setup_log phase
     to after setup_config.  This change was made to allow people to use

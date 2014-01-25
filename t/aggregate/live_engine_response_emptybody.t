@@ -18,7 +18,11 @@ use Catalyst::Test 'TestApp';
 {
     my $res = request('/emptybody');
     is $res->content, '';
-    ok !defined $res->header('Content-Length');
+
+    SKIP: {
+      skip "content-length for body of '' is now server dependent", 1;
+      ok !defined $res->header('Content-Length');
+    }
 }
 
 done_testing;

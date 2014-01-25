@@ -41,6 +41,11 @@ use Plack::Middleware::ReverseProxy;
 use Plack::Middleware::IIS6ScriptNameFix;
 use Plack::Middleware::IIS7KeepAliveFix;
 use Plack::Middleware::LighttpdScriptNameFix;
+use Plack::Middleware::ContentLength;
+use Plack::Middleware::Head;
+use Plack::Middleware::HTTPExceptions;
+use Plack::Middleware::FixMissingBodyInRedirect;
+use Plack::Middleware::RemoveRedundantBody;
 use Plack::Util;
 use Class::Load 'load_class';
 
@@ -120,7 +125,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90053';
+our $VERSION = '5.90059_004';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1857,11 +1862,6 @@ sub finalize {
 
         $c->finalize_headers unless $c->response->finalized_headers;
 
-        # HEAD request
-        if ( $c->request->method eq 'HEAD' ) {
-            $c->response->body('');
-        }
-
         $c->finalize_body;
     }
 
@@ -1899,7 +1899,25 @@ Finalizes error.
 
 =cut
 
-sub finalize_error { my $c = shift; $c->engine->finalize_error( $c, @_ ) }
+sub finalize_error {
+    my $c = shift;
+    if($#{$c->error} > 0) {
+        $c->engine->finalize_error( $c, @_ );
+    } else {
+        my ($error) = @{$c->error};
+        if(
+          blessed $error &&
+          ($error->can('as_psgi') || $error->can('code'))
+        ) {
+            # In the case where the error 'knows what it wants', becauses its PSGI
+            # aware, just rethow and let middleware catch it
+            $error->can('rethrow') ? $error->rethrow : croak $error;
+            croak $error;
+        } else {
+            $c->engine->finalize_error( $c, @_ )
+        }
+    }
+}
 
 =head2 $c->finalize_headers
 
@@ -1919,50 +1937,10 @@ sub finalize_headers {
     if ( my $location = $response->redirect ) {
         $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
         $response->header( Location => $location );
-
-        if ( !$response->has_body ) {
-            # Add a default body if none is already present
-            my $encoded_location = encode_entities($location);
-            $response->body(<<"EOF");
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"> 
-  <head>
-    <title>Moved</title>
-  </head>
-  <body>
-     <p>This item has moved <a href="$encoded_location">here</a>.</p>
-  </body>
-</html>
-EOF
-            $response->content_type('text/html; charset=utf-8');
-        }
     }
 
-    # Content-Length
-    if ( defined $response->body && length $response->body && !$response->content_length ) {
-
-        # get the length from a filehandle
-        if ( blessed( $response->body ) && $response->body->can('read') || ref( $response->body ) eq 'GLOB' )
-        {
-            my $size = -s $response->body;
-            if ( $size ) {
-                $response->content_length( $size );
-            }
-            else {
-                $c->log->warn('Serving filehandle without a content-length');
-            }
-        }
-        else {
-            # everything should be bytes at this point, but just in case
-            $response->content_length( length( $response->body ) );
-        }
-    }
-
-    # Errors
-    if ( $response->status =~ /^(1\d\d|[23]04)$/ ) {
-        $response->headers->remove_header("Content-Length");
-        $response->body('');
-    }
+    # Remove incorrectly added body and content related meta data when returning
+    # an information response, or a response the is required to not include a body
 
     $c->finalize_cookies;
 
@@ -2031,10 +2009,13 @@ sub handle_request {
         my $c = $class->prepare(@arguments);
         $c->dispatch;
         $status = $c->finalize;
-    }
-    catch {
+    } catch {
         chomp(my $error = $_);
         $class->log->error(qq/Caught exception in engine "$error"/);
+        #rethow if this can be handled by middleware
+        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
+            $error->can('rethrow') ? $error->rethrow : croak $error;
+        }
     };
 
     $COUNT++;
@@ -3122,7 +3103,13 @@ L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
 sub registered_middlewares {
     my $class = shift;
     if(my $middleware = $class->_psgi_middleware) {
-        return @$middleware;
+        return (
+          Plack::Middleware::HTTPExceptions->new,
+          Plack::Middleware::FixMissingBodyInRedirect->new,
+          Plack::Middleware::ContentLength->new,
+          Plack::Middleware::Head->new,
+          Plack::Middleware::RemoveRedundantBody->new,
+          @$middleware);
     } else {
         die "You cannot call ->registered_middlewares until middleware has been setup";
     }
@@ -3612,6 +3599,23 @@ So the general form is:
 
 Where C<@middleware> is one or more of the following, applied in the REVERSE of
 the order listed (to make it function similarly to L<Plack::Builder>:
+
+Alternatively, you may also define middleware by calling the L</setup_middleware>
+package method:
+
+    package MyApp::Web;
+
+    use Catalyst;
+
+    __PACKAGE__->setup_middleware( \@middleware_definitions);
+    __PACKAGE__->setup;
+
+In the case where you do both (use 'setup_middleware' and configuration) the
+package call to setup_middleware will be applied earlier (in other words its
+middleware will wrap closer to the application).  Keep this in mind since in
+some cases the order of middleware is important.
+
+The two approaches are not exclusive.
  
 =over 4
  
@@ -3925,6 +3929,8 @@ Yuval Kogman, C<nothingmuch@woobling.org>
 rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
+
+Upasana <me@upasana.me>
 
 =head1 COPYRIGHT
 
