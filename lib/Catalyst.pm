@@ -1895,7 +1895,10 @@ sub finalize_cookies { my $c = shift; $c->engine->finalize_cookies( $c, @_ ) }
 
 =head2 $c->finalize_error
 
-Finalizes error.
+Finalizes error.  If there is only one error in L</error> and it is an object that
+does C<as_psgi> or C<code> we rethrow the error and presume it caught by middleware
+up the ladder.  Otherwise we return the debugging error page (in debug mode) or we
+return the default error page (production mode).
 
 =cut
 
