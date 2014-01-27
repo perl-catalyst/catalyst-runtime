@@ -776,6 +776,25 @@ sub run_tests {
     {
         my @expected = qw[
           TestApp::Controller::Action::Chained->begin
+          TestApp::Controller::Action::Chained->chain_error_a
+          TestApp::Controller::Action::Chained->end
+        ];
+
+        my $expected = join( ", ", @expected );
+
+        ok( my $response = request('http://localhost/chained/chain_error/1/end/2'),
+            "Break a chain in the middle" );
+        is( $response->header('X-Catalyst-Executed'),
+            $expected, 'Executed actions' );
+        is( $response->content, 'FATAL ERROR: break in the middle of a chain', 'Content OK' );
+    }
+
+    #
+    # Test dieing in the middle of a chain.
+    #
+    {
+        my @expected = qw[
+          TestApp::Controller::Action::Chained->begin
           TestApp::Controller::Action::Chained->chain_die_a
           TestApp::Controller::Action::Chained->end
         ];
@@ -786,7 +805,7 @@ sub run_tests {
             "Break a chain in the middle" );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
-        is( $response->content, 'FATAL ERROR: break in the middle of a chain', 'Content OK' );
+        is( $response->content, 'FATAL ERROR: Caught exception in TestApp::Controller::Action::Chained->chain_die_a "die in the middle of a chain"', 'Content OK' );
     }
 
     #
