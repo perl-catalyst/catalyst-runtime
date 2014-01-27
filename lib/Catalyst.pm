@@ -3436,6 +3436,28 @@ C<data_handlers> - See L<DATA HANDLERS>.
 
 =back
 
+=head1 EXCEPTIONS
+
+Generally when you throw an exception inside an Action (or somewhere in
+your stack, such as in a model that an Action is calling) that exception
+is caught by Catalyst and unless you either catch it yourself (via eval
+or something like L<Try::Tiny> or by reviewing the L</error> stack, it
+will eventually reach L</finalize_errors> and return either the debugging
+error stack page, or the default error page.  However, if your exception 
+can be caught by L<Plack::Middleware::HTTPExceptions>, L<Catalyst> will
+instead rethrow it so that it can be handled by that middleware (which
+is part of the default middleware).  For example this would allow
+
+    use HTTP::Throwable::Factory 'http_throw';
+
+    sub throws_exception :Local {
+      my ($self, $c) = @_;
+
+      http_throw(SeeOther => { location => 
+        $c->uri_for($self->action_for('redirect')) });
+
+    }
+
 =head1 INTERNAL ACTIONS
 
 Catalyst uses internal actions like C<_DISPATCH>, C<_BEGIN>, C<_AUTO>,
