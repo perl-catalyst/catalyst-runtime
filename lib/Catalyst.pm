@@ -3961,7 +3961,7 @@ Upasana <me@upasana.me>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005, the above named PROJECT FOUNDER and CONTRIBUTORS.
+Copyright (c) 2005-2014, the above named PROJECT FOUNDER and CONTRIBUTORS.
 
 =head1 LICENSE
 
