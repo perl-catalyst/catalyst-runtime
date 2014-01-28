@@ -82,9 +82,9 @@ requires "Plack::Middleware::LighttpdScriptNameFix";
 requires "Plack::Middleware::ContentLength";
 requires "Plack::Middleware::Head";
 requires "Plack::Middleware::HTTPExceptions";
-requires "Plack::Middleware::FixMissingBodyInRedirect";
+requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.08';
 requires "Plack::Middleware::MethodOverride";
-requires "Plack::Middleware::RemoveRedundantBody";
+requires "Plack::Middleware::RemoveRedundantBody" => '0.03';
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';
