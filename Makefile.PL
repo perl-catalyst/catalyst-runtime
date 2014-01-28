@@ -82,7 +82,7 @@ requires "Plack::Middleware::LighttpdScriptNameFix";
 requires "Plack::Middleware::ContentLength";
 requires "Plack::Middleware::Head";
 requires "Plack::Middleware::HTTPExceptions";
-requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.08';
+requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.09';
 requires "Plack::Middleware::MethodOverride";
 requires "Plack::Middleware::RemoveRedundantBody" => '0.03';
 
