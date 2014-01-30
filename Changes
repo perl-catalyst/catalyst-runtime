@@ -3,6 +3,9 @@
   - Announcing the repo is now open for development of Perl Catalyst 'Runner'
   - http://questhub.io/realm/perl/explore/latest/tag/runner
 
+5.90059_005 - TBA
+  - MyApp->setup now returns $app to allow class method chaining.
+
 5.90059_005 - 2014-01-28
   - Specify newested versions of some middleware in attempt to solve test errors
     reported while installing.

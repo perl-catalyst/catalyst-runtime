@@ -1254,7 +1254,7 @@ EOF
     # Should be the last thing we do so that user things hooking
     # setup_finalize can log..
     $class->log->_flush() if $class->log->can('_flush');
-    return 1; # Explicit return true as people have __PACKAGE__->setup as the last thing in their class. HATE.
+    return $class || 1; # Explicit return true as people have __PACKAGE__->setup as the last thing in their class. HATE.
 }
 
 =head2 $app->setup_finalize
