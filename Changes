@@ -3,10 +3,12 @@
   - Announcing the repo is now open for development of Perl Catalyst 'Runner'
   - http://questhub.io/realm/perl/explore/latest/tag/runner
 
-5.90059_006 - TBA
+5.90059_006 - 2014-02-06
   - MyApp->setup now returns $app to allow class method chaining.
   - New Util helper functional localize $env to make it easier to mount PSIG
     applications under controllers and actions.  See Catalyst::Utils/PSGI Helpers.
+  - NOTICE: Final Development release for Runner, unless significant issues are
+    raised.  Please test.
 
 5.90059_005 - 2014-01-28
   - Specify newest versions of some middleware in attempt to solve test errors
