@@ -5,38 +5,23 @@ perl:
    - "5.14"
    - "5.12"
    - "5.10"
+   - "5.8"
 
 install:
-   # git bits sometimes needed...
-   - git config user.name 'Travis-CI'
-   - git config user.email 'travis@nowhere.dne'
-
-   # ensure we have the latest cpanm
-   - echo y | perlbrew install-cpanm
-
-   # see if we can't speed things up a bit
-   - rm -rf ~/.cpanm
-   - mkdir ~/.cpanm
-   - sudo mount tmpfs -t tmpfs ~/.cpanm
-
-   # these fail on parallel test runs
-   #    Net::Server:  https://rt.cpan.org/Ticket/Display.html?id=84126
-   - cpanm --metacpan --skip-satisfied Net::Server Template File::Remove Filesys::Notify::Simple Config::Any CGI::Simple Plack
-
    # for testing
-   - cpanm --metacpan --skip-satisfied YAML
+   - cpanm --notest --metacpan --skip-satisfied YAML
+
+   # M::I deps
+   - cpanm --notest --metacpan --skip-satisfied Module::Install Module::Install::AuthorRequires Module::Install::CheckConflicts Module::Install::AuthorTests Module::Install::Authority
+
+   # author deps -- wish there was a better way
+   - cpanm --notest --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize Test::WWW::Mechanize::Catalyst Catalyst::Plugin::Params::Nested
+   - cpanm --notest --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod
+   - cpanm --notest --metacpan --skip-satisfied --installdeps .
+   - echo y | perl Makefile.PL
 
    # enable various test options, including parallel testing
    - export AUTOMATED_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
-
-   # M::I deps
-   - cpanm --metacpan --skip-satisfied Module::Install Module::Install::AuthorRequires Module::Install::CheckConflicts Module::Install::AuthorTests Module::Install::Authority
-
-   # author deps -- wish there was a better way
-   - cpanm --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize Test::WWW::Mechanize::Catalyst Catalyst::Plugin::Params::Nested
-   - cpanm --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod
-   - cpanm --metacpan --skip-satisfied --installdeps .
-   - echo y | perl Makefile.PL
 
    # we want these for our tests, but not for any others
    - export AUTHOR_TESTING=1
