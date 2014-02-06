@@ -486,6 +486,131 @@ sub apply_registered_middleware {
     return $new_psgi;
 }
 
+=head1 PSGI Helpers
+
+Utility functions to make it easier to work with PSGI applications under Catalyst
+
+=head2 env_at_path_prefix
+
+Localize C<$env> under the current controller path prefix:
+
+    package MyApp::Controller::User;
+
+    use Catalyst::Utils;
+
+    use base 'Catalyst::Controller';
+
+    sub name :Local {
+      my ($self, $c) = @_;
+      my $env = $c->Catalyst::Utils::env_at_path_prefix;
+    }
+
+Assuming you have a requst like GET /user/name:
+
+In the example case C<$env> will have PATH_INFO of '/name' instead of
+'/user/name' and SCRIPT_NAME will now be '/user'.
+
+=cut
+
+sub env_at_path_prefix {
+  my $ctx = shift;
+  my $path_prefix = $ctx->controller->path_prefix;
+  my $env = $ctx->request->env;
+  my $path_info = $env->{PATH_INFO};
+  my $script_name = ($env->{SCRIPT_NAME} || '');
+
+  $path_info =~ s/(^\/\Q$path_prefix\E)//;
+  $script_name = "$script_name$1";
+
+  return +{
+    %$env,
+    PATH_INFO => $path_info,
+    SCRIPT_NAME => $script_name };
+}
+
+=head2 env_at_action
+
+Localize C<$env> under the current controller path prefix:
+
+    package MyApp::Controller::User;
+
+    use Catalyst::Utils;
+
+    use base 'Catalyst::Controller';
+
+    sub name :Local {
+      my ($self, $c) = @_;
+      my $env = $c->Catalyst::Utils::env_at_action;
+    }
+
+Assuming you have a requst like GET /user/name:
+
+In the example case C<$env> will have PATH_INFO of '/' instead of
+'/user/name' and SCRIPT_NAME will now be '/user/name'.
+
+This is probably a common case where you want to mount a PSGI application
+under an action but let the Args fall through to the PSGI app.
+
+=cut
+
+sub env_at_action {
+  my $ctx = shift;
+  my $argpath = join '/', @{$ctx->request->arguments};
+  my $path = '/' . $ctx->request->path;
+
+  $path =~ s/\/?\Q$argpath\E\/?$//;
+
+  my $env = $ctx->request->env;
+  my $path_info = $env->{PATH_INFO};
+  my $script_name = ($env->{SCRIPT_NAME} || '');
+
+  $path_info =~ s/(^\Q$path\E)//;
+  $script_name = "$script_name$1";
+
+  return +{
+    %$env,
+    PATH_INFO => $path_info,
+    SCRIPT_NAME => $script_name };
+}
+
+=head2 env_at_request_uri
+
+Localize C<$env> under the current controller path prefix:
+
+    package MyApp::Controller::User;
+
+    use Catalyst::Utils;
+
+    use base 'Catalyst::Controller';
+
+    sub name :Local Args(1) {
+      my ($self, $c, $id) = @_;
+      my $env = $c->Catalyst::Utils::env_at_request_uri
+    }
+
+Assuming you have a requst like GET /user/name/hello:
+
+In the example case C<$env> will have PATH_INFO of '/' instead of
+'/user/name' and SCRIPT_NAME will now be '/user/name/hello'.
+
+=cut
+
+sub env_at_request_uri {
+  my $ctx = shift;
+  my $path = '/' . $ctx->request->path;
+  my $env = $ctx->request->env;
+  my $path_info = $env->{PATH_INFO};
+  my $script_name = ($env->{SCRIPT_NAME} || '');
+
+  $path_info =~ s/(^\Q$path\E)//;
+  $script_name = "$script_name$1";
+
+  return +{
+    %$env,
+    PATH_INFO => $path_info,
+    SCRIPT_NAME => $script_name };
+}
+
 =head1 AUTHORS
 
 Catalyst Contributors, see Catalyst.pm
