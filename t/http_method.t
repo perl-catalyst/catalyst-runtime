@@ -1,5 +1,10 @@
 use warnings;
 use strict;
+use Test::More;
+
+plan skip_all => "Test Cases are Sketch for next release";
+
+__END__
 
 # Test case to check that we now send scalar and filehandle like
 # bodys directly to the PSGI engine, rather than call $writer->write
@@ -39,7 +44,7 @@ use strict;
         $c->res->location($c->uri_for( $self->action_for('show')));
     }
 
-  $INC{'MyApp/Controller/User.pm'} = '1';
+  $INC{'MyApp/Controller/User.pm'} = __FILE__;
 
   package MyApp;
   use Catalyst;
@@ -79,16 +84,10 @@ use strict;
 
 
 
-use Devel::Dwarn;
-use Test::More;
+
 use HTTP::Request::Common;
 use Catalyst::Test 'MyApp';
 
 ok my($res, $c) = ctx_request('/');
-
-
-
-
-Dwarn(MyApp->dispatcher);
 
 done_testing();
