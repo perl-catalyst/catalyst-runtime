@@ -439,6 +439,7 @@ Catalyst::Request - provides information about the current client request
     $req->uri;
     $req->user;
     $req->user_agent;
+    $req->env;
 
 See also L<Catalyst>, L<Catalyst::Request::Upload>.
 
@@ -989,6 +990,9 @@ combined from those in the request and those in the body.
 
 If parameters have already been set will clear the parameters and build them again.
 
+=head2 $self->env
+
+Access to the raw PSGI env.  
 
 =head2 meta
 
