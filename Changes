@@ -1,7 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-  - Announcing the repo is now open for development of Perl Catalyst 'Runner'
-  - http://questhub.io/realm/perl/explore/latest/tag/runner
+5.90060 - 2014-02-07
+  - Same as 5.90059_006, just marking it as stable, no functional changes.
+
 
 5.90059_006 - 2014-02-06
   - MyApp->setup now returns $app to allow class method chaining.
