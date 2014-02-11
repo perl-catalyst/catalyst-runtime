@@ -1491,7 +1491,7 @@ sub uri_for_action {
     return $c->uri_for( $action, @args );
 }
 
-=head1 $c->welcome_message
+=head2 $c->welcome_message
 
 Basic response. See L<Catalyst::Plugin::Welcome> for the old page.
 
