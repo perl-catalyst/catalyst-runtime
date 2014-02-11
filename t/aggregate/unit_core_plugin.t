@@ -4,6 +4,11 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
+use Test::Differences;
+BEGIN {
+  no warnings 'redefine';
+  *is_deeply = \&Test::Differences::eq_or_diff;
+}
 
 {
 

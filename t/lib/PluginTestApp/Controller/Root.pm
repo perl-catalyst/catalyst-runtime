@@ -50,6 +50,7 @@ sub run_time_plugins : Local {
     [
         qw/Catalyst::Plugin::Test::Plugin
         Catalyst::Plugin::Unicode::Encoding
+        Catalyst::Plugin::Welcome
         Faux::Plugin
         TestApp::Plugin::FullyQualified/
         ],
