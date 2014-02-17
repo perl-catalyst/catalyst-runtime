@@ -15,6 +15,7 @@ sub _test_plugins {
     [
         qw/Catalyst::Plugin::Test::Plugin
         Catalyst::Plugin::Unicode::Encoding
+        Catalyst::Plugin::Welcome
         TestApp::Plugin::FullyQualified/
     ],
     '... and it should report the correct plugins';
