@@ -54,6 +54,27 @@ use strict;
         $c->res->from_psgi_response(
           $psgi_app->($env));
       }
+
+  sub mounted :Local Args(1) {
+    my ($self, $c, $arg) = @_;
+    our $app ||= ref($c)->psgi_app;
+    my $env = $self->get_env($c);
+    $c->res->from_psgi_response(
+      $app->($env));
+  }
+
+  sub mount_arg :Path(/mounted) Arg(1) {
+    my ($self, $c, $arg) = @_;
+    my $uri =  $c->uri_for( $self->action_for('local_example_args1'),$arg);
+    $c->res->body("$uri");
+  }
+
+  sub mount_noarg :Path(/mounted_no_arg)  {
+    my ($self, $c) = @_;
+    my $uri =  $c->uri_for( $self->action_for('local_example_args1'),444);
+    $c->res->body("$uri");
+  }
+
   
   sub get_env {
     my ($self, $c) = @_;
@@ -78,6 +99,20 @@ use strict;
 
 use Test::More;
 use Catalyst::Test 'MyApp';
+
+{
+  my ($res, $c) = ctx_request('/user/mounted/111?path_prefix=1');
+  is $c->action, 'user/mounted';
+  is $res->content, 'http://localhost/user/user/local_example_args1/111';
+  is_deeply $c->req->args, [111];
+}
+
+{
+  my ($res, $c) = ctx_request('/user/mounted/mounted_no_arg?env_path=1');
+  is $c->action, 'user/mounted';
+  is $res->content, 'http://localhost/user/mounted/user/local_example_args1/444';
+  is_deeply $c->req->args, ['mounted_no_arg'];
+}
 
 # BEGIN [user/local_example]
 {
