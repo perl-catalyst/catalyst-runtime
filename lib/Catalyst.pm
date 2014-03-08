@@ -1133,7 +1133,6 @@ sub setup {
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
 
-    $class->setup_middleware();
     $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
     if (my $engine = delete $flags->{engine}) {
@@ -1173,6 +1172,8 @@ EOF
         local *setup = sub { };
         $class->setup unless $Catalyst::__AM_RESTARTING;
     }
+
+    $class->setup_middleware();
 
     # Initialize our data structure
     $class->components( {} );
