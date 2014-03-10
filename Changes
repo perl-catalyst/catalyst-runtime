@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90061 - 2014-03-10
+  - Reverted a change related to how plugins get initialized that was
+    introduced by a change in December.
+
 5.90060 - 2014-02-07
   - Same as 5.90059_006, just marking it as stable, no functional changes.
 
