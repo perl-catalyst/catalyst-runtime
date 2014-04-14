@@ -12,6 +12,10 @@ use Plack::Test;
 {
   package MyApp::Exception;
 
+  use overload
+    # Use the overloading thet HTTP::Exception uses
+    bool => sub { 1 }, '""' => 'as_string', fallback => 1;
+
   sub new {
     my ($class, $code, $headers, $body) = @_;
     return bless +{res => [$code, $headers, $body]}, $class;
@@ -30,6 +34,8 @@ use Plack::Test;
       $responder->([$code, $headers, $body]);
     };
   }
+
+  sub as_string { 'bad stringy bad' }
   
   package MyApp::Controller::Root;
 

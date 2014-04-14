@@ -126,7 +126,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90061';
+our $VERSION = '5.90062';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -2015,12 +2015,12 @@ sub handle_request {
         $c->dispatch;
         $status = $c->finalize;
     } catch {
+        #rethow if this can be handled by middleware
+        if(blessed $_ && ($_->can('as_psgi') || $_->can('code'))) {
+            $_->can('rethrow') ? $_->rethrow : croak $_;
+        }
         chomp(my $error = $_);
         $class->log->error(qq/Caught exception in engine "$error"/);
-        #rethow if this can be handled by middleware
-        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
-            $error->can('rethrow') ? $error->rethrow : croak $error;
-        }
     };
 
     $COUNT++;

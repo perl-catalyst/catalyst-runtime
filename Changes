@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90061 - 2014-04-14
+  - HTTP::Exception objects were not properly bubbled up to middleware since
+    there was some code in Catalyst that was triggering stringification.
+
 5.90061 - 2014-03-10
   - Reverted a change related to how plugins get initialized that was
     introduced by a change in December.
