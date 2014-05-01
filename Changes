@@ -7,6 +7,10 @@
   - Documentation corrections for Util methods around localized PSGI $env.
   - Improvements to auto detection of terminal width.
   - Updating deprecation list to include Class::Load and ensure_class_loaded
+  - Added a few docs around middleware and corrected the order that middleware
+    is loaded when registering it via ->setup_middleware instead of via
+    configuration.
+  - Added a test case to make sure default middleware order is correct.
 s
 5.90062 - 2014-04-14
   - HTTP::Exception objects were not properly bubbled up to middleware since

@@ -3107,6 +3107,10 @@ which sounds odd but is likely how you expect it to work if you have prior
 experience with L<Plack::Builder> or if you previously used the plugin
 L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
 
+So basically your middleware handles an incoming request from the first
+registered middleware, down and handles the response from the last middleware
+up.
+
 =cut
 
 sub registered_middlewares {
@@ -3128,7 +3132,7 @@ sub registered_middlewares {
 sub setup_middleware {
     my $class = shift;
     my @middleware_definitions = @_ ? 
-      @_ : reverse(@{$class->config->{'psgi_middleware'}||[]});
+      reverse(@_) : reverse(@{$class->config->{'psgi_middleware'}||[]});
 
     my @middleware = ();
     while(my $next = shift(@middleware_definitions)) {
