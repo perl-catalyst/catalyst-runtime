@@ -70,15 +70,19 @@ use Plack::Test;
     die "I'm not dead yet";
   }
 
+  sub end :Private { die "We should never hit end for HTTPExceptions" }
+
   package MyApp;
   use Catalyst;
+
+  MyApp->config(abort_chain_on_error_fix=>1);
 
   sub debug { 1 }
 
   MyApp->setup_log('fatal');
 }
 
-$INC{'MyApp/Controller/Root.pm'} = '1'; # sorry...
+$INC{'MyApp/Controller/Root.pm'} = __FILE__; # sorry...
 MyApp->setup_log('error');
 
 Test::More::ok(MyApp->setup);
@@ -90,6 +94,7 @@ test_psgi $psgi, sub {
     my $res = $cb->(GET "/root/from_psgi_app");
     is $res->code, 404;
     is $res->content, 'Not Found', 'NOT FOUND';
+    unlike $res->content, qr'HTTPExceptions', 'HTTPExceptions';
 };
 
 test_psgi $psgi, sub {
@@ -97,6 +102,7 @@ test_psgi $psgi, sub {
     my $res = $cb->(GET "/root/from_catalyst");
     is $res->code, 403;
     is $res->content, 'Forbidden', 'Forbidden';
+    unlike $res->content, qr'HTTPExceptions', 'HTTPExceptions';
 };
 
 test_psgi $psgi, sub {
@@ -104,6 +110,7 @@ test_psgi $psgi, sub {
     my $res = $cb->(GET "/root/classic_error");
     is $res->code, 500;
     like $res->content, qr'Ex Parrot', 'Ex Parrot';
+    like $res->content, qr'HTTPExceptions', 'HTTPExceptions';
 };
 
 test_psgi $psgi, sub {
@@ -111,6 +118,7 @@ test_psgi $psgi, sub {
     my $res = $cb->(GET "/root/just_die");
     is $res->code, 500;
     like $res->content, qr'not dead yet', 'not dead yet';
+    like $res->content, qr'HTTPExceptions', 'HTTPExceptions';
 };
 
 
@@ -119,5 +127,5 @@ test_psgi $psgi, sub {
 # in the callbacks might never get run (thus all ran tests pass but not all
 # required tests run).
 
-done_testing(10);
+done_testing(14);
 

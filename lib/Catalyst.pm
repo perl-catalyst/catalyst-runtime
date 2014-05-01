@@ -1738,6 +1738,10 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
+        #rethow if this can be handled by middleware
+        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
+            $error->can('rethrow') ? $error->rethrow : croak $error;
+        }
         if ( blessed($error) and $error->isa('Catalyst::Exception::Detach') ) {
             $error->rethrow if $c->depth > 1;
         }
