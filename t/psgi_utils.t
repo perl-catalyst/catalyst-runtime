@@ -3,17 +3,17 @@ use strict;
 
 # Make it easier to mount PSGI apps under catalyst
 
+my $psgi_app = sub {
+  my $req = Plack::Request->new(shift);
+  return [200,[],[$req->path]];
+};
+
 {
   package MyApp::Controller::Docs;
 
   use base 'Catalyst::Controller';
   use Plack::Request;
   use Catalyst::Utils;
-
-  my $psgi_app = sub {
-    my $req = Plack::Request->new(shift);
-    return [200,[],[$req->path]];
-  };
 
   sub name :Local {
     my ($self, $c) = @_;
@@ -35,11 +35,6 @@ use strict;
   use base 'Catalyst::Controller';
   use Plack::Request;
   use Catalyst::Utils;
-
-  my $psgi_app = sub {
-    my $req = Plack::Request->new(shift);
-    return [200,[],[$req->path]];
-  };
 
   sub local_example :Local {
     my ($self, $c) = @_;
