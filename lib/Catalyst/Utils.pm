@@ -530,7 +530,7 @@ sub env_at_path_prefix {
 
 =head2 env_at_action
 
-Localize C<$env> under the current controller path prefix:
+Localize C<$env> under the current action namespace.
 
     package MyApp::Controller::User;
 
@@ -543,10 +543,15 @@ Localize C<$env> under the current controller path prefix:
       my $env = $c->Catalyst::Utils::env_at_action;
     }
 
-Assuming you have a requst like GET /user/name:
+Assuming you have a request like GET /user/name:
 
 In the example case C<$env> will have PATH_INFO of '/' instead of
 '/user/name' and SCRIPT_NAME will now be '/user/name'.
+
+Alternatively, assuming you have a requst like GET /user/name/foo:
+
+In this example case C<$env> will have PATH_INFO of '/foo' instead of
+'/user/name/foo' and SCRIPT_NAME will now be '/user/name'.
 
 This is probably a common case where you want to mount a PSGI application
 under an action but let the Args fall through to the PSGI app.
@@ -575,7 +580,7 @@ sub env_at_action {
 
 =head2 env_at_request_uri
 
-Localize C<$env> under the current controller path prefix:
+Localize C<$env> under the current request URI:
 
     package MyApp::Controller::User;
 
