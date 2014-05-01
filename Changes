@@ -5,6 +5,8 @@
   - Fix bug where Catalyst did not properly detect the terminal width when in
     debug mode and thus making the debug output narrow and hard to read.
   - Documentation corrections for Util methods around localized PSGI $env.
+  - Improvements to auto detection of terminal width.
+  - Updating deprecation list to include Class::Load and ensure_class_loaded
 s
 5.90062 - 2014-04-14
   - HTTP::Exception objects were not properly bubbled up to middleware since
