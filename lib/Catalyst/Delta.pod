@@ -9,6 +9,15 @@ Catalyst releases.
 
 =head2 VERSION 5.90060+
 
+=head3 Deprecation of Catalyst::Utils::ensure_class_loaded
+
+Going forward we recommend you use L<Module::Runtime>.  In fact we will
+be converting all uses of L<Class::Load> to L<Module::Runtime>.  We will
+also convert L<Catalyst::Utils\ensure_class_loaded> to be based on
+L<Module::Runtime> to allow some time for you to update code, however at
+some future point this method will be removed so you should stop
+using it now.
+
 =head3 Support passing Body filehandles directly to your Plack server.
 
 We changed the way we return body content (from response) to whatever
