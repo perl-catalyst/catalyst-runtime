@@ -10,6 +10,7 @@ my $psgi_app = sub {
 
 {
   package MyApp::Controller::Docs;
+  $INC{'MyApp/Controller/Docs.pm'} = __FILE__;
 
   use base 'Catalyst::Controller';
   use Plack::Request;
@@ -31,6 +32,7 @@ my $psgi_app = sub {
   }
 
   package MyApp::Controller::User;
+  $INC{'MyApp/Controller/User.pm'} = __FILE__;
 
   use base 'Catalyst::Controller';
   use Plack::Request;
@@ -88,8 +90,6 @@ my $psgi_app = sub {
       return $c->req->env;
     }
   }
-
-  $INC{'MyApp/Controller/User.pm'} = __FILE__;
 
   package MyApp;
   use Catalyst;

@@ -9,8 +9,9 @@ use Plack::Test;
 # body BUT not so quickly that we fail to calculate the length.  This test
 # exists mainly to prevent regressions.
 
-{  
+{
   package MyApp::Controller::Root;
+  $INC{'MyApp/Controller/Root.pm'} = __FILE__;
 
   use base 'Catalyst::Controller';
 
@@ -25,7 +26,6 @@ use Plack::Test;
   MyApp->setup;
 }
 
-$INC{'MyApp/Controller/Root.pm'} = __FILE__;
 
 Test::More::ok(MyApp->setup);
 
