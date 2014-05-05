@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 our @LOGS;
+our @ILOGS;
 our @ELOGS;
 
 sub new {
@@ -12,6 +13,11 @@ sub new {
 sub debug {
     shift;
     push(@LOGS, shift());
+}
+
+sub info {
+    shift;
+    push(@ILOGS, shift());
 }
 
 sub warn {
