@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90063 - 2013-05-01
+5.90064 - 2014-05-05
+  - Fix for mindless broken tests on Win32 (Haarg++).
+  - Happy Cinco de Mayo!
+
+5.90063 - 2014-05-01
   - 'end' and other special actions won't catch HTTP style exceptions anymore.
   - Fix bug where Catalyst did not properly detect the terminal width when in
     debug mode and thus making the debug output narrow and hard to read.
