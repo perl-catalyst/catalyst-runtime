@@ -23,11 +23,10 @@ use Plack::Test;
   package MyApp;
   use Catalyst;
 
-  MyApp->setup;
+  Test::More::ok(MyApp->setup, 'setup app');
 }
 
 
-Test::More::ok(MyApp->setup);
 
 ok my $psgi = MyApp->psgi_app, 'build psgi app';
 
