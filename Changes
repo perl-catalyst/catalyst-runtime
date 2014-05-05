@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Fix spelling, grammar and structural errors in POD
+
 5.90064 - 2014-05-05
   - Fix for mindless broken tests on Win32 (Haarg++).
   - Happy Cinco de Mayo!
