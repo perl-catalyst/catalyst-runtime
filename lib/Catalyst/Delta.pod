@@ -9,7 +9,7 @@ Catalyst releases.
 
 =head2 VERSION 5.90060+
 
-=head3 Deprecation of Catalyst::Utils::ensure_class_loaded
+=head3 Deprecate Catalyst::Utils::ensure_class_loaded
 
 Going forward we recommend you use L<Module::Runtime>.  In fact we will
 be converting all uses of L<Class::Load> to L<Module::Runtime>.  We will
@@ -26,7 +26,7 @@ always use the streaming interface for the cases when the body is a
 simple scalar, object or filehandle like.  In those cases we now just
 pass the simple response on to the plack handler.  This might lead to
 some minor differences in how streaming is handled.  For example, you
-might notice that streaming starts properly supportubg chunked encoding when
+might notice that streaming starts properly supporting chunked encoding when
 on a server that supports that, or that previously missing headers
 (possible content-length) might appear suddenly correct.  Also, if you
 are using middleware like L<Plack::Middleware::XSendfile> and are using
@@ -45,7 +45,7 @@ using one server but deploying using a different one, differences in
 what those server do with streaming should be noted.
 
 Please see note below about changes to filehandle support and existing
-Plack middleware to aid in back compatibility.
+Plack middleware to aid in backwards compatibility.
 
 =head3 Distinguish between body null versus undef.
 
@@ -68,7 +68,7 @@ so we benefit from better collaboration with developers outside Catalyst, 3)
 In the future you'll be able to change or trim the middleware stack to get
 additional performance when you don't need all the checks and constraints.
 
-=head3 Deprecation of Filehandle like objects that do read but not getline
+=head3 Deprecate Filehandle like objects that do read but not getline
 
 We also deprecated setting the response body to an object that does 'read'
 but not 'getline'.  If you are using a custom IO-Handle like object for
@@ -79,31 +79,31 @@ will issue a warning.  You also may run into this issue with L<MogileFS::Client>
 which does read but not getline.  For now we will just warn when encountering
 such an object and fallback to the previous behavior (where L<Catalyst::Engine>
 itself unrolls the filehandle and performs blocking streams).  However
-this backcompat will be removed in an upcoming release so you should either
+this backwards compatibility will be removed in an upcoming release so you should either
 rewrite your custom filehandle objects to support getline or start using the 
 middleware that adapts read for getline L<Plack::Middleware::AdaptFilehandleRead>.
 
-=head3 Response->headers become readonly after finalizing
+=head3 Response->headers become read-only after finalizing
 
 Once the response headers are finalized, trying to change them is not allowed
 (in the past you could change them and this would lead to unexpected results).
 
-=head3 Offically deprecation of L<Catalyst::Engine::PSGI>
+=head3 Officially deprecate L<Catalyst::Engine::PSGI>
 
 L<Catalyst::Engine::PSGI> is also officially no longer supported.  We will
-no long run test cases against this and can remove backcompat code for it
-as deemed necessary for the evolution of the platform.  You should simple
-discontinue use of this engine, as L<Catalyst> has been PSGI at the core
-for several years.
+no long run test cases against this and can remove backwards compatibility code for it
+as deemed necessary for the evolution of the platform.  You should simply
+discontinue use of this engine, as L<Catalyst> has been PSGI at the core for
+several years.
 
-=head2 Officially deprecate finding the PSGI $env anyplace other than Request
+=head3 Officially deprecate finding the PSGI $env anyplace other than Request
 
 A few early releases of Cataplack had the PSGI $env in L<Catalyst::Engine>.
-Code has been maintained here for backcompat reasons.  This is no longer
-supported and will be removed in upcoming release, so you should update
+Code has been maintained here for backwards compatibility reasons.  This is no
+longer supported and will be removed in upcoming release, so you should update
 your code and / or upgrade to a newer version of L<Catalyst>
 
-=head2 Deprecate setting Response->body after using write/write_fh
+=head3 Deprecate setting Response->body after using write/write_fh
 
 Setting $c->res->body to a filehandle after using $c->res->write or
 $c->res->write_fh is no longer considered allowed, since we can't send
@@ -241,7 +241,7 @@ Below is a brief list of features which have been deprecated in this release:
 
 =item MyApp->plugin method is deprecated, use L<Catalyst::Model::Adaptor> instead.
 
-=item __PACKAGE__->mk_accessors() is supported for backward compatibility only, use Moose attributes instead in new code.
+=item __PACKAGE__->mk_accessors() is supported for backwards compatibility only, use Moose attributes instead in new code.
 
 =item Use of Catalyst::Base now warns
 

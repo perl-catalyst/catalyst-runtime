@@ -3587,7 +3587,7 @@ example given above, which uses L<JSON::Maybe> to provide either L<JSON::PP>
 it installed (if you want the faster XS parser, add it to you project Makefile.PL
 or dist.ini, cpanfile, etc.)
 
-The C<data_handlers> configuation is a hashref whose keys are HTTP Content-Types
+The C<data_handlers> configuration is a hashref whose keys are HTTP Content-Types
 (matched against the incoming request type using a regexp such as to be case
 insensitive) and whose values are coderefs that receive a localized version of
 C<$_> which is a filehandle object pointing to received body.

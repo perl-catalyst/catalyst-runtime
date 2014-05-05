@@ -512,7 +512,7 @@ Localize C<$env> under the current controller path prefix:
       my $env = $c->Catalyst::Utils::env_at_path_prefix;
     }
 
-Assuming you have a requst like GET /user/name:
+Assuming you have a request like GET /user/name:
 
 In the example case C<$env> will have PATH_INFO of '/name' instead of
 '/user/name' and SCRIPT_NAME will now be '/user'.
@@ -555,7 +555,7 @@ Assuming you have a request like GET /user/name:
 In the example case C<$env> will have PATH_INFO of '/' instead of
 '/user/name' and SCRIPT_NAME will now be '/user/name'.
 
-Alternatively, assuming you have a requst like GET /user/name/foo:
+Alternatively, assuming you have a request like GET /user/name/foo:
 
 In this example case C<$env> will have PATH_INFO of '/foo' instead of
 '/user/name/foo' and SCRIPT_NAME will now be '/user/name'.
@@ -600,7 +600,7 @@ Localize C<$env> under the current request URI:
       my $env = $c->Catalyst::Utils::env_at_request_uri
     }
 
-Assuming you have a requst like GET /user/name/hello:
+Assuming you have a request like GET /user/name/hello:
 
 In the example case C<$env> will have PATH_INFO of '/' instead of
 '/user/name' and SCRIPT_NAME will now be '/user/name/hello'.
