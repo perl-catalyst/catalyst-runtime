@@ -3,17 +3,40 @@ use strict;
 
 # Make it easier to mount PSGI apps under catalyst
 
+my $psgi_app = sub {
+  my $req = Plack::Request->new(shift);
+  return [200,[],[$req->path]];
+};
+
 {
-  package MyApp::Controller::User;
+  package MyApp::Controller::Docs;
+  $INC{'MyApp/Controller/Docs.pm'} = __FILE__;
 
   use base 'Catalyst::Controller';
   use Plack::Request;
   use Catalyst::Utils;
 
-  my $psgi_app = sub {
-    my $req = Plack::Request->new(shift);
-    return [200,[],[$req->path]];
-  };
+  sub name :Local {
+    my ($self, $c) = @_;
+    my $env = $c->Catalyst::Utils::env_at_action;
+    $c->res->from_psgi_response(
+      $psgi_app->($env));
+
+  }
+
+  sub name_args :Local Args(1) {
+    my ($self, $c, $arg) = @_;
+    my $env = $c->Catalyst::Utils::env_at_action;
+    $c->res->from_psgi_response(
+      $psgi_app->($env));
+  }
+
+  package MyApp::Controller::User;
+  $INC{'MyApp/Controller/User.pm'} = __FILE__;
+
+  use base 'Catalyst::Controller';
+  use Plack::Request;
+  use Catalyst::Utils;
 
   sub local_example :Local {
     my ($self, $c) = @_;
@@ -88,8 +111,6 @@ use strict;
       return $c->req->env;
     }
   }
-
-  $INC{'MyApp/Controller/User.pm'} = __FILE__;
 
   package MyApp;
   use Catalyst;
@@ -324,6 +345,26 @@ use Catalyst::Test 'MyApp';
   is_deeply $c->req->args, [444];
 }
 
+{
+  my ($res, $c) = ctx_request('/docs/name');
+  is $c->action, 'docs/name';
+  is $res->content, '/';
+  is_deeply $c->req->args, [];
+}
+
+{
+  my ($res, $c) = ctx_request('/docs/name/111/222');
+  is $c->action, 'docs/name';
+  is $res->content, '/111/222';
+  is_deeply $c->req->args, [111,222];
+}
+
+{
+  my ($res, $c) = ctx_request('/docs/name_args/111');
+  is $c->action, 'docs/name_args';
+  is $res->content, '/111';
+  is_deeply $c->req->args, [111];
+}
 
 done_testing();
 

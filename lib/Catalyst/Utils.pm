@@ -393,17 +393,24 @@ sub term_width {
 
     my $width;
     eval '
-        require Term::Size::Any;
-        my ($columns, $rows) = Term::Size::Any::chars;
-        $width = $columns;
-        1;
+      use Term::Size::Any;
+      ($width) = Term::Size::Any::chars;
+      1;
     ' or do {
+          if($@ =~m[Can't locate Term/Size/Any.pm]) {
+            warn "Term::Size::Any is not installed, can't autodetect terminal column width\n";
+          } else {
+            warn "There was an error trying to detect your terminal size: $@\n";
+          }
+        warn 'Trouble trying to detect your terminal size, looking at $ENV{COLUMNS}'."\n";
         $width = $ENV{COLUMNS}
             if exists($ENV{COLUMNS})
             && $ENV{COLUMNS} =~ m/^\d+$/;
     };
 
-    $width = 80 unless ($width && $width >= 80);
+    do {
+      warn "Cannot determine desired terminal width, using default of 80 columns\n";
+      $width = 80 } unless ($width && $width >= 80);
     return $_term_width = $width;
 }
 
@@ -505,7 +512,7 @@ Localize C<$env> under the current controller path prefix:
       my $env = $c->Catalyst::Utils::env_at_path_prefix;
     }
 
-Assuming you have a requst like GET /user/name:
+Assuming you have a request like GET /user/name:
 
 In the example case C<$env> will have PATH_INFO of '/name' instead of
 '/user/name' and SCRIPT_NAME will now be '/user'.
@@ -530,7 +537,7 @@ sub env_at_path_prefix {
 
 =head2 env_at_action
 
-Localize C<$env> under the current controller path prefix:
+Localize C<$env> under the current action namespace.
 
     package MyApp::Controller::User;
 
@@ -543,10 +550,15 @@ Localize C<$env> under the current controller path prefix:
       my $env = $c->Catalyst::Utils::env_at_action;
     }
 
-Assuming you have a requst like GET /user/name:
+Assuming you have a request like GET /user/name:
 
 In the example case C<$env> will have PATH_INFO of '/' instead of
 '/user/name' and SCRIPT_NAME will now be '/user/name'.
+
+Alternatively, assuming you have a request like GET /user/name/foo:
+
+In this example case C<$env> will have PATH_INFO of '/foo' instead of
+'/user/name/foo' and SCRIPT_NAME will now be '/user/name'.
 
 This is probably a common case where you want to mount a PSGI application
 under an action but let the Args fall through to the PSGI app.
@@ -575,7 +587,7 @@ sub env_at_action {
 
 =head2 env_at_request_uri
 
-Localize C<$env> under the current controller path prefix:
+Localize C<$env> under the current request URI:
 
     package MyApp::Controller::User;
 
@@ -588,7 +600,7 @@ Localize C<$env> under the current controller path prefix:
       my $env = $c->Catalyst::Utils::env_at_request_uri
     }
 
-Assuming you have a requst like GET /user/name/hello:
+Assuming you have a request like GET /user/name/hello:
 
 In the example case C<$env> will have PATH_INFO of '/' instead of
 '/user/name' and SCRIPT_NAME will now be '/user/name/hello'.

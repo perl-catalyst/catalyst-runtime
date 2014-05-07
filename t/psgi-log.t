@@ -46,6 +46,8 @@ use HTTP::Request::Common;
     no Moose;
 }
 
+my $cmp = TestApp->debug ? '>=' : '==';
+
 #subtest "psgi.errors" => sub
 {
 
@@ -69,8 +71,8 @@ use HTTP::Request::Common;
         my $cb = shift;
         my $res = $cb->(GET "/log/debug");
         my @logs = $handle->logs;
-        is(scalar(@logs), 1, "psgi.errors: one event output");
-        like($logs[0], qr/debug$/, "psgi.errors: event matches test data");
+        cmp_ok(scalar(@logs), $cmp, 1, "psgi.errors: one event output");
+        like($logs[0], qr/debug$/m, "psgi.errors: event matches test data");
     };
 };
 
@@ -96,8 +98,9 @@ use HTTP::Request::Common;
     test_psgi $app, sub {
         my $cb = shift;
         my $res = $cb->(GET "/log/debug");
-        is(scalar(@logs), 1, "psgix.logger: one event logged");
-        is_deeply($logs[0], { level => 'debug', message => "debug" }, "psgix.logger: right stuff");
+        cmp_ok(scalar(@logs), $cmp, 1, "psgix.logger: one event logged");
+        is(scalar(grep { $_->{level} eq 'debug' and $_->{message} eq 'debug' } @logs),
+           1, "psgix.logger: right stuff");
     };
 };
 

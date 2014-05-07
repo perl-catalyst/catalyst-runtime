@@ -126,7 +126,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90060';
+our $VERSION = '5.90064';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1133,15 +1133,6 @@ sub setup {
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
 
-    # Call plugins setup, this is stupid and evil.
-    # Also screws C3 badly on 5.10, hack to avoid.
-    {
-        no warnings qw/redefine/;
-        local *setup = sub { };
-        $class->setup unless $Catalyst::__AM_RESTARTING;
-    }
-
-    $class->setup_middleware();
     $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
     if (my $engine = delete $flags->{engine}) {
@@ -1173,6 +1164,16 @@ You are running an old script!
 
 EOF
     }
+
+    # Call plugins setup, this is stupid and evil.
+    # Also screws C3 badly on 5.10, hack to avoid.
+    {
+        no warnings qw/redefine/;
+        local *setup = sub { };
+        $class->setup unless $Catalyst::__AM_RESTARTING;
+    }
+
+    $class->setup_middleware();
 
     # Initialize our data structure
     $class->components( {} );
@@ -1737,6 +1738,10 @@ sub execute {
     my $last = pop( @{ $c->stack } );
 
     if ( my $error = $@ ) {
+        #rethow if this can be handled by middleware
+        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
+            $error->can('rethrow') ? $error->rethrow : croak $error;
+        }
         if ( blessed($error) and $error->isa('Catalyst::Exception::Detach') ) {
             $error->rethrow if $c->depth > 1;
         }
@@ -2014,12 +2019,12 @@ sub handle_request {
         $c->dispatch;
         $status = $c->finalize;
     } catch {
+        #rethow if this can be handled by middleware
+        if(blessed $_ && ($_->can('as_psgi') || $_->can('code'))) {
+            $_->can('rethrow') ? $_->rethrow : croak $_;
+        }
         chomp(my $error = $_);
         $class->log->error(qq/Caught exception in engine "$error"/);
-        #rethow if this can be handled by middleware
-        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
-            $error->can('rethrow') ? $error->rethrow : croak $error;
-        }
     };
 
     $COUNT++;
@@ -3102,6 +3107,10 @@ which sounds odd but is likely how you expect it to work if you have prior
 experience with L<Plack::Builder> or if you previously used the plugin
 L<Catalyst::Plugin::EnableMiddleware> (which is now considered deprecated)
 
+So basically your middleware handles an incoming request from the first
+registered middleware, down and handles the response from the last middleware
+up.
+
 =cut
 
 sub registered_middlewares {
@@ -3123,7 +3132,7 @@ sub registered_middlewares {
 sub setup_middleware {
     my $class = shift;
     my @middleware_definitions = @_ ? 
-      @_ : reverse(@{$class->config->{'psgi_middleware'}||[]});
+      reverse(@_) : reverse(@{$class->config->{'psgi_middleware'}||[]});
 
     my @middleware = ();
     while(my $next = shift(@middleware_definitions)) {
@@ -3578,7 +3587,7 @@ example given above, which uses L<JSON::Maybe> to provide either L<JSON::PP>
 it installed (if you want the faster XS parser, add it to you project Makefile.PL
 or dist.ini, cpanfile, etc.)
 
-The C<data_handlers> configuation is a hashref whose keys are HTTP Content-Types
+The C<data_handlers> configuration is a hashref whose keys are HTTP Content-Types
 (matched against the incoming request type using a regexp such as to be case
 insensitive) and whose values are coderefs that receive a localized version of
 C<$_> which is a filehandle object pointing to received body.

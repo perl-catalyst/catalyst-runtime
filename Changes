@@ -1,5 +1,33 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Fix spelling, grammar and structural errors in POD
+  - Remove redundant ->setup call in t/head_middleware.t RT#95361
+  - Fix test failures when running under CATALYST_DEBUG. RT#95358
+
+5.90064 - 2014-05-05
+  - Fix for mindless broken tests on Win32 (Haarg++).
+  - Happy Cinco de Mayo!
+
+5.90063 - 2014-05-01
+  - 'end' and other special actions won't catch HTTP style exceptions anymore.
+  - Fix bug where Catalyst did not properly detect the terminal width when in
+    debug mode and thus making the debug output narrow and hard to read.
+  - Documentation corrections for Util methods around localized PSGI $env.
+  - Improvements to auto detection of terminal width.
+  - Updating deprecation list to include Class::Load and ensure_class_loaded
+  - Added a few docs around middleware and corrected the order that middleware
+    is loaded when registering it via ->setup_middleware instead of via
+    configuration.
+  - Added a test case to make sure default middleware order is correct.
+s
+5.90062 - 2014-04-14
+  - HTTP::Exception objects were not properly bubbled up to middleware since
+    there was some code in Catalyst that was triggering stringification.
+
+5.90061 - 2014-03-10
+  - Reverted a change related to how plugins get initialized that was
+    introduced by a change in December.
+
 5.90060 - 2014-02-07
   - Same as 5.90059_006, just marking it as stable, no functional changes.
 
