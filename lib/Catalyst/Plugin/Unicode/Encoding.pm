@@ -23,6 +23,10 @@ sub encoding {
         if (my $wanted = shift)  {
             $encoding = Encode::find_encoding($wanted)
               or Carp::croak( qq/Unknown encoding '$wanted'/ );
+            binmode(STDERR, ':encoding(' . $encoding->name . ')');
+        }
+        else {
+            binmode(STDERR);
         }
 
         $encoding = ref $c
