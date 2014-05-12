@@ -1256,7 +1256,7 @@ EOF
     # Turn autoflush back off once setup is finished.
     # TODO: this is being done purely for Static::Simple (legacy API), and has been suggested by
     # mst to be removed and require/update Static::Simple to set this flag itself
-    $class->log->autoflush(0) if ($class->log->can('autoflush'));
+    $class->log->autoflush(undef) if ($class->log->can('autoflush'));
 
     return $class || 1; # Just in case someone named their Application 0...
 }
