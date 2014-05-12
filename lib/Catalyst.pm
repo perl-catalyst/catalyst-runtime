@@ -1252,9 +1252,12 @@ EOF
     }
 
     $class->setup_finalize;
-    # Should be the last thing we do so that user things hooking
-    # setup_finalize can log..
-    $class->log->_flush() if $class->log->can('_flush');
+    
+    # Turn autoflush back off once setup is finished.
+    # TODO: this is being done purely for Static::Simple (legacy API), and has been suggested by
+    # mst to be removed and require/update Static::Simple to set this flag itself
+    $class->log->autoflush(0) if ($class->log->can('autoflush'));
+
     return $class || 1; # Just in case someone named their Application 0...
 }
 
@@ -2947,6 +2950,9 @@ sub setup_log {
     unless ( $class->log ) {
         $class->log( Catalyst::Log->new(keys %levels) );
     }
+    
+    # Turn on autoflush by default:
+    $class->log->autoflush(1) if ($class->log->can('autoflush'));
 
     if ( $levels{debug} ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
