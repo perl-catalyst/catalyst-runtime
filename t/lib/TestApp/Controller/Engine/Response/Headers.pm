@@ -8,7 +8,7 @@ sub one : Relative {
     $c->res->header( 'X-Header-Catalyst' => 'Cool' );
     $c->res->header( 'X-Header-Cool'     => 'Catalyst' );
     $c->res->header( 'X-Header-Numbers'  => join ', ', 1 .. 10 );
-    $c->forward('TestApp::View::Dump::Request');
+    $c->forward('TestApp::View::Dump', [ { some => [qw(fixed content)] } ]);
 }
 
 1;
