@@ -1250,13 +1250,8 @@ EOF
         $class->log->warn($class . "->config->{case_sensitive} is set.");
         $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
     }
-
-    $class->setup_finalize;
     
-    # Turn autoflush back off once setup is finished.
-    # TODO: this is being done purely for Static::Simple (legacy API), and has been suggested by
-    # mst to be removed and require/update Static::Simple to set this flag itself
-    $class->log->autoflush(0) if ($class->log->can('autoflush'));
+    $class->setup_finalize;
 
     return $class || 1; # Just in case someone named their Application 0...
 }
@@ -2951,9 +2946,6 @@ sub setup_log {
         $class->log( Catalyst::Log->new(keys %levels) );
     }
     
-    # Turn on autoflush by default:
-    $class->log->autoflush(1) if ($class->log->can('autoflush'));
-
     if ( $levels{debug} ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
@@ -3957,6 +3949,8 @@ szbalint: Balint Szilakszi <szbalint@cpan.org>
 t0m: Tomas Doran <bobtfish@bobtfish.net>
 
 Ulf Edvinsson
+
+vanstyn: Henry Van Styn <vanstyn@cpan.org>
 
 Viljo Marrandi C<vilts@yahoo.com>
 

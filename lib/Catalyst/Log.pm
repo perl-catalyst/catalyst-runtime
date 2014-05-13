@@ -13,7 +13,7 @@ our %LEVEL_MATCH = (); # Stored as additive, thus debug = 31, warn = 30 etc
 has level => (is => 'rw');
 has _body => (is => 'rw');
 has abort => (is => 'rw');
-has autoflush => (is => 'rw');
+has autoflush => (is => 'rw', default => sub {1});
 has _psgi_logger => (is => 'rw', predicate => '_has_psgi_logger', clearer => '_clear_psgi_logger');
 has _psgi_errors => (is => 'rw', predicate => '_has_psgi_errors', clearer => '_clear_psgi_errors');
 
@@ -292,11 +292,25 @@ to use Log4Perl or another logger, you should call it like this:
 
 =head2 autoflush
 
-When enabled, messages are written to the log immediately instead of queued
-until the end of the request. By default, autoflush is enabled during setup,
-but turned back off thereafter. This is done purely for legacy support,
-specifically for L<Catalyst::Plugin::Static::Simple>, and may be changed in
-the future.
+When enabled (default), messages are written to the log immediately instead 
+of queued until the end of the request. 
+
+This option, as well as C<abort>, is provided for modules such as 
+L<Catalyst::Plugin::Static::Simple> to be able to programmatically 
+suppress the output of log messages. By turning off C<autoflush> (application-wide
+setting) and then setting the C<abort> flag within a given request, all log 
+messages for the given request will be suppressed. C<abort> can still be set
+independently of turning off C<autoflush>, however. It just means any messages 
+sent to the log up until that point in the request will obviously still be emitted, 
+since C<autoflush> means they are written in real-time.
+
+If you need to turn off autoflush you should do it like this (in your main app 
+class):
+
+    after setup_finalize => sub {
+      my $c = shift;
+      $c->log->autoflush(0) if $c->log->can('autoflush');
+    };
 
 =head2 _send_to_log
 
