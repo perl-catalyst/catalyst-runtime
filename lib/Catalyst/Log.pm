@@ -108,9 +108,8 @@ sub _log {
     my $self    = shift;
     my $level   = shift;
     my $message = join( "\n", @_ );
-    my $ret;
     if ($self->can('_has_psgi_logger') and $self->_has_psgi_logger) {
-        $ret = $self->_psgi_logger->({
+        $self->_psgi_logger->({
                 level => $level,
                 message => $message,
             });
@@ -118,12 +117,12 @@ sub _log {
         $message .= "\n" unless $message =~ /\n$/;
         my $body = $self->_body;
         $body .= sprintf( "[%s] %s", $level, $message );
-        $ret = $self->_body($body);
+        $self->_body($body);
     }
     if( $self->autoflush && !$self->abort ) {
       $self->_flush;
     }
-    return $ret;
+    return 1;
 }
 
 sub _flush {

@@ -1250,8 +1250,11 @@ EOF
         $class->log->warn($class . "->config->{case_sensitive} is set.");
         $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
     }
-    
+
     $class->setup_finalize;
+
+    # Flush the log for good measure (in case something turned off 'autoflush' early)
+    $class->log->_flush() if $class->log->can('_flush');
 
     return $class || 1; # Just in case someone named their Application 0...
 }
@@ -2945,7 +2948,7 @@ sub setup_log {
     unless ( $class->log ) {
         $class->log( Catalyst::Log->new(keys %levels) );
     }
-    
+
     if ( $levels{debug} ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
         $class->log->debug('Debug messages enabled');
