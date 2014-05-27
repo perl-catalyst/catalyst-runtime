@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90069_001
+  - The Catalyst::Log object now has 'autoflush' (which defaults to true) and
+    causes log messages to be written out in real-time. This is helpful for the
+    test/dev server to be able to see messages during startup as well as before
+    the end of the request when the log is flushed.
   - Set encoding on STDERR when encoding is set in config
   - Fix spelling, grammar and structural errors in POD
   - Remove redundant ->setup call in t/head_middleware.t RT#95361
