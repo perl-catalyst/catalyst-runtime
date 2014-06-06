@@ -564,6 +564,14 @@ sub clear_errors {
     $c->error(0);
 }
 
+=head2 $c->has_errors
+
+Returns true if you have errors
+
+=cut
+
+sub has_errors { scalar(@{shift->error}) ? 1:0 }
+
 sub _comp_search_prefixes {
     my $c = shift;
     return map $c->components->{ $_ }, $c->_comp_names_search_prefixes(@_);
@@ -1741,6 +1749,12 @@ sub execute {
     if ( my $error = $@ ) {
         #rethow if this can be handled by middleware
         if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
+            foreach my $err (@{$c->error}) {
+                $c->log->error($err);
+            }
+            $c->clear_errors;
+            $c->log->_flush if $c->log->can('_flush');
+
             $error->can('rethrow') ? $error->rethrow : croak $error;
         }
         if ( blessed($error) and $error->isa('Catalyst::Exception::Detach') ) {
@@ -1922,7 +1936,6 @@ sub finalize_error {
             # In the case where the error 'knows what it wants', becauses its PSGI
             # aware, just rethow and let middleware catch it
             $error->can('rethrow') ? $error->rethrow : croak $error;
-            croak $error;
         } else {
             $c->engine->finalize_error( $c, @_ )
         }
