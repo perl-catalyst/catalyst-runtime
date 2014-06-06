@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90069_002
+  - When throwing an http style exception, make sure we properly flush the
+    existing log and report other errors in the error stack.
+
 5.90069_001
   - The Catalyst::Log object now has 'autoflush' (which defaults to true) and
     causes log messages to be written out in real-time. This is helpful for the
