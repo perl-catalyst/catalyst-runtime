@@ -1,6 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90069_002
+  - 'abort_chain_on_error_fix' now defaults to true.  If this behavior
+    causes you issues, you can explicitly turn it off by setting it to a 
+    non true defined value (0 is a good option here).
   - When throwing an http style exception, make sure we properly flush the
     existing log and report other errors in the error stack.
 

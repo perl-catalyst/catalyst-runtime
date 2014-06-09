@@ -35,8 +35,13 @@ sub dispatch {
         local $c->request->{arguments} = \@args;
         $action->dispatch( $c );
 
-        # break the chain if exception occurs in the middle of chain
-        return if (@{$c->error} && $c->config->{abort_chain_on_error_fix});
+        # break the chain if exception occurs in the middle of chain.  We
+        # check the global config flag 'abort_chain_on_error_fix', but this
+        # is now considered true by default, so unless someone explictly sets
+        # it to false we default it to true (if its not defined).
+        my $abort = defined($c->config->{abort_chain_on_error_fix}) ?
+          $c->config->{abort_chain_on_error_fix} : 1;
+        return if ($c->has_errors && $abort);
     }
     $last->dispatch( $c );
 }
