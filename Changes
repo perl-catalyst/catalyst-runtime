@@ -1,6 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90069_002
+  - Catalyst stash functionality has been moved to Middleware.  It should
+    work entirely the same when used as a context method, please report
+    questions or problems!
+  - Removed code related to supporting the long deprecated stand alone
+    PSGI Engine.  If you are still using this you code is now broken.
+    Luckily you can just stop using it and likely everything will work
+    under the new PSGI support built into Catalyst for several years.
   - 'abort_chain_on_error_fix' now defaults to true.  If this behavior
     causes you issues, you can explicitly turn it off by setting it to a 
     non true defined value (0 is a good option here).
