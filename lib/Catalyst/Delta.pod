@@ -9,6 +9,15 @@ Catalyst releases.
 
 =head2 VERSION 5.90060+
 
+=head3 Catalyst::Log object autoflush on by default
+
+Starting in 5.90065, the Catalyst::Log object has 'autoflush' which is on
+by default. This causes all messages to be written to the log immediately
+instead of at the end of startup and then at the end of each request. In
+order to access the old behavior, you must now call:
+
+  $c->log->autoflush(0);
+
 =head3 Deprecate Catalyst::Utils::ensure_class_loaded
 
 Going forward we recommend you use L<Module::Runtime>.  In fact we will
