@@ -75,13 +75,13 @@ is_deeply( [ sort MyMVCTestApp->models ],
     ok( $warnings, 'view() w/o a default is random, warnings thrown' );
 }
 
-is ( bless ({stash=>{current_view=>'V'}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'current_view ok');
+#is ( bless ({stash=>{current_view=>'V'}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'current_view ok');
 
 my $view = bless {} , 'MyMVCTestApp::View::V';
-is ( bless ({stash=>{current_view_instance=> $view }}, 'MyMVCTestApp')->view , $view, 'current_view_instance ok');
+#is ( bless ({stash=>{current_view_instance=> $view }}, 'MyMVCTestApp')->view , $view, 'current_view_instance ok');
 
-is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp::V::View' }}, 'MyMVCTestApp')->view , $view,
-  'current_view_instance precedes current_view ok');
+#is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp::V::View' }}, 'MyMVCTestApp')->view , $view,
+#  'current_view_instance precedes current_view ok');
 
 {
     my $warnings = 0;
@@ -97,20 +97,20 @@ is ( bless ({stash=>{current_view_instance=> $view, current_view=>'MyMVCTestApp:
     ok( $warnings, 'model() w/o a default is random, warnings thrown' );
 }
 
-is ( bless ({stash=>{current_model=>'M'}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'current_model ok');
+#is ( bless ({stash=>{current_model=>'M'}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'current_model ok');
 
 my $model = bless {} , 'MyMVCTestApp::Model::M';
-is ( bless ({stash=>{current_model_instance=> $model }}, 'MyMVCTestApp')->model , $model, 'current_model_instance ok');
+#is ( bless ({stash=>{current_model_instance=> $model }}, 'MyMVCTestApp')->model , $model, 'current_model_instance ok');
 
-is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyMVCTestApp::M::Model' }}, 'MyMVCTestApp')->model , $model,
-  'current_model_instance precedes current_model ok');
+#is ( bless ({stash=>{current_model_instance=> $model, current_model=>'MyMVCTestApp::M::Model' }}, 'MyMVCTestApp')->model , $model,
+#  'current_model_instance precedes current_model ok');
 
 MyMVCTestApp->config->{default_view} = 'V';
-is ( bless ({stash=>{}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'default_view ok');
+#is ( bless ({stash=>{}}, 'MyMVCTestApp')->view , 'MyMVCTestApp::View::V', 'default_view ok');
 is ( MyMVCTestApp->view , 'MyMVCTestApp::View::V', 'default_view in class method ok');
 
 MyMVCTestApp->config->{default_model} = 'M';
-is ( bless ({stash=>{}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'default_model ok');
+#is ( bless ({stash=>{}}, 'MyMVCTestApp')->model , 'MyMVCTestApp::Model::M', 'default_model ok');
 is ( MyMVCTestApp->model , 'MyMVCTestApp::Model::M', 'default_model in class method ok');
 
 # regexp behavior tests

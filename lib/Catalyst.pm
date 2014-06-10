@@ -47,13 +47,14 @@ use Plack::Middleware::HTTPExceptions;
 use Plack::Middleware::FixMissingBodyInRedirect;
 use Plack::Middleware::MethodOverride;
 use Plack::Middleware::RemoveRedundantBody;
+use Catalyst::Middleware::Stash;
 use Plack::Util;
 use Class::Load 'load_class';
 
 BEGIN { require 5.008003; }
 
 has stack => (is => 'ro', default => sub { [] });
-has stash => (is => 'rw', default => sub { {} });
+#has stash => (is => 'rw', default => sub { {} });
 has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');
 has action => (is => 'rw');
@@ -494,7 +495,7 @@ Catalyst).
     # stash is automatically passed to the view for use in a template
     $c->forward( 'MyApp::View::TT' );
 
-=cut
+
 
 around stash => sub {
     my $orig = shift;
@@ -511,6 +512,20 @@ around stash => sub {
     return $stash;
 };
 
+=cut
+
+sub stash {
+  my $c = shift;
+  my $stash = Catalyst::Middleware::Stash->get($c->req->env);
+  if(@_) {
+    my $new_stash = @_ > 1 ? {@_} : $_[0];
+    croak('stash takes a hash or hashref') unless ref $new_stash;
+    foreach my $key ( keys %$new_stash ) {
+      $stash->{$key} = $new_stash->{$key};
+    }
+  }
+  return $stash;
+}
 
 =head2 $c->error
 
@@ -3128,6 +3143,7 @@ sub registered_middlewares {
     my $class = shift;
     if(my $middleware = $class->_psgi_middleware) {
         return (
+          Catalyst::Middleware::Stash->new,
           Plack::Middleware::HTTPExceptions->new,
           Plack::Middleware::RemoveRedundantBody->new,
           Plack::Middleware::FixMissingBodyInRedirect->new,
@@ -3209,7 +3225,8 @@ sub registered_data_handlers {
     if(my $data_handlers = $class->_data_handlers) {
         return %$data_handlers;
     } else {
-        die "You cannot call ->registered_data_handlers until data_handers has been setup";
+        $class->setup_data_handlers;
+        return $class->registered_data_handlers;
     }
 }
 

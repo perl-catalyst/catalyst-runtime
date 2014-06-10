@@ -7,7 +7,7 @@ BEGIN {
         plan skip_all => 'CatalystX::LeakChecker 0.05 required for this test';
     }
 
-    plan tests => 4;
+    plan tests => 6;
 }
 
 use FindBin;
@@ -25,6 +25,12 @@ use Catalyst::Test 'TestApp';
 
 {
     my ($resp, $ctx) = ctx_request('/contextclosure/context_closure');
+    ok($resp->is_success);
+    is($ctx->count_leaks, 0);
+}
+
+{
+    my ($resp, $ctx) = ctx_request('/contextclosure/non_closure');
     ok($resp->is_success);
     is($ctx->count_leaks, 0);
 }

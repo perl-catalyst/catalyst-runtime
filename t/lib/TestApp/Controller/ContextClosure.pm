@@ -24,6 +24,11 @@ sub context_closure : Local {
     $ctx->response->body('stashed context closure');
 }
 
+sub non_closure : Local {
+    my ($self, $ctx) = @_;
+    $ctx->stash(no_closure => "not a closure");
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

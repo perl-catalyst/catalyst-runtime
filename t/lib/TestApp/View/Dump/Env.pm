@@ -9,6 +9,7 @@ sub process {
     return $self->SUPER::process($c, {
         map { ($_ => $env->{$_}) }
         grep { $_ ne 'psgi.input' }
+        grep { $_ !~/^Catalyst/ }
         keys %{ $env },
     });
 }
