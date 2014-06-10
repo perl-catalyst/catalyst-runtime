@@ -54,7 +54,6 @@ use Class::Load 'load_class';
 BEGIN { require 5.008003; }
 
 has stack => (is => 'ro', default => sub { [] });
-#has stash => (is => 'rw', default => sub { {} });
 has state => (is => 'rw', default => 0);
 has stats => (is => 'rw');
 has action => (is => 'rw');
@@ -127,7 +126,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 # Remember to update this in Catalyst::Runtime as well!
 
-our $VERSION = '5.90069_001';
+our $VERSION = '5.90069_002';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -494,23 +493,6 @@ Catalyst).
 
     # stash is automatically passed to the view for use in a template
     $c->forward( 'MyApp::View::TT' );
-
-
-
-around stash => sub {
-    my $orig = shift;
-    my $c = shift;
-    my $stash = $orig->($c);
-    if (@_) {
-        my $new_stash = @_ > 1 ? {@_} : $_[0];
-        croak('stash takes a hash or hashref') unless ref $new_stash;
-        foreach my $key ( keys %$new_stash ) {
-          $stash->{$key} = $new_stash->{$key};
-        }
-    }
-
-    return $stash;
-};
 
 =cut
 
