@@ -16,7 +16,9 @@ sub env : Action Relative {
 
 sub env_on_engine : Action Relative {
     my ( $self, $c ) = @_;
-    $c->stash(env => $c->engine->env);
+    # JNAP - I changed this to req since the engine no longer
+    # has the env but the tests here are useful.
+    $c->stash(env => $c->req->env);
     $c->forward('TestApp::View::Dump::Env');
 }
 

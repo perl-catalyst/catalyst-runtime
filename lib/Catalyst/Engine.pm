@@ -22,19 +22,6 @@ use namespace::clean -except => 'meta';
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 
-# XXX - this is only here for compat, do not use!
-has env => ( is => 'rw', writer => '_set_env' );
-my $WARN_ABOUT_ENV = 0;
-around env => sub {
-  my ($orig, $self, @args) = @_;
-  if(@args) {
-    warn "env as a writer is deprecated, you probably need to upgrade Catalyst::Engine::PSGI"
-      unless $WARN_ABOUT_ENV++;
-    return $self->_set_env(@args);
-  }
-  return $self->$orig;
-};
-
 # XXX - Only here for Engine::PSGI compat
 sub prepare_connection {
     my ($self, $ctx) = @_;
@@ -653,7 +640,6 @@ sub prepare_request {
     my ($self, $ctx, %args) = @_;
     $ctx->log->psgienv($args{env}) if $ctx->log->can('psgienv');
     $ctx->request->_set_env($args{env});
-    $self->_set_env($args{env}); # Nasty back compat!
     $ctx->response->_set_response_cb($args{response_cb});
 }
 
