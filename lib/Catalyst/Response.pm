@@ -282,8 +282,8 @@ sub redirect {
         my $location = shift;
         my $status = shift || 302;
 
+        $self->location($location);
         $self->status($status);
-        $self->location($location);    # overwrites status if invalid
 
     }
 
@@ -300,9 +300,7 @@ around '_set_location' => sub {
 
         if ( $location =~ m/[\n\r]/ ) {    # check for header injection
 
-            $self->status(400);            # bad request
-
-            # TODO: warn about this or fail
+            die "blocking header injection";
 
         } else {
 
