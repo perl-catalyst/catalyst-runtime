@@ -8,92 +8,94 @@ use namespace::autoclean;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has _response_cb => (
-    is      => 'ro',
-    isa     => 'CodeRef', 
-    writer  => '_set_response_cb',
-    clearer => '_clear_response_cb',
+    is        => 'ro',
+    isa       => 'CodeRef',
+    writer    => '_set_response_cb',
+    clearer   => '_clear_response_cb',
     predicate => '_has_response_cb',
 );
 
-subtype 'Catalyst::Engine::Types::Writer',
-    as duck_type([qw(write close)]);
+subtype 'Catalyst::Engine::Types::Writer', as duck_type( [qw(write close)] );
 
 has _writer => (
-    is      => 'ro',
-    isa     => 'Catalyst::Engine::Types::Writer', #Pointless since we control how this is built
-    #writer  => '_set_writer', Now that its lazy I think this is safe to remove
-    clearer => '_clear_writer',
+    is  => 'ro',
+    isa => 'Catalyst::Engine::Types::Writer'
+    ,    #Pointless since we control how this is built
+     #writer  => '_set_writer', Now that its lazy I think this is safe to remove
+    clearer   => '_clear_writer',
     predicate => '_has_writer',
     lazy      => 1,
-    builder => '_build_writer',
+    builder   => '_build_writer',
 );
 
 sub _build_writer {
     my $self = shift;
 
     ## These two lines are probably crap now...
-    $self->_context->finalize_headers unless
-      $self->finalized_headers;
+    $self->_context->finalize_headers
+        unless $self->finalized_headers;
 
     my @headers;
-    $self->headers->scan(sub { push @headers, @_ });
+    $self->headers->scan( sub { push @headers, @_ } );
 
-    my $writer = $self->_response_cb->([ $self->status, \@headers ]);
+    my $writer = $self->_response_cb->( [ $self->status, \@headers ] );
     $self->_clear_response_cb;
 
     return $writer;
 }
 
 has write_fh => (
-  is=>'ro',
-  predicate=>'_has_write_fh',
-  lazy=>1,
-  builder=>'_build_write_fh',
+    is        => 'ro',
+    predicate => '_has_write_fh',
+    lazy      => 1,
+    builder   => '_build_write_fh',
 );
 
-sub _build_write_fh { shift ->_writer }
+sub _build_write_fh { shift->_writer }
 
 sub DEMOLISH {
-  my $self = shift;
-  return if $self->_has_write_fh;
-  if($self->_has_writer) {
-    $self->_writer->close
-  }
+    my $self = shift;
+    return if $self->_has_write_fh;
+    if ( $self->_has_writer ) {
+        $self->_writer->close;
+    }
 }
 
-has cookies   => (is => 'rw', default => sub { {} });
-has body      => (is => 'rw', default => undef);
-sub has_body { defined($_[0]->body) }
+has cookies => ( is => 'rw', default => sub { {} } );
+has body => ( is => 'rw', default => undef );
+sub has_body { defined( $_[0]->body ) }
 
-has location  => (is => 'rw');
-has status    => (is => 'rw', default => 200);
-has finalized_headers => (is => 'rw', default => 0);
-has headers   => (
-  is      => 'rw',
-  isa => 'HTTP::Headers',
-  handles => [qw(content_encoding content_length content_type header)],
-  default => sub { HTTP::Headers->new() },
-  required => 1,
-  lazy => 1,
+has location          => ( is => 'rw', writer  => '_set_location' );
+has status            => ( is => 'rw', default => 200 );
+has finalized_headers => ( is => 'rw', default => 0 );
+has headers           => (
+    is       => 'rw',
+    isa      => 'HTTP::Headers',
+    handles  => [qw(content_encoding content_length content_type header)],
+    default  => sub { HTTP::Headers->new() },
+    required => 1,
+    lazy     => 1,
 );
 has _context => (
-  is => 'rw',
-  weak_ref => 1,
-  clearer => '_clear_context',
+    is       => 'rw',
+    weak_ref => 1,
+    clearer  => '_clear_context',
 );
 
-before [qw(status headers content_encoding content_length content_type header)] => sub {
-  my $self = shift;
+before [
+    qw(status headers content_encoding content_length content_type header)]
+    => sub {
+    my $self = shift;
 
-  $self->_context->log->warn( 
-    "Useless setting a header value after finalize_headers called." .
-    " Not what you want." )
-      if ( $self->finalized_headers && @_ );
-};
+    $self->_context->log->warn(
+              "Useless setting a header value after finalize_headers called."
+            . " Not what you want." )
+        if ( $self->finalized_headers && @_ );
+    };
 
 sub output { shift->body(@_) }
 
-sub code   { shift->status(@_) }
+sub code { shift->status(@_) }
 
 sub write {
     my ( $self, $buffer ) = @_;
@@ -115,26 +117,29 @@ sub finalize_headers {
 }
 
 sub from_psgi_response {
-    my ($self, $psgi_res) = @_;
-    if(ref $psgi_res eq 'ARRAY') {
-        my ($status, $headers, $body) = @$psgi_res;
+    my ( $self, $psgi_res ) = @_;
+    if ( ref $psgi_res eq 'ARRAY' ) {
+        my ( $status, $headers, $body ) = @$psgi_res;
         $self->status($status);
-        $self->headers(HTTP::Headers->new(@$headers));
+        $self->headers( HTTP::Headers->new(@$headers) );
         $self->body($body);
-    } elsif(ref $psgi_res eq 'CODE') {
-        $psgi_res->(sub {
-            my $response = shift;
-            my ($status, $headers, $maybe_body) = @$response;
-            $self->status($status);
-            $self->headers(HTTP::Headers->new(@$headers));
-            if(defined $maybe_body) {
-                $self->body($maybe_body);
-            } else {
-                return $self->write_fh;
+    } elsif ( ref $psgi_res eq 'CODE' ) {
+        $psgi_res->(
+            sub {
+                my $response = shift;
+                my ( $status, $headers, $maybe_body ) = @$response;
+                $self->status($status);
+                $self->headers( HTTP::Headers->new(@$headers) );
+                if ( defined $maybe_body ) {
+                    $self->body($maybe_body);
+                } else {
+                    return $self->write_fh;
+                }
             }
-        });  
-     } else {
-        die "You can't set a Catalyst response from that, expect a valid PSGI response";
+        );
+    } else {
+        die
+            "You can't set a Catalyst response from that, expect a valid PSGI response";
     }
 }
 
@@ -179,7 +184,7 @@ When using a L<IO::Handle> type of object and no content length has been
 already set in the response headers Catalyst will make a reasonable attempt
 to determine the size of the Handle. Depending on the implementation of your
 handle object, setting the content length may fail. If it is at all possible
-for you to determine the content length of your handle object, 
+for you to determine the content length of your handle object,
 it is recommended that you set the content length in the response headers
 yourself, which will be respected and sent by Catalyst in the response.
 
@@ -275,14 +280,41 @@ sub redirect {
 
     if (@_) {
         my $location = shift;
-        my $status   = shift || 302;
+        my $status = shift || 302;
 
         $self->location($location);
         $self->status($status);
+
     }
 
     return $self->location;
 }
+
+around '_set_location' => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    if (@_) {
+
+        my $location = shift;
+
+        if ( $location =~ m/[\n\r]/ ) {    # check for header injection
+
+            die "blocking header injection";
+
+        } else {
+
+            $self->$orig($location);
+
+        }
+
+    } else {
+
+        $self->$orig();
+
+    }
+
+};
 
 =head2 $res->location
 
@@ -368,7 +400,7 @@ Example:
     }
 
 Please note this does not attempt to map or nest your PSGI application under
-the Controller and Action namespace or path.  
+the Controller and Action namespace or path.
 
 =head2 DEMOLISH
 
