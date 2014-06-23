@@ -9,7 +9,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 has _response_cb => (
     is      => 'ro',
-    isa     => 'CodeRef', 
+    isa     => 'CodeRef',
     writer  => '_set_response_cb',
     clearer => '_clear_response_cb',
     predicate => '_has_response_cb',
@@ -65,7 +65,7 @@ has cookies   => (is => 'rw', default => sub { {} });
 has body      => (is => 'rw', default => undef);
 sub has_body { defined($_[0]->body) }
 
-has location  => (is => 'rw');
+has location  => (is => 'rw', writer => '_set_location');
 has status    => (is => 'rw', default => 200);
 has finalized_headers => (is => 'rw', default => 0);
 has headers   => (
@@ -85,7 +85,7 @@ has _context => (
 before [qw(status headers content_encoding content_length content_type header)] => sub {
   my $self = shift;
 
-  $self->_context->log->warn( 
+  $self->_context->log->warn(
     "Useless setting a header value after finalize_headers called." .
     " Not what you want." )
       if ( $self->finalized_headers && @_ );
@@ -132,7 +132,7 @@ sub from_psgi_response {
             } else {
                 return $self->write_fh;
             }
-        });  
+        });
      } else {
         die "You can't set a Catalyst response from that, expect a valid PSGI response";
     }
@@ -179,7 +179,7 @@ When using a L<IO::Handle> type of object and no content length has been
 already set in the response headers Catalyst will make a reasonable attempt
 to determine the size of the Handle. Depending on the implementation of your
 handle object, setting the content length may fail. If it is at all possible
-for you to determine the content length of your handle object, 
+for you to determine the content length of your handle object,
 it is recommended that you set the content length in the response headers
 yourself, which will be respected and sent by Catalyst in the response.
 
@@ -284,6 +284,23 @@ sub redirect {
     return $self->location;
 }
 
+around '_set_location' => sub {
+  my $orig = shift;
+  my $self = shift;
+
+  if (@_) {
+    my $location = shift;
+
+    if ( $location =~ m/[\n\r]/ ) { # check for header injection
+      die "blocking header injection";
+    } else {
+      $self->$orig($location);
+    }
+  } else {
+    $self->$orig();
+  }
+};
+
 =head2 $res->location
 
 Sets or returns the HTTP 'Location'.
@@ -368,7 +385,7 @@ Example:
     }
 
 Please note this does not attempt to map or nest your PSGI application under
-the Controller and Action namespace or path.  
+the Controller and Action namespace or path.
 
 =head2 DEMOLISH
 
