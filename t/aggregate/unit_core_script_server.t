@@ -151,7 +151,7 @@ sub testBackgroundOptionWithFork {
 
     ## Check a few args
     is_deeply $app->{ARGV}, $argstring;
-    is $app->{port}, '3000';
+    is $app->port, '3000';
     is($app->{background}, 1);
 }
 
