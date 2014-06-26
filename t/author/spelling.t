@@ -77,6 +77,7 @@ add_stopwords(qw(
     Sedlacek
     Sheidlower
     SpiceMan
+    Styn
     Szilakszi
     Tatsuhiko
     Ulf
@@ -122,6 +123,7 @@ add_stopwords(qw(
     rainboxx
     sri
     szbalint
+    vanstyn
     willert
     wreis
 ));
