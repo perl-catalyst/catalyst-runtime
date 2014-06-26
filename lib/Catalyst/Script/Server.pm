@@ -37,6 +37,7 @@ has port => (
     cmd_aliases   => 'p',
     isa           => 'Int',
     is            => 'ro',
+    lazy          => 1,
     default       => sub {
         Catalyst::Utils::env_value(shift->application_name, 'port') || 3000
     },
@@ -107,6 +108,7 @@ has restart => (
     cmd_aliases   => 'r',
     isa           => 'Bool',
     is            => 'ro',
+    lazy          => 1,
     default       => sub {
         Catalyst::Utils::env_value(shift->application_name, 'reload') || 0;
     },
