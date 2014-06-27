@@ -27,6 +27,14 @@ testOption( [ qw// ], ['3000', undef, opthash()] );
 # host           -host --host              --host
 testOption( [ qw/--host testhost/ ], ['3000', 'testhost', opthash(host => 'testhost')] );
 testOption( [ qw/-h testhost/ ], ['3000', 'testhost', opthash(host => 'testhost')] );
+{
+    local $ENV{TESTAPPTOTESTSCRIPTS_HOST} = 'testhost';
+    testOption( [ qw// ], [3000, 'testhost', opthash(host => 'testhost')] );
+}
+{
+    local $ENV{CATALYST_HOST} = 'testhost';
+    testOption( [ qw// ], [3000, 'testhost', opthash(host => 'testhost')] );
+}
 
 # port           -p -port --port           -l --listen
 testOption( [ qw/-p 3001/ ], ['3001', undef, opthash(port => 3001)] );
