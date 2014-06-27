@@ -117,7 +117,7 @@ __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware
-  _data_handlers/;
+  _data_handlers trace_level trace_logger/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1137,6 +1137,7 @@ sub setup {
 
     $class->setup_log( delete $flags->{log} );
     $class->setup_plugins( delete $flags->{plugins} );
+    $class->setup_trace();
 
     $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
@@ -2900,6 +2901,78 @@ sub psgi_app {
     return $app->Catalyst::Utils::apply_registered_middleware($psgi);
 }
 
+
+=head2 trace_level
+
+Class attribute which is a positive number and defines the noiseness of the
+application trace.  See L</TRACING>.
+
+=head2 trace_logger
+
+Class attribute which is a handler for reporting your traces.  See L</TRACING>.
+
+=head2 $c->setup_trace
+
+Examples your %ENV, configuation and application settings to setup how and if
+application tracing is enabled.  See L</TRACING>.
+
+=head2 $c->trace
+
+Accepts a string $message and level for a trace message.  The configured
+trace level must equal or exceed the level given.  Level is required and should
+be a positive integer. For more see L</TRACING>.
+
+=cut
+
+sub setup_trace {
+  my ($app, @args) = @_;
+
+  # first we look for %ENV
+  if(my $trace = Catalyst::Utils::env_value( $app, 'TRACE' )) {
+    # extract a file path if it exists;
+    my ($level,$op, $path) = ($trace=~m/^(.+)(\=|\+\=)(.+)$/);
+    if($level && $op && $path) {
+      open(my $fh, '>', $path)
+        ||die "Cannot open trace file at $path: $!";
+      $app->trace_logger($fh);
+      $app->trace_level($level);
+    } else {
+      $app->trace_level($trace);
+    }
+  }
+
+  # Next, we look at config
+  $app->trace_level($app->config->{trace_level}) unless defined($app->trace_level);
+  $app->trace_logger($app->config->{trace_logger}) unless defined($app->trace_logger);
+
+  # We do setup_trace AFTER setup_log, so this stuff should be all good to
+  # use by this point in application setup.  For BackCompat, we will try to
+  # respect ->debug
+
+  if($app->debug) {
+    $app->trace_level(1) unless defined($app->trace_level);
+    $app->trace_logger(sub { shift->log->debug }) unless defined($app->trace_logger);
+  }
+
+  # Last, we set defaults if the settings are still emtpy
+  # Setup the defaults
+
+  $app->trace_level(0) unless defined($app->trace_level);
+  $app->trace_logger(sub { shift->log->debug }) unless defined($app->trace_logger);
+
+  return;
+}
+
+sub trace {
+  my ($class, $message, $level) = @_;
+  die "Level is required" unless defined $level;
+  if($class->trace_level >= $level) {
+    ref($class->trace_logger) eq 'CODE' ?
+      $class->trace_logger->($class, $message, $level) :
+        $class->trace_logger->print($message);
+  }
+}
+
 =head2 $c->setup_home
 
 Sets up the home directory.
@@ -3447,11 +3520,19 @@ backwardly compatible).
 
 =item *
 
-C<psgi_middleware> - See L<PSGI MIDDLEWARE>.
+C<psgi_middleware> - See L</PSGI MIDDLEWARE>.
 
 =item *
 
-C<data_handlers> - See L<DATA HANDLERS>.
+C<data_handlers> - See L</DATA HANDLERS>.
+
+=item *
+
+trace_level - This sets your application trace level - See L</TRACING>.
+
+=item *
+
+trace_logger - This sets your application trace logger - See L</TRACING>.
 
 =back
 
@@ -3747,6 +3828,160 @@ to initialize the middleware object.
 =back
 
 Please see L<PSGI> for more on middleware.
+
+=head1 TRACING
+
+B<NOTE> Tracing replaces the functionality of L<Debug>.  For now both
+interfaces will be supported but it is suggested that you become familiar with
+the new interface and begin using it.
+
+Application tracing is debugging information about the state of your L<Catalyst>
+application and a request / response cycle.  This is often used when you want a
+peek into the 'Catalyst Black Box' without needing to actually hack into the
+core code and add debugging statements.  Examples of application tracing include
+startup information about loaded plugins, middleware, models, controllers and
+views.  It also includes details about how a request is dispatched (what actions
+in what controllers are hit, and approximately how long each took) and how a
+response is generated.  Additional trace information includes details about errors
+and some basic statistics on your running application.
+
+It is often the case when running an application in a development environment
+for development purposes that you will enable tracing to assist you in your work.
+However, application tracing is not strictly tied to environment so trace levels
+are not automatically enabled based on any environment settings (although you are
+allowed to set trace levels via configuration, which can be environment specific,
+if you choose so).
+
+Application tracing is also not the same thing as logging. Logging is custom messages
+that you've added to your custom application for the purposes of better understanding
+your application and how effective your application is in achieving its goals.
+Often logging is extended, unstructured meta data around your core business logic
+such as details about when a user account is created or failed to be created, what
+types of validation issues are occuring in your forms, page views, user engagement
+and timestamps to help you understand your application performance.  Basically this
+is often information of business value that doesn't cleanly or meaningfully fit
+into a database.  Catalyst provides an interface for adding various kinds of
+Loggers which can assist you in these tasks.  Most Loggers allow one to log
+messages at different levels of priority, such as debug, warning, critical, etc.
+This is a useful feature since it permits one to turn the logging level down in
+high traffic environments.  In the past Catalyst tracing (previously called
+'Debug') was conflated with log levels of debug, in that in order to enable
+application tracing (or debugging) one was required to turn log level debug on
+globally.  Additionally, the Catalyst application tracing (or debugging) used
+the defined logger to 'record' its messages.  Neither is ideal since it leads
+one to be forced to accept more logging than may be wished, and it also does
+not allow one to separate development tracing from application debug logging.
+
+Application tracing fixes this issues by allowing you to turn on tracing
+independently of setting your log level.  It also lets you define a trace
+log message handler separately from your logger.  So for example you might
+wish to send trace messages to STDOUT, but send your logging to Elasticsearch.
+Here's an example:
+
+    package MyApp;
+
+    use Catalyst;
+
+    __PACKAGE__->trace_level(1);
+    __PACKAGE__->trace_logger(sub { my $class = shift; ...});
+    __PACKAGE__->setup;
+
+You may also configure tracing via configuration:
+
+    package MyApp;
+
+    use Catalyst;
+
+    __PACKAGE__->config({
+      trace_level => 1,
+      trace_logger => sub { my $class = shift; ...},
+    });
+
+    __PACKAGE__->setup;
+
+Or, you may set tracing via environment varables, for example:
+
+    CATALYST_TRACE=1 perl script/myapp_server.pl
+    MYAPP_TRACE=1 perl script/myapp_server.pl
+    MYAPP_TRACE=1=/var/log/traces perl script/myapp_server.pl
+
+The order of precidence is that custom application environment variables
+('MYAPP_TRACE') come first, followed by global environment variables
+('CATALYST_TRACE'), followed by configuration settings and lastly application
+defaults.
+
+For backwards compatiblity, we respect classic Catalyst debugging (L<Debug>) in
+the following way.  If debugging is true, we automatically set
+C<trace_level=1> and set the C<trace_logger> to your the debug method of your
+defined log object (basically it works just as described in L<Debug>).  In this
+case $c->debug will also be set to true.
+
+Please note that if you set C<trace_level> but not debugging then debugging
+($c->debug) will NOT be set to true.
+
+Please note that if you set BOTH trace_level and 'class' debugging, your trace
+level and trace configuation is respected at a high priority, however the state
+of the debug method will be set as requested (although overridden).  This is
+done for backcompatibility with applications that overloaded the debug method
+in custom applications.
+
+Please note that when setting trace levels via environment, you may use an
+extended form of the value, which opens a filehandled to a specified path
+and sends all trace information there:
+
+    MYAPP_TRACE=1=/var/log/traces perl script/myapp_server.pl
+
+This would override any other settings for L<\trace_logger>.  I
+
+=head2 trace_level
+
+This is a number that defaults to 0.  It indicates the level of application
+tracing that is desired.  Larger numbers indicate greater level of tracing.
+Currently trace levels are defined, although at this time respect is limited,
+as this is a new feature.
+
+Levels 1,2 and 3 are reserved for Catalyst core code (code that is part of the
+L<Catalyst> distribution).
+
+Levels 4,5 and 6 are reserved for Catalyst extended ecosystem (Catalyst plugins,
+models, views and distributions under the CatalystX namespace).
+
+Levels 7,8 and 9 are reserved but not currently defined.
+
+Levels 10 and higher are reserved for local (not on CPAN) application use.
+
+=head2 trace_logger
+
+This handles a trace message, if it is determined that one should be sent based
+on the running L<\trace_level>.  This can accept the following values
+
+=over 4
+
+=item a CodeRef
+
+This is a code reference that gets the application class (your Catalyst.pm
+subclass) as argument0, the message as argument1 and the level as argument3.
+The message is expected to be a string.  For example:
+
+    __PACKAGE__->trace_logger( sub {
+      my ($app, $message, $level) = @_;
+      $app->log->debug($message);
+    });
+
+Would send trace messages to the debug log handler (This is currently the
+default behavior).
+
+=item A Filehandle or Object
+
+This must be an open filehandle setup to received output.  We really
+just look for a 'print' method, so strictly speaking this could be
+any object that satisfies the duck type.
+
+=item A String
+
+A path that be be resolved as a file that we open a filehandle to.
+
+=back
 
 =head1 ENCODING
 
