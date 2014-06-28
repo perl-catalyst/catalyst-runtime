@@ -144,8 +144,8 @@ sub list {
         $paths->row(@$_) for @rows;
     }
 
-    $c->log->debug( "Loaded Chained actions:\n" . $paths->draw . "\n" );
-    $c->log->debug( "Unattached Chained actions:\n", $unattached_actions->draw . "\n" )
+    $c->trace(1, "Loaded Chained actions:\n" . $paths->draw . "\n" );
+    $c->trace(1, "Unattached Chained actions:\n", $unattached_actions->draw . "\n" )
         if $has_unattached_actions;
 }
 

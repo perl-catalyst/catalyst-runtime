@@ -1028,6 +1028,24 @@ The first three also set the log level to 'debug'.
 
 Calling C<< $c->debug(1) >> has no effect.
 
+=head2 Effects of debug mode
+
+On older versions of L<Catalyst> debug mode would enable verbose
+application level logging (for example when starting in debug you
+get the startup information at the console regarding loaded models,
+controllers, etc. as well as additional request / response tracing.
+It would also enable the default debugging error page that gives
+you error details and a stack track.
+
+On newer versions of L<Catalyst> we have a new application tracing
+system.  See L</Tracing> for details.  In general trace replaces
+debug, although trace will honor debug if debug is set.  However the
+debug switch still controls whether or not you see the detailed
+error default page or the 'production' error debug.  This will at
+some point be clarified.
+
+Setting debugging (as well as trace) will also enable stats collection.
+
 =cut
 
 sub debug { 0 }
@@ -1082,8 +1100,7 @@ sub plugin {
     }
 
     $class->$name($obj);
-    $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
-      if $class->debug;
+    $class->trace(1, qq/Initialized instant plugin "$plugin" as "$name"/);
 }
 
 =head2 MyApp->setup
@@ -1186,14 +1203,14 @@ EOF
 
     $class->setup_components;
 
-    if ( $class->debug ) {
+    if ( $class->trace_level ) {
         my @plugins = map { "$_  " . ( $_->VERSION || '' ) } $class->registered_plugins;
 
         if (@plugins) {
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @plugins;
-            $class->log->debug( "Loaded plugins:\n" . $t->draw . "\n" );
+            $class->trace(1, "Loaded plugins:\n" . $t->draw . "\n" );
         }
 
         my @middleware = map {
@@ -1206,7 +1223,7 @@ EOF
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @middleware;
-            $class->log->debug( "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
+            $class->trace(1, "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
         }
 
         my %dh = $class->registered_data_handlers;
@@ -1214,21 +1231,21 @@ EOF
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @data_handlers;
-            $class->log->debug( "Loaded Request Data Handlers:\n" . $t->draw . "\n" );
+            $class->trace(1, "Loaded Request Data Handlers:\n" . $t->draw . "\n" );
         }
 
         my $dispatcher = $class->dispatcher;
         my $engine     = $class->engine;
         my $home       = $class->config->{home};
 
-        $class->log->debug(sprintf(q/Loaded dispatcher "%s"/, blessed($dispatcher)));
-        $class->log->debug(sprintf(q/Loaded engine "%s"/, blessed($engine)));
+        $class->trace(1, sprintf(q/Loaded dispatcher "%s"/, blessed($dispatcher)));
+        $class->trace(1, sprintf(q/Loaded engine "%s"/, blessed($engine)));
 
         $home
           ? ( -d $home )
-          ? $class->log->debug(qq/Found home "$home"/)
-          : $class->log->debug(qq/Home "$home" doesn't exist/)
-          : $class->log->debug(q/Couldn't find home/);
+          ? $class->trace(1, qq/Found home "$home"/)
+          : $class->trace(1, qq/Home "$home" doesn't exist/)
+          : $class->trace(1, q/Couldn't find home/);
 
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
@@ -1236,7 +1253,7 @@ EOF
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
             $t->row( $comp, $type );
         }
-        $class->log->debug( "Loaded components:\n" . $t->draw . "\n" )
+        $class->trace(1, "Loaded components:\n" . $t->draw . "\n" )
           if ( keys %{ $class->components } );
     }
 
@@ -1247,14 +1264,14 @@ EOF
 
     $class->setup_actions;
 
-    if ( $class->debug ) {
+    if ( $class->trace_level ) {
         my $name = $class->config->{name} || 'Application';
-        $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
+        $class->trace(1, "$name powered by Catalyst $Catalyst::VERSION");
     }
 
     if ($class->config->{case_sensitive}) {
-        $class->log->warn($class . "->config->{case_sensitive} is set.");
-        $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
+        $class->trace(1,$class . "->config->{case_sensitive} is set.");
+        $class->trace(1,"This setting is deprecated and planned to be removed in Catalyst 5.81.");
     }
 
     $class->setup_finalize;
@@ -1375,8 +1392,7 @@ sub uri_for {
 
        $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
-            $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
-                if $c->debug;
+            $c->trace(1, qq/Can't find uri_for action '$action' @$captures/);
             return undef;
         }
         $path = '/' if $path eq '';
@@ -1956,7 +1972,7 @@ sub finalize_headers {
 
     # Handle redirects
     if ( my $location = $response->redirect ) {
-        $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
+        $c->trace(1, qq/Redirecting to "$location"/);
         $response->header( Location => $location );
     }
 
@@ -2020,11 +2036,11 @@ sub handle_request {
     # Always expect worst case!
     my $status = -1;
     try {
-        if ($class->debug) {
+        if ($class->trace_level) {
             my $secs = time - $START || 1;
             my $av = sprintf '%.3f', $COUNT / $secs;
             my $time = localtime time;
-            $class->log->info("*** Request $COUNT ($av/s) [$$] [$time] ***");
+            $class->trace(1, "*** Request $COUNT ($av/s) [$$] [$time] ***");
         }
 
         my $c = $class->prepare(@arguments);
@@ -2074,6 +2090,8 @@ sub prepare {
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
+    # We'll leave this use of debug since somehow this setting will move
+    # to middleware - jnap
     if ( $c->debug || $c->config->{enable_catalyst_header} ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
@@ -2252,12 +2270,15 @@ Writes information about the request to the debug logs.  This includes:
 
 =back
 
+Starting in Catalyst 5.90070, debug logs are handled by the new trace
+feature.  See L</Tracing>.
+
 =cut
 
 sub log_request {
     my $c = shift;
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my($dump) = grep {$_->[0] eq 'Request' } $c->dump_these;
     my $request = $dump->[1];
@@ -2266,12 +2287,12 @@ sub log_request {
     $method ||= '';
     $path = '/' unless length $path;
     $address ||= '';
-    $c->log->debug(qq/"$method" request for "$path" from "$address"/);
+    $c->trace(1, qq/"$method" request for "$path" from "$address"/);
 
     $c->log_request_headers($request->headers);
 
     if ( my $keywords = $request->query_keywords ) {
-        $c->log->debug("Query keywords are: $keywords");
+        $c->trace(1, "Query keywords are: $keywords");
     }
 
     $c->log_request_parameters( query => $request->query_parameters, $request->_has_body ? (body => $request->body_parameters) : () );
@@ -2289,7 +2310,7 @@ C<< $c->log_response_status_line >> and C<< $c->log_response_headers >>.
 sub log_response {
     my $c = shift;
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
     my $response = $dump->[1];
@@ -2317,7 +2338,7 @@ Writes one line of information about the response to the debug logs.  This inclu
 sub log_response_status_line {
     my ($c, $response) = @_;
 
-    $c->log->debug(
+    $c->trace(1,
         sprintf(
             'Response Code: %s; Content-Type: %s; Content-Length: %s',
             $response->status                            || 'unknown',
@@ -2346,7 +2367,7 @@ sub log_request_parameters {
     my $c          = shift;
     my %all_params = @_;
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my $column_width = Catalyst::Utils::term_width() - 44;
     foreach my $type (qw(query body)) {
@@ -2358,7 +2379,7 @@ sub log_request_parameters {
             my $value = defined($param) ? $param : '';
             $t->row( $key, ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
         }
-        $c->log->debug( ucfirst($type) . " Parameters are:\n" . $t->draw );
+        $c->trace(1, ucfirst($type) . " Parameters are:\n" . $t->draw );
     }
 }
 
@@ -2373,7 +2394,7 @@ the debug logs.
 sub log_request_uploads {
     my $c = shift;
     my $request = shift;
-    return unless $c->debug;
+    return unless $c->trace_level;
     my $uploads = $request->uploads;
     if ( keys %$uploads ) {
         my $t = Text::SimpleTable->new(
@@ -2388,7 +2409,7 @@ sub log_request_uploads {
                 $t->row( $key, $u->filename, $u->type, $u->size );
             }
         }
-        $c->log->debug( "File Uploads are:\n" . $t->draw );
+        $c->trace(1, "File Uploads are:\n" . $t->draw );
     }
 }
 
@@ -2412,7 +2433,7 @@ sub log_headers {
     my $type    = shift;
     my $headers = shift;    # an HTTP::Headers instance
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my $column_width = Catalyst::Utils::term_width() - 28;
     my $t = Text::SimpleTable->new( [ 15, 'Header Name' ], [ $column_width, 'Value' ] );
@@ -2422,7 +2443,7 @@ sub log_headers {
             $t->row( $name, $value );
         }
     );
-    $c->log->debug( ucfirst($type) . " Headers:\n" . $t->draw );
+    $c->trace(1, ucfirst($type) . " Headers:\n" . $t->draw );
 }
 
 
@@ -2952,6 +2973,7 @@ sub setup_trace {
   if($app->debug) {
     $app->trace_level(1) unless defined($app->trace_level);
     $app->trace_logger(sub { shift->log->debug }) unless defined($app->trace_logger);
+    $app->trace(1, 'Debug messages enabled (via Debug state)');
   }
 
   # Last, we set defaults if the settings are still emtpy
@@ -2960,13 +2982,17 @@ sub setup_trace {
   $app->trace_level(0) unless defined($app->trace_level);
   $app->trace_logger(sub { shift->log->debug }) unless defined($app->trace_logger);
 
+  $app->trace(1, "Tracing enabled at level ${\$app->trace_level}")
+    if defined($app->trace_level);
+
   return;
 }
 
 sub trace {
   my ($class, $level, $message) = @_;
   die "Level is required" unless defined $level;
-  die "Message is required unless defined $message;
+  die "Message is required" unless defined $message;
+  return unless $class->trace_level;
   if($class->trace_level >= $level) {
     ref($class->trace_logger) eq 'CODE' ?
       $class->trace_logger->($class, $message, $level) :
@@ -3032,7 +3058,6 @@ sub setup_log {
 
     if ( $levels{debug} ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
-        $class->log->debug('Debug messages enabled');
     }
 }
 
@@ -3054,9 +3079,11 @@ sub setup_stats {
     Catalyst::Utils::ensure_class_loaded($class->stats_class);
 
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
-    if ( defined($env) ? $env : ($stats || $class->debug ) ) {
+    # Will grandfather using debug to turn on stats since there's a complicated
+    # order of events here when trace mode tries to guess its state from debug.
+    if ( defined($env) ? $env : ($stats || $class->trace_level || $class->debug ) ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('use_stats' => sub { 1 });
-        $class->log->debug('Statistics enabled');
+        $class->trace(1,'Statistics enabled');
     }
 }
 

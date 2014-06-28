@@ -196,8 +196,7 @@ sub finalize_cookies {
             )
         );
         if (!defined $cookie) {
-            $c->log->warn("undef passed in '$name' cookie value - not setting cookie")
-                if $c->debug;
+            $c->trace(1, "undef passed in '$name' cookie value - not setting cookie");
             next;
         }
 
@@ -250,6 +249,8 @@ sub finalize_error {
     }
 
     my ( $title, $error, $infos );
+    ## For now we keep debug mode for turning on the default
+    ## debugging error screen - jnap.
     if ( $c->debug ) {
 
         # For pretty dumps

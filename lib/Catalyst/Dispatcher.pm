@@ -111,7 +111,7 @@ sub dispatch {
         my $error = $path
           ? qq/Unknown resource "$path"/
           : "No default action defined";
-        $c->log->error($error) if $c->debug;
+        $c->trace(1, $error);
         $c->error($error);
     }
 }
@@ -125,7 +125,7 @@ sub _command2action {
     my ( $self, $c, $command, @extra_params ) = @_;
 
     unless ($command) {
-        $c->log->debug('Nothing to go to') if $c->debug;
+        $c->trace(1,'Nothing to go to');
         return 0;
     }
 
@@ -200,7 +200,7 @@ sub _do_visit {
 
     if($error) {
         $c->error($error);
-        $c->log->debug($error) if $c->debug;
+        $c->trace(1,$error);
         return 0;
     }
 
@@ -248,7 +248,7 @@ sub _do_forward {
         my $error .= qq/Couldn't $opname to command "$command": /
                     .qq/Invalid action or component./;
         $c->error($error);
-        $c->log->debug($error) if $c->debug;
+        $c->trace(1,$error);
         return 0;
     }
 
@@ -345,8 +345,7 @@ sub _invoke_as_component {
         my $error =
           qq/Couldn't forward to "$component_class". Does not implement "$method"/;
         $c->error($error);
-        $c->log->debug($error)
-          if $c->debug;
+        $c->trace(1,$error);
         return 0;
     }
 }
@@ -385,11 +384,11 @@ sub prepare_action {
 
     s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg for grep { defined } @{$req->captures||[]};
 
-    $c->log->debug( 'Path is "' . $req->match . '"' )
-      if ( $c->debug && defined $req->match && length $req->match );
+    $c->trace(1, 'Path is "' . $req->match . '"' )
+      if (defined $req->match && length $req->match );
 
-    $c->log->debug( 'Arguments are "' . join( '/', @args ) . '"' )
-      if ( $c->debug && @args );
+    $c->trace(1, 'Arguments are "' . join( '/', @args ) . '"' )
+      if @args;
 }
 
 =head2 $self->get_action( $action, $namespace )
@@ -611,7 +610,7 @@ sub setup_actions {
 
     $self->_load_dispatch_types( @{ $self->postload_dispatch_types } );
 
-    return unless $c->debug;
+    return unless $c->trace_level;
     $self->_display_action_tables($c);
 }
 
@@ -646,7 +645,7 @@ sub _display_action_tables {
     };
 
     $walker->( $walker, $self->_tree, '' );
-    $c->log->debug( "Loaded Private actions:\n" . $privates->draw . "\n" )
+    $c->trace(1, "Loaded Private actions:\n" . $privates->draw . "\n" )
       if $has_private;
 
     # List all public actions
