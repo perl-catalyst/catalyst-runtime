@@ -2964,8 +2964,9 @@ sub setup_trace {
 }
 
 sub trace {
-  my ($class, $message, $level) = @_;
+  my ($class, $level, $message) = @_;
   die "Level is required" unless defined $level;
+  die "Message is required unless defined $message;
   if($class->trace_level >= $level) {
     ref($class->trace_logger) eq 'CODE' ?
       $class->trace_logger->($class, $message, $level) :
