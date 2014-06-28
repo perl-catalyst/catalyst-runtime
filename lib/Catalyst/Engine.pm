@@ -22,12 +22,6 @@ use namespace::clean -except => 'meta';
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 
-# XXX - Only here for Engine::PSGI compat
-sub prepare_connection {
-    my ($self, $ctx) = @_;
-    $ctx->request->prepare_connection;
-}
-
 =head1 NAME
 
 Catalyst::Engine - The Catalyst Engine

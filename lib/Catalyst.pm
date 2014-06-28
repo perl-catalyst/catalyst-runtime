@@ -2180,9 +2180,7 @@ Prepares connection.
 
 sub prepare_connection {
     my $c = shift;
-    # XXX - This is called on the engine (not the request) to maintain
-    #       Engine::PSGI back compat.
-    $c->engine->prepare_connection($c);
+    $c->request->prepare_connection($c);
 }
 
 =head2 $c->prepare_cookies
