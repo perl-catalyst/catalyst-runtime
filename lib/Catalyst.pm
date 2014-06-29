@@ -1030,12 +1030,12 @@ Calling C<< $c->debug(1) >> has no effect.
 
 =head2 Effects of debug mode
 
-On older versions of L<Catalyst> debug mode would enable verbose
-application level logging (for example when starting in debug you
-get the startup information at the console regarding loaded models,
+On older versions of L<Catalyst> (prior to version 5.90070) debug mode would
+enable verbose application level logging (for example when starting in debug
+you get the startup information at the console regarding loaded models,
 controllers, etc. as well as additional request / response tracing.
-It would also enable the default debugging error page that gives
-you error details and a stack track.
+It would also enable the default debugging error page that gives you error
+details and a stack track.
 
 On newer versions of L<Catalyst> we have a new application tracing
 system.  See L</Tracing> for details.  In general trace replaces
@@ -1153,8 +1153,8 @@ sub setup {
     $class->setup_home( delete $flags->{home} );
 
     $class->setup_log( delete $flags->{log} );
-    $class->setup_plugins( delete $flags->{plugins} );
     $class->setup_trace();
+    $class->setup_plugins( delete $flags->{plugins} );
 
     $class->setup_data_handlers();
     $class->setup_dispatcher( delete $flags->{dispatcher} );
@@ -2924,7 +2924,8 @@ sub psgi_app {
 =head2 trace_level
 
 Class attribute which is a positive number and defines the noiseness of the
-application trace.  See L</TRACING>.
+application trace.  This attribute is defined at application startup, trying
+to change it in a running app is considered an error.  See L</TRACING>.
 
 =head2 trace_logger
 
@@ -3924,6 +3925,10 @@ You may also configure tracing via configuration:
     });
 
     __PACKAGE__->setup;
+
+B<IMPORTANT> You cannot set tracing via configuration files if you are using
+the L<Catalyst::Plugin::ConfigLoader> plugin, as that plugin is loaded too
+late for it to be applied during all phases of setup.
 
 Or, you may set tracing via environment varables, for example:
 
