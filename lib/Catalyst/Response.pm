@@ -183,6 +183,85 @@ for you to determine the content length of your handle object,
 it is recommended that you set the content length in the response headers
 yourself, which will be respected and sent by Catalyst in the response.
 
+Please note that the object needs to implement C<getline>, not just
+C<read>.
+
+Starting from version 5.90060, when using an L<IO::Handle> object, you
+may want to use L<Plack::Middleware::XSendfile>, to delegate the
+actual serving to the frontend server. To do so, you need to pass to
+C<body> an IO object with a C<path> method. This can be achieved in
+two ways.
+
+Either using L<Plack::Util>:
+
+  my $fh = IO::File->new($file, 'r');
+  Plack::Util::set_io_path($fh, $file);
+
+Or using L<IO::File::WithPath>
+
+  my $fh = IO::File::WithPath->new($file, 'r');
+
+And then passing the filehandle to body and setting headers, if needed.
+
+  $c->response->body($fh);
+  $c->response->headers->content_type('text/plain');
+  $c->response->headers->content_length(-s $file);
+  $c->response->headers->last_modified((stat($file))[9]);
+
+L<Plack::Middleware::XSendfile> can be loaded in the application so:
+
+ __PACKAGE__->config(
+     psgi_middleware => [
+         'XSendfile',
+         # other middlewares here...
+        ],
+ );
+
+B<Beware> that loading the middleware without configuring the
+webserver to set the request header C<X-Sendfile-Type> to a supported
+type (C<X-Accel-Redirect> for nginx, C<X-Sendfile> for Apache and
+Lighttpd), could lead to the disclosure of private paths to malicious
+clients setting that header.
+
+Nginx needs the additional X-Accel-Mapping header to be set in the
+webserver configuration, so the middleware will replace the absolute
+path of the IO object with the internal nginx path. This is also
+useful to prevent a buggy app to server random files from the
+filesystem, as it's an internal redirect.
+
+An nginx configuration for FastCGI could look so:
+
+ server {
+     server_name example.com;
+     root /my/app/root;
+     location /private/repo/ {
+         internal;
+         alias /my/app/repo/;
+     }
+     location /private/staging/ {
+         internal;
+         alias /my/app/staging/;
+     }
+     location @proxy {
+         include /etc/nginx/fastcgi_params;
+         fastcgi_param SCRIPT_NAME '';
+         fastcgi_param PATH_INFO   $fastcgi_script_name;
+         fastcgi_param HTTP_X_SENDFILE_TYPE X-Accel-Redirect;
+         fastcgi_param HTTP_X_ACCEL_MAPPING /my/app=/private;
+         fastcgi_pass  unix:/my/app/run/app.sock;
+    }
+ }
+
+In the example above, passing filehandles with a local path matching
+/my/app/staging or /my/app/repo will be served by nginx. Passing paths
+with other locations will lead to an internal server error.
+
+Setting the body to a filehandle without the C<path> method bypasses
+the middleware completely.
+
+For Apache and Lighttpd, the mapping doesn't apply and setting the
+X-Sendfile-Type is enough.
+
 =head2 $res->has_body
 
 Predicate which returns true when a body has been set.
