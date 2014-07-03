@@ -10,8 +10,16 @@ use Cwd;
 use Class::Load 'is_class_loaded';
 use String::RewritePrefix;
 use Class::Load ();
+use IO::File::WithPath;
+use MIME::Types ();
+use HTTP::Date ();
+
 
 use namespace::clean;
+
+# this should be initialized before forking to avoid loading copies of
+# the mime database, so we put it here.
+my $mime_types = MIME::Types->new(only_complete => 1);
 
 =head1 NAME
 
@@ -622,6 +630,38 @@ sub env_at_request_uri {
     PATH_INFO => $path_info,
     SCRIPT_NAME => $script_name };
 }
+
+
+=head2 filehandle_response_at_path($file_path)
+
+Return a L<IO::File::WithPath> object and a paired list of headers
+commonly used for sending static files. The L<IO::File::WithPath>
+object can be used by L<Plack::Middleware::XSendfile> if set as the
+response body.
+
+=cut
+
+sub filehandle_response_at_path {
+    my $file = shift;
+    return unless ($file && -f $file);
+    my $fh = IO::File::WithPath->new($file, 'r');
+    my $type;
+    if ($file =~ m/\.(\w+)$/s) {
+        my $ext = $1;
+        if (my $mime = $mime_types->mimeTypeOf($ext)) {
+            $type = "$mime";
+        }
+    }
+    $type ||= 'text/plain';
+    my $epoch = (stat($file))[9];
+
+    my %headers = (
+                   content_type  => "$type", # stringify please
+                   last_modified => HTTP::Date::time2str($epoch),
+                  );
+    return $fh, %headers;
+}
+
 
 =head1 AUTHORS
 

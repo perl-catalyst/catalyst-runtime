@@ -47,6 +47,7 @@ requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
 requires 'HTTP::Request::AsCGI' => '1.0';
+requires 'HTTP::Date';
 requires 'Module::Pluggable' => '4.7';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
@@ -85,6 +86,8 @@ requires "Plack::Middleware::HTTPExceptions";
 requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.09';
 requires "Plack::Middleware::MethodOverride";
 requires "Plack::Middleware::RemoveRedundantBody" => '0.03';
+requires "IO::File::WithPath";
+requires "MIME::Types";
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';
