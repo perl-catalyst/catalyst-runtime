@@ -498,15 +498,7 @@ Catalyst).
 
 sub stash {
   my $c = shift;
-  my $stash = Catalyst::Middleware::Stash->get($c->req->env);
-  if(@_) {
-    my $new_stash = @_ > 1 ? {@_} : $_[0];
-    croak('stash takes a hash or hashref') unless ref $new_stash;
-    foreach my $key ( keys %$new_stash ) {
-      $stash->{$key} = $new_stash->{$key};
-    }
-  }
-  return $stash;
+  return Catalyst::Middleware::Stash::get_stash($c->req->env)->(@_);
 }
 
 =head2 $c->error
