@@ -37,8 +37,7 @@ sub _init_stash {
 
 sub stash {
   my ($host, @args) = @_;
-  return get_stash($host->env)->(@args) if
-    $host->can('env');
+  return get_stash($host->env)->(@args);
 }
 
 sub call {
