@@ -14,6 +14,14 @@ has debug => (
     documentation => q{Force debug mode},
 );
 
+has trace => (
+    traits        => [qw(Getopt)],
+    cmd_aliases   => 'd',
+    isa           => 'Integer',
+    is            => 'ro',
+    documentation => q{Force trace mode},
+);
+
 has host => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'h',
@@ -196,6 +204,9 @@ sub run {
 
     local $ENV{CATALYST_DEBUG} = 1
         if $self->debug;
+
+    local $ENV{CATALYST_TRACE} = $self->trace
+        if $self->trace;
 
     if ( $self->restart ) {
         die "Cannot run in the background and also watch for changed files.\n"

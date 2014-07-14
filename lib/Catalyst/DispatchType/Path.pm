@@ -64,7 +64,7 @@ sub list {
             $paths->row( $display_path, "/$action" );
         }
     }
-    $c->log->debug( "Loaded Path actions:\n" . $paths->draw . "\n" )
+    $c->trace(1, "Loaded Path actions:\n" . $paths->draw . "\n" )
       if ( keys %{ $self->_paths } );
 }
 

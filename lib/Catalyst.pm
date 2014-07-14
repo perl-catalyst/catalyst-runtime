@@ -117,7 +117,7 @@ __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware
-  _data_handlers/;
+  _data_handlers trace_level trace_logger/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -1020,6 +1020,24 @@ The first three also set the log level to 'debug'.
 
 Calling C<< $c->debug(1) >> has no effect.
 
+=head2 Effects of debug mode
+
+On older versions of L<Catalyst> (prior to version 5.90070) debug mode would
+enable verbose application level logging (for example when starting in debug
+you get the startup information at the console regarding loaded models,
+controllers, etc. as well as additional request / response tracing.
+It would also enable the default debugging error page that gives you error
+details and a stack track.
+
+On newer versions of L<Catalyst> we have a new application tracing
+system.  See L</Tracing> for details.  In general trace replaces
+debug, although trace will honor debug if debug is set.  However the
+debug switch still controls whether or not you see the detailed
+error default page or the 'production' error debug.  This will at
+some point be clarified.
+
+Setting debugging (as well as trace) will also enable stats collection.
+
 =cut
 
 sub debug { 0 }
@@ -1074,8 +1092,7 @@ sub plugin {
     }
 
     $class->$name($obj);
-    $class->log->debug(qq/Initialized instant plugin "$plugin" as "$name"/)
-      if $class->debug;
+    $class->trace(1, qq/Initialized instant plugin "$plugin" as "$name"/);
 }
 
 =head2 MyApp->setup
@@ -1128,6 +1145,7 @@ sub setup {
     $class->setup_home( delete $flags->{home} );
 
     $class->setup_log( delete $flags->{log} );
+    $class->setup_trace();
     $class->setup_plugins( delete $flags->{plugins} );
 
     $class->setup_data_handlers();
@@ -1177,14 +1195,14 @@ EOF
 
     $class->setup_components;
 
-    if ( $class->debug ) {
+    if ( $class->trace_level ) {
         my @plugins = map { "$_  " . ( $_->VERSION || '' ) } $class->registered_plugins;
 
         if (@plugins) {
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @plugins;
-            $class->log->debug( "Loaded plugins:\n" . $t->draw . "\n" );
+            $class->trace(1, "Loaded plugins:\n" . $t->draw . "\n" );
         }
 
         my @middleware = map {
@@ -1197,7 +1215,7 @@ EOF
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @middleware;
-            $class->log->debug( "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
+            $class->trace(1, "Loaded PSGI Middleware:\n" . $t->draw . "\n" );
         }
 
         my %dh = $class->registered_data_handlers;
@@ -1205,21 +1223,21 @@ EOF
             my $column_width = Catalyst::Utils::term_width() - 6;
             my $t = Text::SimpleTable->new($column_width);
             $t->row($_) for @data_handlers;
-            $class->log->debug( "Loaded Request Data Handlers:\n" . $t->draw . "\n" );
+            $class->trace(1, "Loaded Request Data Handlers:\n" . $t->draw . "\n" );
         }
 
         my $dispatcher = $class->dispatcher;
         my $engine     = $class->engine;
         my $home       = $class->config->{home};
 
-        $class->log->debug(sprintf(q/Loaded dispatcher "%s"/, blessed($dispatcher)));
-        $class->log->debug(sprintf(q/Loaded engine "%s"/, blessed($engine)));
+        $class->trace(1, sprintf(q/Loaded dispatcher "%s"/, blessed($dispatcher)));
+        $class->trace(1, sprintf(q/Loaded engine "%s"/, blessed($engine)));
 
         $home
           ? ( -d $home )
-          ? $class->log->debug(qq/Found home "$home"/)
-          : $class->log->debug(qq/Home "$home" doesn't exist/)
-          : $class->log->debug(q/Couldn't find home/);
+          ? $class->trace(1, qq/Found home "$home"/)
+          : $class->trace(1, qq/Home "$home" doesn't exist/)
+          : $class->trace(1, q/Couldn't find home/);
 
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
@@ -1227,7 +1245,7 @@ EOF
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
             $t->row( $comp, $type );
         }
-        $class->log->debug( "Loaded components:\n" . $t->draw . "\n" )
+        $class->trace(1, "Loaded components:\n" . $t->draw . "\n" )
           if ( keys %{ $class->components } );
     }
 
@@ -1238,14 +1256,14 @@ EOF
 
     $class->setup_actions;
 
-    if ( $class->debug ) {
+    if ( $class->trace_level ) {
         my $name = $class->config->{name} || 'Application';
-        $class->log->info("$name powered by Catalyst $Catalyst::VERSION");
+        $class->trace(1, "$name powered by Catalyst $Catalyst::VERSION");
     }
 
     if ($class->config->{case_sensitive}) {
-        $class->log->warn($class . "->config->{case_sensitive} is set.");
-        $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
+        $class->trace(1,$class . "->config->{case_sensitive} is set.");
+        $class->trace(1,"This setting is deprecated and planned to be removed in Catalyst 5.81.");
     }
 
     $class->setup_finalize;
@@ -1366,8 +1384,7 @@ sub uri_for {
 
        $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
-            $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
-                if $c->debug;
+            $c->trace(1, qq/Can't find uri_for action '$action' @$captures/);
             return undef;
         }
         $path = '/' if $path eq '';
@@ -1947,7 +1964,7 @@ sub finalize_headers {
 
     # Handle redirects
     if ( my $location = $response->redirect ) {
-        $c->log->debug(qq/Redirecting to "$location"/) if $c->debug;
+        $c->trace(1, qq/Redirecting to "$location"/);
         $response->header( Location => $location );
     }
 
@@ -2011,11 +2028,11 @@ sub handle_request {
     # Always expect worst case!
     my $status = -1;
     try {
-        if ($class->debug) {
+        if ($class->trace_level) {
             my $secs = time - $START || 1;
             my $av = sprintf '%.3f', $COUNT / $secs;
             my $time = localtime time;
-            $class->log->info("*** Request $COUNT ($av/s) [$$] [$time] ***");
+            $class->trace(1, "*** Request $COUNT ($av/s) [$$] [$time] ***");
         }
 
         my $c = $class->prepare(@arguments);
@@ -2065,6 +2082,8 @@ sub prepare {
 
     #surely this is not the most efficient way to do things...
     $c->stats($class->stats_class->new)->enable($c->use_stats);
+    # We'll leave this use of debug since somehow this setting will move
+    # to middleware - jnap
     if ( $c->debug || $c->config->{enable_catalyst_header} ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
@@ -2241,12 +2260,15 @@ Writes information about the request to the debug logs.  This includes:
 
 =back
 
+Starting in Catalyst 5.90070, debug logs are handled by the new trace
+feature.  See L</Tracing>.
+
 =cut
 
 sub log_request {
     my $c = shift;
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my($dump) = grep {$_->[0] eq 'Request' } $c->dump_these;
     my $request = $dump->[1];
@@ -2255,12 +2277,12 @@ sub log_request {
     $method ||= '';
     $path = '/' unless length $path;
     $address ||= '';
-    $c->log->debug(qq/"$method" request for "$path" from "$address"/);
+    $c->trace(1, qq/"$method" request for "$path" from "$address"/);
 
     $c->log_request_headers($request->headers);
 
     if ( my $keywords = $request->query_keywords ) {
-        $c->log->debug("Query keywords are: $keywords");
+        $c->trace(1, "Query keywords are: $keywords");
     }
 
     $c->log_request_parameters( query => $request->query_parameters, $request->_has_body ? (body => $request->body_parameters) : () );
@@ -2278,7 +2300,7 @@ C<< $c->log_response_status_line >> and C<< $c->log_response_headers >>.
 sub log_response {
     my $c = shift;
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my($dump) = grep {$_->[0] eq 'Response' } $c->dump_these;
     my $response = $dump->[1];
@@ -2306,7 +2328,7 @@ Writes one line of information about the response to the debug logs.  This inclu
 sub log_response_status_line {
     my ($c, $response) = @_;
 
-    $c->log->debug(
+    $c->trace(1,
         sprintf(
             'Response Code: %s; Content-Type: %s; Content-Length: %s',
             $response->status                            || 'unknown',
@@ -2335,7 +2357,7 @@ sub log_request_parameters {
     my $c          = shift;
     my %all_params = @_;
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my $column_width = Catalyst::Utils::term_width() - 44;
     foreach my $type (qw(query body)) {
@@ -2347,7 +2369,7 @@ sub log_request_parameters {
             my $value = defined($param) ? $param : '';
             $t->row( $key, ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
         }
-        $c->log->debug( ucfirst($type) . " Parameters are:\n" . $t->draw );
+        $c->trace(1, ucfirst($type) . " Parameters are:\n" . $t->draw );
     }
 }
 
@@ -2362,7 +2384,7 @@ the debug logs.
 sub log_request_uploads {
     my $c = shift;
     my $request = shift;
-    return unless $c->debug;
+    return unless $c->trace_level;
     my $uploads = $request->uploads;
     if ( keys %$uploads ) {
         my $t = Text::SimpleTable->new(
@@ -2377,7 +2399,7 @@ sub log_request_uploads {
                 $t->row( $key, $u->filename, $u->type, $u->size );
             }
         }
-        $c->log->debug( "File Uploads are:\n" . $t->draw );
+        $c->trace(1, "File Uploads are:\n" . $t->draw );
     }
 }
 
@@ -2401,7 +2423,7 @@ sub log_headers {
     my $type    = shift;
     my $headers = shift;    # an HTTP::Headers instance
 
-    return unless $c->debug;
+    return unless $c->trace_level;
 
     my $column_width = Catalyst::Utils::term_width() - 28;
     my $t = Text::SimpleTable->new( [ 15, 'Header Name' ], [ $column_width, 'Value' ] );
@@ -2411,7 +2433,7 @@ sub log_headers {
             $t->row( $name, $value );
         }
     );
-    $c->log->debug( ucfirst($type) . " Headers:\n" . $t->draw );
+    $c->trace(1, ucfirst($type) . " Headers:\n" . $t->draw );
 }
 
 
@@ -2890,6 +2912,85 @@ sub psgi_app {
     return $app->Catalyst::Utils::apply_registered_middleware($psgi);
 }
 
+
+=head2 trace_level
+
+Class attribute which is a positive number and defines the noiseness of the
+application trace.  This attribute is defined at application startup, trying
+to change it in a running app is considered an error.  See L</TRACING>.
+
+=head2 trace_logger
+
+Class attribute which is a handler for reporting your traces.  See L</TRACING>.
+
+=head2 $c->setup_trace
+
+Examples your %ENV, configuation and application settings to setup how and if
+application tracing is enabled.  See L</TRACING>.
+
+=head2 $c->trace
+
+Accepts a string $message and level for a trace message.  The configured
+trace level must equal or exceed the level given.  Level is required and should
+be a positive integer. For more see L</TRACING>.
+
+=cut
+
+sub setup_trace {
+  my ($app, @args) = @_;
+
+  # first we look for %ENV
+  if(my $trace = Catalyst::Utils::env_value( $app, 'TRACE' )) {
+    # extract a file path if it exists;
+    my ($level,$op, $path) = ($trace=~m/^(.+)(\=|\+\=)(.+)$/);
+    if($level && $op && $path) {
+      open(my $fh, '>', $path)
+        ||die "Cannot open trace file at $path: $!";
+      $app->trace_logger($fh);
+      $app->trace_level($level);
+    } else {
+      $app->trace_level($trace);
+    }
+  }
+
+  # Next, we look at config
+  $app->trace_level($app->config->{trace_level}) unless defined($app->trace_level);
+  $app->trace_logger($app->config->{trace_logger}) unless defined($app->trace_logger);
+
+  # We do setup_trace AFTER setup_log, so this stuff should be all good to
+  # use by this point in application setup.  For BackCompat, we will try to
+  # respect ->debug
+
+  if($app->debug) {
+    $app->trace_level(1) unless defined($app->trace_level);
+    $app->trace_logger(sub { shift->log->debug }) unless defined($app->trace_logger);
+    $app->trace(1, 'Debug messages enabled (via Debug state)');
+  }
+
+  # Last, we set defaults if the settings are still emtpy
+  # Setup the defaults
+
+  $app->trace_level(0) unless defined($app->trace_level);
+  $app->trace_logger(sub { shift->log->debug }) unless defined($app->trace_logger);
+
+  $app->trace(1, "Tracing enabled at level ${\$app->trace_level}")
+    if defined($app->trace_level);
+
+  return;
+}
+
+sub trace {
+  my ($class, $level, $message) = @_;
+  die "Level is required" unless defined $level;
+  die "Message is required" unless defined $message;
+  return unless $class->trace_level;
+  if($class->trace_level >= $level) {
+    ref($class->trace_logger) eq 'CODE' ?
+      $class->trace_logger->($class, $message, $level) :
+        $class->trace_logger->print($message);
+  }
+}
+
 =head2 $c->setup_home
 
 Sets up the home directory.
@@ -2948,7 +3049,6 @@ sub setup_log {
 
     if ( $levels{debug} ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('debug' => sub { 1 });
-        $class->log->debug('Debug messages enabled');
     }
 }
 
@@ -2970,9 +3070,11 @@ sub setup_stats {
     Catalyst::Utils::ensure_class_loaded($class->stats_class);
 
     my $env = Catalyst::Utils::env_value( $class, 'STATS' );
-    if ( defined($env) ? $env : ($stats || $class->debug ) ) {
+    # Will grandfather using debug to turn on stats since there's a complicated
+    # order of events here when trace mode tries to guess its state from debug.
+    if ( defined($env) ? $env : ($stats || $class->trace_level || $class->debug ) ) {
         Class::MOP::get_metaclass_by_name($class)->add_method('use_stats' => sub { 1 });
-        $class->log->debug('Statistics enabled');
+        $class->trace(1,'Statistics enabled');
     }
 }
 
@@ -3437,11 +3539,19 @@ backwardly compatible).
 
 =item *
 
-C<psgi_middleware> - See L<PSGI MIDDLEWARE>.
+C<psgi_middleware> - See L</PSGI MIDDLEWARE>.
 
 =item *
 
-C<data_handlers> - See L<DATA HANDLERS>.
+C<data_handlers> - See L</DATA HANDLERS>.
+
+=item *
+
+trace_level - This sets your application trace level - See L</TRACING>.
+
+=item *
+
+trace_logger - This sets your application trace logger - See L</TRACING>.
 
 =back
 
@@ -3737,6 +3847,164 @@ to initialize the middleware object.
 =back
 
 Please see L<PSGI> for more on middleware.
+
+=head1 TRACING
+
+B<NOTE> Tracing replaces the functionality of L<Debug>.  For now both
+interfaces will be supported but it is suggested that you become familiar with
+the new interface and begin using it.
+
+Application tracing is debugging information about the state of your L<Catalyst>
+application and a request / response cycle.  This is often used when you want a
+peek into the 'Catalyst Black Box' without needing to actually hack into the
+core code and add debugging statements.  Examples of application tracing include
+startup information about loaded plugins, middleware, models, controllers and
+views.  It also includes details about how a request is dispatched (what actions
+in what controllers are hit, and approximately how long each took) and how a
+response is generated.  Additional trace information includes details about errors
+and some basic statistics on your running application.
+
+It is often the case when running an application in a development environment
+for development purposes that you will enable tracing to assist you in your work.
+However, application tracing is not strictly tied to environment so trace levels
+are not automatically enabled based on any environment settings (although you are
+allowed to set trace levels via configuration, which can be environment specific,
+if you choose so).
+
+Application tracing is also not the same thing as logging. Logging is custom messages
+that you've added to your custom application for the purposes of better understanding
+your application and how effective your application is in achieving its goals.
+Often logging is extended, unstructured meta data around your core business logic
+such as details about when a user account is created or failed to be created, what
+types of validation issues are occuring in your forms, page views, user engagement
+and timestamps to help you understand your application performance.  Basically this
+is often information of business value that doesn't cleanly or meaningfully fit
+into a database.  Catalyst provides an interface for adding various kinds of
+Loggers which can assist you in these tasks.  Most Loggers allow one to log
+messages at different levels of priority, such as debug, warning, critical, etc.
+This is a useful feature since it permits one to turn the logging level down in
+high traffic environments.  In the past Catalyst tracing (previously called
+'Debug') was conflated with log levels of debug, in that in order to enable
+application tracing (or debugging) one was required to turn log level debug on
+globally.  Additionally, the Catalyst application tracing (or debugging) used
+the defined logger to 'record' its messages.  Neither is ideal since it leads
+one to be forced to accept more logging than may be wished, and it also does
+not allow one to separate development tracing from application debug logging.
+
+Application tracing fixes this issues by allowing you to turn on tracing
+independently of setting your log level.  It also lets you define a trace
+log message handler separately from your logger.  So for example you might
+wish to send trace messages to STDOUT, but send your logging to Elasticsearch.
+Here's an example:
+
+    package MyApp;
+
+    use Catalyst;
+
+    __PACKAGE__->trace_level(1);
+    __PACKAGE__->trace_logger(sub { my $class = shift; ...});
+    __PACKAGE__->setup;
+
+You may also configure tracing via configuration:
+
+    package MyApp;
+
+    use Catalyst;
+
+    __PACKAGE__->config({
+      trace_level => 1,
+      trace_logger => sub { my $class = shift; ...},
+    });
+
+    __PACKAGE__->setup;
+
+B<IMPORTANT> You cannot set tracing via configuration files if you are using
+the L<Catalyst::Plugin::ConfigLoader> plugin, as that plugin is loaded too
+late for it to be applied during all phases of setup.
+
+Or, you may set tracing via environment varables, for example:
+
+    CATALYST_TRACE=1 perl script/myapp_server.pl
+    MYAPP_TRACE=1 perl script/myapp_server.pl
+    MYAPP_TRACE=1=/var/log/traces perl script/myapp_server.pl
+
+The order of precidence is that custom application environment variables
+('MYAPP_TRACE') come first, followed by global environment variables
+('CATALYST_TRACE'), followed by configuration settings and lastly application
+defaults.
+
+For backwards compatiblity, we respect classic Catalyst debugging (L<Debug>) in
+the following way.  If debugging is true, we automatically set
+C<trace_level=1> and set the C<trace_logger> to your the debug method of your
+defined log object (basically it works just as described in L<Debug>).  In this
+case $c->debug will also be set to true.
+
+Please note that if you set C<trace_level> but not debugging then debugging
+($c->debug) will NOT be set to true.
+
+Please note that if you set BOTH trace_level and 'class' debugging, your trace
+level and trace configuation is respected at a high priority, however the state
+of the debug method will be set as requested (although overridden).  This is
+done for backcompatibility with applications that overloaded the debug method
+in custom applications.
+
+Please note that when setting trace levels via environment, you may use an
+extended form of the value, which opens a filehandled to a specified path
+and sends all trace information there:
+
+    MYAPP_TRACE=1=/var/log/traces perl script/myapp_server.pl
+
+This would override any other settings for L<\trace_logger>.  I
+
+=head2 trace_level
+
+This is a number that defaults to 0.  It indicates the level of application
+tracing that is desired.  Larger numbers indicate greater level of tracing.
+Currently trace levels are defined, although at this time respect is limited,
+as this is a new feature.
+
+Levels 1,2 and 3 are reserved for Catalyst core code (code that is part of the
+L<Catalyst> distribution).
+
+Levels 4,5 and 6 are reserved for Catalyst extended ecosystem (Catalyst plugins,
+models, views and distributions under the CatalystX namespace).
+
+Levels 7,8 and 9 are reserved but not currently defined.
+
+Levels 10 and higher are reserved for local (not on CPAN) application use.
+
+=head2 trace_logger
+
+This handles a trace message, if it is determined that one should be sent based
+on the running L<\trace_level>.  This can accept the following values
+
+=over 4
+
+=item a CodeRef
+
+This is a code reference that gets the application class (your Catalyst.pm
+subclass) as argument0, the message as argument1 and the level as argument3.
+The message is expected to be a string.  For example:
+
+    __PACKAGE__->trace_logger( sub {
+      my ($app, $message, $level) = @_;
+      $app->log->debug($message);
+    });
+
+Would send trace messages to the debug log handler (This is currently the
+default behavior).
+
+=item A Filehandle or Object
+
+This must be an open filehandle setup to received output.  We really
+just look for a 'print' method, so strictly speaking this could be
+any object that satisfies the duck type.
+
+=item A String
+
+A path that be be resolved as a file that we open a filehandle to.
+
+=back
 
 =head1 ENCODING
 
