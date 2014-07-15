@@ -5,23 +5,32 @@ package Catalyst::Middleware::Stash;
 
 use base 'Plack::Middleware';
 use Exporter 'import';
-use Scalar::Util 'blessed';
 use Carp 'croak';
 
 our @EXPORT_OK = qw(stash get_stash);
 
 sub PSGI_KEY { 'Catalyst.Stash.v1' };
 
-sub get_stash { return shift->{PSGI_KEY} }
+sub get_stash {
+  my $env = shift;
+  return $env->{PSGI_KEY} ||
+    _init_stash($env);
+}
 
-sub generate_stash_closure {
+sub stash {
+  my ($host, @args) = @_;
+  return get_stash($host->env)
+    ->(@args);
+}
+
+sub _generate_stash_closure {
   my $stash = shift || +{};
   return sub {
     if(@_) {
       my $new_stash = @_ > 1 ? {@_} : $_[0];
       croak('stash takes a hash or hashref')
         unless ref $new_stash;
-      foreach my $key ( keys %$new_stash ) {
+      foreach my $key (keys %$new_stash) {
         $stash->{$key} = $new_stash->{$key};
       }
     }
@@ -30,19 +39,14 @@ sub generate_stash_closure {
 }
 
 sub _init_stash {
-  my ($self, $env) = @_;
+  my ($env) = @_;
   return $env->{PSGI_KEY} ||=
-    generate_stash_closure;
-}
-
-sub stash {
-  my ($host, @args) = @_;
-  return get_stash($host->env)->(@args);
+    _generate_stash_closure;
 }
 
 sub call {
   my ($self, $env) = @_;
-  $self->_init_stash($env);
+  _init_stash($env);
   return $self->app->($env);
 }
 
@@ -65,13 +69,22 @@ This class defines the following subroutines.
 
 =head2 PSGI_KEY
 
-Returns the hash key where we store the stash
+Returns the hash key where we store the stash.  You should not assume
+the string value here will never change!  Also, its better to use
+L</get_stash> or L</stash>.
 
 =head2 get_stash
 
-Get the stash out of the C<$env>
+Expect: $psgi_env.
+
+Exportable subroutine.
+
+Get the stash out of the C<$env>.  If the stash does not yet exist, we initialize
+one and return that.
 
 =head2 stash
+
+Expects: An object that does C<env> and arguments
 
 Exportable subroutine.
 
@@ -80,15 +93,19 @@ as a method or via hashref modification.  This stash is automatically
 reset for each request (it is not persistent or shared across connected
 clients.  Stash key / value are stored in memory.
 
-    Catalyst::Middleware::Stash 'stash';
+    use Plack::Request;
+    use Catalyst::Middleware::Stash 'stash';
 
-    $c->stash->{foo} = $bar;
-    $c->stash( { moose => 'majestic', qux => 0 } );
-    $c->stash( bar => 1, gorch => 2 ); # equivalent to passing a hashref
+    my $app = sub {
+      my $env = shift;
+      my $req = Plack::Request->new($env);
+      my $stashed = $req->stash->{in_the_stash};  # Assume the stash was previously populated.
 
-=head2 generate_stash_closure
+      return [200, ['Content-Type' => 'text/plain'],
+        ["I found $stashed in the stash!"]];
+    };
 
-Creates the closure which is stored in the L<PSGI> environment.
+If the stash does not yet exist, we initialize one and return that.
 
 =head1 METHODS
 
