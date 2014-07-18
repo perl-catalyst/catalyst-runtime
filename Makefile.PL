@@ -119,7 +119,6 @@ author_requires(
   @author_requires,
   map {; $_ => 0 } qw(
   File::Copy::Recursive
-  Catalyst::Engine::PSGI
   Test::Without::Module
   Starman
   MooseX::Daemonize
