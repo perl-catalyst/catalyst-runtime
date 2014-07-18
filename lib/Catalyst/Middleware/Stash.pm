@@ -14,7 +14,7 @@ sub PSGI_KEY { 'Catalyst.Stash.v1' };
 sub get_stash {
   my $env = shift;
   return $env->{PSGI_KEY} ||
-    _init_stash($env);
+    _init_stash_in($env);
 }
 
 sub stash {
@@ -23,7 +23,7 @@ sub stash {
     ->(@args);
 }
 
-sub _generate_stash_closure {
+sub _create_stash {
   my $stash = shift || +{};
   return sub {
     if(@_) {
@@ -38,15 +38,15 @@ sub _generate_stash_closure {
   };
 }
 
-sub _init_stash {
+sub _init_stash_in {
   my ($env) = @_;
   return $env->{PSGI_KEY} ||=
-    _generate_stash_closure;
+    _create_stash;
 }
 
 sub call {
   my ($self, $env) = @_;
-  _init_stash($env);
+  _init_stash_in($env);
   return $self->app->($env);
 }
 
@@ -79,8 +79,7 @@ Expect: $psgi_env.
 
 Exportable subroutine.
 
-Get the stash out of the C<$env>.  If the stash does not yet exist, we initialize
-one and return that.
+Get the stash out of the C<$env>.
 
 =head2 stash
 
