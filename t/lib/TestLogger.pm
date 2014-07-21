@@ -25,5 +25,6 @@ sub warn {
     push(@ELOGS, shift());
 }
 
+sub error { die "Got unexpected error; $_[1]" }
 1;
 

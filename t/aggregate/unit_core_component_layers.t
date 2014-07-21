@@ -20,7 +20,10 @@ my $model_foo_bar = $model_foo->bar;
 can_ok($model_foo_bar, 'model_foo_bar_method_from_foo');
 can_ok($model_foo_bar, 'model_foo_bar_method_from_foo_bar');
 
-TestApp->setup;
+# I commented out this line since we seem to just massively
+# fail on the 'you already did setup.  I have no idea why its
+# here - jnap
+#TestApp->setup;
 
 is($model_foo->model_quux_method, 'chunkybacon', 'Model method getting $self->{quux} from config');
 

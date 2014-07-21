@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90069_TBA
+  - Finished merging all the encoding plugin code to core code.  The encoding
+    plugin is now just an empty package.  Also tried to improve encoding docs
+    a bit.
+  - Some additional changes to the stash middleware that should not break
+    anything new.
+
 5.90069_002
   - Catalyst stash functionality has been moved to Middleware.  It should
     work entirely the same when used as a context method, please report
