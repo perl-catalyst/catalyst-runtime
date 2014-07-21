@@ -6,6 +6,10 @@
     a bit.
   - Some additional changes to the stash middleware that should not break
     anything new.
+  - Documentation around using Sendfile type http headers with a filehandle
+    type response.
+  - Merged from master branch to pick up some additional fixes and documentation
+    improvements.
 
 5.90069_002
   - Catalyst stash functionality has been moved to Middleware.  It should
