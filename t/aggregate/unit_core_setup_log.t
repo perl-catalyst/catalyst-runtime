@@ -76,13 +76,13 @@ foreach my $name (grep { /^(CATALYST|TESTAPP)/ } keys %ENV) {
     my $app = mock_app('TestAppLogEmptyString');
     $app->setup_log('');
     ok !$app->debug, 'Not In debug mode';
-    # Note that by default, you get _all_ the log levels turned on
+    # Note that by default, you get _all_ the log levels turned on over debug
     test_log_object($app->log,
         fatal => 1,
         error => 1,
         warn => 1,
         info => 1,
-        debug => 1,
+        debug => 0,
     );
 }
 {

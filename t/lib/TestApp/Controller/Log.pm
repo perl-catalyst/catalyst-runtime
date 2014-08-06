@@ -9,6 +9,11 @@ sub debug :Local  {
     $c->res->body( 'logged' );
 }
 
+sub info :Local  {
+    my ( $self, $c ) = @_;
+    $c->log->info('info');
+    $c->res->body( 'logged' );
+}
 
 1;
 

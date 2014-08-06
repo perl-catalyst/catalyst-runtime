@@ -69,10 +69,10 @@ my $cmp = TestApp->debug ? '>=' : '==';
 
     test_psgi $app, sub {
         my $cb = shift;
-        my $res = $cb->(GET "/log/debug");
+        my $res = $cb->(GET "/log/info");
         my @logs = $handle->logs;
         cmp_ok(scalar(@logs), $cmp, 1, "psgi.errors: one event output");
-        like($logs[0], qr/debug$/m, "psgi.errors: event matches test data");
+        like($logs[0], qr/info$/m, "psgi.errors: event matches test data");
     };
 };
 
@@ -97,9 +97,9 @@ my $cmp = TestApp->debug ? '>=' : '==';
 
     test_psgi $app, sub {
         my $cb = shift;
-        my $res = $cb->(GET "/log/debug");
+        my $res = $cb->(GET "/log/info");
         cmp_ok(scalar(@logs), $cmp, 1, "psgix.logger: one event logged");
-        is(scalar(grep { $_->{level} eq 'debug' and $_->{message} eq 'debug' } @logs),
+        is(scalar(grep { $_->{level} eq 'info' and $_->{message} eq 'info' } @logs),
            1, "psgix.logger: right stuff");
     };
 };
