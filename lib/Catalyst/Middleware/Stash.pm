@@ -13,7 +13,7 @@ sub PSGI_KEY { 'Catalyst.Stash.v1' };
 
 sub get_stash {
   my $env = shift;
-  return $env->{PSGI_KEY} ||
+  return $env->{&PSGI_KEY} ||
     _init_stash_in($env);
 }
 
@@ -40,7 +40,7 @@ sub _create_stash {
 
 sub _init_stash_in {
   my ($env) = @_;
-  return $env->{PSGI_KEY} ||=
+  return $env->{&PSGI_KEY} ||=
     _create_stash;
 }
 
