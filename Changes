@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90069_004
+  - Fixed typo in middleware stash that was causing older Perls to fail
+    certain tests.  No other changes.
+
 5.90069_003
   - The default log level is now 'info', not 'debug'.
   - Finished merging all the encoding plugin code to core code.  The encoding
