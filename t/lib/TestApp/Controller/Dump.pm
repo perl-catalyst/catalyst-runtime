@@ -14,14 +14,6 @@ sub env : Action Relative {
     $c->forward('TestApp::View::Dump::Env');
 }
 
-sub env_on_engine : Action Relative {
-    my ( $self, $c ) = @_;
-    # JNAP - I changed this to req since the engine no longer
-    # has the env but the tests here are useful.
-    $c->stash(env => $c->req->env);
-    $c->forward('TestApp::View::Dump::Env');
-}
-
 sub request : Action Relative {
     my ( $self, $c ) = @_;
     $c->req->params(undef); # Should be a no-op, and be ignored.
