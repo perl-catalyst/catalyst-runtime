@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90071 - 2014-08-10
+  - Travis config now performs basic reverse dependency testing.
+  - Restored deprecated 'env' code in Engine.pm b/c it is still being used out
+    in the wild (Catalyst-Plugin-Authentication-0.10023) - (removed in 5.90070)
+  - Reverted changes to debug log/handling (5.90069_003) to fix
+    rev dep Catalyst-Plugin-Static-Simple-0.32 test suite.
+  - Added italian translation of default error.
+
 5.90070 - 2014-08-07
   - Retagged previous release as stable; no changes
 
