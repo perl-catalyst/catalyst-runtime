@@ -70,7 +70,7 @@ foreach my $name (grep { /^(CATALYST|TESTAPP)/ } keys %ENV) {
     ok $log->is_error, 'Errors should be enabled';
     ok $log->is_fatal, 'Fatal errors should be enabled';
     ok $log->is_info, 'Info should be enabled';
-    ok !$log->is_debug, 'Debugging should not be enabled';
+    ok $log->is_debug, 'Debugging should be enabled';
     ok !$c->debug, 'Catalyst debugging turned off';
 }
 my $log_meta = Class::MOP::Class->create_anon_class(

@@ -66,7 +66,8 @@ around new => sub {
     my $class = shift;
     my $self = $class->$orig;
 
-    $self->levels( scalar(@_) ? @_ : (qw/info warn error fatal/) );
+    $self->levels( scalar(@_) ? @_ : keys %LEVELS );
+
     return $self;
 };
 
