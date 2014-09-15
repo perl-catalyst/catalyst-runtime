@@ -645,9 +645,15 @@ sub param {
         return keys %{ $self->parameters };
     }
 
-    if ( @_ == 1 ) {
+    # If anything in @_ is undef, carp about that, and remove it from
+    # the list;
+    
+    my @params = grep { defined($_) ? 1 : do {carp "You called ->params with an undefined value"; 0} } @_;
 
-        my $param = shift;
+    if ( @params == 1 ) {
+
+        defined(my $param = shift @params) ||
+          carp "You called ->params with an undefined value 2";
 
         unless ( exists $self->parameters->{$param} ) {
             return wantarray ? () : undef;
@@ -664,8 +670,8 @@ sub param {
               : $self->parameters->{$param};
         }
     }
-    elsif ( @_ > 1 ) {
-        my $field = shift;
+    elsif ( @params > 1 ) {
+        my $field = shift @params;
         $self->parameters->{$field} = [@_];
     }
 }

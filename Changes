@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90072 - 2014-09-15
+  - In the case where you call $c->req->param(undef), warn with a more useful
+    warning (now gives the line of your code that called param with the undef,
+    so you can go to hunt it out.
+
 5.90071 - 2014-08-10
   - Travis config now performs basic reverse dependency testing.
   - Restored deprecated 'env' code in Engine.pm b/c it is still being used out
