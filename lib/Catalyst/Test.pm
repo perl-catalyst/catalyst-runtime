@@ -418,18 +418,20 @@ sub _customize_request {
     $opts = {} unless ref($opts) eq 'HASH';
 
     if ( exists( $opts->{host} ) && exists( $opts->{headers}->{host} ) ) {
-		croak "'host' and 'headers->{host}' both exist. Use ONLY ONE";
-	}
+        croak "'host' and 'headers->{host}' both exist. Use ONLY ONE";
+    }
 
-	my $host = $opts->{host} || $opts->{headers}->{host} || $default_host;
+    my $host = exists $opts->{host} ? $opts->{host} :
+                   exists $opts->{headers}->{host} ? $opts->{headers}->{host} :
+                       $default_host;
 
     if ( $host ) {
         $request->header( 'Host' => $host );
     }
 
-	foreach my $header ( keys %{$opts->{headers}} ) {
-		$request->header( ucfirst($header) => $opts->{headers}->{$header} );
-	}
+    foreach my $header ( keys %{$opts->{headers}} ) {
+        $request->header( ucfirst($header) => $opts->{headers}->{$header} );
+    }
 
     if (my $extra = $opts->{extra_env}) {
         @{ $extra_env }{keys %{ $extra }} = values %{ $extra };
