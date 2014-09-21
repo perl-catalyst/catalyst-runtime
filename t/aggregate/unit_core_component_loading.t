@@ -2,7 +2,7 @@
 # (do not forget to update the number of components in test 3 as well)
 # 5 extra tests for the loading options
 # One test for components in inner packages
-use Test::More tests => 2 + 6 * 24 + 8 + 1;
+use Test::More tests => 2 + 6 * 24 + 9 + 1;
 
 use strict;
 use warnings;
@@ -152,12 +152,20 @@ foreach my $component (@components) {
     );
 }
 
+    make_component_file(
+        $libdir,
+        'ExternalExtra',
+        'Controller',
+        'Controller',
+        'FooExternal',
+    );
+
 eval qq(
 package $appclass;
 use Catalyst;
 $shut_up_deprecated_warnings
 __PACKAGE__->config->{ setup_components } = {
-    search_extra => [ '::Extra' ],
+    search_extra => [ '::Extra', 'ExternalExtra::Controller' ],
     except       => [ "${appclass}::Controller::Foo" ]
 };
 __PACKAGE__->setup;
@@ -167,10 +175,12 @@ can_ok( $appclass, 'components');
 
 $complist = $appclass->components;
 
-is(scalar keys %$complist, 24+1, "Correct number of components loaded");
+is(scalar keys %$complist, 24+2, "Correct number of components loaded");
 
 ok( !exists $complist->{ "${appclass}::Controller::Foo" }, 'Controller::Foo was skipped' );
 ok( exists $complist->{ "${appclass}::Extra::Foo" }, 'Extra::Foo was loaded' );
+
+isa_ok($appclass->controller('FooExternal'), 'Catalyst::Controller', 'ExternalExtra::Controller::FooExternal was loaded');
 
 rmtree($libdir);
 
