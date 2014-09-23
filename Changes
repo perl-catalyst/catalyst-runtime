@@ -6,6 +6,7 @@
     You shouldn't do this, but I guess I shouldn't have busted it either :)
   - Allow the term_width to be regenerated (see Catalyst::Utils::term_width,
     Frew Schmidt)
+  - More aggressive skipping of value decoding if the value is undefined.
 
 5.90072 - 2014-09-15
   - In the case where you call $c->req->param(undef), warn with a more useful

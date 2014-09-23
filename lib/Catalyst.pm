@@ -3071,6 +3071,7 @@ sub _handle_unicode_decoding {
 
     return unless defined $value;
 
+    ## I think this mess is to support the old nested
     if ( ref $value eq 'ARRAY' ) {
         foreach ( @$value ) {
             $_ = $self->_handle_unicode_decoding($_);
@@ -3090,6 +3091,8 @@ sub _handle_unicode_decoding {
 
 sub _handle_param_unicode_decoding {
     my ( $self, $value ) = @_;
+    return unless defined $value; # not in love with just ignoring undefs - jnap
+
     my $enc = $self->encoding;
     return try {
         Encode::is_utf8( $value ) ?
