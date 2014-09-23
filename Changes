@@ -4,6 +4,8 @@
   - Fixed a regression caused by the last release where we broke what happened
     when you tried to set request parameters via $c->req->param('foo', 'bar').
     You shouldn't do this, but I guess I shouldn't have busted it either :)
+  - Allow the term_width to be regenerated (see Catalyst::Utils::term_width,
+    Frew Schmidt)
 
 5.90072 - 2014-09-15
   - In the case where you call $c->req->param(undef), warn with a more useful
