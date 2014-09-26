@@ -3111,9 +3111,7 @@ sub _handle_param_unicode_decoding {
 
     my $enc = $self->encoding;
     return try {
-        Encode::is_utf8( $value ) ?
-            $value
-        : $enc->decode( $value, $self->_encode_check );
+      $enc->decode( $value, $self->_encode_check );
     }
     catch {
         $self->handle_unicode_encoding_exception({
