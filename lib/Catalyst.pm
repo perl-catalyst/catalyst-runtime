@@ -127,7 +127,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90073';
+our $VERSION = '5.90080_001';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -2993,7 +2993,9 @@ sub apply_default_middlewares {
     return $psgi_app;
 }
 
-=head2 $c->psgi_app
+=head2 App->psgi_app
+
+=head2 App->to_app
 
 Returns a PSGI application code reference for the catalyst application
 C<$c>. This is the bare application without any middlewares
@@ -3003,6 +3005,8 @@ This is what you want to be using to retrieve the PSGI application code
 reference of your Catalyst application for use in F<.psgi> files.
 
 =cut
+
+*to_app = \&psgi_app;
 
 sub psgi_app {
     my ($app) = @_;
