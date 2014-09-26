@@ -9,12 +9,12 @@ use Carp 'croak';
 
 our @EXPORT_OK = qw(stash get_stash);
 
-sub PSGI_KEY { 'Catalyst.Stash.v1' };
+sub PSGI_KEY () { 'Catalyst.Stash.v1' }
 
 sub get_stash {
   my $env = shift;
-  return $env->{&PSGI_KEY} ||
-    _init_stash_in($env);
+  return $env->{+PSGI_KEY} ||
+   croak "You requested a stash, but one does not exist.";
 }
 
 sub stash {
@@ -38,16 +38,13 @@ sub _create_stash {
   };
 }
 
-sub _init_stash_in {
-  my ($env) = @_;
-  return $env->{&PSGI_KEY} ||=
-    _create_stash;
-}
-
 sub call {
   my ($self, $env) = @_;
-  _init_stash_in($env);
-  return $self->app->($env);
+  my $new_env = +{ %$env };
+  my %stash = %{ ($env->{+PSGI_KEY} || sub {})->() || +{} };
+
+  $new_env->{+PSGI_KEY} = _create_stash( \%stash  );
+  return $self->app->($new_env);
 }
 
 =head1 TITLE
@@ -62,6 +59,15 @@ alone distribution
 
 We store a coderef under the C<PSGI_KEY> which can be dereferenced with
 key values or nothing to access the underly hashref.
+
+The stash middleware is designed so that you can 'nest' applications that
+use it.  If for example you have a L<Catalyst> application that is called
+by a controller under a parent L<Catalyst> application, the child application
+will inherit the full stash of the parent BUT any new keys added by the child
+will NOT bubble back up to the parent.  However, children of children will.
+
+For more information the current test case t/middleware-stash.t is the best
+documentation.
 
 =head1 SUBROUTINES
 
@@ -104,7 +110,7 @@ clients.  Stash key / value are stored in memory.
         ["I found $stashed in the stash!"]];
     };
 
-If the stash does not yet exist, we initialize one and return that.
+If the stash does not yet exist, an exception is thrown.
 
 =head1 METHODS
 

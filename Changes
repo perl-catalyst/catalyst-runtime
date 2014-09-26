@@ -5,6 +5,9 @@
     existing Plack conventions.
   - Modify Catayst::Response->from_psgi_response to allow the first argument to
     be an object that does ->as_psgi.
+  - Modified Catayst::Middleware::Stash to be a shallow copy in $env.  Added some
+    docs.  Added a test case to make sure stash keys added in a child application
+    don't bubble back up to the main application.
 
 5.90073 - 2014-09-23
   - Fixed a regression caused by the last release where we broke what happened

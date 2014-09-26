@@ -495,6 +495,18 @@ Catalyst).
     # stash is automatically passed to the view for use in a template
     $c->forward( 'MyApp::View::TT' );
 
+The stash hash is currently stored in the PSGI C<$env> and is managed by
+L<Catalyst::Middleware::Stash>.  Since it's part of the C<$env> items in
+the stash can be accessed in sub applications mounted under your main
+L<Catalyst> application.  For example if you delegate the response of an
+action to another L<Catalyst> application, that sub application will have
+access to all the stash keys of the main one, and if can of course add
+more keys of its own.  However those new keys will not 'bubble' back up
+to the main application.
+
+For more information the best thing to do is to review the test case:
+t/middleware-stash.t in the distribution /t directory.
+
 =cut
 
 sub stash {
