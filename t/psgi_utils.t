@@ -9,12 +9,24 @@ my $psgi_app = sub {
 };
 
 {
+  package MyApp::PSGIObject;
+
+  sub as_psgi {
+    return [200, ['Content-Type' => 'text/plain'], ['as_psgi']];
+  };
+
   package MyApp::Controller::Docs;
   $INC{'MyApp/Controller/Docs.pm'} = __FILE__;
 
   use base 'Catalyst::Controller';
   use Plack::Request;
   use Catalyst::Utils;
+
+  sub as_psgi :Local {
+    my ($self, $c) = @_;
+    my $as_psgi = bless +{}, 'MyApp::PSGIObject';
+    $c->res->from_psgi_response($as_psgi);
+  }
 
   sub name :Local {
     my ($self, $c) = @_;
@@ -120,6 +132,11 @@ my $psgi_app = sub {
 
 use Test::More;
 use Catalyst::Test 'MyApp';
+
+{
+  my ($res, $c) = ctx_request('/docs/as_psgi');
+  is $res->content, 'as_psgi';
+}
 
 {
   my ($res, $c) = ctx_request('/user/mounted/111?path_prefix=1');
@@ -367,32 +384,3 @@ use Catalyst::Test 'MyApp';
 }
 
 done_testing();
-
-__END__
-
-
-use Plack::App::URLMap;
-use HTTP::Request::Common;
-use HTTP::Message::PSGI;
-
-my $urlmap = Plack::App::URLMap->new;
-
-my $app1 = sub {
-  my $env = shift;
-  return [200, [], [
-    "REQUEST_URI: $env->{REQUEST_URI}, FROM: $env->{MAP_TO}, PATH_INFO: $env->{PATH_INFO}, SCRIPT_NAME $env->{SCRIPT_NAME}"]];
-};
-
-$urlmap->map("/" => sub { my $env = shift; $env->{MAP_TO} = '/'; $app1->($env)});
-$urlmap->map("/foo" => sub { my $env = shift; $env->{MAP_TO} = '/foo'; $app1->($env)});
-$urlmap->map("/bar/baz" => sub { my $env = shift; $env->{MAP_TO} = '/foo/bar'; $app1->($env)});
-
-my $app = $urlmap->to_app;
-
-warn $app->(req_to_psgi(GET '/'))->[2]->[0];
-warn $app->(req_to_psgi(GET '/111'))->[2]->[0];
-warn $app->(req_to_psgi(GET '/foo'))->[2]->[0];
-warn $app->(req_to_psgi(GET '/foo/222'))->[2]->[0];
-warn $app->(req_to_psgi(GET '/bar/baz'))->[2]->[0];
-warn $app->(req_to_psgi(GET '/bar/baz/333'))->[2]->[0];
-

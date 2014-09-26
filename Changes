@@ -3,6 +3,8 @@
 5.90080_001 - TBD
   - MyApp->to_app is now an alias for MyApp->psgi_app in order to better support
     existing Plack conventions.
+  - Modify Catayst::Response->from_psgi_response to allow the first argument to
+    be an object that does ->as_psgi.
 
 5.90073 - 2014-09-23
   - Fixed a regression caused by the last release where we broke what happened

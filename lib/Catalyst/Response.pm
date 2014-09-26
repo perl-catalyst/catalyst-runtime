@@ -4,6 +4,7 @@ use Moose;
 use HTTP::Headers;
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;
+use Scalar::Util 'blessed';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
@@ -116,6 +117,9 @@ sub finalize_headers {
 
 sub from_psgi_response {
     my ($self, $psgi_res) = @_;
+    if(blessed($psgi_res) && $psgi_res->can('as_psgi')) {
+      $psgi_res = $psgi_res->as_psgi;
+    }
     if(ref $psgi_res eq 'ARRAY') {
         my ($status, $headers, $body) = @$psgi_res;
         $self->status($status);
@@ -429,6 +433,8 @@ a $responder) set the response from it.
 
 Properly supports streaming and delayed response and / or async IO if running
 under an expected event loop.
+
+If passed an object, will expect that object to do a method C<as_psgi>.
 
 Example:
 
