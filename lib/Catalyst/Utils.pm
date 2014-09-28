@@ -384,11 +384,21 @@ that 'env' now lists COLUMNS.)
 
 As last resort, default value of 80 chars will be used.
 
+Calling C<term_width> with a true value will cause it to be recalculated; you
+can use this to cause it to get recalculated when your terminal is resized like
+this
+
+ $SIG{WINCH} = sub { Catalyst::Utils::term_width(1) };
+
 =cut
 
 my $_term_width;
 
 sub term_width {
+    my $force_reset = shift;
+
+    undef $_term_width if $force_reset;
+
     return $_term_width if $_term_width;
 
     my $width;

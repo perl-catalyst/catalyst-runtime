@@ -22,6 +22,12 @@ use Plack::Test;
     $c->response->body("This is the body");
   }
 
+  sub set_params :Local {
+    my ($self, $c) = @_;
+    $c->req->param(foo => 'a', 'b', 'c');
+    $c->res->body(join ',', $c->req->param('foo'));
+  }
+
   package MyApp;
   use Catalyst;
 
@@ -37,8 +43,17 @@ ok my $psgi = MyApp->psgi_app, 'build psgi app';
 
 test_psgi $psgi, sub {
     my $cb = shift;
-    my $res = $cb->(GET "/root/test");
-    is $res->code, 200, 'OK';
+
+    {
+      my $res = $cb->(GET "/root/test");
+      is $res->code, 200, 'OK';
+    }
+
+    {
+      my $res = $cb->(GET "/root/set_params");
+      is $res->code, 200, 'OK';
+      is $res->content, 'a,b,c';
+    }
 };
 
 done_testing;

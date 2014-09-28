@@ -672,7 +672,7 @@ sub param {
     }
     elsif ( @params > 1 ) {
         my $field = shift @params;
-        $self->parameters->{$field} = [@_];
+        $self->parameters->{$field} = [@params];
     }
 }
 
