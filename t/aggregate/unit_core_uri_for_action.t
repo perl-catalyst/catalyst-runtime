@@ -77,6 +77,36 @@ my $context = TestApp->new( {
                 namespace => 'yada',
               } );
 
+
+
+
+# this works, using $ctx
+is($context->uri_for( 'TestApp', $context->controller('Action::Chained')->action_for('endpoint')),
+   "http://127.0.0.1/foo/yada/chained/foo/end",
+   "uri_for a controller and action");
+
+# this fails, uri_for returns undef, why isn't this one working??
+is( $context->uri_for_action( '/action/chained/endpoint' ),
+	'http://127.0.0.1/chained/foo/end',
+   "uri_for a controller and action as string");
+
+# this fails, uri_for returns undef
+is(Catalyst::uri_for_action( 'TestApp', $context->controller('Action::Chained')->action_for('endpoint')),
+   "/chained/foo/end",
+   "uri_for a controller and action, called with only class name");
+
+# this fails, uri_for returns undef
+is(Catalyst::uri_for_action( 'TestApp', '/action/chained/endpoint' ),
+   "/chained/foo/end",
+   "uri_for a controller and action as string, called with only class name");
+
+# this fails, uri_for returns undef
+is(Catalyst::uri_for_action( 'TestApp', $chained_action),
+   "/chained/foo/end",
+   "uri_for action via dispatcher, called with only class name");
+
+
+
 is($context->uri_for($context->controller('Action')),
    "http://127.0.0.1/foo/yada/action/",
    "uri_for a controller");
