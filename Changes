@@ -8,6 +8,9 @@
   - Modified Catayst::Middleware::Stash to be a shallow copy in $env.  Added some
     docs.  Added a test case to make sure stash keys added in a child application
     don't bubble back up to the main application.
+  - We no longer use Encode::is_utf8 since it doesn't work the way we think it
+    does... This required some UTF-8 changes.  If your application is UTF-8 aware
+    I highly suggest you test this release.
 
 5.90073 - 2014-09-23
   - Fixed a regression caused by the last release where we broke what happened
