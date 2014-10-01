@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90074 - 2014-10-01
+  - Specify Carp minimum version to avoid pointless test fails (valy++)
+
 5.90073 - 2014-09-23
   - Fixed a regression caused by the last release where we broke what happened
     when you tried to set request parameters via $c->req->param('foo', 'bar').
