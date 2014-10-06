@@ -636,8 +636,10 @@ If multiple C<baz> parameters are provided this code might corrupt data or
 cause a hash initialization error. For a more straightforward interface see
 C<< $c->req->parameters >>.
 
-B<NOTE> A recently discovered exploit in L<CGI> style param methods does exist
-in L<Catalyst>.  Here's the whitepaper of the exploit:
+B<NOTE> Interfaces like this, which are based on L<CGI> and the C<param> method
+are now known to cause demonstrated exploits. It is highly recommended that you
+avoid using this method, and migrate existing code away from it.  Here's the
+whitepaper of the exploit:
 
 L<http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/>
 
@@ -680,6 +682,9 @@ keyword:
       user => scalar($c->req->param('user')),
       foo => scalar($c->req->param('foo')),
     });
+
+Upcoming versions of L<Catalyst> will disable this interface by default and require
+you to positively enable it should you require it for backwards compatibility reasons.
 
 =cut
 
