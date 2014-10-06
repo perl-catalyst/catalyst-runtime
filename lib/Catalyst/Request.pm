@@ -636,6 +636,51 @@ If multiple C<baz> parameters are provided this code might corrupt data or
 cause a hash initialization error. For a more straightforward interface see
 C<< $c->req->parameters >>.
 
+B<NOTE> A recently discovered exploit in L<CGI> style param methods does exist
+in L<Catalyst>.  Here's the whitepaper of the exploit:
+
+L<http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/>
+
+Basically this is an exploit that takes advantage of how L<\param> will do one thing
+in scalar context and another thing in list context.  This is combined with how Perl
+chooses to deal with duplicate keys in a hash definition by overwriting the value of
+existing keys with a new value if the same key shows up again.  Generally you will be
+vulnerale to this exploit if you are using this method in a direct assignment in a
+hash, such as with a L<DBIx::Class> create statement.  For example, if you have
+parameters like:
+
+    user?user=123&foo=a&foo=user&foo=456
+
+You could end up with extra parameters injected into your method calls:
+
+    $c->model('User')->create({
+      user => $c->req->param('user'),
+      foo => $c->req->param('foo'),
+    });
+
+Which would look like:
+
+    $c->model('User')->create({
+      user => 123,
+      foo => qw(a user 456),
+    });
+
+(or to be absolutely clear if you are not seeing it):
+
+    $c->model('User')->create({
+      user => 456,
+      foo => 'a',
+    });
+
+Possible remediations include scrubbing your parameters with a form validator like
+L<HTML::FormHandler> or being careful to force scalar context using the scalar
+keyword:
+
+    $c->model('User')->create({
+      user => scalar($c->req->param('user')),
+      foo => scalar($c->req->param('foo')),
+    });
+
 =cut
 
 sub param {

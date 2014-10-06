@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90075 - 2014-10-06
+  - Documentation patch for $c->req->param to point out the recently discovered
+    potential security issues: http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/
+  - You don't need to install this update, but you should read about the exploit
+    and review if your code is vulnerable.  If you use the $c->req->param interface
+    you really need to review this exploit.
+
 5.90074 - 2014-10-01
   - Specify Carp minimum version to avoid pointless test fails (valy++)
 

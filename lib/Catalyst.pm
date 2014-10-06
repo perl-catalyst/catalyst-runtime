@@ -127,7 +127,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90074';
+our $VERSION = '5.90075';
 
 sub import {
     my ( $class, @arguments ) = @_;
