@@ -128,6 +128,7 @@ __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
 our $VERSION = '5.90080_001';
+$VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -1388,10 +1389,12 @@ sub uri_for {
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
-    foreach my $arg (@args) {
-        utf8::encode($arg) if utf8::is_utf8($arg);
-        $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-    }
+
+     foreach my $arg (@args) {
+       ref $arg eq 'ARRAY' ? do { utf8::encode($_) for @$arg } : utf8::encode($arg);
+       ref $arg eq 'ARRAY' ? do { $_ =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @$arg } : 
+         $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+      }
 
     if ( $path->$_isa('Catalyst::Action') ) { # action object
         s|/|%2F|g for @args;
@@ -1399,11 +1402,6 @@ sub uri_for {
                         ( scalar @args && ref $args[0] eq 'ARRAY'
                          ? @{ shift(@args) }
                          : ()) ];
-
-        foreach my $capture (@$captures) {
-            utf8::encode($capture) if utf8::is_utf8($capture);
-            $capture =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-        }
 
         my $action = $path;
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
@@ -1451,16 +1449,22 @@ sub uri_for {
       # somewhat lifted from URI::_query's query_form
       $query = '?'.join('&', map {
           my $val = $params->{$_};
-          s/([;\/?:@&=+,\$\[\]%])/$URI::Escape::escapes{$1}/go;
+          #s/([;\/?:@&=+,\$\[\]%])/$URI::Escape::escapes{$1}/go; ## Commented out because seems to lead to double encoding - JNAP
           s/ /+/g;
           my $key = $_;
           $val = '' unless defined $val;
           (map {
               my $param = "$_";
-              utf8::encode( $param ) if utf8::is_utf8($param);
+              utf8::encode( $param );
               # using the URI::Escape pattern here so utf8 chars survive
               $param =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               $param =~ s/ /+/g;
+
+              utf8::encode( $key );
+              # using the URI::Escape pattern here so utf8 chars survive
+              $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+              $key =~ s/ /+/g;
+
               "${key}=$param"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
       } @keys);
     }

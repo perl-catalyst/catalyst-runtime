@@ -877,7 +877,7 @@ sub mangle_params {
         next unless defined $value;
         for ( ref $value eq 'ARRAY' ? @$value : $value ) {
             $_ = "$_";
-            utf8::encode( $_ ) if utf8::is_utf8($_);
+            #      utf8::encode($_);
         }
     };
 
