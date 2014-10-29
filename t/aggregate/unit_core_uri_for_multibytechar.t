@@ -1,3 +1,4 @@
+use utf8;
 use strict;
 use warnings;
 use FindBin;
@@ -38,14 +39,17 @@ is($context->req->uri_with({ name => "\x{6751}\x{702c}\x{5927}\x{8f14}" }), $uri
 my $action = $context->controller('Action::Chained')
     ->action_for('roundtrip_urifor_end');
 
-{
-use utf8;
-
 is($context->uri_for($action, ['hütte'], 'hütte', {
     test => 'hütte'
 }),
 'http://127.0.0.1/chained/roundtrip_urifor/h%C3%BCtte/h%C3%BCtte?test=h%C3%BCtte',
 'uri_for with utf8 captures and args');
-}
+
+is(
+  $context->uri_for($action, ['♥'], '♥', { '♥' => '♥'}),
+  'http://127.0.0.1/chained/roundtrip_urifor/' . '%E2%99%A5' . '/' . '%E2%99%A5' . '?' . '%E2%99%A5' . '=' . '%E2%99%A5',
+    'uri_for with utf8 captures and args');
+
+# ^ the match string is purposefully broken up to aid viewing, please to 'fix' it.
 
 done_testing;
