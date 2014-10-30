@@ -50,7 +50,7 @@ use Plack::Middleware::RemoveRedundantBody;
 use Catalyst::Middleware::Stash;
 use Plack::Util;
 use Class::Load 'load_class';
-use Encode 2.21 ();
+use Encode 2.21 'encode_utf8';
 
 BEGIN { require 5.008003; }
 
@@ -1390,26 +1390,37 @@ sub uri_for {
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
 
-     foreach my $arg (@args) {
-       ref $arg eq 'ARRAY' ? do { utf8::encode($_) for @$arg } : utf8::encode($arg);
-       ref $arg eq 'ARRAY' ? do { $_ =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go for @$arg } : 
-         $arg =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+    my @encoded_args = ();
+    foreach my $arg (@args) {
+      if(ref($arg)||'' eq 'ARRAY') {
+        push @encoded_args, [map {
+          my $encoded = encode_utf8 $_;
+          $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+         $encoded;
+        } @$arg];
+      } else {
+        push @encoded_args, do {
+          my $encoded = encode_utf8 $arg;
+          $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+          $encoded;
+        }
       }
+    }
 
     if ( $path->$_isa('Catalyst::Action') ) { # action object
-        s|/|%2F|g for @args;
+        s|/|%2F|g for @encoded_args;
         my $captures = [ map { s|/|%2F|g; $_; }
-                        ( scalar @args && ref $args[0] eq 'ARRAY'
-                         ? @{ shift(@args) }
+                        ( scalar @encoded_args && ref $encoded_args[0] eq 'ARRAY'
+                         ? @{ shift(@encoded_args) }
                          : ()) ];
 
         my $action = $path;
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
-        if( !@args && $action->number_of_args ) {
+        if( !@encoded_args && $action->number_of_args ) {
             my $expanded_action = $c->dispatcher->expand_action( $action );
 
             my $num_captures = $expanded_action->number_of_captures;
-            unshift @args, splice @$captures, $num_captures;
+            unshift @encoded_args, splice @$captures, $num_captures;
         }
 
        $path = $c->dispatcher->uri_for_action($action, $captures);
@@ -1421,18 +1432,18 @@ sub uri_for {
         $path = '/' if $path eq '';
     }
 
-    unshift(@args, $path);
+    unshift(@encoded_args, $path);
 
     unless (defined $path && $path =~ s!^/!!) { # in-place strip
         my $namespace = $c->namespace;
         if (defined $path) { # cheesy hack to handle path '../foo'
-           $namespace =~ s{(?:^|/)[^/]+$}{} while $args[0] =~ s{^\.\./}{};
+           $namespace =~ s{(?:^|/)[^/]+$}{} while $encoded_args[0] =~ s{^\.\./}{};
         }
-        unshift(@args, $namespace || '');
+        unshift(@encoded_args, $namespace || '');
     }
 
     # join args with '/', or a blank string
-    my $args = join('/', grep { defined($_) } @args);
+    my $args = join('/', grep { defined($_) } @encoded_args);
     $args =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
     $args =~ s!^/+!!;
 
@@ -1455,12 +1466,12 @@ sub uri_for {
           $val = '' unless defined $val;
           (map {
               my $param = "$_";
-              utf8::encode( $param );
+              $param = encode_utf8($param);
               # using the URI::Escape pattern here so utf8 chars survive
               $param =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               $param =~ s/ /+/g;
 
-              utf8::encode( $key );
+              $key = encode_utf8($key);
               # using the URI::Escape pattern here so utf8 chars survive
               $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               $key =~ s/ /+/g;
