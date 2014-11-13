@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90076 - 2014-11-13
+  - If throwing an exception object that does the code method, make sure that
+    method returns an expected HTTP status code before passing it on to the
+    HTTP Exception middleware.
+
 5.90075 - 2014-10-06
   - Documentation patch for $c->req->param to point out the recently discovered
     potential security issues: http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/
