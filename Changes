@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90077 - 2014-11-18
+  - We store the PSGI $env in Catalyst::Engine for backcompat reasons.  Changed
+    this so that the storage is a weak reference, so that it goes out of scope
+    with the request.  This solves an issue where items in the stash (now in the
+    PSGI env) would not get closed at the end of the request.  This caused some
+    regression, primarily in custom testing classes.
+
 5.90076 - 2014-11-13
   - If throwing an exception object that does the code method, make sure that
     method returns an expected HTTP status code before passing it on to the

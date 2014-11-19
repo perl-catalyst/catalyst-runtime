@@ -23,7 +23,7 @@ use namespace::clean -except => 'meta';
 our $CHUNKSIZE = 64 * 1024;
 
 # XXX - this is only here for compat, do not use!
-has env => ( is => 'rw', writer => '_set_env' );
+has env => ( is => 'rw', writer => '_set_env' , weak_ref=>1);
 my $WARN_ABOUT_ENV = 0;
 around env => sub {
   my ($orig, $self, @args) = @_;
