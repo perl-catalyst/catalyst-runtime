@@ -8,6 +8,7 @@ use Catalyst::ActionChain;
 use Catalyst::Utils;
 use URI;
 use Scalar::Util ();
+use Encode 2.21 'decode_utf8';
 
 has _endpoints => (
                    is => 'rw',
@@ -140,7 +141,8 @@ sub list {
             push(@rows, [ '', $name ]);
         }
         push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : '')."/${endpoint}". ($consumes ? " :$consumes":"" ) ]);
-        $rows[0][0] = join('/', '', @parts) || '/';
+        my @display_parts = map { $_ =~s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg; decode_utf8 $_ } @parts;
+        $rows[0][0] = join('/', '', @display_parts) || '/';
         $paths->row(@$_) for @rows;
     }
 
@@ -362,9 +364,12 @@ sub register {
         );
     }
 
-    $action->attributes->{PathPart} = [ $part ];
+    my $encoded_part = URI->new($part)->canonical;
+    $encoded_part =~ s{(?<=[^/])/+\z}{};
 
-    unshift(@{ $children->{$part} ||= [] }, $action);
+    $action->attributes->{PathPart} = [ $encoded_part ];
+
+    unshift(@{ $children->{$encoded_part} ||= [] }, $action);
 
     $self->_actions->{'/'.$action->reverse} = $action;
 

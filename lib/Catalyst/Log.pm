@@ -141,6 +141,7 @@ sub _send_to_log {
     if ($self->can('_has_psgi_errors') and $self->_has_psgi_errors) {
         $self->_psgi_errors->print(@_);
     } else {
+        binmode STDERR, ":utf8";
         print STDERR @_;
     }
 }

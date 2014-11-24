@@ -50,7 +50,7 @@ use Plack::Middleware::RemoveRedundantBody;
 use Catalyst::Middleware::Stash;
 use Plack::Util;
 use Class::Load 'load_class';
-use Encode 2.21 'encode_utf8';
+use Encode 2.21 'decode_utf8', 'encode_utf8';
 
 BEGIN { require 5.008003; }
 
@@ -2063,8 +2063,9 @@ sub finalize_encoding {
 
     # Oh my, I wonder what filehandle responses and streams do... - jnap.
     # Encode expects plain scalars (IV, NV or PV) and segfaults on ref's
-    $c->response->body( $c->encoding->encode( $body, $c->_encode_check ) )
-        if ref(\$body) eq 'SCALAR';
+    if (ref(\$body) eq 'SCALAR') {
+      $c->response->body( $c->encoding->encode( $body, $c->_encode_check ) );
+    };
 }
 
 =head2 $c->finalize_output
@@ -2372,6 +2373,10 @@ sub log_request {
     $method ||= '';
     $path = '/' unless length $path;
     $address ||= '';
+
+    $path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+    $path = decode_utf8($path);
+
     $c->log->debug(qq/"$method" request for "$path" from "$address"/);
 
     $c->log_request_headers($request->headers);
@@ -2562,7 +2567,7 @@ sub prepare_uploads {
     return unless $enc;
 
     # Uggg we hook prepare uploads to do the encoding crap on post and query
-    # parameters!  Sorry -jnap
+    # parameters!  Cargo culted from old encoding plugin.  Sorry -jnap
     for my $key (qw/ parameters query_parameters body_parameters /) {
         for my $value ( values %{ $c->request->{$key} } ) {
             # N.B. Check if already a character string and if so do not try to double decode.
