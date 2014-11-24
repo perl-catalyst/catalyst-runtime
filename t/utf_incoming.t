@@ -2,6 +2,7 @@ use utf8;
 use warnings;
 use strict;
 use Test::More;
+use HTTP::Request::Common;
 
 # Test cases for incoming utf8 
 
@@ -42,7 +43,7 @@ use Test::More;
 ok my $psgi = MyApp->psgi_app, 'build psgi app';
 
 use Catalyst::Test 'MyApp';
-use Encode 2.21 'decode_utf8';
+use Encode 2.21 'decode_utf8', 'encode_utf8';
 
 {
   my $res = request "/root/♥";
@@ -69,12 +70,20 @@ use Encode 2.21 'decode_utf8';
 }
 
 {
-  my $res = request "/base/♥?♥=♥♥";
+  my ($res, $c) = ctx_request POST "/base/♥?♥=♥&♥=♥♥", [a=>1, b=>'', '♥'=>'♥', '♥'=>'♥♥'];
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is base-link action ♥</p>', 'correct body';
   is $res->content_length, 35, 'correct length';
+  is $c->req->parameters->{'♥'}[0], '♥';
+  is $c->req->query_parameters->{'♥'}[0], '♥';
+  is $c->req->body_parameters->{'♥'}[0], '♥';
+  is $c->req->parameters->{'♥'}[0], '♥';
 }
+
+## tests for args and captureargs (chained and otherise)
+## warn $c->req->uri; (seemsto be pre encodinged and all
+## test what uri_for looks like in responses 
 
 
 done_testing;

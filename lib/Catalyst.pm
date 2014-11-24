@@ -2279,7 +2279,24 @@ Prepares body parameters.
 
 sub prepare_body_parameters {
     my $c = shift;
-    $c->engine->prepare_body_parameters( $c, @_ );
+    $c->request->prepare_body_parameters( $c, @_ );
+
+    # If we have an encoding configured (like UTF-8) in general we expect a client
+    # to POST with the encoding we fufilled the request in. Otherwise don't do any
+    # encoding (good change wide chars could be in HTML entity style llike the old
+    # days -JNAP
+
+    # so, now that HTTP::Body prepared the body params, we gotta 'walk' the structure
+    # and do any needed decoding.
+
+    # This only does something if the encoding is set via the encoding param.  Remember
+    # this is assuming the client is not bad and responds with what you provided.  In
+    # general you can just use utf8 and get away with it.
+
+    if($c->encoding) {
+        my $current_parameters = $c->request->body_parameters;
+        $c->request->body_parameters($c->_handle_unicode_decoding($current_parameters));
+    }
 }
 
 =head2 $c->prepare_connection
@@ -2566,18 +2583,7 @@ sub prepare_uploads {
     my $enc = $c->encoding;
     return unless $enc;
 
-    # Uggg we hook prepare uploads to do the encoding crap on post and query
-    # parameters!  Cargo culted from old encoding plugin.  Sorry -jnap
-    for my $key (qw/ parameters query_parameters body_parameters /) {
-        for my $value ( values %{ $c->request->{$key} } ) {
-            # N.B. Check if already a character string and if so do not try to double decode.
-            #      http://www.mail-archive.com/catalyst@lists.scsys.co.uk/msg02350.html
-            #      this avoids exception if we have already decoded content, and is _not_ the
-            #      same as not encoding on output which is bad news (as it does the wrong thing
-            #      for latin1 chars for example)..
-            $value = $c->_handle_unicode_decoding($value);
-        }
-    }
+    ## Only trying to decode the filenames.
     for my $value ( values %{ $c->request->uploads } ) {
         # skip if it fails for uploads, as we don't usually want uploads touched
         # in any way
@@ -3115,8 +3121,10 @@ sub _handle_unicode_decoding {
         return $value;
     }
     elsif ( ref $value eq 'HASH' ) {
-        foreach ( values %$value ) {
-            $_ = $self->_handle_unicode_decoding($_);
+        foreach (keys %$value) {
+            my $encoded_key = $self->_handle_param_unicode_decoding($_);
+            $value->{$encoded_key} = $self->_handle_unicode_decoding($value->{$_});
+            delete $value->{$_};
         }
         return $value;
     }

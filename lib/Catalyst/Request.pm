@@ -10,7 +10,7 @@ use HTTP::Headers;
 use Stream::Buffered;
 use Hash::MultiValue;
 use Scalar::Util;
-
+use HTTP::Body;
 use Moose;
 
 use namespace::clean -except => 'meta';
