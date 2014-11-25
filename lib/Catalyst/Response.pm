@@ -103,7 +103,9 @@ sub write {
     $self->_context->finalize_headers unless $self->finalized_headers;
 
     $buffer = q[] unless defined $buffer;
-    $buffer = $self->_context->encoding->encode( $buffer, $self->_context->_encode_check );
+
+    $buffer = $self->_context->encoding->encode( $buffer, $self->_context->_encode_check )
+      if $self->_context->encoding && $self->content_type =~ /^text|xml$|javascript$/;
 
     my $len = length($buffer);
     $self->_writer->write($buffer);
