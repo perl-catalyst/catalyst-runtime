@@ -61,7 +61,18 @@ use HTTP::Request::Common;
         Test::More::is $c->req->captures->[0], '♥';
 
         $c->response->body("<p>This is base-link action ♥ ${\$c->req->args->[0]}</p>");
+
+        # Test to make sure redirect can now take an object (sorry don't have a better place for it
+        # but wanted test coverage.
+        my $location = $c->res->redirect( $c->uri_for($c->controller('Root')->action_for('uri_for')) );
+        Test::More::ok !ref $location; 
       }
+
+  sub stream_write :Local {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/html');
+    $c->response->write("<p>This is stream_write action ♥</p>");
+  }
 
   package MyApp;
   use Catalyst;
@@ -142,7 +153,6 @@ use Encode 2.21 'decode_utf8', 'encode_utf8';
 {
   my $res = request "/base/♥/♥/♥/♥";
 
-  is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is base-link action ♥ ♥</p>', 'correct body';
   is $res->content_length, 39, 'correct length';
 }
@@ -172,11 +182,14 @@ use Encode 2.21 'decode_utf8', 'encode_utf8';
   is decode_utf8($res->content), "$url", 'correct body'; #should do nothing
   is $res->content, "$url", 'correct body';
   is $res->content_length, 90, 'correct length';
-
-  # Test to make sure redirect can now take an object (sorry don't have a better place for it
-  # but wanted test coverage.
-  my $location = $c->res->redirect( $c->uri_for($c->controller('Root')->action_for('uri_for')) );
-  ok !ref $location; 
 }
+
+{
+  my $res = request "/root/stream_write";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), '<p>This is stream_write action ♥</p>', 'correct body';
+}
+
 
 done_testing;

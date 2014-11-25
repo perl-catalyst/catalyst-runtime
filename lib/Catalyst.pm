@@ -2037,7 +2037,10 @@ sub finalize_headers {
 
 =head2 $c->finalize_encoding
 
-Make sure your headers and body are encoded properly IF you set an encoding.
+Make sure your headers and body are encoded properly IF you set an encoding.  By
+default the encoding is UTF-8 but you can disable it by explictly setting the
+encoding configuration value to undef.
+
 See L</ENCODING>.
 
 =cut
@@ -3061,9 +3064,14 @@ Sets up the input/output encoding.  See L<ENCODING>
 
 sub setup_encoding {
     my $c = shift;
-    # This is where you'd set a default encoding
-    my $enc = delete $c->config->{encoding};
-    $c->encoding( $enc ) if defined $enc;
+    if( exists($c->config->{encoding}) && !defined($c->config->{encoding}) ) {
+        # Ok, so the user has explicitly said "I don't want encoding..."
+        return;
+    } else {
+      my $enc = defined($c->config->{encoding}) ?
+        delete $c->config->{encoding} : 'UTF-8'; # not sure why we delete it... (JNAP)
+      $c->encoding($enc);
+    }
 }
 
 =head2 handle_unicode_encoding_exception
@@ -3619,6 +3627,9 @@ C<using_frontend_proxy> - See L</PROXY SUPPORT>.
 
 C<encoding> - See L</ENCODING>
 
+This now defaults to 'UTF-8'.  You my turn it off by setting this configuration
+value to undef.
+
 =item *
 
 C<abort_chain_on_error_fix>
@@ -3963,6 +3974,9 @@ Please see L<PSGI> for more on middleware.
 
 On request, decodes all params from encoding into a sequence of
 logical characters. On response, encodes body into encoding.
+
+By default encoding is now 'UTF-8'.  You may turn it off by setting
+the encoding configuration to undef.
 
 =head2 Methods
 

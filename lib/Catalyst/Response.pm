@@ -103,6 +103,7 @@ sub write {
     $self->_context->finalize_headers unless $self->finalized_headers;
 
     $buffer = q[] unless defined $buffer;
+    $buffer = $self->_context->encoding->encode( $buffer, $self->_context->_encode_check );
 
     my $len = length($buffer);
     $self->_writer->write($buffer);
@@ -391,7 +392,20 @@ $res->code is an alias for this, to match HTTP::Response->code.
 
 =head2 $res->write( $data )
 
-Writes $data to the output stream.
+Writes $data to the output stream.  Calling this method will finalize your
+headers and send the headers and status code response to the client (so changing
+them afterwards is a waste... be sure to set your headers correctly first).
+
+You may call this as often as you want throughout your response cycle.  You may
+even set a 'body' afterward.  So for example you might write your HTTP headers
+and the HEAD section of your document and then set the body from a template
+driven from a database.  In some cases this can seem to the client as if you had
+a faster overall response (but note that unless your server support chunked
+body your content is likely to get queued anyway (L<Starman> and most other 
+http 1.1 webservers support this).
+
+If there is an encoding set, we encode each line of the response (the default
+encoding is UTF-8).
 
 =head2 $res->write_fh
 
@@ -426,6 +440,10 @@ example (assuming you are using a supporting server, like L<Twiggy>
           undef $watcher; # cancel circular-ref
         });
     }
+
+Like the 'write' method, calling this will finalize headers. Unlike 'write' when you
+can this it is assumed you are taking control of the response so the body is never
+finalized (there isn't one anyway) and you need to call the close method.
 
 =head2 $res->print( @data )
 
