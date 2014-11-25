@@ -18,6 +18,8 @@
     path or pathparts in your actions.  query and body parameter keys are now also
     subject to utf8 decoding (or as specificed via the encoding configuration value).
   - lots of UTF8 changes.  Again we think this is now more correct but please test.
+  - Allow $c->res->redirect($url) to accept $url as an object that does ->as_string
+    which I think will ease a common case (and common bug) and added documentation.
 
 5.90077 - 2014-11-18
   - We store the PSGI $env in Catalyst::Engine for backcompat reasons.  Changed

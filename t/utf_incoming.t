@@ -172,6 +172,11 @@ use Encode 2.21 'decode_utf8', 'encode_utf8';
   is decode_utf8($res->content), "$url", 'correct body'; #should do nothing
   is $res->content, "$url", 'correct body';
   is $res->content_length, 90, 'correct length';
+
+  # Test to make sure redirect can now take an object (sorry don't have a better place for it
+  # but wanted test coverage.
+  my $location = $c->res->redirect( $c->uri_for($c->controller('Root')->action_for('uri_for')) );
+  ok !ref $location; 
 }
 
 done_testing;

@@ -351,6 +351,12 @@ qualified (= C<http://...>, etc.) or that starts with a slash
 thing and is not a standard behaviour. You may opt to use uri_for() or
 uri_for_action() instead.
 
+B<Note:> If $url is an object that does ->as_string (such as L<URI>, which is
+what you get from ->uri_for) we automatically call that to stringify.  This
+should ease the common case usage
+
+    return $c->res->redirect( $c->uri_for(...));
+
 =cut
 
 sub redirect {
@@ -359,6 +365,10 @@ sub redirect {
     if (@_) {
         my $location = shift;
         my $status   = shift || 302;
+
+        if(blessed($location) && $location->can('as_string')) {
+            $location = $location->as_string;
+        }
 
         $self->location($location);
         $self->status($status);
