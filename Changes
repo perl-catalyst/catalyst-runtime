@@ -11,6 +11,13 @@
   - We no longer use Encode::is_utf8 since it doesn't work the way we think it
     does... This required some UTF-8 changes.  If your application is UTF-8 aware
     I highly suggest you test this release.
+  - We alway do utf8 decoding on incoming URLs (before we only did so if the server
+    encoding was utf8.  I believe this is correct as per the w3c spec, but please
+    correct if incorrect :)
+  - Debug output now shows utf8 characters if those are incoming via Args or as
+    path or pathparts in your actions.  query and body parameter keys are now also
+    subject to utf8 decoding (or as specificed via the encoding configuration value).
+  - lots of UTF8 changes.  Again we think this is now more correct but please test.
 
 5.90074 - 2014-10-01
   - Specify Carp minimum version to avoid pointless test fails (valy++)
