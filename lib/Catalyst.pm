@@ -2280,23 +2280,6 @@ Prepares body parameters.
 sub prepare_body_parameters {
     my $c = shift;
     $c->request->prepare_body_parameters( $c, @_ );
-
-    # If we have an encoding configured (like UTF-8) in general we expect a client
-    # to POST with the encoding we fufilled the request in. Otherwise don't do any
-    # encoding (good change wide chars could be in HTML entity style llike the old
-    # days -JNAP
-
-    # so, now that HTTP::Body prepared the body params, we gotta 'walk' the structure
-    # and do any needed decoding.
-
-    # This only does something if the encoding is set via the encoding param.  Remember
-    # this is assuming the client is not bad and responds with what you provided.  In
-    # general you can just use utf8 and get away with it.
-
-    if($c->encoding) {
-        my $current_parameters = $c->request->body_parameters;
-        $c->request->body_parameters($c->_handle_unicode_decoding($current_parameters));
-    }
 }
 
 =head2 $c->prepare_connection
@@ -3062,6 +3045,7 @@ Sets up the input/output encoding.  See L<ENCODING>
 
 sub setup_encoding {
     my $c = shift;
+    # This is where you'd set a default encoding
     my $enc = delete $c->config->{encoding};
     $c->encoding( $enc ) if defined $enc;
 }

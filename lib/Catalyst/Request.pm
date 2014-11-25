@@ -312,7 +312,7 @@ sub prepare_body_chunk {
 }
 
 sub prepare_body_parameters {
-    my ( $self ) = @_;
+    my ( $self, $c ) = @_;
 
     $self->prepare_body if ! $self->_has_body;
 
@@ -320,9 +320,29 @@ sub prepare_body_parameters {
       return $self->_use_hash_multivalue ? Hash::MultiValue->new : {};
     }
 
+    my $params = $self->_body->param;
+
+    # If we have an encoding configured (like UTF-8) in general we expect a client
+    # to POST with the encoding we fufilled the request in. Otherwise don't do any
+    # encoding (good change wide chars could be in HTML entity style llike the old
+    # days -JNAP
+
+    # so, now that HTTP::Body prepared the body params, we gotta 'walk' the structure
+    # and do any needed decoding.
+
+    # This only does something if the encoding is set via the encoding param.  Remember
+    # this is assuming the client is not bad and responds with what you provided.  In
+    # general you can just use utf8 and get away with it.
+    #
+    # I need to see if $c is here since this also doubles as a builder for the object :(
+
+    if($c and $c->encoding) {
+        $params = $c->_handle_unicode_decoding($params);
+    }
+
     return $self->_use_hash_multivalue ?
-        Hash::MultiValue->from_mixed($self->_body->param) :
-        $self->_body->param;
+        Hash::MultiValue->from_mixed($params) :
+        $params;
 }
 
 sub prepare_connection {
