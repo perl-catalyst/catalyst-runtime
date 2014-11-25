@@ -79,6 +79,11 @@ use Encode 2.21 'decode_utf8', 'encode_utf8';
   is $c->req->query_parameters->{'♥'}[0], '♥';
   is $c->req->body_parameters->{'♥'}[0], '♥';
   is $c->req->parameters->{'♥'}[0], '♥';
+
+  is $c->req->parameters->{a}, 1;
+  is $c->req->body_parameters->{a}, 1;
+
+
 }
 
 ## tests for args and captureargs (chained and otherise)

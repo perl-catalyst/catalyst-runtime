@@ -2579,26 +2579,6 @@ Prepares uploads.
 sub prepare_uploads {
     my $c = shift;
     $c->engine->prepare_uploads( $c, @_ );
-
-    my $enc = $c->encoding;
-    return unless $enc;
-
-    ## Only trying to decode the filenames.
-    for my $value ( values %{ $c->request->uploads } ) {
-        # skip if it fails for uploads, as we don't usually want uploads touched
-        # in any way
-        for my $inner_value ( ref($value) eq 'ARRAY' ? @{$value} : $value ) {
-            $inner_value->{filename} = try {
-                $enc->decode( $inner_value->{filename}, $c->_encode_check )
-            } catch {
-                $c->handle_unicode_encoding_exception({
-                    param_value => $inner_value->{filename},
-                    error_msg => $_,
-                    encoding_step => 'uploads',
-                });
-            };
-        }
-    }
 }
 
 =head2 $c->prepare_write
@@ -3124,7 +3104,10 @@ sub _handle_unicode_decoding {
         foreach (keys %$value) {
             my $encoded_key = $self->_handle_param_unicode_decoding($_);
             $value->{$encoded_key} = $self->_handle_unicode_decoding($value->{$_});
-            delete $value->{$_};
+
+            # If the key was encoded we now have two (the original and current so
+            # delete the original.
+            delete $value->{$_} if $_ ne $encoded_key;
         }
         return $value;
     }

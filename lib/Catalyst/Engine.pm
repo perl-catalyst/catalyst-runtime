@@ -669,20 +669,25 @@ sub prepare_uploads {
     my $request = $c->request;
     return unless $request->_body;
 
+    my $enc = $c->encoding;
     my $uploads = $request->_body->upload;
     my $parameters = $request->parameters;
     foreach my $name (keys %$uploads) {
+        $name = $c->_handle_unicode_decoding($name) if $enc;
         my $files = $uploads->{$name};
         my @uploads;
         for my $upload (ref $files eq 'ARRAY' ? @$files : ($files)) {
             my $headers = HTTP::Headers->new( %{ $upload->{headers} } );
+            my $filename = $upload->{filename};
+            $filename = $c->_handle_unicode_decoding($filename) if $enc;
+
             my $u = Catalyst::Request::Upload->new
               (
                size => $upload->{size},
                type => scalar $headers->content_type,
                headers => $headers,
                tempname => $upload->{tempname},
-               filename => $upload->{filename},
+               filename => $filename,
               );
             push @uploads, $u;
         }
