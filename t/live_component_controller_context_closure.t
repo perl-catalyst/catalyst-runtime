@@ -22,7 +22,9 @@ use Catalyst::Test 'TestApp';
     ok($resp->is_success);
     #is($ctx->count_leaks, 1);
     # FIXME: find out why this changed from 1 to 2 after 52af51596d
-    is($ctx->count_leaks, 2);
+    # ^^ probably has something to do with env being in Engine and Request - JNAP
+    # ^^ I made the env in Engine a weak ref, should help until we can remove it
+    is($ctx->count_leaks, 1);
 }
 
 {

@@ -1802,7 +1802,15 @@ sub execute {
 
     if ( my $error = $@ ) {
         #rethow if this can be handled by middleware
-        if(blessed $error && ($error->can('as_psgi') || $error->can('code'))) {
+        if(
+          blessed $error && (
+            $error->can('as_psgi') ||
+            (
+              $error->can('code') &&
+              $error->code =~m/^[1-5][0-9][0-9]$/
+            )
+          )
+        ) {
             foreach my $err (@{$c->error}) {
                 $c->log->error($err);
             }
@@ -2129,7 +2137,15 @@ sub handle_request {
         $status = $c->finalize;
     } catch {
         #rethow if this can be handled by middleware
-        if(blessed $_ && ($_->can('as_psgi') || $_->can('code'))) {
+        if(
+          blessed($_) && (
+            $_->can('as_psgi') ||
+            (
+              $_->can('code') &&
+              $_->code =~m/^[1-5][0-9][0-9]$/
+            )
+          )
+        ) {
             $_->can('rethrow') ? $_->rethrow : croak $_;
         }
         chomp(my $error = $_);

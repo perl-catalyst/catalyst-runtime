@@ -12,10 +12,6 @@ use Plack::Test;
 {
   package MyApp::Exception;
 
-  use overload
-    # Use the overloading thet HTTP::Exception uses
-    bool => sub { 1 }, '""' => 'as_string', fallback => 1;
-
   sub new {
     my ($class, $code, $headers, $body) = @_;
     return bless +{res => [$code, $headers, $body]}, $class;
@@ -35,8 +31,14 @@ use Plack::Test;
     };
   }
 
+  package MyApp::AnotherException;
+
+  sub new { bless +{}, shift }
+
+  sub code { 400 }
+
   sub as_string { 'bad stringy bad' }
-  
+
   package MyApp::Controller::Root;
 
   use base 'Catalyst::Controller';
@@ -58,6 +60,11 @@ use Plack::Test;
     my ($self, $c) = @_;
     MyApp::Exception->throw(
       403, ['content-type'=>'text/plain'], ['Forbidden']);
+  }
+
+  sub from_code_type :Local {
+    my $e = MyApp::AnotherException->new;
+    die $e;
   }
 
   sub classic_error :Local {
@@ -107,6 +114,14 @@ test_psgi $psgi, sub {
 
 test_psgi $psgi, sub {
     my $cb = shift;
+    my $res = $cb->(GET "/root/from_code_type");
+    is $res->code, 400;
+    is $res->content, 'bad stringy bad', 'bad stringy bad';
+    unlike $res->content, qr'HTTPExceptions', 'HTTPExceptions';
+};
+
+test_psgi $psgi, sub {
+    my $cb = shift;
     my $res = $cb->(GET "/root/classic_error");
     is $res->code, 500;
     like $res->content, qr'Ex Parrot', 'Ex Parrot';
@@ -127,5 +142,5 @@ test_psgi $psgi, sub {
 # in the callbacks might never get run (thus all ran tests pass but not all
 # required tests run).
 
-done_testing(14);
+done_testing(17);
 
