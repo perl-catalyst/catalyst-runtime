@@ -591,7 +591,7 @@ sub prepare_query_parameters {
     if ( index( $query_string, '=' ) < 0 ) {
         my $keywords = $self->unescape_uri($query_string);
         $keywords = decode_utf8 $keywords;
-        $c->request->query_keywords();
+        $c->request->query_keywords($keywords);
         return;
     }
 
