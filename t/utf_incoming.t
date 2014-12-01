@@ -3,6 +3,8 @@ use warnings;
 use strict;
 use Test::More;
 use HTTP::Request::Common;
+use Encode 2.21 'decode_utf8', 'encode_utf8';
+use File::Spec;
 
 # Test cases for incoming utf8 
 
@@ -80,8 +82,17 @@ use HTTP::Request::Common;
 
     my $writer = $c->res->write_fh;
 
-    $writer->write("<p>This is stream_write_fh action ♥</p>");
-    $writer->close("<p>This is stream_write_fh action ♥</p>");
+    $writer->write(Encode::encode_utf8('<p>This is stream_write_fh action ♥</p>'));
+    $writer->close;
+  }
+
+  sub stream_body_fh :Local {
+    my ($self, $c) = @_;
+
+    my $path = File::Spec->catfile('t', 'utf8.txt');
+    open(my $fh, '<', $path) || die "trouble: $!";
+    $c->response->content_type('text/html');
+    $c->response->body($fh);
   }
 
   package MyApp;
@@ -95,7 +106,6 @@ use HTTP::Request::Common;
 ok my $psgi = MyApp->psgi_app, 'build psgi app';
 
 use Catalyst::Test 'MyApp';
-use Encode 2.21 'decode_utf8', 'encode_utf8';
 
 {
   my $res = request "/root/♥";
@@ -202,10 +212,20 @@ use Encode 2.21 'decode_utf8', 'encode_utf8';
 }
 
 {
-  my $res = request "/root/stream_write_fh";
+  my $res = request "/root/stream_body_fh";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n", 'correct body';
+  # Not sure why there is a trailing newline above... its not in catalyst code I can see. Not sure
+  # if is a problem or just an artifact of the why the test stuff works - JNAP
+}
+
+{
+   my $res = request "/root/stream_write_fh";
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is stream_write_fh action ♥</p>', 'correct body';
 }
+
 
 done_testing;
