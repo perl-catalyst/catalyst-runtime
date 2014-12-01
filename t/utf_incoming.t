@@ -74,6 +74,16 @@ use HTTP::Request::Common;
     $c->response->write("<p>This is stream_write action ♥</p>");
   }
 
+  sub stream_write_fh :Local {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/html');
+
+    my $writer = $c->res->write_fh;
+
+    $writer->write("<p>This is stream_write_fh action ♥</p>");
+    $writer->close("<p>This is stream_write_fh action ♥</p>");
+  }
+
   package MyApp;
   use Catalyst;
 
@@ -191,5 +201,11 @@ use Encode 2.21 'decode_utf8', 'encode_utf8';
   is decode_utf8($res->content), '<p>This is stream_write action ♥</p>', 'correct body';
 }
 
+{
+  my $res = request "/root/stream_write_fh";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), '<p>This is stream_write_fh action ♥</p>', 'correct body';
+}
 
 done_testing;
