@@ -5,6 +5,7 @@ use HTTP::Headers;
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use Scalar::Util 'blessed';
+use Catalyst::Response::Writer;
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
@@ -52,7 +53,17 @@ has write_fh => (
   builder=>'_build_write_fh',
 );
 
-sub _build_write_fh { shift ->_writer }
+sub _build_write_fh {
+  my $writer = $_[0]->_writer; # We need to get the finalize headers side effect...
+  my $requires_encoding = $_[0]->content_type =~ m/^text|xml$|javascript$/;
+  my %fields = (
+    _writer => $writer,
+    _encoding => $_[0]->encoding,
+    _requires_encoding => $requires_encoding,
+  );
+
+  return bless \%fields, 'Catalyst::Response::Writer';
+}
 
 sub DEMOLISH {
   my $self = shift;
@@ -82,6 +93,8 @@ has _context => (
   weak_ref => 1,
   clearer => '_clear_context',
 );
+
+has encoding => (is=>'ro');
 
 before [qw(status headers content_encoding content_length content_type header)] => sub {
   my $self = shift;
@@ -411,9 +424,22 @@ encoding is UTF-8).
 
 =head2 $res->write_fh
 
-Returns a PSGI $writer object that has two methods, write and close.  You can
-close over this object for asynchronous and nonblocking applications.  For
-example (assuming you are using a supporting server, like L<Twiggy>
+Returns an instance of L<Catalyst::Response::Writer>, which is a lightweight
+decorator over the PSGI C<$writer> object (see L<PSGI.pod\Delayed-Response-and-Streaming-Body>).
+
+In addition to proxying the C<write> and C<close> method from the underlying PSGI
+writer, this proxy object knows any application wide encoding, and provides a method
+C<write_encoded> that will properly encode your written lines based upon your
+encoding settings.  By default in L<Catalyst> responses are UTF-8 encoded and this
+is the encoding used if you respond via C<write_encoded>.  If you want to handle
+encoding yourself, you can use the C<write> method directly.
+
+Encoding only applies to content types for which it matters.  Currently the following
+content types are assumed to need encoding: text (including HTML), xml and javascript.
+
+We provide access to this object so that you can properly close over it for use in
+asynchronous and nonblocking applications.  For example (assuming you are using a supporting
+server, like L<Twiggy>:
 
     package AsyncExample::Controller::Root;
 

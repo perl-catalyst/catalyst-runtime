@@ -86,8 +86,10 @@ has response => (
     lazy => 1,
 );
 sub _build_response_constructor_args {
-    my $self = shift;
-    { _log => $self->log };
+    return +{
+      _log => $_[0]->log,
+      encoding => $_[0]->encoding,
+    };
 }
 
 has namespace => (is => 'rw');

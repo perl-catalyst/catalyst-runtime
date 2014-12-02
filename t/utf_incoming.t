@@ -81,19 +81,31 @@ use File::Spec;
     $c->response->content_type('text/html');
 
     my $writer = $c->res->write_fh;
-
-    $writer->write(Encode::encode_utf8('<p>This is stream_write_fh action ♥</p>'));
+    $writer->write_encoded('<p>This is stream_write_fh action ♥</p>');
     $writer->close;
   }
 
+  # Stream a file with utf8 chars directly, you don't need to decode
   sub stream_body_fh :Local {
     my ($self, $c) = @_;
-
     my $path = File::Spec->catfile('t', 'utf8.txt');
     open(my $fh, '<', $path) || die "trouble: $!";
     $c->response->content_type('text/html');
     $c->response->body($fh);
   }
+
+  # If you pull the file contents into a var, NOW you need to specify the
+  # IO encoding on the FH.  Ultimately Plack at the end wants bytes...
+  sub stream_body_fh2 :Local {
+    my ($self, $c) = @_;
+    my $path = File::Spec->catfile('t', 'utf8.txt');
+    open(my $fh, '<:encoding(UTF-8)', $path) || die "trouble: $!";
+    my $contents = do { local $/; <$fh> };
+
+    $c->response->content_type('text/html');
+    $c->response->body($contents);
+  }
+
 
   package MyApp;
   use Catalyst;
@@ -239,6 +251,15 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is stream_write_fh action ♥</p>', 'correct body';
   #is $res->content_length, 41, 'correct length';
+  is $res->content_charset, 'UTF-8';
+}
+
+{
+  my $res = request "/root/stream_body_fh2";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n", 'correct body';
+  is $res->content_length, 41, 'correct length';
   is $res->content_charset, 'UTF-8';
 }
 

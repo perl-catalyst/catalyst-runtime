@@ -20,10 +20,14 @@
   - lots of UTF8 changes.  Again we think this is now more correct but please test.
   - Allow $c->res->redirect($url) to accept $url as an object that does ->as_string
     which I think will ease a common case (and common bug) and added documentation.
-  - UTF-8 is now the default encoding (there used to be none...).  You can disable
+  - !!! UTF-8 is now the default encoding (there used to be none...).  You can disable
     this if you need to with MyApp->config(encoding => undef) if it causes you trouble.
   - Calling $c->res->write($data) now encodes $data based on the configured encoding
     (UTF-8 is default).
+  - $c->res->writer_fh now returns Catalyst::Response::Writer which is a decorator
+    over the PSGI writer and provides and additional methd 'write_encoded' that just
+    does the right thing for encoding your responses.  This is probably the method
+    you want to use.
 
 5.90077 - 2014-11-18
   - We store the PSGI $env in Catalyst::Engine for backcompat reasons.  Changed
