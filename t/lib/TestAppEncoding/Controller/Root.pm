@@ -8,6 +8,7 @@ __PACKAGE__->config->{namespace} = '';
 
 sub binary : Local {
     my ($self, $c) = @_;
+    $c->res->content_type('image/gif');
     $c->res->body(do {
         open(my $fh, '<', $c->path_to('..', '..', 'catalyst_130pix.gif')) or die $!; 
         binmode($fh); 
@@ -31,12 +32,8 @@ sub utf8_non_ascii_content : Local {
     
     my $str = 'ʇsʎlɐʇɐɔ';  # 'catalyst' flipped at http://www.revfad.com/flip.html
     ok utf8::is_utf8($str), '$str is in UTF8 internally';
-    
-    # encode $str into a sequence of octets and turn off the UTF-8 flag, so that
-    # we don't get the 'Wide character in syswrite' error in Catalyst::Engine
-    utf8::encode($str);
-    ok !utf8::is_utf8($str), '$str is a sequence of octets (byte string)';
-    
+
+    $c->res->content_type('text/plain');
     $c->res->body($str);
 }
 

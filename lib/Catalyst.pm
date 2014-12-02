@@ -2031,13 +2031,30 @@ sub finalize_headers {
 
     $c->response->finalize_headers();
 
+    if(my $enc = $c->encoding) {
+       my ($ct, $ct_enc) = $c->response->content_type;
+
+        # Only touch 'text-like' contents
+        if($c->response->content_type =~ /^text|xml$|javascript$/) {
+          if ($ct_enc && $ct_enc =~ /charset=([^;]*)/) {
+            if (uc($1) ne uc($enc->mime_name)) {
+              $c->log->debug("Catalyst encoding config is set to encode in '" .
+                           $enc->mime_name .
+                           "', content type is '$1', not encoding ");
+            }
+          } else {
+            $c->res->content_type($c->res->content_type . "; charset=" . $enc->mime_name);
+          }
+        }
+    }
+
     # Done
     $response->finalized_headers(1);
 }
 
 =head2 $c->finalize_encoding
 
-Make sure your headers and body are encoded properly IF you set an encoding.  By
+Make sure your body is encoded properly IF you set an encoding.  By
 default the encoding is UTF-8 but you can disable it by explictly setting the
 encoding configuration value to undef.
 
@@ -2056,27 +2073,12 @@ sub finalize_encoding {
 
     return unless $enc;
 
-    my ($ct, $ct_enc) = $c->response->content_type;
-
     # Only touch 'text-like' contents
-    return unless $c->response->content_type =~ /^text|xml$|javascript$/;
-
-    if ($ct_enc && $ct_enc =~ /charset=([^;]*)/) {
-        if (uc($1) ne uc($enc->mime_name)) {
-            $c->log->debug("Unicode::Encoding is set to encode in '" .
-                           $enc->mime_name .
-                           "', content type is '$1', not encoding ");
-            return;
-        }
-    } else {
-        $c->res->content_type($c->res->content_type . "; charset=" . $enc->mime_name);
+    if($c->response->content_type =~ /^text|xml$|javascript$/) {
+      if (ref(\$body) eq 'SCALAR') {
+        $c->response->body( $c->encoding->encode( $body, $c->_encode_check ) );
+      }
     }
-
-    # Oh my, I wonder what filehandle responses and streams do... - jnap.
-    # Encode expects plain scalars (IV, NV or PV) and segfaults on ref's
-    if (ref(\$body) eq 'SCALAR') {
-      $c->response->body( $c->encoding->encode( $body, $c->_encode_check ) );
-    };
 }
 
 =head2 $c->finalize_output

@@ -114,6 +114,7 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is path-heart action ♥</p>', 'correct body';
   is $res->content_length, 36, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -122,6 +123,7 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is path-heart-arg action ♥</p>', 'correct body';
   is $res->content_length, 40, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -130,6 +132,7 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is path-hat action ^</p>', 'correct body';
   is $res->content_length, 32, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -138,6 +141,7 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is base-link action ♥</p>', 'correct body';
   is $res->content_length, 35, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -152,6 +156,7 @@ use Catalyst::Test 'MyApp';
   is $c->req->parameters->{'♥'}[0], '♥';
   is $c->req->parameters->{a}, 1;
   is $c->req->body_parameters->{a}, 1;
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -161,6 +166,7 @@ use Catalyst::Test 'MyApp';
   is decode_utf8($res->content), '<p>This is base-link action ♥</p>', 'correct body';
   is $res->content_length, 35, 'correct length';
   is $c->req->query_keywords, '♥♥♥';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -169,6 +175,7 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is base-link action ♥ ♥</p>', 'correct body';
   is $res->content_length, 39, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -176,6 +183,7 @@ use Catalyst::Test 'MyApp';
 
   is decode_utf8($res->content), '<p>This is base-link action ♥ ♥</p>', 'correct body';
   is $res->content_length, 39, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -192,6 +200,8 @@ use Catalyst::Test 'MyApp';
     is $c->req->query_parameters->{'♥'}, '♥♥';
     is $c->req->body_parameters->{'♥'}, '♥♥';
     is $c->req->parameters->{'♥'}[0], '♥♥'; #combined with query and body
+    is $res->content_charset, 'UTF-8';
+
   }
 }
 
@@ -203,6 +213,7 @@ use Catalyst::Test 'MyApp';
   is decode_utf8($res->content), "$url", 'correct body'; #should do nothing
   is $res->content, "$url", 'correct body';
   is $res->content_length, 90, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -210,6 +221,7 @@ use Catalyst::Test 'MyApp';
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is stream_write action ♥</p>', 'correct body';
+  is $res->content_charset, 'UTF-8';
 }
 
 {
@@ -217,6 +229,7 @@ use Catalyst::Test 'MyApp';
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n", 'correct body';
+  is $res->content_charset, 'UTF-8';
   # Not sure why there is a trailing newline above... its not in catalyst code I can see. Not sure
   # if is a problem or just an artifact of the why the test stuff works - JNAP
 }
@@ -226,7 +239,10 @@ use Catalyst::Test 'MyApp';
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is stream_write_fh action ♥</p>', 'correct body';
+  is $res->content_length, 41, 'correct length';
+  is $res->content_charset, 'UTF-8';
 }
 
-
 done_testing;
+
+MyApp->to_app;
