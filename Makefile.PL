@@ -70,7 +70,7 @@ requires 'Class::Data::Inheritable';
 requires 'Encode' => '2.49';
 requires 'LWP' => '5.837'; # LWP had unicode fail in 5.8.26
 requires 'URI' => '1.65';
-requires 'URI::ws' => '003';
+requires 'URI::ws' => '0.03';
 requires 'JSON::MaybeXS' => '1.000000';
 requires 'Stream::Buffered';
 requires 'Hash::MultiValue';

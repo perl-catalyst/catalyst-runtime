@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90079_001 - TBD
+5.90079_002 - 2014-12-02
+  - Fixed typo in Makefile.PL which borked the previous distribution. No other
+    changes.
+
+5.90079_001 - 2014-12-02
   - MyApp->to_app is now an alias for MyApp->psgi_app in order to better support
     existing Plack conventions.
   - Modify Catayst::Response->from_psgi_response to allow the first argument to
