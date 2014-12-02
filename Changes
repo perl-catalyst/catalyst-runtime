@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90080_001 - TBD
+5.90079_001 - TBD
   - MyApp->to_app is now an alias for MyApp->psgi_app in order to better support
     existing Plack conventions.
   - Modify Catayst::Response->from_psgi_response to allow the first argument to
@@ -25,9 +25,14 @@
   - Calling $c->res->write($data) now encodes $data based on the configured encoding
     (UTF-8 is default).
   - $c->res->writer_fh now returns Catalyst::Response::Writer which is a decorator
-    over the PSGI writer and provides and additional methd 'write_encoded' that just
+    over the PSGI writer and provides an additional methd 'write_encoded' that just
     does the right thing for encoding your responses.  This is probably the method
     you want to use.
+  - New dispatch matching attribute: Scheme.  This lets you match a route based on
+    the incoming URI scheme (http, https, ws, wss).
+  - If $c->uri_for targets an action or action chain that defines Scheme, use that
+    scheme for the generated URI object instead of just using whatever the incoming
+    request uses.
 
 5.90077 - 2014-11-18
   - We store the PSGI $env in Catalyst::Engine for backcompat reasons.  Changed

@@ -129,7 +129,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90080_001';
+our $VERSION = '5.90079_001';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -1374,6 +1374,10 @@ path, use C<< $c->uri_for_action >> instead.
   # Path to a static resource
   $c->uri_for('/static/images/logo.png');
 
+In general the scheme of the generated URI object will follow the incoming request
+however if your targeted action or action chain has the Scheme attribute it will
+use that instead.
+
 =cut
 
 sub uri_for {
@@ -1409,6 +1413,7 @@ sub uri_for {
       }
     }
 
+    my $target_action = $path->$_isa('Catalyst::Action') ? $path : undef;
     if ( $path->$_isa('Catalyst::Action') ) { # action object
         s|/|%2F|g for @encoded_args;
         my $captures = [ map { s|/|%2F|g; $_; }
@@ -1420,7 +1425,6 @@ sub uri_for {
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
         if( !@encoded_args && $action->number_of_args ) {
             my $expanded_action = $c->dispatcher->expand_action( $action );
-
             my $num_captures = $expanded_action->number_of_captures;
             unshift @encoded_args, splice @$captures, $num_captures;
         }
@@ -1452,7 +1456,19 @@ sub uri_for {
     my ($base, $class) = ('/', 'URI::_generic');
     if(blessed($c)) {
       $base = $c->req->base;
-      $class = ref($base);
+      if($target_action) {
+        $target_action = $c->dispatcher->expand_action($target_action);
+        if(my $s = $target_action->scheme) {
+          $s = lc($s);
+          $class = "URI::$s";
+          $base->scheme($s);
+        } else {
+          $class = ref($base);
+        }
+      } else {
+        $class = ref($base);
+      }
+
       $base =~ s{(?<!/)$}{/};
     }
 

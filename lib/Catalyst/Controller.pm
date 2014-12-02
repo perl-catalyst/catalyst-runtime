@@ -372,6 +372,8 @@ sub gather_default_action_roles {
   push @roles, 'Catalyst::ActionRole::ConsumesContent'
     if $args{attributes}->{Consumes};
 
+  push @roles, 'Catalyst::ActionRole::Scheme'
+    if $args{attributes}->{Scheme};
     return @roles;
 }
 
@@ -888,6 +890,39 @@ relevant case, so if you use the C<Consumes> attribute, you should place your
 most accurate matches early in the Chain, and your 'catchall' actions last.
 
 See L<Catalyst::ActionRole::ConsumesContent> for more.
+
+=head2 Scheme(...)
+
+Allows you to specify a URI scheme for the action or action chain.  For example
+you can required that a given path be C<https> or that it is a websocket endpoint
+C<ws> or C<wss>.  For an action chain you may currently only have one defined
+Scheme.
+
+    package MyApp::Controller::Root;
+
+    use base 'Catalyst::Controller';
+
+    sub is_http :Path(scheme) Scheme(http) Args(0) {
+      my ($self, $c) = @_;
+      $c->response->body("is_http");
+    }
+
+    sub is_https :Path(scheme) Scheme(https) Args(0)  {
+      my ($self, $c) = @_;
+      $c->response->body("is_https");
+    }
+
+In the above example http://localhost/root/scheme would match the first
+action (is_http) but https://localhost/root/scheme would match the second.
+
+As an added benefit, if an action or action chain defines a Scheme, when using
+$c->uri_for the scheme of the generated URL will use what you define in the action
+or action chain (the current behavior is to set the scheme based on the current
+incoming request).  This makes it easier to use uri_for on websites where some
+paths are secure and others are not.  You may also use this to other schemes
+like websockets.
+
+See L<Catalyst::ActionRole::Scheme> for more.
 
 =head1 OPTIONAL METHODS
 
