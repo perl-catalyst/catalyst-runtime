@@ -98,7 +98,8 @@ use File::Spec;
   package MyApp;
   use Catalyst;
 
-  MyApp->config(encoding=>'UTF-8');
+  # Default encoding is now UTF-8
+  # MyApp->config(encoding=>'UTF-8');
 
   Test::More::ok(MyApp->setup, 'setup app');
 }
@@ -221,7 +222,7 @@ use Catalyst::Test 'MyApp';
 }
 
 {
-   my $res = request "/root/stream_write_fh";
+  my $res = request "/root/stream_write_fh";
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is stream_write_fh action ♥</p>', 'correct body';
