@@ -14,6 +14,10 @@ use strict;
     $c->stash->{inner} = "inner";
     $c->res->body( "inner: ${\$c->stash->{inner}}, outer: ${\$c->stash->{outer}}");
 
+    use Devel::Dwarn;
+    my $stash = $c->stash;
+    Dwarn $stash;
+
     is_deeply [sort {$a cmp $b} keys($c->stash)], ['inner','outer'], 'both keys in stash';
   }
 

@@ -72,7 +72,7 @@ my $cmp = TestApp->debug ? '>=' : '==';
         my $res = $cb->(GET "/log/info");
         my @logs = $handle->logs;
         cmp_ok(scalar(@logs), $cmp, 1, "psgi.errors: one event output");
-        like($logs[0], qr/info$/m, "psgi.errors: event matches test data");
+        like($logs[0], qr/info$/m, "psgi.errors: event matches test data") unless TestApp->debug;
     };
 };
 
