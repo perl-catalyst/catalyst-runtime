@@ -1335,6 +1335,8 @@ sub setup_finalize {
 
 =head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
 
+=head2 $c->uri_for( $action, [@captures, @args], \%query_values? )
+
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
 When used as a string, provides a textual URI.  If you need more flexibility

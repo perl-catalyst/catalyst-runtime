@@ -202,13 +202,15 @@ use Catalyst::Test 'MyApp';
   my ($res, $c) = ctx_request POST "/base/♥/♥/♥/♥?♥=♥♥", [a=>1, b=>'2', '♥'=>'♥♥'];
 
   ## Make sure that the urls we generate work the same
-  my $uri_for = $c->uri_for($c->controller('Root')->action_for('argend'), ['♥'], '♥', {'♥'=>'♥♥'});
+  my $uri_for1 = $c->uri_for($c->controller('Root')->action_for('argend'), ['♥'], '♥', {'♥'=>'♥♥'});
+  my $uri_for2 = $c->uri_for($c->controller('Root')->action_for('argend'), ['♥', '♥'], {'♥'=>'♥♥'});
   my $uri = $c->req->uri;
 
-  is "$uri", "$uri_for";
+  is "$uri_for1", "$uri_for2";
+  is "$uri", "$uri_for1";
 
   {
-    my ($res, $c) = ctx_request POST "$uri_for", [a=>1, b=>'2', '♥'=>'♥♥'];
+    my ($res, $c) = ctx_request POST "$uri_for1", [a=>1, b=>'2', '♥'=>'♥♥'];
     is $c->req->query_parameters->{'♥'}, '♥♥';
     is $c->req->body_parameters->{'♥'}, '♥♥';
     is $c->req->parameters->{'♥'}[0], '♥♥'; #combined with query and body
@@ -225,6 +227,16 @@ use Catalyst::Test 'MyApp';
   is $res->content, "$url", 'correct body';
   is $res->content_length, 90, 'correct length';
   is $res->content_charset, 'UTF-8';
+
+  {
+    my $url = $c->uri_for($c->controller->action_for('heart_with_arg'), '♥');
+    is "$url", 'http://localhost/root/a%E2%99%A5/%E2%99%A5';
+  }
+
+  {
+    my $url = $c->uri_for($c->controller->action_for('heart_with_arg'), ['♥']);
+    is "$url", 'http://localhost/root/a%E2%99%A5/%E2%99%A5';
+  }
 }
 
 {
