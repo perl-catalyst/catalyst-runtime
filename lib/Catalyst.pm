@@ -113,6 +113,7 @@ our $START     = time;
 our $RECURSION = 1000;
 our $DETACH    = Catalyst::Exception::Detach->new;
 our $GO        = Catalyst::Exception::Go->new;
+our $DEFAULT_ENCODE_CONTENT_TYPE_MATCH = qr{text|xml$|javascript$};
 
 #I imagine that very few of these really need to be class variables. if any.
 #maybe we should just make them attributes with a default?
@@ -2055,7 +2056,7 @@ sub finalize_headers {
        my ($ct, $ct_enc) = $c->response->content_type;
 
         # Only touch 'text-like' contents
-        if($c->response->content_type =~ /^text|xml$|javascript$/) {
+        if($c->response->content_type =~ /$DEFAULT_ENCODE_CONTENT_TYPE_MATCH/) {
           if ($ct_enc && $ct_enc =~ /charset=([^;]*)/) {
             if (uc($1) ne uc($enc->mime_name)) {
               $c->log->debug("Catalyst encoding config is set to encode in '" .
@@ -2094,7 +2095,7 @@ sub finalize_encoding {
     return unless $enc;
 
     # Only touch 'text-like' contents
-    if($c->response->content_type =~ /^text|xml$|javascript$/) {
+    if($c->response->content_type =~ /$DEFAULT_ENCODE_CONTENT_TYPE_MATCH/) {
       if (ref(\$body) eq 'SCALAR') {
         $c->response->body( $c->encoding->encode( $body, $c->_encode_check ) );
       }
@@ -3999,6 +4000,26 @@ logical characters. On response, encodes body into encoding.
 
 By default encoding is now 'UTF-8'.  You may turn it off by setting
 the encoding configuration to undef.
+
+Encoding is automatically applied when the content-type is set to
+a type that can be encoded.  Currently we encode when the content type
+matches the following regular expression:
+
+    $content_type =~ /^text|xml$|javascript$/
+
+The value of this regex is contained in the global variable
+
+    $Catalyst::DEFAULT_ENCODE_CONTENT_TYPE_MATCH
+
+This may change in the future.  Be default we don't automatically
+encode 'application/json' since the most popular JSON encoders (such
+as L<JSON::MaybeXS> which is the library that L<Catalyst> can make use
+of) will do the UTF8 encoding and decoding automatically.  Having it on
+in Catalyst could result in double encoding.
+
+If you are producing JSON response in an unconventional manner (such
+as via a template or manual strings) you should perform the UTF8 encoding
+manually as well such as to conform to the JSON specification.
 
 =head2 Methods
 

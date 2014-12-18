@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90079_004 - TBD
+  - Starting adding some docs around the new encoding stuff
+  - Exposed the reqexp we use to match content types that need encoding via a
+    global variable.
+  - Added some test cases for JSON utf8 and tested file uploads with utf8.
+
 5.90079_003 - 2014-12-03
   - Make sure all tests run even if debug mode is enabled.
   - Fixed issue with middleware stash test case that failed on older Perls

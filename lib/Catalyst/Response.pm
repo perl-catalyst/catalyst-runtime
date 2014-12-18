@@ -55,7 +55,7 @@ has write_fh => (
 
 sub _build_write_fh {
   my $writer = $_[0]->_writer; # We need to get the finalize headers side effect...
-  my $requires_encoding = $_[0]->content_type =~ m/^text|xml$|javascript$/;
+  my $requires_encoding = $_[0]->content_type =~ m/$Catalyst::DEFAULT_ENCODE_CONTENT_TYPE_MATCH/;
   my %fields = (
     _writer => $writer,
     _encoding => $_[0]->encoding,
@@ -118,7 +118,7 @@ sub write {
     $buffer = q[] unless defined $buffer;
 
     $buffer = $self->_context->encoding->encode( $buffer, $self->_context->_encode_check )
-      if $self->_context->encoding && $self->content_type =~ /^text|xml$|javascript$/;
+      if $self->_context->encoding && $self->content_type =~ /$Catalyst::DEFAULT_ENCODE_CONTENT_TYPE_MATCH/;
 
     my $len = length($buffer);
     $self->_writer->write($buffer);
