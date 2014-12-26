@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90079_004 - TBD
+5.90079_004 - 2014-12-26
   - Starting adding some docs around the new encoding stuff
   - Exposed the reqexp we use to match content types that need encoding via a
     global variable.
