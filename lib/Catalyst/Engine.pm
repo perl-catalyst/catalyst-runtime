@@ -685,6 +685,7 @@ sub prepare_uploads {
               (
                size => $upload->{size},
                type => scalar $headers->content_type,
+               charset => scalar $headers->content_type_charset,
                headers => $headers,
                tempname => $upload->{tempname},
                filename => $filename,

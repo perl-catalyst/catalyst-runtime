@@ -10,7 +10,6 @@ use Cwd;
 use Class::Load 'is_class_loaded';
 use String::RewritePrefix;
 use Class::Load ();
-
 use namespace::clean;
 
 =head1 NAME
@@ -502,6 +501,8 @@ sub apply_registered_middleware {
     }
     return $new_psgi;
 }
+
+
 
 =head1 PSGI Helpers
 

@@ -6,7 +6,7 @@ use lib "$Bin/lib";
 use Data::Dumper;
 
 BEGIN {
-    $ENV{TESTAPP_ENCODING} = 'UTF-8';
+  # $ENV{TESTAPP_ENCODING} = 'UTF-8'; # This is now default
     $ENV{TESTAPP_DEBUG} = 0;
     $ENV{CATALYST_DEBUG} = 0;
 }
@@ -27,6 +27,6 @@ is scalar(@TestLogger::LOGS), 1
     or diag Dumper(\@TestLogger::LOGS);
 like $TestLogger::LOGS[0], qr/content type is 'iso-8859-1'/;
 
-like $TestLogger::ELOGS[0], qr/Unicode::Encoding plugin/;
+#like $TestLogger::ELOGS[0], qr/Unicode::Encoding plugin/; #no longer a plugin
 
 done_testing;

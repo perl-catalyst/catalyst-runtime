@@ -5,6 +5,16 @@
   - Exposed the reqexp we use to match content types that need encoding via a
     global variable.
   - Added some test cases for JSON utf8 and tested file uploads with utf8.
+  - Fixes to decoding on file upload filenames and related methods
+  - new methods on upload object that tries to do the right thing if we find
+    a character set on the upload and its UTF8.
+  - new additional helper methods on the file upload object.
+  - new helper methods has_encoding and clear_encoding on context.
+  - Method on Catalyst::Response to determine if the reponse should be encoded.
+  - Warn if changing headers only if headers are finalized AND the response callback
+    has allready been called (and headers already sent).
+  - Centralized rules about detecting if we need to automatically encode or not and
+    added tests around cases when you choose to skip auto encoding.
 
 5.90079_003 - 2014-12-03
   - Make sure all tests run even if debug mode is enabled.

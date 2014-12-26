@@ -111,12 +111,19 @@ use JSON::MaybeXS;
     my ($self, $c) = @_;
     Test::More::is $c->req->body_parameters->{'♥'}, '♥♥';
     Test::More::ok my $upload = $c->req->uploads->{file};
+    Test::More::is $upload->charset, 'UTF-8';
 
     my $text = $upload->slurp;
     Test::More::is Encode::decode_utf8($text), "<p>This is stream_body_fh action ♥</p>\n";
 
+    my $decoded_text = $upload->decoded_slurp;
+    Test::More::is $decoded_text, "<p>This is stream_body_fh action ♥</p>\n";
+
+    Test::More::is $upload->filename, '♥ttachment.txt';
+    Test::More::is $upload->raw_basename, '♥ttachment.txt';
+
     $c->response->content_type('text/html');
-    $c->response->body($upload->fh);
+    $c->response->body($decoded_text);
   }
 
   sub json :POST Consumes(JSON) Local {
@@ -130,6 +137,28 @@ use JSON::MaybeXS;
     # have application/json as one of the things we match, otherwise we get double
     # encoding.  
     $c->response->body(JSON::MaybeXS::encode_json($post));
+  }
+
+  ## If someone clears encoding, they can do as they wish
+  sub manual_1 :Local {
+    my ($self, $c) = @_;
+    $c->encoding(undef);
+    $c->res->content_type('text/plain');
+    $c->res->content_type_charset('UTF-8');
+    $c->response->body( Encode::encode_utf8("manual_1 ♥"));
+  }
+
+  ## If you do like gzip, well handle that yourself!  Basically if you do some sort
+  ## of content encoding like gzip, you must do on top of the encoding.  We will fix
+  ## the encoding plugins (Catalyst::Plugin::Compress) to do this properly for you.
+  #
+  sub gzipped :Local {
+    require Compress::Zlib;
+    my ($self, $c) = @_;
+    $c->res->content_type('text/plain');
+    $c->res->content_type_charset('UTF-8');
+    $c->res->content_encoding('gzip');
+    $c->response->body(Compress::Zlib::memGzip(Encode::encode_utf8("manual_1 ♥")));
   }
 
   package MyApp;
@@ -255,19 +284,19 @@ use Catalyst::Test 'MyApp';
 
   {
     my $url = $c->uri_for($c->controller->action_for('heart_with_arg'), '♥');
-    is "$url", 'http://localhost/root/a%E2%99%A5/%E2%99%A5';
+    is "$url", 'http://localhost/root/a%E2%99%A5/%E2%99%A5', "correct $url";
   }
 
   {
     my $url = $c->uri_for($c->controller->action_for('heart_with_arg'), ['♥']);
-    is "$url", 'http://localhost/root/a%E2%99%A5/%E2%99%A5';
+    is "$url", 'http://localhost/root/a%E2%99%A5/%E2%99%A5', "correct $url";
   }
 }
 
 {
   my $res = request "/root/stream_write";
 
-  is $res->code, 200, 'OK';
+  is $res->code, 200, 'OK GET /root/stream_write';
   is decode_utf8($res->content), '<p>This is stream_write action ♥</p>', 'correct body';
   is $res->content_charset, 'UTF-8';
 }
@@ -304,7 +333,7 @@ use Catalyst::Test 'MyApp';
   ok my $path = File::Spec->catfile('t', 'utf8.txt');
   ok my $req = POST '/root/file_upload',
     Content_Type => 'form-data',
-    Content =>  [encode_utf8('♥')=>encode_utf8('♥♥'), file=>["$path", 'attachment.txt', 'Content-Type' =>'text/html; charset=UTF-8', ]];
+    Content =>  [encode_utf8('♥')=>encode_utf8('♥♥'), file=>["$path", encode_utf8('♥ttachment.txt'), 'Content-Type' =>'text/html; charset=UTF-8', ]];
 
   ok my $res = request $req;
   is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n";
@@ -319,6 +348,28 @@ use Catalyst::Test 'MyApp';
 
   ## decode_json expect the binary utf8 string and does the decoded bit for us.
   is_deeply decode_json(($res->content)), +{'♥'=>'♥♥'};
+}
+
+{
+  my $res = request "/root/manual_1";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), "manual_1 ♥", 'correct body';
+  is $res->content_length, 12, 'correct length';
+  is $res->content_charset, 'UTF-8';
+}
+
+SKIP: {
+  eval { require Compress::Zlib; 1} || do {
+    skip "Compress::Zlib needed to test gzip encoding", 5 };
+
+  my $res = request "/root/gzipped";
+  ok my $raw_content = $res->content;
+  ok my $content = Compress::Zlib::memGunzip($raw_content), 'no gunzip error';
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($content), "manual_1 ♥", 'correct body';
+  is $res->content_charset, 'UTF-8';
 }
 
 ## should we use binmode on filehandles to force the encoding...?

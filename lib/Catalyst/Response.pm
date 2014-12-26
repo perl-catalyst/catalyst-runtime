@@ -6,8 +6,17 @@ use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use Scalar::Util 'blessed';
 use Catalyst::Response::Writer;
+use Catalyst::Utils ();
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
+
+our $DEFAULT_ENCODE_CONTENT_TYPE_MATCH = qr{text|xml$|javascript$};
+
+has encodable_content_type => (
+    is => 'rw',
+    required => 1,
+    default => sub { $DEFAULT_ENCODE_CONTENT_TYPE_MATCH }
+);
 
 has _response_cb => (
     is      => 'ro',
@@ -55,10 +64,10 @@ has write_fh => (
 
 sub _build_write_fh {
   my $writer = $_[0]->_writer; # We need to get the finalize headers side effect...
-  my $requires_encoding = $_[0]->content_type =~ m/$Catalyst::DEFAULT_ENCODE_CONTENT_TYPE_MATCH/;
+  my $requires_encoding = $_[0]->encodable_response;
   my %fields = (
     _writer => $writer,
-    _encoding => $_[0]->encoding,
+    _encoding => $_[0]->_context->encoding,
     _requires_encoding => $requires_encoding,
   );
 
@@ -83,7 +92,7 @@ has finalized_headers => (is => 'rw', default => 0);
 has headers   => (
   is      => 'rw',
   isa => 'HTTP::Headers',
-  handles => [qw(content_encoding content_length content_type header)],
+  handles => [qw(content_encoding content_length content_type content_type_charset header)],
   default => sub { HTTP::Headers->new() },
   required => 1,
   lazy => 1,
@@ -94,15 +103,13 @@ has _context => (
   clearer => '_clear_context',
 );
 
-has encoding => (is=>'ro');
-
 before [qw(status headers content_encoding content_length content_type header)] => sub {
   my $self = shift;
 
   $self->_context->log->warn( 
-    "Useless setting a header value after finalize_headers called." .
+    "Useless setting a header value after finalize_headers and the response callback has been called." .
     " Not what you want." )
-      if ( $self->finalized_headers && @_ );
+      if ( $self->finalized_headers && !$self->_has_response_cb && @_ );
 };
 
 sub output { shift->body(@_) }
@@ -117,8 +124,9 @@ sub write {
 
     $buffer = q[] unless defined $buffer;
 
-    $buffer = $self->_context->encoding->encode( $buffer, $self->_context->_encode_check )
-      if $self->_context->encoding && $self->content_type =~ /$Catalyst::DEFAULT_ENCODE_CONTENT_TYPE_MATCH/;
+    if($self->encodable_response) {
+      $buffer = $self->_context->encoding->encode( $buffer, $self->_context->_encode_check )
+    }
 
     my $len = length($buffer);
     $self->_writer->write($buffer);
@@ -194,6 +202,22 @@ Sets or returns the output (text or binary data). If you are returning a large b
 you might want to use a L<IO::Handle> type of object (Something that implements the read method
 in the same fashion), or a filehandle GLOB. Catalyst
 will write it piece by piece into the response.
+
+If you are using a filehandle as the body response you are responsible for
+making sure it comforms to the L<PSGI> specification with regards to content
+encoding.  Unlike with scalar body values or when using the streaming interfaces
+we currently do not attempt to normalize and encode your filehandle.  In general
+this means you should be sure to be sending bytes not UTF8 decoded multibyte
+characters.
+
+Most of the time when you do:
+
+    open(my $fh, '<:raw', $path);
+
+You should be fine.  If you open a filehandle with a L<PerlIO> layer you probably
+are not fine.  You can usually fix this by explicitly using binmode to set
+the IOLayer to :raw.  Its possible future versions of L<Catalyst> will try to
+'do the right thing'.
 
 When using a L<IO::Handle> type of object and no content length has been
 already set in the response headers Catalyst will make a reasonable attempt
@@ -305,6 +329,10 @@ Shortcut for $res->headers->content_type.
 This value is typically set by your view or plugin. For example,
 L<Catalyst::Plugin::Static::Simple> will guess the mime type based on the file
 it found, while L<Catalyst::View::TT> defaults to C<text/html>.
+
+=head2 $res->content_type_charset
+
+Shortcut for $res->headers->content_type_charset;
 
 =head2 $res->cookies
 
@@ -510,6 +538,67 @@ Example:
 
 Please note this does not attempt to map or nest your PSGI application under
 the Controller and Action namespace or path.  
+
+=head2 encodable_content_type
+
+This is a regular expression used to determine of the current content type
+should be considered encodable.  Currently we apply default encoding (usually
+UTF8) to text type contents.  Here's the default regular expression:
+
+This would match content types like:
+
+    text/plain
+    text/html
+    text/xml
+    application/javascript
+    application/xml
+    application/vnd.user+xml
+
+B<NOTE>: We don't encode JSON content type responses by default since most
+of the JSON serializers that are commonly used for this task will do so
+automatically and we don't want to double encode.  If you are not using a
+tool like L<JSON> to produce JSON type content, (for example you are using
+a template system, or creating the strings manually) you will need to either
+encoding the body yourself:
+
+    $c->response->body( $c->encoding->encode( $body, $c->_encode_check ) );
+
+Or you can alter the regular expression using this attribute.
+
+=head2 encodable_response
+
+Given a L<Catalyst::Response> return true if its one that can be encoded.  
+
+     make sure there is an encoding set on the response
+     make sure the content type is encodable
+     make sure no content type charset has been already set to something different from the global encoding
+     make sure no content encoding is present.
+
+Note this does not inspect a body since we do allow automatic encoding on streaming
+type responses.
+
+=cut
+
+sub encodable_response {
+  my ($self) = @_;
+  return 0 unless $self->_context; # Cases like returning a HTTP Exception response you don't have a context here...
+  return 0 unless $self->_context->encoding;
+
+  my $has_manual_charset = 0;
+  if(my $charset = $self->content_type_charset) {
+    $has_manual_charset = (uc($charset) ne uc($self->_context->encoding->mime_name)) ? 1:0;
+  }
+
+  if(
+      ($self->content_type =~ m/${\$self->encodable_content_type}/) and
+      (!$has_manual_charset) and
+      (!$self->content_encoding || $self->content_encoding eq 'identity' )
+  ) { 
+    return 1;
+  } else {
+    return 0;
+  }
+}
 
 =head2 DEMOLISH
 
