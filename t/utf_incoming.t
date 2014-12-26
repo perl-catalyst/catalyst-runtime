@@ -142,7 +142,7 @@ use JSON::MaybeXS;
   ## If someone clears encoding, they can do as they wish
   sub manual_1 :Local {
     my ($self, $c) = @_;
-    $c->encoding(undef);
+    $c->clear_encoding;
     $c->res->content_type('text/plain');
     $c->res->content_type_charset('UTF-8');
     $c->response->body( Encode::encode_utf8("manual_1 ♥"));
