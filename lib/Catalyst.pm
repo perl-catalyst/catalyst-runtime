@@ -1776,6 +1776,7 @@ sub execute {
     if ( my $error = $@ ) {
         #rethow if this can be handled by middleware
         if(
+          !$c->config->{always_catch_http_exceptions} &&
           blessed $error && (
             $error->can('as_psgi') ||
             (
@@ -1965,6 +1966,7 @@ sub finalize_error {
     } else {
         my ($error) = @{$c->error};
         if(
+          !$c->config->{always_catch_http_exceptions} &&
           blessed $error &&
           ($error->can('as_psgi') || $error->can('code'))
         ) {
@@ -2110,6 +2112,7 @@ sub handle_request {
     } catch {
         #rethow if this can be handled by middleware
         if(
+          !$class->config->{always_catch_http_exceptions} &&
           blessed($_) && (
             $_->can('as_psgi') ||
             (
@@ -3503,6 +3506,13 @@ sub version { return $Catalyst::VERSION }
 There are a number of 'base' config variables which can be set:
 
 =over
+
+=item *
+
+C<always_catch_http_exceptions> - As of version 5.90060 Catalyst
+rethrows errors conforming to the interface described by
+L<Plack::Middleware::HTTPExceptions> and lets the middleware deal with it.
+Set true to get the deprecated behaviour and have Catakyst catch HTTP exceptions.
 
 =item *
 
