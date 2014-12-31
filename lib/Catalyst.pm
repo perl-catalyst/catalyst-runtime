@@ -1775,16 +1775,7 @@ sub execute {
 
     if ( my $error = $@ ) {
         #rethow if this can be handled by middleware
-        if(
-          !$c->config->{always_catch_http_exceptions} &&
-          blessed $error && (
-            $error->can('as_psgi') ||
-            (
-              $error->can('code') &&
-              $error->code =~m/^[1-5][0-9][0-9]$/
-            )
-          )
-        ) {
+        if ( $c->_handle_http_exception($error) ) {
             foreach my $err (@{$c->error}) {
                 $c->log->error($err);
             }
@@ -1965,11 +1956,7 @@ sub finalize_error {
         $c->engine->finalize_error( $c, @_ );
     } else {
         my ($error) = @{$c->error};
-        if(
-          !$c->config->{always_catch_http_exceptions} &&
-          blessed $error &&
-          ($error->can('as_psgi') || $error->can('code'))
-        ) {
+        if ( $c->_handle_http_exception($error) ) {
             # In the case where the error 'knows what it wants', becauses its PSGI
             # aware, just rethow and let middleware catch it
             $error->can('rethrow') ? $error->rethrow : croak $error;
@@ -2111,16 +2098,7 @@ sub handle_request {
         $status = $c->finalize;
     } catch {
         #rethow if this can be handled by middleware
-        if(
-          !$class->config->{always_catch_http_exceptions} &&
-          blessed($_) && (
-            $_->can('as_psgi') ||
-            (
-              $_->can('code') &&
-              $_->code =~m/^[1-5][0-9][0-9]$/
-            )
-          )
-        ) {
+        if ( $class->_handle_http_exception($_) ) {
             $_->can('rethrow') ? $_->rethrow : croak $_;
         }
         chomp(my $error = $_);
@@ -3441,6 +3419,22 @@ sub default_data_handlers {
             ->can('decode_json')->(do { local $/; $_->getline });
       },
     };
+}
+
+sub _handle_http_exception {
+    my ( $self, $error ) = @_;
+    if (
+           !$self->config->{always_catch_http_exceptions}
+        && blessed $error
+        && (
+            $error->can('as_psgi')
+            || (   $error->can('code')
+                && $error->code =~ m/^[1-5][0-9][0-9]$/ )
+        )
+      )
+    {
+        return 1;
+    }
 }
 
 =head2 $c->stack
