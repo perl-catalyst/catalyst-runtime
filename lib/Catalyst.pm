@@ -129,7 +129,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90079_004';
+our $VERSION = '5.90079_005';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -533,6 +533,9 @@ Add a new error.
 
     $c->error('Something bad happened');
 
+Calling this will always return an arrayref (if there are no errors it
+will be an empty arrayref.
+
 =cut
 
 sub error {
@@ -576,6 +579,29 @@ Returns true if you have errors
 =cut
 
 sub has_errors { scalar(@{shift->error}) ? 1:0 }
+
+=head2 $c->last_error
+
+Returns the most recent error in the stack (the one most recently added...)
+or nothing if there are no errors.
+
+=cut
+
+sub last_error { my ($err, @errs) = @{shift->error}; return $err }
+
+=head2 shift_errors
+
+shifts the most recently added error off the error stack and returns if.  Returns
+nothing if there are nomore errors.
+
+=cut
+
+sub shift_errors {
+    my ($self) = @_;
+    my ($err, @errors) = @{$self->error};
+    $self->{error} = \@errors;
+    return $err;
+}
 
 sub _comp_search_prefixes {
     my $c = shift;
@@ -1841,15 +1867,7 @@ sub execute {
 
     if ( my $error = $@ ) {
         #rethow if this can be handled by middleware
-        if(
-          blessed $error && (
-            $error->can('as_psgi') ||
-            (
-              $error->can('code') &&
-              $error->code =~m/^[1-5][0-9][0-9]$/
-            )
-          )
-        ) {
+        if ( $c->_handle_http_exception($error) ) {
             foreach my $err (@{$c->error}) {
                 $c->log->error($err);
             }
@@ -1962,7 +1980,7 @@ sub finalize {
 
     # Support skipping finalize for psgix.io style 'jailbreak'.  Used to support
     # stuff like cometd and websockets
-    
+
     if($c->request->_has_io_fh) {
       $c->log_response;
       return;
@@ -2030,10 +2048,7 @@ sub finalize_error {
         $c->engine->finalize_error( $c, @_ );
     } else {
         my ($error) = @{$c->error};
-        if(
-          blessed $error &&
-          ($error->can('as_psgi') || $error->can('code'))
-        ) {
+        if ( $c->_handle_http_exception($error) ) {
             # In the case where the error 'knows what it wants', becauses its PSGI
             # aware, just rethow and let middleware catch it
             $error->can('rethrow') ? $error->rethrow : croak $error;
@@ -2184,15 +2199,7 @@ sub handle_request {
         $status = $c->finalize;
     } catch {
         #rethow if this can be handled by middleware
-        if(
-          blessed($_) && (
-            $_->can('as_psgi') ||
-            (
-              $_->can('code') &&
-              $_->code =~m/^[1-5][0-9][0-9]$/
-            )
-          )
-        ) {
+        if ( $class->_handle_http_exception($_) ) {
             $_->can('rethrow') ? $_->rethrow : croak $_;
         }
         chomp(my $error = $_);
@@ -3102,7 +3109,7 @@ sub setup_home {
 
 =head2 $c->setup_encoding
 
-Sets up the input/output encoding.  See L<ENCODING>
+Sets up the input/output encoding. See L<ENCODING>
 
 =cut
 
@@ -3344,7 +3351,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
             $class => @roles
         ) if @roles;
     }
-}    
+}
 
 =head2 registered_middlewares
 
@@ -3403,7 +3410,7 @@ sub registered_middlewares {
 
 sub setup_middleware {
     my $class = shift;
-    my @middleware_definitions = @_ ? 
+    my @middleware_definitions = @_ ?
       reverse(@_) : reverse(@{$class->config->{'psgi_middleware'}||[]});
 
     my @middleware = ();
@@ -3495,10 +3502,32 @@ sub default_data_handlers {
             ->can('build_cgi_struct')->($params);
       },
       'application/json' => sub {
-          Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON')
-            ->can('decode_json')->(do { local $/; $_->getline });
-      },
+          my ($fh, $req) = @_;
+          my $parser = Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON');
+          my $slurped;
+          return eval { 
+            local $/;
+            $slurped = $fh->getline;
+            $parser->can("decode_json")->($slurped);
+          } || Catalyst::Exception->throw(sprintf "Error Parsing POST '%s', Error: %s", (defined($slurped) ? $slurped : 'undef') ,$@);
+        },
     };
+}
+
+sub _handle_http_exception {
+    my ( $self, $error ) = @_;
+    if (
+           !$self->config->{always_catch_http_exceptions}
+        && blessed $error
+        && (
+            $error->can('as_psgi')
+            || (   $error->can('code')
+                && $error->code =~ m/^[1-5][0-9][0-9]$/ )
+        )
+      )
+    {
+        return 1;
+    }
 }
 
 =head2 $c->stack
@@ -3567,6 +3596,13 @@ There are a number of 'base' config variables which can be set:
 
 =item *
 
+C<always_catch_http_exceptions> - As of version 5.90060 Catalyst
+rethrows errors conforming to the interface described by
+L<Plack::Middleware::HTTPExceptions> and lets the middleware deal with it.
+Set true to get the deprecated behaviour and have Catalyst catch HTTP exceptions.
+
+=item *
+
 C<default_model> - The default model picked if you say C<< $c->model >>. See L<< /$c->model($name) >>.
 
 =item *
@@ -3622,7 +3658,7 @@ to be shown in hit debug tables in the test server.
 =item *
 
 C<use_request_uri_for_path> - Controls if the C<REQUEST_URI> or C<PATH_INFO> environment
-variable should be used for determining the request path. 
+variable should be used for determining the request path.
 
 Most web server environments pass the requested path to the application using environment variables,
 from which Catalyst has to reconstruct the request base (i.e. the top level path to / in the application,
@@ -3661,7 +3697,7 @@ is having paths rewritten into it (e.g. as a .cgi/fcgi in a public_html director
 at other URIs than that which the app is 'normally' based at with C<mod_rewrite>), the resolution of
 C<< $c->request->base >> will be incorrect.
 
-=back 
+=back
 
 =item *
 
@@ -3682,7 +3718,7 @@ When there is an error in an action chain, the default behavior is to continue
 processing the remaining actions and then catch the error upon chain end.  This
 can lead to running actions when the application is in an unexpected state.  If
 you have this issue, setting this config value to true will promptly exit a
-chain when there is an error raised in any action (thus terminating the chain 
+chain when there is an error raised in any action (thus terminating the chain
 early.)
 
 use like:
@@ -3728,7 +3764,7 @@ your stack, such as in a model that an Action is calling) that exception
 is caught by Catalyst and unless you either catch it yourself (via eval
 or something like L<Try::Tiny> or by reviewing the L</error> stack, it
 will eventually reach L</finalize_errors> and return either the debugging
-error stack page, or the default error page.  However, if your exception 
+error stack page, or the default error page.  However, if your exception
 can be caught by L<Plack::Middleware::HTTPExceptions>, L<Catalyst> will
 instead rethrow it so that it can be handled by that middleware (which
 is part of the default middleware).  For example this would allow
@@ -3738,7 +3774,7 @@ is part of the default middleware).  For example this would allow
     sub throws_exception :Local {
       my ($self, $c) = @_;
 
-      http_throw(SeeOther => { location => 
+      http_throw(SeeOther => { location =>
         $c->uri_for($self->action_for('redirect')) });
 
     }
@@ -4161,6 +4197,8 @@ chicks: Christopher Hicks
 Chisel Wright C<pause@herlpacker.co.uk>
 
 Danijel Milicevic C<me@danijel.de>
+
+davewood: David Schmidt <davewood@cpan.org>
 
 David Kamholz E<lt>dkamholz@cpan.orgE<gt>
 

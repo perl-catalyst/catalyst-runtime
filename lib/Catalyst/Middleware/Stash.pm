@@ -47,7 +47,7 @@ sub call {
   return $self->app->($new_env);
 }
 
-=head1 TITLE
+=head1 NAME
 
 Catalyst::Middleware::Stash - The Catalyst stash - in middleware
 
