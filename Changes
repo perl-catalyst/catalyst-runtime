@@ -1,5 +1,14 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90078 - 2014-12-30
+  - POD corrections (sergey++)
+  - New configuration option to disable the HTTP Exception passthru feature
+    introduced in 5.90060.  You can use this if that feature is causing you
+    trouble. (davewood++);
+  - Some additional helper methods for dealing with errors.
+  - More clear exception when $request->body_data tries to parse malformed POSTed
+    data.  Added documentation and tests around this.
+
 5.90077 - 2014-11-18
   - We store the PSGI $env in Catalyst::Engine for backcompat reasons.  Changed
     this so that the storage is a weak reference, so that it goes out of scope

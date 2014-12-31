@@ -10,7 +10,7 @@ use HTTP::Headers;
 use Stream::Buffered;
 use Hash::MultiValue;
 use Scalar::Util;
-
+use Catalyst::Exception;
 use Moose;
 
 use namespace::clean -except => 'meta';
@@ -118,7 +118,11 @@ has body_data => (
 
 sub _build_body_data {
     my ($self) = @_;
-    my $content_type = $self->content_type;
+
+    # Not sure if these returns should not be exceptions...
+    my $content_type = $self->content_type || return;
+    return unless ($self->method eq 'POST' || $self->method eq 'PUT');
+
     my ($match) = grep { $content_type =~/$_/i }
       keys(%{$self->data_handlers});
 
@@ -127,7 +131,7 @@ sub _build_body_data {
       local $_ = $fh;
       return $self->data_handlers->{$match}->($fh, $self);
     } else { 
-      return undef;
+      Catalyst::Exception->throw("$content_type is does not have an available data handler");
     }
 }
 
@@ -501,6 +505,13 @@ form data, such as JSON, XML, etc.  By default, Catalyst will parse incoming
 data of the type 'application/json' and return access to that data via this
 method.  You may define addition data_handlers via a global configuration
 setting.  See L<Catalyst\DATA HANDLERS> for more information.
+
+If the POST is malformed in some way (such as undefined or not content that
+matches the content-type) we raise a L<Catalyst::Exception> with the error
+text as the message.
+
+If the POSTed content type does not match an availabled data handler, this
+will also raise an exception.
 
 =head2 $req->body_parameters
 

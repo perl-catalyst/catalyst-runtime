@@ -518,6 +518,9 @@ Add a new error.
 
     $c->error('Something bad happened');
 
+Calling this will always return an arrayref (if there are no errors it
+will be an empty arrayref.
+
 =cut
 
 sub error {
@@ -561,6 +564,29 @@ Returns true if you have errors
 =cut
 
 sub has_errors { scalar(@{shift->error}) ? 1:0 }
+
+=head2 $c->last_error
+
+Returns the most recent error in the stack (the one most recently added...)
+or nothing if there are no errors.
+
+=cut
+
+sub last_error { my ($err, @errs) = @{shift->error}; return $err }
+
+=head2 shift_errors
+
+shifts the most recently added error off the error stack and returns if.  Returns
+nothing if there are nomore errors.
+
+=cut
+
+sub shift_errors {
+    my ($self) = @_;
+    my ($err, @errors) = @{$self->error};
+    $self->{error} = \@errors;
+    return $err;
+}
 
 sub _comp_search_prefixes {
     my $c = shift;
@@ -3437,9 +3463,15 @@ sub default_data_handlers {
             ->can('build_cgi_struct')->($params);
       },
       'application/json' => sub {
-          Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON')
-            ->can('decode_json')->(do { local $/; $_->getline });
-      },
+          my ($fh, $req) = @_;
+          my $parser = Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON');
+          my $slurped;
+          return eval { 
+            local $/;
+            $slurped = $fh->getline;
+            $parser->can("decode_json")->($slurped);
+          } || Catalyst::Exception->throw(sprintf "Error Parsing POST '%s', Error: %s", (defined($slurped) ? $slurped : 'undef') ,$@);
+        },
     };
 }
 
