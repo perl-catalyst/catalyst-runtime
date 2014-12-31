@@ -3006,15 +3006,30 @@ EOW
 Adds the following L<Plack> middlewares to your application, since they are
 useful and commonly needed:
 
-L<Plack::Middleware::ReverseProxy>, (conditionally added based on the status
-of your $ENV{REMOTE_ADDR}, and can be forced on with C<using_frontend_proxy>
-or forced off with C<ignore_frontend_proxy>), L<Plack::Middleware::LighttpdScriptNameFix>
-(if you are using Lighttpd), L<Plack::Middleware::IIS6ScriptNameFix> (always
-applied since this middleware is smart enough to conditionally apply itself).
+L<Plack::Middleware::LighttpdScriptNameFix> (if you are using Lighttpd),
+L<Plack::Middleware::IIS6ScriptNameFix> (always applied since this middleware
+is smart enough to conditionally apply itself).
+
+We will also automatically add L<Plack::Middleware::ReverseProxy> if we notice
+that your HTTP $env variable C<REMOTE_ADDR> is '127.0.0.1'.  This is usually
+an indication that your server is running behind a proxy frontend.  However in
+2014 this is often not the case.  We preserve this code for backwards compatibility
+however I B<highly> recommend that if you are running the server behind a front
+end proxy that you clearly indicate so with the C<using_frontend_proxy> configuration
+setting to true for your environment configurations that run behind a proxy.  This
+way if you change your front end proxy address someday your code would inexplicably
+stop working as expected.
 
 Additionally if we detect we are using Nginx, we add a bit of custom middleware
 to solve some problems with the way that server handles $ENV{PATH_INFO} and
-$ENV{SCRIPT_NAME}
+$ENV{SCRIPT_NAME}.
+
+Please B<NOTE> that if you do use C<using_frontend_proxy> the middleware is now
+adding via C<registered_middleware> rather than this method.
+
+If you are using Lighttp or IIS6 you may wish to apply these middlewares.  In
+general this is no longer a common case but we have this here for backward
+compatibility.
 
 =cut
 
@@ -3022,16 +3037,21 @@ $ENV{SCRIPT_NAME}
 sub apply_default_middlewares {
     my ($app, $psgi_app) = @_;
 
-    $psgi_app = Plack::Middleware::Conditional->wrap(
-        $psgi_app,
-        builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
-        condition => sub {
-            my ($env) = @_;
-            return if $app->config->{ignore_frontend_proxy};
-            return $env->{REMOTE_ADDR} eq '127.0.0.1'
-                || $app->config->{using_frontend_proxy};
-        },
-    );
+    # Don't add this conditional IF we are explicitly saying we want the
+    # frontend proxy support.  We don't need it here since if that is the
+    # case it will be always loaded in the default_middleware.
+
+    unless($app->config->{using_frontend_proxy}) {
+      $psgi_app = Plack::Middleware::Conditional->wrap(
+          $psgi_app,
+          builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
+          condition => sub {
+              my ($env) = @_;
+              return if $app->config->{ignore_frontend_proxy};
+              return $env->{REMOTE_ADDR} eq '127.0.0.1';
+          },
+      );
+    }
 
     # If we're running under Lighttpd, swap PATH_INFO and SCRIPT_NAME
     # http://lists.scsys.co.uk/pipermail/catalyst/2006-June/008361.html
@@ -3069,11 +3089,24 @@ sub apply_default_middlewares {
 =head2 App->to_app
 
 Returns a PSGI application code reference for the catalyst application
-C<$c>. This is the bare application without any middlewares
-applied. C<${myapp}.psgi> is not taken into account.
+C<$c>. This is the bare application created without the C<apply_default_middlewares>
+method called.  We do however apply C<registered_middleware> since those are
+integral to how L<Catalyst> functions.  Also, unlike starting your application
+with a generated server script (via L<Catalyst::Devel> and C<catalyst.pl>) we do
+not attempt to return a valid L<PSGI> application using any existing C<${myapp}.psgi>
+scripts in your $HOME directory.
+
+B<NOTE> C<apply_default_middlewares> was orginally created when the first PSGI
+port was done for v5.90000.  These are middlewares that are added to achieve
+backward compatibility with older applications.  If you start your application
+using one of the supplied server scripts (generated with L<Catalyst::Devel> and
+the project skeleton script C<catalyst.pl>) we apply C<apply_default_middlewares>
+automatically.  This was done so that pre and post PSGI port applications would
+work the same way.
 
 This is what you want to be using to retrieve the PSGI application code
-reference of your Catalyst application for use in F<.psgi> files.
+reference of your Catalyst application for use in a custom F<.psgi> or in your
+own created server modules.
 
 =cut
 
@@ -3353,6 +3386,68 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
     }
 }
 
+=head2 default_middleware
+
+Returns a list of instantiated PSGI middleware objects which is the default
+middleware that is active for this application (taking any configuration
+options into account, excluding your custom added middleware via the C<psgi_middleware>
+configuration option).  You can override this method if you wish to change
+the default middleware (although do so at risk since some middleware is vital
+to application function.)
+
+The current default middleware list is:
+
+      Catalyst::Middleware::Stash
+      Plack::Middleware::HTTPExceptions
+      Plack::Middleware::RemoveRedundantBody
+      Plack::Middleware::FixMissingBodyInRedirect
+      Plack::Middleware::ContentLength
+      Plack::Middleware::MethodOverride
+      Plack::Middleware::Head
+
+If the configuration setting C<using_frontend_proxy> is true we add:
+
+      Plack::Middleware::ReverseProxy
+
+If the configuration setting C<using_frontend_proxy_path> is true we add:
+
+      Plack::Middleware::ReverseProxyPath
+
+But B<NOTE> that L<Plack::Middleware::ReverseProxyPath> is not a dependency of the
+L<Catalyst> distribution so if you want to use this option you should add it to
+your project distribution file.
+
+These middlewares will be added at L</setup_middleware> during the
+L</setup> phase of application startup.
+
+=cut
+
+sub default_middleware {
+    my $class = shift;
+    my @mw = (
+      Catalyst::Middleware::Stash->new,
+      Plack::Middleware::HTTPExceptions->new,
+      Plack::Middleware::RemoveRedundantBody->new,
+      Plack::Middleware::FixMissingBodyInRedirect->new,
+      Plack::Middleware::ContentLength->new,
+      Plack::Middleware::MethodOverride->new,
+      Plack::Middleware::Head->new);
+
+    if($class->config->{using_frontend_proxy}) {
+        push @mw, Plack::Middleware::ReverseProxy->new;
+    }
+
+    if($class->config->{using_frontend_proxy_path}) {
+        if(Class::Load::try_load_class('Plack::Middleware::ReverseProxyPath')) {
+            push @mw, Plack::Middleware::ReverseProxyPath->new;
+        } else {
+          $class->log->error("Cannot use configuration 'using_frontend_proxy_path' because 'Plack::Middleware::ReverseProxyPath' is not installed");
+        }
+    }
+
+    return @mw;
+}
+
 =head2 registered_middlewares
 
 Read only accessor that returns an array of all the middleware in the order
@@ -3394,15 +3489,13 @@ up.
 sub registered_middlewares {
     my $class = shift;
     if(my $middleware = $class->_psgi_middleware) {
-        return (
-          Catalyst::Middleware::Stash->new,
-          Plack::Middleware::HTTPExceptions->new,
-          Plack::Middleware::RemoveRedundantBody->new,
-          Plack::Middleware::FixMissingBodyInRedirect->new,
-          Plack::Middleware::ContentLength->new,
-          Plack::Middleware::MethodOverride->new,
-          Plack::Middleware::Head->new,
-          @$middleware);
+        my @mw = ($class->default_middleware, @$middleware);
+
+        if($class->config->{using_frontend_proxy}) {
+          push @mw, Plack::Middleware::ReverseProxy->new;
+        }
+
+        return @mw;
     } else {
         die "You cannot call ->registered_middlewares until middleware has been setup";
     }
@@ -3410,8 +3503,17 @@ sub registered_middlewares {
 
 sub setup_middleware {
     my $class = shift;
-    my @middleware_definitions = @_ ?
-      reverse(@_) : reverse(@{$class->config->{'psgi_middleware'}||[]});
+    my @middleware_definitions;
+
+    # If someone calls this method you can add middleware with args.  However if its
+    # called without an arg we need to setup the configuration middleware.
+    if(@_) {
+      @middleware_definitions = reverse(@_);
+    } else {
+      @middleware_definitions = reverse(@{$class->config->{'psgi_middleware'}||[]})
+        unless $class->config->{__configured_from_psgi_middleware};
+      $class->config->{__configured_from_psgi_middleware} = 1; # Only do this once, just in case some people call setup over and over...
+    }
 
     my @middleware = ();
     while(my $next = shift(@middleware_definitions)) {
@@ -3702,6 +3804,15 @@ C<< $c->request->base >> will be incorrect.
 =item *
 
 C<using_frontend_proxy> - See L</PROXY SUPPORT>.
+
+=item *
+
+C<using_frontend_proxy_path> - Enabled L<Plack::Middleware::ReverseProxyPath> on your application (if
+installed, otherwise log an error).  This is useful if your application is not running on the
+'root' (or /) of your host server.  B<NOTE> if you use this feature you should add the required
+middleware to your project dependency list since its not automatically a dependency of L<Catalyst>.
+This has been done since not all people need this feature and we wish to restrict the growth of
+L<Catalyst> dependencies.
 
 =item *
 
@@ -4064,9 +4175,8 @@ matches the following regular expression:
 
     $content_type =~ /^text|xml$|javascript$/
 
-Encoding is set on the application, but it is copied to the response object
-so you can override encoding rules per request (See L<Catalyst::Response>
-for more information).
+Encoding is set on the application, but it is copied to the context object
+so that you can override it on a request basis.
 
 Be default we don't automatically encode 'application/json' since the most
 popular JSON encoders (such as L<JSON::MaybeXS> which is the library that

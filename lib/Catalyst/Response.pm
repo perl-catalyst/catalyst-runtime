@@ -199,9 +199,10 @@ will turn the Catalyst::Response into a HTTP Response and return it to the clien
     $c->response->body('Catalyst rocks!');
 
 Sets or returns the output (text or binary data). If you are returning a large body,
-you might want to use a L<IO::Handle> type of object (Something that implements the read method
-in the same fashion), or a filehandle GLOB. Catalyst
-will write it piece by piece into the response.
+you might want to use a L<IO::Handle> type of object (Something that implements the getline method 
+in the same fashion), or a filehandle GLOB. These will be passed down to the PSGI
+handler you are using and might be optimized using server specific abilities (for
+example L<Twiggy> will attempt to server a real local file in a non blocking manner).
 
 If you are using a filehandle as the body response you are responsible for
 making sure it comforms to the L<PSGI> specification with regards to content
@@ -228,7 +229,11 @@ it is recommended that you set the content length in the response headers
 yourself, which will be respected and sent by Catalyst in the response.
 
 Please note that the object needs to implement C<getline>, not just
-C<read>.
+C<read>.  Older versions of L<Catalyst> expected your filehandle like objects
+to do read.  If you have code written for this expectation and you cannot
+change the code to meet the L<PSGI> specification, you can try the following
+middleware L<Plack::Middleware::AdaptFilehandleRead> which will attempt to
+wrap your object in an interface that so conforms.
 
 Starting from version 5.90060, when using an L<IO::Handle> object, you
 may want to use L<Plack::Middleware::XSendfile>, to delegate the
