@@ -1801,16 +1801,7 @@ sub execute {
 
     if ( my $error = $@ ) {
         #rethow if this can be handled by middleware
-        if(
-          !$c->config->{always_catch_http_exceptions} &&
-          blessed $error && (
-            $error->can('as_psgi') ||
-            (
-              $error->can('code') &&
-              $error->code =~m/^[1-5][0-9][0-9]$/
-            )
-          )
-        ) {
+        if ( $c->_handle_http_exception($error) ) {
             foreach my $err (@{$c->error}) {
                 $c->log->error($err);
             }
@@ -1923,7 +1914,7 @@ sub finalize {
 
     # Support skipping finalize for psgix.io style 'jailbreak'.  Used to support
     # stuff like cometd and websockets
-    
+
     if($c->request->_has_io_fh) {
       $c->log_response;
       return;
@@ -1991,11 +1982,7 @@ sub finalize_error {
         $c->engine->finalize_error( $c, @_ );
     } else {
         my ($error) = @{$c->error};
-        if(
-          !$c->config->{always_catch_http_exceptions} &&
-          blessed $error &&
-          ($error->can('as_psgi') || $error->can('code'))
-        ) {
+        if ( $c->_handle_http_exception($error) ) {
             # In the case where the error 'knows what it wants', becauses its PSGI
             # aware, just rethow and let middleware catch it
             $error->can('rethrow') ? $error->rethrow : croak $error;
@@ -2137,16 +2124,7 @@ sub handle_request {
         $status = $c->finalize;
     } catch {
         #rethow if this can be handled by middleware
-        if(
-          !$class->config->{always_catch_http_exceptions} &&
-          blessed($_) && (
-            $_->can('as_psgi') ||
-            (
-              $_->can('code') &&
-              $_->code =~m/^[1-5][0-9][0-9]$/
-            )
-          )
-        ) {
+        if ( $class->_handle_http_exception($_) ) {
             $_->can('rethrow') ? $_->rethrow : croak $_;
         }
         chomp(my $error = $_);
@@ -3079,7 +3057,7 @@ sub setup_home {
 
 =head2 $c->setup_encoding
 
-Sets up the input/output encoding.  See L<ENCODING>
+Sets up the input/output encoding. See L<ENCODING>
 
 =cut
 
@@ -3312,7 +3290,7 @@ the plugin name does not begin with C<Catalyst::Plugin::>.
             $class => @roles
         ) if @roles;
     }
-}    
+}
 
 =head2 registered_middlewares
 
@@ -3371,7 +3349,7 @@ sub registered_middlewares {
 
 sub setup_middleware {
     my $class = shift;
-    my @middleware_definitions = @_ ? 
+    my @middleware_definitions = @_ ?
       reverse(@_) : reverse(@{$class->config->{'psgi_middleware'}||[]});
 
     my @middleware = ();
@@ -3475,6 +3453,22 @@ sub default_data_handlers {
     };
 }
 
+sub _handle_http_exception {
+    my ( $self, $error ) = @_;
+    if (
+           !$self->config->{always_catch_http_exceptions}
+        && blessed $error
+        && (
+            $error->can('as_psgi')
+            || (   $error->can('code')
+                && $error->code =~ m/^[1-5][0-9][0-9]$/ )
+        )
+      )
+    {
+        return 1;
+    }
+}
+
 =head2 $c->stack
 
 Returns an arrayref of the internal execution stack (actions that are
@@ -3544,7 +3538,7 @@ There are a number of 'base' config variables which can be set:
 C<always_catch_http_exceptions> - As of version 5.90060 Catalyst
 rethrows errors conforming to the interface described by
 L<Plack::Middleware::HTTPExceptions> and lets the middleware deal with it.
-Set true to get the deprecated behaviour and have Catakyst catch HTTP exceptions.
+Set true to get the deprecated behaviour and have Catalyst catch HTTP exceptions.
 
 =item *
 
@@ -3603,7 +3597,7 @@ to be shown in hit debug tables in the test server.
 =item *
 
 C<use_request_uri_for_path> - Controls if the C<REQUEST_URI> or C<PATH_INFO> environment
-variable should be used for determining the request path. 
+variable should be used for determining the request path.
 
 Most web server environments pass the requested path to the application using environment variables,
 from which Catalyst has to reconstruct the request base (i.e. the top level path to / in the application,
@@ -3642,7 +3636,7 @@ is having paths rewritten into it (e.g. as a .cgi/fcgi in a public_html director
 at other URIs than that which the app is 'normally' based at with C<mod_rewrite>), the resolution of
 C<< $c->request->base >> will be incorrect.
 
-=back 
+=back
 
 =item *
 
@@ -3660,7 +3654,7 @@ When there is an error in an action chain, the default behavior is to continue
 processing the remaining actions and then catch the error upon chain end.  This
 can lead to running actions when the application is in an unexpected state.  If
 you have this issue, setting this config value to true will promptly exit a
-chain when there is an error raised in any action (thus terminating the chain 
+chain when there is an error raised in any action (thus terminating the chain
 early.)
 
 use like:
@@ -3706,7 +3700,7 @@ your stack, such as in a model that an Action is calling) that exception
 is caught by Catalyst and unless you either catch it yourself (via eval
 or something like L<Try::Tiny> or by reviewing the L</error> stack, it
 will eventually reach L</finalize_errors> and return either the debugging
-error stack page, or the default error page.  However, if your exception 
+error stack page, or the default error page.  However, if your exception
 can be caught by L<Plack::Middleware::HTTPExceptions>, L<Catalyst> will
 instead rethrow it so that it can be handled by that middleware (which
 is part of the default middleware).  For example this would allow
@@ -3716,7 +3710,7 @@ is part of the default middleware).  For example this would allow
     sub throws_exception :Local {
       my ($self, $c) = @_;
 
-      http_throw(SeeOther => { location => 
+      http_throw(SeeOther => { location =>
         $c->uri_for($self->action_for('redirect')) });
 
     }
@@ -4109,6 +4103,8 @@ chicks: Christopher Hicks
 Chisel Wright C<pause@herlpacker.co.uk>
 
 Danijel Milicevic C<me@danijel.de>
+
+davewood: David Schmidt <davewood@cpan.org>
 
 David Kamholz E<lt>dkamholz@cpan.orgE<gt>
 
