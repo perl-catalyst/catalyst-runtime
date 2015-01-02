@@ -77,8 +77,6 @@ use Plack::Test;
     die "I'm not dead yet";
   }
 
-  sub end : ActionClass('RenderView') {}
-
   package MyApp;
   use Catalyst;
 
