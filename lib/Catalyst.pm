@@ -127,7 +127,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90078';
+our $VERSION = '5.90079';
 
 sub import {
     my ( $class, @arguments ) = @_;
@@ -4222,7 +4222,7 @@ Upasana <me@upasana.me>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2014, the above named PROJECT FOUNDER and CONTRIBUTORS.
+Copyright (c) 2005-2015, the above named PROJECT FOUNDER and CONTRIBUTORS.
 
 =head1 LICENSE
 

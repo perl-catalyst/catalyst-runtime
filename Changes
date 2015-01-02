@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90079 - 2015-01-02
+  - Removed dependency from test case that we don't install for testing (
+    rt #101243)
+  - updated year in copyright notices
+
 5.90078 - 2014-12-30
   - POD corrections (sergey++)
   - New configuration option to disable the HTTP Exception passthru feature
