@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90079.06  - 2015-01-02
+  - Removed unneeded depdency on RenderView in new test case that was causing fails
+    on CPAN testers that did not just happen to have that dependency already installed
+  - Updated copyright notices to 2015
+  - Documentation patches around the setup methods and clarification on on security
+    note posted a few months ago.
+  - Added my name to the contributors list
+
 5.90079_005 - 2014-12-31
   - Merged changes from 5.90078
   - If configuration 'using_frontend_proxy' is set, we add the correct middleware

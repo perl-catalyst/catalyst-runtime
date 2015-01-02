@@ -129,7 +129,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90079_005';
+our $VERSION = '5.90079_006';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -1183,6 +1183,17 @@ Catalyst> line.
 
 B<Note:> You B<should not> wrap this method with method modifiers
 or bad things will happen - wrap the C<setup_finalize> method instead.
+
+B<Note:> You can create a custom setup stage that will execute when the
+application is starting.  Use this to customize setup.
+
+    MyApp->setup(-Custom=value);
+
+    sub setup_custom {
+      my ($class, $value) = @_;
+    }
+
+Can be handy if you want to hook into the setup phase.
 
 =cut
 
@@ -4424,9 +4435,11 @@ dd070: Dhaval Dhanani <dhaval070@gmail.com>
 
 Upasana <me@upasana.me>
 
+John Napiorkowski (jnap) <jjnapiork@cpan.org>
+
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2014, the above named PROJECT FOUNDER and CONTRIBUTORS.
+Copyright (c) 2005-2015, the above named PROJECT FOUNDER and CONTRIBUTORS.
 
 =head1 LICENSE
 

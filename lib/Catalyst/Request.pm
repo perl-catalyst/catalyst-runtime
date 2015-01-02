@@ -669,11 +669,15 @@ cause a hash initialization error. For a more straightforward interface see
 C<< $c->req->parameters >>.
 
 B<NOTE> Interfaces like this, which are based on L<CGI> and the C<param> method
-are now known to cause demonstrated exploits. It is highly recommended that you
-avoid using this method, and migrate existing code away from it.  Here's the
+are known to cause demonstrated exploits. It is highly recommended that you
+avoid using this method, and migrate existing code away from it.  Here's a
 whitepaper of the exploit:
 
 L<http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/>
+
+B<NOTE> Further discussion on IRC indicate that the L<Catalyst> core team from 'back then'
+were well aware of this hack and this is the main reason we added the new approach to
+getting parameters in the first place.
 
 Basically this is an exploit that takes advantage of how L<\param> will do one thing
 in scalar context and another thing in list context.  This is combined with how Perl
