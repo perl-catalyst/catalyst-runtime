@@ -7,6 +7,34 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 This is an overview of the user-visible changes to Catalyst between major
 Catalyst releases.
 
+=head2 VERSION 5.90080+
+
+The biggest change in this release is that UTF8 encoding is now enabled by
+default.  So you no longer need any plugins (such as L<Catalyst::Plugin::Unicode::Encoding>)
+which you can just no go ahead and remove.  You also don't need to set
+the encoding configuration (__PACKAGE__->config(encoding=>'UTF-8')) anymore
+as well (although its presense hurts nothing).
+
+If this change causes you trouble, you can disable it:
+
+    __PACKAGE__->config(encoding=>undef);
+
+But please report bugs.  You will find that a number of common Views have been
+updated for this release (such as L<Catalyst::View::TT>).  In all cases that the
+author is aware of these updates were to fix test cases only.  You shouldn't
+need to update unless you are installing fresh and want tests to pass.
+
+L<Catalyst::Plugin::Compress> was updated to be compatible with this release.
+You will need to upgrade if you are using this plugin.
+
+A small change is that the configuration setting C<using_frontend_proxy>
+was not doing the right thing if you started your application with C<psgi_app>
+and dod not apply the default middleware.  This setting is now honored in
+all the ways an application may be started.  This could cause trouble if you
+are using the configuration value and also adding the proxy middleware
+manually with a custom application startup.  The solution is that you only
+need the configuration value set, or the middleware manually added (not both).
+
 =head2 VERSION 5.90060+
 
 =head3 Catalyst::Log object autoflush on by default

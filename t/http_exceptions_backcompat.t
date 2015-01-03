@@ -6,8 +6,8 @@ use HTTP::Message::PSGI;
 use Plack::Util;
 use Plack::Test;
 
-# Test to make sure we let HTTP style exceptions bubble up to the middleware
-# rather than catching them outselves.
+# Test to make sure HTTP style exceptions do NOT bubble up to the middleware
+# if the backcompat setting 'always_catch_http_exceptions' is enabled.
 
 {
   package MyApp::Exception;
@@ -77,12 +77,13 @@ use Plack::Test;
     die "I'm not dead yet";
   }
 
-  sub end :Private { die "We should never hit end for HTTPExceptions" }
-
   package MyApp;
   use Catalyst;
 
-  MyApp->config(abort_chain_on_error_fix=>1);
+  MyApp->config(
+      abort_chain_on_error_fix=>1,
+      always_catch_http_exceptions=>1,
+  );
 
   sub debug { 1 }
 
@@ -95,29 +96,25 @@ MyApp->setup_log('error');
 Test::More::ok(MyApp->setup);
 
 ok my $psgi = MyApp->psgi_app;
-
 test_psgi $psgi, sub {
     my $cb = shift;
     my $res = $cb->(GET "/root/from_psgi_app");
-    is $res->code, 404;
-    is $res->content, 'Not Found', 'NOT FOUND';
-    unlike $res->content, qr'HTTPExceptions', 'HTTPExceptions';
+    is $res->code, 500;
+    like $res->content, qr/MyApp::Exception=HASH/;
 };
 
 test_psgi $psgi, sub {
     my $cb = shift;
     my $res = $cb->(GET "/root/from_catalyst");
-    is $res->code, 403;
-    is $res->content, 'Forbidden', 'Forbidden';
-    unlike $res->content, qr'HTTPExceptions', 'HTTPExceptions';
+    is $res->code, 500;
+    like $res->content, qr/MyApp::Exception=HASH/;
 };
 
 test_psgi $psgi, sub {
     my $cb = shift;
     my $res = $cb->(GET "/root/from_code_type");
-    is $res->code, 400;
-    is $res->content, 'bad stringy bad', 'bad stringy bad';
-    unlike $res->content, qr'HTTPExceptions', 'HTTPExceptions';
+    is $res->code, 500;
+    like $res->content, qr/MyApp::AnotherException=HASH/;
 };
 
 test_psgi $psgi, sub {
@@ -125,7 +122,6 @@ test_psgi $psgi, sub {
     my $res = $cb->(GET "/root/classic_error");
     is $res->code, 500;
     like $res->content, qr'Ex Parrot', 'Ex Parrot';
-    like $res->content, qr'HTTPExceptions', 'HTTPExceptions';
 };
 
 test_psgi $psgi, sub {
@@ -133,14 +129,10 @@ test_psgi $psgi, sub {
     my $res = $cb->(GET "/root/just_die");
     is $res->code, 500;
     like $res->content, qr'not dead yet', 'not dead yet';
-    like $res->content, qr'HTTPExceptions', 'HTTPExceptions';
 };
-
-
 
 # We need to specify the number of expected tests because tests that live
 # in the callbacks might never get run (thus all ran tests pass but not all
 # required tests run).
 
-done_testing(17);
-
+done_testing(12);

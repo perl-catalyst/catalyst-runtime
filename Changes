@@ -1,6 +1,52 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90080_001 - TBD
+5.90079.06  - 2015-01-02
+  - Removed unneeded depdency on RenderView in new test case that was causing fails
+    on CPAN testers that did not just happen to have that dependency already installed
+  - Updated copyright notices to 2015
+  - Documentation patches around the setup methods and clarification on on security
+    note posted a few months ago.
+  - Added my name to the contributors list
+
+5.90079_005 - 2014-12-31
+  - Merged changes from 5.90078
+  - If configuration 'using_frontend_proxy' is set, we add the correct middleware
+    to the default middleware list.  This way you get the correct and expected
+    behavior if you are starting your application via one of the generated scripts
+    or if you are calling MyApp->psgi_app.  Previously if you started the application
+    with ->psgi_app (or to_app) we ignored this configuration option
+  - New configuration option 'using_frontend_proxy_path' which enables
+    Plack::Middleware::ReverseProxyPath on your application easily.  Please note that
+    Plack::Middleware::ReverseProxyPath is not an automatic dependency of Catalyst at
+    this time, so if you want this feature you should add it to your project dependency
+    list.  This is done to avoid continued growth of Catalyst dependencies.
+  - Tweaks encoding docs a bit to get closer to final.
+
+5.90079_004 - 2014-12-26
+  - Starting adding some docs around the new encoding stuff
+  - Exposed the reqexp we use to match content types that need encoding via a
+    global variable.
+  - Added some test cases for JSON utf8 and tested file uploads with utf8.
+  - Fixes to decoding on file upload filenames and related methods
+  - new methods on upload object that tries to do the right thing if we find
+    a character set on the upload and its UTF8.
+  - new additional helper methods on the file upload object.
+  - new helper methods has_encoding and clear_encoding on context.
+  - Method on Catalyst::Response to determine if the reponse should be encoded.
+  - Warn if changing headers only if headers are finalized AND the response callback
+    has allready been called (and headers already sent).
+  - Centralized rules about detecting if we need to automatically encode or not and
+    added tests around cases when you choose to skip auto encoding.
+
+5.90079_003 - 2014-12-03
+  - Make sure all tests run even if debug mode is enabled.
+  - Fixed issue with middleware stash test case that failed on older Perls
+
+5.90079_002 - 2014-12-02
+  - Fixed typo in Makefile.PL which borked the previous distribution. No other
+    changes.
+
+5.90079_001 - 2014-12-02
   - MyApp->to_app is now an alias for MyApp->psgi_app in order to better support
     existing Plack conventions.
   - Modify Catayst::Response->from_psgi_response to allow the first argument to
@@ -8,6 +54,62 @@
   - Modified Catayst::Middleware::Stash to be a shallow copy in $env.  Added some
     docs.  Added a test case to make sure stash keys added in a child application
     don't bubble back up to the main application.
+  - We no longer use Encode::is_utf8 since it doesn't work the way we think it
+    does... This required some UTF-8 changes.  If your application is UTF-8 aware
+    I highly suggest you test this release.
+  - We alway do utf8 decoding on incoming URLs (before we only did so if the server
+    encoding was utf8.  I believe this is correct as per the w3c spec, but please
+    correct if incorrect :)
+  - Debug output now shows utf8 characters if those are incoming via Args or as
+    path or pathparts in your actions.  query and body parameter keys are now also
+    subject to utf8 decoding (or as specificed via the encoding configuration value).
+  - lots of UTF8 changes.  Again we think this is now more correct but please test.
+  - Allow $c->res->redirect($url) to accept $url as an object that does ->as_string
+    which I think will ease a common case (and common bug) and added documentation.
+  - !!! UTF-8 is now the default encoding (there used to be none...).  You can disable
+    this if you need to with MyApp->config(encoding => undef) if it causes you trouble.
+  - Calling $c->res->write($data) now encodes $data based on the configured encoding
+    (UTF-8 is default).
+  - $c->res->writer_fh now returns Catalyst::Response::Writer which is a decorator
+    over the PSGI writer and provides an additional methd 'write_encoded' that just
+    does the right thing for encoding your responses.  This is probably the method
+    you want to use.
+  - New dispatch matching attribute: Scheme.  This lets you match a route based on
+    the incoming URI scheme (http, https, ws, wss).
+  - If $c->uri_for targets an action or action chain that defines Scheme, use that
+    scheme for the generated URI object instead of just using whatever the incoming
+    request uses.
+
+5.90078 - 2014-12-30
+  - POD corrections (sergey++)
+  - New configuration option to disable the HTTP Exception passthru feature
+    introduced in 5.90060.  You can use this if that feature is causing you
+    trouble. (davewood++);
+  - Some additional helper methods for dealing with errors.
+  - More clear exception when $request->body_data tries to parse malformed POSTed
+    data.  Added documentation and tests around this.
+
+5.90077 - 2014-11-18
+  - We store the PSGI $env in Catalyst::Engine for backcompat reasons.  Changed
+    this so that the storage is a weak reference, so that it goes out of scope
+    with the request.  This solves an issue where items in the stash (now in the
+    PSGI env) would not get closed at the end of the request.  This caused some
+    regression, primarily in custom testing classes.
+
+5.90076 - 2014-11-13
+  - If throwing an exception object that does the code method, make sure that
+    method returns an expected HTTP status code before passing it on to the
+    HTTP Exception middleware.
+
+5.90075 - 2014-10-06
+  - Documentation patch for $c->req->param to point out the recently discovered
+    potential security issues: http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/
+  - You don't need to install this update, but you should read about the exploit
+    and review if your code is vulnerable.  If you use the $c->req->param interface
+    you really need to review this exploit.
+
+5.90074 - 2014-10-01
+  - Specify Carp minimum version to avoid pointless test fails (valy++)
 
 5.90073 - 2014-09-23
   - Fixed a regression caused by the last release where we broke what happened

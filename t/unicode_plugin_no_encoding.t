@@ -18,7 +18,12 @@ my $encode_str = "\x{e3}\x{81}\x{82}"; # e38182 is japanese 'あ'
 my $decode_str = Encode::decode('utf-8' => $encode_str);
 my $escape_str = uri_escape_utf8($decode_str);
 
-check_parameter(GET "/?myparam=$escape_str");
+# JNAP - I am removing this test case because I think its not correct.  I think
+# we do not check the server encoding to determine if the parts of a request URL
+# both paths and query should be decoded.  I think its always safe to assume utf8
+# encoded urlencoded bits.  That is my reading of the spec.  Please correct me if
+# I am wrong
+#check_parameter(GET "/?myparam=$escape_str");
 check_parameter(POST '/',
     Content_Type => 'form-data',
     Content => [
@@ -33,7 +38,6 @@ sub check_parameter {
     my ( undef, $c ) = ctx_request(shift);
 
     my $myparam = $c->req->param('myparam');
-    ok !utf8::is_utf8($myparam);
     unless ( $c->request->method eq 'POST' ) {
         is $c->res->output => $encode_str;
         is $myparam => $encode_str;

@@ -103,6 +103,10 @@ sub number_of_captures {
     return $self->attributes->{CaptureArgs}[0] || 0;
 }
 
+sub scheme {
+  return exists $_[0]->attributes->{Scheme} ? $_[0]->attributes->{Scheme}[0] : undef;
+}
+
 sub list_extra_info {
   my $self = shift;
   return {
@@ -191,6 +195,10 @@ Returns the number of captures this action expects for L<Chained|Catalyst::Dispa
 =head2 list_extra_info
 
 A HashRef of key-values that an action can provide to a debugging screen
+
+=head2 scheme
+
+Any defined scheme for the action
 
 =head2 meta
 

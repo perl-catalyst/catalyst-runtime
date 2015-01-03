@@ -33,7 +33,8 @@ use Plack::Test;
 
   $SIG{__WARN__} = sub {
     my $error = shift;
-    Test::More::is($error, "You called ->params with an undefined value at t/undef-params.t line 20.\n");
+    Test::More::is($error, "You called ->params with an undefined value at t/undef-params.t line 20.\n")
+      unless MyApp->debug;
   };
 
   MyApp->setup, 'setup app';

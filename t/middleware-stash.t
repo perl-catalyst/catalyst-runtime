@@ -14,7 +14,7 @@ use strict;
     $c->stash->{inner} = "inner";
     $c->res->body( "inner: ${\$c->stash->{inner}}, outer: ${\$c->stash->{outer}}");
 
-    is_deeply [sort {$a cmp $b} keys($c->stash)], ['inner','outer'], 'both keys in stash';
+    is_deeply [sort {$a cmp $b} keys(%{$c->stash})], ['inner','outer'], 'both keys in stash';
   }
 
   package MyAppChild;
@@ -34,7 +34,7 @@ use strict;
     $c->stash->{outer} = "outer";
     $c->res->from_psgi_response( MyAppChild->to_app->($c->req->env) );
 
-    is_deeply [keys($c->stash)], ['outer'], 'only one key in stash';
+    is_deeply [keys(%{$c->stash})], ['outer'], 'only one key in stash';
   }
 
   package MyAppParent;

@@ -7,23 +7,19 @@ use CGI::Simple::Cookie;
 use Data::Dump qw/dump/;
 use Errno 'EWOULDBLOCK';
 use HTML::Entities;
-use HTTP::Body;
 use HTTP::Headers;
-use URI::QueryParam;
 use Plack::Loader;
 use Catalyst::EngineLoader;
-use Encode ();
+use Encode 2.21 'decode_utf8';
 use Plack::Request::Upload;
 use Hash::MultiValue;
-use utf8;
-
 use namespace::clean -except => 'meta';
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
 
 # XXX - this is only here for compat, do not use!
-has env => ( is => 'rw', writer => '_set_env' );
+has env => ( is => 'rw', writer => '_set_env' , weak_ref=>1);
 my $WARN_ABOUT_ENV = 0;
 around env => sub {
   my ($orig, $self, @args) = @_;
@@ -593,7 +589,9 @@ sub prepare_query_parameters {
     # Check for keywords (no = signs)
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
-        $c->request->query_keywords($self->unescape_uri($query_string));
+        my $keywords = $self->unescape_uri($query_string);
+        $keywords = decode_utf8 $keywords;
+        $c->request->query_keywords($keywords);
         return;
     }
 
@@ -607,10 +605,13 @@ sub prepare_query_parameters {
     for my $item ( @params ) {
 
         my ($param, $value)
-            = map { $self->unescape_uri($_) }
+            = map { decode_utf8($self->unescape_uri($_)) }
               split( /=/, $item, 2 );
 
-        $param = $self->unescape_uri($item) unless defined $param;
+        unless(defined $param) {
+            $param = $self->unescape_uri($item);
+            $param = decode_utf8 $param;
+        }
 
         if ( exists $query{$param} ) {
             if ( ref $query{$param} ) {
@@ -668,20 +669,26 @@ sub prepare_uploads {
     my $request = $c->request;
     return unless $request->_body;
 
+    my $enc = $c->encoding;
     my $uploads = $request->_body->upload;
     my $parameters = $request->parameters;
     foreach my $name (keys %$uploads) {
+        $name = $c->_handle_unicode_decoding($name) if $enc;
         my $files = $uploads->{$name};
         my @uploads;
         for my $upload (ref $files eq 'ARRAY' ? @$files : ($files)) {
             my $headers = HTTP::Headers->new( %{ $upload->{headers} } );
+            my $filename = $upload->{filename};
+            $filename = $c->_handle_unicode_decoding($filename) if $enc;
+
             my $u = Catalyst::Request::Upload->new
               (
                size => $upload->{size},
                type => scalar $headers->content_type,
+               charset => scalar $headers->content_type_charset,
                headers => $headers,
                tempname => $upload->{tempname},
-               filename => $upload->{filename},
+               filename => $filename,
               );
             push @uploads, $u;
         }

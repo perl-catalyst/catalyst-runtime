@@ -61,6 +61,22 @@ sub number_of_captures {
     return $captures;
 }
 
+# the scheme defined at the end of the chain is the one we use
+# but warn if too many.
+
+sub scheme {
+  my $self = shift;
+  my @chain = @{ $self->chain };
+  my ($scheme, @more) = map {
+    exists $_->attributes->{Scheme} ? $_->attributes->{Scheme}[0] : ();
+  } reverse @chain;
+
+  warn "$self is a chain with two many Scheme attributes (only one is allowed)"
+    if @more;
+
+  return $scheme;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -86,6 +102,10 @@ Catalyst::ActionChain object representing a chain of these actions
 =head2 number_of_captures
 
 Returns the total number of captures for the entire chain of actions.
+
+=head2 scheme
+
+Any defined scheme for the actionchain
 
 =head2 meta
 

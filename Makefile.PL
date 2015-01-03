@@ -35,7 +35,7 @@ requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24';
 requires 'MooseX::Role::WithOverloading' => '0.09';
-requires 'Carp';
+requires 'Carp' => '1.25';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';
 requires 'Data::Dump';
@@ -69,7 +69,8 @@ requires 'Plack::Test::ExternalServer';
 requires 'Class::Data::Inheritable';
 requires 'Encode' => '2.49';
 requires 'LWP' => '5.837'; # LWP had unicode fail in 5.8.26
-requires 'URI' => '1.36';
+requires 'URI' => '1.65';
+requires 'URI::ws' => '0.03';
 requires 'JSON::MaybeXS' => '1.000000';
 requires 'Stream::Buffered';
 requires 'Hash::MultiValue';

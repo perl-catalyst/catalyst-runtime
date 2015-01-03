@@ -10,7 +10,8 @@ use HTTP::Headers;
 use Stream::Buffered;
 use Hash::MultiValue;
 use Scalar::Util;
-
+use HTTP::Body;
+use Catalyst::Exception;
 use Moose;
 
 use namespace::clean -except => 'meta';
@@ -118,7 +119,11 @@ has body_data => (
 
 sub _build_body_data {
     my ($self) = @_;
-    my $content_type = $self->content_type;
+
+    # Not sure if these returns should not be exceptions...
+    my $content_type = $self->content_type || return;
+    return unless ($self->method eq 'POST' || $self->method eq 'PUT');
+
     my ($match) = grep { $content_type =~/$_/i }
       keys(%{$self->data_handlers});
 
@@ -127,7 +132,7 @@ sub _build_body_data {
       local $_ = $fh;
       return $self->data_handlers->{$match}->($fh, $self);
     } else { 
-      return undef;
+      Catalyst::Exception->throw("$content_type is does not have an available data handler");
     }
 }
 
@@ -312,7 +317,7 @@ sub prepare_body_chunk {
 }
 
 sub prepare_body_parameters {
-    my ( $self ) = @_;
+    my ( $self, $c ) = @_;
 
     $self->prepare_body if ! $self->_has_body;
 
@@ -320,9 +325,29 @@ sub prepare_body_parameters {
       return $self->_use_hash_multivalue ? Hash::MultiValue->new : {};
     }
 
+    my $params = $self->_body->param;
+
+    # If we have an encoding configured (like UTF-8) in general we expect a client
+    # to POST with the encoding we fufilled the request in. Otherwise don't do any
+    # encoding (good change wide chars could be in HTML entity style llike the old
+    # days -JNAP
+
+    # so, now that HTTP::Body prepared the body params, we gotta 'walk' the structure
+    # and do any needed decoding.
+
+    # This only does something if the encoding is set via the encoding param.  Remember
+    # this is assuming the client is not bad and responds with what you provided.  In
+    # general you can just use utf8 and get away with it.
+    #
+    # I need to see if $c is here since this also doubles as a builder for the object :(
+
+    if($c and $c->encoding) {
+        $params = $c->_handle_unicode_decoding($params);
+    }
+
     return $self->_use_hash_multivalue ?
-        Hash::MultiValue->from_mixed($self->_body->param) :
-        $self->_body->param;
+        Hash::MultiValue->from_mixed($params) :
+        $params;
 }
 
 sub prepare_connection {
@@ -502,6 +527,13 @@ data of the type 'application/json' and return access to that data via this
 method.  You may define addition data_handlers via a global configuration
 setting.  See L<Catalyst\DATA HANDLERS> for more information.
 
+If the POST is malformed in some way (such as undefined or not content that
+matches the content-type) we raise a L<Catalyst::Exception> with the error
+text as the message.
+
+If the POSTed content type does not match an availabled data handler, this
+will also raise an exception.
+
 =head2 $req->body_parameters
 
 Returns a reference to a hash containing body (POST) parameters. Values can
@@ -635,6 +667,60 @@ when writing code of the form:
 If multiple C<baz> parameters are provided this code might corrupt data or
 cause a hash initialization error. For a more straightforward interface see
 C<< $c->req->parameters >>.
+
+B<NOTE> Interfaces like this, which are based on L<CGI> and the C<param> method
+are known to cause demonstrated exploits. It is highly recommended that you
+avoid using this method, and migrate existing code away from it.  Here's a
+whitepaper of the exploit:
+
+L<http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications/>
+
+B<NOTE> Further discussion on IRC indicate that the L<Catalyst> core team from 'back then'
+were well aware of this hack and this is the main reason we added the new approach to
+getting parameters in the first place.
+
+Basically this is an exploit that takes advantage of how L<\param> will do one thing
+in scalar context and another thing in list context.  This is combined with how Perl
+chooses to deal with duplicate keys in a hash definition by overwriting the value of
+existing keys with a new value if the same key shows up again.  Generally you will be
+vulnerale to this exploit if you are using this method in a direct assignment in a
+hash, such as with a L<DBIx::Class> create statement.  For example, if you have
+parameters like:
+
+    user?user=123&foo=a&foo=user&foo=456
+
+You could end up with extra parameters injected into your method calls:
+
+    $c->model('User')->create({
+      user => $c->req->param('user'),
+      foo => $c->req->param('foo'),
+    });
+
+Which would look like:
+
+    $c->model('User')->create({
+      user => 123,
+      foo => qw(a user 456),
+    });
+
+(or to be absolutely clear if you are not seeing it):
+
+    $c->model('User')->create({
+      user => 456,
+      foo => 'a',
+    });
+
+Possible remediations include scrubbing your parameters with a form validator like
+L<HTML::FormHandler> or being careful to force scalar context using the scalar
+keyword:
+
+    $c->model('User')->create({
+      user => scalar($c->req->param('user')),
+      foo => scalar($c->req->param('foo')),
+    });
+
+Upcoming versions of L<Catalyst> will disable this interface by default and require
+you to positively enable it should you require it for backwards compatibility reasons.
 
 =cut
 
@@ -877,7 +963,7 @@ sub mangle_params {
         next unless defined $value;
         for ( ref $value eq 'ARRAY' ? @$value : $value ) {
             $_ = "$_";
-            utf8::encode( $_ ) if utf8::is_utf8($_);
+            #      utf8::encode($_);
         }
     };
 
