@@ -25,7 +25,8 @@ author is aware of these updates were to fix test cases only.  You shouldn't
 need to update unless you are installing fresh and want tests to pass.
 
 L<Catalyst::Plugin::Compress> was updated to be compatible with this release.
-You will need to upgrade if you are using this plugin.
+You will need to upgrade if you are using this plugin.  L<Catalyst::Upgrading>
+also has details.
 
 A small change is that the configuration setting C<using_frontend_proxy>
 was not doing the right thing if you started your application with C<psgi_app>

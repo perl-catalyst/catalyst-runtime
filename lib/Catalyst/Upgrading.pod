@@ -2,6 +2,30 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90080
+
+UTF8 encoding is now default.  For temporary backwards compatibility, if this
+change is causing you trouble, you can disable it by setting the application
+configuration option to undef:
+
+    MyApp->config(encoding => undef);
+
+But please consider this a temporary measure since it is the intention that
+UTF8 is enabled going forwards and the expectation is that other ecosystem
+projects will assume this as well.  At some point you application will not
+correctly function without this setting.
+
+A number of projects in the wider ecosystem required minor updates to be able
+to work correctly.  Here's the known list:
+
+L<Catalyst::View::TT>, L<Catalyst::View::Mason>, L<Catalyst::View::HTML::Mason>,
+L<Catalyst::View::Xslate>, L<Test::WWW::Mechanize::Catalyst>
+
+You will need to update to modern versions in most cases, although quite a few
+of these only needed minor test case and documentation changes so you will need
+to review the changelog of each one that is relevant to you to determine your
+true upgrade needs.
+
 =head1 Upgrading to Catalyst 5.90060
 
 Starting in the v5.90059_001 development release, the regexp dispatch type is

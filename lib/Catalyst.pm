@@ -4174,11 +4174,18 @@ Please see L<PSGI> for more on middleware.
 
 =head1 ENCODING
 
-On request, decodes all params from encoding into a sequence of
-logical characters. On response, encodes body into encoding.
+Starting in L<Catalyst> version 5.90080 encoding is automatically enabled
+and set to encode all body responses to UTF8 when possible and applicable.
+Following is documentation on this process.  If you are using an older
+version of L<Catalyst> you should review documentation for that version since
+a lot has changed.
 
 By default encoding is now 'UTF-8'.  You may turn it off by setting
 the encoding configuration to undef.
+
+    MyApp->config(encoding => undef);
+
+This is recommended for temporary backwards compatibility only.
 
 Encoding is automatically applied when the content-type is set to
 a type that can be encoded.  Currently we encode when the content type
@@ -4190,9 +4197,9 @@ Encoding is set on the application, but it is copied to the context object
 so that you can override it on a request basis.
 
 Be default we don't automatically encode 'application/json' since the most
-popular JSON encoders (such as L<JSON::MaybeXS> which is the library that
-L<Catalyst> can make use of) will do the UTF8 encoding and decoding automatically.
-Having it on in Catalyst could result in double encoding.
+common approaches to generating this type of response (Either via L<Catalyst::View::JSON>
+or L<Catalyst::Action::REST>) will do so already and we want to avoid double
+encoding issues.
 
 If you are producing JSON response in an unconventional manner (such
 as via a template or manual strings) you should perform the UTF8 encoding
@@ -4202,9 +4209,10 @@ NOTE: We also examine the value of $c->response->content_encoding.  If
 you set this (like for example 'gzip', and manually gzipping the body)
 we assume that you have done all the neccessary encoding yourself, since
 we cannot encode the gzipped contents.  If you use a plugin like
-L<Catalyst::Plugin::Compress> we will be updating that plugin to work 
-with the new UTF8 encoding code, or you can use L<Plack::Middleware::Deflater>
-or (probably best) do your compression on a front end proxy.
+L<Catalyst::Plugin::Compress> you need to update to a modern version in order
+to have this function correctly  with the new UTF8 encoding code, or you
+can use L<Plack::Middleware::Deflater> or (probably best) do your compression on
+a front end proxy.
 
 =head2 Methods
 
