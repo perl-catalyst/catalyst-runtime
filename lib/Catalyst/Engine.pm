@@ -14,6 +14,7 @@ use Encode 2.21 'decode_utf8';
 use Plack::Request::Upload;
 use Hash::MultiValue;
 use namespace::clean -except => 'meta';
+use utf8;
 
 # Amount of data to read from input on each pass
 our $CHUNKSIZE = 64 * 1024;
