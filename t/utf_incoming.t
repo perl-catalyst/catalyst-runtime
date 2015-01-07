@@ -167,8 +167,17 @@ use JSON::MaybeXS;
   sub override_encoding :Local {
     my ($self, $c) = @_;
     $c->res->content_type('text/plain');
+    $c->encoding(Encode::find_encoding('UTF-8'));
     $c->encoding(Encode::find_encoding('Shift_JIS'));
     $c->response->body("テスト");
+  }
+
+  sub stream_write_error :Local {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/html');
+    $c->response->write("<p>This is stream_write action ♥</p>");
+    $c->encoding(Encode::find_encoding('Shift_JIS'));
+    $c->response->write("<p>This is stream_write action ♥</p>");
   }
 
   package MyApp;
@@ -394,6 +403,14 @@ SKIP: {
   is decode_utf8($content), "manual_1 ♥", 'correct body';
   is $res->content_charset, 'UTF-8';
 }
+
+{
+  my $res = request "/root/stream_write_error";
+
+  is $res->code, 200, 'OK';
+  like decode_utf8($res->content), qr[<p>This is stream_write action ♥</p><!DOCTYPE html], 'correct body';
+}
+
 
 ## should we use binmode on filehandles to force the encoding...?
 ## Not sure what else to do with multipart here, if docs are enough...

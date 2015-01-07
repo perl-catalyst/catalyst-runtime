@@ -1049,7 +1049,11 @@ Clears the encoding for the current context
 
 =head2 encoding
 
-Sets or gets the application encoding.
+Sets or gets the application encoding.  Setting encoding takes either an
+Encoding object or a string that we try to resolve via L<Encode::find_encoding>.
+
+You would expect to get the encoding object back if you attempt to set it.  If
+there is a failure you will get undef returned and an error message in the log.
 
 =cut
 
@@ -1060,7 +1064,7 @@ sub clear_encoding {
     if(blessed $c) {
         $c->encoding(undef);
     } else {
-        $c->debug->error("You can't clear encoding on the application");
+        $c->log->error("You can't clear encoding on the application");
     }
 }
 
@@ -1069,6 +1073,13 @@ sub encoding {
     my $encoding;
 
     if ( scalar @_ ) {
+
+        # Don't let one change this once we are too far into the response
+        if(blessed $c && $c->res->finalized_headers) {
+          Carp::croak("You may not change the encoding once the headers are finalized");
+          return;
+        }
+
         # Let it be set to undef
         if (my $wanted = shift)  {
             $encoding = Encode::find_encoding($wanted)
