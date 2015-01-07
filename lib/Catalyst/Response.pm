@@ -551,7 +551,13 @@ Example:
     }
 
 Please note this does not attempt to map or nest your PSGI application under
-the Controller and Action namespace or path.  
+the Controller and Action namespace or path. You may wish to review 'PSGI Helpers'
+under L<Catalyst::Utils> for help in properly nesting applications.
+
+B<NOTE> If your external PSGI application returns a response that has a character
+set associated with the content type (such as "text/html; charset=UTF-8") we set
+$c->clear_encoding to remove any additional content type encoding processing later
+in the application (this is done to avoid double encoding issues).
 
 =head2 encodable_content_type
 

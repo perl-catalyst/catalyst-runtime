@@ -372,8 +372,11 @@ This will use the alternative encoding for a single response.
 
 B<NOTE> If you manually set the content-type character set to whatever $c->encoding->mime_name
 is set to, we STILL encode, rather than assume your manual setting is a flag to override.  This
-is done to support backward compatible assumptions.  If you are going to handle encoding
-manually you may set $c->clear_encoding for a single request response cycle.
+is done to support backward compatible assumptions (in particular L<Catalyst::View::TT> has set
+a utf-8 character set in its default content-type for ages, even though it does not itself do any
+encoding on the body response).  If you are going to handle encoding manually you may set
+$c->clear_encoding for a single request response cycle, or as in the above example set an alternative
+encoding.
 
 =head2 Encoding with streaming type responses
 
@@ -528,6 +531,24 @@ Other views may be similar.  You should review View documentation and test durin
 We tried to make sure most common views worked properly and noted all workaround but if we
 missed something please alert the development team (instead of introducing a local hack into
 your application that will mean nobody will ever upgrade it...).
+
+=head2 Setting the response from an external PSGI application.
+
+L<Catalyst::Response> allows one to set the response from an external L<PSGI> application.
+If you do this, and that external application sets a character set on the content-type, we
+C<clear_encoding> for the rest of the response.  This is done to prevent double encoding.
+
+B<NOTE> Even if the character set of the content type is the same as the encoding set in
+$c->encoding, we still skip encoding.  This is a regrettable difference from the general rule
+outlined above, where if the current character set is the same as the current encoding, we
+encode anyway.  Nevertheless I think this is the correct behavior since the earlier rule exists
+only to support backward compatibility with L<Catalyst::View::TT>.
+
+In general if you want L<Catalyst> to handle encoding, you should avoid setting the content
+type character set since Catalyst will do so automatically based on the requested response
+encoding.  Its best to request alternative encodings by setting $c->encoding and if you  really
+want manual control of encoding you should always $c->clear_encoding so that programmers that
+come after you are very clear as to your intentions.
 
 =head2 Disabling default UTF8 encoding
 
