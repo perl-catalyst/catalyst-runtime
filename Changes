@@ -6,7 +6,7 @@ TDB
   - replace missing utf8 pragma in Catalyst::Engine
 
 5.90079_006  - 2015-01-02
-  - Removed unneeded depdency on RenderView in new test case that was causing fails
+  - Removed unneeded dependency on RenderView in new test case that was causing fails
     on CPAN testers that did not just happen to have that dependency already installed
   - Updated copyright notices to 2015
   - Documentation patches around the setup methods and clarification on on security
@@ -37,9 +37,9 @@ TDB
     a character set on the upload and its UTF8.
   - new additional helper methods on the file upload object.
   - new helper methods has_encoding and clear_encoding on context.
-  - Method on Catalyst::Response to determine if the reponse should be encoded.
+  - Method on Catalyst::Response to determine if the response should be encoded.
   - Warn if changing headers only if headers are finalized AND the response callback
-    has allready been called (and headers already sent).
+    has already been called (and headers already sent).
   - Centralized rules about detecting if we need to automatically encode or not and
     added tests around cases when you choose to skip auto encoding.
 
@@ -54,20 +54,20 @@ TDB
 5.90079_001 - 2014-12-02
   - MyApp->to_app is now an alias for MyApp->psgi_app in order to better support
     existing Plack conventions.
-  - Modify Catayst::Response->from_psgi_response to allow the first argument to
+  - Modify Catalyst::Response->from_psgi_response to allow the first argument to
     be an object that does ->as_psgi.
-  - Modified Catayst::Middleware::Stash to be a shallow copy in $env.  Added some
+  - Modified Catalyst::Middleware::Stash to be a shallow copy in $env.  Added some
     docs.  Added a test case to make sure stash keys added in a child application
     don't bubble back up to the main application.
   - We no longer use Encode::is_utf8 since it doesn't work the way we think it
     does... This required some UTF-8 changes.  If your application is UTF-8 aware
     I highly suggest you test this release.
-  - We alway do utf8 decoding on incoming URLs (before we only did so if the server
+  - We always do utf8 decoding on incoming URLs (before we only did so if the server
     encoding was utf8.  I believe this is correct as per the w3c spec, but please
     correct if incorrect :)
   - Debug output now shows utf8 characters if those are incoming via Args or as
     path or pathparts in your actions.  query and body parameter keys are now also
-    subject to utf8 decoding (or as specificed via the encoding configuration value).
+    subject to utf8 decoding (or as specified via the encoding configuration value).
   - lots of UTF8 changes.  Again we think this is now more correct but please test.
   - Allow $c->res->redirect($url) to accept $url as an object that does ->as_string
     which I think will ease a common case (and common bug) and added documentation.
@@ -76,7 +76,7 @@ TDB
   - Calling $c->res->write($data) now encodes $data based on the configured encoding
     (UTF-8 is default).
   - $c->res->writer_fh now returns Catalyst::Response::Writer which is a decorator
-    over the PSGI writer and provides an additional methd 'write_encoded' that just
+    over the PSGI writer and provides an additional method 'write_encoded' that just
     does the right thing for encoding your responses.  This is probably the method
     you want to use.
   - New dispatch matching attribute: Scheme.  This lets you match a route based on
@@ -92,7 +92,7 @@ TDB
 
 5.90078 - 2014-12-30
   - POD corrections (sergey++)
-  - New configuration option to disable the HTTP Exception passthru feature
+  - New configuration option to disable the HTTP Exception passthrough feature
     introduced in 5.90060.  You can use this if that feature is causing you
     trouble. (davewood++);
   - Some additional helper methods for dealing with errors.
@@ -140,7 +140,7 @@ TDB
     in the wild (Catalyst-Plugin-Authentication-0.10023) - (removed in 5.90070)
   - Reverted changes to debug log/handling (5.90069_003) to fix
     rev dep Catalyst-Plugin-Static-Simple-0.32 test suite.
-  - Added italian translation of default error.
+  - Added Italian translation of default error.
 
 5.90070 - 2014-08-07
   - Retagged previous release as stable; no changes
@@ -218,7 +218,7 @@ s
 
 5.90059_006 - 2014-02-06
   - MyApp->setup now returns $app to allow class method chaining.
-  - New Util helper functional localize $env to make it easier to mount PSIG
+  - New Util helper functional localize $env to make it easier to mount PSGI
     applications under controllers and actions.  See Catalyst::Utils/PSGI Helpers.
   - NOTICE: Final Development release for Runner, unless significant issues are
     raised.  Please test.
@@ -233,7 +233,7 @@ s
     that does 'read' but not 'getline'.  Added deprecation notice for this
     case.  Added docs to Catalyst::Delta.
   - Catalyst::Delta contains a list of behaviors which will be considered
-    deprecated immediatelty.  Most items have workarounds and tweaks you can
+    deprecated immediately.  Most items have workarounds and tweaks you can
     make to avoid issues.  These deprecations are targeted for removal/enforcement
     in the Catalyst 6 release.  Please review and give your feedback.
   - More middleware to replace inline code (upasana++)
@@ -290,7 +290,7 @@ s
   - Give a more descriptive error message when trying to load middleware that
     does not exist.
   - Change the way we initialize plugins to fix a bug where when using the 
-    populare ConfigLoader plugin, configs merged are not available for setting
+    popular ConfigLoader plugin, configs merged are not available for setting
     up middleware and data handlers (and probably other things as well).
 
     NOTE: This change might cause issues if you had code that was relying on the
@@ -300,12 +300,12 @@ s
 
   - You may now also call 'setup_middleware' as a package method if you think
     that loading middleware via configuration is a weird or broken idea.
-  - Various POD formating fixed.
+  - Various POD formatting fixed.
   - Improved some documentation about what type of filehandles that ->body can
     accept and issues that might arise.
 
 5.90051 - 2013-11-06
-  - Be more skeptical of the existance of $request->env to fix a regression
+  - Be more skeptical of the existence of $request->env to fix a regression
     introduced in Catalyst::Action::REST by the previous release
 
 5.90050 - 2013-11-05
@@ -343,7 +343,7 @@ s
 
 5.90049_004 - 2013-10-18
   - JSON Data handler looks for both JSON::MaybeXS and JSON, and uses
-    whichever is first (prefering to find JSON::MaybeXS).  This should
+    whichever is first (preferring to find JSON::MaybeXS).  This should
     improve compatibility as you likely already have one installed.
   - Fixed a warning in the server script (bokutin++)
   - We now populate various Plack $env keys in order to play nice with
@@ -375,7 +375,7 @@ s
 
 5.90049_003 - 2013-09-20
   - Documented the new body_data method added in the previous release
-  - Merged from master many important bugfixes and forward compatiblity
+  - Merged from master many important bugfixes and forward compatibility
     updates, including:
     - Use modern preferred method for Moose metaclass access and many other
       small changes to how we use Moose for better forward compat (ether++)
@@ -428,7 +428,7 @@ s
     1) Only allow one of either :CaptureArgs or :Args
     2) :CaptureArgs() argument must be numeric
     3) :CaptureArgs() and :Args() arguments cannot be negative
-  - Add Devel::InnerPackage to dependencies, fixing tests on perl 5.17.11
+  - Add Devel::InnerPackage to dependencies, fixing tests on Perl 5.17.11
     as it's been removed from core. RT#84787
   - New support for closing over the PSGI $writer object, useful for working
     with event loops.
@@ -463,7 +463,7 @@ s
   - Added cpanfile as a way to notice we are a dev checkout.
   - Added 'x-tunneled-method' HTTP Header method override to match features in
     Catalyst::Action::REST and in other similar systems on CPAN.
-  - smarter valiation around action attributes.
+  - smarter validation around action attributes.
 
 5.90020 - 2013-02-22
   ! Catalyst::Action now defines 'match_captures' so it is no long considered
@@ -482,9 +482,9 @@ s
   - Some test and documentation improvements
 
 5.90019 - 2012-12-04 21:31:00
-  - Fix for perl 5.17.6 (commit g7dc8663). RT#81601
-  - Fix for perl 5.8. RT#61122
-  - Remove use of MooseX::Types as MooseX::Types is broken on perl5.8
+  - Fix for Perl 5.17.6 (commit g7dc8663). RT#81601
+  - Fix for Perl 5.8. RT#61122
+  - Remove use of MooseX::Types as MooseX::Types is broken on Perl 5.8
     RT#77100 & RT#81121
 
 5.90018 - 2012-10-23 20:55:00
@@ -511,7 +511,7 @@ s
 5.90016 - 2012-08-16 15:35:00
   - prepare_parameters is no longer an attribute builder.  It is now a method
     that calls the correct underlying functionality (Bill Moseley++)
-  - Updated Makefile.PL to handle MacOXS tar
+  - Updated Makefile.PL to handle MacOSX tar
   - Fix uri_for to handle a stringifiable object
   - Fix model/view/controller methods to handle stringifiable objects
   - Fix RT#78377 - IIS7 ignores response body for 3xx requests, which
@@ -621,7 +621,7 @@ s
     refactoring.
 
   - The Catalyst::Utils::home function is used to find if the application
-    is a checkout in Catalyst::ScriptRunner. This means that a non-existant
+    is a checkout in Catalyst::ScriptRunner. This means that a non-existent
     lib directory that is relative to the script install location is not
     included when not running from a checkout.
 
@@ -700,7 +700,7 @@ s
      application authors to add custom options to their scripts then
      get them passed through to the application.
 
-  Doumentation:
+  Documentation:
    - Clarify that if you manually write your own .psgi file, then optional
      proxy support (via the using_frontend_proxy config value) will not be
      enabled unless you explicitly apply the default middlewares from
@@ -710,7 +710,7 @@ s
    - Fix issue due to perl internals bugs in 5.8 and 5.10 (not present in
      other perl versions) require can pass the context inappropriately,
      meaning that some methods of loading classes can fail due to void
-     context being passed throuh to make_immutable, causing it to not return
+     context being passed through to make_immutable, causing it to not return
      a value.
      This bug caused loading Catalyst::Script::XXX to fail and is fixed
      both by bumping the Class::Load dependency, and also adding an explicit
@@ -745,7 +745,7 @@ s
 
    - Document how to get the vhost of the request in $c->req->hostname
      to avoid confusion
-   - Remove documentation showing Global / Regex / Private actionsi
+   - Remove documentation showing Global / Regex / Private actions
      as whilst these still exist (and work), they are not recommended.
    - Remove references to the -Engine flag.
    - Remove references to the deprecated Catalyst->plugin method
@@ -763,7 +763,7 @@ s
 5.90003 - 2011-10-05 08:32:00
   Bug fixes:
 
-   - Make default body reponses for 302s W3C compliant. RT#71237
+   - Make default body responses for 302s W3C compliant. RT#71237
 
    - Fix issue where groups of attributes to override controller actions
      in config would be (incorrectly) overwritten, if the parser for that
@@ -780,7 +780,7 @@ s
   Backward compatibility fixes:
 
    - Restore (an almost empty) Catalyst::Engine::HTTP to the dist for old
-     scripts which explictly require Catalyst::Engine::HTTP
+     scripts which explicitly require Catalyst::Engine::HTTP
 
   Documentation fixes:
 
@@ -837,7 +837,7 @@ s
 
     - nginx specific behaviour is removed as it is not needed with any
       web server configuration I can come up with (recommended config is
-      documented in Catalst::Manual::Deployment::nginx::FastCGI)
+      documented in Catalyst::Manual::Deployment::nginx::FastCGI)
 
 5.89003 2011-07-28 20:11:50 (TRIAL release)
 
@@ -876,7 +876,7 @@ s
   - Added a Catalyst::PSGI manual page with information about writing a .psgi
     file for your application.
 
-   - Catalyst::Uprading has been improved, and the status of old Catalyst
+   - Catalyst::Upgrading has been improved, and the status of old Catalyst
      engines clarified.
 
  Deprecations:
@@ -1215,7 +1215,7 @@ s
 
   Bug fixed:
    - $c->uri_for will now escape unsafe characters in captures
-     ($c->request->captures) and correctly encode utf8 charracters.
+     ($c->request->captures) and correctly encode utf8 characters.
 
 5.80020 2010-02-04 06:51:18
 
@@ -1315,7 +1315,7 @@ s
    - Restore -p option for pid file in the FastCGI server script.
    - Fix the script environment variables MYAPP_PORT and MYAPP_RELOAD RT#52604
    - Fix aliasing applications under non-root paths with mod_rewrite in
-     some apache versions where %ENV{SCRIPT_NAME} is set to the real name of
+     some Apache versions where %ENV{SCRIPT_NAME} is set to the real name of
      the script, by using $ENV{REDIRECT_URL} which contains the non-rewritten
      URI.
    - Fix usage display when myapp_create.pl is run with no arguments. RT#52630
@@ -1396,7 +1396,7 @@ s
     - Stop warnings when actions are forwarded to during dispatch.
     - Remove warnings for using Catalyst::Dispatcher->dispatch_types as this is a
       valid method to publicly call on the dispatcher.
-    - Args ($c->request->args) and CaptureArgs ($c->request->captrues)
+    - Args ($c->request->args) and CaptureArgs ($c->request->captures)
       passed to $c->uri_for with an action object ($c->action) will now
       correctly round-trip when args or captures contain / as it is now
       correctly uri encoded to %2F.
@@ -1554,7 +1554,7 @@ s
        - Fix POD to refer to ->config(key => $val), rather than
          ->config->{key} = $val, as the latter form is deprecated.
        - Clearer docs for the 'uri_for' method.
-       - Fix POD refering to CGI::Cookie. We're using CGI::Simple::Cookie.
+       - Fix POD referring to CGI::Cookie. We're using CGI::Simple::Cookie.
          (Forrest Cahoon)
 
 5.80007 2009-06-30 23:54:34
@@ -1652,7 +1652,7 @@ s
           in Catalyst::Engine (kmx)
 
 5.80004 2009-05-18 17:03:23
-        - Rename the actions attribute in Catalyt::Controller to
+        - Rename the actions attribute in Catalyst::Controller to
           _controller_actions to avoid name clashes with application
           controller naming. (random)
         - Test for using Moose in components which have a non-Moose base class
@@ -1704,7 +1704,7 @@ s
         - Fix RT#43375 by sorting results before testing them
         - Fixes for uri_for_action when using Catalyst::DispatchType::Regex
           + tests from RT#39369 (norbi)
-        - Partial rewrite and reoganisation of the C3 docs in
+        - Partial rewrite and reorganization of the C3 docs in
           Catalyst::Upgrading based on feedback from kiffin
         - If you make your application class immutable and turn off
           constructor inlining, Catalyst will die and tell you pass
@@ -1713,7 +1713,7 @@ s
 
 5.80002 2009-04-22 01:28:36
         - Fix CATALYST_DEBUG and MYAPP_DEBUG environment variables
-          turning debuging on if defined, rather than if set.
+          turning debugging on if defined, rather than if set.
           They now force debugging on or off, taking precedence over
           configuration in your application.
           - Tests for this
@@ -1803,7 +1803,7 @@ s
           allowing method modifiers on actions to work as expected.
         - Provide a reasonable API in Catalyst::Controller for working with
           and registering actions, allowing a controller sub-class to replace
-          subroutine attributes for action declerations with an alternate
+          subroutine attributes for action declarations with an alternate
           syntax.
         - Instantiate correct sub-class of Moose::Meta::Class for non-Moose
           components where Catalyst forces the creation of a metaclass instance.
@@ -1844,7 +1844,7 @@ s
           parameter used to be ignored, but started breaking if the parameter
           was not a hash in 5.8000_04. Extra parameter is now ignored if
           it isn't a hashref
-        - Fix request argumentss getting corrupted if you override the
+        - Fix request arguments getting corrupted if you override the
           dispatcher and call an action which detaches (for
           Catalyst::Plugin::Authorization::ACL)
         - Fix calling use Catalyst::Test 'MyApp' 'foo' which used to work,
@@ -2043,7 +2043,7 @@ s
           was introduced when attempting to allow "0" as a Path.
 
 5.7013  2008-05-16 18:20:00
-        - Provide backwards compatability methods in Catalyst::Stats
+        - Provide backwards compatibility methods in Catalyst::Stats
         - Fix subdirs for scripts that run in subdirs more than one level deep.
         - Added test and updated docs for handling the Authorization header
           under mod_fastcgi/mod_cgi.
