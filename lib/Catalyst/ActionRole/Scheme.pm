@@ -24,7 +24,7 @@ around 'list_extra_info' => sub {
 
 =head1 NAME
 
-Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
+Catalyst::ActionRole::Schema - Match on HTTP Request Schema
 
 =head1 SYNOPSIS
 
@@ -32,39 +32,31 @@ Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
 
     use base 'Catalyst::Controller';
 
-    sub start : POST Chained('/') CaptureArg(0) { ... }
+    sub is_http :Path(scheme) Scheme(http) Args(0) {
+      my ($self, $c) = @_;
+      Test::More::is $c->action->scheme, 'http';
+      $c->response->body("is_http");
+    }
 
-      sub is_json       : Chained('start') Consumes('application/json') { ... }
-      sub is_urlencoded : Chained('start') Consumes('application/x-www-form-urlencoded') { ... }
-      sub is_multipart  : Chained('start') Consumes('multipart/form-data') { ... }
-      
-      ## Alternatively, for common types...
+    sub is_https :Path(scheme) Scheme(https) Args(0)  {
+      my ($self, $c) = @_;
+      Test::More::is $c->action->scheme, 'https';
+      $c->response->body("is_https");
+    }
 
-      sub is_json       : Chained('start') Consume(JSON) { ... }
-      sub is_urlencoded : Chained('start') Consumes(UrlEncoded) { ... }
-      sub is_multipart  : Chained('start') Consumes(Multipart) { ... }
-
-      ## Or allow more than one type
-      
-      sub is_more_than_one
-        : Chained('start')
-        : Consumes('application/x-www-form-urlencoded')
-        : Consumes('multipart/form-data')
-      {
-        ## ... 
-      }
-
-      1;
+    1;
 
 =head1 DESCRIPTION
 
-This is an action role that lets your L<Catalyst::Action> match on the content
-type of the incoming request.  
+This is an action role that lets your L<Catalyst::Action> match on the Scheme
+type of the request.  Typically this is C<http> or C<https> but other common
+schemes that L<Catalyst> can handle include C<ws> and C<wss> (web socket and web
+socket secure).
 
-Generally when there's a PUT or POST request, there's a request content body
-with a matching MIME content type.  Commonly this will be one of the types
-used with classic HTML forms ('application/x-www-form-urlencoded' for example)
-but there's nothing stopping you specifying any valid content type.
+This also ensures that if you use C<uri_for> on an action that specifies a
+match scheme, that the generated L<URI> object sets its scheme to that automatically
+(rather than the scheme of the current request object, which is and remains the
+default behavior.)
 
 For matching purposes, we match strings but the casing is insensitive.
 
@@ -86,29 +78,18 @@ This role defines the following methods
 
 =head2 match_captures
 
-Around method modifier that return 1 if the request content type matches one of the
-allowed content types (see L</http_methods>) and zero otherwise.
-
-=head2 allowed_content_types
-
-An array of strings that are the allowed content types for matching this action.
-
-=head2 can_consume
-
-Boolean.  Does the current request match content type with what this actionrole
-can consume?
+Around method modifier that return 1 if the scheme matches
 
 =head2 list_extra_info
 
-Add the accepted content type to the debug screen.
+Add the scheme info  contenif present to the debug screen.
 
 =head1 AUTHORS
 
-Catalyst Contributors, see Catalyst.pm
+Catalyst Contributors, see L<Catalyst>
 
 =head1 COPYRIGHT
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as Perl itself.
+See L<Catalyst>
 
 =cut
