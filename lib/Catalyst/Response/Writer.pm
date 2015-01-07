@@ -5,7 +5,7 @@ sub close { shift->{_writer}->close }
 
 sub write_encoded {
   my ($self, $line) = @_;
-  if((my $enc = $self->{_encoding}) && $self->{_requires_encoding}) {
+  if((my $enc = $self->{_context}->encoding) && $self->{_requires_encoding}) {
     # Not going to worry about CHECK arg since Unicode always croaks I think - jnap
     $line = $enc->encode($line);
   }

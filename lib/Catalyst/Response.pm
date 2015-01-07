@@ -67,7 +67,7 @@ sub _build_write_fh {
   my $requires_encoding = $_[0]->encodable_response;
   my %fields = (
     _writer => $writer,
-    _encoding => $_[0]->_context->encoding,
+    _context => $_[0]->_context,
     _requires_encoding => $requires_encoding,
   );
 
