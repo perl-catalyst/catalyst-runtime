@@ -4,7 +4,7 @@
   - If we get a response set from $res->from_psgi_response and that response
     has a charset for the content type, we clear encoding for the rest of the
     response (avoid double encoding).
-  -
+  - Documentation updates and typo fixes across various UTF8 docs (Mark Ellis++)
 
 5.90079_007  - 2015-01-07
   - Merged from Stable (5.90079)

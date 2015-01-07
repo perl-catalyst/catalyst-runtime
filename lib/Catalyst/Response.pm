@@ -169,6 +169,8 @@ sub from_psgi_response {
     # to assume its properly encoded and NOT encode for this response.  Otherwise
     # We risk double encoding.
     if($self->content_type_charset) {
+      # We have to do this since for backcompat reasons having a charset doesn't always
+      # mean that the body is already encoded :(
       $self->_context->clear_encoding;
     }
 }

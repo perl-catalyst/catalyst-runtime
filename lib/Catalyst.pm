@@ -129,7 +129,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90079_007';
+our $VERSION = '5.90079_008';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -3632,7 +3632,7 @@ sub default_data_handlers {
           return eval { 
             local $/;
             $slurped = $fh->getline;
-            $parser->can("decode_json")->($slurped);
+            $parser->can("decode_json")->($slurped); # decode_json does utf8 decoding for us
           } || Catalyst::Exception->throw(sprintf "Error Parsing POST '%s', Error: %s", (defined($slurped) ? $slurped : 'undef') ,$@);
         },
     };
