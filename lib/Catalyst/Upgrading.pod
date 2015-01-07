@@ -15,6 +15,8 @@ UTF8 is enabled going forwards and the expectation is that other ecosystem
 projects will assume this as well.  At some point you application will not
 correctly function without this setting.
 
+For further information, please see L<Catalyst::UTF8>
+
 A number of projects in the wider ecosystem required minor updates to be able
 to work correctly.  Here's the known list:
 

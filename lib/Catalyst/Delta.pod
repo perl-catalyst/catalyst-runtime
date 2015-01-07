@@ -19,6 +19,8 @@ If this change causes you trouble, you can disable it:
 
     __PACKAGE__->config(encoding=>undef);
 
+For further information, please see L<Catalyst::UTF8>
+
 But please report bugs.  You will find that a number of common Views have been
 updated for this release (such as L<Catalyst::View::TT>).  In all cases that the
 author is aware of these updates were to fix test cases only.  You shouldn't

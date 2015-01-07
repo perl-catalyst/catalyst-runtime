@@ -2,7 +2,7 @@
 
 =head1 Name
 
-Catalyst::UTF8 - All Abouy UTF8 and Catalyst Encoding
+Catalyst::UTF8 - All About UTF8 and Catalyst Encoding
 
 =head1 Description
 
@@ -13,7 +13,7 @@ an overview of the assumptions and practices that  L<Catalyst> uses when
 dealing with UTF8 and encoding issues.  You should also review the
 Changes file, L<Catalyst::Delta> and L<Catalyst::Upgrading> for more.
 
-We attempt to describe all relevent processes, try to give some advice
+We attempt to describe all relevant processes, try to give some advice
 and explain where we may have been exceptional to respect our commitment
 to backwards compatibility.
 
