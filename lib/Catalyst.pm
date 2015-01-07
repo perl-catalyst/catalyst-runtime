@@ -592,7 +592,7 @@ sub last_error { my ($err, @errs) = @{shift->error}; return $err }
 =head2 shift_errors
 
 shifts the most recently added error off the error stack and returns if.  Returns
-nothing if there are nomore errors.
+nothing if there are no more errors.
 
 =cut
 
@@ -2105,7 +2105,7 @@ sub finalize_headers {
 =head2 $c->finalize_encoding
 
 Make sure your body is encoded properly IF you set an encoding.  By
-default the encoding is UTF-8 but you can disable it by explictly setting the
+default the encoding is UTF-8 but you can disable it by explicitly setting the
 encoding configuration value to undef.
 
 We can only encode when the body is a scalar.  Methods for encoding via the
@@ -3038,7 +3038,7 @@ $ENV{SCRIPT_NAME}.
 Please B<NOTE> that if you do use C<using_frontend_proxy> the middleware is now
 adding via C<registered_middleware> rather than this method.
 
-If you are using Lighttp or IIS6 you may wish to apply these middlewares.  In
+If you are using Lighttpd or IIS6 you may wish to apply these middlewares.  In
 general this is no longer a common case but we have this here for backward
 compatibility.
 
@@ -3107,7 +3107,7 @@ with a generated server script (via L<Catalyst::Devel> and C<catalyst.pl>) we do
 not attempt to return a valid L<PSGI> application using any existing C<${myapp}.psgi>
 scripts in your $HOME directory.
 
-B<NOTE> C<apply_default_middlewares> was orginally created when the first PSGI
+B<NOTE> C<apply_default_middlewares> was originally created when the first PSGI
 port was done for v5.90000.  These are middlewares that are added to achieve
 backward compatibility with older applications.  If you start your application
 using one of the supplied server scripts (generated with L<Catalyst::Devel> and
@@ -4207,7 +4207,7 @@ manually as well such as to conform to the JSON specification.
 
 NOTE: We also examine the value of $c->response->content_encoding.  If
 you set this (like for example 'gzip', and manually gzipping the body)
-we assume that you have done all the neccessary encoding yourself, since
+we assume that you have done all the necessary encoding yourself, since
 we cannot encode the gzipped contents.  If you use a plugin like
 L<Catalyst::Plugin::Compress> you need to update to a modern version in order
 to have this function correctly  with the new UTF8 encoding code, or you

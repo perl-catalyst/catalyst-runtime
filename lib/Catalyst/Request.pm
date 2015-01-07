@@ -531,7 +531,7 @@ If the POST is malformed in some way (such as undefined or not content that
 matches the content-type) we raise a L<Catalyst::Exception> with the error
 text as the message.
 
-If the POSTed content type does not match an availabled data handler, this
+If the POSTed content type does not match an available data handler, this
 will also raise an exception.
 
 =head2 $req->body_parameters
@@ -683,7 +683,7 @@ Basically this is an exploit that takes advantage of how L<\param> will do one t
 in scalar context and another thing in list context.  This is combined with how Perl
 chooses to deal with duplicate keys in a hash definition by overwriting the value of
 existing keys with a new value if the same key shows up again.  Generally you will be
-vulnerale to this exploit if you are using this method in a direct assignment in a
+vulnerable to this exploit if you are using this method in a direct assignment in a
 hash, such as with a L<DBIx::Class> create statement.  For example, if you have
 parameters like:
 

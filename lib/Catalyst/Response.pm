@@ -205,7 +205,7 @@ handler you are using and might be optimized using server specific abilities (fo
 example L<Twiggy> will attempt to server a real local file in a non blocking manner).
 
 If you are using a filehandle as the body response you are responsible for
-making sure it comforms to the L<PSGI> specification with regards to content
+making sure it conforms to the L<PSGI> specification with regards to content
 encoding.  Unlike with scalar body values or when using the streaming interfaces
 we currently do not attempt to normalize and encode your filehandle.  In general
 this means you should be sure to be sending bytes not UTF8 decoded multibyte

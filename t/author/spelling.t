@@ -4,25 +4,25 @@ use Test::More;
 use Test::Spelling;
 
 add_stopwords(qw(
-    API CGI MVC PSGI Plack README SSI Starman XXXX URI htaccess middleware
+    Accel API CGI MVC PSGI Plack README SSI Starman XXXX URI htaccess middleware
     mixins namespace psgi startup Deprecations catamoose cataplack linearize
-    subclasses subdirectories refactoring adaptors
+    subclasses subdirectories refactoring adaptors validator remediations
     undef env regex unary rethrow rethrows stringifies CPAN STDERR SIGCHLD baz
     roadmap wishlist refactor refactored Runtime pluggable pluggability hoc apis
-    fastcgi nginx Lighttpd IIS middlewares backend IRC
+    fastcgi nginx Lighttpd IIS middlewares backend IRC IOLayer
     ctx _application MyApp restarter httponly Utils stash's unescapes
-    dispatchtype dispatchtypes redispatch redispatching
+    actionchain dispatchtype dispatchtypes redispatch redispatching
     CaptureArgs ChainedParent PathPart PathPrefix
     BUILDARGS metaclass namespaces pre ARGV ReverseProxy
     filename tempname request's subdirectory ini uninstalled uppercased
     wiki bitmask uri url urls dir hostname proxied http https IP SSL
-    inline INLINE plugins cpanfile
+    inline INLINE plugins cpanfile resized
     FastCGI Stringifies Rethrows DispatchType Wishlist Refactor ROADMAP HTTPS Unescapes Restarter Nginx Refactored
-    ActionClass LocalRegex LocalRegexp MyAction metadata cometd io psgix websockets
-    UTF async codebase dev filenames params MyMiddleware
-    JSON POSTed RESTful performant subref actionrole
-    chunked chunking codewise distingush equivilent plack Javascript
-    ConfigLoader getline
+    ActionClass LocalRegex LocalRegexp MyAction metadata cometd io psgix websocket websockets proxying
+    UTF async codebase dev encodable filenames params MyMiddleware Sendfile
+    JSON xml POSTed RESTful performant subref actionrole
+    chunked chunking codewise distingush equivilent plack Javascript gzipping
+    ConfigLoader getline whitepaper
     Andreas
     Ashton
     Axel
@@ -94,6 +94,7 @@ add_stopwords(qw(
     audreyt
     bricas
     chansen
+    davewood
     dhoss
     dkubb
     dwc
@@ -107,12 +108,14 @@ add_stopwords(qw(
     ilmari
     jcamacho
     jhannah
+    jnap
     jon
     konobi
     marcus
     mgrimes
     miyagawa
     mst
+    Napiorkowski
     naughton
     ningu
     nothingmuch

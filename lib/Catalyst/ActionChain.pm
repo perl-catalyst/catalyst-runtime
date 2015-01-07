@@ -37,7 +37,7 @@ sub dispatch {
 
         # break the chain if exception occurs in the middle of chain.  We
         # check the global config flag 'abort_chain_on_error_fix', but this
-        # is now considered true by default, so unless someone explictly sets
+        # is now considered true by default, so unless someone explicitly sets
         # it to false we default it to true (if its not defined).
         my $abort = defined($c->config->{abort_chain_on_error_fix}) ?
           $c->config->{abort_chain_on_error_fix} : 1;

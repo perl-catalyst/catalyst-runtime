@@ -58,7 +58,7 @@ directly since it is likely to move off the Catalyst namespace into a stand
 alone distribution
 
 We store a coderef under the C<PSGI_KEY> which can be dereferenced with
-key values or nothing to access the underly hashref.
+key values or nothing to access the underlying hashref.
 
 The stash middleware is designed so that you can 'nest' applications that
 use it.  If for example you have a L<Catalyst> application that is called

@@ -13,7 +13,7 @@ The biggest change in this release is that UTF8 encoding is now enabled by
 default.  So you no longer need any plugins (such as L<Catalyst::Plugin::Unicode::Encoding>)
 which you can just no go ahead and remove.  You also don't need to set
 the encoding configuration (__PACKAGE__->config(encoding=>'UTF-8')) anymore
-as well (although its presense hurts nothing).
+as well (although its presence hurts nothing).
 
 If this change causes you trouble, you can disable it:
 
@@ -30,7 +30,7 @@ also has details.
 
 A small change is that the configuration setting C<using_frontend_proxy>
 was not doing the right thing if you started your application with C<psgi_app>
-and dod not apply the default middleware.  This setting is now honored in
+and did not apply the default middleware.  This setting is now honored in
 all the ways an application may be started.  This could cause trouble if you
 are using the configuration value and also adding the proxy middleware
 manually with a custom application startup.  The solution is that you only
