@@ -4,6 +4,9 @@ TDB
   - Merged from Stable (5.90079)
   - reviewed and cleaned up UTF8 related docs
   - replace missing utf8 pragma in Catalyst::Engine
+  - Cleaned up spelling errors in various docs (abbraxxa++)
+  - New document Catalyst::UTF8 which attempts to summarize UTF8 and encoding
+    changes introduced in v5.90080.
 
 5.90079_006  - 2015-01-02
   - Removed unneeded dependency on RenderView in new test case that was causing fails
