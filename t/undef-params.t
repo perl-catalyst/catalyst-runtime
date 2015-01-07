@@ -33,11 +33,11 @@ use Plack::Test;
 
   $SIG{__WARN__} = sub {
     my $error = shift;
-    Test::More::is($error, "You called ->params with an undefined value at t/undef-params.t line 20.\n")
+    Test::More::like($error, qr[You called ->params with an undefined value at t.undef-params.t])
       unless MyApp->debug;
   };
 
-  MyApp->setup, 'setup app';
+  MyApp->setup;
 }
 
 ok my $psgi = MyApp->psgi_app, 'build psgi app';
