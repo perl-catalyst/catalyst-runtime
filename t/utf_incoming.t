@@ -3,6 +3,7 @@ use warnings;
 use strict;
 use Test::More;
 use HTTP::Request::Common;
+use HTTP::Message::PSGI ();
 use Encode 2.21 'decode_utf8', 'encode_utf8';
 use File::Spec;
 use JSON::MaybeXS;
@@ -178,6 +179,12 @@ use JSON::MaybeXS;
     $c->response->write("<p>This is stream_write action ♥</p>");
     $c->encoding(Encode::find_encoding('Shift_JIS'));
     $c->response->write("<p>This is stream_write action ♥</p>");
+  }
+
+  sub from_external_psgi :Local {
+    my ($self, $c) = @_;
+    my $env = HTTP::Message::PSGI::req_to_psgi( HTTP::Request::Common::GET '/root/♥');
+    $c->res->from_psgi_response( ref($c)->to_app->($env));
   }
 
   package MyApp;
@@ -411,6 +418,14 @@ SKIP: {
   like decode_utf8($res->content), qr[<p>This is stream_write action ♥</p><!DOCTYPE html], 'correct body';
 }
 
+{
+  my $res = request "/root/from_external_psgi";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), '<p>This is path-heart action ♥</p>', 'correct body';
+  is $res->content_length, 36, 'correct length';
+  is $res->content_charset, 'UTF-8';
+}
 
 ## should we use binmode on filehandles to force the encoding...?
 ## Not sure what else to do with multipart here, if docs are enough...

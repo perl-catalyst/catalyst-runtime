@@ -148,7 +148,7 @@ sub from_psgi_response {
         my ($status, $headers, $body) = @$psgi_res;
         $self->status($status);
         $self->headers(HTTP::Headers->new(@$headers));
-        $self->body($body);
+        $self->body(join('', @$body));
     } elsif(ref $psgi_res eq 'CODE') {
         $psgi_res->(sub {
             my $response = shift;
@@ -156,13 +156,20 @@ sub from_psgi_response {
             $self->status($status);
             $self->headers(HTTP::Headers->new(@$headers));
             if(defined $maybe_body) {
-                $self->body($maybe_body);
+                $self->body(join('', @$maybe_body));
             } else {
                 return $self->write_fh;
             }
         });  
      } else {
         die "You can't set a Catalyst response from that, expect a valid PSGI response";
+    }
+
+    # Encoding compatibilty.   If the response set a charset, well... we need
+    # to assume its properly encoded and NOT encode for this response.  Otherwise
+    # We risk double encoding.
+    if($self->content_type_charset) {
+      $self->_context->clear_encoding;
     }
 }
 
@@ -589,16 +596,28 @@ sub encodable_response {
   return 0 unless $self->_context; # Cases like returning a HTTP Exception response you don't have a context here...
   return 0 unless $self->_context->encoding;
 
+  # The response is considered to have a 'manual charset' when a charset is already set on
+  # the content type of the response AND it is not the same as the one we set in encoding.
+  # If there is no charset OR we are asking for the one which is the same as the current
+  # required encoding, that is a flag that we want Catalyst to encode the response automatically.
   my $has_manual_charset = 0;
   if(my $charset = $self->content_type_charset) {
     $has_manual_charset = (uc($charset) ne uc($self->_context->encoding->mime_name)) ? 1:0;
   }
 
+  # Content type is encodable if it matches the regular expression stored in this attribute
+  my $encodable_content_type = $self->content_type =~ m/${\$self->encodable_content_type}/ ? 1:0;
+
+  # The content encoding is allowed (for charset encoding) only if its empty or is set to identity
+  my $allowed_content_encoding = (!$self->content_encoding || $self->content_encoding eq 'identity') ? 1:0;
+
+  # The content type must be an encodable type, and there must be NO manual charset and also
+  # the content encoding must be the allowed values;
   if(
-      ($self->content_type =~ m/${\$self->encodable_content_type}/) and
-      (!$has_manual_charset) and
-      (!$self->content_encoding || $self->content_encoding eq 'identity' )
-  ) { 
+      $encodable_content_type and
+      !$has_manual_charset and
+      $allowed_content_encoding
+  ) {
     return 1;
   } else {
     return 0;

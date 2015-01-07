@@ -1,6 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-TDB
+5.90079_008  - 2015-01-07
+  - If we get a response set from $res->from_psgi_response and that response
+    has a charset for the content type, we clear encoding for the rest of the
+    response (avoid double encoding).
+  -
+
+5.90079_007  - 2015-01-07
   - Merged from Stable (5.90079)
   - reviewed and cleaned up UTF8 related docs
   - replace missing utf8 pragma in Catalyst::Engine

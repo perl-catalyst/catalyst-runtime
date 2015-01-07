@@ -130,7 +130,6 @@ sub finalize_body {
             # There's no body...
             $body = [];
         }
-
         $res->_response_cb->([ $res->status, \@headers, $body]);
         $res->_clear_response_cb;
 
