@@ -62,6 +62,8 @@ use JSON::MaybeXS;
 
         Test::More::is $c->req->args->[0], '♥';
         Test::More::is $c->req->captures->[0], '♥';
+        Test::More::is $arg, '♥';
+        Test::More::is length($arg), 1, "got length of one";
 
         $c->response->body("<p>This is base-link action ♥ ${\$c->req->args->[0]}</p>");
 
@@ -131,6 +133,7 @@ use JSON::MaybeXS;
     my $post = $c->req->body_data;
 
     Test::More::is $post->{'♥'}, '♥♥';
+    Test::More::is length($post->{'♥'}), 2;
     $c->response->content_type('application/json');
 
     # Encode JSON also encodes to a UTF-8 encoded, binary string. This is why we don't
@@ -161,11 +164,15 @@ use JSON::MaybeXS;
     $c->response->body(Compress::Zlib::memGzip(Encode::encode_utf8("manual_1 ♥")));
   }
 
+  sub override_encoding :Local {
+    my ($self, $c) = @_;
+    $c->res->content_type('text/plain');
+    $c->encoding(Encode::find_encoding('Shift_JIS'));
+    $c->response->body("テスト");
+  }
+
   package MyApp;
   use Catalyst;
-
-  # Default encoding is now UTF-8
-  # MyApp->config(encoding=>'UTF-8');
 
   Test::More::ok(MyApp->setup, 'setup app');
 }
@@ -268,6 +275,11 @@ use Catalyst::Test 'MyApp';
     is $c->req->query_parameters->{'♥'}, '♥♥';
     is $c->req->body_parameters->{'♥'}, '♥♥';
     is $c->req->parameters->{'♥'}[0], '♥♥'; #combined with query and body
+    is $c->req->args->[0], '♥';
+    is length($c->req->parameters->{'♥'}[0]), 2;
+    is length($c->req->query_parameters->{'♥'}), 2;
+    is length($c->req->body_parameters->{'♥'}), 2;
+    is length($c->req->args->[0]), 1;
     is $res->content_charset, 'UTF-8';
   }
 }
@@ -348,6 +360,17 @@ use Catalyst::Test 'MyApp';
 
   ## decode_json expect the binary utf8 string and does the decoded bit for us.
   is_deeply decode_json(($res->content)), +{'♥'=>'♥♥'};
+}
+
+{
+  ok my $res = request "/root/override_encoding";
+  ok my $enc = Encode::find_encoding('SHIFT_JIS');
+
+  is $res->code, 200, 'OK';
+  is $enc->decode($res->content), "テスト", 'correct body';
+  is $res->content_length, 6, 'correct length'; # Bytes over the wire
+  is length($enc->decode($res->content)), 3;
+  is $res->content_charset, 'SHIFT_JIS';
 }
 
 {
