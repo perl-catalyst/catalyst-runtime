@@ -1,12 +1,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More;
 use Class::Load 'is_class_loaded';
-
 use lib "t/lib";
 
-BEGIN { use_ok("Catalyst::Utils") };
+BEGIN {
+  if ($^O =~ m/^MSWin/) {
+    plan skip_all => 'Skipping this test on Windows until someone with Windows has time to fix it';
+  }
+
+  use_ok("Catalyst::Utils");
+}
 
 {
     package This::Module::Is::Not::In::Inc::But::Does::Exist;
@@ -70,3 +75,4 @@ Catalyst::Utils::ensure_class_loaded("NullPackage");
 is( $warnings, 1, 'Loading a package which defines no symbols warns');
 is( $@, undef, '$@ still undef' );
 
+done_testing;
