@@ -15,7 +15,7 @@ around ['match','match_captures'] => sub {
 around 'list_extra_info' => sub {
   my ($orig, $self, @args) = @_;
   return {
-    %{ $self->$orig(@args) }, 
+    %{ $self->$orig(@args) },
     Scheme => $self->attributes->{Scheme}[0]||'',
   };
 };
@@ -24,7 +24,7 @@ around 'list_extra_info' => sub {
 
 =head1 NAME
 
-Catalyst::ActionRole::Schema - Match on HTTP Request Schema
+Catalyst::ActionRole::Scheme - Match on HTTP Request Scheme
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ Catalyst::ActionRole::Schema - Match on HTTP Request Schema
 
 =head1 DESCRIPTION
 
-This is an action role that lets your L<Catalyst::Action> match on the Scheme
+This is an action role that lets your L<Catalyst::Action> match on the scheme
 type of the request.  Typically this is C<http> or C<https> but other common
 schemes that L<Catalyst> can handle include C<ws> and C<wss> (web socket and web
 socket secure).
