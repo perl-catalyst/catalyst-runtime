@@ -6,7 +6,7 @@ Catalyst::UTF8 - All About UTF8 and Catalyst Encoding
 
 =head1 Description
 
-Starting in 5.90080 L<Catalyst> will enable UTF8 encoding by default for 
+Starting in 5.90080 L<Catalyst> will enable UTF8 encoding by default for
 text like body responses.  In addition we've made a ton of fixes around encoding
 and utf8 scattered throughout the codebase.  This document attempts to give
 an overview of the assumptions and practices that  L<Catalyst> uses when
@@ -17,7 +17,7 @@ We attempt to describe all relevant processes, try to give some advice
 and explain where we may have been exceptional to respect our commitment
 to backwards compatibility.
 
-=head1 UTF8 in Controller Actions 
+=head1 UTF8 in Controller Actions
 
 Using UTF8 characters in your Controller classes and actions.
 
@@ -104,8 +104,8 @@ unicode characters as well:
 
 Again, remember that we are display the unicode character and using it to match actions
 containing such multibyte characters BUT over HTTP you are getting these as URL encoded
-bytes.  For example if you looked at the L<PSGI> C<$env> value for C<REQUEST_URI> you 
-would see (for the above request) 
+bytes.  For example if you looked at the L<PSGI> C<$env> value for C<REQUEST_URI> you
+would see (for the above request)
 
     REQUEST_URI => "/base/%E2%99%A5/%E2%99%A5/%E2%99%A5/%E2%99%A5"
 
@@ -178,7 +178,7 @@ L<Catalyst> will do all the necessary encoding for you).
 
 Again, remember that values of your parameters are now decode into Unicode strings.  so
 for example you'd expect the result of length to reflect the character length not
-the byte length.  
+the byte length.
 
 Just like with arguments and captures, you can use utf8 literals (or utf8
 strings) in $c->uri_for:
@@ -192,7 +192,7 @@ do the right thing regarding utf8 encoding and url encoding.
 	http://localhost/example?%E2%99%A5=%E2%99%A5%E2%99%A5
 
 Since again what you want is a properly url encoded version of this.  Ultimately what you want
-to send over the wire via HTTP needs to be bytes (not unicode characters). 
+to send over the wire via HTTP needs to be bytes (not unicode characters).
 
 Remember if you use any utf8 literals in your source code, you should use the
 C<use utf8> pragma.
@@ -207,7 +207,7 @@ supposed to notice that and encode the form POSTs accordingly.
 As a result since L<Catalyst> now serves UTF8 encoded responses by default, this means that
 you can mostly rely on incoming form POSTs to be so encoded.  L<Catalyst> will make this
 assumption and decode accordingly (unless you explicitly turn off encoding...)  If you are
-running Catalyst in developer debug, then you will see the correct unicode characters in 
+running Catalyst in developer debug, then you will see the correct unicode characters in
 the debug output.  For example if you generate a POST request:
 
 	use Catalyst::Test 'MyApp';
@@ -228,7 +228,7 @@ Running in CATALYST_DEBUG=1 mode you should see output like this:
 And if you had a controller like this:
 
 	package MyApp::Controller::Example;
-	
+
 	use base 'Catalyst::Controller';
 
 	sub posted :POST Local {
@@ -242,7 +242,7 @@ The following test case would be true:
 	use Encode 2.21 'decode_utf8';
 	is decode_utf8($req->content), 'hearts => ♥';
 
-In this case we decode so that we can print and compare strings with multibyte characters.	
+In this case we decode so that we can print and compare strings with multibyte characters.
 
 B<NOTE>  In some cases some browsers may not follow the specification and set the form POST
 encoding based on the server response.  Catalyst itself doesn't attempt any workarounds, but one
@@ -281,7 +281,7 @@ determine when that is needed.
 		my ($self, $c) = @_;
 		$c->response->content_type('text/html');
 		$c->response->write("<p>This is stream_write action ♥</p>");
-	}	
+	}
 
 	sub stream_write_fh :Local {
 		my ($self, $c) = @_;
@@ -324,7 +324,7 @@ This would match content-types like the following (examples)
     application/xml
     application/vnd.user+xml
 
-You should set your content type prior to header finalization if you want L<Catalyst> to 
+You should set your content type prior to header finalization if you want L<Catalyst> to
 encode.
 
 B<NOTE> We do not attempt to encode C<application/json> since the two most commonly used
