@@ -82,7 +82,7 @@ Around method modifier that return 1 if the scheme matches
 
 =head2 list_extra_info
 
-Add the scheme info  contenif present to the debug screen.
+Add the scheme declaration if present to the debug screen.
 
 =head1 AUTHORS
 

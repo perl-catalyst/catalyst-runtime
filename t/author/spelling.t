@@ -13,16 +13,16 @@ add_stopwords(qw(
     ctx _application MyApp restarter httponly Utils stash's unescapes
     actionchain dispatchtype dispatchtypes redispatch redispatching
     CaptureArgs ChainedParent PathPart PathPrefix
-    BUILDARGS metaclass namespaces pre ARGV ReverseProxy
+    BUILDARGS metaclass namespaces pre ARGV ReverseProxy TT UI
     filename tempname request's subdirectory ini uninstalled uppercased
     wiki bitmask uri url urls dir hostname proxied http https IP SSL
     inline INLINE plugins cpanfile resized
     FastCGI Stringifies Rethrows DispatchType Wishlist Refactor ROADMAP HTTPS Unescapes Restarter Nginx Refactored
     ActionClass LocalRegex LocalRegexp MyAction metadata cometd io psgix websocket websockets proxying
-    UTF async codebase dev encodable filenames params MyMiddleware Sendfile
-    JSON xml POSTed RESTful performant subref actionrole
+    UTF unicode async codebase dev encodable filenames params MyMiddleware Sendfile
+    JSON xml POSTs POSTed RESTful performant subref actionrole
     chunked chunking codewise distingush equivilent plack Javascript gzipping
-    ConfigLoader getline whitepaper
+    ConfigLoader getline whitepaper matchable
     Andreas
     Ashton
     Axel
