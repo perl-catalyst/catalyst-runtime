@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90080 - 2014-01-09
+  - Minor documentation corrections
+  - Make the '79 development series stable
+
 5.90079_008  - 2015-01-07
   - If we get a response set from $res->from_psgi_response and that response
     has a charset for the content type, we clear encoding for the rest of the
