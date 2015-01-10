@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90082 - 2014-01-10
+  - Fixed a regression created in $response->from_psgi_response and test case
+    to prevent it happening again.
+
 5.90081 - 2014-01-10
   - created class attribute 'finalized_default_middleware' which determines
     if the default middleware has been added to the stack yet or not.  This
