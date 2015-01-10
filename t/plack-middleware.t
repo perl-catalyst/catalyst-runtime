@@ -54,4 +54,15 @@ ok my($res, $c) = ctx_request('/');
   ok $response->headers->{"x-runtime"}, "Got value for expected middleware";
 }
 
+{
+  my $total_mw = scalar(TestMiddleware->registered_middlewares);
+
+  TestMiddleware->setup_middleware;
+  TestMiddleware->setup_middleware;
+
+  my $post_mw = scalar(TestMiddleware->registered_middlewares);
+
+  is $total_mw, $post_mw, 'Calling ->setup_middleware does not re-add default middleware';
+}
+
 done_testing;

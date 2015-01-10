@@ -120,7 +120,7 @@ __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware
-  _data_handlers _encoding _encode_check/;
+  _data_handlers _encoding _encode_check finalized_default_middleware/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -129,7 +129,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90080';
+our $VERSION = '5.90081';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -3533,8 +3533,8 @@ sub setup_middleware {
       @middleware_definitions = reverse(@_);
     } else {
       @middleware_definitions = reverse(@{$class->config->{'psgi_middleware'}||[]})
-        unless $class->config->{__configured_from_psgi_middleware};
-      $class->config->{__configured_from_psgi_middleware} = 1; # Only do this once, just in case some people call setup over and over...
+        unless $class->finalized_default_middleware;
+      $class->finalized_default_middleware(1); # Only do this once, just in case some people call setup over and over...
     }
 
     my @middleware = ();
