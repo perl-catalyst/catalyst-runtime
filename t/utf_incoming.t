@@ -4,7 +4,7 @@ use strict;
 use Test::More;
 use HTTP::Request::Common;
 use HTTP::Message::PSGI ();
-use Encode 2.21 'decode_utf8', 'encode_utf8';
+use Encode 2.21 'decode_utf8', 'encode_utf8', 'encode';
 use File::Spec;
 use JSON::MaybeXS;
 
@@ -185,6 +185,12 @@ use JSON::MaybeXS;
     my ($self, $c) = @_;
     my $env = HTTP::Message::PSGI::req_to_psgi( HTTP::Request::Common::GET '/root/♥');
     $c->res->from_psgi_response( ref($c)->to_app->($env));
+  }
+
+  sub echo_arg :Local {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/plain');
+    $c->response->body($c->req->body_parameters->{arg});
   }
 
   package MyApp;
@@ -425,6 +431,36 @@ SKIP: {
   is decode_utf8($res->content), '<p>This is path-heart action ♥</p>', 'correct body';
   is $res->content_length, 36, 'correct length';
   is $res->content_charset, 'UTF-8';
+}
+
+{
+  my $utf8 = 'test ♥';
+  my $shiftjs = 'test テスト';
+
+  ok my $req = POST '/root/echo_arg',
+    Content_Type => 'form-data',
+      Content =>  [
+        arg0 => 'helloworld',
+        arg1 => [
+          undef, '',
+          'Content-Type' =>'text/plain; charset=UTF-8',
+          'Content' => Encode::encode('UTF-8', $utf8)],
+        arg2 => [
+          undef, '',
+          'Content-Type' =>'text/plain; charset=SHIFT_JIS',
+          'Content' => Encode::encode('SHIFT_JIS', $shiftjs)],
+        arg2 => [
+          undef, '',
+          'Content-Type' =>'text/plain; charset=SHIFT_JIS',
+          'Content' => Encode::encode('SHIFT_JIS', $shiftjs)],
+      ];
+
+  my ($res, $c) = ctx_request $req;
+
+  is $c->req->body_parameters->{'arg0'}, 'helloworld';
+  is Encode::decode('UTF-8', $c->req->body_parameters->{'arg1'}), $utf8;
+  is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'arg2'}[0]), $shiftjs;
+
 }
 
 ## should we use binmode on filehandles to force the encoding...?
