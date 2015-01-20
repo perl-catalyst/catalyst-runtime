@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90083 - 2014-01-20
+  - Fixed typo in support for OPTIONS method matching (andre++)
+  - Use new HTTP::Body and code updates to fix issue when POSTed params have
+    non UTF-8 charset encodings.
+
 5.90082 - 2015-01-10
   - Fixed a regression created in $response->from_psgi_response and test case
     to prevent it happening again.
