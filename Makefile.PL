@@ -26,7 +26,7 @@ author 'Sebastian Riedel <sri@cpan.org>';
 authority('cpan:MSTROUT');
 all_from 'lib/Catalyst/Runtime.pm';
 
-requires 'List::MoreUtils';
+equires 'List::MoreUtils';
 requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean' => '0.23';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
@@ -42,7 +42,7 @@ requires 'Data::Dump';
 requires 'Data::OptList';
 requires 'HTML::Entities';
 requires 'HTML::HeadParser';
-requires 'HTTP::Body'    => '1.06'; # ->cleanup(1)
+requires 'HTTP::Body'    => '1.20';
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
