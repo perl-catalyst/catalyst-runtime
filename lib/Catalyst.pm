@@ -4316,7 +4316,7 @@ acme: Leon Brocard <leon@astray.com>
 
 abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
 
-André Walker <andre@cpan.org>
+andrewalker: André Walker <andre@cpan.org>
 
 Andrew Bramble
 
