@@ -24,6 +24,7 @@ add_stopwords(qw(
     chunked chunking codewise distingush equivilent plack Javascript gzipping
     ConfigLoader getline whitepaper matchable
     Andreas
+    André
     Ashton
     Axel
     Balint

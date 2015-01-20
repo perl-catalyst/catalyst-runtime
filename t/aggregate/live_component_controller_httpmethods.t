@@ -1,13 +1,17 @@
 use strict;
 use warnings;
 use Test::More;
-use HTTP::Request::Common qw/GET POST DELETE PUT /;
+use HTTP::Request::Common qw/GET POST DELETE PUT/;
  
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Catalyst::Test 'TestApp';
- 
+
+sub OPTIONS {
+    HTTP::Request->new('OPTIONS', @_);
+}
+
 is(request(GET    '/httpmethods/foo')->content, 'get');
 is(request(POST   '/httpmethods/foo')->content, 'post');
 is(request(DELETE '/httpmethods/foo')->content, 'default');
@@ -33,5 +37,13 @@ is(request(DELETE '/httpmethods/get_put_post_delete')->content, 'delete2');
 is(request(GET    '/httpmethods/check_default')->content, 'get3');
 is(request(POST   '/httpmethods/check_default')->content, 'post3');
 is(request(PUT    '/httpmethods/check_default')->content, 'chain_default');
+
+is(request(GET    '/httpmethods/opt_typo')->content, 'typo');
+is(request(POST   '/httpmethods/opt_typo')->content, 'typo');
+is(request(PUT    '/httpmethods/opt_typo')->content, 'typo');
+
+is(request(OPTIONS '/httpmethods/opt')->content, 'options');
+is(request(GET     '/httpmethods/opt')->content, 'default');
+is(request(POST    '/httpmethods/opt')->content, 'default');
 
 done_testing;

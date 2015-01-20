@@ -30,6 +30,16 @@ sub any_method : Path('baz') {
     $ctx->response->body('any');
 }
 
+sub typo_option : Path('opt_typo') OPTION {
+    my ($self, $ctx) = @_;
+    $ctx->response->body('typo');
+}
+
+sub real_options : Path('opt') OPTIONS {
+    my ($self, $ctx) = @_;
+    $ctx->response->body('options');
+}
+
 sub base :Chained('/') PathPrefix CaptureArgs(0) { }
 
 sub chained_get :Chained('base') Args(0) GET {
