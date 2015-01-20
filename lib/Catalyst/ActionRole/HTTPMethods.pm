@@ -47,13 +47,13 @@ Catalyst::ActionRole::HTTPMethods - Match on HTTP Methods
 
     sub user_base : Chained('/') CaptureArg(0) { ... }
 
-      sub get_user    : Chained('user_base') Args(1) GET { ... }
-      sub post_user   : Chained('user_base') Args(1) POST { ... }
-      sub put_user    : Chained('user_base') Args(1) PUT { ... }
-      sub delete_user : Chained('user_base') Args(1) DELETE { ... }
-      sub head_user   : Chained('user_base') Args(1) HEAD { ... }
-      sub option_user : Chained('user_base') Args(1) OPTION { ... }
-      sub option_user : Chained('user_base') Args(1) PATCH { ... }
+      sub get_user     : Chained('user_base') Args(1) GET { ... }
+      sub post_user    : Chained('user_base') Args(1) POST { ... }
+      sub put_user     : Chained('user_base') Args(1) PUT { ... }
+      sub delete_user  : Chained('user_base') Args(1) DELETE { ... }
+      sub head_user    : Chained('user_base') Args(1) HEAD { ... }
+      sub options_user : Chained('user_base') Args(1) OPTIONS { ... }
+      sub patch_user   : Chained('user_base') Args(1) PATCH { ... }
 
 
       sub post_and_put : Chained('user_base') POST PUT Args(1) { ... }

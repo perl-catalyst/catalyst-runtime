@@ -544,12 +544,12 @@ sub _parse_Does_attr {
     return Does => $self->_expand_role_shortname($value);
 }
 
-sub _parse_GET_attr    { Method => 'GET'    }
-sub _parse_POST_attr   { Method => 'POST'   }
-sub _parse_PUT_attr    { Method => 'PUT'    }
-sub _parse_DELETE_attr { Method => 'DELETE' }
-sub _parse_OPTION_attr { Method => 'OPTION' }
-sub _parse_HEAD_attr   { Method => 'HEAD'   }
+sub _parse_GET_attr     { Method => 'GET'     }
+sub _parse_POST_attr    { Method => 'POST'    }
+sub _parse_PUT_attr     { Method => 'PUT'     }
+sub _parse_DELETE_attr  { Method => 'DELETE'  }
+sub _parse_OPTIONS_attr { Method => 'OPTIONS' }
+sub _parse_HEAD_attr    { Method => 'HEAD'    }
 
 sub _expand_role_shortname {
     my ($self, @shortnames) = @_;
