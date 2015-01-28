@@ -98,14 +98,15 @@ sub report {
     my $with_percentages = exists $ENV{ENABLE_CATALYST_STATS_PERCENTAGES} &&
         $ENV{ENABLE_CATALYST_STATS_PERCENTAGES};
 
-    my $percentages_width = $with_percentages ? 11 : 0;
+    my $percentages_width = $with_percentages ? 6 : 0;
     my $column_width = Catalyst::Utils::term_width() - 9 - $percentages_width - 13;
     my $t = Text::SimpleTable->new(
         [ $column_width, 'Action' ],
-        [ 9 + $percentages_width, 'Time' . ($with_percentages ? '            (%)' : '') ]
+        [ 9, 'Time' ],
+        ($with_percentages ? ([ $percentages_width, 'Perc' ]) : ())
     );
     my @results;
-    my $total = 0;
+    my $total;
     $self->traverse(
         sub {
             my $action = shift;
@@ -115,8 +116,7 @@ sub report {
         }
     ) if $with_percentages;
 
-    $self->traverse(
-        sub {
+    $self->traverse(sub {
         my $action = shift;
         my $stat   = $action->getNodeValue;
         my @r = ( $action->getDepth,
@@ -128,18 +128,17 @@ sub report {
 
         # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
         my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
+        my $perc;
 
-        if ($with_percentages){
-            my $deep_indicator = $action->getDepth == 0 ? '~ ' : $action->getDepth == 1 ? ' -> ' : ' ->~';
-            my $perc = sprintf("%0.2f", $stat->{elapsed} / $total * 100 );
-            $elapsed .= " $deep_indicator$perc%";
-        }
+        $perc = sprintf("%0.2f", $stat->{elapsed} / $total * 100 ) . '%' if $with_percentages;
 
-        $t->row( ( q{ } x $r[0] ) . $r[1],
-                defined $r[2] ? $elapsed : '??');
+        $t->row(
+            (( q{ } x $r[0] ) . $r[1]),
+            (defined $r[2] ? $elapsed : '??'),
+            ($perc ? ($perc) : ()),
+        );
         push(@results, \@r);
-        }
-    );
+    } );
     return wantarray ? @results : $t->draw;
 }
 
@@ -261,19 +260,17 @@ part 0.111s.
 
 Optionally, you can enable percentage of each profile setting environment ENABLE_CATALYST_STATS_PERCENTAGES to 1.
 
-  .-----------------------------------------------------+----------------------.
-  | Action                                              | Time            (%)  |
-  +-----------------------------------------------------+----------------------+
-  | /index                                              | 0.178756s ~ 3.68%    |
-  |  -> /forwad1                                        | 0.000161s  -> 0.00%  |
-  |  -> /forwad2                                        | 0.139885s  -> 2.88%  |
-  |   -> /forwad_called_on_forward2                     | 0.091628s  ->~1.88%  |
-  |  -> /forward3                                       | 0.010002s  -> 0.21%  |
-  |  -> /forward4                                       | 0.027598s  -> 0.57%  |
-  |  -> /etc                                            | 0.000249s  -> 0.01%  |
-  | /end                                                | 2.206834s ~ 45.40%   |
-  |  -> YouApp::View::TT->process                       | 2.205930s  -> 45.38% |
-  '-----------------------------------------------------+----------------------'
+  .-------------------------------------------------------+-----------+--------.
+  | Action                                                | Time      | Perc   |
+  +-------------------------------------------------------+-----------+--------+
+  | /root                                                 | 0.006333s | 2.64%  |
+  | /user/base                                            | 0.000153s | 0.06%  |
+  | /user/index/base                                      | 0.000049s | 0.02%  |
+  | /user/index/render                                    | 0.000052s | 0.02%  |
+  | /end                                                  | 0.116790s | 48.74% |
+  |  -> YouApp::View::TT->process                         | 0.116258s | 48.51% |
+  '-------------------------------------------------------+-----------+--------'
+
 
 
 
