@@ -105,7 +105,7 @@ sub report {
         [ 9 + $percentages_width, 'Time' . ($with_percentages ? '            (%)' : '') ]
     );
     my @results;
-    my $total;
+    my $total = 0;
     $self->traverse(
         sub {
             my $action = shift;
