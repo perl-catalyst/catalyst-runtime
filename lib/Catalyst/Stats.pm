@@ -106,15 +106,7 @@ sub report {
         ($with_percentages ? ([ $percentages_width, 'Perc' ]) : ())
     );
     my @results;
-    my $total;
-    $self->traverse(
-        sub {
-            my $action = shift;
-            my $stat   = $action->getNodeValue;
-
-            $total += $stat->{elapsed};
-        }
-    ) if $with_percentages;
+    my $total = $with_percentages ? $self->elapsed : undef;
 
     $self->traverse(sub {
         my $action = shift;
@@ -260,16 +252,17 @@ part 0.111s.
 
 Optionally, you can enable percentage of each profile setting environment ENABLE_CATALYST_STATS_PERCENTAGES to 1.
 
-  .-------------------------------------------------------+-----------+--------.
-  | Action                                                | Time      | Perc   |
-  +-------------------------------------------------------+-----------+--------+
-  | /root                                                 | 0.006333s | 2.64%  |
-  | /user/base                                            | 0.000153s | 0.06%  |
-  | /user/index/base                                      | 0.000049s | 0.02%  |
-  | /user/index/render                                    | 0.000052s | 0.02%  |
-  | /end                                                  | 0.116790s | 48.74% |
-  |  -> YouApp::View::TT->process                         | 0.116258s | 48.51% |
-  '-------------------------------------------------------+-----------+--------'
+  .------------------------------------------------------+-----------+--------.
+  | Action                                               | Time      | Perc   |
+  +------------------------------------------------------+-----------+--------+
+  | /root                                                | 0.004990s | 21.20% |
+  | /user/base                                           | 0.000441s | 1.87%  |
+  | /user/index/base                                     | 0.000149s | 0.63%  |
+  | /user/index/render                                   | 0.000144s | 0.61%  |
+  | /end                                                 | 0.009820s | 41.73% |
+  |  -> YourApp::View::TT->process                       | 0.008623s | 36.64% |
+  '------------------------------------------------------+-----------+--------'
+
 
 
 
