@@ -574,14 +574,6 @@ sub prepare_query_parameters {
     my ($self, $c) = @_;
     my $env = $c->request->env;
 
-    if(my $query_obj = $env->{'plack.request.query'}) {
-         $c->request->query_parameters(
-           $c->request->_use_hash_multivalue ?
-              $query_obj->clone :
-              $query_obj->as_hashref_mixed);
-         return;
-    }
-
     my $query_string = exists $env->{QUERY_STRING}
         ? $env->{QUERY_STRING}
         : '';
