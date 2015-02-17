@@ -26,7 +26,7 @@ author 'Sebastian Riedel <sri@cpan.org>';
 authority('cpan:MSTROUT');
 all_from 'lib/Catalyst/Runtime.pm';
 
-equires 'List::MoreUtils';
+requires 'List::MoreUtils';
 requires 'namespace::autoclean' => '0.09';
 requires 'namespace::clean' => '0.23';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
@@ -84,7 +84,7 @@ requires "Plack::Middleware::ContentLength";
 requires "Plack::Middleware::Head";
 requires "Plack::Middleware::HTTPExceptions";
 requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.09';
-requires "Plack::Middleware::MethodOverride";
+requires "Plack::Middleware::MethodOverride" => '0.12';
 requires "Plack::Middleware::RemoveRedundantBody" => '0.03';
 
 test_requires 'Test::Fatal';
