@@ -1,9 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90083 - 2014-01-20
+5.90083 - 2014-02-16
   - Fixed typo in support for OPTIONS method matching (andre++)
-  - Use new HTTP::Body and code updates to fix issue when POSTed params have
-    non UTF-8 charset encodings.
+  - Stop using $env->{'plack.request.query'} as a query paring optimization
+    since 1) it doesn't belong to us and 2) there's subtle differences in the
+    way plack parses parameters and catalyst does.  This fixes a bug when you
+    are using middleware that uses Plack::Request to do its thing.  This change
+    might have subtle impact on query parsing.  Please test this change!
 
 5.90082 - 2015-01-10
   - Fixed a regression created in $response->from_psgi_response and test case
