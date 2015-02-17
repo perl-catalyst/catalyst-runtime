@@ -574,14 +574,6 @@ sub prepare_query_parameters {
     my ($self, $c) = @_;
     my $env = $c->request->env;
 
-    if(my $query_obj = $env->{'plack.request.query'}) {
-         $c->request->query_parameters(
-           $c->request->_use_hash_multivalue ?
-              $query_obj->clone :
-              $query_obj->as_hashref_mixed);
-         return;
-    }
-
     my $query_string = exists $env->{QUERY_STRING}
         ? $env->{QUERY_STRING}
         : '';
@@ -595,41 +587,15 @@ sub prepare_query_parameters {
         return;
     }
 
-    my %query;
+    $query_string =~ s/\A[&;]+//;
 
-    # replace semi-colons
-    $query_string =~ s/;/&/g;
+    my $p = Hash::MultiValue->new(
+        map { defined $_ ? decode_utf8($self->unescape_uri($_)) : $_ }
+        map { ( split /=/, $_, 2 )[0,1] } # slice forces two elements
+        split /[&;]+/, $query_string
+    );
 
-    my @params = grep { length $_ } split /&/, $query_string;
-
-    for my $item ( @params ) {
-
-        my ($param, $value)
-            = map { decode_utf8($self->unescape_uri($_)) }
-              split( /=/, $item, 2 );
-
-        unless(defined $param) {
-            $param = $self->unescape_uri($item);
-            $param = decode_utf8 $param;
-        }
-
-        if ( exists $query{$param} ) {
-            if ( ref $query{$param} ) {
-                push @{ $query{$param} }, $value;
-            }
-            else {
-                $query{$param} = [ $query{$param}, $value ];
-            }
-        }
-        else {
-            $query{$param} = $value;
-        }
-    }
-
-    $c->request->query_parameters( 
-      $c->request->_use_hash_multivalue ?
-        Hash::MultiValue->from_mixed(\%query) :
-        \%query);
+    $c->request->query_parameters( $c->request->_use_hash_multivalue ? $p : $p->mixed );
 }
 
 =head2 $self->prepare_read($c)
