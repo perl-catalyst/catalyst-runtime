@@ -443,6 +443,10 @@ SKIP: {
       Content =>  [
         arg0 => 'helloworld',
         Encode::encode('UTF-8','♥') => Encode::encode('UTF-8','♥♥'),  # Long form POST simple does not auto encode...
+        Encode::encode('UTF-8','♥♥♥') => [
+          undef, '',
+          'Content-Type' =>'text/plain; charset=SHIFT_JIS',
+          'Content' => Encode::encode('SHIFT_JIS', $shiftjs)],
         arg1 => [
           undef, '',
           'Content-Type' =>'text/plain; charset=UTF-8',
@@ -459,20 +463,19 @@ SKIP: {
 
   my ($res, $c) = ctx_request $req;
 
-  use Devel::Dwarn;
-  #Dwarn $c->req->body_parameters;
-
   is $c->req->body_parameters->{'arg0'}, 'helloworld', 'got helloworld value';
   is $c->req->body_parameters->{'♥'}, '♥♥';
 
   ok Scalar::Util::blessed($c->req->body_parameters->{'arg1'});
   ok Scalar::Util::blessed($c->req->body_parameters->{'arg2'}[0]);
   ok Scalar::Util::blessed($c->req->body_parameters->{'arg2'}[1]);
+  ok Scalar::Util::blessed($c->req->body_parameters->{'♥♥♥'});
 
   # Since the form post is COMPLEX you are expected to decode it yourself.
   is Encode::decode('UTF-8', $c->req->body_parameters->{'arg1'}->raw_data), $utf8, 'decoded utf8 param';
   is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'arg2'}[0]->raw_data), $shiftjs, 'decoded shiftjis param';
   is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'arg2'}[1]->raw_data), $shiftjs, 'decoded shiftjis param';
+  is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'♥♥♥'}->raw_data), $shiftjs, 'decoded shiftjis param';
 
 }
 
