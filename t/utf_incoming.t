@@ -433,8 +433,7 @@ SKIP: {
   is $res->content_charset, 'UTF-8';
 }
 
-SKIP: {
-  skip 4;
+{
   my $utf8 = 'test ♥';
   my $shiftjs = 'test テスト';
 
