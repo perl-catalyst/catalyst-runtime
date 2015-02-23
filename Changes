@@ -1,8 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90084 - 2015-02-XX
+  - Small change to the way body parameters are created in order to prevent
+    trying to create parameters twice.
   - Use new HTTP::Body and code updates to fix issue when POSTed params have
-    non UTF-8 charset encodings.  Documentation about this.
+    non UTF-8 charset encodings or otherwise complex upload parts that are not
+    file uploads. Documentation about this.
+  - Two new application configuration parameters 'skip_body_param_unicode_decoding'
+    and 'skip_complex_post_part_handling' to assist you with any backward
+    compatibility issues with all the new UTF8 work in the most recent stable
+    Catalyst.  You may use these settings to TEMPORARILY disable certain new
+    features while you are seeking a long term fix.
 
 5.90083 - 2015-02-16
   - Fixed typo in support for OPTIONS method matching (andre++)

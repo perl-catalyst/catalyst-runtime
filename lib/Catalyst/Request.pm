@@ -12,6 +12,7 @@ use Hash::MultiValue;
 use Scalar::Util;
 use HTTP::Body;
 use Catalyst::Exception;
+use Catalyst::Request::PartData;
 use Moose;
 
 use namespace::clean -except => 'meta';
@@ -179,6 +180,7 @@ has body_parameters => (
   is => 'rw',
   required => 1,
   lazy => 1,
+  predicate => 'has_body_parameters',
   builder => 'prepare_body_parameters',
 );
 
@@ -318,14 +320,31 @@ sub prepare_body_chunk {
 
 sub prepare_body_parameters {
     my ( $self, $c ) = @_;
-
+    return $self->body_parameters if $self->has_body_parameters;
     $self->prepare_body if ! $self->_has_body;
 
     unless($self->_body) {
-      return $self->_use_hash_multivalue ? Hash::MultiValue->new : {};
+      my $return = $self->_use_hash_multivalue ? Hash::MultiValue->new : {};
+      $self->body_parameters($return);
+      return $return;
     }
 
-    my $params = $self->_body->param;
+    my $params;
+    my %part_data = %{$self->_body->part_data};
+    if(scalar %part_data && !$c->config->{skip_complex_post_part_handling}) {
+      foreach my $key (keys %part_data) {
+        my $proto_value = $part_data{$key};
+        my ($val, @extra) = (ref($proto_value)||'') eq 'ARRAY' ? @$proto_value : ($proto_value);
+
+        if(@extra) {
+          $params->{$key} = [map { Catalyst::Request::PartData->build_from_part_data($_) } ($val,@extra)];
+        } else {
+          $params->{$key} = Catalyst::Request::PartData->build_from_part_data($val);
+        }
+      }
+    } else {
+      $params = $self->_body->param;
+    }
 
     # If we have an encoding configured (like UTF-8) in general we expect a client
     # to POST with the encoding we fufilled the request in. Otherwise don't do any
@@ -341,13 +360,16 @@ sub prepare_body_parameters {
     #
     # I need to see if $c is here since this also doubles as a builder for the object :(
 
-    if($c and $c->encoding) {
+    if($c and $c->encoding and !$c->config->{skip_body_param_unicode_decoding}) {
         $params = $c->_handle_unicode_decoding($params);
     }
 
-    return $self->_use_hash_multivalue ?
+    my $return = $self->_use_hash_multivalue ?
         Hash::MultiValue->from_mixed($params) :
         $params;
+
+    $self->body_parameters($return) unless $self->has_body_parameters;
+    return $return;
 }
 
 sub prepare_connection {
@@ -543,6 +565,11 @@ be either a scalar or an arrayref containing scalars.
     print $c->request->body_parameters->{field}->[0];
 
 These are the parameters from the POST part of the request, if any.
+
+B<NOTE> If your POST is multipart, but contains non file upload parts (such
+as an line part with an alternative encoding or content type) we cannot determine
+the correct way to extra a meaningful value from the upload.  In this case any
+part like this will be represented as an instance of L<Catalyst::Request::PartData>.
 
 =head2 $req->body_params
 

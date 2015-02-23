@@ -42,7 +42,7 @@ requires 'Data::Dump';
 requires 'Data::OptList';
 requires 'HTML::Entities';
 requires 'HTML::HeadParser';
-requires 'HTTP::Body'    => '1.20';
+requires 'HTTP::Body'    => '1.22';
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';

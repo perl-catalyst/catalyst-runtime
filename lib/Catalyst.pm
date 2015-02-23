@@ -3233,6 +3233,7 @@ sub _handle_unicode_decoding {
 sub _handle_param_unicode_decoding {
     my ( $self, $value ) = @_;
     return unless defined $value; # not in love with just ignoring undefs - jnap
+    return $value if blessed($value); #don't decode when the value is an object.
 
     my $enc = $self->encoding;
     return try {
@@ -3879,6 +3880,27 @@ which is used by L<Plack::Request> and others to solve this very issue.  You
 may prefer this behavior to the default, if so enable this option (be warned
 if you enable it in a legacy application we are not sure if it is completely
 backwardly compatible).
+
+=item *
+
+C<skip_complex_post_part_handling>
+
+When creating body parameters from a POST, if we run into a multpart POST
+that does not contain uploads, but instead contains inlined complex data
+(very uncommon) we cannot reliably convert that into field => value pairs.  So
+instead we create an instance of L<Catalyst::Request::PartData>.  If this causes
+issue for you, you can disable this by setting C<skip_complex_post_part_handling>
+to true (default is false).  
+
+=item *
+
+C<skip_body_param_unicode_decoding>
+
+Generally we decode incoming POST params based on your declared encoding (the
+default for this is to decode UTF-8).  If this is causing you trouble and you
+do not wish to turn all encoding support off (with the C<encoding> configuration
+parameter) you may disable this step atomically by setting this configuration
+parameter to true.
 
 =item *
 
