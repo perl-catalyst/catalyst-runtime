@@ -381,7 +381,7 @@ use Catalyst::Test 'MyApp';
   ok my $res = request $req;
 
   ## decode_json expect the binary utf8 string and does the decoded bit for us.
-  is_deeply decode_json(($res->content)), +{'♥'=>'♥♥'};
+  is_deeply decode_json(($res->content)), +{'♥'=>'♥♥'}, 'JSON was decoded correctly';
 }
 
 {
@@ -392,7 +392,7 @@ use Catalyst::Test 'MyApp';
   is $enc->decode($res->content), "テスト", 'correct body';
   is $res->content_length, 6, 'correct length'; # Bytes over the wire
   is length($enc->decode($res->content)), 3;
-  is $res->content_charset, 'SHIFT_JIS';
+  is $res->content_charset, 'SHIFT_JIS', 'content charset is SHIFT_JIS as expected';
 }
 
 {
@@ -414,7 +414,7 @@ SKIP: {
 
   is $res->code, 200, 'OK';
   is decode_utf8($content), "manual_1 ♥", 'correct body';
-  is $res->content_charset, 'UTF-8';
+  is $res->content_charset, 'UTF-8', 'zlib charset is set correctly';
 }
 
 {
@@ -430,7 +430,7 @@ SKIP: {
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), '<p>This is path-heart action ♥</p>', 'correct body';
   is $res->content_length, 36, 'correct length';
-  is $res->content_charset, 'UTF-8';
+  is $res->content_charset, 'UTF-8', 'external PSGI app has expected charset';
 }
 
 {
@@ -457,9 +457,11 @@ SKIP: {
 
   my ($res, $c) = ctx_request $req;
 
-  is $c->req->body_parameters->{'arg0'}, 'helloworld';
-  is Encode::decode('UTF-8', $c->req->body_parameters->{'arg1'}), $utf8;
-  is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'arg2'}[0]), $shiftjs;
+  is $c->req->body_parameters->{'arg0'}, 'helloworld', 'got helloworld value';
+
+  # We expect catalyst to have decoded this
+  is $c->req->body_parameters->{'arg1'}, $utf8, 'decoded utf8 param';
+  is $c->req->body_parameters->{'arg2'}[0], $shiftjs, 'decoded shiftjis param';
 
 }
 
