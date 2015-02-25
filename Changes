@@ -6,7 +6,7 @@
   - Use new HTTP::Body and code updates to fix issue when POSTed params have
     non UTF-8 charset encodings or otherwise complex upload parts that are not
     file uploads. In these cases when Catalyst can't determine what the value of
-    a form upload is, will return an instance of Catalyst::Request::PartData will
+    a form upload is, will return an instance of Catalyst::Request::PartData with
     all the information need to figure it out.  Documentation about this corner
     case. For RT https://rt.cpan.org/Ticket/Display.html?id=101556
   - Two new application configuration parameters 'skip_body_param_unicode_decoding'
