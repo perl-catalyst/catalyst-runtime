@@ -2,7 +2,21 @@ package Catalyst::ActionRole::ConsumesContent;
 
 use Moose::Role;
 
-requires 'match', 'match_captures', 'list_extra_info';
+requires 'match', 'match_captures', 'list_extra_info', 'compare_rules', 'compare_keys';
+
+around compare_rules => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return ( $self->$orig(@_), Consumes => -1 );
+};
+
+around compare_keys => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    return ( $self->$orig(@_), 'Consumes' );
+};
 
 has allowed_content_types => (
   is=>'ro',
