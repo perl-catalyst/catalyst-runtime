@@ -81,13 +81,29 @@ sub match_captures { 1 }
 sub compare {
     my ($a1, $a2) = @_;
 
-    my ($a1_args) = @{ $a1->attributes->{Args} || [] };
-    my ($a2_args) = @{ $a2->attributes->{Args} || [] };
+    my %cmp = (
+        a1 => {},
+        a2 => {},
+    );
 
-    $_ = looks_like_number($_) ? $_ : ~0
-        for $a1_args, $a2_args;
+    ( $cmp{a1}{Args} ) = @{ $a1->attributes->{Args} || [] };
+    ( $cmp{a2}{Args} ) = @{ $a2->attributes->{Args} || [] };
 
-    return $a1_args <=> $a2_args;
+     $cmp{$_}{Args}
+        = looks_like_number( $cmp{$_}{Args} ) ? $cmp{$_}{Args} : ~0
+            for ('a1', 'a2');
+
+    for my $attr ('Method', 'Scheme', 'Consumes') {
+        $cmp{a1}{$attr} = @{ $a1->attributes->{$attr} || [] };
+        $cmp{a2}{$attr} = @{ $a2->attributes->{$attr} || [] };
+    }
+
+    return (
+           $cmp{a1}{Args}     <=> $cmp{a2}{Args}
+        || $cmp{a2}{Method}   <=> $cmp{a1}{Method}
+        || $cmp{a2}{Scheme}   <=> $cmp{a1}{Scheme}
+        || $cmp{a2}{Consumes} <=> $cmp{a1}{Consumes}
+    );
 }
 
 sub number_of_args {
@@ -164,8 +180,8 @@ makes the chain not match (and alternate, less preferred chains will be attempte
 
 =head2 compare
 
-Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
-having the highest precedence.
+Compares 2 actions based on the value of the C<Args>, C<Method>, C<Scheme> and C<Consumes> attributes.
+With no C<Args>, max C<Method>, C<Scheme> and C<Consumes> having the highest precedence.
 
 =head2 namespace
 

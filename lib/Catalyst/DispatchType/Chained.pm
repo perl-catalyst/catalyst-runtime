@@ -378,7 +378,10 @@ sub register {
 
     $action->attributes->{PathPart} = [ $encoded_part ];
 
-    unshift(@{ $children->{$encoded_part} ||= [] }, $action);
+    # "Reversed" sort: best actions should be at the end
+    $children->{$encoded_part} = [
+        sort { $b->compare($a) } ($action, @{ $children->{$encoded_part} || [] })
+    ];
 
     $self->_actions->{'/'.$action->reverse} = $action;
 
