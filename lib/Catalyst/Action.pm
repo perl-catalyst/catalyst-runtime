@@ -21,6 +21,7 @@ L<Catalyst::Controller> subclasses.
 
 use Moose;
 use Scalar::Util 'looks_like_number';
+use List::MoreUtils 'uniq';
 with 'MooseX::Emulate::Class::Accessor::Fast';
 use namespace::clean -except => 'meta';
 
@@ -78,6 +79,67 @@ sub match {
 
 sub match_captures { 1 }
 
+
+
+# Compare rules to future compare sort order.
+# HASH with rules:
+# (
+#   RULE => DEFINITION
+# )
+# RULE := string
+# DEFINITION:= -1 | 0 | 1 | coderef
+#
+# Default rule (no sorting): * => 0
+#
+# When DEFINITION is integer, then RULE is being used
+# as action attribute key to get values:
+#   $self->attributes->{RULE} * DEFINITION
+#
+# When DEFINITION is coderef, then rule value is
+# result of calling DEFINITION->($self)
+
+sub compare_rules {
+    return (
+        '*', => 0,
+        Args => sub {
+            my $self = shift;
+
+            my ($val) =  @{ $self->attributes->{Args} || [] };
+
+            return looks_like_number($val) ? $val : ~0;
+        },
+    );
+}
+
+# Rules keys. Order of keys is equal to compare order checks
+sub compare_keys {
+    return ('Args');
+}
+
+# rule definition for specified rule
+sub _compare_rule {
+    my ($self, $attr) = @_;
+
+    my %rules = $self->compare_rules;
+
+    return ( $rules{$attr} // $rules{'*'} );
+}
+
+# rule value for specified rule
+sub _compare_value {
+    my ($self, $attr) = @_;
+
+    my $rule = $self->_compare_rule($attr);
+
+    if ( ref $rule eq 'CODE' ) {
+        return $rule->($self);
+    }
+    else {
+        return $rule * @{ $self->attributes->{$attr} || [] };
+    }
+}
+
+
 sub compare {
     my ($a1, $a2) = @_;
 
@@ -86,24 +148,19 @@ sub compare {
         a2 => {},
     );
 
-    ( $cmp{a1}{Args} ) = @{ $a1->attributes->{Args} || [] };
-    ( $cmp{a2}{Args} ) = @{ $a2->attributes->{Args} || [] };
+    my @a1keys = $a1->compare_keys;
+    my @a2keys = $a2->compare_keys;
 
-     $cmp{$_}{Args}
-        = looks_like_number( $cmp{$_}{Args} ) ? $cmp{$_}{Args} : ~0
-            for ('a1', 'a2');
-
-    for my $attr ('Method', 'Scheme', 'Consumes') {
-        $cmp{a1}{$attr} = @{ $a1->attributes->{$attr} || [] };
-        $cmp{a2}{$attr} = @{ $a2->attributes->{$attr} || [] };
+    for my $attr (uniq(@a1keys, @a2keys)) {
+        $cmp{a1}{$attr} = $a1->_compare_value($attr);
+        $cmp{a2}{$attr} = $a2->_compare_value($attr);
     }
 
-    return (
-           $cmp{a1}{Args}     <=> $cmp{a2}{Args}
-        || $cmp{a2}{Method}   <=> $cmp{a1}{Method}
-        || $cmp{a2}{Scheme}   <=> $cmp{a1}{Scheme}
-        || $cmp{a2}{Consumes} <=> $cmp{a1}{Consumes}
-    );
+    my $cmp = 0;
+
+    $cmp ||= $cmp{a1}{$_} <=> $cmp{a2}{$_} for uniq(@a1keys, @a2keys);
+
+    return $cmp;
 }
 
 sub number_of_args {
