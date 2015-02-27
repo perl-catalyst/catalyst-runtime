@@ -152,8 +152,8 @@ sub compare {
     my @a2keys = $a2->compare_keys;
 
     for my $attr (uniq(@a1keys, @a2keys)) {
-        $cmp{a1}{$attr} = $a1->_compare_value($attr);
-        $cmp{a2}{$attr} = $a2->_compare_value($attr);
+        $cmp{a1}{$attr} = $a1->_compare_value($attr) * @a1keys;
+        $cmp{a2}{$attr} = $a2->_compare_value($attr) * @a2keys;
     }
 
     my $cmp = 0;
