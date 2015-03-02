@@ -4,19 +4,8 @@ use Moose::Role;
 
 requires 'match', 'match_captures', 'list_extra_info', 'compare_rules', 'compare_keys';
 
-around compare_rules => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    return ( $self->$orig(@_), Scheme => -1 );
-};
-
-around compare_keys => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    return ( $self->$orig(@_), 'Scheme' );
-};
+override compare_rules => sub { return ( super(), 'Scheme' => -1 ) };
+override compare_keys  => sub { return ( super(), 'Scheme' ) };
 
 around ['match','match_captures'] => sub {
     my ($orig, $self, $ctx, @args) = @_;

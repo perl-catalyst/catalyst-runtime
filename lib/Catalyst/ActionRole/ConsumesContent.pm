@@ -4,19 +4,8 @@ use Moose::Role;
 
 requires 'match', 'match_captures', 'list_extra_info', 'compare_rules', 'compare_keys';
 
-around compare_rules => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    return ( $self->$orig(@_), Consumes => -1 );
-};
-
-around compare_keys => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    return ( $self->$orig(@_), 'Consumes' );
-};
+override compare_rules => sub { return ( super(), 'Consumes' => -1 ) };
+override compare_keys  => sub { return ( super(), 'Consumes' ) };
 
 has allowed_content_types => (
   is=>'ro',
