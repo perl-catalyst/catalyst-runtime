@@ -15,6 +15,12 @@ UTF8 is enabled going forwards and the expectation is that other ecosystem
 projects will assume this as well.  At some point you application will not
 correctly function without this setting.
 
+As of 5.90084 we've added two additional configuration flags for more selective
+control over some encoding changes: 'skip_body_param_unicode_decoding' and
+'skip_complex_post_part_handling'.  You may use these to more selectively
+disable new features while you are seeking a long term fix.  Please review
+CONFIGURATION in L<Catalyst>.
+
 For further information, please see L<Catalyst::UTF8>
 
 A number of projects in the wider ecosystem required minor updates to be able

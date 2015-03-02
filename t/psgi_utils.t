@@ -43,6 +43,18 @@ my $psgi_app = sub {
       $psgi_app->($env));
   }
 
+  sub filehandle :Local {
+    my ($self, $c, $arg) = @_;
+    my $path = File::Spec->catfile('t', 'utf8.txt');
+    open(my $fh, '<', $path) || die "trouble: $!";
+    $c->res->from_psgi_response([200, ['Content-Type'=>'text/html'], $fh]);
+  }
+
+  sub direct :Local {
+    my ($self, $c, $arg) = @_;
+    $c->res->from_psgi_response([200, ['Content-Type'=>'text/html'], ["hello","world"]]);
+  }
+
   package MyApp::Controller::User;
   $INC{'MyApp/Controller/User.pm'} = __FILE__;
 
@@ -381,6 +393,18 @@ use Catalyst::Test 'MyApp';
   is $c->action, 'docs/name_args';
   is $res->content, '/111';
   is_deeply $c->req->args, [111];
+}
+
+{
+  use utf8;
+  use Encode;
+  my ($res, $c) = ctx_request('/docs/filehandle');
+  is Encode::decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n";
+}
+
+{
+  my ($res, $c) = ctx_request('/docs/direct');
+  is $res->content, "helloworld";
 }
 
 done_testing();

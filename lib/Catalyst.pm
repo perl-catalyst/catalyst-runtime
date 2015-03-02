@@ -120,7 +120,7 @@ __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware
-  _data_handlers _encoding _encode_check/;
+  _data_handlers _encoding _encode_check finalized_default_middleware/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
@@ -3233,6 +3233,7 @@ sub _handle_unicode_decoding {
 sub _handle_param_unicode_decoding {
     my ( $self, $value ) = @_;
     return unless defined $value; # not in love with just ignoring undefs - jnap
+    return $value if blessed($value); #don't decode when the value is an object.
 
     my $enc = $self->encoding;
     return try {
@@ -3533,8 +3534,8 @@ sub setup_middleware {
       @middleware_definitions = reverse(@_);
     } else {
       @middleware_definitions = reverse(@{$class->config->{'psgi_middleware'}||[]})
-        unless $class->config->{__configured_from_psgi_middleware};
-      $class->config->{__configured_from_psgi_middleware} = 1; # Only do this once, just in case some people call setup over and over...
+        unless $class->finalized_default_middleware;
+      $class->finalized_default_middleware(1); # Only do this once, just in case some people call setup over and over...
     }
 
     my @middleware = ();
@@ -3879,6 +3880,27 @@ which is used by L<Plack::Request> and others to solve this very issue.  You
 may prefer this behavior to the default, if so enable this option (be warned
 if you enable it in a legacy application we are not sure if it is completely
 backwardly compatible).
+
+=item *
+
+C<skip_complex_post_part_handling>
+
+When creating body parameters from a POST, if we run into a multpart POST
+that does not contain uploads, but instead contains inlined complex data
+(very uncommon) we cannot reliably convert that into field => value pairs.  So
+instead we create an instance of L<Catalyst::Request::PartData>.  If this causes
+issue for you, you can disable this by setting C<skip_complex_post_part_handling>
+to true (default is false).  
+
+=item *
+
+C<skip_body_param_unicode_decoding>
+
+Generally we decode incoming POST params based on your declared encoding (the
+default for this is to decode UTF-8).  If this is causing you trouble and you
+do not wish to turn all encoding support off (with the C<encoding> configuration
+parameter) you may disable this step atomically by setting this configuration
+parameter to true.
 
 =item *
 
@@ -4315,6 +4337,8 @@ abw: Andy Wardley
 acme: Leon Brocard <leon@astray.com>
 
 abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
+
+andrewalker: André Walker <andre@cpan.org>
 
 Andrew Bramble
 

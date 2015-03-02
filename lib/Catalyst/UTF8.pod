@@ -254,6 +254,43 @@ based tricks and workarounds for even more odd cases (just search the web for th
 a number of approaches.  Hopefully as more compliant browsers become popular these edge cases
 will fade.
 
+B<NOTE>  It is possible for a form POST multipart response (normally a file upload) to contain
+inline content with mixed content character sets and encoding.  For example one might create
+a POST like this:
+
+    use utf8;
+    use HTTP::Request::Common;
+
+    my $utf8 = 'test ♥';
+    my $shiftjs = 'test テスト';
+    my $req = POST '/root/echo_arg',
+        Content_Type => 'form-data',
+          Content =>  [
+            arg0 => 'helloworld',
+            Encode::encode('UTF-8','♥') => Encode::encode('UTF-8','♥♥'),
+            arg1 => [
+              undef, '',
+              'Content-Type' =>'text/plain; charset=UTF-8',
+              'Content' => Encode::encode('UTF-8', $utf8)],
+            arg2 => [
+              undef, '',
+              'Content-Type' =>'text/plain; charset=SHIFT_JIS',
+              'Content' => Encode::encode('SHIFT_JIS', $shiftjs)],
+            arg2 => [
+              undef, '',
+              'Content-Type' =>'text/plain; charset=SHIFT_JIS',
+              'Content' => Encode::encode('SHIFT_JIS', $shiftjs)],
+          ];
+
+In this case we've created a POST request but each part specifies its own content
+character set (and setting a content encoding would also be possible).  Generally one
+would not run into this situation in a web browser context but for completeness sake
+Catalyst will notice if a multipart POST contains parts with complex or extended
+header information and in those cases it will not attempt to apply decoding to the
+form values.  Instead the part will be represented as an instance of an object
+L<Catalyst::Request::PartData> which will contain all the header information needed
+for you to perform custom parser of the data.
+
 =head1 UTF8 Encoding in Body Response
 
 When does L<Catalyst> encode your response body and what rules does it use to
@@ -558,10 +595,17 @@ so you can disable this with the following configurations setting:
 
 Where C<MyApp> is your L<Catalyst> subclass.
 
+If you do not wish to disable all the Catalyst encoding features, you may disable specific
+features via two additional configuration options:  'skip_body_param_unicode_decoding'
+and 'skip_complex_post_part_handling'.  The first will skip any attempt to decode POST
+parameters in the creating of body parameters and the second will skip creation of instances
+of L<Catalyst::Request::PartData> in the case that the multipart form upload contains parts
+with a mix of content character sets.
+
 If you believe you have discovered a bug in UTF8 body encoding, I strongly encourage you to
 report it (and not try to hack a workaround in your local code).  We also recommend that you
 regard such a workaround as a temporary solution.  It is ideal if L<Catalyst> extension
-authors can start to count on L<Catalyst> doing the write thing for encoding
+authors can start to count on L<Catalyst> doing the write thing for encoding.
 
 =head1 Conclusion
 

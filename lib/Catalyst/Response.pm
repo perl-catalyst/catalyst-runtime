@@ -148,7 +148,10 @@ sub from_psgi_response {
         my ($status, $headers, $body) = @$psgi_res;
         $self->status($status);
         $self->headers(HTTP::Headers->new(@$headers));
-        $self->body(join('', @$body));
+        # Can be arrayref or filehandle...
+        if(defined $body) { # probably paranoia
+          ref $body eq 'ARRAY' ? $self->body(join('', @$body)) : $self->body($body);
+        }
     } elsif(ref $psgi_res eq 'CODE') {
         $psgi_res->(sub {
             my $response = shift;
@@ -156,7 +159,8 @@ sub from_psgi_response {
             $self->status($status);
             $self->headers(HTTP::Headers->new(@$headers));
             if(defined $maybe_body) {
-                $self->body(join('', @$maybe_body));
+                # Can be arrayref or filehandle...
+                ref $maybe_body eq 'ARRAY' ? $self->body(join('', @$maybe_body)) : $self->body($maybe_body);
             } else {
                 return $self->write_fh;
             }

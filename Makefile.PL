@@ -42,7 +42,7 @@ requires 'Data::Dump';
 requires 'Data::OptList';
 requires 'HTML::Entities';
 requires 'HTML::HeadParser';
-requires 'HTTP::Body'    => '1.06'; # ->cleanup(1)
+requires 'HTTP::Body'    => '1.22';
 requires 'HTTP::Headers' => '1.64';
 requires 'HTTP::Request' => '5.814';
 requires 'HTTP::Response' => '5.813';
@@ -84,7 +84,7 @@ requires "Plack::Middleware::ContentLength";
 requires "Plack::Middleware::Head";
 requires "Plack::Middleware::HTTPExceptions";
 requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.09';
-requires "Plack::Middleware::MethodOverride";
+requires "Plack::Middleware::MethodOverride" => '0.12';
 requires "Plack::Middleware::RemoveRedundantBody" => '0.03';
 
 test_requires 'Test::Fatal';
