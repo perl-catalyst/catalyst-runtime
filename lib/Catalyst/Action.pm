@@ -21,6 +21,7 @@ L<Catalyst::Controller> subclasses.
 
 use Moose;
 use Scalar::Util 'looks_like_number';
+use List::MoreUtils 'uniq';
 with 'MooseX::Emulate::Class::Accessor::Fast';
 use namespace::clean -except => 'meta';
 
@@ -78,16 +79,88 @@ sub match {
 
 sub match_captures { 1 }
 
+
+
+# Compare rules to future compare sort order.
+# HASH with rules:
+# (
+#   RULE => DEFINITION
+# )
+# RULE := string
+# DEFINITION:= -1 | 0 | 1 | coderef
+#
+# Default rule (no sorting): * => 0
+#
+# When DEFINITION is integer, then RULE is being used
+# as action attribute key to get values:
+#   $self->attributes->{RULE} * DEFINITION
+#
+# When DEFINITION is coderef, then rule value is
+# result of calling DEFINITION->($self)
+
+sub compare_rules {
+    return (
+        '*', => 0,
+        Args => sub {
+            my $self = shift;
+
+            my ($val) =  @{ $self->attributes->{Args} || [] };
+
+            return looks_like_number($val) ? $val : ~0;
+        },
+    );
+}
+
+# Rules keys. Order of keys is equal to compare order checks
+sub compare_keys {
+    return ('Args');
+}
+
+# rule definition for specified rule
+sub _compare_rule {
+    my ($self, $attr) = @_;
+
+    my %rules = $self->compare_rules;
+
+    return ( $rules{$attr} // $rules{'*'} );
+}
+
+# rule value for specified rule
+sub _compare_value {
+    my ($self, $attr) = @_;
+
+    my $rule = $self->_compare_rule($attr);
+
+    if ( ref $rule eq 'CODE' ) {
+        return $rule->($self);
+    }
+    else {
+        return $rule * @{ $self->attributes->{$attr} || [] };
+    }
+}
+
+
 sub compare {
     my ($a1, $a2) = @_;
 
-    my ($a1_args) = @{ $a1->attributes->{Args} || [] };
-    my ($a2_args) = @{ $a2->attributes->{Args} || [] };
+    my %cmp = (
+        a1 => {},
+        a2 => {},
+    );
 
-    $_ = looks_like_number($_) ? $_ : ~0
-        for $a1_args, $a2_args;
+    my @a1keys = $a1->compare_keys;
+    my @a2keys = $a2->compare_keys;
 
-    return $a1_args <=> $a2_args;
+    for my $attr (uniq(@a1keys, @a2keys)) {
+        $cmp{a1}{$attr} = $a1->_compare_value($attr) * @a1keys;
+        $cmp{a2}{$attr} = $a2->_compare_value($attr) * @a2keys;
+    }
+
+    my $cmp = 0;
+
+    $cmp ||= $cmp{a1}{$_} <=> $cmp{a2}{$_} for uniq(@a1keys, @a2keys);
+
+    return $cmp;
 }
 
 sub number_of_args {
@@ -164,8 +237,8 @@ makes the chain not match (and alternate, less preferred chains will be attempte
 
 =head2 compare
 
-Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
-having the highest precedence.
+Compares 2 actions based on the value of the C<Args>, C<Method>, C<Scheme> and C<Consumes> attributes.
+With no C<Args>, max C<Method>, C<Scheme> and C<Consumes> having the highest precedence.
 
 =head2 namespace
 

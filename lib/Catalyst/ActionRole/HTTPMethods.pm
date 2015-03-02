@@ -2,7 +2,10 @@ package Catalyst::ActionRole::HTTPMethods;
 
 use Moose::Role;
 
-requires 'match', 'match_captures', 'list_extra_info';
+requires 'match', 'match_captures', 'list_extra_info', 'compare_rules', 'compare_keys';
+
+override compare_rules => sub { return ( super(), 'Method' => -1 ) };
+override compare_keys  => sub { return ( super(), 'Method' ) };
 
 around ['match','match_captures'] => sub {
   my ($orig, $self, $ctx, @args) = @_;

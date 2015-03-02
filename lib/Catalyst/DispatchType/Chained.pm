@@ -220,6 +220,7 @@ sub recurse_match {
     my ( $self, $c, $parent, $path_parts ) = @_;
     my $children = $self->_children_of->{$parent};
     return () unless $children;
+
     my $best_action;
     my @captures;
     TRY: foreach my $try_part (sort { length($b) <=> length($a) }
@@ -378,7 +379,10 @@ sub register {
 
     $action->attributes->{PathPart} = [ $encoded_part ];
 
-    unshift(@{ $children->{$encoded_part} ||= [] }, $action);
+    # "Reversed" sort: best actions should be at the end
+    $children->{$encoded_part} = [
+        reverse sort { $a->compare($b) } ($action, @{ $children->{$encoded_part} || [] })
+    ];
 
     $self->_actions->{'/'.$action->reverse} = $action;
 

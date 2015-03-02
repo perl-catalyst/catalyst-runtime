@@ -2,7 +2,10 @@ package Catalyst::ActionRole::ConsumesContent;
 
 use Moose::Role;
 
-requires 'match', 'match_captures', 'list_extra_info';
+requires 'match', 'match_captures', 'list_extra_info', 'compare_rules', 'compare_keys';
+
+override compare_rules => sub { return ( super(), 'Consumes' => -1 ) };
+override compare_keys  => sub { return ( super(), 'Consumes' ) };
 
 has allowed_content_types => (
   is=>'ro',
