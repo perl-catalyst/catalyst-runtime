@@ -12,8 +12,15 @@ use HTTP::Request::Common;
 
   extends 'Catalyst::Controller';
 
-  sub check :Local {
-    pop->res->from_psgi_response([200, ['Content-Type'=>'text/plain'],['check']]);
+  sub an_int :Local Args(Int) {
+    my ($self, $c, $int) = @_;
+    #use Devel::Dwarn; Dwarn $self;
+    $c->res->body('an_int');
+  }
+
+  sub default :Default {
+    my ($self, $c, $int) = @_;
+    $c->res->body('default');
   }
 
   MyApp::Controller::Root->config(namespace=>'');
@@ -27,10 +34,13 @@ use HTTP::Request::Common;
 use Catalyst::Test 'MyApp';
 
 {
-  my $res = request '/check';
-  is $res->code, 200, 'OK';
-  is $res->content, 'check', 'correct body';
-  is $res->content_length, 5, 'correct length';
+  my $res = request '/an_int/1';
+  is $res->content, 'an_int';
+}
+
+{
+  my $res = request '/an_int/aa';
+  is $res->content, 'default';
 }
 
 done_testing;

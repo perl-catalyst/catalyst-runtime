@@ -21,6 +21,7 @@ L<Catalyst::Controller> subclasses.
 
 use Moose;
 use Scalar::Util 'looks_like_number';
+use Moose::Util::TypeConstraints ();
 with 'MooseX::Emulate::Class::Accessor::Fast';
 use namespace::clean -except => 'meta';
 
@@ -37,6 +38,40 @@ has private_path => (
   required => 1,
   default => sub { '/'.shift->reverse },
 );
+
+has args_constraints => (
+  is=>'ro',
+  traits=>['Array'],
+  isa=>'ArrayRef',
+  required=>1,
+  lazy=>1,
+  builder=>'_build_args_constraints',
+  handles => {
+    has_args_constraints => 'count',
+    number_of_args => 'count',
+    all_args_constraints => 'elements',
+  });
+
+  sub _build_args_constraints {
+    my $self = shift;
+    my @arg_protos = @{$self->attributes->{Args}||[]};
+
+    return [] unless scalar(@arg_protos);
+    # If there is only one arg and it looks like a number
+    # we assume its 'classic' and the number is the number of
+    # constraints.
+    my @args = ();
+    if(
+      scalar(@arg_protos) == 1 &&
+      looks_like_number($arg_protos[0])
+    ) {
+      return [];
+    } else {
+      @args = map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } @arg_protos;
+    }
+
+    return \@args;
+  }
 
 use overload (
 
@@ -67,33 +102,29 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
-    #would it be unreasonable to store the number of arguments
-    #the action has as its own attribute?
-    #it would basically eliminate the code below.  ehhh. small fish
-    return 1 unless exists $self->attributes->{Args};
-    my $args = $self->attributes->{Args}[0];
-    return 1 unless defined($args) && length($args);
-    return scalar( @{ $c->req->args } ) == $args;
+    warn "number args = ${\$self->number_of_args} for ${\$self->name}";
+    return 1 unless $self->number_of_args;
+    #my $args = $self->attributes->{Args}[0];
+    #return 1 unless defined($args) && length($args); The "Args" slurpy case, remove for now.
+    if( scalar( @{ $c->req->args } ) == $self->number_of_args ) {
+      return 1 unless $self->has_args_constraints;
+      for my $i($#{ $c->req->args }) {
+        $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
+      }
+      return 1;
+    } else {
+      return 0;
+    }
 }
 
 sub match_captures { 1 }
 
 sub compare {
     my ($a1, $a2) = @_;
-
-    my ($a1_args) = @{ $a1->attributes->{Args} || [] };
-    my ($a2_args) = @{ $a2->attributes->{Args} || [] };
-
-    $_ = looks_like_number($_) ? $_ : ~0
-        for $a1_args, $a2_args;
+    my ($a1_args) = $a1->number_of_args;
+    my ($a2_args) = $a2->number_of_args;
 
     return $a1_args <=> $a2_args;
-}
-
-sub number_of_args {
-    my ( $self ) = @_;
-    return 0 unless exists $self->attributes->{Args};
-    return $self->attributes->{Args}[0];
 }
 
 sub number_of_captures {

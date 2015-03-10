@@ -56,7 +56,7 @@ sub list {
     );
     foreach my $path ( sort keys %{ $self->_paths } ) {
         foreach my $action ( @{ $self->_paths->{$path} } ) {
-            my $args  = $action->attributes->{Args}->[0];
+            my $args  = $action->number_of_args;
             my $parts = defined($args) ? '/*' x $args : '/...';
 
             my $display_path = "/$path/$parts";
