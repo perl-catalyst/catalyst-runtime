@@ -50,7 +50,10 @@ has ['preargs', 'postargs'] => (is => 'rw', default => sub { [] } );
 
   sub _build_number_of_args {
     my $self = shift;
+
     my @arg_protos = @{$self->attributes->{Args}||[]};
+
+    return undef unless @arg_protos;
 
     my @args = ();
     my ($preany, $any, $postany) = (0,0,0);
@@ -87,7 +90,7 @@ has ['preargs', 'postargs'] => (is => 'rw', default => sub { [] } );
             }
         }
     }
-    warn "$preany, $any, $postany";
+    #warn "$preany, $any, $postany";
     $self->preargs([@args]);
     $self->postargs([@postargs]);
 
@@ -129,9 +132,9 @@ sub match {
     my $number_of_args = $self->number_of_args;
     my @args = @{ $c->req->args };
 
-    warn "number args = ${\($number_of_args // '*ANY*')} for ${\$self->name}";
+    #warn "number args = ${\($number_of_args // '*ANY*')} for ${\$self->name} " . ~~@args ;
 
-    if(    ( $number_of_args  && scalar( @args ) == $number_of_args )
+    if(    (  defined($number_of_args) && scalar( @args ) == $number_of_args )
         || ( !defined($number_of_args) && scalar( @args ) >= (@{$self->preargs} + @{$self->postargs}) )
     ) {
         # For each *pre any*
@@ -145,7 +148,7 @@ sub match {
         for my $constraint(@{$self->postargs}) {
             $self->check_args_contraint(\@args, $constraint) or return 0;
         }
-      return 1;
+        return 1;
     } else {
       return 0;
     }
@@ -172,6 +175,8 @@ sub compare {
     my ($a1, $a2) = @_;
     my ($a1_args) = $a1->number_of_args;
     my ($a2_args) = $a2->number_of_args;
+
+    $_ = looks_like_number($_) ? $_ : ~0 for $a1_args, $a2_args;
 
     return $a1_args <=> $a2_args;
 }
