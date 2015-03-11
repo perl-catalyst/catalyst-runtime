@@ -18,11 +18,18 @@ use HTTP::Request::Common;
     $c->res->body('an_int');
   }
 
-    # For Args(N) Args(T) Args Args(T) Args(N)
-    sub nttn :Local Args(2) Args(Int) Args(Int) Args Args(3) Args(Int) Args(1) {
+  # For Args(N) Args(T) Args Args(T) Args(N)
+  sub nttn :Local Args(2) Args(Int) Args(Int) Args Args(3) Args(Int) Args(1) {
     my ($self, $c, $int) = @_;
     #use Devel::Dwarn; Dwarn $self;
     $c->res->body('nttn');
+  }
+
+  # For Args(N, T, *, T, N)
+  sub nttn_str :Local Args(1, Int, Int, *, 3, Int, 1) {
+    my ($self, $c, $int) = @_;
+    #use Devel::Dwarn; Dwarn $self;
+    $c->res->body('nttn_str');
   }
 
   sub default :Default {
@@ -68,6 +75,15 @@ use Catalyst::Test 'MyApp';
 
      $res = request '/nttn/aaaa/bbbb/123/456/*/**/cc/dd/ee/XXX/fffffff';
   is $res->content, 'default';
+}
+
+{
+                         # Args(1,  Int Int   *      3    Int   1)
+  my $res = request '/nttn_str/aaaa/123/567/*/**/cc/dd/ee/890/fffffff';
+  is $res->content, 'nttn_str';
+
+     $res = request '/nttn_str/aaaa/123/567/cc/dd/ee/890/fffffff';
+  is $res->content, 'nttn_str';
 }
 
 done_testing;

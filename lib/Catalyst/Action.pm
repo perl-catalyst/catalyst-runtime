@@ -53,6 +53,17 @@ has ['preargs', 'postargs'] => (is => 'rw', default => sub { [] } );
 
     my @arg_protos = @{$self->attributes->{Args}||[]};
 
+    my @extracted;
+    for my $arg (@arg_protos) {
+        if (defined $arg) {
+            push( @extracted, map { $_ eq '*' ? undef : $_ } split(/\s*,\s*/, $arg) );
+        }
+        else {
+            push( @extracted, $arg );
+        }
+    }
+    @arg_protos = @extracted;
+
     return undef unless @arg_protos;
 
     my @args = ();
