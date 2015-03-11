@@ -39,38 +39,59 @@ has private_path => (
   default => sub { '/'.shift->reverse },
 );
 
-has args_constraints => (
-  is=>'ro',
-  traits=>['Array'],
-  isa=>'ArrayRef',
-  required=>1,
-  lazy=>1,
-  builder=>'_build_args_constraints',
-  handles => {
-    has_args_constraints => 'count',
-    number_of_args => 'count',
-    all_args_constraints => 'elements',
-  });
+has number_of_args => (
+    is => 'rw',
+    lazy => 1,
+    builder=>'_build_number_of_args',
+);
 
-  sub _build_args_constraints {
+has ['preargs', 'postargs'] => (is => 'rw', default => sub { [] } );
+
+
+  sub _build_number_of_args {
     my $self = shift;
     my @arg_protos = @{$self->attributes->{Args}||[]};
 
-    return [] unless scalar(@arg_protos);
-    # If there is only one arg and it looks like a number
-    # we assume its 'classic' and the number is the number of
-    # constraints.
     my @args = ();
-    if(
-      scalar(@arg_protos) == 1 &&
-      looks_like_number($arg_protos[0])
-    ) {
-      return [];
-    } else {
-      @args = map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } @arg_protos;
+    my ($preany, $any, $postany) = (0,0,0);
+    for (0 .. $#arg_protos) {
+        if ( defined( $arg_protos[$_] ) && looks_like_number( $arg_protos[$_] ) ) {
+            push( @args, 0 + $arg_protos[$_] );
+            $preany += $arg_protos[$_];
+        }
+        elsif ( defined $arg_protos[$_] ) {
+            my $constraint = Moose::Util::TypeConstraints::find_or_parse_type_constraint($arg_protos[$_]) or die "$arg_protos[$_] is not a constraint!";
+            push(@args, $constraint);
+            $preany += 1;
+        }
+        else {
+            $any = 1;
+            last;
+        }
     }
 
-    return \@args;
+    my @postargs = ();
+    if ($any) {
+        for (reverse(0 .. $#arg_protos)) {
+            if ( defined( $arg_protos[$_] ) && looks_like_number( $arg_protos[$_] ) ) {
+                push( @postargs, 0 + $arg_protos[$_] );
+                $postany += $arg_protos[$_];
+            }
+            elsif ( defined $arg_protos[$_] ) {
+                my $constraint = Moose::Util::TypeConstraints::find_or_parse_type_constraint($arg_protos[$_]) or die "$arg_protos[$_] is not a constraint!";
+                push(@postargs, $constraint);
+                $postany += 1;
+            }
+            else {
+                last;
+            }
+        }
+    }
+    warn "$preany, $any, $postany";
+    $self->preargs([@args]);
+    $self->postargs([@postargs]);
+
+    return $any ? undef : $preany;
   }
 
 use overload (
@@ -102,19 +123,47 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
-    warn "number args = ${\$self->number_of_args} for ${\$self->name}";
-    return 1 unless $self->number_of_args;
-    #my $args = $self->attributes->{Args}[0];
-    #return 1 unless defined($args) && length($args); The "Args" slurpy case, remove for now.
-    if( scalar( @{ $c->req->args } ) == $self->number_of_args ) {
-      return 1 unless $self->has_args_constraints;
-      for my $i($#{ $c->req->args }) {
-        $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
-      }
+
+    return 1 unless exists $self->attributes->{Args};
+
+    my $number_of_args = $self->number_of_args;
+    my @args = @{ $c->req->args };
+
+    warn "number args = ${\($number_of_args // '*ANY*')} for ${\$self->name}";
+
+    if(    ( $number_of_args  && scalar( @args ) == $number_of_args )
+        || ( !defined($number_of_args) && scalar( @args ) >= (@{$self->preargs} + @{$self->postargs}) )
+    ) {
+        # For each *pre any*
+        for my $constraint(@{$self->preargs}) {
+            $self->check_args_contraint(\@args, $constraint) or return 0;
+        }
+
+        # Reverse remained (after pre any constraints checking) @args
+        @args = reverse @args;
+        # ...and check for post any
+        for my $constraint(@{$self->postargs}) {
+            $self->check_args_contraint(\@args, $constraint) or return 0;
+        }
       return 1;
     } else {
       return 0;
     }
+}
+
+sub check_args_contraint {
+    my ($self, $args, $constraint) = @_;
+
+    if (ref $constraint eq 'Moose::Meta::TypeConstraint') {
+        return !!($constraint->check(splice(@{$args}, 0, 1)));
+    }
+    elsif (!ref $constraint) {
+        return 0 if @{$args} < $constraint;
+        splice(@{$args}, 0, $constraint);
+        return 1;
+    }
+
+    return 0;
 }
 
 sub match_captures { 1 }
