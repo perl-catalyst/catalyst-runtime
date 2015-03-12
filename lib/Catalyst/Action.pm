@@ -49,18 +49,24 @@ has number_of_args => (
 
   sub _build_number_of_args {
     my $self = shift;
-    return 0 unless exists $self->attributes->{Args};
-    if(!defined($self->attributes->{Args}[0])) {
+    if( ! exists $self->attributes->{Args} ) {
+      # When 'Args' does not exist, that means we want 'any number of args'.
+      return undef;
+    } elsif(!defined($self->attributes->{Args}[0])) {
       # When its 'Args' that internal cue for 'unlimited'
       return undef;
     } elsif(looks_like_number($self->attributes->{Args}[0])) {
-      # 'old school' numberd args (is allowed to be undef as well)
+      # 'Old school' numberd args (is allowed to be undef as well)
       return $self->attributes->{Args}[0];
     } else {
-      # new hotness named arg constraints
+      # New hotness named arg constraints
       return $self->number_of_args_constraints;
     }
   }
+
+sub normalized_arg_number {
+  return defined($_[0]->number_of_args) ? $_[0]->number_of_args : ~0;
+}
 
 has args_constraints => (
   is=>'ro',
@@ -123,20 +129,20 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
-    #would it be unreasonable to store the number of arguments
-    #the action has as its own attribute?
-    #it would basically eliminate the code below.  ehhh. small fish
-    return 1 unless exists $self->attributes->{Args};
-    my $args = $self->attributes->{Args}[0];
-    return 1 unless defined($args) && length($args);
 
+    # If infinite args, we always match
+    return 1 if $self->normalized_arg_number == ~0;
+
+    # There there are arg constraints, we must see to it that the constraints
+    # check positive for each arg in the list.
     if($self->has_args_constraints) {
       for my $i($#{ $c->req->args }) {
         $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
       }
       return 1;
     } else {
-      return scalar( @{ $c->req->args } ) == $args;
+      # Otherwise, we just need to match the number of args.
+      return scalar( @{ $c->req->args } ) == $self->normalized_arg_number;
     }
 }
 
@@ -144,21 +150,7 @@ sub match_captures { 1 }
 
 sub compare {
     my ($a1, $a2) = @_;
-
-    # Wen there is no declared Args for Local and Path (and Default??) we
-    # say that means any number of args...  If Args exists however we use
-    # the number of args as determined by inspecting the value of it.
-
-    my $a1_args = exists($a1->attributes->{Args}) ? $a1->number_of_args : ~0;
-    my $a2_args = exists($a2->attributes->{Args}) ? $a2->number_of_args : ~0;
-
-    # If we did have an Args but it was undefined value (:Args() or :Args), that
-    # is the cue for 'as many args as you like also...
-    # 
-    $_ = defined($_) ? $_ : ~0
-        for $a1_args, $a2_args;
-
-    return $a1_args <=> $a2_args;
+    return $a1->normalized_arg_number <=> $a2->normalized_arg_number;
 }
 
 sub number_of_captures {
@@ -251,7 +243,13 @@ Returns the sub name of this action.
 
 =head2 number_of_args
 
-Returns the number of args this action expects. This is 0 if the action doesn't take any arguments and undef if it will take any number of arguments.
+Returns the number of args this action expects. This is 0 if the action doesn't
+take any arguments and undef if it will take any number of arguments.
+
+=head2 normalized_arg_number
+
+For the purposes of comparison we normalize 'number_of_args' so that if it is
+undef we mean ~0 (as many args are we can think of).
 
 =head2 number_of_captures
 
