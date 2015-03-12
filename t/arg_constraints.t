@@ -14,8 +14,12 @@ use HTTP::Request::Common;
 
   sub an_int :Local Args(Int) {
     my ($self, $c, $int) = @_;
-    #use Devel::Dwarn; Dwarn $self;
     $c->res->body('an_int');
+  }
+
+  sub many_ints :Local Args(ArrayRef[Int]) {
+    my ($self, $c, $int) = @_;
+    $c->res->body('many_ints');
   }
 
   sub default :Default {
@@ -36,6 +40,26 @@ use Catalyst::Test 'MyApp';
 {
   my $res = request '/an_int/1';
   is $res->content, 'an_int';
+}
+
+{
+  my $res = request '/many_ints/1';
+  is $res->content, 'many_ints';
+}
+
+{
+  my $res = request '/many_ints/1/2';
+  is $res->content, 'many_ints';
+}
+
+{
+  my $res = request '/many_ints/1/2/3';
+  is $res->content, 'many_ints';
+}
+
+{
+  my $res = request '/many_ints/1/2/a';
+  is $res->content, 'default';
 }
 
 {

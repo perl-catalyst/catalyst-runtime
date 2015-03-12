@@ -55,7 +55,10 @@ has number_of_args => (
     } elsif(!defined($self->attributes->{Args}[0])) {
       # When its 'Args' that internal cue for 'unlimited'
       return undef;
-    } elsif(looks_like_number($self->attributes->{Args}[0])) {
+    } elsif(
+      scalar(@{$self->attributes->{Args}}) == 1 &&
+      looks_like_number($self->attributes->{Args}[0])
+    ) {
       # 'Old school' numberd args (is allowed to be undef as well)
       return $self->attributes->{Args}[0];
     } else {
@@ -96,7 +99,10 @@ has args_constraints => (
     ) {
       return \@args;
     } else {
-      @args = map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } @arg_protos;
+      # Allows Args(Int,Str) and Args(Str,2,Int) == Args(Str,Any,Any,Int)
+      @args =
+        map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } 
+        map { looks_like_number($_) ? ('Any' x $_) : $_ } @arg_protos;
     }
 
     return \@args;
@@ -136,10 +142,19 @@ sub match {
     # There there are arg constraints, we must see to it that the constraints
     # check positive for each arg in the list.
     if($self->has_args_constraints) {
-      for my $i($#{ $c->req->args }) {
-        $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
+      # If there is only one type constraint, and its a Ref or subtype of Ref,
+      # That means we expect a reference, so use the full args arrayref.
+      if(
+        $self->number_of_args_constraints == 1 &&
+        $self->args_constraints->[0]->is_a_type_of('Ref')
+      ) {
+        return $self->args_constraints->[0]->check($c->req->args);
+      } else {
+        for my $i($#{ $c->req->args }) {
+          $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
+        }
+        return 1;
       }
-      return 1;
     } else {
       # Otherwise, we just need to match the number of args.
       return scalar( @{ $c->req->args } ) == $self->normalized_arg_number;
