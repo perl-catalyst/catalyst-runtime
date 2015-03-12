@@ -99,10 +99,9 @@ has args_constraints => (
     ) {
       return \@args;
     } else {
-      # Allows Args(Int,Str) and Args(Str,2,Int) == Args(Str,Any,Any,Int)
       @args =
         map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } 
-        map { looks_like_number($_) ? ('Any' x $_) : $_ } @arg_protos;
+        @arg_protos;
     }
 
     return \@args;

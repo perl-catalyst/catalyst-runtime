@@ -43,6 +43,11 @@ use Catalyst::Test 'MyApp';
 }
 
 {
+  my $res = request '/an_int/aa';
+  is $res->content, 'default';
+}
+
+{
   my $res = request '/many_ints/1';
   is $res->content, 'many_ints';
 }
@@ -59,11 +64,6 @@ use Catalyst::Test 'MyApp';
 
 {
   my $res = request '/many_ints/1/2/a';
-  is $res->content, 'default';
-}
-
-{
-  my $res = request '/an_int/aa';
   is $res->content, 'default';
 }
 
