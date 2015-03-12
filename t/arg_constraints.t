@@ -22,8 +22,8 @@ use HTTP::Request::Common;
     $c->res->body('many_ints');
   }
 
-  sub int_priority :Path('priority_test') Args(Int) { $_[1]->res->body('int_priority') }
   sub any_priority :Path('priority_test') Args(1) { $_[1]->res->body('any_priority') }
+  sub int_priority :Path('priority_test') Args(Int) { $_[1]->res->body('int_priority') }
 
   sub default :Default {
     my ($self, $c, $int) = @_;
