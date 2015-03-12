@@ -22,6 +22,9 @@ use HTTP::Request::Common;
     $c->res->body('many_ints');
   }
 
+  sub int_priority :Path('priority_test') Args(Int) { $_[1]->res->body('int_priority') }
+  sub any_priority :Path('priority_test') Args(1) { $_[1]->res->body('any_priority') }
+
   sub default :Default {
     my ($self, $c, $int) = @_;
     $c->res->body('default');
@@ -32,6 +35,7 @@ use HTTP::Request::Common;
   package MyApp;
   use Catalyst;
 
+  #MyApp->config(show_internal_actions => 1);
   MyApp->setup;
 }
 
@@ -65,6 +69,15 @@ use Catalyst::Test 'MyApp';
 {
   my $res = request '/many_ints/1/2/a';
   is $res->content, 'default';
+}
+
+{
+  my $res = request '/priority_test/1';
+  is $res->content, 'int_priority';
+}
+{
+  my $res = request '/priority_test/a';
+  is $res->content, 'any_priority';
 }
 
 done_testing;

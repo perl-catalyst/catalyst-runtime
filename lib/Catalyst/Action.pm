@@ -134,6 +134,7 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
+    $c->log->debug($self->reverse);
 
     # If infinite args, we always match
     return 1 if $self->normalized_arg_number == ~0;
@@ -149,7 +150,7 @@ sub match {
       ) {
         return $self->args_constraints->[0]->check($c->req->args);
       } else {
-        for my $i($#{ $c->req->args }) {
+        for my $i(0..$#{ $c->req->args }) {
           $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
         }
         return 1;
