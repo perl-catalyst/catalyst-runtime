@@ -44,3 +44,4 @@ use Catalyst::Test 'MyApp';
 }
 
 done_testing;
+

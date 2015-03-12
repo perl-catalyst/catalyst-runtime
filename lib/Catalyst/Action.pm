@@ -39,8 +39,32 @@ has private_path => (
   default => sub { '/'.shift->reverse },
 );
 
+has number_of_args => (
+  is=>'ro',
+  init_arg=>undef,
+  isa=>'Int|Undef',
+  required=>1,
+  lazy=>1,
+  builder=>'_build_number_of_args');
+
+  sub _build_number_of_args {
+    my $self = shift;
+    return 0 unless exists $self->attributes->{Args};
+    if(!defined($self->attributes->{Args}[0])) {
+      # When its 'Args' that internal cue for 'unlimited'
+      return undef;
+    } elsif(looks_like_number($self->attributes->{Args}[0])) {
+      # 'old school' numberd args (is allowed to be undef as well)
+      return $self->attributes->{Args}[0];
+    } else {
+      # new hotness named arg constraints
+      return $self->number_of_args_constraints;
+    }
+  }
+
 has args_constraints => (
   is=>'ro',
+  init_arg=>undef,
   traits=>['Array'],
   isa=>'ArrayRef',
   required=>1,
@@ -48,8 +72,7 @@ has args_constraints => (
   builder=>'_build_args_constraints',
   handles => {
     has_args_constraints => 'count',
-    number_of_args => 'count',
-    all_args_constraints => 'elements',
+    number_of_args_constraints => 'count',
   });
 
   sub _build_args_constraints {
@@ -65,7 +88,7 @@ has args_constraints => (
       scalar(@arg_protos) == 1 &&
       looks_like_number($arg_protos[0])
     ) {
-      return [];
+      return \@args;
     } else {
       @args = map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } @arg_protos;
     }
@@ -86,8 +109,6 @@ use overload (
 
 );
 
-
-
 no warnings 'recursion';
 
 sub dispatch {    # Execute ourselves against a context
@@ -102,18 +123,20 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
-    warn "number args = ${\$self->number_of_args} for ${\$self->name}";
-    return 1 unless $self->number_of_args;
-    #my $args = $self->attributes->{Args}[0];
-    #return 1 unless defined($args) && length($args); The "Args" slurpy case, remove for now.
-    if( scalar( @{ $c->req->args } ) == $self->number_of_args ) {
-      return 1 unless $self->has_args_constraints;
+    #would it be unreasonable to store the number of arguments
+    #the action has as its own attribute?
+    #it would basically eliminate the code below.  ehhh. small fish
+    return 1 unless exists $self->attributes->{Args};
+    my $args = $self->attributes->{Args}[0];
+    return 1 unless defined($args) && length($args);
+
+    if($self->has_args_constraints) {
       for my $i($#{ $c->req->args }) {
         $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
       }
       return 1;
     } else {
-      return 0;
+      return scalar( @{ $c->req->args } ) == $args;
     }
 }
 
@@ -121,8 +144,19 @@ sub match_captures { 1 }
 
 sub compare {
     my ($a1, $a2) = @_;
-    my ($a1_args) = $a1->number_of_args;
-    my ($a2_args) = $a2->number_of_args;
+
+    # Wen there is no declared Args for Local and Path (and Default??) we
+    # say that means any number of args...  If Args exists however we use
+    # the number of args as determined by inspecting the value of it.
+
+    my $a1_args = exists($a1->attributes->{Args}) ? $a1->number_of_args : ~0;
+    my $a2_args = exists($a2->attributes->{Args}) ? $a2->number_of_args : ~0;
+
+    # If we did have an Args but it was undefined value (:Args() or :Args), that
+    # is the cue for 'as many args as you like also...
+    # 
+    $_ = defined($_) ? $_ : ~0
+        for $a1_args, $a2_args;
 
     return $a1_args <=> $a2_args;
 }
@@ -245,3 +279,5 @@ This library is free software. You can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+
+
