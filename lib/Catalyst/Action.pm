@@ -100,12 +100,18 @@ has args_constraints => (
       return \@args;
     } else {
       @args =
-        map { Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) || die "$_ is not a constraint!" } 
+        map {  $self->resolve_type_constraint($_) || die "$_ is not a constraint!" }
         @arg_protos;
     }
 
     return \@args;
   }
+
+sub resolve_type_constraint {
+  my ($self, $name) = @_;
+  my $tc = eval "package ${\$self->class}; $name" || undef;
+  return $tc || Moose::Util::TypeConstraints::find_or_parse_type_constraint($name);
+}
 
 use overload (
 

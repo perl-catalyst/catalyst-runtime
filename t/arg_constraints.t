@@ -1,7 +1,12 @@
 use warnings;
 use strict;
-use Test::More;
-use HTTP::Request::Common;
+
+BEGIN {
+  use Test::More;
+  eval "use Types::Standard; 1;" || do {
+    plan skip_all => "Trouble loading Types::Standard => $@";
+  };
+}
 
 {
   package MyApp::Controller::Root;
@@ -9,6 +14,7 @@ use HTTP::Request::Common;
 
   use Moose;
   use MooseX::MethodAttributes;
+  use Types::Standard qw/Tuple Int Str/;
 
   extends 'Catalyst::Controller';
 
@@ -22,7 +28,14 @@ use HTTP::Request::Common;
     $c->res->body('many_ints');
   }
 
+  sub tuple :Local Args(Tuple[Str,Int]) {
+    my ($self, $c, $int) = @_;
+    $c->res->body('tuple');
+  }
+
+
   sub any_priority :Path('priority_test') Args(1) { $_[1]->res->body('any_priority') }
+
   sub int_priority :Path('priority_test') Args(Int) { $_[1]->res->body('int_priority') }
 
   sub default :Default {
@@ -75,9 +88,20 @@ use Catalyst::Test 'MyApp';
   my $res = request '/priority_test/1';
   is $res->content, 'int_priority';
 }
+
 {
   my $res = request '/priority_test/a';
   is $res->content, 'any_priority';
+}
+
+{
+  my $res = request '/tuple/aaa/111';
+  is $res->content, 'tuple';
+}
+
+{
+  my $res = request '/tuple/aaa/aaa';
+  is $res->content, 'default';
 }
 
 done_testing;
