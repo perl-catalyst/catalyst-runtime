@@ -33,7 +33,7 @@ use Plack::Test;
 
   $SIG{__WARN__} = sub {
     my $error = shift;
-    Test::More::like($error, qr[You called ->params with an undefined value at t.undef-params.t])
+    Test::More::like($error, qr[You called ->params with an undefined value])
       unless MyApp->debug;
   };
 

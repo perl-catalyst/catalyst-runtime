@@ -59,7 +59,7 @@ has number_of_args => (
       scalar(@{$self->attributes->{Args}}) == 1 &&
       looks_like_number($self->attributes->{Args}[0])
     ) {
-      # 'Old school' numberd args (is allowed to be undef as well)
+      # 'Old school' numbered args (is allowed to be undef as well)
       return $self->attributes->{Args}[0];
     } else {
       # New hotness named arg constraints
@@ -151,14 +151,18 @@ sub match {
       # That means we expect a reference, so use the full args arrayref.
       if(
         $self->number_of_args_constraints == 1 &&
-        ($self->args_constraints->[0]->is_a_type_of('Ref') || $self->args_constraints->[0]->is_a_type_of('ClassName'))
+        (
+          $self->args_constraints->[0]->is_a_type_of('Ref') ||
+          $self->args_constraints->[0]->is_a_type_of('ClassName')
+        )
       ) {
         return 1 if $self->args_constraints->[0]->check($c->req->args);
-        if($self->args_constraints->[0]->coercion && $self->attributes->{Coerce}) {
-          my $coerced = $self->args_constraints->[0]->coerce($c) || return 0;
-          $c->req->args([$coerced]);
-          return 1;
-        }
+        # Removing coercion stuff for the first go
+        #if($self->args_constraints->[0]->coercion && $self->attributes->{Coerce}) {
+        #  my $coerced = $self->args_constraints->[0]->coerce($c) || return 0;
+        #  $c->req->args([$coerced]);
+        #  return 1;
+        #}
       } else {
         for my $i(0..$#{ $c->req->args }) {
           $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;

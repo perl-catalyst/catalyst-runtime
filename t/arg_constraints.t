@@ -28,6 +28,7 @@ BEGIN {
    as Int,
    where { $_ < 5 };
 
+  # Tests using this are skipped pending deeper thought
   coerce User,
    from ContextLike,
      via { $_->model('User')->find( $_->req->args->[0] ) };
@@ -67,6 +68,7 @@ BEGIN {
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
 
+  # Tests using this are current skipped pending coercion rethink
   sub user_object :Local Args(User) Coerce(1) {
     my ($self, $c, $user) = @_;
     $c->res->body("name: $user->{name}, age: $user->{age}");
@@ -180,12 +182,15 @@ use Catalyst::Test 'MyApp';
   is $res->content, 'default';
 }
 
-{
+
+SKIP: {
+  skip "coercion support needs more thought", 1;
   my $res = request '/user_object/20';
   is $res->content, 'default';
 }
 
-{
+SKIP: {
+  skip "coercion support needs more thought", 1;
   my $res = request '/user_object/2';
   is $res->content, 'name: mary, age: 36';
 }
