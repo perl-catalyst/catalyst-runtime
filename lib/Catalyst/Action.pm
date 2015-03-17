@@ -140,14 +140,13 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
-    $c->log->debug($self->reverse);
 
     # If infinite args, we always match
     return 1 if $self->normalized_arg_number == ~0;
 
     # There there are arg constraints, we must see to it that the constraints
     # check positive for each arg in the list.
-    if(0 && $self->has_args_constraints) {
+    if($self->has_args_constraints) {
       # If there is only one type constraint, and its a Ref or subtype of Ref,
       # That means we expect a reference, so use the full args arrayref.
       if(

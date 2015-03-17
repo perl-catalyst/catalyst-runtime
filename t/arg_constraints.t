@@ -84,7 +84,6 @@ BEGIN {
 
   sub tuple :Local Args(Tuple[Str,Int]) {
     my ($self, $c, $str, $int) = @_;
-    warn "$str $int";
     $c->res->body('tuple');
   }
 
