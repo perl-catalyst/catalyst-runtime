@@ -147,14 +147,19 @@ sub match {
 
     # There there are arg constraints, we must see to it that the constraints
     # check positive for each arg in the list.
-    if($self->has_args_constraints) {
+    if(0 && $self->has_args_constraints) {
       # If there is only one type constraint, and its a Ref or subtype of Ref,
       # That means we expect a reference, so use the full args arrayref.
       if(
         $self->number_of_args_constraints == 1 &&
-        $self->args_constraints->[0]->is_a_type_of('Ref')
+        ($self->args_constraints->[0]->is_a_type_of('Ref') || $self->args_constraints->[0]->is_a_type_of('ClassName'))
       ) {
-        return $self->args_constraints->[0]->check($c->req->args);
+        return 1 if $self->args_constraints->[0]->check($c->req->args);
+        if($self->args_constraints->[0]->coercion && $self->attributes->{Coerce}) {
+          my $coerced = $self->args_constraints->[0]->coerce($c) || return 0;
+          $c->req->args([$coerced]);
+          return 1;
+        }
       } else {
         for my $i(0..$#{ $c->req->args }) {
           $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
@@ -239,6 +244,9 @@ of the captures for this action.
 Returning true from this method causes the chain match to continue, returning
 makes the chain not match (and alternate, less preferred chains will be attempted).
 
+=head2 resolve_type_constraint
+
+Trys to find a type constraint if you have on on a type constrained method.
 
 =head2 compare
 
