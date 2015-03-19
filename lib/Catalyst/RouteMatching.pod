@@ -31,11 +31,13 @@ is a simple example:
 
 In this case the incoming request "http://localhost:/user/100" would match the action
 C<find> but "http://localhost:/user/not_a_number" would not. You may find declaring
-constraints in this manner aids with debuggin, automatic generation of documentation
-and reduces the amount of manual checking you might need to do in your actions.  For
-example if the argument in the example action was going to be used to lookup a row
-in a database, if the matching field expected an integer a string might cause a database
+constraints in this manner aids with debugging, automatic generation of documentation
+and reducing the amount of manual checking you might need to do in your actions.  For
+example if the argument in the given action was going to be used to lookup a row
+in a database, if the matching field expected an integer, a string might cause a database
 exception, prompting you to add additional checking of the argument prior to using it.
+In general it is hoped this feature can lead to reduced validation boilerplate and more
+easily understood and declarative actions.
 
 More than one argument may be added by comma separating your type constraint names, for
 example:
@@ -50,7 +52,7 @@ Would require three arguments, an integer, integer and a string.
 
 By default L<Catalyst> allows all the standard, built-in, named type constraints that come
 bundled with L<Moose>.  However it is trivial to create your own Type constraint libraries
-and export them to controller that wish to use them.  We recommend using L<Type::Tiny> or
+and export them to a controller that wishes to use them.  We recommend using L<Type::Tiny> or
 L<MooseX::Types> for this.  Here is an example using some extended type constraints via
 the L<Types::Standard> library that is packaged with L<Type::Tiny>:
 
@@ -98,13 +100,15 @@ action NEVER gets hit.  You would need to reverse the order:
     sub an_int :Path(user) Args(Int) {
     }
 
-Now requests that match this path would first hit the 'an_int' action, and then the 'an_any'
-action, which it likely what you are looking for!
+Now requests that match this path would first hit the 'an_int' action and will check to see if
+the argument is an integer.  If it is, then the action will execute, otherwise it will pass and
+the dispatcher will check the next matching action (in this case we fall thru to the 'an_any'
+action).
 
 =head3 Type Constraints and Chained Actions
 
 Using type constraints in Chained actions works the same as it does for Path and Local or Global
-actions.  The only difference is that you maybe declare type constraints on CaptureArgs as
+actions.  The only difference is that you may declare type constraints on CaptureArgs as
 well as Args.  For Example:
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
