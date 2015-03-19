@@ -786,7 +786,29 @@ Like L</Regex> but scoped under the namespace of the containing controller
 
 =head2 CaptureArgs
 
-Please see L<Catalyst::DispatchType::Chained>
+Allowed values for CaptureArgs is a single integer (CaptureArgs(2), meaning two
+allowed) or you can declare a L<Moose>, L<MooseX::Types> or L<Type::Tiny>
+named constraint such as CaptureArgs(Int,Str) would require two args with
+the first being a Integer and the second a string.  You may declare your own
+custom type constraints and import them into the controller namespace:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use MyApp::Types qw/Int/;
+
+    extends 'Catalyst::Controller';
+
+    sub chain_base :Chained(/) CaptureArgs(1) { }
+
+      sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) { }
+
+      sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { }
+
+See L<Catalyst::RouteMatching> for more.
+
+Please see L<Catalyst::DispatchType::Chained> for more.
 
 =head2 ActionClass
 
@@ -835,6 +857,38 @@ L<Catalyst::ActionRole::HTTPMethods>).
 When used with L</Path> indicates the number of arguments expected in
 the path.  However if no Args value is set, assumed to 'slurp' all
 remaining path pars under this namespace.
+
+Allowed values for Args is a single integer (Args(2), meaning two allowed) or you
+can declare a L<Moose>, L<MooseX::Types> or L<Type::Tiny> named constraint such
+as Args(Int,Str) would require two args with the first being a Integer and the
+second a string.  You may declare your own custom type constraints and import
+them into the controller namespace:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use MyApp::Types qw/Tuple Int Str StrMatch UserId/;
+
+    extends 'Catalyst::Controller';
+
+    sub user :Local Args(UserId) {
+      my ($self, $c, $int) = @_;
+    }
+
+    sub an_int :Local Args(Int) {
+      my ($self, $c, $int) = @_;
+    }
+
+    sub many_ints :Local Args(ArrayRef[Int]) {
+      my ($self, $c, @ints) = @_;
+    }
+
+    sub match :Local Args(StrMatch[qr{\d\d-\d\d-\d\d}]) {
+      my ($self, $c, $int) = @_;
+    }
+
+See L<Catalyst::RouteMatching> for more.
 
 =head2 Consumes('...')
 

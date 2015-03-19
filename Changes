@@ -1,6 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90089_001 - TBA
+  - New Feature: Type Constraints on Args/CapturArgs.  ALlows you to declare
+    a Moose, MooseX::Types or Type::Tiny named constraint on your Arg or 
+    CaptureArg.
+  - New top level document on Route matching. (Catalyst::RouteMatching).
 
 5.90084 - 2015-02-23
   - Small change to the way body parameters are created in order to prevent
@@ -36,7 +40,6 @@
     test case to prevent regressions.
 
 5.90080 - 2015-01-09
->>>>>>> master
   - Minor documentation corrections
   - Make the '79 development series stable
 

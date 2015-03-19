@@ -104,6 +104,12 @@ BEGIN {
 
     sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { $_[1]->res->body('int_priority_chain') }
 
+    sub link_any :Chained(chain_base) PathPart('') CaptureArgs(1) { }
+
+      sub any_priority_link_any :Chained(link_any) PathPart('') Args(1) { $_[1]->res->body('any_priority_link_any') }
+
+      sub int_priority_link_any :Chained(link_any) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link_any') }
+    
     sub link_int :Chained(chain_base) PathPart('') CaptureArgs(Int) { }
 
       sub any_priority_link :Chained(link_int) PathPart('') Args(1) { $_[1]->res->body('any_priority_link') }
@@ -227,6 +233,16 @@ SKIP: {
 {
   my $res = request '/chain_base/capture/100';
   is $res->content, 'int_priority_chain', 'got expected';
+}
+
+{
+  my $res = request '/chain_base/cap1/a/arg';
+  is $res->content, 'any_priority_link_any';
+}
+
+{
+  my $res = request '/chain_base/cap1/a/102';
+  is $res->content, 'int_priority_link_any';
 }
 
 done_testing;

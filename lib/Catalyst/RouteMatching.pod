@@ -1,0 +1,173 @@
+=encoding UTF-8
+
+=head1 Name
+
+Catalyst::RouteMatching - How Catalyst maps an incoming URL to actions in controllers.
+
+=head1 Description
+
+This is a WIP document intended to help people understand the logic that L<Catalyst>
+uses to determine how to match in incoming request to an action (or action chain)
+in a controller.
+
+=head2 Type Constraints in Args and Capture Args
+
+Beginning in Version 5.90090+ you may use L<Moose>, L<MooseX::Types> or L<Type::Tiny>
+type constraints to futher declare allowed matching for Args or CaptureArgs.  Here
+is a simple example:
+
+    package MyApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub find :Path('') Args(Int) {
+      my ($self, $c, $int) = @_;
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+In this case the incoming request "http://localhost:/user/100" would match the action
+C<find> but "http://localhost:/user/not_a_number" would not. You may find declaring
+constraints in this manner aids with debuggin, automatic generation of documentation
+and reduces the amount of manual checking you might need to do in your actions.  For
+example if the argument in the example action was going to be used to lookup a row
+in a database, if the matching field expected an integer a string might cause a database
+exception, prompting you to add additional checking of the argument prior to using it.
+
+More than one argument may be added by comma separating your type constraint names, for
+example:
+
+    sub find :Path('') Args(Int,Int,Str) {
+      my ($self, $c, $int1, $int2, $str) = @_;
+    }
+
+Would require three arguments, an integer, integer and a string.
+
+=head3 Using type constraints in a controller
+
+By default L<Catalyst> allows all the standard, built-in, named type constraints that come
+bundled with L<Moose>.  However it is trivial to create your own Type constraint libraries
+and export them to controller that wish to use them.  We recommend using L<Type::Tiny> or
+L<MooseX::Types> for this.  Here is an example using some extended type constraints via
+the L<Types::Standard> library that is packaged with L<Type::Tiny>:
+
+    package MyApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use Types::Standard qw/StrMatch/;
+    
+    extends 'Catalyst::Controller';
+
+    sub looks_like_a_date :Path('') Args(StrMatch[qr{\d\d-\d\d-\d\d}]) {
+      my ($self, $c, $int) = @_;
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+This would match URLs like "http://localhost/user/11-11-2015" for example.  If you've been
+missing the old RegExp matching, this can emulate a good chunk of that ability, and more.
+
+A tutorial on how to make custom type libraries is outside the scope of this document.  I'd
+recommend looking at the copious documentation in L<Type::Tiny> or in L<MooseX::Types> if
+you prefer that system.  The author recommends L<Type::Tiny> if you are unsure which to use.
+
+=head3 Match order when more than one Action matches a path.
+
+As previously described, L<Catalyst> will match 'the longest path', which generally means
+that named path / path_parts will take precidence over Args or CaptureArgs.  However, what
+will happen if two actions match the same path with equal args?  For example:
+
+    sub an_int :Path(user) Args(Int) {
+    }
+
+    sub an_any :Path(user) Args(1) {
+    }
+
+In this case L<Catalyst> will check actions starting from the LAST one defined.  Generally
+this means you should put your most specific action rules LAST and your 'catch-alls' first.
+In the above example, since Args(1) will match any argument, you will find that that 'an_int'
+action NEVER gets hit.  You would need to reverse the order:
+
+    sub an_any :Path(user) Args(1) {
+    }
+
+    sub an_int :Path(user) Args(Int) {
+    }
+
+Now requests that match this path would first hit the 'an_int' action, and then the 'an_any'
+action, which it likely what you are looking for!
+
+=head3 Type Constraints and Chained Actions
+
+Using type constraints in Chained actions works the same as it does for Path and Local or Global
+actions.  The only difference is that you maybe declare type constraints on CaptureArgs as
+well as Args.  For Example:
+
+  sub chain_base :Chained(/) CaptureArgs(1) { }
+
+    sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) {  }
+
+    sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) {  }
+
+    sub link_any :Chained(chain_base) PathPart('') CaptureArgs(1) { }
+
+      sub any_priority_link_any :Chained(link_any) PathPart('') Args(1) {  }
+
+      sub int_priority_link_any :Chained(link_any) PathPart('') Args(Int) { }
+    
+    sub link_int :Chained(chain_base) PathPart('') CaptureArgs(Int) { }
+
+      sub any_priority_link :Chained(link_int) PathPart('') Args(1) { }
+
+      sub int_priority_link :Chained(link_int) PathPart('') Args(Int) { }
+
+These chained actions migth create match tables like the following:
+
+    [debug] Loaded Chained actions:
+    .----------------------------------------------+----------------------------------------------.
+    | Path Spec                                    | Private                                      |
+    +----------------------------------------------+----------------------------------------------+
+    | /chain_base/*/*                              | /chain_base (1)                              |
+    |                                              | => /any_priority_chain                       |
+    | /chain_base/*/*/*                            | /chain_base (1)                              |
+    |                                              | -> /link_int (1)                             |
+    |                                              | => /any_priority_link                        |
+    | /chain_base/*/*/*                            | /chain_base (1)                              |
+    |                                              | -> /link_any (1)                             |
+    |                                              | => /any_priority_link_any                    |
+    | /chain_base/*/*                              | /chain_base (1)                              |
+    |                                              | => /int_priority_chain                       |
+    | /chain_base/*/*/*                            | /chain_base (1)                              |
+    |                                              | -> /link_int (1)                             |
+    |                                              | => /int_priority_link                        |
+    | /chain_base/*/*/*                            | /chain_base (1)                              |
+    |                                              | -> /link_any (1)                             |
+    |                                              | => /int_priority_link_any                    |
+    '----------------------------------------------+----------------------------------------------'
+
+As you can see the same general path could be matched by various action chains.  In this case
+the rule described in the previous section should be followed, which is that L<Catalyst>
+will start with the last defined action and work upward.  For example the action C<int_priority_chain>
+would be checked before C<any_priority_chain>.  The same applies for actions that are midway links
+in a longer chain.  In this case C<link_int> would be checked before C<link_any>.  So as always we
+recommend that you place you priority or most constrainted actions last and you least or catch-all
+actions first.
+
+Although this reverse order checking may seen counter intuitive it does have the added benefit that
+when inheriting controllers any new actions added would take check precedence over those in your
+parent controller or consumed role.
+
+=head1 Conclusion
+
+    TBD
+
+=head1 Author
+
+John Napiorkowski L<jjnapiork@cpan.org|email:jjnapiork@cpan.org>
+
+=cut
+

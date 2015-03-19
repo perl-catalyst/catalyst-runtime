@@ -675,6 +675,28 @@ An action that is part of a chain (that is, one that has a C<:Chained>
 attribute) but has no C<:CaptureArgs> attribute is treated by Catalyst
 as a chain end.
 
+Allowed values for CaptureArgs is a single integer (CaptureArgs(2), meaning two
+allowed) or you can declare a L<Moose>, L<MooseX::Types> or L<Type::Tiny>
+named constraint such as CaptureArgs(Int,Str) would require two args with
+the first being a Integer and the second a string.  You may declare your own
+custom type constraints and import them into the controller namespace:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use MyApp::Types qw/Int/;
+
+    extends 'Catalyst::Controller';
+
+    sub chain_base :Chained(/) CaptureArgs(1) { }
+
+      sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) { }
+
+      sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { }
+
+See L<Catalyst::RouteMatching> for more.
+
 =item Args
 
 By default, endpoints receive the rest of the arguments in the path. You
