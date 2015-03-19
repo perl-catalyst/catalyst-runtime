@@ -236,7 +236,7 @@ sub recurse_match {
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
             if (my $capture_attr = $action->attributes->{CaptureArgs}) {
-                my $capture_count = $capture_attr->[0] || 0;
+                my $capture_count = $action->number_of_captures|| 0;
 
                 # Short-circuit if not enough remaining parts
                 next TRY_ACTION unless @parts >= $capture_count;
@@ -248,7 +248,7 @@ sub recurse_match {
                 push(@captures, splice(@parts, 0, $capture_count));
 
                 # check if the action may fit, depending on a given test by the app
-                if ($action->can('match_captures')) { next TRY_ACTION unless $action->match_captures($c, \@captures) }
+                next TRY_ACTION unless $action->match_captures($c, \@captures);
 
                 # try the remaining parts against children of this action
                 my ($actions, $captures, $action_parts, $n_pathparts) = $self->recurse_match(
@@ -309,32 +309,6 @@ Calls register_path for every Path attribute for the given $action.
 
 =cut
 
-sub _check_args_attr {
-    my ( $self, $action, $name ) = @_;
-
-    return unless exists $action->attributes->{$name};
-
-    if (@{$action->attributes->{$name}} > 1) {
-        Catalyst::Exception->throw(
-          "Multiple $name attributes not supported registering " . $action->reverse()
-        );
-    }
-    my $args = $action->attributes->{$name}->[0];
-    if (defined($args) and not (
-        Scalar::Util::looks_like_number($args) and
-        int($args) == $args and $args >= 0
-    )) {
-        require Data::Dumper;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 0;
-        $args = Data::Dumper::Dumper($args);
-        Catalyst::Exception->throw(
-          "Invalid $name($args) for action " . $action->reverse() .
-          " (use '$name' or '$name(<number>)')"
-        );
-    }
-}
-
 sub register {
     my ( $self, $c, $action ) = @_;
 
@@ -381,10 +355,6 @@ sub register {
     unshift(@{ $children->{$encoded_part} ||= [] }, $action);
 
     $self->_actions->{'/'.$action->reverse} = $action;
-
-    foreach my $name (qw(Args CaptureArgs)) {
-        $self->_check_args_attr($action, $name);
-    }
 
     if (exists $action->attributes->{Args} and exists $action->attributes->{CaptureArgs}) {
         Catalyst::Exception->throw(

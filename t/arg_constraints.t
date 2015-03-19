@@ -93,9 +93,23 @@ BEGIN {
     my ($self, $c, $int) = @_;
     $c->res->body('match');
   }
+
   sub any_priority :Path('priority_test') Args(1) { $_[1]->res->body('any_priority') }
 
   sub int_priority :Path('priority_test') Args(Int) { $_[1]->res->body('int_priority') }
+
+  sub chain_base :Chained(/) CaptureArgs(1) { }
+
+    sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('any_priority_chain') }
+
+    sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { $_[1]->res->body('int_priority_chain') }
+
+    sub link_int :Chained(chain_base) PathPart('') CaptureArgs(Int) { }
+
+      sub any_priority_link :Chained(link_int) PathPart('') Args(1) { $_[1]->res->body('any_priority_link') }
+
+      sub int_priority_link :Chained(link_int) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link') }
+
 
   sub default :Default {
     my ($self, $c, $int) = @_;
@@ -193,6 +207,26 @@ SKIP: {
   skip "coercion support needs more thought", 1;
   my $res = request '/user_object/2';
   is $res->content, 'name: mary, age: 36';
+}
+
+{
+  my $res = request '/chain_base/capture/arg';
+  is $res->content, 'any_priority_chain';
+}
+
+{
+  my $res = request '/chain_base/cap1/100/arg';
+  is $res->content, 'any_priority_link';
+}
+
+{
+  my $res = request '/chain_base/cap1/101/102';
+  is $res->content, 'int_priority_link';
+}
+
+{
+  my $res = request '/chain_base/capture/100';
+  is $res->content, 'int_priority_chain', 'got expected';
 }
 
 done_testing;

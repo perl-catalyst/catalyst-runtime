@@ -107,11 +107,76 @@ has args_constraints => (
     return \@args;
   }
 
+has captures_constraints => (
+  is=>'ro',
+  init_arg=>undef,
+  traits=>['Array'],
+  isa=>'ArrayRef',
+  required=>1,
+  lazy=>1,
+  builder=>'_build_captures_constraints',
+  handles => {
+    has_captures_constraints => 'count',
+    number_of_captures_constraints => 'count',
+  });
+
+  sub _build_captures_constraints {
+    my $self = shift;
+    my @arg_protos = @{$self->attributes->{CaptureArgs}||[]};
+
+    return [] unless scalar(@arg_protos);
+    # If there is only one arg and it looks like a number
+    # we assume its 'classic' and the number is the number of
+    # constraints.
+    my @args = ();
+    if(
+      scalar(@arg_protos) == 1 &&
+      looks_like_number($arg_protos[0])
+    ) {
+      return \@args;
+    } else {
+      @args =
+        map {  $self->resolve_type_constraint($_) || die "$_ is not a constraint!" }
+        @arg_protos;
+    }
+
+    return \@args;
+  }
+
 sub resolve_type_constraint {
   my ($self, $name) = @_;
   my $tc = eval "package ${\$self->class}; $name" || undef;
   return $tc || Moose::Util::TypeConstraints::find_or_parse_type_constraint($name);
 }
+
+has number_of_captures => (
+  is=>'ro',
+  init_arg=>undef,
+  isa=>'Int',
+  required=>1,
+  lazy=>1,
+  builder=>'_build_number_of_captures');
+
+  sub _build_number_of_captures {
+    my $self = shift;
+    if( ! exists $self->attributes->{CaptureArgs} ) {
+      # If there are no defined capture args, thats considered 0.
+      return 0;
+    } elsif(!defined($self->attributes->{CaptureArgs}[0])) {
+      # If you fail to give a defined value, that's also 0
+      return 0;
+    } elsif(
+      scalar(@{$self->attributes->{CaptureArgs}}) == 1 &&
+      looks_like_number($self->attributes->{CaptureArgs}[0])
+    ) {
+      # 'Old school' numbered captures
+      return $self->attributes->{CaptureArgs}[0];
+    } else {
+      # New hotness named arg constraints
+      return $self->number_of_captures_constraints;
+    }
+  }
+
 
 use overload (
 
@@ -164,6 +229,10 @@ sub match {
         #  return 1;
         #}
       } else {
+        # Because of the way chaining works, we can expect args that are totally not
+        # what you'd expect length wise.  When they don't match length, thats a fail
+        return 0 unless scalar( @{ $c->req->args } ) == $self->normalized_arg_number;
+
         for my $i(0..$#{ $c->req->args }) {
           $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
         }
@@ -175,18 +244,36 @@ sub match {
     }
 }
 
-sub match_captures { 1 }
+sub match_captures {
+  my ($self, $c, $captures) = @_;
+  my @captures = @{$captures||[]};
+
+  return 1 unless scalar(@captures); # If none, just say its ok
+
+  if($self->has_captures_constraints) {
+    if(
+      $self->number_of_captures_constraints == 1 &&
+      (
+        $self->captures_constraints->[0]->is_a_type_of('Ref') ||
+        $self->captures_constraints->[0]->is_a_type_of('ClassName')
+      )
+    ) {
+      return 1 if $self->captures_constraints->[0]->check($c->req->args);
+    } else {
+      for my $i(0..$#captures) {
+        $self->captures_constraints->[$i]->check($captures[$i]) || return 0;
+      }
+      return 1;
+      }
+  } else {
+    return 1;
+  }
+  return 1;
+}
 
 sub compare {
     my ($a1, $a2) = @_;
     return $a1->normalized_arg_number <=> $a2->normalized_arg_number;
-}
-
-sub number_of_captures {
-    my ( $self ) = @_;
-
-    return 0 unless exists $self->attributes->{CaptureArgs};
-    return $self->attributes->{CaptureArgs}[0] || 0;
 }
 
 sub scheme {
@@ -196,7 +283,7 @@ sub scheme {
 sub list_extra_info {
   my $self = shift;
   return {
-    Args => $self->attributes->{Args}[0],
+    Args => $self->normalized_arg_number,
     CaptureArgs => $self->number_of_captures,
   }
 } 

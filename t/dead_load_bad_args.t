@@ -4,6 +4,13 @@ use lib 't/lib';
 
 use Test::More;
 
+# This test needs to be rewritten (and the code it was using as well) since
+# when we added the arg and capturearg type constraint support, we now allow
+# non integer values.  however we could probably support some additional sanity
+# testing on the values, so this is a nice TODO for someone -jnap
+
+plan skip_all => 'Removing this test because constraint arg types allow this';
+
 use Catalyst::Test 'TestApp';
 
 for my $fail (
