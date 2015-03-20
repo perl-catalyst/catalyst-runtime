@@ -71,6 +71,37 @@ sub normalized_arg_number {
   return defined($_[0]->number_of_args) ? $_[0]->number_of_args : ~0;
 }
 
+has number_of_args_constraints => (
+  is=>'ro',
+  isa=>'Int|Undef',
+  init_arg=>undef,
+  required=>1,
+  lazy=>1,
+  builder=>'_build_number_of_args_constraints');
+
+  sub _build_number_of_args_constraints {
+    my $self = shift;
+    return unless $self->has_args_constraints;
+
+    my $total = 0;
+    foreach my $tc( @{$self->args_constraints}) {
+      if($tc->is_a_type_of('Ref')) {
+        if($tc->can('parameters') && $tc->has_parameters) {
+          my $total_params = scalar(@{ $tc->parameters||[] });
+          $total = $total + $total_params;
+        } else {
+          # Its a Reftype but we don't know the number of params it
+          # actually validates.
+          return undef;
+        }
+      } else {
+        $total++;
+      }
+    }
+
+    return $total;
+  }
+
 has args_constraints => (
   is=>'ro',
   init_arg=>undef,
@@ -81,7 +112,7 @@ has args_constraints => (
   builder=>'_build_args_constraints',
   handles => {
     has_args_constraints => 'count',
-    number_of_args_constraints => 'count',
+    args_constraint_count => 'count',
   });
 
   sub _build_args_constraints {
@@ -100,11 +131,42 @@ has args_constraints => (
       return \@args;
     } else {
       @args =
-        map {  $self->resolve_type_constraint($_) || die "$_ is not a constraint!" }
+        map {  my @tc = $self->resolve_type_constraint($_); scalar(@tc) ? @tc : die "$_ is not a constraint!" }
         @arg_protos;
     }
-
     return \@args;
+  }
+
+has number_of_captures_constraints => (
+  is=>'ro',
+  isa=>'Int|Undef',
+  init_arg=>undef,
+  required=>1,
+  lazy=>1,
+  builder=>'_build_number_of_capture_constraints');
+
+  sub _build_number_of_capture_constraints {
+    my $self = shift;
+    return unless $self->has_captures_constraints;
+
+    my $total = 0;
+    foreach my $tc( @{$self->captures_constraints}) {
+      if($tc->is_a_type_of('Ref')) {
+        if($tc->can('parameters') && $tc->has_parameters) {
+          my $total_params = scalar(@{ $tc->parameters||[] });
+          $total = $total + $total_params;
+        } else {
+          # Its a Reftype but we don't know the number of params it
+          # actually validates.  This is not currently permitted in
+          # a capture...
+          die "You cannot use CaptureArgs($tc) in ${\$self->reverse} because we cannot determined the number of its parameters";
+        }
+      } else {
+        $total++;
+      }
+    }
+
+    return $total;
   }
 
 has captures_constraints => (
@@ -117,7 +179,7 @@ has captures_constraints => (
   builder=>'_build_captures_constraints',
   handles => {
     has_captures_constraints => 'count',
-    number_of_captures_constraints => 'count',
+    captures_constraints_count => 'count',
   });
 
   sub _build_captures_constraints {
@@ -136,7 +198,7 @@ has captures_constraints => (
       return \@args;
     } else {
       @args =
-        map {  $self->resolve_type_constraint($_) || die "$_ is not a constraint!" }
+        map {  my @tc = $self->resolve_type_constraint($_); scalar(@tc) ? @tc : die "$_ is not a constraint!" }
         @arg_protos;
     }
 
@@ -145,8 +207,9 @@ has captures_constraints => (
 
 sub resolve_type_constraint {
   my ($self, $name) = @_;
-  my $tc = eval "package ${\$self->class}; $name" || undef;
-  return $tc || Moose::Util::TypeConstraints::find_or_parse_type_constraint($name);
+  my @tc = eval "package ${\$self->class}; $name";
+  return @tc if $tc[0];
+  return Moose::Util::TypeConstraints::find_or_parse_type_constraint($name);
 }
 
 has number_of_captures => (
@@ -215,13 +278,13 @@ sub match {
       # If there is only one type constraint, and its a Ref or subtype of Ref,
       # That means we expect a reference, so use the full args arrayref.
       if(
-        $self->number_of_args_constraints == 1 &&
+        $self->args_constraint_count == 1 &&
         (
           $self->args_constraints->[0]->is_a_type_of('Ref') ||
           $self->args_constraints->[0]->is_a_type_of('ClassName')
         )
       ) {
-        return 1 if $self->args_constraints->[0]->check($c->req->args);
+        return $self->args_constraints->[0]->check($c->req->args);
         # Removing coercion stuff for the first go
         #if($self->args_constraints->[0]->coercion && $self->attributes->{Coerce}) {
         #  my $coerced = $self->args_constraints->[0]->coerce($c) || return 0;
@@ -252,13 +315,13 @@ sub match_captures {
 
   if($self->has_captures_constraints) {
     if(
-      $self->number_of_captures_constraints == 1 &&
+      $self->captures_constraints_count == 1 &&
       (
         $self->captures_constraints->[0]->is_a_type_of('Ref') ||
         $self->captures_constraints->[0]->is_a_type_of('ClassName')
       )
     ) {
-      return 1 if $self->captures_constraints->[0]->check($c->req->args);
+      return $self->captures_constraints->[0]->check($captures);
     } else {
       for my $i(0..$#captures) {
         $self->captures_constraints->[$i]->check($captures[$i]) || return 0;

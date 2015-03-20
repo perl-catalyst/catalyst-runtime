@@ -58,7 +58,7 @@ BEGIN {
 
   use Moose;
   use MooseX::MethodAttributes;
-  use MyApp::Types qw/Tuple Int Str StrMatch UserId User/;
+  use MyApp::Types qw/Tuple Int Str StrMatch ArrayRef UserId User/;
 
   extends 'Catalyst::Controller';
 
@@ -77,6 +77,11 @@ BEGIN {
   sub an_int :Local Args(Int) {
     my ($self, $c, $int) = @_;
     $c->res->body('an_int');
+  }
+
+  sub two_ints :Local Args(Int,Int) {
+    my ($self, $c, $int) = @_;
+    $c->res->body('two_ints');
   }
 
   sub many_ints :Local Args(ArrayRef[Int]) {
@@ -115,6 +120,12 @@ BEGIN {
       sub any_priority_link :Chained(link_int) PathPart('') Args(1) { $_[1]->res->body('any_priority_link') }
 
       sub int_priority_link :Chained(link_int) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link') }
+
+    sub link_int_int :Chained(chain_base) PathPart('') CaptureArgs(Tuple[Int,Int]) { }
+
+      sub any_priority_link2 :Chained(link_int_int) PathPart('') Args(1) { $_[1]->res->body('any_priority_link2') }
+
+      sub int_priority_link2 :Chained(link_int_int) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link2') }
 
 
   sub default :Default {
@@ -158,11 +169,6 @@ use Catalyst::Test 'MyApp';
 }
 
 {
-  my $res = request '/many_ints/1/2/a';
-  is $res->content, 'default';
-}
-
-{
   my $res = request '/priority_test/1';
   is $res->content, 'int_priority';
 }
@@ -170,16 +176,6 @@ use Catalyst::Test 'MyApp';
 {
   my $res = request '/priority_test/a';
   is $res->content, 'any_priority';
-}
-
-{
-  my $res = request '/tuple/aaa/111';
-  is $res->content, 'tuple';
-}
-
-{
-  my $res = request '/tuple/aaa/aaa';
-  is $res->content, 'default';
 }
 
 {
@@ -244,5 +240,47 @@ SKIP: {
   my $res = request '/chain_base/cap1/a/102';
   is $res->content, 'int_priority_link_any';
 }
+
+{
+  my $res = request '/two_ints/1/2';
+  is $res->content, 'two_ints';
+}
+
+{
+  my $res = request '/two_ints/aa/111';
+  is $res->content, 'default';
+}
+
+{
+  my $res = request '/tuple/aaa/aaa';
+  is $res->content, 'default';
+}
+
+{
+  my $res = request '/tuple/aaa/111';
+  is $res->content, 'tuple';
+}
+
+{
+  my $res = request '/many_ints/1/2/a';
+  is $res->content, 'default';
+}
+
+{
+  my $res = request '/chain_base/100/100/100/100';
+  is $res->content, 'int_priority_link2';
+}
+
+{
+  my $res = request '/chain_base/100/ss/100/100';
+  is $res->content, 'default';
+}
+
+#{
+  # URI testing
+  #my ($res, $c) = ctx_request '/';
+
+
+#}
 
 done_testing;
