@@ -121,11 +121,17 @@ BEGIN {
 
       sub int_priority_link :Chained(link_int) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link') }
 
-    sub link_int_int :Chained(chain_base) PathPart('') CaptureArgs(Tuple[Int,Int]) { }
+    sub link_int_int :Chained(chain_base) PathPart('') CaptureArgs(Int,Int) { }
 
       sub any_priority_link2 :Chained(link_int_int) PathPart('') Args(1) { $_[1]->res->body('any_priority_link2') }
 
       sub int_priority_link2 :Chained(link_int_int) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link2') }
+
+    sub link_tuple :Chained(chain_base) PathPart('') CaptureArgs(Tuple[Int,Int,Int]) { }
+
+      sub any_priority_link3 :Chained(link_tuple) PathPart('') Args(1) { $_[1]->res->body('any_priority_link3') }
+
+      sub int_priority_link3 :Chained(link_tuple) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link3') }
 
 
   sub default :Default {
@@ -273,6 +279,16 @@ SKIP: {
 
 {
   my $res = request '/chain_base/100/ss/100/100';
+  is $res->content, 'default';
+}
+
+{
+  my $res = request '/chain_base/100/100/100/100/100';
+  is $res->content, 'int_priority_link3';
+}
+
+{
+  my $res = request '/chain_base/100/ss/100/100/100';
   is $res->content, 'default';
 }
 
