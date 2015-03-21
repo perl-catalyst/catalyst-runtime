@@ -133,6 +133,9 @@ BEGIN {
 
       sub int_priority_link3 :Chained(link_tuple) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link3') }
 
+      sub link2_int :Chained(link_tuple) PathPart('') CaptureArgs(UserId) { }
+
+        sub finally :Chained(link2_int) PathPart('') Args(Int) { $_[1]->res->body('finally') }
 
   sub default :Default {
     my ($self, $c, $int) = @_;
@@ -292,11 +295,23 @@ SKIP: {
   is $res->content, 'default';
 }
 
-#{
+=over
+
+| /chain_base/*/*/*/*/*/*         | /chain_base (1)                    |
+|                                 | -> /link_tuple (3)                 |
+|                                 | -> /link2_int (1)                  |
+|                                 | => /finally (missing...)           |
+
+=cut
+
+{
   # URI testing
-  #my ($res, $c) = ctx_request '/';
+  my ($res, $c) = ctx_request '/';
+  ok my $url1 = $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5],6);
+  warn $url1;
 
-
-#}
+  ok my $url2 = $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5,6]);
+  warn $url2;
+}
 
 done_testing;

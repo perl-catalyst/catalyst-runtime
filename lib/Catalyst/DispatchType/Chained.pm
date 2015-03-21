@@ -387,11 +387,15 @@ sub uri_for_action {
     my @captures = @$captures;
     my $parent = "DUMMY";
     my $curr = $action;
+    # If this is an action chain get the last action in the chain
+    if($curr->can('chain') ) {
+      $curr = ${$curr->chain}[-1];
+    }
     while ($curr) {
-        if (my $cap = $curr->attributes->{CaptureArgs}) {
-            return undef unless @captures >= ($cap->[0]||0); # not enough captures
-            if ($cap->[0]) {
-                unshift(@parts, splice(@captures, -$cap->[0]));
+        if (my $cap = $curr->number_of_captures) {
+            return undef unless @captures >= $cap; # not enough captures
+            if ($cap) {
+                unshift(@parts, splice(@captures, -$cap));
             }
         }
         if (my $pp = $curr->attributes->{PathPart}) {
