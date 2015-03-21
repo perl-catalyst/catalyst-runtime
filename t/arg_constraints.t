@@ -105,6 +105,17 @@ BEGIN {
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
+    # <jnap> dim1: so the common rule is 'longest path first, then for all matching actions for that longest path, process in reverse order of declaration
+    # <dim1> yes, but it doesn't work with Args(0)
+    # <jnap> you are finding exceptions to that rule, we need to look at that carefully, and either fix it or document
+    # <jnap> dim1:  that really sucks :)
+    # <jnap> dim1: any chance you could add that test case to australorp t/args_constraints.t ?
+    # <jnap> just add the test case that shows us breaking the general rule
+    # <jnap> we'll then decide if that is an ok exception and document it, or do something about it
+
+    sub chained_zero_post :POST Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_post') }
+    sub chained_zero      :     Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero') }
+
     sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('any_priority_chain') }
 
     sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { $_[1]->res->body('int_priority_chain') }
@@ -148,6 +159,7 @@ BEGIN {
 }
 
 use Catalyst::Test 'MyApp';
+use HTTP::Request::Common;
 
 {
   my $res = request '/an_int/1';
@@ -215,6 +227,20 @@ SKIP: {
   skip "coercion support needs more thought", 1;
   my $res = request '/user_object/2';
   is $res->content, 'name: mary, age: 36';
+}
+
+
+{
+    my $res = request PUT '/chain_base/capture';
+    is $res->content, 'chained_zero';
+}
+{
+    my $res = request '/chain_base/capture';
+    is $res->content, 'chained_zero';
+}
+{
+    my $res = request POST '/chain_base/capture';
+    is $res->content, 'chained_zero_post';
 }
 
 {
