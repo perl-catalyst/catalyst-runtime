@@ -105,7 +105,7 @@ BEGIN {
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
-    sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('any_priority_chain') }
+    sub any_priority_chain :GET Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('any_priority_chain') }
 
     sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { $_[1]->res->body('int_priority_chain') }
 
@@ -135,7 +135,7 @@ BEGIN {
 
       sub link2_int :Chained(link_tuple) PathPart('') CaptureArgs(UserId) { }
 
-        sub finally :Chained(link2_int) PathPart('') Args(Int) { $_[1]->res->body('finally') }
+        sub finally :GET Chained(link2_int) PathPart('') Args(Int) { $_[1]->res->body('finally') }
 
   sub default :Default {
     my ($self, $c, $int) = @_;

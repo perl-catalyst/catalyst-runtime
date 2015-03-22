@@ -130,7 +130,12 @@ sub list {
                 $name = "${extra} ${name}";
             }
             if (defined(my $cap = $p->list_extra_info->{CaptureArgs})) {
-                $name .= ' ('.$cap.')';
+                if($p->has_captures_constraints) {
+                  my $tc = join ',', @{$p->captures_constraints};
+                  $name .= " ($tc)";
+                } else {
+                  $name .= " ($cap)";
+                }
             }
             if (defined(my $ct = $p->list_extra_info->{Consumes})) {
                 $name .= ' :'.$ct;
@@ -143,6 +148,15 @@ sub list {
                 $name = "-> ${name}";
             }
             push(@rows, [ '', $name ]);
+        }
+
+        if(defined $endpoint->number_of_args) {
+          if($endpoint->has_args_constraints) {
+            my $tc = join ',', @{$endpoint->args_constraints};
+            $endpoint .= " ($tc)";
+          } else {
+            $endpoint .= " (${\$endpoint->number_of_args})";
+          }
         }
         push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : ''). ($scheme ? "$scheme: ":'')."/${endpoint}". ($consumes ? " :$consumes":"" ) ]);
         my @display_parts = map { $_ =~s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg; decode_utf8 $_ } @parts;
