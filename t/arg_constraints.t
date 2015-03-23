@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use HTTP::Request::Common;
 
 BEGIN {
   use Test::More;
@@ -104,6 +105,9 @@ BEGIN {
   sub int_priority :Path('priority_test') Args(Int) { $_[1]->res->body('int_priority') }
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
+
+    sub chained_zero_post :POST Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_post') }
+    sub chained_zero      :     Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero') }
 
     sub any_priority_chain :GET Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('any_priority_chain') }
 
@@ -313,10 +317,35 @@ SKIP: {
 
 =over
 
-| /chain_base/*/*/*/*/*/*                                     | /chain_base (1)                                             |
-|                                                             | -> /link_tuple (Tuple[Int,Int,Int])                         |
-|                                                             | -> /link2_int (UserId)                                      |
-|                                                             | => GET /finally (Int)  
+| /chain_base/*                                               | /chain_base (1)                                             |
+|                                                             | => /chained_zero (0)                                        |
+| /chain_base/*                                               | /chain_base (1)                                             |
+|                                                             | => POST /chained_zero_post (0)                              
+
+=cut
+
+{
+    my $res = request PUT '/chain_base/capture';
+    is $res->content, 'chained_zero';
+}
+
+{
+    my $res = request '/chain_base/capture';
+    is $res->content, 'chained_zero';
+}
+
+{
+    my $res = request POST '/chain_base/capture';
+    is $res->content, 'chained_zero_post';
+}
+
+=over
+
+| /chain_base/*/*/*/*/*/*                 | /chain_base (1)
+|                                         | -> /link_tuple (Tuple[Int,Int,Int])
+|                                         | -> /link2_int (UserId)
+|                                         | => GET /finally (Int)
+
 =cut
 
 {
