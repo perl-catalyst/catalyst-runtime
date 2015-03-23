@@ -120,6 +120,8 @@ has args_constraints => (
     my @arg_protos = @{$self->attributes->{Args}||[]};
 
     return [] unless scalar(@arg_protos);
+    return [] unless defined($arg_protos[0]);
+
     # If there is only one arg and it looks like a number
     # we assume its 'classic' and the number is the number of
     # constraints.
@@ -187,6 +189,7 @@ has captures_constraints => (
     my @arg_protos = @{$self->attributes->{CaptureArgs}||[]};
 
     return [] unless scalar(@arg_protos);
+    return [] unless defined($arg_protos[0]);
     # If there is only one arg and it looks like a number
     # we assume its 'classic' and the number is the number of
     # constraints.

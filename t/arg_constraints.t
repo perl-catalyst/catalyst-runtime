@@ -135,6 +135,7 @@ BEGIN {
 
       sub link2_int :Chained(link_tuple) PathPart('') CaptureArgs(UserId) { }
 
+        sub finally2 :GET Chained(link2_int) PathPart('') Args { $_[1]->res->body('finally2') }
         sub finally :GET Chained(link2_int) PathPart('') Args(Int) { $_[1]->res->body('finally') }
 
   sub default :Default {
@@ -295,13 +296,27 @@ SKIP: {
   is $res->content, 'default';
 }
 
+{
+  my $res = request '/chain_base/1/2/3/3/3/6';
+  is $res->content, 'finally';
+}
+
+{
+  my $res = request '/chain_base/1/2/3/3/3/a';
+  is $res->content, 'finally2';
+}
+
+{
+  my $res = request '/chain_base/1/2/3/3/3/6/7/8/9';
+  is $res->content, 'finally2';
+}
+
 =over
 
-| /chain_base/*/*/*/*/*/*         | /chain_base (1)                    |
-|                                 | -> /link_tuple (3)                 |
-|                                 | -> /link2_int (1)                  |
-|                                 | => /finally (missing...)           |
-
+| /chain_base/*/*/*/*/*/*                                     | /chain_base (1)                                             |
+|                                                             | -> /link_tuple (Tuple[Int,Int,Int])                         |
+|                                                             | -> /link2_int (UserId)                                      |
+|                                                             | => GET /finally (Int)  
 =cut
 
 {

@@ -98,7 +98,7 @@ sub list {
                            @{ $self->_endpoints }
                   ) {
         my $args = $endpoint->list_extra_info->{Args};
-        my @parts = (defined($args) ? (("*") x $args) : '...');
+        my @parts = (defined($endpoint->attributes->{Args}[0]) ? (("*") x $args) : '...');
         my @parents = ();
         my $parent = "DUMMY";
         my $extra  = $self->_list_extra_http_methods($endpoint);
@@ -150,13 +150,11 @@ sub list {
             push(@rows, [ '', $name ]);
         }
 
-        if(defined $endpoint->number_of_args) {
-          if($endpoint->has_args_constraints) {
-            my $tc = join ',', @{$endpoint->args_constraints};
-            $endpoint .= " ($tc)";
-          } else {
-            $endpoint .= " (${\$endpoint->number_of_args})";
-          }
+        if($endpoint->has_args_constraints) {
+          my $tc = join ',', @{$endpoint->args_constraints};
+          $endpoint .= " ($tc)";
+        } else {
+          $endpoint .= defined($endpoint->attributes->{Args}[0]) ? " ($args)" : " (...)";
         }
         push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : ''). ($scheme ? "$scheme: ":'')."/${endpoint}". ($consumes ? " :$consumes":"" ) ]);
         my @display_parts = map { $_ =~s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg; decode_utf8 $_ } @parts;
