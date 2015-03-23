@@ -4,7 +4,7 @@ use HTTP::Request::Common;
 
 BEGIN {
   use Test::More;
-  eval "use Types::Standard; 1;" || do {
+  eval "use Types::Standard; use Type::Utils; use Type::Library; 1;" || do {
     plan skip_all => "Trouble loading Types::Standard => $@";
   };
 
