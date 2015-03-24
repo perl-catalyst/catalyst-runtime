@@ -4,14 +4,7 @@ use Moose::Role;
 
 requires 'match', 'match_captures', 'list_extra_info';
 
-around ['match','match_captures'] => sub {
-  my ($orig, $self, $ctx, @args) = @_;
-  my $expected = $ctx->req->method;
-  return $self->_has_expected_http_method($expected) ?
-    $self->$orig($ctx, @args) :
-    0;
-};
-
+sub allowed_http_methods { @{shift->attributes->{Method}||[]} }
 
 sub _has_expected_http_method {
   my ($self, $expected) = @_;
@@ -20,7 +13,14 @@ sub _has_expected_http_method {
     1 : 0;
 }
 
-sub allowed_http_methods { @{shift->attributes->{Method}||[]} }
+around ['match','match_captures'] => sub {
+  my ($orig, $self, $ctx, @args) = @_;
+  return 0 unless $self->$orig($ctx, @args);
+
+  my $expected = $ctx->req->method;
+  warn $expected;
+  return $self->_has_expected_http_method($expected);
+};
 
 around 'list_extra_info' => sub {
   my ($orig, $self, @args) = @_;

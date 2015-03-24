@@ -141,10 +141,11 @@ BEGIN {
 
   sub chain_base2 :Chained(/) CaptureArgs(1) { }
 
-    sub chained_zero_post2 :POST Chained(chain_base2) PathPart('') Args(0) { $_[1]->res->body('chained_zero_post2') }
+    sub chained_zero_again : Chained(chain_base2) PathPart('') Args(0) { $_[1]->res->body('chained_zero_again') }
+    sub chained_zero_post2 : Chained(chain_base2) PathPart('') Args(0) { $_[1]->res->body('chained_zero_post2') }
     sub chained_zero2      :     Chained(chain_base2) PathPart('') Args(0) { $_[1]->res->body('chained_zero2') }
 
-    sub chained_zero_post3 :POST Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero_post3') }
+    sub chained_zero_post3 : Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero_post3') }
     sub chained_zero3      :     Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero3') }
 
 
@@ -321,43 +322,35 @@ SKIP: {
   is $res->content, 'finally2';
 }
 
-=over
-
-| /chain_base/*                                               | /chain_base (1)                                             |
-|                                                             | => /chained_zero (0)                                        |
-| /chain_base/*                                               | /chain_base (1)                                             |
-|                                                             | => POST /chained_zero_post (0)                              
-
-=cut
 
 {
     my $res = request PUT '/chain_base2/capture/1';
-    is $res->content, 'chained_zero3';
+    is $res->content, 'chained_zero3', "request PUT '/chain_base2/capture/1'";
 }
 
 {
     my $res = request '/chain_base2/capture/1';
-    is $res->content, 'chained_zero3';
+    is $res->content, 'chained_zero3', "request '/chain_base2/capture/1'";
 }
 
 {
     my $res = request POST '/chain_base2/capture/1';
-    is $res->content, 'chained_zero3';
+    is $res->content, 'chained_zero3', "request POST '/chain_base2/capture/1'";
 }
 
 {
     my $res = request PUT '/chain_base2/capture';
-    is $res->content, 'chained_zero2';
+    is $res->content, 'chained_zero2', "request PUT '/chain_base2/capture'";
 }
 
 {
     my $res = request '/chain_base2/capture';
-    is $res->content, 'chained_zero2';
+    is $res->content, 'chained_zero2', "request '/chain_base2/capture'";
 }
 
 {
     my $res = request POST '/chain_base2/capture';
-    is $res->content, 'chained_zero2';
+    is $res->content, 'chained_zero2', "request POST '/chain_base2/capture'";
 }
 
 =over
