@@ -106,9 +106,6 @@ BEGIN {
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
-    sub chained_zero_post :POST Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_post') }
-    sub chained_zero      :     Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero') }
-
     sub any_priority_chain :GET Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('any_priority_chain') }
 
     sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { $_[1]->res->body('int_priority_chain') }
@@ -141,6 +138,15 @@ BEGIN {
 
         sub finally2 :GET Chained(link2_int) PathPart('') Args { $_[1]->res->body('finally2') }
         sub finally :GET Chained(link2_int) PathPart('') Args(Int) { $_[1]->res->body('finally') }
+
+  sub chain_base2 :Chained(/) CaptureArgs(1) { }
+
+    sub chained_zero_post2 :POST Chained(chain_base2) PathPart('') Args(0) { $_[1]->res->body('chained_zero_post2') }
+    sub chained_zero2      :     Chained(chain_base2) PathPart('') Args(0) { $_[1]->res->body('chained_zero2') }
+
+    sub chained_zero_post3 :POST Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero_post3') }
+    sub chained_zero3      :     Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero3') }
+
 
   sub default :Default {
     my ($self, $c, $int) = @_;
@@ -325,18 +331,33 @@ SKIP: {
 =cut
 
 {
-    my $res = request PUT '/chain_base/capture';
-    is $res->content, 'chained_zero';
+    my $res = request PUT '/chain_base2/capture/1';
+    is $res->content, 'chained_zero3';
 }
 
 {
-    my $res = request '/chain_base/capture';
-    is $res->content, 'chained_zero';
+    my $res = request '/chain_base2/capture/1';
+    is $res->content, 'chained_zero3';
 }
 
 {
-    my $res = request POST '/chain_base/capture';
-    is $res->content, 'chained_zero_post';
+    my $res = request POST '/chain_base2/capture/1';
+    is $res->content, 'chained_zero3';
+}
+
+{
+    my $res = request PUT '/chain_base2/capture';
+    is $res->content, 'chained_zero2';
+}
+
+{
+    my $res = request '/chain_base2/capture';
+    is $res->content, 'chained_zero2';
+}
+
+{
+    my $res = request POST '/chain_base2/capture';
+    is $res->content, 'chained_zero2';
 }
 
 =over
@@ -348,6 +369,10 @@ SKIP: {
 
 =cut
 
+
+done_testing;
+
+__END__
 {
   # URI testing
   my ($res, $c) = ctx_request '/';
@@ -358,4 +383,3 @@ SKIP: {
   warn $url2;
 }
 
-done_testing;
