@@ -110,7 +110,7 @@ sub scheme {
 sub list_extra_info {
   my $self = shift;
   return {
-    Args => $self->attributes->{Args}[0],
+    Args => exists $self->attributes->{Args} ? $self->attributes->{Args}[0] : undef,
     CaptureArgs => $self->number_of_captures,
   }
 } 
