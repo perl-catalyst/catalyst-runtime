@@ -1,3 +1,4 @@
+package Catalyst::Runtime;
 
 use strict;
 use warnings;
