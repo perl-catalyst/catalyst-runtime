@@ -205,7 +205,8 @@ precedence:
 C<do_not_decode_query>
 
 If true, then do not try to character decode any wide characters in your
-request URL query or keywords.
+request URL query or keywords.  You will need gto handle this manually in your action code
+(although if you choose this setting, chances are you already do this).
 
 C<default_query_encoding>
 
