@@ -80,6 +80,10 @@ sub delete2 :Chained('post_or_delete') PathPart('') Args(0) DELETE {
 
 sub check_default :Chained('base') CaptureArgs(0) { }
 
+sub chain_default :Chained('check_default') PathPart('') Args(0) {
+    pop->res->body('chain_default');
+}
+
 sub default_get :Chained('check_default') PathPart('') Args(0) GET {
     pop->res->body('get3');
 }
@@ -88,8 +92,6 @@ sub default_post :Chained('check_default') PathPart('') Args(0) POST {
     pop->res->body('post3');
 }
 
-sub chain_default :Chained('check_default') PathPart('') Args(0) {
-    pop->res->body('chain_default');
-}
+
 
 __PACKAGE__->meta->make_immutable;

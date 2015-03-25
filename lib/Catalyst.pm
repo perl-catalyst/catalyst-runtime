@@ -3904,6 +3904,51 @@ parameter to true.
 
 =item *
 
+C<do_not_decode_query>
+
+If true, then do not try to character decode any wide characters in your
+request URL query or keywords.  Most readings of the relevent specifications
+suggest these should be UTF-* encoded, which is the default that L<Catalyst>
+will use, hwoever if you are creating a lot of URLs manually or have external
+evil clients, this might cause you trouble.  If you find the changes introduced
+in Catalyst version 5.90080+ break some of your query code, you may disable 
+the UTF-8 decoding globally using this configuration.
+
+This setting takes precedence over C<default_query_encoding> and
+C<decode_query_using_global_encoding>
+
+=item *
+
+C<default_query_encoding>
+
+By default we decode query and keywords in your request URL using UTF-8, which
+is our reading of the relevent specifications.  This setting allows one to
+specify a fixed value for how to decode your query.  You might need this if
+you are doing a lot of custom encoding of your URLs and not using UTF-8.
+
+This setting take precedence over C<decode_query_using_global_encoding>.
+
+=item *
+
+C<decode_query_using_global_encoding>
+
+Setting this to true will default your query decoding to whatever your
+general global encoding is (the default is UTF-8).
+
+=item *
+
+C<use_chained_args_0_special_case>
+
+In older versions of Catalyst, when more than one action matched the same path
+AND all those matching actions declared Args(0), we'd break the tie by choosing
+the first action defined.  We now normalized how Args(0) works so that it
+follows the same rule as Args(N), which is to say when we need to break a tie
+we choose the LAST action defined.  If this breaks your code and you don't
+have time to update to follow the new normalized approach, you may set this
+value to true and it will globally revert to the original chaining behavior.
+
+=item *
+
 C<psgi_middleware> - See L<PSGI MIDDLEWARE>.
 
 =item *

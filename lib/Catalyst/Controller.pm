@@ -550,6 +550,7 @@ sub _parse_PUT_attr     { Method => 'PUT'     }
 sub _parse_DELETE_attr  { Method => 'DELETE'  }
 sub _parse_OPTIONS_attr { Method => 'OPTIONS' }
 sub _parse_HEAD_attr    { Method => 'HEAD'    }
+sub _parse_PATCH_attr  { Method => 'PATCH'  }
 
 sub _expand_role_shortname {
     my ($self, @shortnames) = @_;

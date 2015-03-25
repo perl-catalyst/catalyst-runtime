@@ -298,13 +298,29 @@ sub recurse_match {
                 #    The current best action might also be Args(0),
                 #    but we couldn't chose between then anyway so we'll take the last seen
 
-                if (!$best_action                       ||
+                if (
+                    !$best_action                       ||
                     @parts < @{$best_action->{parts}}   ||
-                    (!@parts && defined($args_attr) && $args_attr eq "0")){
+                    (
+                        !@parts && 
+                        defined($args_attr) && 
+                        (
+                            $args_attr eq "0" &&
+                            (
+                              ($c->config->{use_chained_args_0_special_case}||0) || 
+                                (
+                                  exists($best_action->{args_attr}) && defined($best_action->{args_attr}) ?
+                                  ($best_action->{args_attr} ne 0) : 1
+                                )
+                            )
+                        )
+                    )
+                ){
                     $best_action = {
                         actions => [ $action ],
                         captures=> [],
                         parts   => \@parts,
+                        args_attr => $args_attr,
                         n_pathparts => scalar(@pathparts),
                     };
                 }

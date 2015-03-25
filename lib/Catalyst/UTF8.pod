@@ -196,6 +196,27 @@ to send over the wire via HTTP needs to be bytes (not unicode characters).
 Remember if you use any utf8 literals in your source code, you should use the
 C<use utf8> pragma.
 
+B<NOTE:> Assuming UTF-8 in your query parameters and keywords may be an issue if you have
+legacy code where you created URL in templates manually and used an encoding other than UTF-8.
+In these cases you may find versions of Catalyst after 5.90080+ will incorrectly decode.  For
+backwards compatibility we offer three configurations settings, here described in order of
+precedence:
+
+C<do_not_decode_query>
+
+If true, then do not try to character decode any wide characters in your
+request URL query or keywords.  You will need gto handle this manually in your action code
+(although if you choose this setting, chances are you already do this).
+
+C<default_query_encoding>
+
+This setting allows one to specify a fixed value for how to decode your query, instead of using
+the default, UTF-8.
+
+C<decode_query_using_global_encoding>
+
+If this is true we decode using whatever you set C<encoding> to.
+
 =head2 UTF8 in Form POST
 
 In general most modern browsers will follow the specification, which says that POSTed

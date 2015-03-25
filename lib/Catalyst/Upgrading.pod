@@ -2,6 +2,104 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90085
+
+In this version of Catalyst we made a small change to Chained Dispatching so
+that when two or more actions all have the same path specification AND they
+all have Args(0), we break the tie by choosing the last action defined, and
+not the first one defined.  This was done to normalize Chaining to following
+the 'longest Path wins, and when several actions match the same Path specification
+we choose the last defined.' rule. Previously Args(0) was hard coded to be a special
+case such that the first action defined would match (which is not the case when
+Args is not zero.)
+
+Its possible that this could be a breaking change for you, if you had used
+action roles (custom or otherwise) to add additional matching rules to differentiate
+between several Args(0) actions that share the same root action chain.  For
+example if you have code now like this:
+
+    sub check_default :Chained(/) CaptureArgs(0) { ... }
+
+      sub default_get :Chained('check_default') PathPart('') Args(0) GET {
+          pop->res->body('get3');
+      }
+
+      sub default_post :Chained('check_default') PathPart('') Args(0) POST {
+          pop->res->body('post3');
+      }
+
+      sub chain_default :Chained('check_default') PathPart('') Args(0) {
+          pop->res->body('chain_default');
+      }
+
+The way that chaining will work previous is that when two or more equal actions can
+match, the 'top' one wins.  So if the request is "GET .../check_default" BOTH
+actions 'default_get' AND 'chain_default' would match.  To break the tie in
+the case when Args is 0, we'd previous take the 'top' (or first defined) action.
+Unfortunately this treatment of Args(0) is special case.  In all other cases
+we choose the 'last defined' action to break a tie.  So this version of
+Catalyst changed the dispatcher to make Args(0) no longer a special case for
+breaking ties.  This means that the above code must now become:
+
+    sub check_default :Chained(/) CaptureArgs(0) { ... }
+
+      sub chain_default :Chained('check_default') PathPart('') Args(0) {
+          pop->res->body('chain_default');
+      }
+
+      sub default_get :Chained('check_default') PathPart('') Args(0) GET {
+          pop->res->body('get3');
+      }
+
+      sub default_post :Chained('check_default') PathPart('') Args(0) POST {
+          pop->res->body('post3');
+      }
+
+If we want it to work as expected (for example we we GET to match 'default_get' and
+POST to match 'default_post' and any other http Method to match 'chain_default').
+
+In other words Arg(0) and chained actions must now follow the normal rule where
+in a tie the last defined action wins and you should place all your less defined
+or 'catch all' actions first.
+
+If this causes you trouble and you can't fix your code to conform, you may set the
+application configuration setting "use_chained_args_0_special_case" to true and
+that will revert you code to the previous behavior.
+
+=head2 More backwards compatibility options with UTF-8 changes
+
+In order to give better backwards compatiblity with the 5.90080+ UTF-8 changes
+we've added several configuration options around control of how we try to decode
+your URL keywords / query parameters.
+
+C<do_not_decode_query>
+
+If true, then do not try to character decode any wide characters in your
+request URL query or keywords.  Most readings of the relevent specifications
+suggest these should be UTF-* encoded, which is the default that L<Catalyst>
+will use, hwoever if you are creating a lot of URLs manually or have external
+evil clients, this might cause you trouble.  If you find the changes introduced
+in Catalyst version 5.90080+ break some of your query code, you may disable 
+the UTF-8 decoding globally using this configuration.
+
+This setting takes precedence over C<default_query_encoding> and
+C<decode_query_using_global_encoding>
+
+C<default_query_encoding>
+
+By default we decode query and keywords in your request URL using UTF-8, which
+is our reading of the relevent specifications.  This setting allows one to
+specify a fixed value for how to decode your query.  You might need this if
+you are doing a lot of custom encoding of your URLs and not using UTF-8.
+
+This setting take precedence over C<decode_query_using_global_encoding>.
+
+C<decode_query_using_global_encoding>
+
+Setting this to true will default your query decoding to whatever your
+general global encoding is (the default is UTF-8).
+
+
 =head1 Upgrading to Catalyst 5.90080
 
 UTF8 encoding is now default.  For temporary backwards compatibility, if this
