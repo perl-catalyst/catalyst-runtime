@@ -13,11 +13,11 @@ use Test::More;
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
-    sub chained_zero_args_0 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_0') }
-    sub chained_zero_args_1 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_1') }
-
     sub chained_one_args_0  : Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('chained_one_args_0') }
     sub chained_one_args_1  : Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('chained_one_args_1') }
+
+    sub chained_zero_args_0 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_0') }
+    sub chained_zero_args_1 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_1') }
 
   MyApp::Controller::Root->config(namespace=>'');
 
@@ -46,19 +46,17 @@ use Test::More;
 =cut
 
 use Catalyst::Test 'MyApp';
-
 {
-    # Generally if more than one action can match and the path length is equal, we expect
-    # the dispatcher to just take the first one.  So this works as expected.
-    my $res = request '/chain_base/capturearg/arg';
-    is $res->content, 'chained_one_args_1', "request '/chain_base/capturearg/arg'";
+   my $res = request '/chain_base/capturearg/arg';
+  is $res->content, 'chained_one_args_1', "request '/chain_base/capturearg/arg'";
 }
 
 {
-    # However this doesn't pass :(  For some reason when Args(0), we take the last one that
-    # matches...
     my $res = request '/chain_base/capturearg';
-    is $res->content, 'chained_zero_args_1', "request '/chained_one_args_0/capturearg/arg'";
+    is $res->content, 'chained_zero_args_1', "request '/chain_base/capturearg'";
 }
 
 done_testing;
+
+__END__
+
