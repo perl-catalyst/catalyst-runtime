@@ -10,7 +10,7 @@ use HTML::Entities;
 use HTTP::Headers;
 use Plack::Loader;
 use Catalyst::EngineLoader;
-use Encode 2.21 'decode_utf8';
+use Encode 2.21 'decode_utf8', 'encode', 'decode';
 use Plack::Request::Upload;
 use Hash::MultiValue;
 use namespace::clean -except => 'meta';
@@ -573,6 +573,17 @@ process the query string and extract query parameters.
 sub prepare_query_parameters {
     my ($self, $c) = @_;
     my $env = $c->request->env;
+    my $do_not_decode_query = $c->config->{do_not_decode_query};
+    my $default_query_encoding = $c->config->{default_query_encoding} || 
+      ($c->config->{decode_query_using_global_encoding} ?
+        $c->encoding : 'UTF-8');
+
+    my $decoder = sub {
+      my $str = shift;
+      return $str if $do_not_decode_query;
+      return $str unless $default_query_encoding;
+      return decode( $default_query_encoding, $str);
+    };
 
     my $query_string = exists $env->{QUERY_STRING}
         ? $env->{QUERY_STRING}
@@ -582,7 +593,7 @@ sub prepare_query_parameters {
     # (yes, index() is faster than a regex :))
     if ( index( $query_string, '=' ) < 0 ) {
         my $keywords = $self->unescape_uri($query_string);
-        $keywords = decode_utf8 $keywords;
+        $keywords = $decoder->($keywords);
         $c->request->query_keywords($keywords);
         return;
     }
@@ -590,7 +601,7 @@ sub prepare_query_parameters {
     $query_string =~ s/\A[&;]+//;
 
     my $p = Hash::MultiValue->new(
-        map { defined $_ ? decode_utf8($self->unescape_uri($_)) : $_ }
+        map { defined $_ ? $decoder->($self->unescape_uri($_)) : $_ }
         map { ( split /=/, $_, 2 )[0,1] } # slice forces two elements
         split /[&;]+/, $query_string
     );

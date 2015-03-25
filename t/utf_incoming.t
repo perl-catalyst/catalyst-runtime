@@ -479,6 +479,16 @@ SKIP: {
 
 }
 
+{
+  my $shiftjs = 'test テスト';
+  my $encoded = Encode::encode('UTF-8', $shiftjs);
+
+  ok my $req = GET "/root/echo_arg?a=$encoded";
+  my ($res, $c) = ctx_request $req;
+
+  is $c->req->query_parameters->{'a'}, $shiftjs, 'got expected value';
+}
+
 ## should we use binmode on filehandles to force the encoding...?
 ## Not sure what else to do with multipart here, if docs are enough...
 

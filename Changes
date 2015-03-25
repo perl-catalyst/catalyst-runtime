@@ -10,6 +10,9 @@
     You may use the application configuration setting "use_chained_args_0_special_case"
     to disable this new behavior, if you must for back-compat reasons.
   - Added PATCH HTTP Method action attribute shortcut.
+  - Several new configuration options aimed to give improved backwards compatibility
+    for when your URL query parameters or keywords have non UTF-8 encodings.
+    See Catalyst::Upgrading.
 
 5.90084 - 2015-02-23
   - Small change to the way body parameters are created in order to prevent
