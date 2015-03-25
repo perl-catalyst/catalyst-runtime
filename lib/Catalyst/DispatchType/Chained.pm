@@ -294,7 +294,13 @@ sub recurse_match {
                         defined($args_attr) && 
                         (
                             $args_attr eq "0" &&
-                            ( exists($best_action->{args_attr}) && defined($best_action->{args_attr}) ?  ($best_action->{args_attr} ne 0) : 1 )
+                            (
+                              ($c->config->{use_chained_args_0_special_case}||0) || 
+                                (
+                                  exists($best_action->{args_attr}) && defined($best_action->{args_attr}) ?
+                                  ($best_action->{args_attr} ne 0) : 1
+                                )
+                            )
                         )
                     )
                 ){

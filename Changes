@@ -1,5 +1,15 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90085 - 2014-03-25
+  - Small change to Catalyst::Action to prevent autovivication of Args value (dim1++)
+  - Minor typo fixes (Abraxxa++)
+  - Make sure than when using chained actions and when more than one action
+    matches the same path specification AND has Args(0), that we follow the
+    "in a tie, the last action defined wins" rule.  There is a small chance
+    this is a breaking change for you.  See Catalyst::Upgrading for more.
+    You may use the application configuration setting "use_chained_args_0_special_case"
+    to disable this new behavior, if you must.
+
 5.90084 - 2015-02-23
   - Small change to the way body parameters are created in order to prevent
     trying to create parameters twice.

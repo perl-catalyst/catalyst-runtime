@@ -24,6 +24,7 @@ use Test::More;
   package MyApp;
   use Catalyst;
 
+  #MyApp->config(use_chained_args_0_special_case=>1);
   MyApp->setup;
 }
 

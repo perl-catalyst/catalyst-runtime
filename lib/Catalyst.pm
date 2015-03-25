@@ -129,7 +129,7 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90084';
+our $VERSION = '5.90085';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -3901,6 +3901,18 @@ default for this is to decode UTF-8).  If this is causing you trouble and you
 do not wish to turn all encoding support off (with the C<encoding> configuration
 parameter) you may disable this step atomically by setting this configuration
 parameter to true.
+
+=item *
+
+C<use_chained_args_0_special_case>
+
+In older versions of Catalyst, when more than one action matched the same path
+AND all those matching actions declared Args(0), we'd break the tie by choosing
+the first action defined.  We now normalized how Args(0) works so that it
+follows the same rule as Args(N), which is to say when we need to break a tie
+we choose the LAST action defined.  If this breaks your code and you don't
+have time to update to follow the new normalized approach, you may set this
+value to true and it will globally revert to the original chaining behavior.
 
 =item *
 
