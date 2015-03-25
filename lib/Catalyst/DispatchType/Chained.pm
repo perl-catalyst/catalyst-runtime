@@ -292,13 +292,17 @@ sub recurse_match {
                     (
                         !@parts && 
                         defined($args_attr) && 
-                        $args_attr eq "0"
+                        (
+                            $args_attr eq "0" &&
+                            ( exists($best_action->{args_attr}) && defined($best_action->{args_attr}) ?  ($best_action->{args_attr} ne 0) : 1 )
+                        )
                     )
                 ){
                     $best_action = {
                         actions => [ $action ],
                         captures=> [],
                         parts   => \@parts,
+                        args_attr => $args_attr,
                         n_pathparts => scalar(@pathparts),
                     };
                 }
