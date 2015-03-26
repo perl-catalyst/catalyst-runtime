@@ -362,10 +362,6 @@ SKIP: {
 
 =cut
 
-
-done_testing;
-
-__END__
 {
   # URI testing
   my ($res, $c) = ctx_request '/';
@@ -375,4 +371,9 @@ __END__
   ok my $url2 = $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5,6]);
   warn $url2;
 }
+
+done_testing;
+
+__END__
+
 

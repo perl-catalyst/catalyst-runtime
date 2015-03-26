@@ -4,7 +4,11 @@
   - New Feature: Type Constraints on Args/CapturArgs.  ALlows you to declare
     a Moose, MooseX::Types or Type::Tiny named constraint on your Arg or 
     CaptureArg.
-  - New top level document on Route matching. (Catalyst::RouteMatching).
+  - When using $c->uri_for (or the derived $c->uri_for_action) and the target
+    action has type constrainted args (or captures), verify that the proposed
+    URL matches the defined args.
+  - New top level document on Route matching. (Catalyst::RouteMatching).  This
+    document is still in development, but is worth review and comments, please!
 
 5.90085 - 2015-03-25
   - Small change to Catalyst::Action to prevent autovivication of Args value (dim1++)

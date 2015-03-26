@@ -7,6 +7,23 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 This is an overview of the user-visible changes to Catalyst between major
 Catalyst releases.
 
+=head2 VERSION 5.90090+
+
+=head2 Type constraints on Args and CaptureArgs.
+
+You may now use a type constraint (using L<Moose>, L<MooseX::Types> or preferably
+L<Type::Tiny) in your Args or CaptureArgs action attributes.  This can be used
+to restrict the value of the Arg.  For example:
+
+    sub myaction :Local Args(Int) { ... }
+
+Would match '.../myaction/5' but not '.../myaction/string'.
+
+When an action (or action chain) has Args (or CaptureArgs) that declare type constraints
+your arguments to $c->uri_for(...) must match those constraints.
+
+See L<Catalyst::RouteMatching> for more.
+
 =head2 VERSION 5.90080+
 
 The biggest change in this release is that UTF8 encoding is now enabled by
