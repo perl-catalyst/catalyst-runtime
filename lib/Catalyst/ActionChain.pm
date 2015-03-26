@@ -61,6 +61,17 @@ sub number_of_captures {
     return $captures;
 }
 
+sub match_captures {
+  my ($self, $c, $captures) = @_;
+  my @captures = @{$captures||[]};
+
+  foreach my $link(@{$self->chain}) {
+    my @local_captures = splice @captures,0,$link->number_of_captures;
+    return unless $link->match_captures($c, \@local_captures);
+  }
+  return 1;
+}
+
 # the scheme defined at the end of the chain is the one we use
 # but warn if too many.
 
@@ -102,6 +113,10 @@ Catalyst::ActionChain object representing a chain of these actions
 =head2 number_of_captures
 
 Returns the total number of captures for the entire chain of actions.
+
+=head2 match_captures
+
+Match all the captures that this chain encloses, if any.
 
 =head2 scheme
 

@@ -367,22 +367,54 @@ SKIP: {
 {
   # URI testing
   my ($res, $c) = ctx_request '/';
-  ok my $url1 = $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5],6);
-  warn $url1;
 
-  ok my $url2 = $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5,6]);
-  warn $url2;
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('user'), 2) };
+    is $url, 'http://localhost/user/2';
+  }
 
-  ok my $url3 = $c->uri_for($c->controller('Root')->action_for('user'), 2);
-  warn $url3;
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('user'), [2]) };
+    is $url, 'http://localhost/user/2';
+  }
 
-  ok my $url4 = $c->uri_for($c->controller('Root')->action_for('user'), [2]);
-  warn $url4;
+  {
+    ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('user'), [20]) };
+  }
+
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,4],6) };
+    is $url, 'http://localhost/chain_base/1/2/3/4/4/6';
+  }
+
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,4,6]) };
+    is $url, 'http://localhost/chain_base/1/2/3/4/4/6';
+  }
+
+  {
+    ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5,6]) };
+  }
+
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('finally'), ['a',2,3,4,4,6]) };
+    is $url, 'http://localhost/chain_base/a/2/3/4/4/6';
+  }
+
+  {
+    ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('finally'), ['a','1',3,4,4,'a']) };
+  }
+
+  {
+    ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('finally'), ['a','a',3,4,4,'6']) };
+  }
 
 }
 
 done_testing;
 
+
 __END__
+
 
 

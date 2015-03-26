@@ -1491,18 +1491,18 @@ sub uri_for {
                          : ()) ];
 
         my $action = $path;
+        my $expanded_action = $c->dispatcher->expand_action( $action );
+         my $num_captures = $expanded_action->number_of_captures;
+
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
         if( !@encoded_args && $action->number_of_args ) {
-            my $expanded_action = $c->dispatcher->expand_action( $action );
-            my $num_captures = $expanded_action->number_of_captures;
-            unshift @encoded_args, splice @$captures, $num_captures;
+          unshift @encoded_args, splice @$captures, $num_captures;
         }
 
-        # use Devel::Dwarn;Dwarn $captures;
-
-        if($action->has_captures_constraints) {
-          unless($action->match_captures($c, $captures)) {
-            carp "@{$captures} do not match the type constraints in $action";
+        if($num_captures) {
+          unless($expanded_action->match_captures($c, $captures)) {
+            carp "captures [@{$captures}] do not match the type constraints in action '$action'";
+            return;
           }
         }
 
@@ -1515,9 +1515,10 @@ sub uri_for {
         $path = '/' if $path eq '';
 
         # At this point @encoded_args is the remaining Args (all captures removed).
-        if($action->has_args_constraints) {
-          unless($action->match_args($c,\@encoded_args)) {
-            carp "@encoded_args do not match the type constraints in $action";
+        if($expanded_action->has_args_constraints) {
+          unless($expanded_action->match_args($c,\@encoded_args)) {
+             carp "args [@encoded_args] do not match the type constraints in action '$expanded_action'";
+             return;
           }
         }
     }
@@ -1582,8 +1583,8 @@ sub uri_for {
       } @keys);
     }
 
-    warn $base;
-    warn $args;
+    #warn $base;
+    #warn $args;
     
     my $res = bless(\"${base}${args}${query}", $class);
     $res;
