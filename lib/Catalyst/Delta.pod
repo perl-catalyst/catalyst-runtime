@@ -12,7 +12,7 @@ Catalyst releases.
 =head2 Type constraints on Args and CaptureArgs.
 
 You may now use a type constraint (using L<Moose>, L<MooseX::Types> or preferably
-L<Type::Tiny) in your Args or CaptureArgs action attributes.  This can be used
+L<Type::Tiny> in your Args or CaptureArgs action attributes.  This can be used
 to restrict the value of the Arg.  For example:
 
     sub myaction :Local Args(Int) { ... }

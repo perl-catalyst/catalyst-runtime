@@ -271,6 +271,12 @@ sub execute {
 
 sub match {
     my ( $self, $c ) = @_;
+    return $self->match_args($c, $c->req->args);
+}
+
+sub match_args {
+    my ($self, $c, $args) = @_;
+    my @args = @{$args||[]};
 
     # If infinite args, we always match
     return 1 if $self->normalized_arg_number == ~0;
@@ -287,7 +293,7 @@ sub match {
           $self->args_constraints->[0]->is_a_type_of('ClassName')
         )
       ) {
-        return $self->args_constraints->[0]->check($c->req->args);
+        return $self->args_constraints->[0]->check($args);
         # Removing coercion stuff for the first go
         #if($self->args_constraints->[0]->coercion && $self->attributes->{Coerce}) {
         #  my $coerced = $self->args_constraints->[0]->coerce($c) || return 0;
@@ -297,16 +303,16 @@ sub match {
       } else {
         # Because of the way chaining works, we can expect args that are totally not
         # what you'd expect length wise.  When they don't match length, thats a fail
-        return 0 unless scalar( @{ $c->req->args } ) == $self->normalized_arg_number;
+        return 0 unless scalar( @args ) == $self->normalized_arg_number;
 
-        for my $i(0..$#{ $c->req->args }) {
-          $self->args_constraints->[$i]->check($c->req->args->[$i]) || return 0;
+        for my $i(0..$#args) {
+          $self->args_constraints->[$i]->check($args[$i]) || return 0;
         }
         return 1;
       }
     } else {
       # Otherwise, we just need to match the number of args.
-      return scalar( @{ $c->req->args } ) == $self->normalized_arg_number;
+      return scalar( @args ) == $self->normalized_arg_number;
     }
 }
 
@@ -399,6 +405,11 @@ of the captures for this action.
 
 Returning true from this method causes the chain match to continue, returning
 makes the chain not match (and alternate, less preferred chains will be attempted).
+
+=head2 match_args($c, $args)
+
+Underlying feature that does the 'match' work, but doesn't require a context to
+work (like 'match' does.).
 
 =head2 resolve_type_constraint
 

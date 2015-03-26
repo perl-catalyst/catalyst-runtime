@@ -1498,13 +1498,28 @@ sub uri_for {
             unshift @encoded_args, splice @$captures, $num_captures;
         }
 
-       $path = $c->dispatcher->uri_for_action($action, $captures);
+        # use Devel::Dwarn;Dwarn $captures;
+
+        if($action->has_captures_constraints) {
+          unless($action->match_captures($c, $captures)) {
+            carp "@{$captures} do not match the type constraints in $action";
+          }
+        }
+
+        $path = $c->dispatcher->uri_for_action($action, $captures);
         if (not defined $path) {
             $c->log->debug(qq/Can't find uri_for action '$action' @$captures/)
                 if $c->debug;
             return undef;
         }
         $path = '/' if $path eq '';
+
+        # At this point @encoded_args is the remaining Args (all captures removed).
+        if($action->has_args_constraints) {
+          unless($action->match_args($c,\@encoded_args)) {
+            carp "@encoded_args do not match the type constraints in $action";
+          }
+        }
     }
 
     unshift(@encoded_args, $path);
@@ -1567,6 +1582,9 @@ sub uri_for {
       } @keys);
     }
 
+    warn $base;
+    warn $args;
+    
     my $res = bless(\"${base}${args}${query}", $class);
     $res;
 }

@@ -372,6 +372,13 @@ SKIP: {
 
   ok my $url2 = $c->uri_for($c->controller('Root')->action_for('finally'), [1,2,3,4,5,6]);
   warn $url2;
+
+  ok my $url3 = $c->uri_for($c->controller('Root')->action_for('user'), 2);
+  warn $url3;
+
+  ok my $url4 = $c->uri_for($c->controller('Root')->action_for('user'), [2]);
+  warn $url4;
+
 }
 
 done_testing;
