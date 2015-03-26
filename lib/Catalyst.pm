@@ -1469,31 +1469,12 @@ sub uri_for {
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
 
-    my @encoded_args = ();
-    foreach my $arg (@args) {
-      if(ref($arg)||'' eq 'ARRAY') {
-        push @encoded_args, [map {
-          #   my $encoded = encode_utf8 $_;
-          # $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-          # $encoded;
-          $_
-        } @$arg];
-      } else {
-        push @encoded_args, do {
-          #   my $encoded = encode_utf8 $arg;
-          # $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-          # $encoded;
-          $arg;
-        }
-      }
-    }
-
     my $target_action = $path->$_isa('Catalyst::Action') ? $path : undef;
     if ( $path->$_isa('Catalyst::Action') ) { # action object
-        s|/|%2F|g for @encoded_args;
+        s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
-                        ( scalar @encoded_args && ref $encoded_args[0] eq 'ARRAY'
-                         ? @{ shift(@encoded_args) }
+                        ( scalar @args && ref $args[0] eq 'ARRAY'
+                         ? @{ shift(@args) }
                          : ()) ];
 
         my $action = $path;
@@ -1501,8 +1482,8 @@ sub uri_for {
         my $num_captures = $expanded_action->number_of_captures;
 
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
-        if( !@encoded_args && $action->number_of_args ) {
-          unshift @encoded_args, splice @$captures, $num_captures;
+        if( !@args && $action->number_of_args ) {
+          unshift @args, splice @$captures, $num_captures;
         }
 
         if($num_captures) {
@@ -1522,25 +1503,25 @@ sub uri_for {
 
         # At this point @encoded_args is the remaining Args (all captures removed).
         if($expanded_action->has_args_constraints) {
-          unless($expanded_action->match_args($c,\@encoded_args)) {
-             carp "args [@encoded_args] do not match the type constraints in action '$expanded_action'";
+          unless($expanded_action->match_args($c,\@args)) {
+             carp "args [@args] do not match the type constraints in action '$expanded_action'";
              return;
           }
         }
     }
 
-    unshift(@encoded_args, $path);
+    unshift(@args, $path);
 
     unless (defined $path && $path =~ s!^/!!) { # in-place strip
         my $namespace = $c->namespace;
         if (defined $path) { # cheesy hack to handle path '../foo'
-           $namespace =~ s{(?:^|/)[^/]+$}{} while $encoded_args[0] =~ s{^\.\./}{};
+           $namespace =~ s{(?:^|/)[^/]+$}{} while $args[0] =~ s{^\.\./}{};
         }
-        unshift(@encoded_args, $namespace || '');
+        unshift(@args, $namespace || '');
     }
 
     # join args with '/', or a blank string
-    my $args = join('/', grep { defined($_) } @encoded_args);
+    my $args = join('/', grep { defined($_) } @args);
     $args =~ s/\?/%3F/g; # STUPID STUPID SPECIAL CASE
     $args =~ s!^/+!!;
 
