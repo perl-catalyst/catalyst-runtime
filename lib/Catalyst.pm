@@ -1447,6 +1447,10 @@ In general the scheme of the generated URI object will follow the incoming reque
 however if your targeted action or action chain has the Scheme attribute it will
 use that instead.
 
+Also, if the targeted Action or Action chain declares Args/CaptureArgs that have
+type constraints, we will require that your proposed URL verify on those declared
+constraints.
+
 =cut
 
 sub uri_for {
@@ -1469,15 +1473,17 @@ sub uri_for {
     foreach my $arg (@args) {
       if(ref($arg)||'' eq 'ARRAY') {
         push @encoded_args, [map {
-          my $encoded = encode_utf8 $_;
-          $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-         $encoded;
+          #   my $encoded = encode_utf8 $_;
+          # $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+          # $encoded;
+          $_
         } @$arg];
       } else {
         push @encoded_args, do {
-          my $encoded = encode_utf8 $arg;
-          $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-          $encoded;
+          #   my $encoded = encode_utf8 $arg;
+          # $encoded =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+          # $encoded;
+          $arg;
         }
       }
     }
@@ -1492,7 +1498,7 @@ sub uri_for {
 
         my $action = $path;
         my $expanded_action = $c->dispatcher->expand_action( $action );
-         my $num_captures = $expanded_action->number_of_captures;
+        my $num_captures = $expanded_action->number_of_captures;
 
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
         if( !@encoded_args && $action->number_of_args ) {
@@ -1501,7 +1507,7 @@ sub uri_for {
 
         if($num_captures) {
           unless($expanded_action->match_captures($c, $captures)) {
-            carp "captures [@{$captures}] do not match the type constraints in action '$action'";
+            carp "captures [@{$captures}] do not match the type constraints in actionchain ending with '$action'";
             return;
           }
         }
@@ -1583,8 +1589,10 @@ sub uri_for {
       } @keys);
     }
 
-    #warn $base;
-    #warn $args;
+    $base = encode_utf8 $base;
+    $base =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
+    $args = encode_utf8 $args;
+    $args =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     
     my $res = bless(\"${base}${args}${query}", $class);
     $res;

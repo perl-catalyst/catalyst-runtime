@@ -9,6 +9,8 @@
     URL matches the defined args.
   - New top level document on Route matching. (Catalyst::RouteMatching).  This
     document is still in development, but is worth review and comments, please!
+  - uri_for now does more aggressing testing and warning if your args and captures
+    do not match expected number and type.
 
 5.90085 - 2015-03-25
   - Small change to Catalyst::Action to prevent autovivication of Args value (dim1++)

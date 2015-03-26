@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 use HTTP::Request::Common;
+use utf8;
 
 BEGIN {
   use Test::More;
@@ -20,7 +21,7 @@ BEGIN {
   use Types::Standard -types;
   use Type::Library
    -base,
-   -declare => qw( UserId User ContextLike );
+   -declare => qw( UserId Heart User ContextLike );
 
   extends "Types::Standard"; 
 
@@ -30,6 +31,10 @@ BEGIN {
   declare UserId,
    as Int,
    where { $_ < 5 };
+
+  declare Heart,
+   as Str,
+   where { $_ eq '♥' };
 
   # Tests using this are skipped pending deeper thought
   coerce User,
@@ -61,7 +66,7 @@ BEGIN {
 
   use Moose;
   use MooseX::MethodAttributes;
-  use MyApp::Types qw/Tuple Int Str StrMatch ArrayRef UserId User/;
+  use MyApp::Types qw/Tuple Int Str StrMatch ArrayRef UserId User Heart/;
 
   extends 'Catalyst::Controller';
 
@@ -150,6 +155,11 @@ BEGIN {
     sub chained_zero_post3 : Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero_post3') }
     sub chained_zero3      :     Chained(chain_base2) PathPart('') Args(1) { $_[1]->res->body('chained_zero3') }
 
+
+  sub heart :Local Args(Heart) { }
+
+  sub utf8_base :Chained(/) CaptureArgs(Heart) { }
+    sub utf8_end :Chained(utf8_base) PathPart('') Args(Heart) { }
 
   sub default :Default {
     my ($self, $c, $int) = @_;
@@ -409,12 +419,24 @@ SKIP: {
     ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('finally'), ['a','a',3,4,4,'6']) };
   }
 
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('heart'), ['♥']) };
+    is $url, 'http://localhost/heart/%E2%99%A5';
+  }
+
+  {
+    ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('heart'), ['1']) };
+  }
+
+  {
+    ok my $url = eval { $c->uri_for($c->controller('Root')->action_for('utf8_end'), ['♥','♥']) };
+    is $url, 'http://localhost/utf8_base/%E2%99%A5/%E2%99%A5';
+  }
+
+  {
+    ok my $url = ! eval { $c->uri_for($c->controller('Root')->action_for('utf8_end'), ['2','1']) };
+  }
+
 }
 
 done_testing;
-
-
-__END__
-
-
-
