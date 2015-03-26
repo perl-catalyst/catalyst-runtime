@@ -290,6 +290,7 @@ sub recurse_match {
                     next TRY_ACTION unless $action->match($c);
                 }
                 my $args_attr = $action->attributes->{Args}->[0];
+                my $args_count = $action->normalized_arg_number;
                 my @pathparts = split /\//, $action->attributes->{PathPart}->[0];
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,
@@ -305,12 +306,12 @@ sub recurse_match {
                         !@parts && 
                         defined($args_attr) && 
                         (
-                            $args_attr eq "0" &&
+                            $args_count eq "0" &&
                             (
                               ($c->config->{use_chained_args_0_special_case}||0) || 
                                 (
-                                  exists($best_action->{args_attr}) && defined($best_action->{args_attr}) ?
-                                  ($best_action->{args_attr} ne 0) : 1
+                                  exists($best_action->{args_count}) && defined($best_action->{args_count}) ?
+                                  ($best_action->{args_count} ne 0) : 1
                                 )
                             )
                         )
@@ -320,7 +321,7 @@ sub recurse_match {
                         actions => [ $action ],
                         captures=> [],
                         parts   => \@parts,
-                        args_attr => $args_attr,
+                        args_count => $args_count,
                         n_pathparts => scalar(@pathparts),
                     };
                 }

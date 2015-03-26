@@ -18,7 +18,6 @@ around ['match','match_captures'] => sub {
   return 0 unless $self->$orig($ctx, @args);
 
   my $expected = $ctx->req->method;
-  warn $expected;
   return $self->_has_expected_http_method($expected);
 };
 

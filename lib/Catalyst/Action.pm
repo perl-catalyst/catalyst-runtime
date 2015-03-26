@@ -272,8 +272,6 @@ sub execute {
 sub match {
     my ( $self, $c ) = @_;
 
-    warn $self->reverse;
-
     # If infinite args, we always match
     return 1 if $self->normalized_arg_number == ~0;
 
