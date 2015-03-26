@@ -1,16 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90089_001 - TBA
-  - New Feature: Type Constraints on Args/CapturArgs.  ALlows you to declare
+  - New development branch synched with 5.90085.
+  - New Feature: Type Constraints on Args/CaptureArgs.  Allows you to declare
     a Moose, MooseX::Types or Type::Tiny named constraint on your Arg or 
     CaptureArg.
   - When using $c->uri_for (or the derived $c->uri_for_action) and the target
     action has type constrainted args (or captures), verify that the proposed
-    URL matches the defined args.
+    URL matches the defined args.  In general $c->uri_for will be a bit more
+    noisy if the supplied arguments are not correct.
   - New top level document on Route matching. (Catalyst::RouteMatching).  This
-    document is still in development, but is worth review and comments, please!
-  - uri_for now does more aggressing testing and warning if your args and captures
-    do not match expected number and type.
+    document is still in development, but is worth review and comments.
 
 5.90085 - 2015-03-25
   - Small change to Catalyst::Action to prevent autovivication of Args value (dim1++)
