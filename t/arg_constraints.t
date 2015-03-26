@@ -4,10 +4,12 @@ use HTTP::Request::Common;
 
 BEGIN {
   use Test::More;
-  eval "use Types::Standard; use Type::Utils; use Type::Library; 1;" || do {
-    plan skip_all => "Trouble loading Types::Standard => $@";
+  eval "use Type::Tiny; 1" || do {
+    plan skip_all => "Trouble loading Type::Tiny and friends => $@";
   };
+}
 
+BEGIN {
   package MyApp::Types;
   $INC{'MyApp/Types.pm'} = __FILE__;
 
