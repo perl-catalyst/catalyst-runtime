@@ -113,7 +113,7 @@ well as Args.  For Example:
 
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
-    sub any_priority_chain :Chained(chain_base) PathPart('') Args(1) {  }
+    sub any_priority_chain :GET Chained(chain_base) PathPart('') Args(1) {  }
 
     sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) {  }
 
@@ -121,37 +121,69 @@ well as Args.  For Example:
 
       sub any_priority_link_any :Chained(link_any) PathPart('') Args(1) {  }
 
-      sub int_priority_link_any :Chained(link_any) PathPart('') Args(Int) { }
+      sub int_priority_link_any :Chained(link_any) PathPart('') Args(Int) {  }
     
     sub link_int :Chained(chain_base) PathPart('') CaptureArgs(Int) { }
 
-      sub any_priority_link :Chained(link_int) PathPart('') Args(1) { }
+      sub any_priority_link :Chained(link_int) PathPart('') Args(1) {  }
 
-      sub int_priority_link :Chained(link_int) PathPart('') Args(Int) { }
+      sub int_priority_link :Chained(link_int) PathPart('') Args(Int) {  }
+
+    sub link_int_int :Chained(chain_base) PathPart('') CaptureArgs(Int,Int) { }
+
+      sub any_priority_link2 :Chained(link_int_int) PathPart('') Args(1) {  }
+
+      sub int_priority_link2 :Chained(link_int_int) PathPart('') Args(Int) {  }
+
+    sub link_tuple :Chained(chain_base) PathPart('') CaptureArgs(Tuple[Int,Int,Int]) { }
+
+      sub any_priority_link3 :Chained(link_tuple) PathPart('') Args(1) {  }
+
+      sub int_priority_link3 :Chained(link_tuple) PathPart('') Args(Int) {  }
 
 These chained actions migth create match tables like the following:
 
     [debug] Loaded Chained actions:
-    .----------------------------------------------+----------------------------------------------.
-    | Path Spec                                    | Private                                      |
-    +----------------------------------------------+----------------------------------------------+
-    | /chain_base/*/*                              | /chain_base (1)                              |
-    |                                              | => /any_priority_chain                       |
-    | /chain_base/*/*/*                            | /chain_base (1)                              |
-    |                                              | -> /link_int (1)                             |
-    |                                              | => /any_priority_link                        |
-    | /chain_base/*/*/*                            | /chain_base (1)                              |
-    |                                              | -> /link_any (1)                             |
-    |                                              | => /any_priority_link_any                    |
-    | /chain_base/*/*                              | /chain_base (1)                              |
-    |                                              | => /int_priority_chain                       |
-    | /chain_base/*/*/*                            | /chain_base (1)                              |
-    |                                              | -> /link_int (1)                             |
-    |                                              | => /int_priority_link                        |
-    | /chain_base/*/*/*                            | /chain_base (1)                              |
-    |                                              | -> /link_any (1)                             |
-    |                                              | => /int_priority_link_any                    |
-    '----------------------------------------------+----------------------------------------------'
+    .-------------------------------------+--------------------------------------.
+    | Path Spec                           | Private                              |
+    +-------------------------------------+--------------------------------------+
+    | /chain_base/*/*                     | /chain_base (1)                      |
+    |                                     | => GET /any_priority_chain (1)       |
+    | /chain_base/*/*/*                   | /chain_base (1)                      |
+    |                                     | -> /link_int (Int)                   |
+    |                                     | => /any_priority_link (1)            |
+    | /chain_base/*/*/*/*                 | /chain_base (1)                      |
+    |                                     | -> /link_int_int (Int,Int)           |
+    |                                     | => /any_priority_link2 (1)           |
+    | /chain_base/*/*/*/*/*               | /chain_base (1)                      |
+    |                                     | -> /link_tuple (Tuple[Int,Int,Int])  |
+    |                                     | => /any_priority_link3 (1)           |
+    | /chain_base/*/*/*                   | /chain_base (1)                      |
+    |                                     | -> /link_any (1)                     |
+    |                                     | => /any_priority_link_any (1)        |
+    | /chain_base/*/*/*/*/*/*             | /chain_base (1)                      |
+    |                                     | -> /link_tuple (Tuple[Int,Int,Int])  |
+    |                                     | -> /link2_int (UserId)               |
+    |                                     | => GET /finally (Int)                |
+    | /chain_base/*/*/*/*/*/...           | /chain_base (1)                      |
+    |                                     | -> /link_tuple (Tuple[Int,Int,Int])  |
+    |                                     | -> /link2_int (UserId)               |
+    |                                     | => GET /finally2 (...)               |
+    | /chain_base/*/*                     | /chain_base (1)                      |
+    |                                     | => /int_priority_chain (Int)         |
+    | /chain_base/*/*/*                   | /chain_base (1)                      |
+    |                                     | -> /link_int (Int)                   |
+    |                                     | => /int_priority_link (Int)          |
+    | /chain_base/*/*/*/*                 | /chain_base (1)                      |
+    |                                     | -> /link_int_int (Int,Int)           |
+    |                                     | => /int_priority_link2 (Int)         |
+    | /chain_base/*/*/*/*/*               | /chain_base (1)                      |
+    |                                     | -> /link_tuple (Tuple[Int,Int,Int])  |
+    |                                     | => /int_priority_link3 (Int)         |
+    | /chain_base/*/*/*                   | /chain_base (1)                      |
+    |                                     | -> /link_any (1)                     |
+    |                                     | => /int_priority_link_any (Int)      |
+    '-------------------------------------+--------------------------------------'
 
 As you can see the same general path could be matched by various action chains.  In this case
 the rule described in the previous section should be followed, which is that L<Catalyst>
@@ -164,6 +196,8 @@ actions first.
 Although this reverse order checking may seen counter intuitive it does have the added benefit that
 when inheriting controllers any new actions added would take check precedence over those in your
 parent controller or consumed role.
+
+Please note that your declared type constraint names will now appear in the debug console.
 
 =head1 Conclusion
 
