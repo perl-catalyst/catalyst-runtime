@@ -5,7 +5,7 @@ use utf8;
 
 BEGIN {
   use Test::More;
-  eval "use Type::Tiny; 1" || do {
+  eval "use Type::Tiny 1.000005; 1" || do {
     plan skip_all => "Trouble loading Type::Tiny and friends => $@";
   };
 }
