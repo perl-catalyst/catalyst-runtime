@@ -374,6 +374,9 @@ sub gather_default_action_roles {
 
   push @roles, 'Catalyst::ActionRole::Scheme'
     if $args{attributes}->{Scheme};
+
+  push @roles, 'Catalyst::ActionRole::QueryMatching'
+    if $args{attributes}->{Query};
     return @roles;
 }
 
