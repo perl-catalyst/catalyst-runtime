@@ -23,7 +23,7 @@ is a simple example:
 
     extends 'Catalyst::Controller';
 
-    sub find :Path('') Args(Int) {
+    sub find :Path('') Args('Int') {
       my ($self, $c, $int) = @_;
     }
 
@@ -42,11 +42,18 @@ easily understood and declarative actions.
 More than one argument may be added by comma separating your type constraint names, for
 example:
 
+    use Types::Standard qw/Int Str/;
+
     sub find :Path('') Args(Int,Int,Str) {
       my ($self, $c, $int1, $int2, $str) = @_;
     }
 
-Would require three arguments, an integer, integer and a string.
+Would require three arguments, an integer, integer and a string.  Note in this example we
+constrained the args using imported types via L<Types::Standard>.  Although you may use
+stringy Moose types, we recommend imported types since this is less ambiguous to your readers.
+If you want to use Moose stringy types. you must quote them (either "Int" or 'Int' is fine).
+
+Conversely, you should not quote types that are imported!
 
 =head3 Using type constraints in a controller
 
@@ -60,7 +67,7 @@ the L<Types::Standard> library that is packaged with L<Type::Tiny>:
 
     use Moose;
     use MooseX::MethodAttributes;
-    use Types::Standard qw/StrMatch/;
+    use Types::Standard qw/StrMatch Int/;
     
     extends 'Catalyst::Controller';
 
@@ -111,6 +118,8 @@ Using type constraints in Chained actions works the same as it does for Path and
 actions.  The only difference is that you may declare type constraints on CaptureArgs as
 well as Args.  For Example:
 
+  use Types::Standard qw/Int Tuple/;
+  
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
     sub any_priority_chain :GET Chained(chain_base) PathPart('') Args(1) {  }

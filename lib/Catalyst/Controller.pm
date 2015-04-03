@@ -892,6 +892,12 @@ them into the controller namespace:
       my ($self, $c, $int) = @_;
     }
 
+If you choose not to use imported type constraints (like L<Type::Tiny>, or <MooseX::Types>
+you may use L<Moose> 'stringy' types however just like when you use these types in your
+declared attributes you must quote them:
+
+    sub my_moose_type :Local Args('Int') { ... }
+
 See L<Catalyst::RouteMatching> for more.
 
 =head2 Consumes('...')

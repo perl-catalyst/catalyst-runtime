@@ -82,6 +82,11 @@ BEGIN {
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
 
+  sub stringy_enum :Local Args('Int',Int) {
+    my ($self, $c) = @_;
+    $c->res->body('enum');
+  }
+
   sub an_int :Local Args(Int) {
     my ($self, $c, $int) = @_;
     $c->res->body('an_int');
@@ -363,6 +368,21 @@ SKIP: {
 {
     my $res = request POST '/chain_base2/capture';
     is $res->content, 'chained_zero2', "request POST '/chain_base2/capture'";
+}
+
+{
+    my $res = request '/stringy_enum/1/2';
+    is $res->content, 'enum', "request '/stringy_enum/a'";
+}
+
+{
+    my $res = request '/stringy_enum/b/2';
+    is $res->content, 'default', "request '/stringy_enum/a'";
+}
+
+{
+    my $res = request '/stringy_enum/1/a';
+    is $res->content, 'default', "request '/stringy_enum/a'";
 }
 
 =over

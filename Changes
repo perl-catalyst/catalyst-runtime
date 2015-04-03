@@ -1,6 +1,16 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90089_001 - TBA
+5.90089_002 - 2015-04-03
+  - Changed the way we check for presence of Type::Tiny in a test case to be
+    more explicit in the version requirement.  Hopefully a fix for reported
+    test fail.
+  - When declaring type constraints in Args and CaptureArgs, if you want to
+    use a Moose builtin type (or a custom stringy type that you've already
+    defined and associated with the Moose::TypeRegistry) you must now quote
+    the type name.  This is to clearly disambiguate between Moose stringy types
+    and imported types.
+
+5.90089_001 - 2015-03-26
   - New development branch synched with 5.90085.
   - New Feature: Type Constraints on Args/CaptureArgs.  Allows you to declare
     a Moose, MooseX::Types or Type::Tiny named constraint on your Arg or 

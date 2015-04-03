@@ -92,6 +92,7 @@ has number_of_args_constraints => (
         } else {
           # Its a Reftype but we don't know the number of params it
           # actually validates.
+          warn "Your type constraint '$tc' is a reference type but I cannot determine its number of parameters in action ${\$self->private_path}";
           return undef;
         }
       } else {
@@ -211,8 +212,11 @@ has captures_constraints => (
 sub resolve_type_constraint {
   my ($self, $name) = @_;
   my @tc = eval "package ${\$self->class}; $name";
-  return @tc if $tc[0];
-  return Moose::Util::TypeConstraints::find_or_parse_type_constraint($name);
+  if($tc[0]) {
+    return map { ref($_) ? $_ : Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) } @tc;
+  } else {
+    return;
+  }
 }
 
 has number_of_captures => (
@@ -408,8 +412,7 @@ makes the chain not match (and alternate, less preferred chains will be attempte
 
 =head2 match_args($c, $args)
 
-Underlying feature that does the 'match' work, but doesn't require a context to
-work (like 'match' does.).
+Does the Args match or not?
 
 =head2 resolve_type_constraint
 
