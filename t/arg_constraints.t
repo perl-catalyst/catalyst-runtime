@@ -66,6 +66,7 @@ BEGIN {
 
   use Moose;
   use MooseX::MethodAttributes;
+  use Types::Standard qw/slurpy/;
   use MyApp::Types qw/Tuple Int Str StrMatch ArrayRef UserId User Heart/;
 
   extends 'Catalyst::Controller';
@@ -98,11 +99,16 @@ BEGIN {
   }
 
   sub many_ints :Local Args(ArrayRef[Int]) {
-    my ($self, $c, $int) = @_;
+    my ($self, $c, @ints) = @_;
     $c->res->body('many_ints');
   }
 
   sub tuple :Local Args(Tuple[Str,Int]) {
+    my ($self, $c, $str, $int) = @_;
+    $c->res->body('tuple');
+  }
+
+  sub slurpy_tuple :Local Args(Tuple[Str,Int, slurpy ArrayRef[Int]]) {
     my ($self, $c, $str, $int) = @_;
     $c->res->body('tuple');
   }
@@ -298,6 +304,17 @@ SKIP: {
   my $res = request '/tuple/aaa/111';
   is $res->content, 'tuple';
 }
+
+{
+  my $res = request '/tuple/aaa/111/111/111';
+  is $res->content, 'default';
+}
+
+{
+  my $res = request '/slurpy_tuple/aaa/111/111/111';
+  is $res->content, 'tuple';
+}
+
 
 {
   my $res = request '/many_ints/1/2/a';

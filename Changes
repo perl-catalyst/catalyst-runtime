@@ -9,6 +9,9 @@
     defined and associated with the Moose::TypeRegistry) you must now quote
     the type name.  This is to clearly disambiguate between Moose stringy types
     and imported types.
+  - Additional changes to type constraint detection to between determine when a
+    type constraint for reference types have a measured number of arguments or
+    not.  clarify restriction on reference type constraints.
 
 5.90089_001 - 2015-03-26
   - New development branch synched with 5.90085.

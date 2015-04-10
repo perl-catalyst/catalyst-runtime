@@ -728,6 +728,10 @@ custom type constraints and import them into the controller namespace:
 
       sub int_priority_chain :Chained(chain_base) PathPart('') Args(Int) { }
 
+If you use a reference type constraint in CaptureArgs, it must be a type
+like Tuple in L<Types::Standard> that allows us to determine the number of
+args to match.  Otherwise this will raise an error during startup.
+
 See L<Catalyst::RouteMatching> for more.
 
 =item Args
@@ -747,6 +751,9 @@ of path parts after the endpoint.
 Just as with C<:CaptureArgs>, the arguments get passed to the action in
 C<@_> after the context object. They can also be reached through
 C<$c-E<gt>request-E<gt>arguments>.
+
+You should see 'Args' in L<Catalyst::Controller> for more details on using
+type constraints in your Args declarations.
 
 =back
 
