@@ -12,6 +12,7 @@ use String::RewritePrefix;
 use Class::Load ();
 use namespace::clean;
 use Devel::InnerPackage;
+use Moose::Util;
 
 =head1 NAME
 
@@ -509,6 +510,7 @@ Used to add components at runtime:
 
     into        The Catalyst package to inject into (e.g. My::App)
     component   The component package to inject
+    traits      (Optional) ArrayRef of L<Moose::Role>s that the componet should consume.
     as          An optional moniker to use as the package name for the derived component
 
 For example:
@@ -531,6 +533,11 @@ package extend the given component, and then having Catalyst setup the new compo
 B<NOTE:> This is basically a core version of L<CatalystX::InjectComponent>.  If you were using that
 you can now use this safely instead.  Going forward changes required to make this work will be
 synchronized with the core method.
+
+B<NOTE:> The 'traits' option is unique to the L<Catalyst::Utils> version of this feature.
+
+B<NOTE:> These injected components really need to be a L<Catalyst::Component> and a L<Moose>
+based class.
 
 =cut
 
@@ -560,6 +567,7 @@ sub inject_component {
     unless ( Class::Load::is_class_loaded $component_package ) {
         eval "package $component_package; use base qw/$component/; 1;" or
             croak "Unable to build component package for \"$component_package\": $@";
+        Moose::Util::apply_all_roles($component_package, @{$given{traits}}) if $given{traits};
         (my $file = "$component_package.pm") =~ s{::}{/}g;
         $INC{$file} ||= 1;    
     }

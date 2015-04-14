@@ -17,7 +17,9 @@
   - NEW FEATURE: New method in Catalyst::Utils 'inject_component', which is a core
     version of the previously external addon 'CatalystX::InjectComponent'.  You should
     start to convert your existing code which uses the stand alone version, since
-    going forward only the core version will be supported.
+    going forward only the core version will be supported.  Also the core version in
+    Catalyst::Utils has an additional feature to compose roles into the injected
+    component.
   - NEW FEATURE: Concepts from 'CatalystX::RoleApplicator' have been moved to core
     so we now have the follow application attributes 'request_class_traits',
     'response_class_traits' and 'stats_class_traits' which allow you to compose
