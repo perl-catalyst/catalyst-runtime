@@ -21,6 +21,34 @@ Into
 and we expect everything to work the same (we'd consider it not working the same
 to be a bug, and please report it.)
 
+We also cored features from L<CatalystX::RoleApplicator> to compose a role into the
+request, response and stats classes.  The main difference is that with L<CatalystX::RoleApplicator>
+you did:
+
+    package MyApp;
+
+    use Catalyst;
+    use CatalystX::RoleApplicator;
+
+    __PACKAGE__->apply_request_class_roles(
+      qw/My::Request::Role Other::Request::Role/);
+
+Whereas now we have three class attributes, 'request_class_traits', 'response_class_traits'
+and 'stats_class_traits', so you use like this (note this value is an ArrayRef)
+
+
+    package MyApp;
+
+    use Catalyst;
+
+    __PACKAGE__->request_class_traits([qw/
+      My::Request::Role
+      Other::Request::Role/]);
+
+(And the same for response_class_traits and stats_class_traits.  We left off the
+traits for Engine, since that class does a lot less nowadays, and dispatcher.  If you
+used those and can share a use case, we'd be likely to support them.
+
 =head1 Upgrading to Catalyst 5.90085
 
 In this version of Catalyst we made a small change to Chained Dispatching so
