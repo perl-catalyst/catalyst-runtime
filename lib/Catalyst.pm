@@ -63,7 +63,9 @@ has request => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        $self->request_class->new($self->_build_request_constructor_args);
+        my $class = ref $self;
+        my $composed_request_class = $class->composed_request_class;
+        return $composed_request_class->new( $self->_build_request_constructor_args);
     },
     lazy => 1,
 );
@@ -77,11 +79,19 @@ sub _build_request_constructor_args {
     \%p;
 }
 
+sub composed_request_class {
+  my $class = shift;
+  return $class->_composed_request_class ||
+    $class->_composed_request_class(Moose::Util::with_traits($class->request_class, @{$class->request_class_traits||[]}));
+}
+
 has response => (
     is => 'rw',
     default => sub {
         my $self = shift;
-        $self->response_class->new($self->_build_response_constructor_args);
+        my $class = ref $self;
+        my $composed_response_class = $class->composed_response_class;
+        return $composed_response_class->new( $self->_build_response_constructor_args);
     },
     lazy => 1,
 );
@@ -90,6 +100,12 @@ sub _build_response_constructor_args {
       _log => $_[0]->log,
       encoding => $_[0]->encoding,
     };
+}
+
+sub composed_response_class {
+  my $class = shift;
+  return $class->_composed_response_class ||
+    $class->_composed_response_class(Moose::Util::with_traits($class->response_class, @{$class->response_class_traits||[]}));
 }
 
 has namespace => (is => 'rw');
@@ -120,12 +136,21 @@ __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
   engine_loader context_class request_class response_class stats_class
   setup_finished _psgi_app loading_psgi_file run_options _psgi_middleware
-  _data_handlers _encoding _encode_check finalized_default_middleware/;
+  _data_handlers _encoding _encode_check finalized_default_middleware
+  request_class_traits response_class_traits stats_class_traits
+  _composed_request_class _composed_response_class _composed_stats_class/;
 
 __PACKAGE__->dispatcher_class('Catalyst::Dispatcher');
 __PACKAGE__->request_class('Catalyst::Request');
 __PACKAGE__->response_class('Catalyst::Response');
 __PACKAGE__->stats_class('Catalyst::Stats');
+
+sub composed_stats_class {
+  my $class = shift;
+  return $class->_composed_stats_class ||
+    $class->_composed_stats_class(Moose::Util::with_traits($class->stats_class, @{$class->stats_class_traits||[]}));
+}
+
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
@@ -1487,8 +1512,8 @@ sub uri_for {
         }
 
         if($num_captures) {
-          unless($expanded_action->match_captures($c, $captures)) {
-            carp "captures [@{$captures}] do not match the type constraints in actionchain ending with '$action'";
+          unless($expanded_action->match_captures_constraints($c, $captures)) {
+            carp "captures [@{$captures}] do not match the type constraints in actionchain ending with '$expanded_action'";
             return;
           }
         }
@@ -2269,8 +2294,10 @@ sub prepare {
 
     $c->response->_context($c);
 
-    #surely this is not the most efficient way to do things...
-    $c->stats($class->stats_class->new)->enable($c->use_stats);
+    if($c->use_stats) {
+      $c->stats($class->composed_stats_class->new)->enable;
+    }
+
     if ( $c->debug || $c->config->{enable_catalyst_header} ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
     }
@@ -2676,9 +2703,25 @@ sub prepare_write { my $c = shift; $c->engine->prepare_write( $c, @_ ) }
 
 Returns or sets the request class. Defaults to L<Catalyst::Request>.
 
+=head2 $app->request_class_traits
+
+An arrayref of L<Moose::Role>s which are applied to the request class.  
+
+=head2 $app->composed_request_class
+
+This is the request class which has been composed with any request_class_traits.
+
 =head2 $c->response_class
 
 Returns or sets the response class. Defaults to L<Catalyst::Response>.
+
+=head2 $app->response_class_traits
+
+An arrayref of L<Moose::Role>s which are applied to the response class.
+
+=head2 $app->composed_response_class
+
+This is the request class which has been composed with any response_class_traits.
 
 =head2 $c->read( [$maxlength] )
 
@@ -2797,6 +2840,15 @@ sub setup_components {
             $class->components->{ $component } = $class->setup_component($component);
         }
     }
+
+    # Inject a component or wrap a stand alone class in an adaptor
+    #my @configured_comps = grep { not($class->component($_)||'') }
+    # grep { /^(Model)::|(View)::|(Controller::)/ }
+    #   keys %{$class->config ||+{}};
+
+    #foreach my $configured_comp(@configured_comps) {
+      #warn $configured_comp;
+      #}
 }
 
 =head2 $c->locate_components( $setup_component_config )
@@ -3682,6 +3734,14 @@ by itself.
 =head2 $c->stats_class
 
 Returns or sets the stats (timing statistics) class. L<Catalyst::Stats|Catalyst::Stats> is used by default.
+
+=head2 $app->stats_class_traits
+
+A arrayref of L<Moose::Role>s that are applied to the stats_class before creating it.
+
+=head2 $app->composed_stats_class
+
+this is the stats_class composed with any 'stats_class_traits'.
 
 =head2 $c->use_stats
 

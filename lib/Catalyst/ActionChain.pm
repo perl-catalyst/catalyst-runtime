@@ -71,6 +71,17 @@ sub match_captures {
   }
   return 1;
 }
+sub match_captures_constraints {
+  my ($self, $c, $captures) = @_;
+  my @captures = @{$captures||[]};
+
+  foreach my $link(@{$self->chain}) {
+    my @local_captures = splice @captures,0,$link->number_of_captures;
+    next unless $link->has_captures_constraints;
+    return unless $link->match_captures_constraints($c, \@local_captures);
+  }
+  return 1;
+}
 
 # the scheme defined at the end of the chain is the one we use
 # but warn if too many.

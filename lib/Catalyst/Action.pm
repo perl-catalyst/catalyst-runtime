@@ -371,27 +371,36 @@ sub match_captures {
   my @captures = @{$captures||[]};
 
   return 1 unless scalar(@captures); # If none, just say its ok
+  return $self->has_captures_constraints ?
+    $self->match_captures_constraints($c, $captures) : 1;
 
-  if($self->has_captures_constraints) {
-    if(
-      $self->captures_constraints_count == 1 &&
-      (
-        $self->captures_constraints->[0]->is_a_type_of('Ref') ||
-        $self->captures_constraints->[0]->is_a_type_of('ClassName')
-      )
-    ) {
-      return $self->captures_constraints->[0]->check($captures);
-    } else {
-      for my $i(0..$#captures) {
-        $self->captures_constraints->[$i]->check($captures[$i]) || return 0;
-      }
-      return 1;
-      }
-  } else {
-    return 1;
-  }
   return 1;
 }
+
+sub match_captures_constraints {
+  my ($self, $c, $captures) = @_;
+  my @captures = @{$captures||[]};
+
+  # Match is positive if you don't have any.
+  return 1 unless $self->has_captures_constraints;
+
+  if(
+    $self->captures_constraints_count == 1 &&
+    (
+      $self->captures_constraints->[0]->is_a_type_of('Ref') ||
+      $self->captures_constraints->[0]->is_a_type_of('ClassName')
+    )
+  ) {
+    return $self->captures_constraints->[0]->check($captures);
+  } else {
+    for my $i(0..$#captures) {
+      $self->captures_constraints->[$i]->check($captures[$i]) || return 0;
+    }
+    return 1;
+    }
+
+}
+
 
 sub compare {
     my ($a1, $a2) = @_;
@@ -455,6 +464,11 @@ of the captures for this action.
 
 Returning true from this method causes the chain match to continue, returning
 makes the chain not match (and alternate, less preferred chains will be attempted).
+
+=head2 match_captures_constraints ($c, \@captures);
+
+Does the \@captures given match any constraints (if any constraints exist).  Returns
+true if you ask but there are no constraints.
 
 =head2 match_args($c, $args)
 

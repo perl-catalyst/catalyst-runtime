@@ -24,6 +24,11 @@ your arguments to $c->uri_for(...) must match those constraints.
 
 See L<Catalyst::RouteMatching> for more.
 
+=head2 Move CatalystX::InjectComponent into core
+
+L<Catalyst::Utils> has a new method 'inject_component' which works the same as the method of
+the same name in L<CatalystX::InjectComponent>.
+
 =head2 VERSION 5.90080+
 
 The biggest change in this release is that UTF8 encoding is now enabled by

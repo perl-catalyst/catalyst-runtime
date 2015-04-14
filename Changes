@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90089_002 - 2015-04-03
+5.90089_002 - 2015-04-15
   - Changed the way we check for presence of Type::Tiny in a test case to be
     more explicit in the version requirement.  Hopefully a fix for reported
     test fail.
@@ -12,10 +12,25 @@
   - Additional changes to type constraint detection to between determine when a
     type constraint for reference types have a measured number of arguments or
     not.  clarify restriction on reference type constraints.
+  - Several bugs with type constraints and uri_for squashed.  More test cases
+    around all the argument type constraints to tighten scope of action.
+  - NEW FEATURE: New method in Catalyst::Utils 'inject_component', which is a core
+    version of the previously external addon 'CatalystX::InjectComponent'.  You should
+    start to convert your existing code which uses the stand alone version, since
+    going forward only the core version will be supported.
+  - NEW FEATURE: Concepts from 'CatalystX::RoleApplicator' have been moved to core
+    so we now have the follow application attributes 'request_class_traits',
+    'response_class_traits' and 'stats_class_traits' which allow you to compose
+    traits for these core Catalyst classes without needing to create subclasses. So
+    in general any request or response trait on CPAN that used 'CatalystX::RoleApplicator'
+    should now just work with this core feature.
+  - Only create a stats object if you are using stats.  This is a minor performance
+    optimization, but there's a small chance it is a breaking change, so please
+    report any stats related issues.
 
 5.90089_001 - 2015-03-26
   - New development branch synched with 5.90085.
-  - New Feature: Type Constraints on Args/CaptureArgs.  Allows you to declare
+  - NEW FEATURE: Type Constraints on Args/CaptureArgs.  Allows you to declare
     a Moose, MooseX::Types or Type::Tiny named constraint on your Arg or 
     CaptureArg.
   - When using $c->uri_for (or the derived $c->uri_for_action) and the target

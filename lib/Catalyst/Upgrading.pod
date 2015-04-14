@@ -2,6 +2,25 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90090
+
+L<Catalyst::Utils> has a new method 'inject_component' which works the same as the method of
+the same name in L<CatalystX::InjectComponent>.  You should start converting any
+use of the non core method in your code as future changes to Catalyst will be
+sychronized to the core method first.  We reserve the right to cease support
+of the non core version should we reach a point in time where it cannot be
+properly supported as an external module.  Luckily this should be a trivial
+search and replace.  Change all occurances of:
+
+    CatalystX::InjectComponent->inject(...)
+
+Into
+
+    Catalyst::Utils::inject_component(...)
+
+and we expect everything to work the same (we'd consider it not working the same
+to be a bug, and please report it.)
+
 =head1 Upgrading to Catalyst 5.90085
 
 In this version of Catalyst we made a small change to Chained Dispatching so
