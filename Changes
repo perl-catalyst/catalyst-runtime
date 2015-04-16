@@ -26,9 +26,19 @@
     traits for these core Catalyst classes without needing to create subclasses. So
     in general any request or response trait on CPAN that used 'CatalystX::RoleApplicator'
     should now just work with this core feature.
+  - NEW FEATURE: Core concepts from 'CatalystX::ComponentsFromConfig'.  You can now
+    setup components directly from configuration.  This could save you some effort and
+    creating 'empty' base classes in your Model/View and Controller directories.  This
+    feature is currently limited in that you can only configure components that are
+    'true' Catalyst components (but you may use Catalyst::Model::Adaptor to proxy
+    stand alone classes...).
   - Only create a stats object if you are using stats.  This is a minor performance
     optimization, but there's a small chance it is a breaking change, so please
     report any stats related issues.
+  - Added a developer mode warning if you call a component with arguments that does not
+    expect arguments (for example calling $c->model('Foo', 1,2,3,4) where Myapp::Model::Foo
+    does not ACCEPT_CONTEXT.   Only components that ACCEPT_CONTEXT do anything with
+    passed arguments in $c->controller/view/model.
 
 5.90089_001 - 2015-03-26
   - New development branch synched with 5.90085.

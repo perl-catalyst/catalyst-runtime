@@ -4,6 +4,15 @@ use HTTP::Request::Common;
 use Test::More;
 
 {
+  package Local::Model::Foo;
+
+  use Moose;
+  extends 'Catalyst::Model';
+
+  has a => (is=>'ro', required=>1);
+
+  sub foo { shift->a . 'foo' }
+
   package Local::Controller::Errors;
 
   use Moose;
@@ -13,12 +22,22 @@ use Test::More;
 
   has ['a', 'b'] => (is=>'ro', required=>1);
 
-  sub not_found :Local { pop->res->from_psgi_response(404, [], ['Not Found']) }
+  sub not_found :Local { pop->res->from_psgi_response([404, [], ['Not Found']]) }
 
   package MyApp::Model::User;
   $INC{'MyApp/Model/User.pm'} = __FILE__;
 
-  use base 'Catalyst::Model';
+  use Moose;
+  extends 'Catalyst::Model';
+
+  has 'zoo' => (is=>'ro', required=>1, isa=>'Object');
+
+  around 'COMPONENT', sub {
+    my ($orig, $class, $app, $config) = @_;
+    $config->{zoo} = $app->model('Zoo');
+
+    return $class->$orig($app, $config);
+  };
 
   our %users = (
     1 => { name => 'john', age => 46 },
@@ -44,6 +63,9 @@ use Test::More;
   sub user :Local Args(1) {
     my ($self, $c, $int) = @_;
     my $user = $c->model("User")->find($int);
+
+     $c->model("User")->zoo->a;
+    
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
 
@@ -59,8 +81,18 @@ use Test::More;
 
   MyApp->config({
     'Controller::Err' => {
-      component => 'Local::Controller::Errors'
-    }
+      from_component => 'Local::Controller::Errors',
+      args => { a=> 100, b => 200, namespace =>'error' },
+    },
+    'Model::Zoo' => {
+      from_component => 'Local::Model::Foo',
+      args => {a=>2},
+    },
+    'Model::Foo' => {
+      from_component => 'Local::Model::Foo',
+      args => { a=> 100 },
+    },
+
   });
 
   MyApp->setup;
@@ -71,6 +103,11 @@ use Catalyst::Test 'MyApp';
 {
   my $res = request '/user/1';
   is $res->content, 'name: john, age: 46';
+}
+
+{
+  my $res = request '/error/not_found';
+  is $res->content, 'Not Found';
 }
 
 done_testing;

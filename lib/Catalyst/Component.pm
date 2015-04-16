@@ -202,6 +202,19 @@ something like this:
       return $class->new($app, $args);
   }
 
+B<NOTE:> Generally when L<Catalyst> starts, it initializes all the components
+and passes the hashref present in any configutation information to the
+COMPONET method.  For example
+
+    MyApp->config(
+      'Model::Foo' => {
+        bar => 'baz',
+      });
+
+You would expect COMPONENT to be called like this ->COMPONENT( 'MyApp', +{ bar=>'baz'});
+
+This would happen ONCE during setup.
+
 =head2 $c->config
 
 =head2 $c->config($hashref)
@@ -250,6 +263,31 @@ with the current $c and any additional args (e.g. $c->model('Foo', qw/bar baz/)
 would cause your MyApp::Model::Foo instance's ACCEPT_CONTEXT to be called with
 ($c, 'bar', 'baz')) and the return value of this method is returned to the
 calling code in the application rather than the component itself.
+
+B<NOTE:> All classes that are L<Catalyst::Component>s will have a COMPONENT
+method, but classes that are intended to be factories or generators will
+have ACCEPT_CONTEXT.  If you have initialization arguments (such as from
+configuration) that you wish to expose to the ACCEPT_CONTEXT you should
+proxy them in the factory instance.  For example:
+
+    MyApp::Model::FooFactory;
+
+    use Moose;
+    extends 'Catalyst::Model';
+
+    has type => (is=>'ro', required=>1);
+
+    sub ACCEPT_CONTEXT {
+      my ($self, $c, @args) = @_;
+      return bless { args=>\@args }, $self->type;
+    }
+
+    MyApp::Model::Foo->meta->make_immutable;
+    MyApp::Model::Foo->config( type => 'Type1' );
+
+And in a controller:
+
+    my $type = $c->model('FooFactory', 1,2,3,4): # $type->isa('Type1')
 
 =head1 SEE ALSO
 

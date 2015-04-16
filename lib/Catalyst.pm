@@ -713,9 +713,15 @@ sub _comp_names {
 sub _filter_component {
     my ( $c, $comp, @args ) = @_;
 
+    if(ref $comp eq 'CODE') {
+      $comp = $comp->();
+    }
+
     if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
         return $comp->ACCEPT_CONTEXT( $c, @args );
     }
+
+    $c->log->warn("You called component '${\$comp->catalyst_component_name}' with arguments [@args], but this component does not ACCEPT_CONTEXT, so args are ignored.") if scalar(@args) && $c->debug;
 
     return $comp;
 }
@@ -763,7 +769,8 @@ Gets a L<Catalyst::Model> instance by name.
 
     $c->model('Foo')->do_stuff;
 
-Any extra arguments are directly passed to ACCEPT_CONTEXT.
+Any extra arguments are directly passed to ACCEPT_CONTEXT, if the model
+defines ACCEPT_CONTEXT.  If it does not, the args are discarded.
 
 If the name is omitted, it will look for
  - a model object in $c->stash->{current_model_instance}, then
@@ -2832,23 +2839,40 @@ sub setup_components {
 
     for my $component (@comps) {
         my $instance = $class->components->{ $component } = $class->setup_component($component);
-        my @expanded_components = $instance->can('expand_modules')
-            ? $instance->expand_modules( $component, $config )
-            : $class->expand_component_module( $component, $config );
-        for my $component (@expanded_components) {
-            next if $comps{$component};
-            $class->components->{ $component } = $class->setup_component($component);
-        }
     }
 
-    # Inject a component or wrap a stand alone class in an adaptor
-    #my @configured_comps = grep { not($class->component($_)||'') }
-    # grep { /^(Model)::|(View)::|(Controller::)/ }
-    #   keys %{$class->config ||+{}};
+    # Inject a component or wrap a stand alone class in an adaptor. This makes a list
+    # of named components in the configuration that are not actually existing (not a
+    # real file).
+    my @configured_comps = grep { not($class->components->{$_}||'') }
+      grep { /^(Model)::|(View)::|(Controller::)/ }
+        keys %{$class->config ||+{}};
 
-    #foreach my $configured_comp(@configured_comps) {
-      #warn $configured_comp;
-      #}
+    foreach my $configured_comp(@configured_comps) {
+      my $component_class = exists $class->config->{$configured_comp}->{from_component} ? 
+        delete $class->config->{$configured_comp}->{from_component} : '';
+
+      if($component_class) {
+        my @roles = @{ exists $class->config->{$configured_comp}->{roles} ?
+          delete $class->config->{$configured_comp}->{roles} : [] };
+
+        my %args = %{ exists $class->config->{$configured_comp}->{args} ? 
+          delete $class->config->{$configured_comp}->{args} : +{} };
+
+        $class->config->{$configured_comp} = \%args;
+        Catalyst::Utils::inject_component(
+          into => $class,
+          component => $component_class,
+          (scalar(@roles) ? (traits => \@roles) : ()),
+          as => $configured_comp);
+      }
+    }
+
+    # All components are registered, now we need to 'init' them.
+    foreach my $component_name (keys %{$class->components||{}}) {
+      $class->components->{$component_name} = $class->components->{$component_name}->();
+    }
+
 }
 
 =head2 $c->locate_components( $setup_component_config )
@@ -2899,6 +2923,7 @@ sub expand_component_module {
 sub setup_component {
     my( $class, $component ) = @_;
 
+return sub {
     unless ( $component->can( 'COMPONENT' ) ) {
         return $component;
     }
@@ -2910,14 +2935,15 @@ sub setup_component {
     # for the debug screen, as $component is already the key name.
     local $config->{catalyst_component_name} = $component;
 
-    my $instance = eval { $component->COMPONENT( $class, $config ); };
-
-    if ( my $error = $@ ) {
-        chomp $error;
-        Catalyst::Exception->throw(
-            message => qq/Couldn't instantiate component "$component", "$error"/
-        );
-    }
+    my $instance = eval {
+      $component->COMPONENT( $class, $config );
+    } || do {
+      my $error = $@;
+      chomp $error;
+      Catalyst::Exception->throw(
+        message => qq/Couldn't instantiate component "$component", "$error"/
+      );
+    };
 
     unless (blessed $instance) {
         my $metaclass = Moose::Util::find_meta($component);
@@ -2929,7 +2955,18 @@ sub setup_component {
             qq/Couldn't instantiate component "$component", COMPONENT() method (from $component_method_from) didn't return an object-like value (value was $value)./
         );
     }
-    return $instance;
+
+my @expanded_components = $instance->can('expand_modules')
+  ? $instance->expand_modules( $component, $config )
+  : $class->expand_component_module( $component, $config );
+for my $component (@expanded_components) {
+  next if $class->components->{ $component };
+  $class->components->{ $component } = $class->setup_component($component);
+}
+
+    return $instance; 
+}
+
 }
 
 =head2 $c->setup_dispatcher

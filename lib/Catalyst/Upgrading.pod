@@ -49,6 +49,38 @@ and 'stats_class_traits', so you use like this (note this value is an ArrayRef)
 traits for Engine, since that class does a lot less nowadays, and dispatcher.  If you
 used those and can share a use case, we'd be likely to support them.
 
+Lastly, we have some of the feature from L<CatalystX::ComponentsFromConfig> in
+core.  This should mostly work the same way in core, except for now the
+core version does not create an automatic base wrapper class for your configured
+components (it requires these to be catalyst components and injects them directly.
+So if you make heavy use of custom base classes in L<CatalystX::ComponentsFromConfig>
+you might need a bit of work to use the core version (although there is no reason
+to stop using L<CatalystX::ComponentsFromConfig> since it should continue to work
+fine and we'd consider issues with it to be bugs).  Here's one way to map from
+L<CatalystX::ComponentsFromConfig> to core:
+
+In L<CatalystX::ComponentsFromConfig>:
+
+    MyApp->config(
+      'Model::MyClass' => {
+          class => 
+
+      });
+
+<Model::MyClass>
+ class My::Class
+ <args>
+  some param
+ </args>
+</Model::MyClass>
+
+Also we added a new develop console mode only warning when you call a component
+with arguments that don't expect or do anything meaningful with those args.  Its
+possible if you are logging debug mode in production (please don't...) this 
+could add verbosity to those logs if you also happen to be calling for components
+and passing pointless arguments.  We added this warning to help people not make this
+error and to better understand the component resolution flow.
+
 =head1 Upgrading to Catalyst 5.90085
 
 In this version of Catalyst we made a small change to Chained Dispatching so
