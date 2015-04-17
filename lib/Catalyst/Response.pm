@@ -109,7 +109,7 @@ before [qw(status headers content_encoding content_length content_type header)] 
   $self->_context->log->warn( 
     "Useless setting a header value after finalize_headers and the response callback has been called." .
     " Not what you want." )
-      if ( $self->finalized_headers && !$self->_has_response_cb && @_ );
+      if ( $self->_context && $self->finalized_headers && !$self->_has_response_cb && @_ );
 };
 
 sub output { shift->body(@_) }
