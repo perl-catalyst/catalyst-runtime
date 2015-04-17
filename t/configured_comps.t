@@ -100,7 +100,7 @@ use Test::More;
       'Model::Zoo' => { from_component => 'Local::Model::Foo' },
       'Model::Foo' => { from_component => 'Local::Model::Foo', roles => ['TestRole'] },
     },
-    'Controller::Err' => { a => 100, b=>200, namespace=>'error' },
+    'Controller::Err' => { a => 100, b => 200, namespace => 'error' },
     'Model::Zoo' => { a => 2 },
     'Model::Foo' => { a => 100 },
     'Model::One' => { a => 'one' },
