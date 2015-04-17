@@ -2849,35 +2849,27 @@ sub setup_components {
     # Inject a component or wrap a stand alone class in an adaptor. This makes a list
     # of named components in the configuration that are not actually existing (not a
     # real file).
-    my @configured_comps = grep { not($class->components->{$_}||'') }
-      grep { /^(Model)::|(View)::|(Controller::)/ }
-        keys %{$class->config ||+{}};
 
-    foreach my $configured_comp(@configured_comps) {
-      my $component_class = exists $class->config->{$configured_comp}->{from_component} ? 
-        delete $class->config->{$configured_comp}->{from_component} : '';
-
+    my @injected_components = keys %{$class->config->{inject_components} ||+{}};
+    foreach my $injected_comp_name(@injected_components) {
+      my $component_class = $class->config->{inject_components}->{$injected_comp_name}->{from_component} || '';
       if($component_class) {
-        my @roles = @{ exists $class->config->{$configured_comp}->{roles} ?
-          delete $class->config->{$configured_comp}->{roles} : [] };
+        my @roles = @{$class->config->{inject_components}->{$injected_comp_name}->{roles} ||[]};
+        my %args = %{ $class->config->{$injected_comp_name} || +{} };
 
-        my %args = %{ exists $class->config->{$configured_comp}->{args} ? 
-          delete $class->config->{$configured_comp}->{args} : +{} };
-
-        $class->config->{$configured_comp} = \%args;
         Catalyst::Utils::inject_component(
           into => $class,
           component => $component_class,
           (scalar(@roles) ? (traits => \@roles) : ()),
-          as => $configured_comp);
+          as => $injected_comp_name);
       }
     }
 
     # All components are registered, now we need to 'init' them.
     foreach my $component_name (keys %{$class->components||{}}) {
-      $class->components->{$component_name} = $class->components->{$component_name}->();
+      $class->components->{$component_name} = $class->components->{$component_name}->() if
+      (ref($class->components->{$component_name}) || '') eq 'CODE';
     }
-
 }
 
 =head2 $c->locate_components( $setup_component_config )

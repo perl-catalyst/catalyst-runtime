@@ -4,12 +4,19 @@ use HTTP::Request::Common;
 use Test::More;
 
 {
+  package TestRole;
+
+  use Moose::Role;
+
+  sub role { 'role' }
+  
   package Local::Model::Foo;
 
   use Moose;
   extends 'Catalyst::Model';
 
   has a => (is=>'ro', required=>1);
+  has b => (is=>'ro');
 
   sub foo { shift->a . 'foo' }
 
@@ -64,8 +71,9 @@ use Test::More;
     my ($self, $c, $int) = @_;
     
     Test::More::ok(my $user = $c->model("User")->find($int));
-    Test::More::ok($c->model("User")->zoo->a);
-    
+    Test::More::is($c->model("User")->zoo->a, 2);
+    Test::More::is($c->model("Foo")->role, 'role');
+   
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
 
@@ -80,18 +88,14 @@ use Test::More;
   use Catalyst;
 
   MyApp->config({
-    'Controller::Err' => {
-      from_component => 'Local::Controller::Errors',
-      args => { a=> 100, b => 200, namespace =>'error' },
+    inject_components => {
+      'Controller::Err' => { from_component => 'Local::Controller::Errors' },
+      'Model::Zoo' => { from_component => 'Local::Model::Foo' },
+      'Model::Foo' => { from_component => 'Local::Model::Foo', roles => ['TestRole'] },
     },
-    'Model::Zoo' => {
-      from_component => 'Local::Model::Foo',
-      args => { a=>2 },
-    },
-    'Model::Foo' => {
-      from_component => 'Local::Model::Foo',
-      args => { a=> 100 },
-    },
+    'Controller::Err' => { a => 100, b=>200, namespace=>'error' },
+    'Model::Zoo' => { a => 2 },
+    'Model::Foo' => { a => 100 },
   });
 
   MyApp->setup;
