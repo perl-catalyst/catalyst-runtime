@@ -29,6 +29,31 @@ See L<Catalyst::RouteMatching> for more.
 L<Catalyst::Utils> has a new method 'inject_component' which works the same as the method of
 the same name in L<CatalystX::InjectComponent>.
 
+=head2 inject_components
+
+New configuration key allows you to inject components directly into your application without
+any subclasses.  For example:
+
+    MyApp->config({
+      inject_components => {
+        'Controller::Err' => { from_component => 'Local::Controller::Errors' },
+        'Model::Zoo' => { from_component => 'Local::Model::Foo' },
+        'Model::Foo' => { from_component => 'Local::Model::Foo', roles => ['TestRole'] },
+      },
+      'Controller::Err' => { a => 100, b=>200, namespace=>'error' },
+      'Model::Zoo' => { a => 2 },
+      'Model::Foo' => { a => 100 },
+    });
+
+Injected components are useful to reduce the ammount of nearly empty boilerplate classes
+you might have, particularly when first starting an application.
+
+=head2 Component setup changes.
+
+Previously you could not depend on an application scoped component doing setup_components
+since components were setup 'in order'.  Now all components are first registered and then
+setup, so you can now reliably use any component doing setup_components.
+
 =head2 VERSION 5.90080+
 
 The biggest change in this release is that UTF8 encoding is now enabled by

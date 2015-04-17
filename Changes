@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90089_002 - 2015-04-15
+5.90089_002 - 2015-04-XX
   - Changed the way we check for presence of Type::Tiny in a test case to be
     more explicit in the version requirement.  Hopefully a fix for reported
     test fail.
@@ -25,7 +25,10 @@
     'response_class_traits' and 'stats_class_traits' which allow you to compose
     traits for these core Catalyst classes without needing to create subclasses. So
     in general any request or response trait on CPAN that used 'CatalystX::RoleApplicator'
-    should now just work with this core feature.
+    should now just work with this core feature.  Note that  can also set thse roles
+    via new configuration keys, 'request_class_traits', 'response_class_traits' 
+    and 'stats_class_traits'. If you use both config at application class methods, they
+    are combined.
   - NEW FEATURE: Core concepts from 'CatalystX::ComponentsFromConfig'.  You can now
     setup components directly from configuration.  This could save you some effort and
     creating 'empty' base classes in your Model/View and Controller directories.  This
@@ -39,6 +42,9 @@
     expect arguments (for example calling $c->model('Foo', 1,2,3,4) where Myapp::Model::Foo
     does not ACCEPT_CONTEXT.   Only components that ACCEPT_CONTEXT do anything with
     passed arguments in $c->controller/view/model.
+  - Change the way components are setup so that you can now rely on all components
+    when setting up a component.  Previously application scoped components could not
+    reliably use an existing application scoped component as a dependecy for initialization.
 
 5.90089_001 - 2015-03-26
   - New development branch synched with 5.90085.

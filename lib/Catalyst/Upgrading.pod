@@ -63,16 +63,25 @@ In L<CatalystX::ComponentsFromConfig>:
 
     MyApp->config(
       'Model::MyClass' => {
-          class => 
+          class => 'MyClass',
+          args => { %args },
 
       });
 
-<Model::MyClass>
- class My::Class
- <args>
-  some param
- </args>
-</Model::MyClass>
+and now in core:
+
+    MyApp->config(
+      inject_components => {
+        'Model::MyClass' => { from_component => 'My::Class' },
+      },
+      'Model::MyClass' => {
+        %args
+      },
+    );
+
+Although the cored behavior requires more code, its better separates concerns
+as well as plays more into core Catalyst expections of how configuration shoul
+look.
 
 Also we added a new develop console mode only warning when you call a component
 with arguments that don't expect or do anything meaningful with those args.  Its

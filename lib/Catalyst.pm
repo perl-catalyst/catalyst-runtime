@@ -81,8 +81,9 @@ sub _build_request_constructor_args {
 
 sub composed_request_class {
   my $class = shift;
+  my @traits = (@{$class->request_class_traits||[]}, @{$class->config->{request_class_traits}||[]});
   return $class->_composed_request_class ||
-    $class->_composed_request_class(Moose::Util::with_traits($class->request_class, @{$class->request_class_traits||[]}));
+    $class->_composed_request_class(Moose::Util::with_traits($class->request_class, @traits));
 }
 
 has response => (
@@ -104,8 +105,9 @@ sub _build_response_constructor_args {
 
 sub composed_response_class {
   my $class = shift;
+  my @traits = (@{$class->response_class_traits||[]}, @{$class->config->{response_class_traits}||[]});
   return $class->_composed_response_class ||
-    $class->_composed_response_class(Moose::Util::with_traits($class->response_class, @{$class->response_class_traits||[]}));
+    $class->_composed_response_class(Moose::Util::with_traits($class->response_class, @traits));
 }
 
 has namespace => (is => 'rw');
@@ -147,8 +149,9 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 
 sub composed_stats_class {
   my $class = shift;
+  my @traits = (@{$class->stats_class_traits||[]}, @{$class->config->{stats_class_traits}||[]});
   return $class->_composed_stats_class ||
-    $class->_composed_stats_class(Moose::Util::with_traits($class->stats_class, @{$class->stats_class_traits||[]}));
+    $class->_composed_stats_class(Moose::Util::with_traits($class->stats_class, @traits));
 }
 
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
@@ -2872,7 +2875,7 @@ sub setup_components {
     }
 }
 
-=head2 $app->inject_components($MyApp_Component_name => \%args);
+=head2 $app->inject_component($MyApp_Component_name => \%args);
 
 Add a component that is injected at setup:
 
@@ -4127,6 +4130,55 @@ C<psgi_middleware> - See L<PSGI MIDDLEWARE>.
 =item *
 
 C<data_handlers> - See L<DATA HANDLERS>.
+
+=item *
+
+C<stats_class_traits>
+
+An arrayref of L<Moose::Role>s that get componsed into your stats class.
+
+=item *
+
+C<request_class_traits>
+
+An arrayref of L<Moose::Role>s that get componsed into your request class.
+
+=item *
+
+C<response_class_traits>
+
+An arrayref of L<Moose::Role>s that get componsed into your response class.
+
+=item *
+
+C<inject_components>
+
+A Hashref of L<Catalyst::Component> subclasses that are 'injected' into configuration.
+For example:
+
+    MyApp->config({
+      inject_components => {
+        'Controller::Err' => { from_component => 'Local::Controller::Errors' },
+        'Model::Zoo' => { from_component => 'Local::Model::Foo' },
+        'Model::Foo' => { from_component => 'Local::Model::Foo', roles => ['TestRole'] },
+      },
+      'Controller::Err' => { a => 100, b=>200, namespace=>'error' },
+      'Model::Zoo' => { a => 2 },
+      'Model::Foo' => { a => 100 },
+    });
+
+Generally L<Catalyst> looks for components in your Model/View or Controller directories.
+However for cases when you which to use an existing component and you don't need any
+customization (where for when you can apply a role to customize it) you may inject those
+components into your application.  Please note any configuration should be done 'in the
+normal way', with a key under configuration named after the component affix, as in the
+above example.
+
+Using this type of injection allows you to construct significant amounts of your application
+with only configuration!.  This may or may not lead to increased code understanding.
+
+Please not you may also call the ->inject_components application method as well, although
+you must do so BEFORE setup.
 
 =back
 
