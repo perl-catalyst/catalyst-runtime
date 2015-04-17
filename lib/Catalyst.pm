@@ -718,7 +718,7 @@ sub _filter_component {
     # die "Circular Dependencies Detected." if $tracker{$comp};
     #   $tracker{$comp}++;
     if(ref $comp eq 'CODE') {
-      $comp = $comp->();
+      $comp = $comp->($c);
     }
     #$tracker{$comp}++;
 
