@@ -2872,6 +2872,65 @@ sub setup_components {
     }
 }
 
+=head2 $app->inject_components($MyApp_Component_name => \%args);
+
+Add a component that is injected at setup:
+
+    MyApp->inject_component( 'Model::Foo' => { from_component => 'Common::Foo' } );
+
+Must be called before ->setup.  Expects a component name for your
+current application and \%args where
+
+=over 4
+
+=item from_component
+
+The target component being injected into your application
+
+=item roles
+
+An arrayref of L<Moose::Role>s that are applied to your component.
+
+=back
+
+Example
+
+    MyApp->inject_component(
+      'Model::Foo' => {
+        from_component => 'Common::Model::Foo',
+        roles => ['Role1', 'Role2'],
+      });
+
+=head2 $app->inject_components
+
+Inject a list of components:
+
+    MyApp->inject_components(
+      'Model::FooOne' => {
+        from_component => 'Common::Model::Foo',
+        roles => ['Role1', 'Role2'],
+      },
+      'Model::FooTwo' => {
+        from_component => 'Common::Model::Foo',
+        roles => ['Role1', 'Role2'],
+      });
+
+=cut
+
+sub inject_component {
+  my ($app, $name, $args) = @_;
+  die "Component $name exists" if
+    $app->config->{inject_components}->{$name};
+  $app->config->{inject_components}->{$name} = $args;
+}
+
+sub inject_components {
+  my $app = shift;
+  while(@_) {
+    $app->inject_component(shift, shift);
+  }
+}
+
 =head2 $c->locate_components( $setup_component_config )
 
 This method is meant to provide a list of component modules that should be

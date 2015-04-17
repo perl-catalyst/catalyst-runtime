@@ -73,6 +73,8 @@ use Test::More;
     Test::More::ok(my $user = $c->model("User")->find($int));
     Test::More::is($c->model("User")->zoo->a, 2);
     Test::More::is($c->model("Foo")->role, 'role');
+    Test::More::is($c->model("One")->a, 'one');
+    Test::More::is($c->model("Two")->a, 'two');
    
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
@@ -87,6 +89,11 @@ use Test::More;
   package MyApp;
   use Catalyst;
 
+  MyApp->inject_components(
+      'Model::One' => { from_component => 'Local::Model::Foo' },
+      'Model::Two' => { from_component => 'Local::Model::Foo' },
+  );
+
   MyApp->config({
     inject_components => {
       'Controller::Err' => { from_component => 'Local::Controller::Errors' },
@@ -96,6 +103,9 @@ use Test::More;
     'Controller::Err' => { a => 100, b=>200, namespace=>'error' },
     'Model::Zoo' => { a => 2 },
     'Model::Foo' => { a => 100 },
+    'Model::One' => { a => 'one' },
+    'Model::Two' => { a => 'two' },
+
   });
 
   MyApp->setup;
