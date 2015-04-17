@@ -62,9 +62,9 @@ use Test::More;
 
   sub user :Local Args(1) {
     my ($self, $c, $int) = @_;
-    my $user = $c->model("User")->find($int);
-
-     $c->model("User")->zoo->a;
+    
+    Test::More::ok(my $user = $c->model("User")->find($int));
+    Test::More::ok($c->model("User")->zoo->a);
     
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
@@ -86,13 +86,12 @@ use Test::More;
     },
     'Model::Zoo' => {
       from_component => 'Local::Model::Foo',
-      args => {a=>2},
+      args => { a=>2 },
     },
     'Model::Foo' => {
       from_component => 'Local::Model::Foo',
       args => { a=> 100 },
     },
-
   });
 
   MyApp->setup;

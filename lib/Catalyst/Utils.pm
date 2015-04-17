@@ -575,13 +575,10 @@ sub inject_component {
     my $_setup_component = sub {
       my $into = shift;
       my $component_package = shift;
-      $into->components->{$component_package} = $into->setup_component( $component_package );
+      $into->components->{$component_package} = $into->delayed_setup_component( $component_package );
     };
 
     $_setup_component->( $into, $component_package );
-    #  for my $inner_component_package ( Devel::InnerPackage::list_packages( $component_package ) ) {
-    #       $_setup_component->( $into, $inner_component_package );
-    #   }
 }
 
 =head1 PSGI Helpers

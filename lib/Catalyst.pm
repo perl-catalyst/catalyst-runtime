@@ -710,12 +710,17 @@ sub _comp_names {
 }
 
 # Filter a component before returning by calling ACCEPT_CONTEXT if available
+
+#our %tracker = ();
 sub _filter_component {
     my ( $c, $comp, @args ) = @_;
 
+    # die "Circular Dependencies Detected." if $tracker{$comp};
+    #   $tracker{$comp}++;
     if(ref $comp eq 'CODE') {
       $comp = $comp->();
     }
+    #$tracker{$comp}++;
 
     if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
         return $comp->ACCEPT_CONTEXT( $c, @args );
@@ -2838,7 +2843,7 @@ sub setup_components {
     }
 
     for my $component (@comps) {
-        my $instance = $class->components->{ $component } = $class->setup_component($component);
+        my $instance = $class->components->{ $component } = $class->delayed_setup_component($component);
     }
 
     # Inject a component or wrap a stand alone class in an adaptor. This makes a list
@@ -2916,6 +2921,21 @@ sub expand_component_module {
     return Devel::InnerPackage::list_packages( $module );
 }
 
+=head2 $app->delayed_setup_component
+
+Returns a coderef that points to a setup_component instance.  Used
+internally for when you want to delay setup until the first time
+the component is called.
+
+=cut
+
+sub delayed_setup_component {
+  my($class, $component, @more) = @_;
+  return sub {
+    return my $instance = $class->setup_component($component, @more);
+  };
+}
+
 =head2 $c->setup_component
 
 =cut
@@ -2923,7 +2943,6 @@ sub expand_component_module {
 sub setup_component {
     my( $class, $component ) = @_;
 
-return sub {
     unless ( $component->can( 'COMPONENT' ) ) {
         return $component;
     }
@@ -2956,17 +2975,15 @@ return sub {
         );
     }
 
-my @expanded_components = $instance->can('expand_modules')
-  ? $instance->expand_modules( $component, $config )
-  : $class->expand_component_module( $component, $config );
-for my $component (@expanded_components) {
-  next if $class->components->{ $component };
-  $class->components->{ $component } = $class->setup_component($component);
-}
+    my @expanded_components = $instance->can('expand_modules')
+      ? $instance->expand_modules( $component, $config )
+      : $class->expand_component_module( $component, $config );
+    for my $component (@expanded_components) {
+      next if $class->components->{ $component };
+      $class->components->{ $component } = $class->setup_component($component);
+    }
 
     return $instance; 
-}
-
 }
 
 =head2 $c->setup_dispatcher
