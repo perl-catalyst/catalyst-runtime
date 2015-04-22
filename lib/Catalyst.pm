@@ -493,7 +493,7 @@ L<< detach|/"$c->detach( $action [, \@arguments ] )" >>. Like C<< $c->visit >>,
 C<< $c->go >> will perform a full dispatch on the specified action or method,
 with localized C<< $c->action >> and C<< $c->namespace >>. Like C<detach>,
 C<go> escapes the processing of the current request chain on completion, and
-does not return to its caller.
+does not return to its cunless blessed $cunless blessed $caller.
 
 @arguments are arguments to the final destination of $action. @captures are
 arguments to the intermediate steps, if any, on the way to the final sub of
@@ -542,6 +542,7 @@ t/middleware-stash.t in the distribution /t directory.
 
 sub stash {
   my $c = shift;
+  $c->log->error("You are requesting the stash but you don't have a context") unless blessed $c;
   return Catalyst::Middleware::Stash::get_stash($c->req->env)->(@_);
 }
 
@@ -721,11 +722,12 @@ sub _filter_component {
     # die "Circular Dependencies Detected." if $tracker{$comp};
     #   $tracker{$comp}++;
     if(ref $comp eq 'CODE') {
-      $comp = $comp->($c);
+      $comp = $comp->();
     }
     #$tracker{$comp}++;
 
     if ( eval { $comp->can('ACCEPT_CONTEXT'); } ) {
+        die "Component '${\$comp->catalyst_component_name}' does ACCEPT_CONTEXT but I am in application scope" unless blessed $c;
         return $comp->ACCEPT_CONTEXT( $c, @args );
     }
 
@@ -2869,9 +2871,9 @@ sub setup_components {
     }
 
     # All components are registered, now we need to 'init' them.
-    foreach my $component_name (keys %{$class->components||{}}) {
+    foreach my $component_name (@comps, @injected_components) {
       $class->components->{$component_name} = $class->components->{$component_name}->() if
-      (ref($class->components->{$component_name}) || '') eq 'CODE';
+        (ref($class->components->{$component_name}) || '') eq 'CODE';
     }
 }
 

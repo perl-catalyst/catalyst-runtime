@@ -27,8 +27,8 @@
     in general any request or response trait on CPAN that used 'CatalystX::RoleApplicator'
     should now just work with this core feature.  Note that  can also set thse roles
     via new configuration keys, 'request_class_traits', 'response_class_traits' 
-    and 'stats_class_traits'. If you use both config at application class methods, they
-    are combined.
+    and 'stats_class_traits'. If you use both configuration and application class methods,
+    they are combined.
   - NEW FEATURE: Core concepts from 'CatalystX::ComponentsFromConfig'.  You can now
     setup components directly from configuration.  This could save you some effort and
     creating 'empty' base classes in your Model/View and Controller directories.  This
