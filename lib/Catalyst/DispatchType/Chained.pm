@@ -247,6 +247,8 @@ sub recurse_match {
         }
         my @try_actions = @{$children->{$try_part}};
         TRY_ACTION: foreach my $action (@try_actions) {
+
+
             if (my $capture_attr = $action->attributes->{CaptureArgs}) {
                 my $capture_count = $action->number_of_captures|| 0;
 
@@ -287,6 +289,8 @@ sub recurse_match {
             else {
                 {
                     local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
+warn $action;
+
                     next TRY_ACTION unless $action->match($c);
                 }
                 my $args_attr = $action->attributes->{Args}->[0];
@@ -298,7 +302,6 @@ sub recurse_match {
                 # OR No parts and this expects 0
                 #    The current best action might also be Args(0),
                 #    but we couldn't chose between then anyway so we'll take the last seen
-
                 if (
                     !$best_action                       ||
                     @parts < @{$best_action->{parts}}   ||

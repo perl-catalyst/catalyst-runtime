@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90089_003 - TBA
+  - Fixed an issue where a delayed controller that did ACCEPT_CONTEXT would
+    raise an error when registering its actions.
+
 5.90089_002 - 2015-04-17
   - Changed the way we check for presence of Type::Tiny in a test case to be
     more explicit in the version requirement.  Hopefully a fix for reported

@@ -15,9 +15,11 @@ use Test::More;
 
     sub chained_one_args_0  : Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('chained_one_args_0') }
     sub chained_one_args_1  : Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('chained_one_args_1') }
+    sub chained_one_args_2  : Chained(chain_base) PathPart('') Args(1) { $_[1]->res->body('chained_one_args_2') }
 
     sub chained_zero_args_0 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_0') }
     sub chained_zero_args_1 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_1') }
+    sub chained_zero_args_2 : Chained(chain_base) PathPart('') Args(0) { $_[1]->res->body('chained_zero_args_2') }
 
   MyApp::Controller::Root->config(namespace=>'');
 
@@ -49,12 +51,12 @@ use Test::More;
 use Catalyst::Test 'MyApp';
 {
    my $res = request '/chain_base/capturearg/arg';
-  is $res->content, 'chained_one_args_1', "request '/chain_base/capturearg/arg'";
+  is $res->content, 'chained_one_args_2', "request '/chain_base/capturearg/arg'";
 }
 
 {
     my $res = request '/chain_base/capturearg';
-    is $res->content, 'chained_zero_args_1', "request '/chain_base/capturearg'";
+    is $res->content, 'chained_zero_args_2', "request '/chain_base/capturearg'";
 }
 
 done_testing;
