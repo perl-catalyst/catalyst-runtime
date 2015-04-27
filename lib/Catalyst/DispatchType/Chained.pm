@@ -289,8 +289,6 @@ sub recurse_match {
             else {
                 {
                     local $c->req->{arguments} = [ @{$c->req->args}, @parts ];
-warn $action;
-
                     next TRY_ACTION unless $action->match($c);
                 }
                 my $args_attr = $action->attributes->{Args}->[0];

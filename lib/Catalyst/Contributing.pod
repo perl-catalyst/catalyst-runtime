@@ -1,0 +1,41 @@
+=encoding UTF-8
+
+=head1 Name
+
+Catalyst::Contributing - Contributing to Catalyst and Change managment
+
+=head1 Description
+
+How to contribute to L<Catalyst> and what are the criteria for evaluating change and
+deciding on the future direction of the project.
+
+=head2 Change Management
+
+In general there are two rules when thinking about changing Catalyst. The first is technical merit of the idea. If there is a bug, then its obvious it needs to be fixed. Less obvious is the types of refactoring that went into giving Catalyst modern features like websocket support, interoperability with event loops and to expose more and more of Catalyst's PSGI underpinnings.
+
+When an idea has strong technical merit, it recommends itself. The only thing to consider is the needs of backward compatibility, and to offer people upgrading at least some sort of path forward when features change (such as to have plugins or configuration options to replace or replicate something that is no longer available).
+
+Then there is a second and more difficult type of change consideration, which is the general will of the community. Like technical merit, this needs to balance against our commitment to not leave existing users high and dry with changes that break code and offer no path forward that does not involve significant code rewrites. Unlike technical merit, the will of the community can be hard to figure. In general we don't get a lot of bug reports or conversation around Catalyst future evolution. I wish I could find a way to get more involvement, but I also understand this is not very unusual issue for open source projects. I personally don't believe that "silence is consent" either. I think choices need to have broad acceptability or the choosers lose respect and authority. Typical that results in people just drifting away.
+
+Without direct involvement the only other way to measure the will of the community is to look at what other choices people are making and what other projects have received the acceptance of a broad number of people. Since Plack is clearly accepted and important it leads me to feel the choice to make Catalyst expose more of its Plack nature and to better play with the larger Plack ecosystem are correct ones. One can also pay attention to the kinds of problems that get reported on IRC, at conferences and the problems that I see having looked at how Catalyst has been used in the wild. For example its clear that Chaining actions could use a tweak in some way since it seems to trip up people a lot. The same goes with $c->forward and $c->go, which tend to lead to confusing code (and combined with the stash is a particularly toxic brew).
+
+Going further, if we allow ourselves to look hard at projects outside of Perl we can get lots of great ideas about what has worked for other projects in other languages. When we see certain features and approaches have excited programmers using frameworks like Ruby on Rails, Django, Scala Play, etc. then it should provide us with with help in thinking about how those features might influence the evolution of Catalyst as well.
+
+=head2 Reporting a bug
+
+Reported bugs via RT or Github Issues that come with attached test cases will be more likely addressed quickly than those that do not.  Proposing a bugfix patch is also alwaysvery welcomed, although it is recommended to stick as closely as possible to an actual bug (rather than a feature change) and to not include unneeded changes in your patch such as formatting corrections.  In any case it is recommended before spending a lot of time on a patch to discuss the issue and your proposed solution, else you risk spending a lot of time on code that may not get merged, which tends to be frustrating.
+
+For bug patches you should create a new branch from the current master.
+
+=head2 Proposing a new feature
+
+You should first ask yourself if your new idea could rationally live in the extended Catalyst ecosystem independently on CPAN.  Ideas that have demonstrated worth over time as stand alone modules are more likely to be considered for core inclusion.  Additionally, ideas that are best achieved in core rather than as standalone, are more likely considered for core inclusion than those ideas which could just as well be stand alone.  For example, the PSGI integration project happened because it was clear that building Catalyst on top of PSGI standards would lead to a better overall version than keeping it stand alone.
+
+You should propose your new idea in a github issue, on IRC and ideally on the mailing list so that other people can comment on your idea and its merits prior to you writing code.  If you write code before proposing the idea you stand a high chance of being frustrated when you idea is not accepted.
+
+=head2 AUTHOR
+
+John Napiorkowski L<jjnapiork@cpan.org|email:jjnapiork@cpan.org>
+
+=cut
+

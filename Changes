@@ -1,8 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90089_003 - TBA
+5.90089_003 - 2015-04-27
   - Fixed an issue where a delayed controller that did ACCEPT_CONTEXT would
     raise an error when registering its actions.
+  - Updated some documentation around route matching.
+  - refactored the setup of injected components to allow you to hook into
+    the injection and do custom injection types.
 
 5.90089_002 - 2015-04-17
   - Changed the way we check for presence of Type::Tiny in a test case to be
@@ -44,7 +47,7 @@
     report any stats related issues.
   - Added a developer mode warning if you call a component with arguments that does not
     expect arguments (for example calling $c->model('Foo', 1,2,3,4) where Myapp::Model::Foo
-    does not ACCEPT_CONTEXT.   Only components that ACCEPT_CONTEXT do anything with
+    does not ACCEPT_CONTEXT.  Only components that ACCEPT_CONTEXT do anything with
     passed arguments in $c->controller/view/model.
   - Change the way components are setup so that you can now rely on all components
     when setting up a component.  Previously application scoped components could not
