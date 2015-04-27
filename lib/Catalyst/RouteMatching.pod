@@ -10,6 +10,73 @@ This is a WIP document intended to help people understand the logic that L<Catal
 uses to determine how to match in incoming request to an action (or action chain)
 in a controller.
 
+=head2 Request to Controller/Action Matching
+
+L<Catalyst> maps requests to action using a 'longest path wins' approach.  That means
+that if the request is '/foo/bar/baz' That means the action 'baz' matches:
+
+    package MyApp::Controller::Foo;
+
+    use Moose;
+    use MooseX::MethodAttributes
+
+    extends 'Catalyst::Controller';
+
+    sub bar :Path('bar') Args(1) { ...}
+    sub baz :Path('bar/baz') Args(0) { ... }
+
+Path length matches take precidence over all other types of matches (included HTTP
+Method, Scheme, etc.).  The same holds true for Chained actions.  Generally the
+chain that matches the most PathParts wins.
+
+=head2 Args(N) versus Args
+
+'Args' matches any number of args.  Because this functions as a sort of catchall, we
+treat 'Args' as the lowest precedence of any Args(N) when N is 0 to infinity.  An
+action with 'Args' always get the last chance to match.
+
+=head2 When two or more actions match a given Path
+
+Sometimes two or more actions match the same path and all have the same pathpart
+length.  For example:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/) CaptureArgs(0) { }
+
+      sub one :Chained(root) PathPart('') Args(0) { }
+      sub two :Chained(root) PathPart('') Args(0) { }
+      sub three :Chained(root) PathPart('') Args(0) { }
+
+    __PACKAGE__->meta->make_immutable;
+
+In this case the last defined action wins (for the example that is action 'three').
+
+This is most common to happen when you are using action matching beyond paths, such as
+when using method matching:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/) CaptureArgs(0) { }
+
+      sub any :Chained(root) PathPart('') Args(0) { }
+      sub get :GET Chained(root) PathPart('') Args(0) { }
+
+    __PACKAGE__->meta->make_immutable;
+
+In the above example GET /root could match both actions.  In this case you should define
+your 'catchall' actions higher in the controller.
+
 =head2 Type Constraints in Args and Capture Args
 
 Beginning in Version 5.90090+ you may use L<Moose>, L<MooseX::Types> or L<Type::Tiny>
@@ -207,10 +274,6 @@ when inheriting controllers any new actions added would take check precedence ov
 parent controller or consumed role.
 
 Please note that your declared type constraint names will now appear in the debug console.
-
-=head1 Conclusion
-
-    TBD
 
 =head1 Author
 
