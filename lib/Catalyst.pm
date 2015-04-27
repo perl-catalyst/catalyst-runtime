@@ -3022,8 +3022,7 @@ sub setup_component {
         return $component;
     }
 
-    my $suffix = Catalyst::Utils::class2classsuffix( $component );
-    my $config = $class->config->{ $suffix } || {};
+    my $config = $class->config_for($component);
     # Stash catalyst_component_name in the config here, so that custom COMPONENT
     # methods also pass it. local to avoid pointlessly shitting in config
     # for the debug screen, as $component is already the key name.
@@ -3059,6 +3058,33 @@ sub setup_component {
     }
 
     return $instance; 
+}
+
+=head2 $app->config_for( $component_name )
+
+Return the application level configuration (which is not yet merged with any
+local component configuration, via $component_class->config) for the named
+component or component object. Example:
+
+    MyApp->config(
+      'Model::Foo' => { a => 1, b => 2},
+    );
+
+    my $config = MyApp->config_for('MyApp::Model::Foo');
+
+In this case $config is the hashref C< {a=>1, b=>2} >.
+
+This is also handy for looking up configuration for a plugin, to make sure you follow
+existing L<Catalyst> standards for where a plugin should put its configuration.
+
+=cut
+
+sub config_for {
+    my ($class, $component_name) = @_;
+    my $component_suffix = Catalyst::Utils::class2classsuffix($component_name);
+    my $config = $class->config->{ $component_suffix } || {};
+
+    return $config;
 }
 
 =head2 $c->setup_dispatcher

@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90089_004 - TDB
+  - New application setup hook 'config_for' which allows one to get the
+    canonical application configuration for a controller, view or model, or
+    a plugin.  Can also be used to override and adapt what configuration is
+    retrieved.
+
 5.90089_003 - 2015-04-27
   - Fixed an issue where a delayed controller that did ACCEPT_CONTEXT would
     raise an error when registering its actions.
