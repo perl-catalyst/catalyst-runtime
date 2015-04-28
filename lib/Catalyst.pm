@@ -2306,9 +2306,7 @@ sub prepare {
 
     $c->response->_context($c);
 
-    if($c->use_stats) {
-      $c->stats($class->composed_stats_class->new)->enable;
-    }
+    $c->stats($class->stats_class->new)->enable($c->use_stats);
 
     if ( $c->debug || $c->config->{enable_catalyst_header} ) {
         $c->res->headers->header( 'X-Catalyst' => $Catalyst::VERSION );
