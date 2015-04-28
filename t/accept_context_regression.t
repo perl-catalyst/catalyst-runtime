@@ -33,8 +33,6 @@ my ($res, $c) = ctx_request('/test_model');
 
 ok $res;
 
-use Devel::Dwarn;
-#Dwarn $c->model('AcceptContext');
 
 done_testing;
 
