@@ -1,6 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90089_004 - TDB
+  - Added swanky github badges.
+  - Reverted a change to how the stats engine is setup that was incorrect.
   - New application setup hook 'config_for' which allows one to get the
     canonical application configuration for a controller, view or model, or
     a plugin.  Can also be used to override and adapt what configuration is
