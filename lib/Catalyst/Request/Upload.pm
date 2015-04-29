@@ -99,6 +99,14 @@ false for failure.
 
      $upload->copy_to('/path/to/target');
 
+Please note the filename used for the copy target is the 'tempname' that
+is the actual filename on the filesystem, NOT the 'filename' that was
+part of the upload headers.  This might seem counter intuitive but at this
+point this behavior is so established that its not something we can change.
+
+You can always create your own copy routine that munges the target path
+as you wish.
+
 =cut
 
 sub copy_to {

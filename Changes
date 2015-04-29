@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90090 - 2014-04-29
+  - Updated some documention in Catalyst::Request::Upload to clarify behavior
+    that RT ticket reported as confusing or unexpected
+  - Merged all changes from 5.90089_XXX development cycle.
+  - removed a mistaken use of Test::Most, which is not a core Catalyst
+    dependency.  Used Test::More instead.
+
 5.90089_004 - 2015-04-28
   - Added swanky github badges.
   - Reverted a change to how the stats engine is setup that was incorrect.

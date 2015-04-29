@@ -1,4 +1,6 @@
-use Test::Most;
+use strict;
+use warnings;
+use Test::More;
 
 {
   package MyApp::Model::AcceptContext;
@@ -6,7 +8,7 @@ use Test::Most;
 
   sub ACCEPT_CONTEXT {
     my ($self, $c, @args) = @_;
-    Test::Most::ok( ref $c);
+    Test::More::ok( ref $c);
   }
 
   $INC{'MyApp/Model/AcceptContext.pm'} = __FILE__;
