@@ -7,9 +7,18 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 This is an overview of the user-visible changes to Catalyst between major
 Catalyst releases.
 
+=head2 VERSION 5.90091
+
+=head3 'case_sensitive' configuration
+
+At one point in time we allowed you to set a 'case_sensitive' configuraion value so
+that you could find actions by their private names using mixed case.  We highly
+discourage that.  If you are using this 'feature' you should be on notice that we
+plan to remove the code around it in the near future.
+
 =head2 VERSION 5.90090+
 
-=head2 Type constraints on Args and CaptureArgs.
+=head3 Type constraints on Args and CaptureArgs.
 
 You may now use a type constraint (using L<Moose>, L<MooseX::Types> or preferably
 L<Type::Tiny> in your Args or CaptureArgs action attributes.  This can be used
@@ -24,12 +33,12 @@ your arguments to $c->uri_for(...) must match those constraints.
 
 See L<Catalyst::RouteMatching> for more.
 
-=head2 Move CatalystX::InjectComponent into core
+=head3 Move CatalystX::InjectComponent into core
 
 L<Catalyst::Utils> has a new method 'inject_component' which works the same as the method of
 the same name in L<CatalystX::InjectComponent>.
 
-=head2 inject_components
+=head3 inject_components
 
 New configuration key allows you to inject components directly into your application without
 any subclasses.  For example:
@@ -48,7 +57,7 @@ any subclasses.  For example:
 Injected components are useful to reduce the ammount of nearly empty boilerplate classes
 you might have, particularly when first starting an application.
 
-=head2 Component setup changes.
+=head3 Component setup changes.
 
 Previously you could not depend on an application scoped component doing setup_components
 since components were setup 'in order'.  Now all components are first registered and then

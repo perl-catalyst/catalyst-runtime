@@ -1384,6 +1384,7 @@ EOF
           : $class->log->debug(q/Couldn't find home/);
 
         my $column_width = Catalyst::Utils::term_width() - 8 - 9;
+
         my $t = Text::SimpleTable->new( [ $column_width, 'Class' ], [ 8, 'Type' ] );
         for my $comp ( sort keys %{ $class->components } ) {
             my $type = ref $class->components->{$comp} ? 'instance' : 'class';
@@ -2853,10 +2854,10 @@ sub setup_components {
     # of named components in the configuration that are not actually existing (not a
     # real file).
 
-    my @injected_components = $class->setup_injected_components;
+    $class->setup_injected_components;
 
     # All components are registered, now we need to 'init' them.
-    foreach my $component_name (@comps, @injected_components) {
+    foreach my $component_name (keys %{$class->components||+{}}) {
       $class->components->{$component_name} = $class->components->{$component_name}->() if
         (ref($class->components->{$component_name}) || '') eq 'CODE';
     }
@@ -2877,8 +2878,6 @@ sub setup_injected_components {
           $injected_comp_name,
           $class->config->{inject_components}->{$injected_comp_name});
     }
-
-    return @injected_components;
 }
 
 =head2 $app->setup_injected_component( $injected_component_name, $config )
