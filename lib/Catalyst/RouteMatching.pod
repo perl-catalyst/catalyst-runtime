@@ -87,10 +87,11 @@ is a simple example:
 
     use Moose;
     use MooseX::MethodAttributes;
+    use MooseX::Types::Moose qw(Int);
 
     extends 'Catalyst::Controller';
 
-    sub find :Path('') Args('Int') {
+    sub find :Path('') Args(Int) {
       my ($self, $c, $int) = @_;
     }
 
