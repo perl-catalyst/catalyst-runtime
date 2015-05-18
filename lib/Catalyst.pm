@@ -2854,10 +2854,10 @@ sub setup_components {
     # of named components in the configuration that are not actually existing (not a
     # real file).
 
-    $class->setup_injected_components;
+    my @injected = $class->setup_injected_components;
 
     # All components are registered, now we need to 'init' them.
-    foreach my $component_name (keys %{$class->components||+{}}) {
+    foreach my $component_name (@injected, @comps) {
       $class->components->{$component_name} = $class->components->{$component_name}->() if
         (ref($class->components->{$component_name}) || '') eq 'CODE';
     }
@@ -2878,6 +2878,9 @@ sub setup_injected_components {
           $injected_comp_name,
           $class->config->{inject_components}->{$injected_comp_name});
     }
+
+    return map { $class ."::" . $_ }
+      @injected_components;
 }
 
 =head2 $app->setup_injected_component( $injected_component_name, $config )
