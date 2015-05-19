@@ -1,11 +1,15 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90091 - 2014-05-08
+5.90092 - 2015-05-XX
+  - Allows you to use a namespace suffix for request, response and stats
+    class traits.  Docs and tests for this.
+
+5.90091 - 2015-05-08
   - Fixed a bug where if an injected component expanded sub components, those
     sub components would not show up in the startup debug dev console (
     even though they were actually created).
 
-5.90090 - 2014-04-29
+5.90090 - 2015-04-29
   - Updated some documention in Catalyst::Request::Upload to clarify behavior
     that RT ticket reported as confusing or unexpected
   - Merged all changes from 5.90089_XXX development cycle.

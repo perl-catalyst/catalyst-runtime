@@ -82,8 +82,18 @@ sub _build_request_constructor_args {
 sub composed_request_class {
   my $class = shift;
   my @traits = (@{$class->request_class_traits||[]}, @{$class->config->{request_class_traits}||[]});
+
+  # For each trait listed, figure out what the namespace is.  First we try the $trait
+  # as it is in the config.  Then try $MyApp::TraitFor::Request:$trait. Last we try
+  # Catalyst::TraitFor::Request::$trait.  If none load, throw error.
+
+  my $trait_ns = 'TraitFor::Request';
+  my @normalized_traits = map {
+    Class::Load::load_first_existing_class($_, $class.'::'.$trait_ns.'::'. $_, 'Catalyst::'.$trait_ns.'::'.$_)
+  } @traits;
+
   return $class->_composed_request_class ||
-    $class->_composed_request_class(Moose::Util::with_traits($class->request_class, @traits));
+    $class->_composed_request_class(Moose::Util::with_traits($class->request_class, @normalized_traits));
 }
 
 has response => (
@@ -106,8 +116,14 @@ sub _build_response_constructor_args {
 sub composed_response_class {
   my $class = shift;
   my @traits = (@{$class->response_class_traits||[]}, @{$class->config->{response_class_traits}||[]});
+
+  my $trait_ns = 'TraitFor::Response';
+  my @normalized_traits = map {
+    Class::Load::load_first_existing_class($_, $class.'::'.$trait_ns.'::'. $_, 'Catalyst::'.$trait_ns.'::'.$_)
+  } @traits;
+
   return $class->_composed_response_class ||
-    $class->_composed_response_class(Moose::Util::with_traits($class->response_class, @traits));
+    $class->_composed_response_class(Moose::Util::with_traits($class->response_class, @normalized_traits));
 }
 
 has namespace => (is => 'rw');
@@ -132,7 +148,8 @@ our $RECURSION = 1000;
 our $DETACH    = Catalyst::Exception::Detach->new;
 our $GO        = Catalyst::Exception::Go->new;
 
-#I imagine that very few of these really need to be class variables. if any.
+#I imagine that very few of these really 
+#need to be class variables. if any.
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
   for qw/components arguments dispatcher engine log dispatcher_class
@@ -150,14 +167,20 @@ __PACKAGE__->stats_class('Catalyst::Stats');
 sub composed_stats_class {
   my $class = shift;
   my @traits = (@{$class->stats_class_traits||[]}, @{$class->config->{stats_class_traits}||[]});
+
+  my $trait_ns = 'TraitFor::Stats';
+  my @normalized_traits = map {
+    Class::Load::load_first_existing_class($_, $class.'::'.$trait_ns.'::'. $_, 'Catalyst::'.$trait_ns.'::'.$_)
+  } @traits;
+
   return $class->_composed_stats_class ||
-    $class->_composed_stats_class(Moose::Util::with_traits($class->stats_class, @traits));
+    $class->_composed_stats_class(Moose::Util::with_traits($class->stats_class, @normalized_traits));
 }
 
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90091';
+our $VERSION = '5.90092';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -2721,8 +2744,27 @@ Returns or sets the request class. Defaults to L<Catalyst::Request>.
 
 =head2 $app->request_class_traits
 
-An arrayref of L<Moose::Role>s which are applied to the request class.  
+An arrayref of L<Moose::Role>s which are applied to the request class.  You can
+name the full namespace of the role, or a namespace suffix, which will then
+be tried against the following standard namespace prefixes.
 
+    $MyApp::TraitFor::Request::$trait_suffix
+    Catalyst::TraitFor::Request::$trait_suffix
+
+So for example if you set:
+
+    MyApp->request_class_traits(['Foo']);
+
+We try each possible role in turn (and throw an error if none load)
+
+    Foo
+    MyApp::TraitFor::Request::Foo
+    Catalyst::TraitFor::Request::Foo
+
+The namespace part 'TraitFor::Request' was choosen to assist in backwards
+compatibility with L<CatalystX::RoleApplicator> which previously provided
+these features in a stand alone package.
+  
 =head2 $app->composed_request_class
 
 This is the request class which has been composed with any request_class_traits.
@@ -2733,7 +2775,27 @@ Returns or sets the response class. Defaults to L<Catalyst::Response>.
 
 =head2 $app->response_class_traits
 
-An arrayref of L<Moose::Role>s which are applied to the response class.
+An arrayref of L<Moose::Role>s which are applied to the response class.  You can
+name the full namespace of the role, or a namespace suffix, which will then
+be tried against the following standard namespace prefixes.
+
+    $MyApp::TraitFor::Response::$trait_suffix
+    Catalyst::TraitFor::Response::$trait_suffix
+
+So for example if you set:
+
+    MyApp->response_class_traits(['Foo']);
+
+We try each possible role in turn (and throw an error if none load)
+
+    Foo
+    MyApp::TraitFor::Response::Foo
+    Catalyst::TraitFor::Responset::Foo
+
+The namespace part 'TraitFor::Response' was choosen to assist in backwards
+compatibility with L<CatalystX::RoleApplicator> which previously provided
+these features in a stand alone package.
+
 
 =head2 $app->composed_response_class
 
@@ -3898,7 +3960,26 @@ A arrayref of L<Moose::Role>s that are applied to the stats_class before creatin
 
 =head2 $app->composed_stats_class
 
-this is the stats_class composed with any 'stats_class_traits'.
+this is the stats_class composed with any 'stats_class_traits'.  You can
+name the full namespace of the role, or a namespace suffix, which will then
+be tried against the following standard namespace prefixes.
+
+    $MyApp::TraitFor::Stats::$trait_suffix
+    Catalyst::TraitFor::Stats::$trait_suffix
+
+So for example if you set:
+
+    MyApp->stats_class_traits(['Foo']);
+
+We try each possible role in turn (and throw an error if none load)
+
+    Foo
+    MyApp::TraitFor::Stats::Foo
+    Catalyst::TraitFor::Stats::Foo
+
+The namespace part 'TraitFor::Stats' was choosen to assist in backwards
+compatibility with L<CatalystX::RoleApplicator> which previously provided
+these features in a stand alone package.
 
 =head2 $c->use_stats
 
