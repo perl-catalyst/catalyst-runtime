@@ -1,8 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90092 - 2015-05-XX
+5.90092 - 2015-05-19
   - Allows you to use a namespace suffix for request, response and stats
     class traits.  Docs and tests for this.
+  - Refactor the change introduced in 5.90091 to solve reported issues (for
+    example Catalyst::Controller::DBIC::API fails its tests) and to be a more
+    conservative refactor (new code more closely resembles the orginal code
+    that has proven to work for years.)
 
 5.90091 - 2015-05-08
   - Fixed a bug where if an injected component expanded sub components, those

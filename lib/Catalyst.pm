@@ -2919,7 +2919,7 @@ sub setup_components {
     my @injected = $class->setup_injected_components;
 
     # All components are registered, now we need to 'init' them.
-    foreach my $component_name (@injected, @comps) {
+    foreach my $component_name (@comps, @injected) {
       $class->components->{$component_name} = $class->components->{$component_name}->() if
         (ref($class->components->{$component_name}) || '') eq 'CODE';
     }
