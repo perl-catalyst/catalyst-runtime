@@ -134,6 +134,20 @@ sub write {
     return $len;
 }
 
+sub unencoded_write {
+    my ( $self, $buffer ) = @_;
+
+    # Finalize headers if someone manually writes output
+    $self->_context->finalize_headers unless $self->finalized_headers;
+
+    $buffer = q[] unless defined $buffer;
+
+    my $len = length($buffer);
+    $self->_writer->write($buffer);
+
+    return $len;
+}
+
 sub finalize_headers {
     my ($self) = @_;
     return;

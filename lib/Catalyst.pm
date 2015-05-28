@@ -2228,9 +2228,10 @@ sub finalize_encoding {
         # Set the charset if necessary.  This might be a bit bonkers since encodable response
         # is false when the set charset is not the same as the encoding mimetype (maybe 
         # confusing action at a distance here..
-        # Don't try to set the charset if one already exists
+        # Don't try to set the charset if one already exists or if headers are already finalized
         $c->res->content_type($c->res->content_type . "; charset=" . $c->encoding->mime_name)
-          unless($c->res->content_type_charset);
+          unless($c->res->content_type_charset ||
+                ($c->res->_context && $c->res->finalized_headers && !$c->res->_has_response_cb));
     }
 }
 

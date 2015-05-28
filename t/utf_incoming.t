@@ -113,8 +113,8 @@ use Scalar::Util ();
 
   sub write_then_body :Local {
     my ($self, $c) = @_;
-    $c->clear_encoding;
-    $c->res->content_type('text/plain');
+
+    $c->res->content_type('text/html');
     $c->res->write("<p>This is early_write action ♥</p>");
     $c->res->body("<p>This is body_write action ♥</p>");
   }

@@ -159,11 +159,11 @@ sub finalize_body {
           }
           else {
               
-              # Case where body was set afgter calling ->write.  We'd prefer not to
+              # Case where body was set after calling ->write.  We'd prefer not to
               # support this, but I can see some use cases with the way most of the
-              # views work.
-
-              $self->write($c, $body );
+              # views work. Since body has already been encoded, we need to do
+              # an 'unencoded_write' here.
+              $self->unencoded_write( $c, $body );
           }
         }
 
@@ -698,6 +698,20 @@ sub write {
     my ( $self, $c, $buffer ) = @_;
 
     $c->response->write($buffer);
+}
+
+=head2 $self->unencoded_write($c, $buffer)
+
+Writes the buffer to the client without encoding. Necessary for
+already encoded buffers. Used when a $c->write has been done
+followed by $c->res->body.
+
+=cut
+
+sub unencoded_write {
+    my ( $self, $c, $buffer ) = @_;
+
+    $c->response->unencoded_write($buffer);
 }
 
 =head2 $self->read($c, [$maxlength])
