@@ -111,6 +111,14 @@ use Scalar::Util ();
     $c->response->body($contents);
   }
 
+  sub write_then_body :Local {
+    my ($self, $c) = @_;
+    $c->clear_encoding;
+    $c->res->content_type('text/plain');
+    $c->res->write("<p>This is early_write action ♥</p>");
+    $c->res->body("<p>This is body_write action ♥</p>");
+  }
+
   sub file_upload :POST  Consumes(Multipart) Local {
     my ($self, $c) = @_;
     Test::More::is $c->req->body_parameters->{'♥'}, '♥♥';
@@ -361,6 +369,14 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n", 'correct body';
   is $res->content_length, 41, 'correct length';
+  is $res->content_charset, 'UTF-8';
+}
+
+{
+  my $res = request "/root/write_then_body";
+
+  is $res->code, 200, 'OK';
+  is decode_utf8($res->content), "<p>This is early_write action ♥</p><p>This is body_write action ♥</p>";
   is $res->content_charset, 'UTF-8';
 }
 
