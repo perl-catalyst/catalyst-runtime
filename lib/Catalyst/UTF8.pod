@@ -462,6 +462,11 @@ B<NOTE> If you try to change the encoding after you start the stream, this will 
 response.  However since you've already started streaming this will not show up as an HTTP error
 status code, but rather error information in your body response and an error in your logs.
 
+B<NOTE> If you use ->body AFTER using ->write (for example you may do this to write your HTML
+HEAD information as fast as possible) we expect the contents to body to be encoded as it
+normally would be if you never called ->write.  In general unless you are doing weird custom
+stuff with encoding this is likely to just already do the correct thing.
+
 The second way to stream a response is to get the response writer object and invoke methods
 on that directly:
 

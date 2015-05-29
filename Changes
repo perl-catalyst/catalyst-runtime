@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90093 - 2015-05-29
+  - Fixed a bug where if you used $res->write and then $res->body, the
+    contents of body would be double encoded (gshank++).
+
 5.90092 - 2015-05-19
   - Allows you to use a namespace suffix for request, response and stats
     class traits.  Docs and tests for this.
