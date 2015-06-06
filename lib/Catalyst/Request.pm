@@ -293,7 +293,10 @@ sub prepare_body {
     # Check for definedness as you could read '0'
     while ( defined ( my $chunk = $self->read() ) ) {
         $self->prepare_body_chunk($chunk);
-        $stream_buffer->print($chunk) if $stream_buffer;
+        next unless $stream_buffer;
+
+        $stream_buffer->print($chunk)
+            || die sprintf "Failed to write %d bytes to psgi.input file: $!", length( $chunk );
     }
 
     # Ok, we read the body.  Lets play nice for any PSGI app down the pipe
