@@ -1440,7 +1440,7 @@ variable should be used for determining the request path.
         decoded, this means that applications using this mode can correctly handle URIs including the %2F character
         (i.e. with `AllowEncodedSlashes` set to `On` in Apache).
 
-        Given that this method of path resolution is provably more correct, it is recommended that you use
+        Given that this method of path resolution is probably more correct, it is recommended that you use
         this unless you have a specific need to deploy your application in a non-standard environment, and you are
         aware of the implications of not being able to handle encoded URI paths correctly.
 
@@ -1454,7 +1454,7 @@ variable should be used for determining the request path.
 - `using_frontend_proxy_path` - Enabled [Plack::Middleware::ReverseProxyPath](https://metacpan.org/pod/Plack::Middleware::ReverseProxyPath) on your application (if
 installed, otherwise log an error).  This is useful if your application is not running on the
 'root' (or /) of your host server.  **NOTE** if you use this feature you should add the required
-middleware to your project dependency list since its not automatically a dependency of [Catalyst](https://metacpan.org/pod/Catalyst).
+middleware to your project dependency list since it's not automatically a dependency of [Catalyst](https://metacpan.org/pod/Catalyst).
 This has been done since not all people need this feature and we wish to restrict the growth of
 [Catalyst](https://metacpan.org/pod/Catalyst) dependencies.
 - `encoding` - See ["ENCODING"](#encoding)
@@ -1515,7 +1515,7 @@ This has been done since not all people need this feature and we wish to restric
 - `do_not_decode_query`
 
     If true, then do not try to character decode any wide characters in your
-    request URL query or keywords.  Most readings of the relevent specifications
+    request URL query or keywords.  Most readings of the relevant specifications
     suggest these should be UTF-\* encoded, which is the default that [Catalyst](https://metacpan.org/pod/Catalyst)
     will use, hwoever if you are creating a lot of URLs manually or have external
     evil clients, this might cause you trouble.  If you find the changes introduced
@@ -2009,7 +2009,7 @@ acme: Leon Brocard <leon@astray.com>
 
 abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
 
-andrewalker: André Walker <andre@cpan.org>
+andrewalker: AndrÃ© Walker <andre@cpan.org>
 
 Andrew Bramble
 
@@ -2067,7 +2067,7 @@ groditi: Guillermo Roditi <groditi@gmail.com>
 
 hobbs: Andrew Rodland <andrew@cleverdomain.org>
 
-ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+ilmari: Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
 
