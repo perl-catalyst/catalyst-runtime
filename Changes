@@ -6,7 +6,8 @@
     - https://github.com/perl-catalyst/catalyst-runtime/pull/96
     - https://github.com/perl-catalyst/catalyst-runtime/pull/97
     - https://github.com/perl-catalyst/catalyst-runtime/pull/98
-
+  - Fixed issue where last_error actually returned the first error.  Took
+    the change to add a 'pop_errors' to give the inverse of shift_errors.
 
 5.90093 - 2015-05-29
   - Fixed a bug where if you used $res->write and then $res->body, the

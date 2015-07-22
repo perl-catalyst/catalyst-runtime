@@ -482,6 +482,12 @@ http 1.1 webservers support this).
 If there is an encoding set, we encode each line of the response (the default
 encoding is UTF-8).
 
+=head2 $res->unencoded_write( $data )
+
+Works just like ->write but we don't apply any content encoding to C<$data>.  Use
+this if you are already encoding the $data or the data is arriving from an encoded
+storage.
+
 =head2 $res->write_fh
 
 Returns an instance of L<Catalyst::Response::Writer>, which is a lightweight
