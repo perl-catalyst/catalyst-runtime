@@ -205,7 +205,7 @@ precedence:
 C<do_not_decode_query>
 
 If true, then do not try to character decode any wide characters in your
-request URL query or keywords.  You will need gto handle this manually in your action code
+request URL query or keywords.  You will need to handle this manually in your action code
 (although if you choose this setting, chances are you already do this).
 
 C<default_query_encoding>
@@ -490,7 +490,7 @@ L<http://www.catalystframework.org/calendar/2013/12>, L<http://www.catalystframe
 L<http://www.catalystframework.org/calendar/2013/14>.
 
 The main difference this year is that previously calling ->write_fh would return the actual
-L<Plack> writer object that was supplied by your plack application handler, whereas now we wrap
+L<Plack> writer object that was supplied by your Plack application handler, whereas now we wrap
 that object in a lightweight decorator object that proxies the C<write> and C<close> methods
 and supplies an additional C<write_encoded> method.  C<write_encoded> does the exact same thing
 as C<write> except that it will first encode the string when necessary.  In general if you are
