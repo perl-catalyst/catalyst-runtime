@@ -121,6 +121,7 @@ use Scalar::Util ();
 
   sub file_upload :POST  Consumes(Multipart) Local {
     my ($self, $c) = @_;
+
     Test::More::is $c->req->body_parameters->{'♥'}, '♥♥';
     Test::More::ok my $upload = $c->req->uploads->{file};
     Test::More::is $upload->charset, 'UTF-8';
@@ -481,17 +482,10 @@ SKIP: {
 
   is $c->req->body_parameters->{'arg0'}, 'helloworld', 'got helloworld value';
   is $c->req->body_parameters->{'♥'}, '♥♥';
-
-  ok Scalar::Util::blessed($c->req->body_parameters->{'arg1'});
-  ok Scalar::Util::blessed($c->req->body_parameters->{'arg2'}[0]);
-  ok Scalar::Util::blessed($c->req->body_parameters->{'arg2'}[1]);
-  ok Scalar::Util::blessed($c->req->body_parameters->{'♥♥♥'});
-
-  # Since the form post is COMPLEX you are expected to decode it yourself.
-  is Encode::decode('UTF-8', $c->req->body_parameters->{'arg1'}->raw_data), $utf8, 'decoded utf8 param';
-  is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'arg2'}[0]->raw_data), $shiftjs, 'decoded shiftjis param';
-  is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'arg2'}[1]->raw_data), $shiftjs, 'decoded shiftjis param';
-  is Encode::decode('SHIFT_JIS', $c->req->body_parameters->{'♥♥♥'}->raw_data), $shiftjs, 'decoded shiftjis param';
+  is $c->req->body_parameters->{'arg1'}, $utf8, 'decoded utf8 param';
+  is $c->req->body_parameters->{'arg2'}[0], $shiftjs, 'decoded shiftjs param';
+  is $c->req->body_parameters->{'arg2'}[1], $shiftjs, 'decoded shiftjs param';
+  is $c->req->body_parameters->{'♥♥♥'}, $shiftjs, 'decoded shiftjs param';
 
 }
 

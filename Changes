@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90094 - 2015-07-24
+  - When there is a multipart POST request and the parts have extended
+    HTTP headers, try harder to decode and squeeze a meaningful value
+    out of it before giving up and crying.  Updated docs and tests to
+    reflect this change.
+
 5.90093 - 2015-05-29
   - Fixed a bug where if you used $res->write and then $res->body, the
     contents of body would be double encoded (gshank++).

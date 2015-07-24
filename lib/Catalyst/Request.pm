@@ -336,32 +336,35 @@ sub prepare_body_parameters {
         my $proto_value = $part_data{$key};
         my ($val, @extra) = (ref($proto_value)||'') eq 'ARRAY' ? @$proto_value : ($proto_value);
 
+        $key = $c->_handle_param_unicode_decoding($key)
+          if ($c and $c->encoding and !$c->config->{skip_body_param_unicode_decoding});
+
         if(@extra) {
-          $params->{$key} = [map { Catalyst::Request::PartData->build_from_part_data($_) } ($val,@extra)];
+          $params->{$key} = [map { Catalyst::Request::PartData->build_from_part_data($c, $_) } ($val,@extra)];
         } else {
-          $params->{$key} = Catalyst::Request::PartData->build_from_part_data($val);
+          $params->{$key} = Catalyst::Request::PartData->build_from_part_data($c, $val);
         }
       }
     } else {
       $params = $self->_body->param;
-    }
 
-    # If we have an encoding configured (like UTF-8) in general we expect a client
-    # to POST with the encoding we fufilled the request in. Otherwise don't do any
-    # encoding (good change wide chars could be in HTML entity style llike the old
-    # days -JNAP
+      # If we have an encoding configured (like UTF-8) in general we expect a client
+      # to POST with the encoding we fufilled the request in. Otherwise don't do any
+      # encoding (good change wide chars could be in HTML entity style llike the old
+      # days -JNAP
 
-    # so, now that HTTP::Body prepared the body params, we gotta 'walk' the structure
-    # and do any needed decoding.
+      # so, now that HTTP::Body prepared the body params, we gotta 'walk' the structure
+      # and do any needed decoding.
 
-    # This only does something if the encoding is set via the encoding param.  Remember
-    # this is assuming the client is not bad and responds with what you provided.  In
-    # general you can just use utf8 and get away with it.
-    #
-    # I need to see if $c is here since this also doubles as a builder for the object :(
+      # This only does something if the encoding is set via the encoding param.  Remember
+      # this is assuming the client is not bad and responds with what you provided.  In
+      # general you can just use utf8 and get away with it.
+      #
+      # I need to see if $c is here since this also doubles as a builder for the object :(
 
-    if($c and $c->encoding and !$c->config->{skip_body_param_unicode_decoding}) {
+      if($c and $c->encoding and !$c->config->{skip_body_param_unicode_decoding}) {
         $params = $c->_handle_unicode_decoding($params);
+      }
     }
 
     my $return = $self->_use_hash_multivalue ?
@@ -567,9 +570,14 @@ be either a scalar or an arrayref containing scalars.
 These are the parameters from the POST part of the request, if any.
 
 B<NOTE> If your POST is multipart, but contains non file upload parts (such
-as an line part with an alternative encoding or content type) we cannot determine
-the correct way to extra a meaningful value from the upload.  In this case any
+as an line part with an alternative encoding or content type) we do our best to
+try and figure out how the value should be presented.  If there's a specified character
+set we will use that to decode rather than the default encoding set by the application.
+However if there are complex headers and we cannot determine
+the correct way to extra a meaningful value from the upload, in this case any
 part like this will be represented as an instance of L<Catalyst::Request::PartData>.
+
+Patches and review of this part of the code welcomed.
 
 =head2 $req->body_params
 
