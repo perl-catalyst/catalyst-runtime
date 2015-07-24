@@ -23,7 +23,7 @@ Going further, if we allow ourselves to look hard at projects outside of Perl we
 
 =head2 Reporting a bug
 
-Reported bugs via RT or Github Issues that come with attached test cases will be more likely addressed quickly than those that do not.  Proposing a bugfix patch is also alwaysvery welcomed, although it is recommended to stick as closely as possible to an actual bug (rather than a feature change) and to not include unneeded changes in your patch such as formatting corrections.  In any case it is recommended before spending a lot of time on a patch to discuss the issue and your proposed solution, else you risk spending a lot of time on code that may not get merged, which tends to be frustrating.
+Reported bugs via RT or L<Github Issues|https://github.com/perl-catalyst/catalyst-runtime/issues> that come with attached test cases will be more likely addressed quickly than those that do not.  Proposing a bugfix patch is also alwaysvery welcomed, although it is recommended to stick as closely as possible to an actual bug (rather than a feature change) and to not include unneeded changes in your patch such as formatting corrections.  In any case it is recommended before spending a lot of time on a patch to discuss the issue and your proposed solution, else you risk spending a lot of time on code that may not get merged, which tends to be frustrating.
 
 For bug patches you should create a new branch from the current master.
 
@@ -31,7 +31,7 @@ For bug patches you should create a new branch from the current master.
 
 You should first ask yourself if your new idea could rationally live in the extended Catalyst ecosystem independently on CPAN.  Ideas that have demonstrated worth over time as stand alone modules are more likely to be considered for core inclusion.  Additionally, ideas that are best achieved in core rather than as standalone, are more likely considered for core inclusion than those ideas which could just as well be stand alone.  For example, the PSGI integration project happened because it was clear that building Catalyst on top of PSGI standards would lead to a better overall version than keeping it stand alone.
 
-You should propose your new idea in a github issue, on IRC and ideally on the mailing list so that other people can comment on your idea and its merits prior to you writing code.  If you write code before proposing the idea you stand a high chance of being frustrated when you idea is not accepted.
+You should propose your new idea in a L<github issue|https://github.com/perl-catalyst/catalyst-runtime/issues>, on IRC and ideally on the mailing list so that other people can comment on your idea and its merits prior to you writing code.  If you write code before proposing the idea you stand a high chance of being frustrated when you idea is not accepted.
 
 =head2 AUTHOR
 
