@@ -4,7 +4,8 @@
   - When there is a multipart POST request and the parts have extended
     HTTP headers, try harder to decode and squeeze a meaningful value
     out of it before giving up and crying.  Updated docs and tests to
-    reflect this change.
+    reflect this change.  This should solve problems when your clients
+    are posting multipart form values with special character sets.
   - Fixed issue where last_error actually returned the first error.  Took
     the change to add a 'pop_errors' to give the inverse of shift_errors.
   - Merged Pull Requests:
