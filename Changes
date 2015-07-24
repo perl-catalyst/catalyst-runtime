@@ -13,6 +13,7 @@
     - https://github.com/perl-catalyst/catalyst-runtime/pull/97
     - https://github.com/perl-catalyst/catalyst-runtime/pull/98
     - https://github.com/perl-catalyst/catalyst-runtime/pull/106
+    - https://github.com/perl-catalyst/catalyst-runtime/pull/107
 
 5.90093 - 2015-05-29
   - Fixed a bug where if you used $res->write and then $res->body, the
