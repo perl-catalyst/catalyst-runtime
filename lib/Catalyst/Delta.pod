@@ -7,6 +7,20 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 This is an overview of the user-visible changes to Catalyst between major
 Catalyst releases.
 
+=head2 VERSION 5.90094
+
+=head3 Multipart form POST with character set headers
+
+When we did the UTF8 work, we punted on Form POSTs when the POST envelope was
+multipart and each part had complex headers such as content-types, character
+sets and so forth.  In those cases instead of returning a possibly incorrect
+value, we returned an object describing the part so that you could figure it
+out manually.  This turned out to be a bad workaround as people did not expect
+to find that object.  So we changed this to try much harder to get a correct
+value.  We still return an object if we fail but we try much harder now.  If
+you used to check for the object you might find that code is no longer needed
+(although checking for it should not hurt or break anything either).
+
 =head2 VERSION 5.90091
 
 =head3 'case_sensitive' configuration
