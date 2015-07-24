@@ -5,6 +5,14 @@
     HTTP headers, try harder to decode and squeeze a meaningful value
     out of it before giving up and crying.  Updated docs and tests to
     reflect this change.
+  - Fixed issue where last_error actually returned the first error.  Took
+    the change to add a 'pop_errors' to give the inverse of shift_errors.
+  - Merged Pull Requests:
+    - https://github.com/perl-catalyst/catalyst-runtime/pull/95
+    - https://github.com/perl-catalyst/catalyst-runtime/pull/96
+    - https://github.com/perl-catalyst/catalyst-runtime/pull/97
+    - https://github.com/perl-catalyst/catalyst-runtime/pull/98
+    - https://github.com/perl-catalyst/catalyst-runtime/pull/106
 
 5.90093 - 2015-05-29
   - Fixed a bug where if you used $res->write and then $res->body, the

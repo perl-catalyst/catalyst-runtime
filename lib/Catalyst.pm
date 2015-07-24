@@ -521,7 +521,7 @@ L<< detach|/"$c->detach( $action [, \@arguments ] )" >>. Like C<< $c->visit >>,
 C<< $c->go >> will perform a full dispatch on the specified action or method,
 with localized C<< $c->action >> and C<< $c->namespace >>. Like C<detach>,
 C<go> escapes the processing of the current request chain on completion, and
-does not return to its cunless blessed $cunless blessed $caller.
+does not return to its caller.
 
 @arguments are arguments to the final destination of $action. @captures are
 arguments to the intermediate steps, if any, on the way to the final sub of
@@ -640,22 +640,42 @@ sub has_errors { scalar(@{shift->error}) ? 1:0 }
 =head2 $c->last_error
 
 Returns the most recent error in the stack (the one most recently added...)
-or nothing if there are no errors.
+or nothing if there are no errors.  This does not modify the contents of the
+error stack.
 
 =cut
 
-sub last_error { my ($err, @errs) = @{shift->error}; return $err }
+sub last_error {
+  my (@errs) = @{shift->error};
+  return scalar(@errs) ? $errs[-1]: undef;
+}
 
 =head2 shift_errors
 
-shifts the most recently added error off the error stack and returns if.  Returns
+shifts the most recently added error off the error stack and returns it.  Returns
 nothing if there are no more errors.
 
 =cut
 
 sub shift_errors {
     my ($self) = @_;
-    my ($err, @errors) = @{$self->error};
+    my @errors = @{$self->error};
+    my $err = shift(@errors);
+    $self->{error} = \@errors;
+    return $err;
+}
+
+=head2 pop_errors
+
+pops the most recently added error off the error stack and returns it.  Returns
+nothing if there are no more errors.
+
+=cut
+
+sub pop_errors {
+    my ($self) = @_;
+    my @errors = @{$self->error};
+    my $err = pop(@errors);
     $self->{error} = \@errors;
     return $err;
 }

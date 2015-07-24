@@ -2,6 +2,16 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90100
+
+The method C<last_error> in L</Catalyst> was actually returning the first error.  This has
+been fixed but there is a small chance it could be a breaking issue for you.  If this gives
+you trouble changing to C<shift_errors> is the easiest workaround (although that does
+modify the error stack so if you are relying on that not being changed you should try something
+like @{$c->errors}[-1] instead.  Since this method is relatively new and the cases when the
+error stack actually has more than one error in it, we feel the exposure is very low, but bug
+reports are very welcomed.
+
 =head1 Upgrading to Catalyst 5.90090
 
 L<Catalyst::Utils> has a new method 'inject_component' which works the same as the method of
