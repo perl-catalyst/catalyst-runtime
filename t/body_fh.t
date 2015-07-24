@@ -40,12 +40,14 @@ use Plack::Util;
     $c->res->body('manual_write');
   }
 
+  $INC{'MyApp/Controller/Root.pm'} = __FILE__; # sorry...
+
   package MyApp;
   use Catalyst;
 
 }
 
-$INC{'MyApp/Controller/Root.pm'} = '1'; # sorry...
+
 
 ok(MyApp->setup);
 ok(my $psgi = MyApp->psgi_app);
