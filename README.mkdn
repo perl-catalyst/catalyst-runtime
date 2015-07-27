@@ -2089,6 +2089,8 @@ konobi: Scott McWhirter <konobi@cpan.org>
 
 marcus: Marcus Ramberg <mramberg@cpan.org>
 
+Mischa Spiegelmock <revmischa@cpan.org>
+
 miyagawa: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
 mgrimes: Mark Grimes <mgrimes@cpan.org>
