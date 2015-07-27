@@ -59,14 +59,11 @@ is(
     'Plus is not encoded'
 );
 
-TODO: {
-    local $TODO = 'broken by 5.7008';
-    is(
-        Catalyst::uri_for( $context, '/bar#fragment', { param1 => 'value1' } )->as_string,
-        'http://127.0.0.1/foo/bar?param1=value1#fragment',
-        'URI for path with fragment and query params'
-    );
-}
+is(
+    Catalyst::uri_for( $context, '/bar#fragment', { param1 => 'value1' } )->as_string,
+    'http://127.0.0.1/foo/bar?param1=value1#fragment',
+    'URI for path with fragment and query params'
+);
 
 # test with utf-8
 is(
