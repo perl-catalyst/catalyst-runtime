@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90095 - TDB
+
 5.90094 - 2015-07-24
   - When there is a multipart POST request and the parts have extended
     HTTP headers, try harder to decode and squeeze a meaningful value
