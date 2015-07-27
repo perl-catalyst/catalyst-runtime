@@ -33,7 +33,7 @@ use Scalar::Util ();
   sub uri_for :Path('uri_for') {
     my ($self, $c) = @_;
     $c->response->content_type('text/html');
-    $c->response->body("${\$c->uri_for($c->controller('Root')->action_for('argend'), ['♥'], '♥', {'♥'=>'♥♥'})}");
+    $c->response->body("${\$c->uri_for($c->controller('Root')->action_for('argend'), ['♥'], '♥#X♥X', {'♥'=>'♥♥'})}");
   }
 
   sub heart_with_arg :Path('a♥') Args(1)  {
@@ -318,12 +318,12 @@ use Catalyst::Test 'MyApp';
 
 {
   my ($res, $c) = ctx_request "/root/uri_for";
-  my $url = $c->uri_for($c->controller('Root')->action_for('argend'), ['♥'], '♥', {'♥'=>'♥♥'});
+  my $url = $c->uri_for($c->controller('Root')->action_for('argend'), ['♥'], '♥#X♥X', {'♥'=>'♥♥'});
 
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), "$url", 'correct body'; #should do nothing
   is $res->content, "$url", 'correct body';
-  is $res->content_length, 90, 'correct length';
+  is $res->content_length, 102, 'correct length';
   is $res->content_charset, 'UTF-8';
 
   {
