@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90096 - 2015-07-27
+  - Fixed regression introduced in previous release that prevented a URI
+    fragment from getting properly encoded.  Added more tests around this
+    to define behavior better.
+
 5.90095 - 2015-07-27
   - Minor test case tweak that I hope solve some minor hiesenfails reported
     on CPAN testers.
