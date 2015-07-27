@@ -1670,7 +1670,7 @@ sub uri_for {
     $args =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
 
     # re-attach fragment on the end of everything after adding params
-    $args .= "#$fragment" if $fragment;
+    $query .= "#$fragment" if $fragment;
 
     my $res = bless(\"${base}${args}${query}", $class);
     $res;
