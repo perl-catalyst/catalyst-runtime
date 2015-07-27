@@ -1632,6 +1632,12 @@ sub uri_for {
 
     my $query = '';
 
+    # remove and save fragment if there is one
+    my $fragment;
+    if ($args =~ s/(#.+)$//) {
+      $fragment = $1;
+    }
+
     if (my @keys = keys %$params) {
       # somewhat lifted from URI::_query's query_form
       $query = '?'.join('&', map {
@@ -1660,7 +1666,10 @@ sub uri_for {
     $base =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
     $args = encode_utf8 $args;
     $args =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
-    
+
+    # re-attach fragment on the end of everything after adding params
+    $query .= $fragment if $fragment;
+
     my $res = bless(\"${base}${args}${query}", $class);
     $res;
 }
