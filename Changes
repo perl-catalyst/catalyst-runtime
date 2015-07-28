@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+TBA
+  - $c->uri_for now defines a final argument for setting the URL fragment
+  /URL anchor.  This is now the canonical approach to setting a fragment
+  via uri_for.
+
 5.90096 - 2015-07-27
   - Fixed regression introduced in previous release that prevented a URI
     fragment from getting properly encoded.  Added more tests around this
