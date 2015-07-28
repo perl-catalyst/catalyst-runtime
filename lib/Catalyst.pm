@@ -1484,11 +1484,11 @@ sub setup_finalize {
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $path?, @args?, \%query_values?, $fragment? )
+=head2 $c->uri_for( $path?, @args?, \%query_values?, \$fragment? )
 
-=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values?, $fragment? )
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values?, \$fragment? )
 
-=head2 $c->uri_for( $action, [@captures, @args], \%query_values?, $fragment? )
+=head2 $c->uri_for( $action, [@captures, @args], \%query_values?, \$fragment? )
 
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
