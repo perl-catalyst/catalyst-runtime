@@ -1,9 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-TBA
+5.90097 - 2015-07-28
   - $c->uri_for now defines a final argument for setting the URL fragment
   /URL anchor.  This is now the canonical approach to setting a fragment
   via uri_for.
+  - Reverted how we treat $c->uri_for($path) where $path is a string.  When
+    we introduced the UTF-8 work we started encoding stringy paths, which
+    breaks code that did not expect that.  We now consider stringy $path to
+    be 'expert' mode and you are expected to perform all nessary encoding.
 
 5.90096 - 2015-07-27
   - Fixed regression introduced in previous release that prevented a URI

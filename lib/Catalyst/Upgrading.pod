@@ -8,10 +8,6 @@ In older versions of Catalyst one could construct a L<URI> with a fragment (such
 https://localhost/foo/bar#fragment) by using a '#' in the path or final argument, for
 example:
 
-    $c->uri_for('/mypath#fragment');
-
-or:
-
     $c->uri_for($action, 'foo#fragment');
 
 This behavior was never documented and would break if using the Unicode plugin, or when
@@ -39,7 +35,7 @@ delimiter, which is going to be a breaking change for you.  You need to alter yo
 to match the new specification or modify uri_for for your local case.  Patches to solve
 this are very welcomed, as long as they don't break existing test cases.
 
-B<NOTE> If you are using the alternative:
+B<NOTE> If you are using the string form of the first argument:
 
     $c->uri_for('/foo/bar#baz')
 
