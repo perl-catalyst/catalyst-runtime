@@ -1484,11 +1484,11 @@ sub setup_finalize {
     $class->setup_finished(1);
 }
 
-=head2 $c->uri_for( $path?, @args?, \%query_values? )
+=head2 $c->uri_for( $path?, @args?, \%query_values?, $fragment? )
 
-=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values? )
+=head2 $c->uri_for( $action, \@captures?, @args?, \%query_values?, $fragment? )
 
-=head2 $c->uri_for( $action, [@captures, @args], \%query_values? )
+=head2 $c->uri_for( $action, [@captures, @args], \%query_values?, $fragment? )
 
 Constructs an absolute L<URI> object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
@@ -1549,6 +1549,8 @@ sub uri_for {
     }
 
     undef($path) if (defined $path && $path eq '');
+
+    my $fragment =  ((scalar(@args) && ref($args[-1]) eq 'SCALAR') ? pop @args : undef );
 
     my $params =
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
@@ -1631,15 +1633,6 @@ sub uri_for {
     }
 
     my $query = '';
-
-    # remove and save fragment if there is one
-    my $fragment;
-    if ($args =~ s/#(.+)$//) {
-      $fragment = encode_utf8($1);
-      $fragment =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
-      $fragment =~ s/ /+/g;
-    }
-
     if (my @keys = keys %$params) {
       # somewhat lifted from URI::_query's query_form
       $query = '?'.join('&', map {
@@ -1669,8 +1662,12 @@ sub uri_for {
     $args = encode_utf8 $args;
     $args =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
 
-    # re-attach fragment on the end of everything after adding params
-    $query .= "#$fragment" if $fragment;
+    if(defined $fragment) {
+      $fragment = encode_utf8(${$fragment});
+      $fragment =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+      $fragment =~ s/ /+/g;
+      $query .= "#$fragment";
+    }
 
     my $res = bless(\"${base}${args}${query}", $class);
     $res;

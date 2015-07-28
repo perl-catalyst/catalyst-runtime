@@ -2,7 +2,44 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
-=head1 Upgrading to Catalyst 5.90100
+=head1 Upgrading to Catalyst 5.90097
+
+In older versions of Catalyst one could construct a L<URI> with a fragment (such as
+https://localhost/foo/bar#fragment) by using a '#' in the path or final argument, for
+example:
+
+    $c->uri_for('/mypath#fragment');
+
+or:
+
+    $c->uri_for($action, 'foo#fragment');
+
+This behavior was never documented and would break if using the Unicode plugin, or when
+adding a query to the arguments:
+
+    $c->uri_for($action, 'foo#fragment', +{ a=>1, b=>2});
+
+would define a fragment like "#fragment?a=1&b=2".
+
+When we introduced UTF-8 encoding by default in Catalyst 5.9008x this side effect behavior
+was broken since we started encoding the '#' when it was part of the URI path.
+
+In version 5.90095 and 5.90096 we attempted to fix this, but all we managed to do was break
+people with URIs that included '#' as part of the path data, when it was not expected to
+be a fragment delimiter.
+
+In general L<Catalyst> prefers an explicit specification rather than relying on side effects
+or domain specific mini languages.  As a result we are now defining how to set a fragment
+for a URI via ->uri_for:
+
+    $c->uri_for($action_or_path, \@captures_or_args, @args, \$query, \$fragment);
+
+If you are relying on the previous side effect behavior your URLs will now encode the '#'
+delimiter, which is going to be a breaking change for you.  You need to alter your code
+to match the new specification or modify uri_for for your local case.  Patches to solve
+this are very welcomed, as long as they don't break existing test cases. 
+
+=head1 Upgrading to Catalyst 5.90095
 
 The method C<last_error> in L</Catalyst> was actually returning the first error.  This has
 been fixed but there is a small chance it could be a breaking issue for you.  If this gives

@@ -323,7 +323,7 @@ use Catalyst::Test 'MyApp';
   is $res->code, 200, 'OK';
   is decode_utf8($res->content), "$url", 'correct body'; #should do nothing
   is $res->content, "$url", 'correct body';
-  is $res->content_length, 102, 'correct length';
+  is $res->content_length, 104, 'correct length';
   is $res->content_charset, 'UTF-8';
 
   {
