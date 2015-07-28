@@ -37,7 +37,15 @@ for a URI via ->uri_for:
 If you are relying on the previous side effect behavior your URLs will now encode the '#'
 delimiter, which is going to be a breaking change for you.  You need to alter your code
 to match the new specification or modify uri_for for your local case.  Patches to solve
-this are very welcomed, as long as they don't break existing test cases. 
+this are very welcomed, as long as they don't break existing test cases.
+
+B<NOTE> If you are using the alternative:
+
+    $c->uri_for('/foo/bar#baz')
+
+construction, we do not attempt to encode this and it will make a URL with a
+fragment of 'baz'.
+
 
 =head1 Upgrading to Catalyst 5.90095
 

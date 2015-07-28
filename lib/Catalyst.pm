@@ -1506,6 +1506,15 @@ relative to the application root (if it does). It is then merged with
 C<< $c->request->base >>; any C<@args> are appended as additional path
 components; and any C<%query_values> are appended as C<?foo=bar> parameters.
 
+B<NOTE> If you are using this 'stringy' first argument, we skip encoding and
+allow you to declare something like:
+
+    $c->uri_for('/foo/bar#baz')
+
+Where 'baz' is a URI fragment.  We consider this first argument string to be
+'expert' mode where you are expected to create a valid URL and we for the most
+part just pass it through without a lot of internal effort to escape and encode.
+
 If the first argument is a L<Catalyst::Action> it represents an action which
 will have its path resolved using C<< $c->dispatcher->uri_for_action >>. The
 optional C<\@captures> argument (an arrayref) allows passing the captured
@@ -1548,12 +1557,23 @@ sub uri_for {
         $path .= '/';
     }
 
-    undef($path) if (defined $path && $path eq '');
-
     my $fragment =  ((scalar(@args) && ref($args[-1]) eq 'SCALAR') ? pop @args : undef );
+
+    unless(blessed $path) {
+      if ($path =~ s/#(.+)$//)  {
+        if(defined($1) and $fragment) {
+          carp "Abiguious fragment declaration: You cannot define a fragment in '$path' and as an argument '$fragment'";
+        }
+        if(defined($1)) {
+          $fragment = $1;
+        }
+      }
+    }
 
     my $params =
       ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
+
+    undef($path) if (defined $path && $path eq '');
 
     carp "uri_for called with undef argument" if grep { ! defined $_ } @args;
 
@@ -1663,9 +1683,11 @@ sub uri_for {
     $args =~ s/([^$URI::uric])/$URI::Escape::escapes{$1}/go;
 
     if(defined $fragment) {
-      $fragment = encode_utf8(${$fragment});
-      $fragment =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
-      $fragment =~ s/ /+/g;
+      if(blessed $path) {
+        $fragment = encode_utf8(${$fragment});
+        $fragment =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+        $fragment =~ s/ /+/g;
+      }
       $query .= "#$fragment";
     }
 

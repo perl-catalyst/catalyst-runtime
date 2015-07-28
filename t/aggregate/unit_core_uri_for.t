@@ -61,30 +61,21 @@ is(
 
 is(
     Catalyst::uri_for( $context, '/bar#fragment', { param1 => 'value1' } )->as_string,
-    'http://127.0.0.1/foo/bar%23fragment?param1=value1',
+    'http://127.0.0.1/foo/bar?param1=value1#fragment',
     'URI for path with fragment and query params 1'
 );
 
-
-is(
-    Catalyst::uri_for( $context, '/bar#fragment\x{2620}', { param1 => 'value1' } )->as_string,
-    'http://127.0.0.1/foo/bar%23fragment%5Cx%7B2620%7D?param1=value1',
-    'URI for path with fragment and query params 2'
-);
-
-
 is(
     Catalyst::uri_for( $context, '/bar#fragment^%$', { param1 => 'value1' } )->as_string,
-    'http://127.0.0.1/foo/bar%23fragment%5E%$?param1=value1',
+    'http://127.0.0.1/foo/bar?param1=value1#fragment^%$',
     'URI for path with fragment and query params 3'
 );
 
 is(
-    Catalyst::uri_for( $context, '/bar', { param1 => 'value1' }, \'fragment\x{2620}' )->as_string,
-    'http://127.0.0.1/foo/bar?param1=value1#fragment%5Cx%7B2620%7D',
-    'URI for path with fragment and query params 2'
+    Catalyst::uri_for( $context, '/foo#bar/baz', { param1 => 'value1' } )->as_string,
+    'http://127.0.0.1/foo/foo?param1=value1#bar/baz',
+    'URI for path with fragment and query params 3'
 );
-
 
 # test with utf-8
 is(

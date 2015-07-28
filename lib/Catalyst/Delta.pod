@@ -22,6 +22,13 @@ follow the new, supported specification:
 This will be a breaking change for some codebases, we recommend testing if
 you are creating URLs with fragments.
 
+B<NOTE> If you are using the alternative:
+
+    $c->uri_for('/foo/bar#baz')
+
+construction, we do not attempt to encode this and it will make a URL with a
+fragment of 'baz'.
+
 =head2 VERSION 5.90094
 
 =head3 Multipart form POST with character set headers
