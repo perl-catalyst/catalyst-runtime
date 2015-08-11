@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90098 - 2015-08-11
+  - Fix for RT#106373 (Issue when you try to install and also have an old
+  verion of Test::Mechanize::WWW::Catalyst)
+
 5.90097 - 2015-07-28
   - $c->uri_for now defines a final argument for setting the URL fragment
   /URL anchor.  This is now the canonical approach to setting a fragment
