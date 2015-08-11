@@ -221,6 +221,7 @@ BEGIN {
 
   use Moose::Role;
   use MooseX::MethodAttributes::Role;
+  use MyApp::Types qw/Int/;
 
   sub an_int :Local Args(Int) {
     my ($self, $c, $int) = @_;
