@@ -179,6 +179,47 @@ BEGIN {
 
   MyApp::Controller::Root->config(namespace=>'');
 
+  package MyApp::Controller::Autoclean;
+  $INC{'MyApp/Controller/Autoclean.pm'} = __FILE__;
+
+  use Moose;
+  use MooseX::MethodAttributes;
+  use namespace::autoclean;
+
+  use MyApp::Types qw/Int/;
+
+  extends 'Catalyst::Controller';
+
+  sub an_int :Local Args(Int) {
+    my ($self, $c, $int) = @_;
+    $c->res->body('an_int (autoclean)');
+  }
+
+  MyApp::Controller::Autoclean->config(namespace=>'autoclean');
+
+  package MyApp::Role;
+  $INC{'MyApp/Role.pm'} = __FILE__;
+
+  use Moose::Role;
+  use MooseX::MethodAttributes::Role;
+
+  sub an_int :Local Args(Int) {
+    my ($self, $c, $int) = @_;
+    $c->res->body('an_int (withrole)');
+  }
+
+  package MyApp::Controller::WithRole;
+  $INC{'MyApp/Controller/WithRole.pm'} = __FILE__;
+
+  use Moose;
+  use MooseX::MethodAttributes;
+
+  extends 'Catalyst::Controller';
+
+  with 'MyApp::Role';
+
+  MyApp::Controller::WithRole->config(namespace=>'withrole');
+
   package MyApp;
   use Catalyst;
 
@@ -400,6 +441,16 @@ SKIP: {
 {
     my $res = request '/stringy_enum/1/a';
     is $res->content, 'default', "request '/stringy_enum/a'";
+}
+
+{
+  my $res = request '/autoclean/an_int/1';
+  is $res->content, 'an_int (autoclean)';
+}
+
+{
+  my $res = request '/withrole/an_int/1';
+  is $res->content, 'an_int (withrole)';
 }
 
 =over
