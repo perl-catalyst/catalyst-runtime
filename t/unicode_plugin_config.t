@@ -9,7 +9,7 @@ use FindBin qw($Bin);
 use lib "$Bin/lib";
 
 BEGIN {
-if ( !eval { require Test::WWW::Mechanize::Catalyst } || ! Test::WWW::Mechanize::Catalyst->VERSION('0.51') ) {
+if ( !eval { require Test::WWW::Mechanize::Catalyst; Test::WWW::Mechanize::Catalyst->VERSION('0.51')} ) {
     plan skip_all => 'Need Test::WWW::Mechanize::Catalyst for this test';
 }
 }
