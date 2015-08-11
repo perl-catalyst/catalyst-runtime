@@ -43,6 +43,23 @@ BEGIN {
 }
 
 {
+  package MyApp::Role::Controller;
+  $INC{'MyApp/Role/Controller.pm'} = __FILE__;
+
+  use Moose::Role;
+  use MooseX::MethodAttributes::Role;
+  use MyApp::Types qw/Int Str/;
+
+  sub role_str :Path('role_test') Args(Str) {
+    my ($self, $c, $arg) = @_;
+    $c->res->body('role_str'.$arg);
+  }
+
+  sub role_int :Path('role_test') Args(Int) {
+    my ($self, $c, $arg) = @_;
+    $c->res->body('role_int'.$arg);
+  }
+
   package MyApp::Model::User;
   $INC{'MyApp/Model/User.pm'} = __FILE__;
 
@@ -70,6 +87,8 @@ BEGIN {
   use MyApp::Types qw/Tuple Int Str StrMatch ArrayRef UserId User Heart/;
 
   extends 'Catalyst::Controller';
+  with 'MyApp::Role::Controller';
+
 
   sub user :Local Args(UserId) {
     my ($self, $c, $int) = @_;
@@ -475,5 +494,18 @@ SKIP: {
   }
 
 }
+
+# Test Roles
+
+{
+    my $res = request '/role_test/1';
+    is $res->content, 'role_int1';
+}
+
+{
+    my $res = request '/role_test/a';
+    is $res->content, 'role_stra';
+}
+
 
 done_testing;
