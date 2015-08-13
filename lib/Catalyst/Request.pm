@@ -1119,7 +1119,8 @@ If parameters have already been set will clear the parameters and build them aga
 
 =head2 $self->env
 
-Access to the raw PSGI env.  
+Access to the raw PSGI env.  Note that this is currently effectively read only
+and any changes to the env will be lost.
 
 =head2 meta
 
