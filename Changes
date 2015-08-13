@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - Add note about readonly env (Arthur Axel fREW Schmidt)
+
 5.90098 - 2015-08-11
   - Fix for RT#106373 (Issue when you try to install and also have an old
   verion of Test::Mechanize::WWW::Catalyst)
