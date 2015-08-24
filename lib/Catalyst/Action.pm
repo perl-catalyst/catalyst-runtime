@@ -20,7 +20,7 @@ L<Catalyst::Controller> subclasses.
 =cut
 
 use Moose;
-use Scalar::Util 'looks_like_number';
+use Scalar::Util 'looks_like_number', 'blessed';
 use Moose::Util::TypeConstraints ();
 with 'MooseX::Emulate::Class::Accessor::Fast';
 use namespace::clean -except => 'meta';
@@ -243,7 +243,46 @@ has captures_constraints => (
 
 sub resolve_type_constraint {
   my ($self, $name) = @_;
-  my @tc = eval "package ${\$self->class}; $name" or die "'$name' not a type constraint in ${\$self->private_path}";
+
+  if(defined($name) && blessed($name) && $name->can('check')) {
+    # Its already a TC, good to go.
+    return $name;
+  }
+
+  if($name=~m/::/) {
+    eval "use Type::Registry; 1" || die "Can't resolve type constraint $name without installing Type::Tiny";
+    my $tc =  Type::Registry->new->foreign_lookup($name);
+    return defined $tc ? $tc : die "'$name' not a type constraint in ${\$self->private_path}";
+  }
+
+  my @tc = eval "package ${\$self->class}; $name" or do {
+    # ok... so its not defined in the package.  we need to look at all the roles
+    # and superclasses, look for attributes and figure it out.
+    # Superclasses take precedence;
+    #
+    my @supers = map { $_->meta } $self->class->meta->superclasses;
+    my @roles = $self->class->meta->calculate_all_roles;
+
+    # So look thru all the super and roles in order and return the
+    # first type constraint found. We should probably find all matching
+    # type constraints and try to do some sort of resolution.
+
+    foreach my $parent (@roles, @supers) {
+      if(my $m = $parent->get_method($self->name)) {
+        if($m->can('attributes')) {
+          my ($key, $value) = map { $_ =~ /^(.*?)(?:\(\s*(.+?)\s*\))?$/ }
+            grep { $_=~/^Args\(/ or $_=~/^CaptureArgs\(/ }
+              @{$m->attributes};
+          next unless $value eq $name;
+          my @tc = eval "package ${\$parent->name}; $name";
+          return @tc if @tc;
+        }
+      }
+    }
+
+    die "'$name' not a type constraint in ${\$self->private_path}";
+  };
+
   if($tc[0]) {
     return map { ref($_) ? $_ : Moose::Util::TypeConstraints::find_or_parse_type_constraint($_) } @tc;
   } else {

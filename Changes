@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90099 - 2015-08-XX
+  - Document using namespace::autoclean with controllers that have actions
+    with type constraints.
+  - Look for type constraints in super classes and consumed roles.
+
 5.90098 - 2015-08-11
   - Fix for RT#106373 (Issue when you try to install and also have an old
   verion of Test::Mechanize::WWW::Catalyst)

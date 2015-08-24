@@ -203,7 +203,7 @@ BEGIN {
 
   use Moose;
   use MooseX::MethodAttributes;
-  use namespace::autoclean;
+  use namespace::autoclean -except => 'Int';
 
   use MyApp::Types qw/Int/;
 
@@ -228,13 +228,32 @@ BEGIN {
     $c->res->body('an_int (withrole)');
   }
 
+  sub an_int_ns :Local Args(MyApp::Types::Int) {
+    my ($self, $c, $int) = @_;
+    $c->res->body('an_int (withrole)');
+  }
+
+  package MyApp::BaseController;
+  $INC{'MyApp/BaseController.pm'} = __FILE__;
+
+  use Moose;
+  use MooseX::MethodAttributes;
+  use MyApp::Types qw/Int/;
+
+  extends 'Catalyst::Controller';
+
+  sub from_parent :Local Args(Int) {
+    my ($self, $c, $id) = @_;
+    $c->res->body("from_parent $id");
+  }
+
   package MyApp::Controller::WithRole;
   $INC{'MyApp/Controller/WithRole.pm'} = __FILE__;
 
   use Moose;
   use MooseX::MethodAttributes;
 
-  extends 'Catalyst::Controller';
+  extends 'MyApp::BaseController';
 
   with 'MyApp::Role';
 
@@ -463,16 +482,6 @@ SKIP: {
     is $res->content, 'default', "request '/stringy_enum/a'";
 }
 
-{
-  my $res = request '/autoclean/an_int/1';
-  is $res->content, 'an_int (autoclean)';
-}
-
-{
-  my $res = request '/withrole/an_int/1';
-  is $res->content, 'an_int (withrole)';
-}
-
 =over
 
 | /chain_base/*/*/*/*/*/*                 | /chain_base (1)
@@ -560,4 +569,28 @@ SKIP: {
 }
 
 
+{
+  my $res = request '/autoclean/an_int/1';
+  is $res->content, 'an_int (autoclean)';
+}
+
+{
+  my $res = request '/withrole/an_int_ns/S';
+  is $res->content, 'default';
+}
+
+{
+  my $res = request '/withrole/an_int_ns/111';
+  is $res->content, 'an_int (withrole)';
+}
+
+{
+  my $res = request '/withrole/an_int/1';
+  is $res->content, 'an_int (withrole)';
+}
+
+{
+  my $res = request '/withrole/from_parent/1';
+  is $res->content, 'from_parent 1';
+}
 done_testing;

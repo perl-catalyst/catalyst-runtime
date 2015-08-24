@@ -152,6 +152,115 @@ A tutorial on how to make custom type libraries is outside the scope of this doc
 recommend looking at the copious documentation in L<Type::Tiny> or in L<MooseX::Types> if
 you prefer that system.  The author recommends L<Type::Tiny> if you are unsure which to use.
 
+=head3 Type constraint namespace.
+
+By default we assume the namespace which defines the type constraint is in the package
+which contains the action declaring the arg or capture arg.  However if you do not wish
+to import type constraints into you package, you may use a fully qualified namespace for
+your type constraint.  If you do this you must install L<Type::Tiny> which defines the
+code used to lookup and normalize the various types of Type constraint libraries.
+
+Example:
+
+    package MyApp::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub an_int_ns :Local Args(MyApp::Types::Int) {
+      my ($self, $c, $int) = @_;
+      $c->res->body('an_int (withrole)');
+    }
+
+Would basically work the same as:
+
+    package MyApp::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use MyApp::Types 'Int';
+
+    extends 'Catalyst::Controller';
+
+    sub an_int_ns :Local Args(Int) {
+      my ($self, $c, $int) = @_;
+      $c->res->body('an_int (withrole)');
+    }
+
+=head3 namespace::autoclean
+
+If you want to use L<namespace::autoclean> in your controllers you must 'except' imported
+type constraints since the code that resolves type constraints in args / capture args
+run after the cleaning.  For example:
+
+    package MyApp::Controller::Autoclean;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use namespace::autoclean -except => 'Int';
+    use MyApp::Types qw/Int/;
+
+    extends 'Catalyst::Controller';
+
+    sub an_int :Local Args(Int) {
+      my ($self, $c, $int) = @_;
+      $c->res->body('an_int (autoclean)');
+    }
+
+=head3 Using roles and base controller with type constraints
+
+If your controller is using a base class or a role that has an action with a type constraint
+you should declare your use of the type constraint in that role or base controller in the
+same way as you do in main controllers.  Catalyst will try to find the package with declares
+the type constraint first by looking in any roles and then in superclasses.  It will use the
+first package that defines the type constraint.  For example:
+
+    package MyApp::Role;
+
+    use Moose::Role;
+    use MooseX::MethodAttributes::Role;
+    use MyApp::Types qw/Int/;
+
+    sub an_int :Local Args(Int) {
+      my ($self, $c, $int) = @_;
+      $c->res->body('an_int (withrole)');
+    }
+
+    sub an_int_ns :Local Args(MyApp::Types::Int) {
+      my ($self, $c, $int) = @_;
+      $c->res->body('an_int (withrole)');
+    }
+
+    package MyApp::BaseController;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use MyApp::Types qw/Int/;
+
+    extends 'Catalyst::Controller';
+
+    sub from_parent :Local Args(Int) {
+      my ($self, $c, $id) = @_;
+      $c->res->body('from_parent $id');
+    }
+
+    package MyApp::Controller::WithRole;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'MyApp::BaseController';
+
+    with 'MyApp::Role';
+
+If you have complex controller hierarchy, we
+do not at this time attempt to look for all packages with a match type constraint, but instead
+take the first one found.  In the future we may add code that attempts to insure a sane use
+of subclasses with type constraints but right now there are no clear use cases so report issues
+and interests.
+
 =head3 Match order when more than one Action matches a path.
 
 As previously described, L<Catalyst> will match 'the longest path', which generally means
