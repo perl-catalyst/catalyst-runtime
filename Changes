@@ -4,6 +4,7 @@
   - Document using namespace::autoclean with controllers that have actions
     with type constraints.
   - Look for type constraints in super classes and consumed roles.
+  - Change the way the stash middleware works to no longer localize $psgi_env.
 
 5.90098 - 2015-08-11
   - Fix for RT#106373 (Issue when you try to install and also have an old

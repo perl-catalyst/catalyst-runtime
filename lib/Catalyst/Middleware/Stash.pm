@@ -43,8 +43,8 @@ sub call {
   my $new_env = +{ %$env };
   my %stash = %{ ($env->{+PSGI_KEY} || sub {})->() || +{} };
 
-  $new_env->{+PSGI_KEY} = _create_stash( \%stash  );
-  return $self->app->($new_env);
+  $env->{+PSGI_KEY} = _create_stash( \%stash  );
+  return $self->app->($env);
 }
 
 =head1 NAME
