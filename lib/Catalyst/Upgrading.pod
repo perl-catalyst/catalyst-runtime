@@ -2,6 +2,17 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90100
+
+We changed the way the middleware stash works so that it no longer localizes
+the PSGI env hashref.  This was done to fix bugs where people set PSGI ENV hash
+keys and found them to dissappear in certain cases.  It also means that now if
+a sub applications sets stash variables, that stash will now bubble up to the
+parent application.  This may be a breaking change for you since previous
+versions of this code did not allow that.  A workaround is to explicitly delete
+stash keys in your sub application before returning control to the parent
+application.
+
 =head1 Upgrading to Catalyst 5.90097
 
 In older versions of Catalyst one could construct a L<URI> with a fragment (such as

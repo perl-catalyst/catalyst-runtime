@@ -58,11 +58,12 @@ use strict;
     $c->stash->{outer} = "outer";
     $c->res->from_psgi_response( MyAppChild->to_app->($c->req->env) );
 
-    is_deeply [keys(%{$c->stash})], ['outer'], 'only one key in stash';
+    is_deeply [sort keys(%{$c->stash})], ['inner','outer'];
   }
 
   package MyAppParent;
   use Catalyst;
+  MyAppParent->config(psgi_middleware=>['+MyMiddleware']);
   MyAppParent->setup;
 
 }

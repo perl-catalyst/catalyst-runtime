@@ -9,7 +9,7 @@ use Carp 'croak';
 
 our @EXPORT_OK = qw(stash get_stash);
 
-sub PSGI_KEY () { 'Catalyst.Stash.v1' }
+sub PSGI_KEY () { 'Catalyst.Stash.v2' }
 
 sub get_stash {
   my $env = shift;
@@ -24,6 +24,7 @@ sub stash {
 }
 
 sub _create_stash {
+  my $self = shift;
   my $stash = shift || +{};
   return sub {
     if(@_) {
@@ -40,10 +41,9 @@ sub _create_stash {
 
 sub call {
   my ($self, $env) = @_;
-  my $new_env = +{ %$env };
-  my %stash = %{ ($env->{+PSGI_KEY} || sub {})->() || +{} };
+  $env->{+PSGI_KEY} = $self->_create_stash 
+    unless exists($env->{+PSGI_KEY});
 
-  $env->{+PSGI_KEY} = _create_stash( \%stash  );
   return $self->app->($env);
 }
 
@@ -60,11 +60,13 @@ alone distribution
 We store a coderef under the C<PSGI_KEY> which can be dereferenced with
 key values or nothing to access the underlying hashref.
 
-The stash middleware is designed so that you can 'nest' applications that
-use it.  If for example you have a L<Catalyst> application that is called
-by a controller under a parent L<Catalyst> application, the child application
-will inherit the full stash of the parent BUT any new keys added by the child
-will NOT bubble back up to the parent.  However, children of children will.
+Anything placed into the stash will be available in the stash of any 'mounted'
+Catalyst applictions.  A mounted Catalyst application may set the stash and
+'pass back' information to the parent application.  Non Catalyst applications
+may use this middleware to access and set stash values.
+
+Please note I highly recommend having a stronger interface than a stash key
+between applications.
 
 For more information the current test case t/middleware-stash.t is the best
 documentation.
