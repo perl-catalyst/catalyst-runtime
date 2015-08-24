@@ -289,6 +289,14 @@ And in a controller:
 
     my $type = $c->model('FooFactory', 1,2,3,4): # $type->isa('Type1')
 
+B<NOTE:> If you define a ACCEPT_CONTEXT method it MUST check to see if the
+second argument is blessed (is a context) or not (is an application class name) and
+it MUST return something valid for the case when the scope is application.  This is
+required because a component maybe be called from the application scope even if it
+requires a context and you must prevent errors from being issued if this happens.
+Remeber not all components that ACCEPT_CONTEXT actually need or use context information
+(and there is a school of thought that suggestions doing so is a design error anyway...)
+
 =head1 SEE ALSO
 
 L<Catalyst>, L<Catalyst::Model>, L<Catalyst::View>, L<Catalyst::Controller>.
