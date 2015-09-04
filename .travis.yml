@@ -18,7 +18,7 @@ install:
 
    # author deps -- wish there was a better way
    - cpanm --notest --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize Test::WWW::Mechanize::Catalyst Catalyst::Plugin::Params::Nested
-   - cpanm --notest --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod
+   - cpanm --notest --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod Type::Tiny
    - cpanm --notest --metacpan --skip-satisfied --installdeps .
    - echo y | perl Makefile.PL
 

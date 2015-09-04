@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90101 - 2015-09-04
+  - Fixed a regression introduced in the last release which caused test
+    case failure when using a version of Perl 5.14 or older.
+
 5.90100 - 2015-08-24
   - Document using namespace::autoclean with controllers that have actions
     with type constraints.
