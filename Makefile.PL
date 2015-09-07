@@ -34,7 +34,7 @@ requires 'Class::Load' => '0.12';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24';
-requires 'MooseX::Role::WithOverloading' => '0.09';
+requires 'MooseX::Role::WithOverloading' => '0.09' unless can_use('Moose', '2.1300');
 requires 'Carp' => '1.25';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';
