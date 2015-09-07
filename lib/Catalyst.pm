@@ -475,7 +475,7 @@ or stash it like so:
 
 and access it from the stash.
 
-Keep in mind that the C<end> method used is that of the caller action. So a C<$c-E<gt>detach> inside a forwarded action would run the C<end> method from the original action requested.
+Keep in mind that the C<end> method used is that of the caller action. So a C<< $c->detach >> inside a forwarded action would run the C<end> method from the original action requested.
 
 =cut
 
@@ -4887,7 +4887,7 @@ andrewalker: André Walker <andre@cpan.org>
 
 Andrew Bramble
 
-Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
+Andrew Ford <A.Ford@ford-mason.co.uk>
 
 Andrew Ruthven
 
@@ -4911,7 +4911,7 @@ Danijel Milicevic C<me@danijel.de>
 
 davewood: David Schmidt <davewood@cpan.org>
 
-David Kamholz E<lt>dkamholz@cpan.orgE<gt>
+David Kamholz <dkamholz@cpan.org>
 
 David Naughton, C<naughton@umn.edu>
 

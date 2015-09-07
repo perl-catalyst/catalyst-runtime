@@ -715,7 +715,7 @@ parts of the path (separated by C</>) this action wants to capture as
 its arguments. If it doesn't expect any, just specify
 C<:CaptureArgs(0)>.  The captures get passed to the action's C<@_> right
 after the context, but you can also find them as array references in
-C<$c-E<gt>request-E<gt>captures-E<gt>[$level]>. The C<$level> is the
+C<< $c->request->captures->[$level] >>. The C<$level> is the
 level of the action in the chain that captured the parts of the path.
 
 An action that is part of a chain (that is, one that has a C<:Chained>
@@ -764,7 +764,7 @@ of path parts after the endpoint.
 
 Just as with C<:CaptureArgs>, the arguments get passed to the action in
 C<@_> after the context object. They can also be reached through
-C<$c-E<gt>request-E<gt>arguments>.
+C<< $c->request->arguments >>.
 
 You should see 'Args' in L<Catalyst::Controller> for more details on using
 type constraints in your Args declarations.
