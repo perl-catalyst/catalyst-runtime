@@ -13,12 +13,12 @@ Support for type constraints in Args and CaptureArgs has been improved.  You may
 now inherit from a base controller that declares type constraints and use roles
 that declare type constraints.  See L<Catalyst::RouteMatching> for more.
 
-You may now. also use a full type constraint namespace instead of inporting type
+You may now. also use a full type constraint namespace instead of importing type
 constraints into your package namespace.
 
 We changed the way the middleware stash works so that it no longer localizes
 the PSGI env hashref.  This was done to fix bugs where people set PSGI ENV hash
-keys and found them to dissappear in certain cases.  It also means that now if
+keys and found them to disappear in certain cases.  It also means that now if
 a sub applications sets stash variables, that stash will now bubble up to the
 parent application.  This may be a breaking change for you since previous
 versions of this code did not allow that.  A workaround is to explicitly delete
@@ -65,7 +65,7 @@ you used to check for the object you might find that code is no longer needed
 
 =head3 'case_sensitive' configuration
 
-At one point in time we allowed you to set a 'case_sensitive' configuraion value so
+At one point in time we allowed you to set a 'case_sensitive' configuration value so
 that you could find actions by their private names using mixed case.  We highly
 discourage that.  If you are using this 'feature' you should be on notice that we
 plan to remove the code around it in the near future.
@@ -108,7 +108,7 @@ any subclasses.  For example:
       'Model::Foo' => { a => 100 },
     });
 
-Injected components are useful to reduce the ammount of nearly empty boilerplate classes
+Injected components are useful to reduce the amount of nearly empty boilerplate classes
 you might have, particularly when first starting an application.
 
 =head3 Component setup changes.
@@ -199,7 +199,7 @@ Plack middleware to aid in backwards compatibility.
 
 =head3 Distinguish between body null versus undef.
 
-We also now more carefully distingush the different between a body set
+We also now more carefully distinguish the different between a body set
 to '' and a body that is undef.  This might lead to situations where
 again you'll get a content-length were you didn't get one before or
 where a supporting server will start chunking output.  If this is an
@@ -208,7 +208,7 @@ or report specific problems to the dev team.
 
 =head3 More Catalyst Middleware
 
-We have started migrating code in Catalyst to equivilent Plack
+We have started migrating code in Catalyst to equivalent Plack
 Middleware when such exists and is correct to do so.  For example we now use
 L<Plack::Middleware::ContentLength> to determine content length of a response
 when none is provided.  This replaces similar code inlined with L<Catalyst>

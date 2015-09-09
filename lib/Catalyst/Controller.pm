@@ -900,7 +900,7 @@ declared attributes you must quote them:
 
 If you use 'reference' type constraints (such as ArrayRef[Int]) that have an unknown
 number of allowed matches, we set this the same way "Args" is.  Please keep in mind
-that actions with an undetermined number of args match at lower precidence than those
+that actions with an undetermined number of args match at lower precedence than those
 with a fixed number.  You may use reference types such as Tuple from L<Types::Standard>
 that allows you to fix the number of allowed args.  For example Args(Tuple[Int,Int])
 would be determined to be two args (or really the same as Args(Int,Int).)  You may
