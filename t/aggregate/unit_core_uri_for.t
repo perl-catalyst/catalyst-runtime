@@ -128,6 +128,15 @@ is(
     is( $warnings, 0, "no warnings emitted" );
 }
 
+# test with empty path -- no warnings should be thrown
+{
+    my $warnings = 0;
+    local $SIG{__WARN__} = sub { $warnings++ };
+
+    Catalyst::uri_for( $context )->as_string,
+    is( $warnings, 0, "no warnings emitted for empty path" );
+}
+
 # Test with parameters '/', 'foo', 'bar' - should not generate a //
 is( Catalyst::uri_for( $context, qw| / foo bar | )->as_string,
     'http://127.0.0.1/foo/bar', 'uri is /foo/bar, not //foo/bar'
