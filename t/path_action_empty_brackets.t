@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Test::More tests => 9;
+use Test::More tests => 12;
 use Catalyst::Test 'TestPath';
 
 
@@ -23,5 +23,8 @@ use Catalyst::Test 'TestPath';
     ok( $response->is_success, '"Path(\'\')" - Response Successful 2xx' );
     is( $response->content, 'OK', '"Path(\'\')" - Body okay' );
 }
-
-
+{
+    ok( my $response = request('http://localhost/four'), 'Request' );
+    ok( $response->is_success, '"Path(\'\')" - Response Successful 2xx' );
+    is( $response->content, 'OK', '"Path() Args()" - Body okay' );
+}
