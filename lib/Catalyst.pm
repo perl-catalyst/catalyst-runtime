@@ -1560,7 +1560,7 @@ sub uri_for {
     my $fragment =  ((scalar(@args) && ref($args[-1]) eq 'SCALAR') ? pop @args : undef );
 
     unless(blessed $path) {
-      if ($path and $path =~ s/#(.+)$//)  {
+      if (defined($path) and $path =~ s/#(.+)$//)  {
         if(defined($1) and $fragment) {
           carp "Abiguious fragment declaration: You cannot define a fragment in '$path' and as an argument '$fragment'";
         }
