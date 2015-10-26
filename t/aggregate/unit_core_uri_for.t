@@ -94,7 +94,19 @@ is(
     Catalyst::uri_for( $context, 'quux', { param1 => $request->base } )->as_string,
     'http://127.0.0.1/foo/yada/quux?param1=http%3A%2F%2F127.0.0.1%2Ffoo',
     'URI for undef action with query param as object'
-);
+  );
+
+# test with empty arg
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    is(
+       Catalyst::uri_for( $context )->as_string,
+       'http://127.0.0.1/foo/yada',
+       'URI with no action'
+      );
+    is_deeply(\@warnings, [], "No warnings with no path argument");
+}
 
 $request->base( URI->new('http://localhost:3000/') );
 $request->match( 'orderentry/contract' );
