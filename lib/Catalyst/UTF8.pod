@@ -637,7 +637,7 @@ with a mix of content character sets.
 If you believe you have discovered a bug in UTF8 body encoding, I strongly encourage you to
 report it (and not try to hack a workaround in your local code).  We also recommend that you
 regard such a workaround as a temporary solution.  It is ideal if L<Catalyst> extension
-authors can start to count on L<Catalyst> doing the write thing for encoding.
+authors can start to count on L<Catalyst> doing the right thing for encoding.
 
 =head1 Conclusion
 
