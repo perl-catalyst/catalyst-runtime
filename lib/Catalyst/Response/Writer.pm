@@ -13,7 +13,7 @@ sub write_encoded {
   $self->write($line);
 }
 
-=head1 TITLE 
+=head1 NAME
 
 Catalyst::Response::Writer - Proxy over the PSGI Writer
 
