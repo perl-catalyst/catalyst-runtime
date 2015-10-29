@@ -807,6 +807,11 @@ sub controller {
             my $comps = $c->components;
             my $check = $appclass."::Controller::".$name;
             return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+            foreach my $path (@{$appclass->config->{ setup_components }->{ search_extra }}) {
+                next unless $path =~ /.*::Controller/;
+                $check = $path."::".$name;
+                return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+            }
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Controller C/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -846,6 +851,11 @@ sub model {
             my $comps = $c->components;
             my $check = $appclass."::Model::".$name;
             return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+            foreach my $path (@{$appclass->config->{ setup_components }->{ search_extra }}) {
+                next unless $path =~ /.*::Model/;
+                $check = $path."::".$name;
+                return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
+            }
         }
         my @result = $c->_comp_search_prefixes( $name, qw/Model M/ );
         return map { $c->_filter_component( $_, @args ) } @result if ref $name;
@@ -909,6 +919,11 @@ sub view {
             }
             else {
                 $c->log->warn( "Attempted to use view '$check', but does not exist" );
+            }
+            foreach my $path (@{$appclass->config->{ setup_components }->{ search_extra }}) {
+                next unless $path =~ /.*::View/;
+                $check = $path."::".$name;
+                return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
             }
         }
         my @result = $c->_comp_search_prefixes( $name, qw/View V/ );
@@ -3090,7 +3105,7 @@ sub locate_components {
     my $config = shift;
 
     my @paths   = qw( ::M ::Model ::V ::View ::C ::Controller );
-    my $extra   = delete $config->{ search_extra } || [];
+    my $extra   = $config->{ search_extra } || [];
 
     unshift @paths, @$extra;
 
