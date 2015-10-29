@@ -1,8 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90102 - 2015-10-29
-  - Better warnings when there's an error reading the psgi.input
-  -
+  - Better warnings when there's an error reading the psgi.input (billmosley++)
+  - Fixed spurious warnings in uri_for when using no arguments (melmothx++ and 
+    paultcochrane++)
+
 5.90101 - 2015-09-04
   - Fixed a regression introduced in the last release which caused test
     case failure when using a version of Perl 5.14 or older.
