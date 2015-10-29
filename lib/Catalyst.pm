@@ -180,7 +180,7 @@ sub composed_stats_class {
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90101';
+our $VERSION = '5.90102';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -606,12 +606,16 @@ sub error {
     return $c->{error} || [];
 }
 
-
 =head2 $c->state
 
 Contains the return value of the last executed action.
 Note that << $c->state >> operates in a scalar context which means that all
 values it returns are scalar.
+
+Please note that if an action throws an exception, the value of state
+should no longer be considered the return if the last action.  It is generally
+going to be 0, which indicates an error state.  Examine $c->error for error
+details.
 
 =head2 $c->clear_errors
 
@@ -2001,7 +2005,7 @@ via $c->error.
 sub execute {
     my ( $c, $class, $code ) = @_;
     $class = $c->component($class) || $class;
-    $c->state(0);
+    #$c->state(0);
 
     if ( $c->depth >= $RECURSION ) {
         my $action = $code->reverse();
@@ -2053,7 +2057,7 @@ sub execute {
             }
             $c->error($error);
         }
-        $c->state(0);
+        #$c->state(0);
     }
     return $c->state;
 }
@@ -2400,7 +2404,6 @@ sub prepare {
     my $c = $class->context_class->new({ $uploadtmp ? (_uploadtmp => $uploadtmp) : ()});
 
     $c->response->_context($c);
-
     $c->stats($class->stats_class->new)->enable($c->use_stats);
 
     if ( $c->debug || $c->config->{enable_catalyst_header} ) {

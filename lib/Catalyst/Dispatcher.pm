@@ -273,6 +273,7 @@ Documented in L<Catalyst>
 sub detach {
     my ( $self, $c, $command, @args ) = @_;
     $self->_do_forward(detach => $c, $command, @args ) if $command;
+    $c->state(0); # Needed in order to skip any auto functions
     Catalyst::Exception::Detach->throw;
 }
 

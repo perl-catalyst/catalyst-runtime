@@ -143,7 +143,12 @@ sub _BEGIN : Private {
     my $begin = ( $c->get_actions( 'begin', $c->namespace ) )[-1];
     return 1 unless $begin;
     $begin->dispatch( $c );
-    return !@{ $c->error };
+    #If there is an error, all bets off
+    if( @{ $c->error }) {
+      return !@{ $c->error };
+    } else {
+      return $c->state || 1;
+    }
 }
 
 sub _AUTO : Private {
@@ -153,7 +158,7 @@ sub _AUTO : Private {
         $auto->dispatch( $c );
         return 0 unless $c->state;
     }
-    return 1;
+    return $c->state || 1;
 }
 
 sub _ACTION : Private {
@@ -164,7 +169,12 @@ sub _ACTION : Private {
     {
         $c->action->dispatch( $c );
     }
-    return !@{ $c->error };
+    #If there is an error, all bets off
+    if( @{ $c->error }) {
+      return !@{ $c->error };
+    } else {
+      return $c->state || 1;
+    }
 }
 
 sub _END : Private {

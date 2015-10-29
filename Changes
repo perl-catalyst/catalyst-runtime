@@ -8,6 +8,8 @@
   - Improvements to 'search_extra' configuration and tests around using 
     uri_for as a class method (cngarrison++)
   - Fix when Path() is set and not geting registered as action (grim8634++)
+  - $c->state is now preserved over actions in a chain, and across begin,
+    auto, ->forward and ->detach.
 
 5.90101 - 2015-09-04
   - Fixed a regression introduced in the last release which caused test
