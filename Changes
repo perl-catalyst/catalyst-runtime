@@ -7,6 +7,7 @@
   - Documentation improvements (paultcochrane++)
   - Improvements to 'search_extra' configuration and tests around using 
     uri_for as a class method (cngarrison++)
+  - Fix when Path() is set and not geting registered as action (grim8634++)
 
 5.90101 - 2015-09-04
   - Fixed a regression introduced in the last release which caused test
