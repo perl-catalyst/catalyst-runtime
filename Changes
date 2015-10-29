@@ -4,6 +4,7 @@
   - Better warnings when there's an error reading the psgi.input (billmosley++)
   - Fixed spurious warnings in uri_for when using no arguments (melmothx++ and 
     paultcochrane++)
+  - Documentation improvements (paultcochrane++)
 
 5.90101 - 2015-09-04
   - Fixed a regression introduced in the last release which caused test
