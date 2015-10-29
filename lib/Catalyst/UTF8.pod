@@ -315,7 +315,7 @@ an instance of an object L<Catalyst::Request::PartData> which will contain all t
 information needed for you to perform custom parser of the data.
 
 Ideally we'd fix L<Catalyst> to be smarter about decoding so please submit your cases of
-this so we can add inteligence to the parser and find a way to extract a valid value out
+this so we can add intelligence to the parser and find a way to extract a valid value out
 of it.
 
 =head1 UTF8 Encoding in Body Response

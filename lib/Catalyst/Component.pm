@@ -203,8 +203,8 @@ something like this:
   }
 
 B<NOTE:> Generally when L<Catalyst> starts, it initializes all the components
-and passes the hashref present in any configutation information to the
-COMPONET method.  For example
+and passes the hashref present in any configuration information to the
+COMPONENT method.  For example
 
     MyApp->config(
       'Model::Foo' => {
@@ -294,7 +294,7 @@ second argument is blessed (is a context) or not (is an application class name) 
 it MUST return something valid for the case when the scope is application.  This is
 required because a component maybe be called from the application scope even if it
 requires a context and you must prevent errors from being issued if this happens.
-Remeber not all components that ACCEPT_CONTEXT actually need or use context information
+Remember not all components that ACCEPT_CONTEXT actually need or use context information
 (and there is a school of thought that suggestions doing so is a design error anyway...)
 
 =head1 SEE ALSO

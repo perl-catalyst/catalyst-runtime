@@ -2,7 +2,7 @@
 
 =head1 Name
 
-Catalyst::Contributing - Contributing to Catalyst and Change managment
+Catalyst::Contributing - Contributing to Catalyst and Change management
 
 =head1 Description
 
@@ -23,7 +23,7 @@ Going further, if we allow ourselves to look hard at projects outside of Perl we
 
 =head2 Reporting a bug
 
-Reported bugs via RT or L<Github Issues|https://github.com/perl-catalyst/catalyst-runtime/issues> that come with attached test cases will be more likely addressed quickly than those that do not.  Proposing a bugfix patch is also alwaysvery welcomed, although it is recommended to stick as closely as possible to an actual bug (rather than a feature change) and to not include unneeded changes in your patch such as formatting corrections.  In any case it is recommended before spending a lot of time on a patch to discuss the issue and your proposed solution, else you risk spending a lot of time on code that may not get merged, which tends to be frustrating.
+Reported bugs via RT or L<Github Issues|https://github.com/perl-catalyst/catalyst-runtime/issues> that come with attached test cases will be more likely addressed quickly than those that do not.  Proposing a bugfix patch is also always very welcome, although it is recommended to stick as closely as possible to an actual bug (rather than a feature change) and to not include unneeded changes in your patch such as formatting corrections.  In any case it is recommended before spending a lot of time on a patch to discuss the issue and your proposed solution, else you risk spending a lot of time on code that may not get merged, which tends to be frustrating.
 
 For bug patches you should create a new branch from the current master.
 

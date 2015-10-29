@@ -25,7 +25,7 @@ that if the request is '/foo/bar/baz' That means the action 'baz' matches:
     sub bar :Path('bar') Args(1) { ...}
     sub baz :Path('bar/baz') Args(0) { ... }
 
-Path length matches take precidence over all other types of matches (included HTTP
+Path length matches take precedence over all other types of matches (included HTTP
 Method, Scheme, etc.).  The same holds true for Chained actions.  Generally the
 chain that matches the most PathParts wins.
 
@@ -37,7 +37,7 @@ action with 'Args' always get the last chance to match.
 
 =head2 When two or more actions match a given Path
 
-Sometimes two or more actions match the same path and all have the same pathpart
+Sometimes two or more actions match the same path and all have the same PathPart
 length.  For example:
 
     package MyApp::Controller::Root;
@@ -80,7 +80,7 @@ your 'catchall' actions higher in the controller.
 =head2 Type Constraints in Args and Capture Args
 
 Beginning in Version 5.90090+ you may use L<Moose>, L<MooseX::Types> or L<Type::Tiny>
-type constraints to futher declare allowed matching for Args or CaptureArgs.  Here
+type constraints to further declare allowed matching for Args or CaptureArgs.  Here
 is a simple example:
 
     package MyApp::Controller::User;
@@ -264,7 +264,7 @@ and interests.
 =head3 Match order when more than one Action matches a path.
 
 As previously described, L<Catalyst> will match 'the longest path', which generally means
-that named path / path_parts will take precidence over Args or CaptureArgs.  However, what
+that named path / path_parts will take precedence over Args or CaptureArgs.  However, what
 will happen if two actions match the same path with equal args?  For example:
 
     sub an_int :Path(user) Args(Int) {
@@ -286,7 +286,7 @@ action NEVER gets hit.  You would need to reverse the order:
 
 Now requests that match this path would first hit the 'an_int' action and will check to see if
 the argument is an integer.  If it is, then the action will execute, otherwise it will pass and
-the dispatcher will check the next matching action (in this case we fall thru to the 'an_any'
+the dispatcher will check the next matching action (in this case we fall through to the 'an_any'
 action).
 
 =head3 Type Constraints and Chained Actions
@@ -327,7 +327,7 @@ well as Args.  For Example:
 
       sub int_priority_link3 :Chained(link_tuple) PathPart('') Args(Int) {  }
 
-These chained actions migth create match tables like the following:
+These chained actions might create match tables like the following:
 
     [debug] Loaded Chained actions:
     .-------------------------------------+--------------------------------------.
@@ -376,7 +376,7 @@ the rule described in the previous section should be followed, which is that L<C
 will start with the last defined action and work upward.  For example the action C<int_priority_chain>
 would be checked before C<any_priority_chain>.  The same applies for actions that are midway links
 in a longer chain.  In this case C<link_int> would be checked before C<link_any>.  So as always we
-recommend that you place you priority or most constrainted actions last and you least or catch-all
+recommend that you place you priority or most constrained actions last and you least or catch-all
 actions first.
 
 Although this reverse order checking may seen counter intuitive it does have the added benefit that

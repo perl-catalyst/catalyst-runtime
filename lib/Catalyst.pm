@@ -2812,7 +2812,7 @@ We try each possible role in turn (and throw an error if none load)
     MyApp::TraitFor::Request::Foo
     Catalyst::TraitFor::Request::Foo
 
-The namespace part 'TraitFor::Request' was choosen to assist in backwards
+The namespace part 'TraitFor::Request' was chosen to assist in backwards
 compatibility with L<CatalystX::RoleApplicator> which previously provided
 these features in a stand alone package.
   
@@ -2843,7 +2843,7 @@ We try each possible role in turn (and throw an error if none load)
     MyApp::TraitFor::Response::Foo
     Catalyst::TraitFor::Responset::Foo
 
-The namespace part 'TraitFor::Response' was choosen to assist in backwards
+The namespace part 'TraitFor::Response' was chosen to assist in backwards
 compatibility with L<CatalystX::RoleApplicator> which previously provided
 these features in a stand alone package.
 
@@ -4031,7 +4031,7 @@ We try each possible role in turn (and throw an error if none load)
     MyApp::TraitFor::Stats::Foo
     Catalyst::TraitFor::Stats::Foo
 
-The namespace part 'TraitFor::Stats' was choosen to assist in backwards
+The namespace part 'TraitFor::Stats' was chosen to assist in backwards
 compatibility with L<CatalystX::RoleApplicator> which previously provided
 these features in a stand alone package.
 
@@ -4245,7 +4245,7 @@ backwardly compatible).
 
 C<skip_complex_post_part_handling>
 
-When creating body parameters from a POST, if we run into a multpart POST
+When creating body parameters from a POST, if we run into a multipart POST
 that does not contain uploads, but instead contains inlined complex data
 (very uncommon) we cannot reliably convert that into field => value pairs.  So
 instead we create an instance of L<Catalyst::Request::PartData>.  If this causes
@@ -4267,9 +4267,9 @@ parameter to true.
 C<do_not_decode_query>
 
 If true, then do not try to character decode any wide characters in your
-request URL query or keywords.  Most readings of the relevent specifications
+request URL query or keywords.  Most readings of the relevant specifications
 suggest these should be UTF-* encoded, which is the default that L<Catalyst>
-will use, hwoever if you are creating a lot of URLs manually or have external
+will use, however if you are creating a lot of URLs manually or have external
 evil clients, this might cause you trouble.  If you find the changes introduced
 in Catalyst version 5.90080+ break some of your query code, you may disable 
 the UTF-8 decoding globally using this configuration.
@@ -4282,7 +4282,7 @@ C<decode_query_using_global_encoding>
 C<default_query_encoding>
 
 By default we decode query and keywords in your request URL using UTF-8, which
-is our reading of the relevent specifications.  This setting allows one to
+is our reading of the relevant specifications.  This setting allows one to
 specify a fixed value for how to decode your query.  You might need this if
 you are doing a lot of custom encoding of your URLs and not using UTF-8.
 
@@ -4319,19 +4319,19 @@ C<data_handlers> - See L<DATA HANDLERS>.
 
 C<stats_class_traits>
 
-An arrayref of L<Moose::Role>s that get componsed into your stats class.
+An arrayref of L<Moose::Role>s that get composed into your stats class.
 
 =item *
 
 C<request_class_traits>
 
-An arrayref of L<Moose::Role>s that get componsed into your request class.
+An arrayref of L<Moose::Role>s that get composed into your request class.
 
 =item *
 
 C<response_class_traits>
 
-An arrayref of L<Moose::Role>s that get componsed into your response class.
+An arrayref of L<Moose::Role>s that get composed into your response class.
 
 =item *
 
