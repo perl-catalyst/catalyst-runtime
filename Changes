@@ -5,6 +5,8 @@
   - Fixed spurious warnings in uri_for when using no arguments (melmothx++ and 
     paultcochrane++)
   - Documentation improvements (paultcochrane++)
+  - Improvements to 'search_extra' configuration and tests around using 
+    uri_for as a class method (cngarrison++)
 
 5.90101 - 2015-09-04
   - Fixed a regression introduced in the last release which caused test

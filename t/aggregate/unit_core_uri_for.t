@@ -83,6 +83,59 @@ is(
     'URI for path with fragment and query params 3'
 );
 
+is(
+    Catalyst::uri_for( 'TestApp', '/bar/baz' )->as_string,
+    '/bar/baz',
+    'URI for absolute path, called with only class name'
+);
+
+## relative action (or path) doesn't make sense when calling as class method
+# is(
+#     Catalyst::uri_for( 'TestApp', 'bar/baz' )->as_string,
+#     '/yada/bar/baz',
+#     'URI for relative path, called with only class name'
+# );
+
+is(
+    Catalyst::uri_for( 'TestApp', '/', 'arg1', 'arg2' )->as_string,
+    '/arg1/arg2',
+    'URI for root action with args, called with only class name'
+);
+
+## relative action (or path) doesn't make sense when calling as class method
+# is( Catalyst::uri_for( 'TestApp', '../quux' )->as_string,
+#     '/quux', 'URI for relative dot path, called with only class name' );
+
+is(
+    Catalyst::uri_for( 'TestApp', '/quux', { param1 => 'value1' } )->as_string,
+    '/quux?param1=value1',
+    'URI for quux action with query params, called with only class name'
+);
+
+is (Catalyst::uri_for( 'TestApp', '/bar/wibble?' )->as_string,
+   '/bar/wibble%3F', 'Question Mark gets encoded, called with only class name'
+);
+
+## relative action (or path) doesn't make sense when calling as class method
+# is( Catalyst::uri_for( 'TestApp', qw/bar wibble?/, 'with space' )->as_string,
+#     '/yada/bar/wibble%3F/with%20space', 'Space gets encoded, called with only class name'
+# );
+
+is(
+    Catalyst::uri_for( 'TestApp', '/bar', 'with+plus', { 'also' => 'with+plus' })->as_string,
+    '/bar/with+plus?also=with%2Bplus',
+    'Plus is not encoded, called with only class name'
+);
+
+TODO: {
+    local $TODO = 'broken by 5.7008';
+    is(
+        Catalyst::uri_for( $context, '/bar#fragment', { param1 => 'value1' } )->as_string,
+        'http://127.0.0.1/foo/bar?param1=value1#fragment',
+        'URI for path with fragment and query params'
+    );
+}
+
 # test with utf-8
 is(
     Catalyst::uri_for( $context, 'quux', { param1 => "\x{2620}" } )->as_string,
