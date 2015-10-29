@@ -6,7 +6,7 @@ Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
 We changed the way the middleware stash works so that it no longer localizes
 the PSGI env hashref.  This was done to fix bugs where people set PSGI ENV hash
-keys and found them to dissappear in certain cases.  It also means that now if
+keys and found them to disappear in certain cases.  It also means that now if
 a sub applications sets stash variables, that stash will now bubble up to the
 parent application.  This may be a breaking change for you since previous
 versions of this code did not allow that.  A workaround is to explicitly delete
@@ -69,10 +69,10 @@ reports are very welcomed.
 L<Catalyst::Utils> has a new method 'inject_component' which works the same as the method of
 the same name in L<CatalystX::InjectComponent>.  You should start converting any
 use of the non core method in your code as future changes to Catalyst will be
-sychronized to the core method first.  We reserve the right to cease support
+synchronized to the core method first.  We reserve the right to cease support
 of the non core version should we reach a point in time where it cannot be
 properly supported as an external module.  Luckily this should be a trivial
-search and replace.  Change all occurances of:
+search and replace.  Change all occurences of:
 
     CatalystX::InjectComponent->inject(...)
 
@@ -141,8 +141,8 @@ and now in core:
       },
     );
 
-Although the cored behavior requires more code, its better separates concerns
-as well as plays more into core Catalyst expections of how configuration shoul
+Although the core behavior requires more code, it better separates concerns
+as well as plays more into core Catalyst expectations of how configuration should
 look.
 
 Also we added a new develop console mode only warning when you call a component
@@ -218,16 +218,16 @@ that will revert you code to the previous behavior.
 
 =head2 More backwards compatibility options with UTF-8 changes
 
-In order to give better backwards compatiblity with the 5.90080+ UTF-8 changes
+In order to give better backwards compatibility with the 5.90080+ UTF-8 changes
 we've added several configuration options around control of how we try to decode
 your URL keywords / query parameters.
 
 C<do_not_decode_query>
 
 If true, then do not try to character decode any wide characters in your
-request URL query or keywords.  Most readings of the relevent specifications
+request URL query or keywords.  Most readings of the relevant specifications
 suggest these should be UTF-* encoded, which is the default that L<Catalyst>
-will use, hwoever if you are creating a lot of URLs manually or have external
+will use, however if you are creating a lot of URLs manually or have external
 evil clients, this might cause you trouble.  If you find the changes introduced
 in Catalyst version 5.90080+ break some of your query code, you may disable 
 the UTF-8 decoding globally using this configuration.
@@ -238,7 +238,7 @@ C<decode_query_using_global_encoding>
 C<default_query_encoding>
 
 By default we decode query and keywords in your request URL using UTF-8, which
-is our reading of the relevent specifications.  This setting allows one to
+is our reading of the relevant specifications.  This setting allows one to
 specify a fixed value for how to decode your query.  You might need this if
 you are doing a lot of custom encoding of your URLs and not using UTF-8.
 

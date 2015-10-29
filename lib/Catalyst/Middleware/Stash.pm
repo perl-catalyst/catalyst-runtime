@@ -61,7 +61,7 @@ We store a coderef under the C<PSGI_KEY> which can be dereferenced with
 key values or nothing to access the underlying hashref.
 
 Anything placed into the stash will be available in the stash of any 'mounted'
-Catalyst applictions.  A mounted Catalyst application may set the stash and
+Catalyst applications.  A mounted Catalyst application may set the stash and
 'pass back' information to the parent application.  Non Catalyst applications
 may use this middleware to access and set stash values.
 
