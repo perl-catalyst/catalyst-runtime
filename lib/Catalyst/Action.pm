@@ -52,9 +52,7 @@ has number_of_args => (
     if( ! exists $self->attributes->{Args} ) {
       # When 'Args' does not exist, that means we want 'any number of args'.
       return undef;
-    } elsif(
-      !defined($self->attributes->{Args}[0]) || 
-      $self->attributes->{Args}[0] eq '' ) {
+    } elsif(!defined($self->attributes->{Args}[0])) {
       # When its 'Args' that internal cue for 'unlimited'
       return undef;
     } elsif(
@@ -140,7 +138,6 @@ has args_constraints => (
 
     return [] unless scalar(@arg_protos);
     return [] unless defined($arg_protos[0]);
-    return [] if ($arg_protos[0] eq '' && scalar(@arg_protos) == 1);
 
     # If there is only one arg and it looks like a number
     # we assume its 'classic' and the number is the number of
