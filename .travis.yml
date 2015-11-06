@@ -49,7 +49,7 @@ script:
    - cpanm --test-only --metacpan Catalyst::Devel
    - cpanm --test-only --metacpan Catalyst::Action::REST
    - cpanm --test-only --metacpan Catalyst::Component::InstancePerContext
-   - cpanm --verbose --test-only --metacpan Catalyst::Plugin::Session
+   - cpanm --test-only --metacpan Catalyst::Plugin::Session
    - cpanm --test-only --metacpan Catalyst::Plugin::Session::State::Cookie
    - cpanm --test-only --metacpan Catalyst::Plugin::Static::Simple
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader

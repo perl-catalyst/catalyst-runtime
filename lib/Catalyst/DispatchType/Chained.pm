@@ -97,8 +97,8 @@ sub list {
                   sort { $a->reverse cmp $b->reverse }
                            @{ $self->_endpoints }
                   ) {
-        my $args = $endpoint->attributes->{Args}[0];
-        my @parts = (defined($args) and length($args)) ? ('*') x $args : '...';
+        my $args = $endpoint->list_extra_info->{Args};
+        my @parts = (defined($endpoint->attributes->{Args}[0]) ? (("*") x $args) : '...');
         my @parents = ();
         my $parent = "DUMMY";
         my $extra  = $self->_list_extra_http_methods($endpoint);
