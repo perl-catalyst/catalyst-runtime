@@ -403,8 +403,7 @@ sub _parse_attrs {
     foreach my $attr (@attrs) {
 
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
-
-        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+?)?\s*\))?$/ ) )
+        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+?)\s*\))?$/ ) )
         {
 
             if ( defined $value ) {
