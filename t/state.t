@@ -19,7 +19,10 @@ use HTTP::Request::Common;
 
   sub auto :Action {
     my ($self, $c) = @_;
-    Test::More::is($c->state, 'begin'); # default state of 1 is new to 9.0102
+    # Even if a begin returns something, we kill it.  Need to
+    # do this since there's actually people doing detach in
+    # auto and expect that to work the same as 0.
+    Test::More::is($c->state, '0');
     return 'auto';
 
   }
