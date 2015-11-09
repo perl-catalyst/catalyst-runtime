@@ -7,6 +7,22 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 This is an overview of the user-visible changes to Catalyst between major
 Catalyst releases.
 
+=head2 VERSION 5.90102 - 5.90103
+
+A significant change is that we now preserve the value of $c->state from action
+to follwoing action.  This gives you a new way to pass a value between actions
+in a chain, for example.   However any 'auto' actions always have $c->state
+forced to be set to 0, which is the way its been for a long time, this way an
+auto action is required to return 1 to pass the match.  It also exists to maintain
+compatibility with anyone that exits an auto action with a detach (which is not a
+documented way to excape matching, but exists in the wild since it worked as a
+side effect of the code for a long time).
+
+Additionally, upon $c->detach we also force set state to 0.
+
+Version 5.90102 contains a version of this change but its considered buggy, so
+that is a version to avoid.
+
 =head2 VERSION 5.90100
 
 Support for type constraints in Args and CaptureArgs has been improved.  You may

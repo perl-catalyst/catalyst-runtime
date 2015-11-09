@@ -155,6 +155,11 @@ sub _AUTO : Private {
     my ( $self, $c ) = @_;
     my @auto = $c->get_actions( 'auto', $c->namespace );
     foreach my $auto (@auto) {
+        # We FORCE the auto action user to explicitly return
+        # true.  We need to do this since there's some auto
+        # users (Catalyst::Authentication::Credential::HTTP) that
+        # actually do a detach instead.  
+        $c->state(0);
         $auto->dispatch( $c );
         return 0 unless $c->state;
     }
