@@ -6,6 +6,7 @@
     introduced in 5.90102.  This is a recommended upgrade (tsibley++, mst++)
   - Fixed regression around auto actions that escape by throwing an exception
     which was introduced in the last release.
+  - Bumped namespace::autoclean dep to latest since tests require -except
 
 5.90102 - 2015-10-29
   - Better warnings when there's an error reading the psgi.input (billmosley++)

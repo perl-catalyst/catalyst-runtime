@@ -27,7 +27,7 @@ authority('cpan:MSTROUT');
 all_from 'lib/Catalyst/Runtime.pm';
 
 requires 'List::MoreUtils';
-requires 'namespace::autoclean' => '0.09';
+requires 'namespace::autoclean' => '0.28';
 requires 'namespace::clean' => '0.23';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
 requires 'Class::Load' => '0.12';
