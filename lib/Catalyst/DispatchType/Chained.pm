@@ -95,7 +95,7 @@ sub list {
 
     ENDPOINT: foreach my $endpoint (
                   sort { $a->reverse cmp $b->reverse }
-                           @{ $self->_endpoints }
+                           ()=@{ $self->_endpoints }
                   ) {
         my $args = $endpoint->list_extra_info->{Args};
         my @parts = (defined($endpoint->attributes->{Args}[0]) ? (("*") x $args) : '...');
