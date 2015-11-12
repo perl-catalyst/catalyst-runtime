@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90103 - TBD
+5.90103 - 2015-11-12
   - More documentation fixes (thanks to the debian maintainers and melmothx++)
   - Fixed the way we parse subroutine attribute values to fix a regression
     introduced in 5.90102.  This is a recommended upgrade (tsibley++, mst++)
