@@ -219,7 +219,18 @@ around action_namespace => sub {
             $case_s = $class->config->{case_sensitive};
         } else {
             if (ref $self) {
-                $case_s = ref($self->_application)->config->{case_sensitive};
+                # This seems like total wack from 2009.  Not sure
+                # why we'd take a ref on _application since we
+                # expect it to be a string... Seems like it was
+                # part of a whole bunch of changes related to the
+                # failed app/ctx stuff from years ago.  However
+                # in cases where the controller gets called in
+                # application context, this now fails hard.  I've
+                # added defensive 'if its a ref' code just to be
+                # safe but I don't think its really ever used
+                my $local_app = ref($self->_application) ?
+                  ref($self->_application): $self->_application;
+                $case_s = $local_app->config->{case_sensitive};
             } else {
                 confess("Can't figure out case_sensitive setting");
             }
