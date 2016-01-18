@@ -50,6 +50,7 @@ requires 'HTTP::Request::AsCGI' => '1.0';
 requires 'Module::Pluggable' => '4.7';
 requires 'Path::Class' => '0.09';
 requires 'Scalar::Util';
+requires 'Socket' => '1.96';
 requires 'Sub::Exporter';
 requires 'Text::SimpleTable' => '0.03';
 requires 'Time::HiRes';
