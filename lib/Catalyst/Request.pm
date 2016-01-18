@@ -1,6 +1,6 @@
 package Catalyst::Request;
 
-use IO::Socket qw[AF_INET inet_aton];
+use Socket qw( getaddrinfo getnameinfo AI_NUMERICHOST NI_NAMEREQD NIx_NOSERV );
 use Carp;
 use utf8;
 use URI::http;
@@ -439,7 +439,21 @@ has hostname => (
   lazy      => 1,
   default   => sub {
     my ($self) = @_;
-    gethostbyaddr( inet_aton( $self->address ), AF_INET ) || $self->address
+    my ( $err, $sockaddr ) = getaddrinfo(
+        $self->address,
+        # no service
+        '',
+        { flags => AI_NUMERICHOST }
+    );
+    return $self->address
+        if $err;
+    ( $err, my $hostname ) = getnameinfo(
+        $sockaddr->{addr},
+        NI_NAMEREQD,
+        # we are only interested in the hostname, not the servicename
+        NIx_NOSERV
+    );
+    return $err ? $self->address : $hostname;
   },
 );
 
