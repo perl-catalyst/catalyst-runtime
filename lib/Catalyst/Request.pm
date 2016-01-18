@@ -445,15 +445,21 @@ has hostname => (
         '',
         { flags => AI_NUMERICHOST }
     );
-    return $self->address
-        if $err;
+    if ( $err ) {
+        $self->_log->warn("resolve of hostname failed: $err");
+        return $self->address;
+    }
     ( $err, my $hostname ) = getnameinfo(
         $sockaddr->{addr},
         NI_NAMEREQD,
         # we are only interested in the hostname, not the servicename
         NIx_NOSERV
     );
-    return $err ? $self->address : $hostname;
+    if ( $err ) {
+        $self->_log->warn("resolve of hostname failed: $err");
+        return $self->address;
+    }
+    return $hostname;
   },
 );
 
