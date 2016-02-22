@@ -461,7 +461,7 @@ sub scheme {
 sub list_extra_info {
   my $self = shift;
   return {
-    Args => $self->attributes->{Args}[0],
+    Args => $self->normalized_arg_number,
     CaptureArgs => $self->number_of_captures,
   }
 } 
