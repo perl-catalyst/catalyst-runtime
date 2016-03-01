@@ -98,7 +98,14 @@ sub list {
                            @{ $self->_endpoints }
                   ) {
         my $args = $endpoint->list_extra_info->{Args};
-        my @parts = (defined($endpoint->attributes->{Args}[0]) ? (("*") x $args) : '...');
+
+        my @parts;
+        if($endpoint->has_args_constraints) {
+            @parts = map { "{$_}" } $endpoint->all_args_constraints;
+        } elsif(defined $endpoint->attributes->{Args}) {
+            @parts = (defined($endpoint->attributes->{Args}[0]) ? (("*") x $args) : '...');
+        }
+
         my @parents = ();
         my $parent = "DUMMY";
         my $extra  = $self->_list_extra_http_methods($endpoint);
@@ -107,7 +114,12 @@ sub list {
         my $curr = $endpoint;
         while ($curr) {
             if (my $cap = $curr->list_extra_info->{CaptureArgs}) {
-                unshift(@parts, (("*") x $cap));
+                if($curr->has_captures_constraints) {
+                    my $names = join '/', map { "{$_}" } $curr->all_captures_constraints;
+                    unshift(@parts, $names);
+                } else {
+                    unshift(@parts, (("*") x $cap));
+                }
             }
             if (my $pp = $curr->attributes->{PathPart}) {
                 unshift(@parts, $pp->[0])
@@ -150,13 +162,14 @@ sub list {
             push(@rows, [ '', $name ]);
         }
 
+        my $endpoint_arg_info;
         if($endpoint->has_args_constraints) {
           my $tc = join ',', @{$endpoint->args_constraints};
-          $endpoint .= " ($tc)";
+          $endpoint_arg_info .= " ($tc)";
         } else {
-          $endpoint .= defined($endpoint->attributes->{Args}[0]) ? " ($args)" : " (...)";
+          $endpoint_arg_info .= defined($endpoint->attributes->{Args}[0]) ? " ($args)" : " (...)";
         }
-        push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : ''). ($scheme ? "$scheme: ":'')."/${endpoint}". ($consumes ? " :$consumes":"" ) ]);
+        push(@rows, [ '', (@rows ? "=> " : '').($extra ? "$extra " : ''). ($scheme ? "$scheme: ":'')."/${endpoint_arg_info}". ($consumes ? " :$consumes":"" ) ]);
         my @display_parts = map { $_ =~s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg; decode_utf8 $_ } @parts;
         $rows[0][0] = join('/', '', @display_parts) || '/';
         $paths->row(@$_) for @rows;
@@ -292,7 +305,7 @@ sub recurse_match {
                     next TRY_ACTION unless $action->match($c);
                 }
                 my $args_attr = $action->attributes->{Args}->[0];
-                my $args_count = $action->normalized_arg_number;
+                my $args_count = $action->comparable_arg_number;
                 my @pathparts = split /\//, $action->attributes->{PathPart}->[0];
                 #    No best action currently
                 # OR This one matches with fewer parts left than the current best action,

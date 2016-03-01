@@ -23,13 +23,25 @@ my $error;
   sub infinity :Chained(root) PathPart('test') Args { 
     my ($self, $c) = @_;
     $c->response->body("This is the body");
-    Test::More::is $c->action->normalized_arg_number, ~0;
+    Test::More::is $c->action->comparable_arg_number, ~0;
+  }
+
+  sub midpoint :Chained(root) PathPart('') CaptureArgs('"Int"') {
+    my ($self, $c) = @_;
+    Test::More::is $c->action->number_of_captures, 1;
+    #Test::More::is $c->action->number_of_captures_constraints, 1;
+  }
+
+  sub endpoint :Chained('midpoint') Args('"Int"') {
+    my ($self, $c) = @_;
+    Test::More::is $c->action->comparable_arg_number, 1;
+    Test::More::is $c->action->normalized_arg_number, 1;
   }
 
   sub local :Local Args {
     my ($self, $c) = @_;
     $c->response->body("This is the body");
-    Test::More::is $c->action->normalized_arg_number, ~0;
+    Test::More::is $c->action->comparable_arg_number, ~0;
   }
 
 
@@ -47,6 +59,8 @@ use Catalyst::Test 'MyApp';
 
 request GET '/root/test/a/b/c';
 request GET '/root/local/a/b/c';
+request GET '/root/11/endpoint/22';
+
 
 if($error) {
   unlike($error, qr[Argument ""Int"" isn't numeric in repeat]);
@@ -54,4 +68,4 @@ if($error) {
   ok 1;
 }
 
-done_testing(3);
+done_testing(6);

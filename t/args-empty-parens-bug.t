@@ -19,8 +19,8 @@ use Catalyst::Test App;
 eval { App->dispatcher->dispatch_type('Chained')->list(App) };
 ok !$@, "didn't die"
     or diag "Died with: $@";
-like $TestLogger::LOGS[-1], qr{/args\s*\Q(...)\E};
-like $TestLogger::LOGS[-1], qr{/args_empty\s*\Q(...)\E};
+like $TestLogger::LOGS[-1], qr{chain_base\/args\/\.\.\.};
+like $TestLogger::LOGS[-1], qr{chain_base\/args_empty\/\.\.\.};
 
 done_testing;
 
