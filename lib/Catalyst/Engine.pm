@@ -650,8 +650,8 @@ sub prepare_uploads {
     my $uploads = $request->_body->upload;
     my $parameters = $request->parameters;
     foreach my $name (keys %$uploads) {
-        $name = $c->_handle_unicode_decoding($name) if $enc;
         my $files = $uploads->{$name};
+        $name = $c->_handle_unicode_decoding($name) if $enc;
         my @uploads;
         for my $upload (ref $files eq 'ARRAY' ? @$files : ($files)) {
             my $headers = HTTP::Headers->new( %{ $upload->{headers} } );
