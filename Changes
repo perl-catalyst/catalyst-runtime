@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90104 - 2016-04-04
+  - Merged pull request #131, fix for noisy debug logs when used type constraints
+    in your actions.  Additional changes to the developer debug screen output to
+    improve reporting details.
+  - Merged pull request #133, fix for case when a file upload filename contains
+    wide characters which caused the filename to not appear in the uploads hash.
+
 5.90103 - 2015-11-12
   - More documentation fixes (thanks to the debian maintainers and melmothx++)
   - Fixed the way we parse subroutine attribute values to fix a regression
