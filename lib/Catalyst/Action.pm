@@ -68,6 +68,10 @@ has number_of_args => (
   }
 
 sub normalized_arg_number {
+  return $_[0]->number_of_args;
+}
+
+sub comparable_arg_number {
   return defined($_[0]->number_of_args) ? $_[0]->number_of_args : ~0;
 }
 
@@ -130,6 +134,7 @@ has args_constraints => (
   handles => {
     has_args_constraints => 'count',
     args_constraint_count => 'count',
+    all_args_constraints => 'elements',
   });
 
   sub _build_args_constraints {
@@ -215,6 +220,7 @@ has captures_constraints => (
   handles => {
     has_captures_constraints => 'count',
     captures_constraints_count => 'count',
+    all_captures_constraints => 'elements',
   });
 
   sub _build_captures_constraints {
@@ -381,8 +387,8 @@ sub match_args {
         # Optimization since Tuple[Int, Int] would fail on 3,4,5 anyway, but this
         # way we can avoid calling the constraint when the arg length is incorrect.
         if(
-          $self->normalized_arg_number == ~0 ||
-          scalar( @args ) == $self->normalized_arg_number
+          $self->comparable_arg_number == ~0 ||
+          scalar( @args ) == $self->comparable_arg_number
         ) {
           return $self->args_constraints->[0]->check($args);
         } else {
@@ -397,7 +403,7 @@ sub match_args {
       } else {
         # Because of the way chaining works, we can expect args that are totally not
         # what you'd expect length wise.  When they don't match length, thats a fail
-        return 0 unless scalar( @args ) == $self->normalized_arg_number;
+        return 0 unless scalar( @args ) == $self->comparable_arg_number;
 
         for my $i(0..$#args) {
           $self->args_constraints->[$i]->check($args[$i]) || return 0;
@@ -406,10 +412,10 @@ sub match_args {
       }
     } else {
       # If infinite args with no constraints, we always match
-      return 1 if $self->normalized_arg_number == ~0;
+      return 1 if $self->comparable_arg_number == ~0;
 
       # Otherwise, we just need to match the number of args.
-      return scalar( @args ) == $self->normalized_arg_number;
+      return scalar( @args ) == $self->comparable_arg_number;
     }
 }
 
@@ -451,7 +457,7 @@ sub match_captures_constraints {
 
 sub compare {
     my ($a1, $a2) = @_;
-    return $a1->normalized_arg_number <=> $a2->normalized_arg_number;
+    return $a1->comparable_arg_number <=> $a2->comparable_arg_number;
 }
 
 sub scheme {
@@ -461,7 +467,7 @@ sub scheme {
 sub list_extra_info {
   my $self = shift;
   return {
-    Args => $self->attributes->{Args}[0],
+    Args => $self->normalized_arg_number,
     CaptureArgs => $self->number_of_captures,
   }
 } 
@@ -553,6 +559,12 @@ Returns the number of args this action expects. This is 0 if the action doesn't
 take any arguments and undef if it will take any number of arguments.
 
 =head2 normalized_arg_number
+
+The number of arguments (starting with zero) that the current action defines, or
+undefined if there is not defined number of args (which is later treated as, "
+as many arguments as you like").
+
+=head2 comparable_arg_number
 
 For the purposes of comparison we normalize 'number_of_args' so that if it is
 undef we mean ~0 (as many args are we can think of).

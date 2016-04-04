@@ -924,6 +924,10 @@ wish to reuse over many actions.
 
 See L<Catalyst::RouteMatching> for more.
 
+B<Note>: It is highly recommended to use L<Type::Tiny> for your type constraints over
+other options.  L<Type::Tiny> exposed a better meta data interface which allows us to
+do more and better types of introspection driving tests and debugging.
+
 =head2 Consumes('...')
 
 Matches the current action against the content-type of the request.  Typically
