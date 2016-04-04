@@ -139,6 +139,26 @@ use Scalar::Util ();
     $c->response->body($decoded_text);
   }
 
+  sub file_upload_utf8_param :POST  Consumes(Multipart) Local {
+    my ($self, $c) = @_;
+
+    Test::More::is $c->req->body_parameters->{'♥'}, '♥♥';
+    Test::More::ok my $upload = $c->req->uploads->{'♥'};
+    Test::More::is $upload->charset, 'UTF-8';
+
+    my $text = $upload->slurp;
+    Test::More::is Encode::decode_utf8($text), "<p>This is stream_body_fh action ♥</p>\n";
+
+    my $decoded_text = $upload->decoded_slurp;
+    Test::More::is $decoded_text, "<p>This is stream_body_fh action ♥</p>\n";
+
+    Test::More::is $upload->filename, '♥ttachment.txt';
+    Test::More::is $upload->raw_basename, '♥ttachment.txt';
+
+    $c->response->content_type('text/html');
+    $c->response->body($decoded_text);
+  }
+
   sub json :POST Consumes(JSON) Local {
     my ($self, $c) = @_;
     my $post = $c->req->body_data;
@@ -386,6 +406,16 @@ use Catalyst::Test 'MyApp';
   ok my $req = POST '/root/file_upload',
     Content_Type => 'form-data',
     Content =>  [encode_utf8('♥')=>encode_utf8('♥♥'), file=>["$path", encode_utf8('♥ttachment.txt'), 'Content-Type' =>'text/html; charset=UTF-8', ]];
+
+  ok my $res = request $req;
+  is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n";
+}
+
+{
+  ok my $path = File::Spec->catfile('t', 'utf8.txt');
+  ok my $req = POST '/root/file_upload_utf8_param',
+    Content_Type => 'form-data',
+    Content =>  [encode_utf8('♥')=>encode_utf8('♥♥'), encode_utf8('♥')=>["$path", encode_utf8('♥ttachment.txt'), 'Content-Type' =>'text/html; charset=UTF-8', ]];
 
   ok my $res = request $req;
   is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n";
