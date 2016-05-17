@@ -28,8 +28,7 @@ use Catalyst::Test 'MyApp';
 # https://www.w3.org/TR/html5/forms.html#url-encoded-form-data 
 
 {
-  ok my $req = GET 'root/bar',
-    'Content-Type' => 'application/x-www-form-urlencoded';
+  ok my $req = GET 'root/bar';
 
   my ($res, $c) = ctx_request($req);
 
@@ -39,8 +38,7 @@ use Catalyst::Test 'MyApp';
 
 
 {
-  ok my $req = GET 'root/bar?',
-    'Content-Type' => 'application/x-www-form-urlencoded';
+  ok my $req = GET 'root/bar?';
 
   my ($res, $c) = ctx_request($req);
 
@@ -50,8 +48,7 @@ use Catalyst::Test 'MyApp';
 
 
 {
-  ok my $req = GET 'root/bar?a=b',
-    'Content-Type' => 'application/x-www-form-urlencoded';
+  ok my $req = GET 'root/bar?a=b';
 
   my ($res, $c) = ctx_request($req);
 
@@ -61,8 +58,7 @@ use Catalyst::Test 'MyApp';
 
 
 {
-  ok my $req = GET 'root/bar?x',
-    'Content-Type' => 'application/x-www-form-urlencoded';
+  ok my $req = GET 'root/bar?x';
 
   my ($res, $c) = ctx_request($req);
 
@@ -75,8 +71,7 @@ use Catalyst::Test 'MyApp';
 
 
 {
-  ok my $req = GET 'root/bar?x&a=b',
-    'Content-Type' => 'application/x-www-form-urlencoded';
+  ok my $req = GET 'root/bar?x&a=b';
 
   my ($res, $c) = ctx_request($req);
 
