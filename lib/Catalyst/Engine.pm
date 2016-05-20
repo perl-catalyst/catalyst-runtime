@@ -598,7 +598,7 @@ sub prepare_query_parameters {
     for my $pair (@unsplit_pairs) {
         my ($name, $value)
           = map { defined $_ ? $decoder->($self->unescape_uri($_)) : $_ }
-            ( split /=/, $_, 2 )[0,1]; # slice forces two elements
+            ( split /=/, $pair, 2 )[0,1]; # slice forces two elements
 
         if ($is_first_pair) {
             # If the first pair has no equal sign, then it means the isindex
