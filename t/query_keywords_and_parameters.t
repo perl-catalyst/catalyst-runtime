@@ -42,7 +42,7 @@ use Catalyst::Test 'MyApp';
 
   my ($res, $c) = ctx_request($req);
 
-  is $c->req->query_keywords, '', 'query_keywords is not defined with empty query string';
+  ok !defined $c->req->query_keywords, 'query_keywords is not defined when ? with empty query string';
   is_deeply $c->req->query_parameters, {}, 'query_parameters defined, but empty with empty query string';
 }
 
