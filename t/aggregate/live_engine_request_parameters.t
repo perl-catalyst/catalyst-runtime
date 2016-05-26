@@ -137,8 +137,8 @@ use HTTP::Request::Common;
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->uri->query, 'query+string', 'Catalyst::Request POST query_string' );
     is( $creq->query_keywords, 'query string', 'Catalyst::Request query_keywords' );
-    is( $creq->query_parameters, $query_parameters, 'Catalyst::Request query_parameters' );
-    is( $creq->body_parameters, $body_parameters, 'Catalyst::Request body_parameters' );
+    is_deeply( $creq->query_parameters, $query_parameters, 'Catalyst::Request query_parameters' );
+    is_deeply( $creq->body_parameters, $body_parameters, 'Catalyst::Request body_parameters' );
     is_deeply( $creq->parameters, $parameters, 'Catalyst::Request parameters' );
     
     ok( $response = request('http://localhost/dump/request/a/b?x=1&y=1&z=1'), 'Request' );
