@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 54;
+use Test::More tests => 56;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
