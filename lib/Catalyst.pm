@@ -4828,6 +4828,8 @@ Caelum: Rafael Kitover <rkitover@io.com>
 
 chansen: Christian Hansen
 
+Chase Venters C<chase.venters@gmail.com>
+
 chicks: Christopher Hicks
 
 Chisel Wright C<pause@herlpacker.co.uk>
