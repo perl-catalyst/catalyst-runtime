@@ -239,7 +239,7 @@ Documented in L<Catalyst>
 sub forward {
     my $self = shift;
     no warnings 'recursion';
-    $self->_do_forward(forward => @_);
+    return $self->_do_forward(forward => @_);
 }
 
 sub _do_forward {
@@ -261,6 +261,12 @@ sub _do_forward {
     no warnings 'recursion';
     $action->dispatch( $c );
 
+    #If there is an error, all bets off regarding state.  Documentation
+    #Specifies that when you forward, if there's an error you must expect
+    #state to be 0.
+    if( @{ $c->error }) {
+      $c->state(0);
+    }
     return $c->state;
 }
 
