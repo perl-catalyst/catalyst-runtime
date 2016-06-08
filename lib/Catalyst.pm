@@ -1420,11 +1420,6 @@ EOF
     $class->setup_encoding();
     $class->setup_middleware();
 
-    # call these so we pre setup the composed classes
-    $class->composed_request_class;
-    $class->composed_response_class;
-    $class->composed_stats_class;
-
     # Initialize our data structure
     $class->components( {} );
 
@@ -1501,6 +1496,11 @@ EOF
         $class->log->warn($class . "->config->{case_sensitive} is set.");
         $class->log->warn("This setting is deprecated and planned to be removed in Catalyst 5.81.");
     }
+
+    # call these so we pre setup the composed classes
+    $class->composed_request_class;
+    $class->composed_response_class;
+    $class->composed_stats_class;
 
     $class->setup_finalize;
 
