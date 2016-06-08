@@ -6,9 +6,9 @@
     that we compose just once at setup time (performance optimization).  Also added
     a debug screen at startup to display composed classes to help with debugging.
   - Fixed a regressed caused by the changes we made to the way ->state works so that
-    now when you forward to an action and that action throws and exception, $c->state
+    now when you forward to an action and that action throws an exception, $c->state
     is set to 0, instead of the value of the exeption (this is to be as indicated by
-    the documentation).
+    the documentation). (cventers++ for reported bug and test case).
 
 5.90104 - 2016-04-04
   - Merged pull request #131, fix for noisy debug logs when used type constraints
