@@ -7,6 +7,23 @@ Catalyst::Delta - Overview of changes between versions of Catalyst
 This is an overview of the user-visible changes to Catalyst between major
 Catalyst releases.
 
+=head2 VERSION 5.90105
+
+This version primarily fixed a regression in the way we preserved $c->state
+which the previous version introduced.  Now in the case when you forward to
+an action, should that action throw an exception it sets state to 0 and is
+sure that the return value is false.  This is to meet expected behavior based
+on the documentation.  If you relied on the last update behavior you may not have
+regressions but it was thought that we should make the code behave as documented
+for more than 10 years.
+
+We also changed how we compose the request, response and stats base class.  We
+now compose the base class with any configured traits once at the end of the
+application setup, rather than for each request.  This reduced request overhead
+when you are composing lots of traits.  It possible this may break some code that
+was adding traits after the application setup was finalized.  Please shout out if
+this actually causes you trouble and we'll do the best to accomodate.
+
 =head2 VERSION 5.90102 - 5.90103
 
 A significant change is that we now preserve the value of $c->state from action
