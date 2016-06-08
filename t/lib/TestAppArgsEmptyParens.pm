@@ -1,4 +1,5 @@
 package TestAppArgsEmptyParens::Controller::Root;
+$INC{'TestAppArgsEmptyParens/Controller/Root.pm'} = __FILE__;
 use Moose;
 use MooseX::MethodAttributes;
 
@@ -12,6 +13,8 @@ sub chain_base :Chained(/) PathPart('chain_base') CaptureArgs(0) { }
 TestAppArgsEmptyParens::Controller::Root->config(namespace=>'');
 
 package TestAppArgsEmptyParens;
+$INC{'TestAppArgsEmptyParens.pm'} = __FILE__;
+
 use Catalyst;
 use TestLogger;
 
