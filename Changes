@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90105 - 2016-07-08
+  - Tweak some test cases to try and prevent them from failing in limited cases.
+  - Changed how we compose traits onto the response, request, and stats class so
+    that we compose just once at setup time (performance optimization).  Also added
+    a debug screen at startup to display composed classes to help with debugging.
+
 5.90104 - 2016-04-04
   - Merged pull request #131, fix for noisy debug logs when used type constraints
     in your actions.  Additional changes to the developer debug screen output to

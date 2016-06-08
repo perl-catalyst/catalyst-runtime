@@ -5,27 +5,34 @@ use Class::MOP;
 
 BEGIN {
   package TestRole;
+  $INC{'TestRole'} = __FILE__;
   use Moose::Role;
 
   sub a { 'a' }
   sub b { 'b' }
 
   package Catalyst::TraitFor::Request::Foo;
+  $INC{'Catalyst/TraitFor/Request/Foo.pm'} = __FILE__;
   use Moose::Role;
 
   sub c { 'c' }
 
   package TestApp::TraitFor::Request::Bar;
+  $INC{'Catalyst/TraitFor/Request/Bar.pm'} = __FILE__;
   use Moose::Role;
 
   sub d { 'd' }
 
   package Catalyst::TraitFor::Response::Foo;
+  $INC{'Catalyst/TraitFor/Response/Foo.pm'} = __FILE__;
+
   use Moose::Role;
 
   sub c { 'c' }
 
-  package TestApp::TraitFor::Response::Bar;
+  package TestApp::TraitFor::Response::Bar; 
+  $INC{'Catalyst/TraitFor/Response/Bar.pm'} = __FILE__;
+
   use Moose::Role;
 
   sub d { 'd' }
@@ -33,6 +40,7 @@ BEGIN {
  
 {
   package TestApp;
+  $INC{'TestApp.pm'} = __FILE__;
  
   use Catalyst;
 
