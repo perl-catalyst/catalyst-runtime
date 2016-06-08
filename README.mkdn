@@ -2032,6 +2032,8 @@ Caelum: Rafael Kitover <rkitover@io.com>
 
 chansen: Christian Hansen
 
+Chase Venters <chase.venters@gmail.com>
+
 chicks: Christopher Hicks
 
 Chisel Wright `pause@herlpacker.co.uk`
