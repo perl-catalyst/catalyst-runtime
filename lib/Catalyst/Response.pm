@@ -103,12 +103,24 @@ has _context => (
   clearer => '_clear_context',
 );
 
-before [qw(status headers content_encoding content_length content_type header)] => sub {
+before [qw(status headers content_encoding content_length content_type )] => sub {
   my $self = shift;
 
-  $self->_context->log->warn( 
+  $self->_context->log->warn(
     "Useless setting a header value after finalize_headers and the response callback has been called." .
-    " Not what you want." )
+    " Since we don't support tail headers this will not work as you might expect." )
+      if ( $self->_context && $self->finalized_headers && !$self->_has_response_cb && @_ );
+};
+
+# This has to be different since the first param to ->header is the header name and presumably
+# you should be able to request the header even after finalization, just not try to change it.
+before 'header' => sub {
+  my $self = shift;
+  my $header = shift;
+
+  $self->_context->log->warn(
+    "Useless setting a header value after finalize_headers and the response callback has been called." .
+    " Since we don't support tail headers this will not work as you might expect." )
       if ( $self->_context && $self->finalized_headers && !$self->_has_response_cb && @_ );
 };
 

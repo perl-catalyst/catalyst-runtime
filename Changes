@@ -9,6 +9,9 @@
     now when you forward to an action and that action throws an exception, $c->state
     is set to 0, instead of the value of the exeption (this is to be as indicated by
     the documentation). (cventers++ for reported bug and test case).
+  - Changed the code that detects if you try to set HTTP headers after headers are
+    finalized to not warn if you are just requested the response header state.  Tweaked
+    this error message a bit to help people understand it.
 
 5.90104 - 2016-04-04
   - Merged pull request #131, fix for noisy debug logs when used type constraints
