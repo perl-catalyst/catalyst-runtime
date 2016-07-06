@@ -1,6 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90105 - 2016-07-08
+5.90106 - 2016-07-05
+  - Fixed regression in debug screen rendering of the private names in chained
+    actions caused by commit 5dd46e24eedec447bdfbc4061ed683b5a17a7b0c.
+  - Fixed incorrect date entered for the release of 5.90105
+  - Fixed some incorrect code in a test case that might be causing test fails
+    in some configurations.
+
+5.90105 - 2016-06-08
   - Tweak some test cases to try and prevent them from failing in limited cases.
   - Changed how we compose traits onto the response, request, and stats class so
     that we compose just once at setup time (performance optimization).  Also added
