@@ -162,7 +162,7 @@ sub list {
             push(@rows, [ '', $name ]);
         }
 
-        my $endpoint_arg_info;
+        my $endpoint_arg_info = $endpoint;
         if($endpoint->has_args_constraints) {
           my $tc = join ',', @{$endpoint->args_constraints};
           $endpoint_arg_info .= " ($tc)";
