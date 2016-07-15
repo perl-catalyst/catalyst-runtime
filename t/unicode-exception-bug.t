@@ -72,3 +72,5 @@ use Catalyst::Test 'TestApp';
 }
 
 done_testing;
+
+#TestApp->to_app;

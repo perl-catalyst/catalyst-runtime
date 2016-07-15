@@ -2466,9 +2466,6 @@ sub prepare {
     # VERY ugly and probably shouldn't rely on ->finalize actually working
     catch {
         # failed prepare is always due to an invalid request, right?
-        $c->response->status(400);
-        $c->response->content_type('text/plain');
-        $c->response->body('Bad Request');
         # Note we call finalize and then die here, which escapes
         # finalize being called in the enclosing block..
         # It in fact couldn't be called, as we don't return $c..
@@ -2476,8 +2473,20 @@ sub prepare {
         # breaking compat for people doing crazy things (we should set
         # the 400 and just return the ctx here IMO, letting finalize get called
         # above...
-        $c->finalize;
-        die $_;
+        if ( $c->_handle_http_exception($_) ) {
+            foreach my $err (@{$c->error}) {
+                $c->log->error($err);
+            }
+            $c->clear_errors;
+            $c->log->_flush if $c->log->can('_flush');
+            $_->can('rethrow') ? $_->rethrow : croak $_;
+        } else {
+            $c->response->status(400);
+            $c->response->content_type('text/plain');
+            $c->response->body('Bad Request');
+            $c->finalize;
+            die $_;
+        }
     };
 
     $c->log_request;
