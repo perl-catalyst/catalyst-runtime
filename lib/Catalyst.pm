@@ -3573,13 +3573,55 @@ sub setup_encoding {
 
 Hook to let you customize how encoding errors are handled.  By default
 we just throw an exception.  Receives a hashref of debug information.
-Example:
 
-    $c->handle_unicode_encoding_exception({
-        param_value => $value,
-        error_msg => $_,
-            encoding_step => 'params',
-        });
+In your application module, before the C<setup> call:
+
+  sub handle_unicode_encoding_exception {
+      my ($c, $debug) = @_;
+      # here you'll get, e.g.
+      #   {
+      #     encoding_step => "params",
+      #     error_msg => "utf8 \"\\xE2\" does not map to Unicode at..."
+      #     param_value => "\342\303\203\306\222\303%8"
+      #   }
+      # This is the default:
+      die $debug->{error_msg};
+  }
+
+You can use override this behaviour creating a minimal class which
+will die throwing an object which will respond to C<as_psgi> and provide
+a psgi response.
+
+Example (in C<MyApp::Exception>)
+
+  package MyApp::Exception;
+  
+  sub new {
+    my ($class, $code, $headers, $body) = @_;
+    return bless +{res => [$code, $headers, $body]}, $class;
+  }
+  
+  sub throw { die shift->new(@_) }
+  
+  sub as_psgi {
+    my ($self, $env) = @_;
+    my ($code, $headers, $body) = @{$self->{res}};
+    return [$code, $headers, $body];
+  }
+
+And in the application module:
+
+  use MyApp::Exception;
+  
+  sub handle_unicode_encoding_exception {
+      my ($c, $debug) = @_;
+      MyApp::Exception->throw(
+         200, ['content-type'=>'text/plain'], ['Bad unicode data']
+      );
+  }
+
+Given that in the C<handle_unicode_encoding_exception> method you get
+the context, you can even render a template or anything you want.
 
 =cut
 
