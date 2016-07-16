@@ -3562,15 +3562,40 @@ sub setup_encoding {
 
 =head2 handle_unicode_encoding_exception
 
-Hook to let you customize how encoding errors are handled.  By default
-we just throw an exception.  Receives a hashref of debug information.
-Example:
+Hook to let you customize how encoding errors are handled. By default
+we just throw an exception. Receives a hashref of debug information
+and should return a decoded string or die.
 
-    $c->handle_unicode_encoding_exception({
-        param_value => $value,
-        error_msg => $_,
-            encoding_step => 'params',
-        });
+In your application module, before the C<setup> call:
+
+  sub handle_unicode_encoding_exception {
+      my ($c, $debug) = @_;
+      # here you'll get, e.g.
+      #   {
+      #     encoding_step => "params",
+      #     error_msg => "utf8 \"\\xE2\" does not map to Unicode at..."
+      #     param_value => "\342\303\203\306\222\303%8"
+      #   }
+      # This is the default:
+      die $debug->{error_msg};
+  }
+
+Please note that at this point, even if you have the context object
+available, you can't do a detach() or throw an L<HTTP::Throwable>-like
+object, because this method is getting called in the prepare phase
+when arguments and parameters are parsed.
+
+However, given that you have the context object you can do:
+
+ sub handle_unicode_encoding_exception {
+     my ($c, $debug) = @_;
+     $c->stash->{BAD_UNICODE_DATA} = 1;
+     # return a dummy string
+     return 'BAD_UNICODE_DATA';
+ }
+
+and do the detach() at the root of the dispatch chain when you see the
+flag in the stash.
 
 =cut
 
