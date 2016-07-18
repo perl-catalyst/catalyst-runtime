@@ -574,15 +574,18 @@ sub prepare_query_parameters {
     my ($self, $c) = @_;
     my $env = $c->request->env;
     my $do_not_decode_query = $c->config->{do_not_decode_query};
-    my $default_query_encoding = $c->config->{default_query_encoding} || 
-      ($c->config->{decode_query_using_global_encoding} ?
-        $c->encoding : 'UTF-8');
 
+    my $old_encoding;
+    if(my $new = $c->config->{default_query_encoding}) {
+      $old_encoding = $c->encoding;
+      $c->encoding($new);
+    }
+
+    my $check = $c->config->{do_not_check_query_encoding} ? undef :$c->_encode_check;
     my $decoder = sub {
       my $str = shift;
       return $str if $do_not_decode_query;
-      return $str unless $default_query_encoding;
-      return decode( $default_query_encoding, $str);
+      return $c->_handle_param_unicode_decoding($str, $check);
     };
 
     my $query_string = exists $env->{QUERY_STRING}
@@ -606,6 +609,7 @@ sub prepare_query_parameters {
         split /[&;]+/, $query_string
     );
 
+    $c->encoding($old_encoding) if $old_encoding;
     $c->request->query_parameters( $c->request->_use_hash_multivalue ? $p : $p->mixed );
 }
 

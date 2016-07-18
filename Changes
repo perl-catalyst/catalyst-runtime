@@ -1,5 +1,18 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+TBD
+  - Better catching of HTTP style exceptions so that you can reliable use one to
+    override many core method.
+  - Documention on better ways to catch and handle Unicode errors
+  - We now check the unicode in your URL request queries and raise an error if the
+    check fails.  This was done to be consistent with what we do in other parts of
+    the code (such as in args, or POSTed parameters).  If this breaks your code in
+    ways you don't want to fix, you may disable this using the global configuration
+    setting, "do_not_check_query_encoding".
+  - Removed configuration setting, "decode_query_using_global_encoding" since it no
+    longer does anything useful.  Query decoding follows from whatever you set the
+    global encoding to, unless you specify an alternative or to not decode.
+
 5.90106 - 2016-07-05
   - Fixed regression in debug screen rendering of the private names in chained
     actions caused by commit 5dd46e24eedec447bdfbc4061ed683b5a17a7b0c.

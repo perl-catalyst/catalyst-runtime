@@ -3637,13 +3637,14 @@ sub _handle_unicode_decoding {
 }
 
 sub _handle_param_unicode_decoding {
-    my ( $self, $value ) = @_;
+    my ( $self, $value, $check ) = @_;
     return unless defined $value; # not in love with just ignoring undefs - jnap
     return $value if blessed($value); #don't decode when the value is an object.
 
     my $enc = $self->encoding;
+    $check ||= $self->_encode_check;
     return try {
-      $enc->decode( $value, $self->_encode_check );
+      $enc->decode( $value, $check);
     }
     catch {
         $self->handle_unicode_encoding_exception({
@@ -4347,8 +4348,16 @@ evil clients, this might cause you trouble.  If you find the changes introduced
 in Catalyst version 5.90080+ break some of your query code, you may disable 
 the UTF-8 decoding globally using this configuration.
 
-This setting takes precedence over C<default_query_encoding> and
-C<decode_query_using_global_encoding>
+This setting takes precedence over C<default_query_encoding>
+
+=item *
+
+C<do_not_check_query_encoding>
+
+Catalyst versions 5.90080 - 5.90106 would decode query parts of an incoming
+request but would not raise an exception when the decoding failed due to
+incorrect unicode.  It now does, but if this change is giving you trouble
+you may disable it by setting this configuration to true.
 
 =item *
 
@@ -4358,15 +4367,6 @@ By default we decode query and keywords in your request URL using UTF-8, which
 is our reading of the relevant specifications.  This setting allows one to
 specify a fixed value for how to decode your query.  You might need this if
 you are doing a lot of custom encoding of your URLs and not using UTF-8.
-
-This setting take precedence over C<decode_query_using_global_encoding>.
-
-=item *
-
-C<decode_query_using_global_encoding>
-
-Setting this to true will default your query decoding to whatever your
-general global encoding is (the default is UTF-8).
 
 =item *
 
