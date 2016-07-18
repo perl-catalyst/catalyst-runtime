@@ -3573,13 +3573,30 @@ sub setup_encoding {
 
 Hook to let you customize how encoding errors are handled.  By default
 we just throw an exception.  Receives a hashref of debug information.
-Example:
+Example of call:
 
     $c->handle_unicode_encoding_exception({
         param_value => $value,
         error_msg => $_,
-            encoding_step => 'params',
+        encoding_step => 'params',
         });
+
+You can override this for custom handling of unicode errors.  If you want a
+custom response here, one approach is to throw an HTTP style exception:
+
+    sub handle_unicode_encoding_exception {
+      my ($c, $params) = @_;
+      HTTP::Exception::BAD_REQUEST->throw(status_message=>$params->{error_msg});
+    }
+
+Alternatively you can 'catch' the error, stash it and write handling code later
+in your application:
+
+    sub handle_unicode_encoding_exception {
+      my ($c, $params) = @_;
+      $c->stash(BAD_UNICODE_DATA=>$params);
+      return 1;
+    }
 
 =cut
 
