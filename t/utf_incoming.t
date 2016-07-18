@@ -7,6 +7,7 @@ use HTTP::Message::PSGI ();
 use Encode 2.21 'decode_utf8', 'encode_utf8', 'encode';
 use File::Spec;
 use JSON::MaybeXS;
+use Data::Dumper;
 use Scalar::Util ();
 
 # Test cases for incoming utf8 
@@ -222,6 +223,13 @@ use Scalar::Util ();
     $c->response->content_type('text/plain');
     $c->response->body($c->req->body_parameters->{arg});
   }
+
+  sub echo_param :Local {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/plain');
+    $c->response->body($c->req->query_parameters->{arg});
+  }
+
 
   package MyApp;
   use Catalyst;
@@ -528,6 +536,31 @@ SKIP: {
 
   is $c->req->query_parameters->{'a'}, $shiftjs, 'got expected value';
 }
+
+{
+    my $invalid = '%e2';
+    # in url
+    {
+        my $req = GET "/$invalid";
+        my $res = request $req;
+        is ($res->code, '400', "Invalid url param is 400");
+    }
+    # in body
+    {
+        my $req = POST "/root/echo_arg", Content => "arg0=$invalid";
+        my $res = request $req;
+        is ($res->code, '400', "Invalid post param is 400");
+    }
+    # in query
+    {
+        # failing since 5.90080
+        my $req = GET "/root/echo_param?arg=$invalid";
+        my $res = request $req;
+        is ($res->code, '400', "Invalid get param is 400") or diag Dumper($res->decoded_content);
+    }
+
+}
+
 
 ## should we use binmode on filehandles to force the encoding...?
 ## Not sure what else to do with multipart here, if docs are enough...
