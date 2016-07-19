@@ -3572,8 +3572,8 @@ sub setup_encoding {
 =head2 handle_unicode_encoding_exception
 
 Hook to let you customize how encoding errors are handled.  By default
-we just throw an exception.  Receives a hashref of debug information.
-Example of call:
+we just throw an exception and the default error page will pick it up.
+Receives a hashref of debug information.  Example of call:
 
     $c->handle_unicode_encoding_exception({
         param_value => $value,
@@ -3597,6 +3597,11 @@ in your application:
       $c->stash(BAD_UNICODE_DATA=>$params);
       return 1;
     }
+
+<B>NOTE:</b> Please keep in mind that once an error like this occurs, the request
+setup is aborted, which means the state of C<$c> and related context parts like
+the request and response may not be setup up correctly (since we never finished the
+setup.
 
 =cut
 
@@ -3647,7 +3652,7 @@ sub _handle_param_unicode_decoding {
       $enc->decode( $value, $check);
     }
     catch {
-        $self->handle_unicode_encoding_exception({
+        return $self->handle_unicode_encoding_exception({
             param_value => $value,
             error_msg => $_,
             encoding_step => 'params',

@@ -558,9 +558,7 @@ SKIP: {
         my $res = request $req;
         is ($res->code, '400', "Invalid get param is 400") or diag Dumper($res->decoded_content);
     }
-
 }
-
 
 ## should we use binmode on filehandles to force the encoding...?
 ## Not sure what else to do with multipart here, if docs are enough...
