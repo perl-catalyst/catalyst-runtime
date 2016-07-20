@@ -3571,17 +3571,18 @@ sub setup_encoding {
 
 =head2 handle_unicode_encoding_exception
 
-Hook to let you customize how encoding errors are handled.  By default
+Hook to let you customize how encoding errors are handled. By default
 we just throw an exception and the default error page will pick it up.
-Receives a hashref of debug information.  Example of call:
+Receives a hashref of debug information. Example of call (from the
+Catalyst internals):
 
-    $c->handle_unicode_encoding_exception({
+  my $decoded_after_fail = $c->handle_unicode_encoding_exception({
         param_value => $value,
         error_msg => $_,
         encoding_step => 'params',
-        });
+   });
 
-It expects to receive a decoded string.
+The calling code expects to receive a decoded string or an exception.
 
 You can override this for custom handling of unicode errors. By
 default we just die. If you want a custom response here, one approach
