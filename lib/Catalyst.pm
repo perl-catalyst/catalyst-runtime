@@ -3581,8 +3581,12 @@ Receives a hashref of debug information.  Example of call:
         encoding_step => 'params',
         });
 
-You can override this for custom handling of unicode errors.  If you want a
-custom response here, one approach is to throw an HTTP style exception:
+It expects to receive a decoded string.
+
+You can override this for custom handling of unicode errors. By
+default we just die. If you want a custom response here, one approach
+is to throw an HTTP style exception, instead of returning a decoded
+string or throwing a generic exception.
 
     sub handle_unicode_encoding_exception {
       my ($c, $params) = @_;
@@ -3595,13 +3599,15 @@ in your application:
     sub handle_unicode_encoding_exception {
       my ($c, $params) = @_;
       $c->stash(BAD_UNICODE_DATA=>$params);
+      # return a dummy string.
       return 1;
     }
 
-<B>NOTE:</b> Please keep in mind that once an error like this occurs, the request
-setup is aborted, which means the state of C<$c> and related context parts like
-the request and response may not be setup up correctly (since we never finished the
-setup.
+<B>NOTE:</b> Please keep in mind that once an error like this occurs,
+the request setup is still ongoing, which means the state of C<$c> and
+related context parts like the request and response may not be setup
+up correctly (since we haven't finished the setup yet). If you throw
+an exception the setup is aborted.
 
 =cut
 
