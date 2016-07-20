@@ -3571,18 +3571,23 @@ sub setup_encoding {
 
 =head2 handle_unicode_encoding_exception
 
-Hook to let you customize how encoding errors are handled.  By default
+Hook to let you customize how encoding errors are handled. By default
 we just throw an exception and the default error page will pick it up.
-Receives a hashref of debug information.  Example of call:
+Receives a hashref of debug information. Example of call (from the
+Catalyst internals):
 
-    $c->handle_unicode_encoding_exception({
+  my $decoded_after_fail = $c->handle_unicode_encoding_exception({
         param_value => $value,
         error_msg => $_,
         encoding_step => 'params',
-        });
+   });
 
-You can override this for custom handling of unicode errors.  If you want a
-custom response here, one approach is to throw an HTTP style exception:
+The calling code expects to receive a decoded string or an exception.
+
+You can override this for custom handling of unicode errors. By
+default we just die. If you want a custom response here, one approach
+is to throw an HTTP style exception, instead of returning a decoded
+string or throwing a generic exception.
 
     sub handle_unicode_encoding_exception {
       my ($c, $params) = @_;
@@ -3595,13 +3600,15 @@ in your application:
     sub handle_unicode_encoding_exception {
       my ($c, $params) = @_;
       $c->stash(BAD_UNICODE_DATA=>$params);
+      # return a dummy string.
       return 1;
     }
 
-<B>NOTE:</b> Please keep in mind that once an error like this occurs, the request
-setup is aborted, which means the state of C<$c> and related context parts like
-the request and response may not be setup up correctly (since we never finished the
-setup.
+<B>NOTE:</b> Please keep in mind that once an error like this occurs,
+the request setup is still ongoing, which means the state of C<$c> and
+related context parts like the request and response may not be setup
+up correctly (since we haven't finished the setup yet). If you throw
+an exception the setup is aborted.
 
 =cut
 
