@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-TBD
+5.90110 - 2016-07-20
   - Better catching of HTTP style exceptions so that you can reliable use one to
     override many core method.
   - Documention on better ways to catch and handle Unicode errors
