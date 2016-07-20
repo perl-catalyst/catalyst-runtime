@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90111 - 2016-07-20
+  - Improved documentation around some of the unicode changes; tests (melmothx++)
+
 5.90110 - 2016-07-20
   - Better catching of HTTP style exceptions so that you can reliable use one to
     override many core method.
