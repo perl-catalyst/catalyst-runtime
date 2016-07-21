@@ -3654,6 +3654,9 @@ sub _handle_param_unicode_decoding {
     return $value if blessed($value); #don't decode when the value is an object.
 
     my $enc = $self->encoding;
+
+    return $value unless $enc; # don't decode if no encoding is specified
+
     $check ||= $self->_encode_check;
     return try {
       $enc->decode( $value, $check);
