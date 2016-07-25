@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90112 - 2016-07-25
+  - Fixed regression introduced in last release that caused the code to crap out
+    if you set the encoding to 'undef'.
+
 5.90111 - 2016-07-20
   - Improved documentation around some of the unicode changes; tests (melmothx++)
 
