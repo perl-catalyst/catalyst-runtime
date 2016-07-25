@@ -1,6 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
 5.90112 - 2016-07-25
+  - Spelling fixes from Debian group.
   - Fixed regression introduced in last release that caused the code to crap out
     if you set the encoding to 'undef'.
 

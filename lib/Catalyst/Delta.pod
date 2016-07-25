@@ -22,7 +22,7 @@ now compose the base class with any configured traits once at the end of the
 application setup, rather than for each request.  This reduced request overhead
 when you are composing lots of traits.  It possible this may break some code that
 was adding traits after the application setup was finalized.  Please shout out if
-this actually causes you trouble and we'll do the best to accomodate.
+this actually causes you trouble and we'll do the best to accommodate.
 
 =head2 VERSION 5.90102 - 5.90103
 

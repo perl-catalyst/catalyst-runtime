@@ -72,7 +72,7 @@ use of the non core method in your code as future changes to Catalyst will be
 synchronized to the core method first.  We reserve the right to cease support
 of the non core version should we reach a point in time where it cannot be
 properly supported as an external module.  Luckily this should be a trivial
-search and replace.  Change all occurences of:
+search and replace.  Change all occurrences of:
 
     CatalystX::InjectComponent->inject(...)
 
