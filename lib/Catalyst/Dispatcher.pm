@@ -620,7 +620,7 @@ sub setup_actions {
       $self->_load_dispatch_types( @{ $self->preload_dispatch_types } );
     @{ $self->_registered_dispatch_types }{@classes} = (1) x @classes;
 
-    foreach my $comp ( values %{ $c->components } ) {
+    foreach my $comp ( map @{$_}{sort keys %$_}, $c->components ) {
         $comp = $comp->() if ref($comp) eq 'CODE';
         $comp->register_actions($c) if $comp->can('register_actions');
     }
