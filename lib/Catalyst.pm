@@ -2490,6 +2490,7 @@ sub prepare {
     };
 
     $c->log_request;
+    $c->{stash} = $c->stash;
 
     return $c;
 }
