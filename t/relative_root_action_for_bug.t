@@ -17,11 +17,6 @@ use Test::Most;
       my ($self, $c) = @_;
       Test::Most::is $self->action_for('top'), 'top';
       Test::Most::is $self->action_for('story/story'), 'story/story';
-
-      #warn ref($c)->dispatcher->get_action('story/story', '/root');
-
-      #use Devel::Dwarn;
-      #Dwarn ref($c)->dispatcher->_action_hash->{'story/story'};
     }
 
     MyApp::Controller::Root->config(namespace=>'');
@@ -62,8 +57,9 @@ use Test::Most;
     sub author :Chained(root) Args(0) {
       my ($self, $c, $id) = @_;
       Test::Most::is $self->action_for('author'), 'story/author/author';
+      Test::Most::is $self->action_for('../story'), 'story/story';
+      Test::Most::is $self->action_for('../../top'), 'top';
     }
-
 
     __PACKAGE__->meta->make_immutable;
 
@@ -77,9 +73,9 @@ use Test::Most;
 
 use Catalyst::Test 'MyApp';
 
+ok request '/top';
 ok request '/story';
 ok request '/author';
-ok request '/top';
 
-done_testing(8);
+done_testing(10);
 

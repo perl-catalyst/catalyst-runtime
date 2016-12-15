@@ -407,9 +407,14 @@ sub prepare_action {
       if ( $c->debug && @args );
 }
 
-=head2 $self->get_action( $action, $namespace )
+=head2 $self->get_action( $action_name, $namespace )
 
-returns a named action from a given namespace.
+returns a named action from a given namespace.  C<$action_name>
+may be a relative path on that C<$namespace> such as
+
+    $self->get_action('../bar', 'foo/baz');
+
+In which case we look for the action at 'foo/bar'.
 
 =cut
 
@@ -426,10 +431,15 @@ sub get_action {
 
 Returns the named action by its full private path.
 
+This method performs some normalization on C<$path> so that if
+it includes '..' it will do the right thing (for example if
+C<$path> is '/foo/../bar' that is normalized to '/bar'.
+
 =cut
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
+    $path =~s/[^\/]+\/\.\.\/// while $path=~m/\.\./;
     $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
     $self->_action_hash->{$path};

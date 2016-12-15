@@ -662,10 +662,25 @@ arguments, when it is instantiated:
 From L<Catalyst::Component::ApplicationAttribute>, stashes the application
 instance as $self->_application.
 
-=head2 $self->action_for('name')
+=head2 $self->action_for($action_name)
 
-Returns the Catalyst::Action object (if any) for a given method name
-in this component.
+Returns the Catalyst::Action object (if any) for a given action in this
+controller or relative to it.  You may refer to actions in controllers
+nested under the current controllers namespace, or in controllers 'up'
+from the current controller namespace.  For example:
+
+    package MyApp::Controller::One::Two;
+    use base 'Catalyst::Controller';
+
+    sub foo :Local {
+      my ($self, $c) = @_;
+      $self->action_for('foo'); # action 'foo' in Controller 'One::Two'
+      $self->action_for('three/bar'); # action 'bar' in Controller 'One::Two::Three'
+      $self->action_for('../boo'); # action 'boo' in Controller 'One'
+    }
+
+This returns 'undef' if there is no action matching the requested action
+name (after any path normalization) so you should check for this as needed.
 
 =head2 $self->action_namespace($c)
 
