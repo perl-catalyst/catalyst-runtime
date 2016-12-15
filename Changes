@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90113 - 2016-12-15
+  - Fixed issue with $controller->action_for when targeting an action in
+    a namespace nested inside the current controller and the current controller
+    is a 'root' controller.
+  - Enhanced $controller->action_for so that you can reference the 'parent'
+    controller via relative path (eg ->action_for('../foo')).
+  - Backcompat fix for people that made the mistake of doing $c->{stash}
   - Sort controllers in setup_actions so cross-controller precedence is
     consistent.
 
