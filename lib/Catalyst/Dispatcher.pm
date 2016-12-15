@@ -419,7 +419,7 @@ sub get_action {
 
     $namespace = join( "/", grep { length } split '/', ( defined $namespace ? $namespace : "" ) );
 
-    return $self->_action_hash->{"${namespace}/${name}"};
+    return $self->get_action_by_path("${namespace}/${name}");
 }
 
 =head2 $self->get_action_by_path( $path );
