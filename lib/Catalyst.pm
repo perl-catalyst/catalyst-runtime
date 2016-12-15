@@ -51,6 +51,7 @@ use Catalyst::Middleware::Stash;
 use Plack::Util;
 use Class::Load 'load_class';
 use Encode 2.21 'decode_utf8', 'encode_utf8';
+use Scalar::Util;
 
 BEGIN { require 5.008003; }
 
@@ -2491,6 +2492,7 @@ sub prepare {
 
     $c->log_request;
     $c->{stash} = $c->stash;
+    Scalar::Util::weaken($c->{stash});
 
     return $c;
 }
