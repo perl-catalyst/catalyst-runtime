@@ -19,6 +19,12 @@ use Test::Most;
       Test::Most::is $self->action_for('story/story'), 'story/story';
     }
 
+    sub default : Path {
+
+        my ($self, $c) = @_;
+        $c->response->body("Ok");
+    }
+
     MyApp::Controller::Root->config(namespace=>'');
 
     package MyApp::Controller::Story;
@@ -76,6 +82,10 @@ use Catalyst::Test 'MyApp';
 ok request '/top';
 ok request '/story';
 ok request '/author';
+ok request '/double';
+ok request '/double/file.ext';
+ok request '/double/file..ext';
 
-done_testing(10);
+
+done_testing(13);
 
