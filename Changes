@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90114 - 2016-12-19
+  - Fixed regression introduced in the last version (5.90113) which caused 
+    application to hang when the action private name contained a string
+    like 'foo/bar..html'.  If you are running 5.90113 you should consider this
+    a required update.
+
 5.90113 - 2016-12-15
   - Fixed issue with $controller->action_for when targeting an action in
     a namespace nested inside the current controller and the current controller

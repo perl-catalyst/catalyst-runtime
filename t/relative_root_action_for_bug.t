@@ -1,4 +1,6 @@
-use Test::Most;
+use warnings;
+use strict;
+use Test::More;
 
 {
     package MyApp::Controller::Root;
@@ -15,8 +17,8 @@ use Test::Most;
 
     sub top :Chained('root') Args(0) {
       my ($self, $c) = @_;
-      Test::Most::is $self->action_for('top'), 'top';
-      Test::Most::is $self->action_for('story/story'), 'story/story';
+      Test::More::is $self->action_for('top'), 'top';
+      Test::More::is $self->action_for('story/story'), 'story/story';
     }
 
     sub default : Path {
@@ -42,8 +44,8 @@ use Test::Most;
     sub story :Chained(root) Args(0) {
       my ($self, $c) = @_;
 
-      Test::Most::is $self->action_for('story'), 'story/story';
-      Test::Most::is $self->action_for('author/author'), 'story/author/author';
+      Test::More::is $self->action_for('story'), 'story/story';
+      Test::More::is $self->action_for('author/author'), 'story/author/author';
     }
 
     __PACKAGE__->meta->make_immutable;
@@ -62,9 +64,9 @@ use Test::Most;
 
     sub author :Chained(root) Args(0) {
       my ($self, $c, $id) = @_;
-      Test::Most::is $self->action_for('author'), 'story/author/author';
-      Test::Most::is $self->action_for('../story'), 'story/story';
-      Test::Most::is $self->action_for('../../top'), 'top';
+      Test::More::is $self->action_for('author'), 'story/author/author';
+      Test::More::is $self->action_for('../story'), 'story/story';
+      Test::More::is $self->action_for('../../top'), 'top';
     }
 
     __PACKAGE__->meta->make_immutable;
