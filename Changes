@@ -5,6 +5,7 @@
     application to hang when the action private name contained a string
     like 'foo/bar..html'.  If you are running 5.90113 you should consider this
     a required update.
+  - Tweaked travis CI script.
 
 5.90113 - 2016-12-15
   - Fixed issue with $controller->action_for when targeting an action in
