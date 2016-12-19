@@ -439,7 +439,7 @@ C<$path> is '/foo/../bar' that is normalized to '/bar'.
 
 sub get_action_by_path {
     my ( $self, $path ) = @_;
-    $path =~s/[^\/]+\/\.\.\/// while $path=~m/\.\./;
+    $path =~s/[^\/]+\/\.\.\/// while $path=~m/[^\/]+\/\.\.\//;
     $path =~ s/^\///;
     $path = "/$path" unless $path =~ /\//;
     $self->_action_hash->{$path};
