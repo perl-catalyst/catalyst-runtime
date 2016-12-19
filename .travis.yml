@@ -53,7 +53,7 @@ script:
    - cpanm --test-only --metacpan Catalyst::Component::InstancePerContext
    - cpanm --test-only --metacpan Catalyst::Plugin::Session
    - cpanm --test-only --metacpan Catalyst::Plugin::Session::State::Cookie
-   - cpanm --test-only --metacpan Catalyst::Plugin::Static::Simple
+   - cpanm --test-only --verbose --metacpan Catalyst::Plugin::Static::Simple
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
    - cpanm --test-only --metacpan Catalyst::Authentication::Credential::HTTP
