@@ -2741,9 +2741,16 @@ sub log_request_parameters {
         next if ! keys %$params;
         my $t = Text::SimpleTable->new( [ 35, 'Parameter' ], [ $column_width, 'Value' ] );
         for my $key ( sort keys %$params ) {
-            my $param = $params->{$key};
-            my $value = defined($param) ? $param : '';
-            $t->row( $key, ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
+            my @values = ();
+            if(ref $params eq 'Hash::MultiValue') {
+                @values = $params->get_all($key);
+            } else {
+                my $param = $params->{$key};
+                if( defined($param) ) {
+                    @values = ref $param eq 'ARRAY' ? @$param : $param;
+                }
+            }
+            $t->row( $key.( scalar @values > 1 ? ' [multiple]' : ''), join(', ', @values) );
         }
         $c->log->debug( ucfirst($type) . " Parameters are:\n" . $t->draw );
     }
