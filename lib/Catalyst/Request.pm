@@ -1,6 +1,6 @@
 package Catalyst::Request;
 
-use Socket qw( getaddrinfo getnameinfo AI_NUMERICHOST NI_DGRAM NIx_NOSERV );
+use Socket qw( getaddrinfo getnameinfo AI_NUMERICHOST NIx_NOSERV );
 use Carp;
 use utf8;
 use URI::http;
@@ -448,8 +448,9 @@ has hostname => (
     }
     ( $err, my $hostname ) = getnameinfo(
         $sockaddr->{addr},
+        0,
         # we are only interested in the hostname, not the servicename
-        NI_DGRAM|NIx_NOSERV
+        NIx_NOSERV
     );
     if ( $err ) {
         $self->_log->warn("resolve of hostname failed: $err");
