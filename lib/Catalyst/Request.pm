@@ -435,7 +435,6 @@ sub body {
 
 has hostname => (
   is        => 'rw',
-  required  => 1,
   lazy      => 1,
   default   => sub {
     my ($self) = @_;
