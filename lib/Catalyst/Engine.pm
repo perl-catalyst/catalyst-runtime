@@ -210,7 +210,7 @@ sub finalize_cookies {
             next;
         }
 
-        push @cookies, $cookie->as_string;
+        push @cookies, $cookie->as_string if $cookie;
     }
 
     for my $cookie (@cookies) {
