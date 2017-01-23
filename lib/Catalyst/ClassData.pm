@@ -12,7 +12,7 @@ sub mk_classdata {
 
   my $accessor =  sub {
     my $pkg = ref $_[0] || $_[0];
-    my $meta = Moose::Util::find_meta($pkg)
+    my $meta = Class::MOP::get_metaclass_by_name($pkg)
         || Moose::Meta::Class->initialize( $pkg );
     if (@_ > 1) {
       $meta->namespace->{$attribute} = \$_[1];
@@ -40,7 +40,7 @@ sub mk_classdata {
     return;
   };
 
-  my $meta = $class->Class::MOP::Object::meta();
+  my $meta = Moose::Meta::Class->initialize($class);
   confess "${class}'s metaclass is not a Class::MOP::Class"
     unless $meta->isa('Class::MOP::Class');
 
