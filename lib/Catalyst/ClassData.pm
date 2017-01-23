@@ -10,7 +10,6 @@ sub mk_classdata {
   confess("mk_classdata() is a class method, not an object method")
     if blessed $class;
 
-  my $slot = '$'.$attribute;
   my $accessor =  sub {
     my $pkg = ref $_[0] || $_[0];
     my $meta = Moose::Util::find_meta($pkg)
@@ -21,8 +20,8 @@ sub mk_classdata {
     }
 
     # tighter version of
-    # if ( $meta->has_package_symbol($slot) ) {
-    #   return ${ $meta->get_package_symbol($slot) };
+    # if ( $meta->has_package_symbol('$'.$attribute) ) {
+    #   return ${ $meta->get_package_symbol('$'.$attribute) };
     # }
     no strict 'refs';
     my $v = *{"${pkg}::${attribute}"}{SCALAR};
@@ -40,9 +39,6 @@ sub mk_classdata {
     }
     return;
   };
-
-  confess("Failed to create accessor: $@ ")
-    unless ref $accessor eq 'CODE';
 
   my $meta = $class->Class::MOP::Object::meta();
   confess "${class}'s metaclass is not a Class::MOP::Class"
