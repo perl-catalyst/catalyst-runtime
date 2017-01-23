@@ -13,6 +13,7 @@ use Catalyst::EngineLoader;
 use Encode 2.21 'decode_utf8', 'encode', 'decode';
 use Plack::Request::Upload;
 use Hash::MultiValue;
+use Ref::Util qw(is_plain_arrayref is_plain_globref is_plain_hashref);
 use namespace::clean -except => 'meta';
 use utf8;
 
@@ -112,7 +113,7 @@ sub finalize_body {
                     $body = ["$body"]; 
                 }
             } elsif(ref $body) {
-                if( (ref($body) eq 'GLOB') or (ref($body) eq 'ARRAY')) {
+                if( (is_plain_globref($body)) or (is_plain_arrayref($body))) {
                   # Again, PSGI can just accept this, no transform needed.  We don't officially
                   # document the body as arrayref at this time (and there's not specific test
                   # cases.  we support it because it simplifies some plack compatibility logic
@@ -144,7 +145,7 @@ sub finalize_body {
 
         if(my $body = $res->body) {
 
-          if ( blessed($body) && $body->can('read') or ref($body) eq 'GLOB' ) {
+          if ( blessed($body) && $body->can('read') or is_plain_globref($body) ) {
 
               ## In this case we have no choice and will fall back on the old
               ## manual streaming stuff.  Not optimal.  This is deprecated as of 5.900560+
@@ -233,7 +234,7 @@ sub _dump_error_page_element {
     # This is fugly, but the metaclass is _HUGE_ and demands waaay too much
     # scrolling. Suggestions for more pleasant ways to do this welcome.
     local $val->{'__MOP__'} = "Stringified: "
-        . $val->{'__MOP__'} if ref $val eq 'HASH' && exists $val->{'__MOP__'};
+        . $val->{'__MOP__'} if is_plain_hashref($val) && exists $val->{'__MOP__'};
 
     my $text = encode_entities( dump( $val ));
     sprintf <<"EOF", $name, $text;
@@ -443,7 +444,7 @@ sub finalize_uploads {
     foreach my $key (keys %{ $request->uploads }) {
         my $upload = $request->uploads->{$key};
         unlink grep { -e $_ } map { $_->tempname }
-          (ref $upload eq 'ARRAY' ? @{$upload} : ($upload));
+          (is_plain_arrayref($upload) ? @{$upload} : ($upload));
     }
 
 }
@@ -657,7 +658,7 @@ sub prepare_uploads {
         my $files = $uploads->{$name};
         $name = $c->_handle_unicode_decoding($name) if $enc;
         my @uploads;
-        for my $upload (ref $files eq 'ARRAY' ? @$files : ($files)) {
+        for my $upload (is_plain_arrayref($files) ? @$files : ($files)) {
             my $headers = HTTP::Headers->new( %{ $upload->{headers} } );
             my $filename = $upload->{filename};
             $filename = $c->_handle_unicode_decoding($filename) if $enc;
@@ -679,7 +680,7 @@ sub prepare_uploads {
         my @filenames = map { $_->{filename} } @uploads;
         # append, if there's already params with this name
         if (exists $parameters->{$name}) {
-            if (ref $parameters->{$name} eq 'ARRAY') {
+            if (is_plain_arrayref($parameters->{$name})) {
                 push @{ $parameters->{$name} }, @filenames;
             }
             else {
@@ -764,7 +765,7 @@ sub run {
     # FIXME - we should stash the options in an attribute so that custom args
     # like Gitalist's --git_dir are possible to get from the app without stupid tricks.
     my $server = pop @args if (scalar @args && blessed $args[-1]);
-    my $options = pop @args if (scalar @args && ref($args[-1]) eq 'HASH');
+    my $options = pop @args if (scalar @args && is_plain_hashref($args[-1]));
     # Back compat hack for applications with old (non Catalyst::Script) scripts to work in FCGI.
     if (scalar @args && !ref($args[0])) {
         if (my $listen = shift @args) {

@@ -14,6 +14,7 @@ use HTTP::Body;
 use Catalyst::Exception;
 use Catalyst::Request::PartData;
 use Moose;
+use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 
 use namespace::clean -except => 'meta';
 
@@ -224,15 +225,15 @@ sub _build_parameters {
     # We copy, no references
     foreach my $name (keys %$query_parameters) {
         my $param = $query_parameters->{$name};
-        $parameters->{$name} = ref $param eq 'ARRAY' ? [ @$param ] : $param;
+        $parameters->{$name} = is_plain_arrayref($param) ? [ @$param ] : $param;
     }
 
     # Merge query and body parameters
     foreach my $name (keys %$body_parameters) {
         my $param = $body_parameters->{$name};
-        my @values = ref $param eq 'ARRAY' ? @$param : ($param);
+        my @values = is_plain_arrayref($param) ? @$param : ($param);
         if ( my $existing = $parameters->{$name} ) {
-          unshift(@values, (ref $existing eq 'ARRAY' ? @$existing : $existing));
+          unshift(@values, (is_plain_arrayref($existing) ? @$existing : $existing));
         }
         $parameters->{$name} = @values > 1 ? \@values : $values[0];
     }
@@ -337,7 +338,7 @@ sub prepare_body_parameters {
     if(scalar %part_data && !$c->config->{skip_complex_post_part_handling}) {
       foreach my $key (keys %part_data) {
         my $proto_value = $part_data{$key};
-        my ($val, @extra) = (ref($proto_value)||'') eq 'ARRAY' ? @$proto_value : ($proto_value);
+        my ($val, @extra) = is_plain_arrayref($proto_value) ? @$proto_value : ($proto_value);
 
         $key = $c->_handle_param_unicode_decoding($key)
           if ($c and $c->encoding and !$c->config->{skip_body_param_unicode_decoding});
@@ -783,7 +784,7 @@ sub param {
             return wantarray ? () : undef;
         }
 
-        if ( ref $self->parameters->{$param} eq 'ARRAY' ) {
+        if ( is_plain_arrayref($self->parameters->{$param}) ) {
             return (wantarray)
               ? @{ $self->parameters->{$param} }
               : $self->parameters->{$param}->[0];
@@ -925,7 +926,7 @@ sub upload {
             return wantarray ? () : undef;
         }
 
-        if ( ref $self->uploads->{$upload} eq 'ARRAY' ) {
+        if ( is_plain_arrayref($self->uploads->{$upload}) ) {
             return (wantarray)
               ? @{ $self->uploads->{$upload} }
               : $self->uploads->{$upload}->[0];
@@ -943,7 +944,7 @@ sub upload {
 
             if ( exists $self->uploads->{$field} ) {
                 for ( $self->uploads->{$field} ) {
-                    $_ = [$_] unless ref($_) eq "ARRAY";
+                    $_ = [$_] unless is_plain_arrayref($_);
                     push( @$_, $upload );
                 }
             }
@@ -999,7 +1000,7 @@ sub mangle_params {
 
     foreach my $value ( values %$args ) {
         next unless defined $value;
-        for ( ref $value eq 'ARRAY' ? @$value : $value ) {
+        for ( is_plain_arrayref($value) ? @$value : $value ) {
             $_ = "$_";
             #      utf8::encode($_);
         }
@@ -1016,8 +1017,8 @@ sub mangle_params {
                 # an existing one regardless if the existing value is an array
                 # or not, and regardless if the new value is an array or not
                 $params{$key} = [
-                    ref($params{$key}) eq 'ARRAY' ? @{ $params{$key} } : $params{$key},
-                    ref($val) eq 'ARRAY' ? @{ $val } : $val
+                    is_plain_arrayref($params{$key}) ? @{ $params{$key} } : $params{$key},
+                    is_plain_arrayref($val) ? @{ $val } : $val
                 ];
 
             } else {
@@ -1056,7 +1057,7 @@ sub uri_with {
     carp( 'No arguments passed to uri_with()' ) unless $args;
 
     my $append = 0;
-    if((ref($behavior) eq 'HASH') && defined($behavior->{mode}) && ($behavior->{mode} eq 'append')) {
+    if(is_plain_hashref($behavior) && defined($behavior->{mode}) && ($behavior->{mode} eq 'append')) {
         $append = 1;
     }
 

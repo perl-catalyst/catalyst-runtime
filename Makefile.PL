@@ -86,6 +86,7 @@ requires "Plack::Middleware::HTTPExceptions";
 requires "Plack::Middleware::FixMissingBodyInRedirect" => '0.09';
 requires "Plack::Middleware::MethodOverride" => '0.12';
 requires "Plack::Middleware::RemoveRedundantBody" => '0.03';
+requires 'Ref::Util' => '0.010';
 
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => '0.88';

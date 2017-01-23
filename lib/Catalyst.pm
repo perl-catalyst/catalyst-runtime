@@ -52,6 +52,7 @@ use Plack::Util;
 use Class::Load 'load_class';
 use Encode 2.21 'decode_utf8', 'encode_utf8';
 use Scalar::Util;
+use Ref::Util qw(is_plain_arrayref is_plain_coderef is_plain_hashref is_plain_scalarref is_regexpref);
 
 BEGIN { require 5.008003; }
 
@@ -623,7 +624,7 @@ will be an empty arrayref.
 sub error {
     my $c = shift;
     if ( $_[0] ) {
-        my $error = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+        my $error = is_plain_arrayref($_[0]) ? $_[0] : [@_];
         croak @$error unless ref $c;
         push @{ $c->{error} }, @$error;
     }
@@ -728,13 +729,13 @@ sub _comp_names_search_prefixes {
     # undef for a name will return all
     return keys %eligible if !defined $name;
 
-    my $query  = $name->$_isa('Regexp') ? $name : qr/^$name$/i;
+    my $query  = is_regexpref($name) ? $name : qr/^$name$/i;
     my @result = grep { $eligible{$_} =~ m{$query} } keys %eligible;
 
     return @result if @result;
 
     # if we were given a regexp to search against, we're done.
-    return if $name->$_isa('Regexp');
+    return if is_regexpref($name);
 
     # skip regexp fallback if configured
     return
@@ -795,7 +796,7 @@ sub _comp_names {
 sub _filter_component {
     my ( $c, $comp, @args ) = @_;
 
-    if(ref $comp eq 'CODE') {
+    if(is_plain_coderef($comp)) {
       $comp = $comp->();
     }
 
@@ -832,7 +833,7 @@ sub controller {
 
     my $appclass = ref($c) || $c;
     if( $name ) {
-        unless ( $name->$_isa('Regexp') ) { # Direct component hash lookup to avoid costly regexps
+        unless ( is_regexpref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $comps = $c->components;
             my $check = $appclass."::Controller::".$name;
             return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
@@ -876,7 +877,7 @@ sub model {
     my ( $c, $name, @args ) = @_;
     my $appclass = ref($c) || $c;
     if( $name ) {
-        unless ( $name->$_isa('Regexp') ) { # Direct component hash lookup to avoid costly regexps
+        unless ( is_regexpref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $comps = $c->components;
             my $check = $appclass."::Model::".$name;
             return $c->_filter_component( $comps->{$check}, @args ) if exists $comps->{$check};
@@ -940,7 +941,7 @@ sub view {
 
     my $appclass = ref($c) || $c;
     if( $name ) {
-        unless ( $name->$_isa('Regexp') ) { # Direct component hash lookup to avoid costly regexps
+        unless ( is_regexpref($name) ) { # Direct component hash lookup to avoid costly regexps
             my $comps = $c->components;
             my $check = $appclass."::View::".$name;
             if( exists $comps->{$check} ) {
@@ -1437,7 +1438,7 @@ EOF
         }
 
         my @middleware = map {
-          ref $_ eq 'CODE' ? 
+          is_plain_coderef($_) ?
             "Inline Coderef" : 
               (ref($_) .'  '. ($_->can('VERSION') ? $_->VERSION || '' : '') 
                 || '')  } $class->registered_middlewares;
@@ -1606,7 +1607,7 @@ sub uri_for {
         $path .= '/';
     }
 
-    my $fragment =  ((scalar(@args) && ref($args[-1]) eq 'SCALAR') ? pop @args : undef );
+    my $fragment =  ((scalar(@args) && is_plain_scalarref($args[-1])) ? pop @args : undef );
 
     unless(blessed $path) {
       if (defined($path) and $path =~ s/#(.+)$//)  {
@@ -1620,7 +1621,7 @@ sub uri_for {
     }
 
     my $params =
-      ( scalar @args && ref $args[$#args] eq 'HASH' ? pop @args : {} );
+      ( scalar @args && is_plain_hashref($args[$#args]) ? pop @args : {} );
 
     undef($path) if (defined $path && $path eq '');
 
@@ -1630,7 +1631,7 @@ sub uri_for {
     if ( $path->$_isa('Catalyst::Action') ) { # action object
         s|/|%2F|g for @args;
         my $captures = [ map { s|/|%2F|g; $_; }
-                        ( scalar @args && ref $args[0] eq 'ARRAY'
+                        ( scalar @args && is_plain_arrayref($args[0])
                          ? @{ shift(@args) }
                          : ()) ];
 
@@ -1722,7 +1723,7 @@ sub uri_for {
               $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               $key =~ s/ /+/g;
 
-              "${key}=$param"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
+              "${key}=$param"; } ( is_plain_arrayref($val) ? @$val : $val ));
       } @keys);
     }
 
@@ -2320,7 +2321,7 @@ sub finalize_encoding {
     if(
       ($res->encodable_response) and
       (defined($res->body)) and
-      (ref(\$res->body) eq 'SCALAR')
+      (is_plain_scalarref(\$res->body))
     ) {
         $c->res->body( $c->encoding->encode( $c->res->body, $c->_encode_check ) );
 
@@ -2743,7 +2744,7 @@ sub log_request_parameters {
         for my $key ( sort keys %$params ) {
             my $param = $params->{$key};
             my $value = defined($param) ? $param : '';
-            $t->row( $key, ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
+            $t->row( $key, is_plain_arrayref($value) ? ( join ', ', @$value ) : $value );
         }
         $c->log->debug( ucfirst($type) . " Parameters are:\n" . $t->draw );
     }
@@ -2771,7 +2772,7 @@ sub log_request_uploads {
         );
         for my $key ( sort keys %$uploads ) {
             my $upload = $uploads->{$key};
-            for my $u ( ref $upload eq 'ARRAY' ? @{$upload} : ($upload) ) {
+            for my $u ( is_plain_arrayref($upload) ? @{$upload} : ($upload) ) {
                 $t->row( $key, $u->filename, $u->type, $u->size );
             }
         }
@@ -3031,7 +3032,7 @@ sub setup_components {
     # All components are registered, now we need to 'init' them.
     foreach my $component_name (@comps, @injected) {
       $class->components->{$component_name} = $class->components->{$component_name}->() if
-        (ref($class->components->{$component_name}) || '') eq 'CODE';
+        is_plain_coderef($class->components->{$component_name});
     }
 }
 
@@ -3629,13 +3630,13 @@ sub _handle_unicode_decoding {
     return unless defined $value;
 
     ## I think this mess is to support the old nested
-    if ( ref $value eq 'ARRAY' ) {
+    if ( is_plain_arrayref($value) ) {
         foreach ( @$value ) {
             $_ = $self->_handle_unicode_decoding($_);
         }
         return $value;
     }
-    elsif ( ref $value eq 'HASH' ) {
+    elsif ( is_plain_hashref($value) ) {
         foreach (keys %$value) {
             my $encoded_key = $self->_handle_param_unicode_decoding($_);
             $value->{$encoded_key} = $self->_handle_unicode_decoding($value->{$_});
@@ -3968,9 +3969,9 @@ sub setup_middleware {
         if(ref $next) {
             if(Scalar::Util::blessed $next && $next->can('wrap')) {
                 push @middleware, $next;
-            } elsif(ref $next eq 'CODE') {
+            } elsif(is_plain_coderef($next)) {
                 push @middleware, $next;
-            } elsif(ref $next eq 'HASH') {
+            } elsif(is_plain_hashref($next)) {
                 my $namespace = shift @middleware_definitions;
                 my $mw = $class->Catalyst::Utils::build_middleware($namespace, %$next);
                 push @middleware, $mw;

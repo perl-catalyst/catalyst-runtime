@@ -2,6 +2,7 @@ package Catalyst::ActionRole::QueryMatching;
 
 use Moose::Role;
 use Moose::Util::TypeConstraints ();
+use Ref::Util ();
 
 requires 'match', 'match_captures', 'list_extra_info';
 
@@ -65,7 +66,7 @@ has query_constraints => (
 around ['match','match_captures'] => sub {
     my ($orig, $self, $c, @args) = @_;
     my $tc = $self->query_constraints;
-    if(ref $tc eq 'HASH') {
+    if(Ref::Util::is_plain_hashref($tc)) {
       # Do the key names match, unless slurpy?
       unless($self->is_slurpy) {
         return 0 unless $self->_compare_arrays([sort keys %$tc],[sort keys %{$c->req->query_parameters}]);

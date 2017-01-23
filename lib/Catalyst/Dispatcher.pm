@@ -16,6 +16,7 @@ use Tree::Simple;
 use Tree::Simple::Visitor::FindByPath;
 use Class::Load qw(load_class try_load_class);
 use Encode 2.21 'decode_utf8';
+use Ref::Util qw(is_plain_arrayref is_plain_coderef);
 
 use namespace::clean -except => 'meta';
 
@@ -135,11 +136,11 @@ sub _command2action {
 
     my (@args, @captures);
 
-    if ( ref( $extra_params[-2] ) eq 'ARRAY' ) {
+    if ( is_plain_arrayref($extra_params[-2]) ) {
         @captures = @{ splice @extra_params, -2, 1 };
     }
 
-    if ( ref( $extra_params[-1] ) eq 'ARRAY' ) {
+    if ( is_plain_arrayref($extra_params[-1]) ) {
         @args = @{ pop @extra_params }
     } else {
         # this is a copy, it may take some abuse from
@@ -631,7 +632,7 @@ sub setup_actions {
     @{ $self->_registered_dispatch_types }{@classes} = (1) x @classes;
 
     foreach my $comp ( map @{$_}{sort keys %$_}, $c->components ) {
-        $comp = $comp->() if ref($comp) eq 'CODE';
+        $comp = $comp->() if is_plain_coderef($comp);
         $comp->register_actions($c) if $comp->can('register_actions');
     }
 

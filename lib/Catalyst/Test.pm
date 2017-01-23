@@ -11,6 +11,7 @@ use Class::Load qw(load_class is_class_loaded);
 use Sub::Exporter;
 use Moose::Util 'find_meta';
 use Carp 'croak', 'carp';
+use Ref::Util qw(is_plain_coderef is_plain_hashref);
 
 sub _build_request_export {
     my ($self, $args) = @_;
@@ -153,7 +154,7 @@ say: use Catalyst::Test (); # If you don't want to import a test app right now.
 or say: use Catalyst::Test 'MyApp'; # If you do want to import a test app.\n\n})
         unless $class;
         $import->($self, '-all' => { class => $class });
-        $opts = {} unless ref $opts eq 'HASH';
+        $opts = {} unless is_plain_hashref($opts);
         $default_host = $opts->{default_host} if exists $opts->{default_host};
         return 1;
     }
@@ -290,7 +291,7 @@ sub _local_request {
     my $class = shift;
 
     return _request({
-        app => ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app,
+        app => is_plain_coderef($class) ? $class : $class->_finalized_psgi_app,
         mangle_response => sub {
             my ($resp) = @_;
 
@@ -405,7 +406,7 @@ sub _customize_request {
     my $request = shift;
     my $extra_env = shift;
     my $opts = pop(@_) || {};
-    $opts = {} unless ref($opts) eq 'HASH';
+    $opts = {} unless is_plain_hashref($opts);
     if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
         $request->header( 'Host' => $host );
     }

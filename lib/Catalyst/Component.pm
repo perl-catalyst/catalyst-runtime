@@ -11,6 +11,7 @@ use mro 'c3';
 use Scalar::Util 'blessed';
 use Class::Load 'is_class_loaded';
 use Moose::Util 'find_meta';
+use Ref::Util qw(is_plain_hashref);
 use namespace::clean -except => 'meta';
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
@@ -91,12 +92,12 @@ sub BUILDARGS {
     my $args = {};
 
     if (@_ == 1) {
-        $args = $_[0] if ref($_[0]) eq 'HASH';
+        $args = $_[0] if is_plain_hashref($_[0]);
     } elsif (@_ == 2) { # is it ($app, $args) or foo => 'bar' ?
         if (blessed($_[0])) {
-            $args = $_[1] if ref($_[1]) eq 'HASH';
+            $args = $_[1] if is_plain_hashref($_[1]);
         } elsif (is_class_loaded($_[0]) &&
-                $_[0]->isa('Catalyst') && ref($_[1]) eq 'HASH') {
+                $_[0]->isa('Catalyst') && is_plain_hashref($_[1])) {
             $args = $_[1];
         } else {
             $args = +{ @_ };
@@ -112,7 +113,7 @@ sub COMPONENT {
     my ( $class, $c ) = @_;
 
     # Temporary fix, some components does not pass context to constructor
-    my $arguments = ( ref( $_[-1] ) eq 'HASH' ) ? $_[-1] : {};
+    my $arguments = is_plain_hashref($_[-1]) ? $_[-1] : {};
     if ( my $next = $class->next::can ) {
       my ($next_package) = Class::MOP::get_code_info($next);
       warn "There is a COMPONENT method resolving after Catalyst::Component in ${next_package}.\n";

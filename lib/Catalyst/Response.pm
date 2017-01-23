@@ -7,6 +7,7 @@ use namespace::autoclean;
 use Scalar::Util 'blessed';
 use Catalyst::Response::Writer;
 use Catalyst::Utils ();
+use Ref::Util qw(is_plain_arrayref is_plain_coderef);
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
@@ -170,15 +171,15 @@ sub from_psgi_response {
     if(blessed($psgi_res) && $psgi_res->can('as_psgi')) {
       $psgi_res = $psgi_res->as_psgi;
     }
-    if(ref $psgi_res eq 'ARRAY') {
+    if(is_plain_arrayref($psgi_res)) {
         my ($status, $headers, $body) = @$psgi_res;
         $self->status($status);
         $self->headers(HTTP::Headers->new(@$headers));
         # Can be arrayref or filehandle...
         if(defined $body) { # probably paranoia
-          ref $body eq 'ARRAY' ? $self->body(join('', @$body)) : $self->body($body);
+          is_plain_arrayref($body) ? $self->body(join('', @$body)) : $self->body($body);
         }
-    } elsif(ref $psgi_res eq 'CODE') {
+    } elsif(is_plain_coderef($psgi_res)) {
         $psgi_res->(sub {
             my $response = shift;
             my ($status, $headers, $maybe_body) = @$response;
@@ -186,7 +187,7 @@ sub from_psgi_response {
             $self->headers(HTTP::Headers->new(@$headers));
             if(defined $maybe_body) {
                 # Can be arrayref or filehandle...
-                ref $maybe_body eq 'ARRAY' ? $self->body(join('', @$maybe_body)) : $self->body($maybe_body);
+                is_plain_arrayref($maybe_body) ? $self->body(join('', @$maybe_body)) : $self->body($maybe_body);
             } else {
                 return $self->write_fh;
             }

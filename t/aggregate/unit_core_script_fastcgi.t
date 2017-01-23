@@ -7,6 +7,8 @@ use lib "$Bin/../lib";
 use Test::More;
 use Test::Fatal;
 
+use Ref::Util qw(is_plain_hashref);
+
 use Catalyst::Script::FastCGI;
 
 local our $fake_handler = \42;
@@ -41,7 +43,7 @@ sub testOption {
     my $server = pop @TestAppToTestScripts::RUN_ARGS;
     is $server, $fake_handler, 'Loaded Plack handler gets passed to the app';
 
-    if (scalar(@TestAppToTestScripts::RUN_ARGS) && ref($TestAppToTestScripts::RUN_ARGS[-1]) eq "HASH") {
+    if (scalar(@TestAppToTestScripts::RUN_ARGS) && is_plain_hashref($TestAppToTestScripts::RUN_ARGS[-1])) {
         is ref(delete($TestAppToTestScripts::RUN_ARGS[-1]->{argv})), 'ARRAY';
         is ref(delete($TestAppToTestScripts::RUN_ARGS[-1]->{extra_argv})), 'ARRAY';
     }

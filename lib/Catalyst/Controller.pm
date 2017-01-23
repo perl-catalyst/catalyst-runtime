@@ -7,6 +7,7 @@ use String::RewritePrefix;
 use Moose::Util qw/find_meta/;
 use List::Util qw/first/;
 use List::MoreUtils qw/uniq/;
+use Ref::Util qw(is_plain_arrayref);
 use namespace::clean -except => 'meta';
 
 BEGIN {
@@ -429,7 +430,7 @@ sub _parse_attrs {
         %raw_attributes,
         # Note we deep copy array refs here to stop crapping on config
         # when attributes are parsed. RT#65463
-        exists $actions_config->{$name} ? map { ref($_) eq 'ARRAY' ? [ @$_ ] : $_ } %{ $actions_config->{$name } } : (),
+        exists $actions_config->{$name} ? map { is_plain_arrayref($_) ? [ @$_ ] : $_ } %{ $actions_config->{$name } } : (),
     );
 
     # Private actions with additional attributes will raise a warning and then
@@ -455,7 +456,7 @@ sub _parse_attr {
     my ($self, $c, $name, $key, $values) = @_;
 
     my %final_attributes;
-    foreach my $value (ref($values) eq 'ARRAY' ? @$values : $values) {
+    foreach my $value (is_plain_arrayref($values) ? @$values : $values) {
         my $meth = "_parse_${key}_attr";
         if ( my $code = $self->can($meth) ) {
             my %new_attrs = $self->$code( $c, $name, $value );
