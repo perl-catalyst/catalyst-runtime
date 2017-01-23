@@ -84,6 +84,7 @@ add_stopwords(qw(
     Tatsuhiko
     Ulf
     Upasana
+    Venters
     Vilain
     Viljo
     Wardley
