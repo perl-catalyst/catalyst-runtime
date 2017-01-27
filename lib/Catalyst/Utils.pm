@@ -413,11 +413,14 @@ sub term_width {
           } else {
             warn "There was an error trying to detect your terminal size: $@\n";
           }
+    };
+
+    unless ($width) {
         warn 'Trouble trying to detect your terminal size, looking at $ENV{COLUMNS}'."\n";
         $width = $ENV{COLUMNS}
             if exists($ENV{COLUMNS})
             && $ENV{COLUMNS} =~ m/^\d+$/;
-    };
+    }
 
     do {
       warn "Cannot determine desired terminal width, using default of 80 columns\n";
