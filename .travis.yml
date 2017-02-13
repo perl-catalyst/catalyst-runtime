@@ -12,17 +12,8 @@ perl:
    - "5.8"
 
 install:
-   # for testing
-   - cpanm --notest --metacpan --skip-satisfied YAML
-
-   # M::I deps
-   - cpanm --notest --metacpan --skip-satisfied Module::Install Module::Install::AuthorRequires Module::Install::CheckConflicts Module::Install::AuthorTests Module::Install::Authority
-
-   # author deps -- wish there was a better way
-   - cpanm --notest --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize Test::WWW::Mechanize::Catalyst Catalyst::Plugin::Params::Nested
-   - cpanm --notest --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod Type::Tiny
-   - cpanm --notest --metacpan --skip-satisfied --installdeps .
-   - echo y | perl Makefile.PL
+   - cpanm --notest --metacpan --skip-satisfied --with-develop --installdeps .
+   - perl Makefile.PL
 
    # enable various test options, including parallel testing
    - export AUTOMATED_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
