@@ -1,4 +1,4 @@
-package Catalyst::ActionRole::Moo;
+package Guff;
 
 use Moose::Role;
 

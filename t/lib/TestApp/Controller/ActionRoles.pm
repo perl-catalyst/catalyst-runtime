@@ -11,12 +11,12 @@ __PACKAGE__->config(
     },
 );
 
-sub foo  : Local Does('Moo')  {}
-sub bar  : Local Does('~Moo') {}
-sub baz  : Local Does('+Moo') {}
+sub foo  : Local Does('Guff')  {}
+sub bar  : Local Does('~Guff') {}
+sub baz  : Local Does('+Guff') {}
 sub quux : Local Does('Zoo')  {}
 
-sub corge : Local Does('Moo') ActionClass('TestAfter') {
+sub corge : Local Does('Guff') ActionClass('TestAfter') {
     my ($self, $ctx) = @_;
     $ctx->stash(after_message => 'moo');
 }

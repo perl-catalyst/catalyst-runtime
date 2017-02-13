@@ -1,8 +1,6 @@
-package Moo;
+package TestApp::ActionRole::Guff;
 
 use Moose::Role;
-
-use namespace::autoclean;
 
 after execute => sub {
     my ($self, $controller, $c) = @_;

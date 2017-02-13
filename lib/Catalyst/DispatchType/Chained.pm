@@ -702,7 +702,7 @@ controller. For Example:
   # in MyApp::Controller::Foo
   sub bar : Chained CaptureArgs(1) { ... }
 
-  # in MyApp::Controller::Foo::Moo
+  # in MyApp::Controller::Foo::Bar
   sub bar : ChainedParent Args(1) { ... }
 
 This builds a chain like C</bar/*/bar/*>.

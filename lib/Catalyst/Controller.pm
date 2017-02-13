@@ -862,9 +862,9 @@ The following is exactly the same:
 
     package MyApp::Controller::Zoo;
 
-    sub foo  : Local Does('Moo')  { ... } # Catalyst::ActionRole::
-    sub bar  : Local Does('~Moo') { ... } # MyApp::ActionRole::Moo
-    sub baz  : Local Does('+MyApp::ActionRole::Moo') { ... }
+    sub foo  : Local Does('Buzz')  { ... } # Catalyst::ActionRole::
+    sub bar  : Local Does('~Buzz') { ... } # MyApp::ActionRole::Buzz
+    sub baz  : Local Does('+MyApp::ActionRole::Buzz') { ... }
 
 =head2 GET
 
