@@ -1,2 +1,0 @@
-^(?!script/\w+\.pl$|TODO$|lib/.+(?<!ROADMAP)\.p(m|od)$|inc/|t/a(uthor|ggregate)/.*\.t$|t/([^/]+|.{1,2}|[^t][^m][^p].*)\.(gif|yml|pl|t)$|t/lib/.*\.pm$|t/something/(Makefile.PL|script/foo/bar/for_dist)$|t/conf/extra.conf.in$|Makefile.PL$|README$|MANIFEST$|Changes$|META.yml$|.+testappencodingsetinconfig.json|.+TestMiddleware/share.*|.+TestMiddlewareFromConfig/share.*|.+TestContentNegotiation/share.*|t/utf8.txt)
-/cpanfile

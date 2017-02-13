@@ -21,4 +21,3 @@ foreach my $module (@modules) {
 }
 
 done_testing;
-
