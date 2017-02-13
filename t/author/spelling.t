@@ -60,8 +60,10 @@ add_stopwords(qw(
     Marrandi
     McWhirter
     Milicevic
+    Mischa
     Miyagawa
     Montes
+    Napiorkowski
     Naughton
     Oleg
     Ragwitz
@@ -79,6 +81,7 @@ add_stopwords(qw(
     Sedlacek
     Sheidlower
     SpiceMan
+    Spiegelmock
     Styn
     Szilakszi
     Tatsuhiko
@@ -122,7 +125,6 @@ add_stopwords(qw(
     miyagawa
     mst
     multipart
-    Napiorkowski
     naughton
     ningu
     nothingmuch
@@ -131,6 +133,7 @@ add_stopwords(qw(
     phaylon
     rafl
     rainboxx
+    revmischa
     sri
     szbalint
     uploadtmp

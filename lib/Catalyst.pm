@@ -4911,19 +4911,19 @@ Caelum: Rafael Kitover <rkitover@io.com>
 
 chansen: Christian Hansen
 
-Chase Venters C<chase.venters@gmail.com>
+Chase Venters <chase.venters@gmail.com>
 
 chicks: Christopher Hicks
 
-Chisel Wright C<pause@herlpacker.co.uk>
+Chisel Wright <pause@herlpacker.co.uk>
 
-Danijel Milicevic C<me@danijel.de>
+Danijel Milicevic <me@danijel.de>
 
 davewood: David Schmidt <davewood@cpan.org>
 
 David Kamholz <dkamholz@cpan.org>
 
-David Naughton, C<naughton@umn.edu>
+David Naughton <naughton@umn.edu>
 
 David E. Wheeler
 
@@ -4945,7 +4945,7 @@ gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
-Gavin Henry C<ghenry@perl.me.uk>
+Gavin Henry <ghenry@perl.me.uk>
 
 Geoff Richards
 
@@ -4957,7 +4957,7 @@ ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
 
-jester: Jesse Sheidlower C<jester@panix.com>
+jester: Jesse Sheidlower <jester@panix.com>
 
 jhannah: Jay Hannah <jay@jays.net>
 
@@ -4967,9 +4967,9 @@ Johan Lindstrom
 
 jon: Jon Schutz <jjschutz@cpan.org>
 
-Jonathan Rockway C<< <jrockway@cpan.org> >>
+Jonathan Rockway <jrockway@cpan.org>
 
-Kieren Diment C<kd@totaldatasolution.com>
+Kieren Diment <kd@totaldatasolution.com>
 
 konobi: Scott McWhirter <konobi@cpan.org>
 
@@ -5005,7 +5005,9 @@ rafl: Florian Ragwitz <rafl@debian.org>
 
 random: Roland Lammel <lammel@cpan.org>
 
-Robert Sedlacek C<< <rs@474.at> >>
+revmischa: Mischa Spiegelmock <revmischa@cpan.org>
+
+Robert Sedlacek <rs@474.at>
 
 SpiceMan: Marcel Montes
 
@@ -5019,17 +5021,17 @@ Ulf Edvinsson
 
 vanstyn: Henry Van Styn <vanstyn@cpan.org>
 
-Viljo Marrandi C<vilts@yahoo.com>
+Viljo Marrandi <vilts@yahoo.com>
 
-Will Hawes C<info@whawes.co.uk>
+Will Hawes <info@whawes.co.uk>
 
 willert: Sebastian Willert <willert@cpan.org>
 
 wreis: Wallace Reis <wreis@cpan.org>
 
-Yuval Kogman, C<nothingmuch@woobling.org>
+Yuval Kogman <nothingmuch@woobling.org>
 
-rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
+rainboxx: Matthias Dietrich <perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
 
