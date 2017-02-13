@@ -10,26 +10,19 @@ BEGIN { $ENV{PACKAGE_STASH_IMPLEMENTATION} = 'PP' if $] < '5.008007' }
 use Test::More;
 use Try::Tiny;
 
-plan skip_all => "Need Test::Without::Module for this test"
-    unless try { require Test::Without::Module; 1 };
-
-Test::Without::Module->import(qw(
+my %hidden = map { (my $m = "$_.pm") =~ s{::}{/}g; $m => 1 } qw(
     Starman::Server
     Plack::Handler::Starman
     MooseX::Daemonize
     MooseX::Daemonize::Pid::File
     MooseX::Daemonize::Core
-));
+);
+local @INC = (sub {
+  return unless exists $hidden{$_[1]};
+  die "Can't locate $_[1] in \@INC (hidden)\n";
+}, @INC);
 
-require "$Bin/../aggregate/unit_core_script_server.t";
-
-Test::Without::Module->unimport(qw(
-    Starman::Server
-    Plack::Handler::Starman
-    MooseX::Daemonize
-    MooseX::Daemonize::Pid::File
-    MooseX::Daemonize::Core
-));
+do "$Bin/../aggregate/unit_core_script_server.t"
+  or die $@ || 'test returned false';
 
 1;
-

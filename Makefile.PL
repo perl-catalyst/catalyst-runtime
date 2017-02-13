@@ -120,7 +120,6 @@ author_requires(
   @author_requires,
   map {; $_ => 0 } qw(
   File::Copy::Recursive
-  Test::Without::Module
   Starman
   MooseX::Daemonize
   Test::NoTabs

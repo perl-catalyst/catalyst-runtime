@@ -11,6 +11,17 @@ BEGIN {
 }
 
 BEGIN {
+  my %hidden = map { (my $m = "$_.pm") =~ s{::}{/}g; $m => 1 } qw(
+    Foo
+    Bar
+  );
+  unshift @INC, sub {
+    return unless exists $hidden{$_[1]};
+    die "Can't locate $_[1] in \@INC (hidden)\n";
+  };
+}
+
+BEGIN {
   package TestRole;
   $INC{'TestRole'} = __FILE__;
   use Moose::Role;
