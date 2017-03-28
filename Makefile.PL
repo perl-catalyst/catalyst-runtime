@@ -142,6 +142,7 @@ resources(
     'license',    => 'http://dev.perl.org/licenses/',
     'homepage',   => 'http://dev.catalyst.perl.org/',
     # r/w: catagits@git.shadowcat.co.uk:Catalyst-Runtime.git
+    # web: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=summary
     'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
 );
 
