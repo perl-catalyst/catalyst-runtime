@@ -350,6 +350,14 @@ the middleware completely.
 For Apache and Lighttpd, the mapping doesn't apply and setting the
 X-Sendfile-Type is enough.
 
+When using a L<IO::Handle> type of object and no content length has been
+already set in the response headers Catalyst will make a reasonable attempt
+to determine the size of the Handle. Depending on the implementation of your
+handle object, setting the content length may fail. If it is at all possible
+for you to determine the content length of your handle object, 
+it is recomended that you set the content length in the response headers
+yourself, which will be respected and sent by Catalyst in the response.
+
 =head2 $res->has_body
 
 Predicate which returns true when a body has been set.
