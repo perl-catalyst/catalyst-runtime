@@ -1,5 +1,6 @@
 package Catalyst::Script::Server;
 use Moose;
+use Moose::Util::TypeConstraints;
 use Catalyst::Utils;
 use Class::Load qw(try_load_class load_class);
 use namespace::autoclean;
@@ -14,11 +15,22 @@ has debug => (
     documentation => q{Force debug mode},
 );
 
+# MooseX::GetOpt treats anything that can use an undef as a flag value.
+# This type definition lets use use MaybeStr as a string value for Getopt.
+
+subtype 'MaybeStr' => as 'Maybe[Str]';
+MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
+    'MaybeStr' => '=s'
+);
+
 has host => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'h',
-    isa           => 'Str',
+    isa           => 'MaybeStr',
     is            => 'ro',
+    default       => sub {
+        Catalyst::Utils::env_value(shift->application_name, 'host') || undef;
+    },
     # N.B. undef (the default) means we bind on all interfaces on the host.
     documentation => 'Specify a hostname or IP on this host for the server to bind to',
 );
