@@ -219,7 +219,9 @@ around action_namespace => sub {
             $case_s = $class->config->{case_sensitive};
         } else {
             if (ref $self) {
-                $case_s = ref($self->_application)->config->{case_sensitive};
+                my $_app = $self->_application;
+                my $_app_class = ref($self->_application) || $self->_application;
+                $case_s = $_app_class->config->{case_sensitive};
             } else {
                 confess("Can't figure out case_sensitive setting");
             }
