@@ -250,11 +250,21 @@ to decode it into characters.
 
 =head2 $res = request( ... );
 
-Returns an L<HTTP::Response> object. Accepts an optional hashref for request
-header configuration; currently only supports setting 'host' value.
+Returns an L<HTTP::Response> object. Accepts an optional hashref for additional
+options including host and header configuration; .
 
     my $res = request('foo/bar?test=1');
     my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
+
+	or
+
+	my $req_with_headers = request('foo/bar', { headers => {
+									'X-HEADER' => 'Some header data',
+									'X-OTHER'  => 'Other header',
+									} } );
+
+Note that if you set the host option as in the second example above you must
+not set a host header - doing so will cause the request to die.
 
 =head2 ($res, $c) = ctx_request( ... );
 
@@ -406,8 +416,21 @@ sub _customize_request {
     my $extra_env = shift;
     my $opts = pop(@_) || {};
     $opts = {} unless ref($opts) eq 'HASH';
-    if ( my $host = exists $opts->{host} ? $opts->{host} : $default_host  ) {
+
+    if ( exists( $opts->{host} ) && exists( $opts->{headers}->{host} ) ) {
+        croak "'host' and 'headers->{host}' both exist. Use ONLY ONE";
+    }
+
+    my $host = exists $opts->{host} ? $opts->{host} :
+                   exists $opts->{headers}->{host} ? $opts->{headers}->{host} :
+                       $default_host;
+
+    if ( $host ) {
         $request->header( 'Host' => $host );
+    }
+
+    foreach my $header ( keys %{$opts->{headers}} ) {
+        $request->header( ucfirst($header) => $opts->{headers}->{$header} );
     }
 
     if (my $extra = $opts->{extra_env}) {

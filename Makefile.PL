@@ -94,6 +94,7 @@ test_requires 'HTTP::Request::Common';
 test_requires 'IO::Scalar';
 test_requires 'HTTP::Status';
 test_requires 'JSON::MaybeXS';
+test_requires 'Test::Exception';
 
 # see also cpanfile for authordeps -- install via
 # cpanm --installdeps --with-develop .

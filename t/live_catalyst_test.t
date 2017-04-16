@@ -8,6 +8,7 @@ use Catalyst::Request;
 use HTTP::Request::Common;
 
 use Test::More;
+use Test::Exception;
 
 content_like('/',qr/root/,'content check');
 action_ok('/','Action ok ok','normal action ok');
@@ -53,6 +54,27 @@ my $req = '/dump/request';
 {
 	my $response = request( POST( '/bodyparams/no_params' ) )->content;
     is($response, 'HASH', 'empty body param is hashref');
+}
+
+{
+	eval '$creq = ' . request($req, { headers => { host => 'www.headers.com' } })->content;
+	is( $creq->uri->host, 'www.headers.com', 'Setting host via headers works' );
+}
+
+{
+	throws_ok( sub { request($req, { headers => { host => 'www.headers.com' }, host => 'adad'} ) },
+			qr{'host' and 'headers->{host}' both exist. Use ONLY ONE},
+			'Correct exception thrown for using host and headers->{host}'
+	);
+}
+
+{
+	eval '$creq = ' . request($req, { headers => {
+							'X-HEAD1'	=> 'First Header',
+							'X-HEAD2'	=> 'Second Header',
+					} } )->content;
+	is( $creq->headers->header('X-HEAD1'), 'First Header', 'First header is correct' );
+	is( $creq->headers->header('X-HEAD2'), 'Second Header', 'Second header is correct' );
 }
 
 done_testing;
