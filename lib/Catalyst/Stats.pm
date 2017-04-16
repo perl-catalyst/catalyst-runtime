@@ -95,26 +95,42 @@ sub elapsed {
 sub report {
     my $self = shift;
 
-    my $column_width = Catalyst::Utils::term_width() - 9 - 13;
-    my $t = Text::SimpleTable->new( [ $column_width, 'Action' ], [ 9, 'Time' ] );
+    my $with_percentages = exists $ENV{ENABLE_CATALYST_STATS_PERCENTAGES} &&
+        $ENV{ENABLE_CATALYST_STATS_PERCENTAGES};
+
+    my $percentages_width = $with_percentages ? 6 : 0;
+    my $column_width = Catalyst::Utils::term_width() - 9 - $percentages_width - 13;
+    my $t = Text::SimpleTable->new(
+        [ $column_width, 'Action' ],
+        [ 9, 'Time' ],
+        ($with_percentages ? ([ $percentages_width, 'Perc' ]) : ())
+    );
     my @results;
-    $self->traverse(
-                sub {
-                my $action = shift;
-                my $stat   = $action->getNodeValue;
-                my @r = ( $action->getDepth,
-                      ($stat->{action} || "") .
-                      ($stat->{action} && $stat->{comment} ? " " : "") . ($stat->{comment} ? '- ' . $stat->{comment} : ""),
-                      $stat->{elapsed},
-                      $stat->{action} ? 1 : 0,
-                      );
-                # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
-                my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
-                $t->row( ( q{ } x $r[0] ) . $r[1],
-                     defined $r[2] ? $elapsed : '??');
-                push(@results, \@r);
-                }
-            );
+    my $total = $with_percentages ? $self->elapsed : undef;
+
+    $self->traverse(sub {
+        my $action = shift;
+        my $stat   = $action->getNodeValue;
+        my @r = ( $action->getDepth,
+            ($stat->{action} || "") .
+            ($stat->{action} && $stat->{comment} ? " " : "") . ($stat->{comment} ? '- ' . $stat->{comment} : ""),
+            $stat->{elapsed},
+            $stat->{action} ? 1 : 0,
+        );
+
+        # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
+        my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
+        my $perc;
+
+        $perc = sprintf("%0.2f", $stat->{elapsed} / $total * 100 ) . '%' if $with_percentages;
+
+        $t->row(
+            (( q{ } x $r[0] ) . $r[1]),
+            (defined $r[2] ? $elapsed : '??'),
+            ($perc ? ($perc) : ()),
+        );
+        push(@results, \@r);
+    } );
     return wantarray ? @results : $t->draw;
 }
 
@@ -233,6 +249,22 @@ might look something like this:
 which means mysub took 0.555555s overall, it took 0.111111s to reach the
 critical bit, the first part of the critical bit took 0.333333s, and the second
 part 0.111s.
+
+Optionally, you can enable percentage of each profile setting environment ENABLE_CATALYST_STATS_PERCENTAGES to 1.
+
+  .------------------------------------------------------+-----------+--------.
+  | Action                                               | Time      | Perc   |
+  +------------------------------------------------------+-----------+--------+
+  | /root                                                | 0.004990s | 21.20% |
+  | /user/base                                           | 0.000441s | 1.87%  |
+  | /user/index/base                                     | 0.000149s | 0.63%  |
+  | /user/index/render                                   | 0.000144s | 0.61%  |
+  | /end                                                 | 0.009820s | 41.73% |
+  |  -> YourApp::View::TT->process                       | 0.008623s | 36.64% |
+  '------------------------------------------------------+-----------+--------'
+
+
+
 
 
 =head1 METHODS
