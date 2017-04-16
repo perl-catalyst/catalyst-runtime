@@ -236,7 +236,7 @@
 5.90085 - 2015-03-25
   - Small change to Catalyst::Action to prevent autovivication of Args value (dim1++)
   - Minor typo fixes (Abraxxa++)
-  - Make sure than when using chained actions and when more than one action
+  - Make sure that when using chained actions and when more than one action
     matches the same path specification AND has Args(0), that we follow the
     "in a tie, the last action defined wins" rule.  There is a small chance
     this is a breaking change for you.  See Catalyst::Upgrading for more.
