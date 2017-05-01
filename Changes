@@ -9,7 +9,7 @@
   - Improve documentation and test cases for 'abort_chain_on_error_fix' configuration
     option (melmothx++)
   - Better debug output when using Hash::MultiValue (tremor69++)
-
+  - Fixes for detecting debug terminal size (simonamor++)
 
 5.90114 - 2016-12-19
   - Fixed regression introduced in the last version (5.90113) which caused 
