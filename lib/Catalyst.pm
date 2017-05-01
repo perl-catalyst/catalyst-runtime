@@ -4304,18 +4304,20 @@ value to undef.
 
 C<abort_chain_on_error_fix>
 
-When there is an error in an action chain, the default behavior is to continue
-processing the remaining actions and then catch the error upon chain end.  This
-can lead to running actions when the application is in an unexpected state.  If
-you have this issue, setting this config value to true will promptly exit a
-chain when there is an error raised in any action (thus terminating the chain
-early.)
+Defaults to true.
 
-use like:
+When there is an error in an action chain, the default behavior is to
+abort the processing of the remaining actions to avoid running them
+when the application is in an unexpected state.
 
-    __PACKAGE__->config(abort_chain_on_error_fix => 1);
+Before version 5.90070, the default used to be false. To keep the old
+behaviour, you can explicitely set the value to false. E.g.
 
-In the future this might become the default behavior.
+    __PACKAGE__->config(abort_chain_on_error_fix => 0);
+
+If this setting is set to false, then the remaining actions are
+performed and the error is caught at the end of the chain.
+
 
 =item *
 
