@@ -247,12 +247,6 @@ sub _application { $_[0] }
 
 Catalyst - The Elegant MVC Web Application Framework
 
-=for html
-
-<a href="https://badge.fury.io/pl/Catalyst-Runtime"><img src="https://badge.fury.io/pl/Catalyst-Runtime.svg" alt="CPAN version" height="18"></a>
-<a href="https://travis-ci.org/perl-catalyst/catalyst-runtime/"><img src="https://api.travis-ci.org/perl-catalyst/catalyst-runtime.png" alt="Catalyst></a>
-<a href="http://cpants.cpanauthors.org/dist/Catalyst-Runtime"><img src="http://cpants.cpanauthors.org/dist/Catalyst-Runtime.png" alt='Kwalitee Score' /></a>
-
 =head1 SYNOPSIS
 
 See the L<Catalyst::Manual> distribution for comprehensive

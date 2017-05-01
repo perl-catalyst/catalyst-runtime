@@ -2,14 +2,6 @@
 
 Catalyst - The Elegant MVC Web Application Framework
 
-<div>
-
-</div>
-
-&lt;a href="https://badge.fury.io/pl/Catalyst-Runtime">&lt;img src="https://badge.fury.io/pl/Catalyst-Runtime.svg" alt="CPAN version" height="18">&lt;/a>
-&lt;a href="https://travis-ci.org/perl-catalyst/catalyst-runtime/">&lt;img src="https://api.travis-ci.org/perl-catalyst/catalyst-runtime.png" alt="Catalyst>&lt;/a>
-&lt;a href="http://cpants.cpanauthors.org/dist/Catalyst-Runtime">&lt;img src="http://cpants.cpanauthors.org/dist/Catalyst-Runtime.png" alt='Kwalitee Score' />&lt;/a>
-
 # SYNOPSIS
 
 See the [Catalyst::Manual](https://metacpan.org/pod/Catalyst::Manual) distribution for comprehensive
