@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90115 - 2017-05-01
+  - fixes for silent bad behavior in Catalyst::ScriptRole and 'ensure_class_loaded'
+    (hobbs++)
+  - do not require MXRWO if Moose is new enough to have cored it (ether++)
+  - documentation improvements (ether++)
+
 5.90114 - 2016-12-19
   - Fixed regression introduced in the last version (5.90113) which caused 
     application to hang when the action private name contained a string
