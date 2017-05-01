@@ -2322,6 +2322,10 @@ sub finalize_encoding {
       (defined($res->body)) and
       (ref(\$res->body) eq 'SCALAR')
     ) {
+        # if you are finding yourself here and your body is already encoded correctly
+        # and you want to turn this off, use $c->clear_encoding to prevent encoding
+        # at this step, or set encoding to undef in the config to do so for the whole
+        # application.  See the ENCODING documentaiton for better notes.
         $c->res->body( $c->encoding->encode( $c->res->body, $c->_encode_check ) );
 
         # Set the charset if necessary.  This might be a bit bonkers since encodable response
@@ -4764,6 +4768,11 @@ the encoding configuration to undef.
     MyApp->config(encoding => undef);
 
 This is recommended for temporary backwards compatibility only.
+
+To turn it off for a single request use the L<clear_encoding>
+method to turn off encoding for this request.  This can be useful
+when you are setting the body to be an arbitrary block of bytes,
+especially if that block happens to be a block of UTF8 text.
 
 Encoding is automatically applied when the content-type is set to
 a type that can be encoded.  Currently we encode when the content type
