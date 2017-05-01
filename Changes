@@ -5,6 +5,7 @@
     (hobbs++)
   - do not require MXRWO if Moose is new enough to have cored it (ether++)
   - documentation improvements (ether++)
+  - Encoding documentation improvements (colinnewell++)
 
 5.90114 - 2016-12-19
   - Fixed regression introduced in the last version (5.90113) which caused 
