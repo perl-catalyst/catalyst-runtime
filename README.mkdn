@@ -4,20 +4,16 @@ Catalyst - The Elegant MVC Web Application Framework
 
 <div>
 
-    <a href="https://badge.fury.io/pl/Catalyst-Runtime"><img src="https://badge.fury.io/pl/Catalyst-Runtime.svg" alt="CPAN version" height="18"></a>
-    <a href="https://travis-ci.org/perl-catalyst/catalyst-runtime/"><img src="https://api.travis-ci.org/perl-catalyst/catalyst-runtime.png" alt="Catalyst></a>
-    <a href="http://cpants.cpanauthors.org/dist/Catalyst-Runtime"><img src="http://cpants.cpanauthors.org/dist/Catalyst-Runtime.png" alt='Kwalitee Score' /></a>
 </div>
+
+&lt;a href="https://badge.fury.io/pl/Catalyst-Runtime">&lt;img src="https://badge.fury.io/pl/Catalyst-Runtime.svg" alt="CPAN version" height="18">&lt;/a>
+&lt;a href="https://travis-ci.org/perl-catalyst/catalyst-runtime/">&lt;img src="https://api.travis-ci.org/perl-catalyst/catalyst-runtime.png" alt="Catalyst>&lt;/a>
+&lt;a href="http://cpants.cpanauthors.org/dist/Catalyst-Runtime">&lt;img src="http://cpants.cpanauthors.org/dist/Catalyst-Runtime.png" alt='Kwalitee Score' />&lt;/a>
 
 # SYNOPSIS
 
 See the [Catalyst::Manual](https://metacpan.org/pod/Catalyst::Manual) distribution for comprehensive
 documentation and tutorials.
-
-    # Building Catalyst for development
-    cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-    cpanm --installdeps --with-develop .
-    perl Makefile.PL
 
     # Install Catalyst::Devel for helpers and other development tools
     # use the helper to create a new application
@@ -296,7 +292,7 @@ the relationship between
 `$c->go` will perform a full dispatch on the specified action or method,
 with localized `$c->action` and `$c->namespace`. Like `detach`,
 `go` escapes the processing of the current request chain on completion, and
-does not return to its cunless blessed $cunless blessed $caller.
+does not return to its caller.
 
 @arguments are arguments to the final destination of $action. @captures are
 arguments to the intermediate steps, if any, on the way to the final sub of
@@ -362,6 +358,11 @@ Contains the return value of the last executed action.
 Note that << $c->state >> operates in a scalar context which means that all
 values it returns are scalar.
 
+Please note that if an action throws an exception, the value of state
+should no longer be considered the return if the last action.  It is generally
+going to be 0, which indicates an error state.  Examine $c->error for error
+details.
+
 ## $c->clear\_errors
 
 Clear errors.  You probably don't want to clear the errors unless you are
@@ -378,11 +379,17 @@ Returns true if you have errors
 ## $c->last\_error
 
 Returns the most recent error in the stack (the one most recently added...)
-or nothing if there are no errors.
+or nothing if there are no errors.  This does not modify the contents of the
+error stack.
 
 ## shift\_errors
 
-shifts the most recently added error off the error stack and returns if.  Returns
+shifts the most recently added error off the error stack and returns it.  Returns
+nothing if there are no more errors.
+
+## pop\_errors
+
+pops the most recently added error off the error stack and returns it.  Returns
 nothing if there are no more errors.
 
 ## COMPONENT ACCESSORS
@@ -637,11 +644,11 @@ Example:
         ## do stuff here..
     };
 
-## $c->uri\_for( $path?, @args?, \\%query\_values? )
+## $c->uri\_for( $path?, @args?, \\%query\_values?, \\$fragment? )
 
-## $c->uri\_for( $action, \\@captures?, @args?, \\%query\_values? )
+## $c->uri\_for( $action, \\@captures?, @args?, \\%query\_values?, \\$fragment? )
 
-## $c->uri\_for( $action, \[@captures, @args\], \\%query\_values? )
+## $c->uri\_for( $action, \[@captures, @args\], \\%query\_values?, \\$fragment? )
 
 Constructs an absolute [URI](https://metacpan.org/pod/URI) object based on the application root, the
 provided path, and the additional arguments and query parameters provided.
@@ -658,6 +665,15 @@ to `$c->namespace` (if it doesn't begin with a forward slash) or
 relative to the application root (if it does). It is then merged with
 `$c->request->base`; any `@args` are appended as additional path
 components; and any `%query_values` are appended as `?foo=bar` parameters.
+
+**NOTE** If you are using this 'stringy' first argument, we skip encoding and
+allow you to declare something like:
+
+    $c->uri_for('/foo/bar#baz')
+
+Where 'baz' is a URI fragment.  We consider this first argument string to be
+'expert' mode where you are expected to create a valid URL and we for the most
+part just pass it through without a lot of internal effort to escape and encode.
 
 If the first argument is a [Catalyst::Action](https://metacpan.org/pod/Catalyst::Action) it represents an action which
 will have its path resolved using `$c->dispatcher->uri_for_action`. The
@@ -976,7 +992,26 @@ Returns or sets the request class. Defaults to [Catalyst::Request](https://metac
 
 ## $app->request\_class\_traits
 
-An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s which are applied to the request class.  
+An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s which are applied to the request class.  You can
+name the full namespace of the role, or a namespace suffix, which will then
+be tried against the following standard namespace prefixes.
+
+    $MyApp::TraitFor::Request::$trait_suffix
+    Catalyst::TraitFor::Request::$trait_suffix
+
+So for example if you set:
+
+    MyApp->request_class_traits(['Foo']);
+
+We try each possible role in turn (and throw an error if none load)
+
+    Foo
+    MyApp::TraitFor::Request::Foo
+    Catalyst::TraitFor::Request::Foo
+
+The namespace part 'TraitFor::Request' was chosen to assist in backwards
+compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX::RoleApplicator) which previously provided
+these features in a stand alone package.
 
 ## $app->composed\_request\_class
 
@@ -988,7 +1023,26 @@ Returns or sets the response class. Defaults to [Catalyst::Response](https://met
 
 ## $app->response\_class\_traits
 
-An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s which are applied to the response class.
+An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s which are applied to the response class.  You can
+name the full namespace of the role, or a namespace suffix, which will then
+be tried against the following standard namespace prefixes.
+
+    $MyApp::TraitFor::Response::$trait_suffix
+    Catalyst::TraitFor::Response::$trait_suffix
+
+So for example if you set:
+
+    MyApp->response_class_traits(['Foo']);
+
+We try each possible role in turn (and throw an error if none load)
+
+    Foo
+    MyApp::TraitFor::Response::Foo
+    Catalyst::TraitFor::Responset::Foo
+
+The namespace part 'TraitFor::Response' was chosen to assist in backwards
+compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX::RoleApplicator) which previously provided
+these features in a stand alone package.
 
 ## $app->composed\_response\_class
 
@@ -1191,15 +1245,44 @@ Sets up the input/output encoding. See [ENCODING](https://metacpan.org/pod/ENCOD
 
 ## handle\_unicode\_encoding\_exception
 
-Hook to let you customize how encoding errors are handled.  By default
-we just throw an exception.  Receives a hashref of debug information.
-Example:
+Hook to let you customize how encoding errors are handled. By default
+we just throw an exception and the default error page will pick it up.
+Receives a hashref of debug information. Example of call (from the
+Catalyst internals):
 
-    $c->handle_unicode_encoding_exception({
-        param_value => $value,
-        error_msg => $_,
-            encoding_step => 'params',
-        });
+    my $decoded_after_fail = $c->handle_unicode_encoding_exception({
+          param_value => $value,
+          error_msg => $_,
+          encoding_step => 'params',
+     });
+
+The calling code expects to receive a decoded string or an exception.
+
+You can override this for custom handling of unicode errors. By
+default we just die. If you want a custom response here, one approach
+is to throw an HTTP style exception, instead of returning a decoded
+string or throwing a generic exception.
+
+    sub handle_unicode_encoding_exception {
+      my ($c, $params) = @_;
+      HTTP::Exception::BAD_REQUEST->throw(status_message=>$params->{error_msg});
+    }
+
+Alternatively you can 'catch' the error, stash it and write handling code later
+in your application:
+
+    sub handle_unicode_encoding_exception {
+      my ($c, $params) = @_;
+      $c->stash(BAD_UNICODE_DATA=>$params);
+      # return a dummy string.
+      return 1;
+    }
+
+<B>NOTE:&lt;/b> Please keep in mind that once an error like this occurs,
+the request setup is still ongoing, which means the state of `$c` and
+related context parts like the request and response may not be setup
+up correctly (since we haven't finished the setup yet). If you throw
+an exception the setup is aborted.
 
 ## $c->setup\_log
 
@@ -1365,7 +1448,26 @@ A arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s that are appl
 
 ## $app->composed\_stats\_class
 
-this is the stats\_class composed with any 'stats\_class\_traits'.
+this is the stats\_class composed with any 'stats\_class\_traits'.  You can
+name the full namespace of the role, or a namespace suffix, which will then
+be tried against the following standard namespace prefixes.
+
+    $MyApp::TraitFor::Stats::$trait_suffix
+    Catalyst::TraitFor::Stats::$trait_suffix
+
+So for example if you set:
+
+    MyApp->stats_class_traits(['Foo']);
+
+We try each possible role in turn (and throw an error if none load)
+
+    Foo
+    MyApp::TraitFor::Stats::Foo
+    Catalyst::TraitFor::Stats::Foo
+
+The namespace part 'TraitFor::Stats' was chosen to assist in backwards
+compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX::RoleApplicator) which previously provided
+these features in a stand alone package.
 
 ## $c->use\_stats
 
@@ -1445,7 +1547,7 @@ variable should be used for determining the request path.
         decoded, this means that applications using this mode can correctly handle URIs including the %2F character
         (i.e. with `AllowEncodedSlashes` set to `On` in Apache).
 
-        Given that this method of path resolution is probably more correct, it is recommended that you use
+        Given that this method of path resolution is provably more correct, it is recommended that you use
         this unless you have a specific need to deploy your application in a non-standard environment, and you are
         aware of the implications of not being able to handle encoded URI paths correctly.
 
@@ -1459,7 +1561,7 @@ variable should be used for determining the request path.
 - `using_frontend_proxy_path` - Enabled [Plack::Middleware::ReverseProxyPath](https://metacpan.org/pod/Plack::Middleware::ReverseProxyPath) on your application (if
 installed, otherwise log an error).  This is useful if your application is not running on the
 'root' (or /) of your host server.  **NOTE** if you use this feature you should add the required
-middleware to your project dependency list since it's not automatically a dependency of [Catalyst](https://metacpan.org/pod/Catalyst).
+middleware to your project dependency list since its not automatically a dependency of [Catalyst](https://metacpan.org/pod/Catalyst).
 This has been done since not all people need this feature and we wish to restrict the growth of
 [Catalyst](https://metacpan.org/pod/Catalyst) dependencies.
 - `encoding` - See ["ENCODING"](#encoding)
@@ -1469,18 +1571,19 @@ This has been done since not all people need this feature and we wish to restric
 
 - `abort_chain_on_error_fix`
 
-    When there is an error in an action chain, the default behavior is to continue
-    processing the remaining actions and then catch the error upon chain end.  This
-    can lead to running actions when the application is in an unexpected state.  If
-    you have this issue, setting this config value to true will promptly exit a
-    chain when there is an error raised in any action (thus terminating the chain
-    early.)
+    Defaults to true.
 
-    use like:
+    When there is an error in an action chain, the default behavior is to
+    abort the processing of the remaining actions to avoid running them
+    when the application is in an unexpected state.
 
-        __PACKAGE__->config(abort_chain_on_error_fix => 1);
+    Before version 5.90070, the default used to be false. To keep the old
+    behaviour, you can explicitely set the value to false. E.g.
 
-    In the future this might become the default behavior.
+        __PACKAGE__->config(abort_chain_on_error_fix => 0);
+
+    If this setting is set to false, then the remaining actions are
+    performed and the error is caught at the end of the chain.
 
 - `use_hash_multivalue_in_request`
 
@@ -1527,8 +1630,14 @@ This has been done since not all people need this feature and we wish to restric
     in Catalyst version 5.90080+ break some of your query code, you may disable 
     the UTF-8 decoding globally using this configuration.
 
-    This setting takes precedence over `default_query_encoding` and
-    `decode_query_using_global_encoding`
+    This setting takes precedence over `default_query_encoding`
+
+- `do_not_check_query_encoding`
+
+    Catalyst versions 5.90080 - 5.90106 would decode query parts of an incoming
+    request but would not raise an exception when the decoding failed due to
+    incorrect unicode.  It now does, but if this change is giving you trouble
+    you may disable it by setting this configuration to true.
 
 - `default_query_encoding`
 
@@ -1536,13 +1645,6 @@ This has been done since not all people need this feature and we wish to restric
     is our reading of the relevant specifications.  This setting allows one to
     specify a fixed value for how to decode your query.  You might need this if
     you are doing a lot of custom encoding of your URLs and not using UTF-8.
-
-    This setting take precedence over `decode_query_using_global_encoding`.
-
-- `decode_query_using_global_encoding`
-
-    Setting this to true will default your query decoding to whatever your
-    general global encoding is (the default is UTF-8).
 
 - `use_chained_args_0_special_case`
 
@@ -1904,6 +2006,11 @@ the encoding configuration to undef.
 
 This is recommended for temporary backwards compatibility only.
 
+To turn it off for a single request use the [clear\_encoding](https://metacpan.org/pod/clear_encoding)
+method to turn off encoding for this request.  This can be useful
+when you are setting the body to be an arbitrary block of bytes,
+especially if that block happens to be a block of UTF8 text.
+
 Encoding is automatically applied when the content-type is set to
 a type that can be encoded.  Currently we encode when the content type
 matches the following regular expression:
@@ -2032,7 +2139,7 @@ Caelum: Rafael Kitover <rkitover@io.com>
 
 chansen: Christian Hansen
 
-Chase Venters <chase.venters@gmail.com>
+Chase Venters `chase.venters@gmail.com`
 
 chicks: Christopher Hicks
 
@@ -2095,8 +2202,6 @@ Kieren Diment `kd@totaldatasolution.com`
 konobi: Scott McWhirter <konobi@cpan.org>
 
 marcus: Marcus Ramberg <mramberg@cpan.org>
-
-Mischa Spiegelmock <revmischa@cpan.org>
 
 miyagawa: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
 
