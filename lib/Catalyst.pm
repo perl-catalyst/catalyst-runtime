@@ -1701,23 +1701,20 @@ sub uri_for {
       # somewhat lifted from URI::_query's query_form
       $query = '?'.join('&', map {
           my $val = $params->{$_};
-          #s/([;\/?:@&=+,\$\[\]%])/$URI::Escape::escapes{$1}/go; ## Commented out because seems to lead to double encoding - JNAP
-          s/ /+/g;
-          my $key = $_;
+          my $key = encode_utf8($_);
+          # using the URI::Escape pattern here so utf8 chars survive
+          $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+          $key =~ s/ /+/g;
+
           $val = '' unless defined $val;
           (map {
-              my $param = "$_";
-              $param = encode_utf8($param);
+              my $param = encode_utf8($_);
               # using the URI::Escape pattern here so utf8 chars survive
               $param =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               $param =~ s/ /+/g;
 
-              $key = encode_utf8($key);
-              # using the URI::Escape pattern here so utf8 chars survive
-              $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
-              $key =~ s/ /+/g;
-
-              "${key}=$param"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
+              "${key}=$param";
+          } ( ref $val eq 'ARRAY' ? @$val : $val ));
       } @keys);
     }
 
