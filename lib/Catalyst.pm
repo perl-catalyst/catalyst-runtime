@@ -4313,7 +4313,7 @@ abort the processing of the remaining actions to avoid running them
 when the application is in an unexpected state.
 
 Before version 5.90070, the default used to be false. To keep the old
-behaviour, you can explicitely set the value to false. E.g.
+behaviour, you can explicitly set the value to false. E.g.
 
     __PACKAGE__->config(abort_chain_on_error_fix => 0);
 
