@@ -5,8 +5,7 @@ use Class::MOP;
 use Class::Load ':all';
 use String::RewritePrefix;
 use Moose::Util qw/find_meta/;
-use List::Util qw/first/;
-use List::MoreUtils qw/uniq/;
+use List::Util qw/first uniq/;
 use namespace::clean -except => 'meta';
 
 BEGIN {

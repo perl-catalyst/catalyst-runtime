@@ -24,6 +24,15 @@ install:
    - cpanm --notest --metacpan --skip-satisfied --installdeps .
    - echo y | perl Makefile.PL
 
+   # installing Catalyst::Devel above causes the latest release of
+   # Catalyst::Runtime to be installed, but the version we're testing might
+   # have additional deps that aren't yet satisfied. so we should try
+   # installing deps again now that the MYMETA has been created (and we'll also
+   # need to delete the now-unneeded cpanfile so that cpanm doesn't choose it
+   # in preference to the MYMETA)
+   - rm -f cpanfile
+   - cpanm --notest --metacpan --skip-satisfied --installdeps .
+
    # enable various test options, including parallel testing
    - export AUTOMATED_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
 
