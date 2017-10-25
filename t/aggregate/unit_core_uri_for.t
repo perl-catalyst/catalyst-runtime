@@ -60,6 +60,12 @@ is(
 );
 
 is(
+    Catalyst::uri_for( $context, '/bar', 'with space', { 'also with' => 'space here' })->as_string,
+    'http://127.0.0.1/foo/bar/with%20space?also+with=space+here',
+    'Spaces encoded correctly'
+);
+
+is(
     Catalyst::uri_for( $context, '/bar#fragment', { param1 => 'value1' } )->as_string,
     'http://127.0.0.1/foo/bar?param1=value1#fragment',
     'URI for path with fragment and query params 1'
@@ -125,6 +131,12 @@ is(
     Catalyst::uri_for( 'TestApp', '/bar', 'with+plus', { 'also' => 'with+plus' })->as_string,
     '/bar/with+plus?also=with%2Bplus',
     'Plus is not encoded, called with only class name'
+);
+
+is(
+    Catalyst::uri_for( 'TestApp', '/bar', 'with space', { 'also with' => 'space here' })->as_string,
+    '/bar/with%20space?also+with=space+here',
+    'Spaces encoded correctly, called with only class name'
 );
 
 TODO: {

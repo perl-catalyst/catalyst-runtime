@@ -4,6 +4,17 @@ use Test::More;
 use Class::MOP;
 
 BEGIN {
+  my %hidden = map { (my $m = "$_.pm") =~ s{::}{/}g; $m => 1 } qw(
+    Foo
+    Bar
+  );
+  unshift @INC, sub {
+    return unless exists $hidden{$_[1]};
+    die "Can't locate $_[1] in \@INC (hidden)\n";
+  };
+}
+
+BEGIN {
   package TestRole;
   $INC{'TestRole'} = __FILE__;
   use Moose::Role;
@@ -30,7 +41,7 @@ BEGIN {
 
   sub c { 'c' }
 
-  package TestApp::TraitFor::Response::Bar; 
+  package TestApp::TraitFor::Response::Bar;
   $INC{'TestApp/TraitFor/Response/Bar.pm'} = __FILE__;
 
   use Moose::Role;

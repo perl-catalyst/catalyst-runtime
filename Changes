@@ -1,5 +1,30 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90115 - 2017-05-01
+  - fixes for silent bad behavior in Catalyst::ScriptRole and 'ensure_class_loaded'
+    (hobbs++)
+  - do not require MXRWO if Moose is new enough to have cored it (ether++)
+  - documentation improvements (ether++)
+  - Encoding documentation improvements (colinnewell++)
+  - Improve documentation and test cases for 'abort_chain_on_error_fix' configuration
+    option (melmothx++)
+  - Better debug output when using Hash::MultiValue (tremor69++)
+  - Fixes for detecting debug terminal size (simonamor++)
+
+5.90114 - 2016-12-19
+  - Fixed regression introduced in the last version (5.90113) which caused 
+    application to hang when the action private name contained a string
+    like 'foo/bar..html'.  If you are running 5.90113 you should consider this
+    a required update.
+  - Tweaked travis CI script.
+
+5.90113 - 2016-12-15
+  - Fixed issue with $controller->action_for when targeting an action in
+    a namespace nested inside the current controller and the current controller
+    is a 'root' controller.
+  - Enhanced $controller->action_for so that you can reference the 'parent'
+    controller via relative path (eg ->action_for('../foo')).
+  - Backcompat fix for people that made the mistake of doing $c->{stash}
   - Sort controllers in setup_actions so cross-controller precedence is
     consistent.
 

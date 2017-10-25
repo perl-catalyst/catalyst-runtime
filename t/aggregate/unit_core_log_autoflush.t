@@ -35,7 +35,7 @@ like $MESSAGES[0], qr/^\[info\] hello there!$/,
 
 {
 
-    package Catalyst::Log::Subclass;
+    package Catalyst::Log::SubclassAutoflush;
     use base qw/Catalyst::Log/;
 
     sub _send_to_log {
@@ -47,9 +47,9 @@ like $MESSAGES[0], qr/^\[info\] hello there!$/,
 
 @MESSAGES = (); # clear the message log
 
-my $SUBCLASS = 'Catalyst::Log::Subclass';
+my $SUBCLASS = 'Catalyst::Log::SubclassAutoflush';
 can_ok $SUBCLASS, 'new';
-ok $log = Catalyst::Log::Subclass->new,
+ok $log = $SUBCLASS->new,
     '... and the log subclass constructor should return a new object';
 isa_ok $log, $SUBCLASS, '... and the object it returns';
 isa_ok $log, $LOG,      '... and it also';

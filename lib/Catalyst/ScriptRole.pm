@@ -4,15 +4,14 @@ use Pod::Usage;
 use MooseX::Getopt;
 use Catalyst::EngineLoader;
 use Moose::Util::TypeConstraints;
-use Catalyst::Utils qw/ ensure_class_loaded /;
-use Class::Load 'load_class';
+use Catalyst::Utils;
 use namespace::autoclean;
 
 subtype 'Catalyst::ScriptRole::LoadableClass',
   as 'ClassName';
 coerce 'Catalyst::ScriptRole::LoadableClass',
   from 'Str',
-  via { ensure_class_loaded($_); 1 };
+  via { Catalyst::Utils::ensure_class_loaded($_); $_ };
 
 with 'MooseX::Getopt' => {
     -version => 0.48,
@@ -88,7 +87,7 @@ sub _plack_engine_name {}
 sub _run_application {
     my $self = shift;
     my $app = $self->application_name;
-    load_class($app);
+    Catalyst::Utils::ensure_class_loaded($app);
     my $server;
     if (my $e = $self->_plack_engine_name ) {
         $server = $self->load_engine($e, $self->_plack_loader_args);

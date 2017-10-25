@@ -1,6 +1,8 @@
 language: perl
 sudo: false
 perl:
+   - "5.24"
+   - "5.22"
    - "5.20"
    - "5.18"
    - "5.16"
@@ -51,7 +53,7 @@ script:
    - cpanm --test-only --metacpan Catalyst::Component::InstancePerContext
    - cpanm --test-only --metacpan Catalyst::Plugin::Session
    - cpanm --test-only --metacpan Catalyst::Plugin::Session::State::Cookie
-   - cpanm --test-only --metacpan Catalyst::Plugin::Static::Simple
+   - cpanm --test-only --verbose --metacpan Catalyst::Plugin::Static::Simple
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
    - cpanm --test-only --metacpan Catalyst::Authentication::Credential::HTTP

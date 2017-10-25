@@ -1,6 +1,8 @@
 package Catalyst::Exception::Interface;
 
-use MooseX::Role::WithOverloading;
+use Moose::Role;
+use if !eval { require Moose; Moose->VERSION('2.1300') },
+    'MooseX::Role::WithOverloading';
 use namespace::clean -except => 'meta';
 
 use overload

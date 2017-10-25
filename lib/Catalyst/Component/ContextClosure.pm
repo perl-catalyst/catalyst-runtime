@@ -67,7 +67,7 @@ L<CatalystX::LeakChecker>
 
 =head1 AUTHOR
 
-Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+Florian Ragwitz <rafl@debian.org>
 
 =end stopwords
 

@@ -26,7 +26,7 @@ author 'Sebastian Riedel <sri@cpan.org>';
 authority('cpan:MSTROUT');
 all_from 'lib/Catalyst/Runtime.pm';
 
-requires 'List::MoreUtils';
+requires 'List::Util' => '1.45';
 requires 'namespace::autoclean' => '0.28';
 requires 'namespace::clean' => '0.23';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00903';
@@ -34,7 +34,7 @@ requires 'Class::Load' => '0.12';
 requires 'Data::OptList';
 requires 'Moose' => '1.03';
 requires 'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24';
-requires 'MooseX::Role::WithOverloading' => '0.09';
+requires 'MooseX::Role::WithOverloading' => '0.09' unless can_use('Moose', '2.1300');
 requires 'Carp' => '1.25';
 requires 'Class::C3::Adopt::NEXT' => '0.07';
 requires 'CGI::Simple::Cookie' => '1.109';
@@ -120,7 +120,6 @@ author_requires(
   @author_requires,
   map {; $_ => 0 } qw(
   File::Copy::Recursive
-  Test::Without::Module
   Starman
   MooseX::Daemonize
   Test::NoTabs
@@ -142,6 +141,7 @@ resources(
     'license',    => 'http://dev.perl.org/licenses/',
     'homepage',   => 'http://dev.catalyst.perl.org/',
     # r/w: catagits@git.shadowcat.co.uk:Catalyst-Runtime.git
+    # web: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=summary
     'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
 );
 
