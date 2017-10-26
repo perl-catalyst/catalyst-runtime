@@ -556,7 +556,7 @@ finalized (there isn't one anyway) and you need to call the close method.
 Prints @data to the output stream, separated by $,.  This lets you pass
 the response object to functions that want to write to an L<IO::Handle>.
 
-=head2 $self->finalize_headers($c)
+=head2 $res->finalize_headers()
 
 Writes headers to response if not already written
 
