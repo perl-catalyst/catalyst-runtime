@@ -7,6 +7,7 @@ use FindBin;
 use Test::More;
 use HTTP::Request::Common;
 use JSON::MaybeXS;
+use Capture::Tiny qw/:all/;
 
 use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestDataHandlers';
@@ -30,5 +31,13 @@ ok my($res, $c) = ctx_request('/');
   is $response->content, 'expected', 'expected content body';
 }
 
+{
+  my $out;
+  local *STDERR;
+  open(STDERR, ">", \$out) or die "Can't open STDERR: $!";
+  ok my $req = POST $c->uri_for_action('/test_nested_for'), 'Content-Type' => 'multipart/form-data', Content => { die => "a horrible death" };
+  ok my $response = request $req;
+  is($out, "[error] multipart/form-data does not have an available data handler. Valid data_handlers are application/json, application/x-www-form-urlencoded.\n", 'yep we throw the slightly more usefull error');
+}
 
 done_testing;

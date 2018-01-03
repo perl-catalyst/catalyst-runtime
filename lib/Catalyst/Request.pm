@@ -132,8 +132,11 @@ sub _build_body_data {
       my $fh = $self->body;
       local $_ = $fh;
       return $self->data_handlers->{$match}->($fh, $self);
-    } else { 
-      Catalyst::Exception->throw("$content_type is does not have an available data handler");
+    } else {
+      Catalyst::Exception->throw(
+        sprintf '%s does not have an available data handler. Valid data_handlers are %s.',
+          $content_type, join ', ', sort keys %{$self->data_handlers}
+      );
     }
 }
 
