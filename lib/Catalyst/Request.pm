@@ -136,7 +136,7 @@ sub _build_body_data {
       Catalyst::Exception->throw(
         sprintf '%s does not have an available data handler. Valid data_handlers are %s.',
           $content_type, join ', ', sort keys %{$self->data_handlers}
-	  );
+      );
     }
 }
 
