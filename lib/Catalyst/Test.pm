@@ -256,6 +256,15 @@ header configuration; currently only supports setting 'host' value.
     my $res = request('foo/bar?test=1');
     my $virtual_res = request('foo/bar?test=1', {host => 'virtualhost.com'});
 
+Alternately, you can pass in an L<HTTP::Request::Common> object to set arbitrary
+request headers.
+
+    my $res = request(GET '/foo/bar',
+        X-Foo => 'Bar',
+        Authorization => 'Bearer JWT_HERE',
+        ...
+    );
+
 =head2 ($res, $c) = ctx_request( ... );
 
 Works exactly like L<request|/"$res = request( ... );">, except it also returns the Catalyst context object,
