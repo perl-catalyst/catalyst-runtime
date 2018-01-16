@@ -27,6 +27,7 @@ use HTML::Entities;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
+use List::Util qw/uniq/;
 use attributes;
 use String::RewritePrefix;
 use Catalyst::EngineLoader;
