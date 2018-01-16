@@ -592,22 +592,28 @@ sub prepare_query_parameters {
         ? $env->{QUERY_STRING}
         : '';
 
-    # Check for keywords (no = signs)
-    # (yes, index() is faster than a regex :))
-    if ( index( $query_string, '=' ) < 0 ) {
-        my $keywords = $self->unescape_uri($query_string);
-        $keywords = $decoder->($keywords);
-        $c->request->query_keywords($keywords);
-        return;
-    }
-
     $query_string =~ s/\A[&;]+//;
 
-    my $p = Hash::MultiValue->new(
-        map { defined $_ ? $decoder->($self->unescape_uri($_)) : $_ }
-        map { ( split /=/, $_, 2 )[0,1] } # slice forces two elements
-        split /[&;]+/, $query_string
-    );
+    my @unsplit_pairs = split /[&;]+/, $query_string;
+    my $p = Hash::MultiValue->new();
+
+    my $is_first_pair = 1;
+    for my $pair (@unsplit_pairs) {
+        my ($name, $value)
+          = map { defined $_ ? $decoder->($self->unescape_uri($_)) : $_ }
+            ( split /=/, $pair, 2 )[0,1]; # slice forces two elements
+
+        if ($is_first_pair) {
+            # If the first pair has no equal sign, then it means the isindex
+            # flag is set.
+            $c->request->query_keywords($name) unless defined $value;
+
+            $is_first_pair = 0;
+        }
+
+        $p->add( $name => $value );
+    }
+
 
     $c->encoding($old_encoding) if $old_encoding;
     $c->request->query_parameters( $c->request->_use_hash_multivalue ? $p : $p->mixed );

@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 54;
+use Test::More tests => 56;
 use Catalyst::Test 'TestApp';
 
 use Catalyst::Request;
@@ -115,14 +115,21 @@ use HTTP::Request::Common;
 {
     my $creq;
     
-    my $parameters = {
+    my $body_parameters = {
         a     => 1,
         blank => '',
+    };
+    my $query_parameters = {
+      'query string' => undef
+    };
+    my $parameters = {
+      %$body_parameters,
+      %$query_parameters
     };
 
     my $request = POST(
         'http://localhost/dump/request/a/b?query+string',
-        'Content'      => $parameters,
+        'Content'      => $body_parameters,
         'Content-Type' => 'application/x-www-form-urlencoded'
     );
     
@@ -130,6 +137,8 @@ use HTTP::Request::Common;
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->uri->query, 'query+string', 'Catalyst::Request POST query_string' );
     is( $creq->query_keywords, 'query string', 'Catalyst::Request query_keywords' );
+    is_deeply( $creq->query_parameters, $query_parameters, 'Catalyst::Request query_parameters' );
+    is_deeply( $creq->body_parameters, $body_parameters, 'Catalyst::Request body_parameters' );
     is_deeply( $creq->parameters, $parameters, 'Catalyst::Request parameters' );
     
     ok( $response = request('http://localhost/dump/request/a/b?x=1&y=1&z=1'), 'Request' );
