@@ -3,7 +3,12 @@
 5.90116 - TBA
   - Switch from Module::Install to Distar (solves problems that MI has with newer Perl) haarg++
   - Killed Test::Aggregate since its clearly doomed
-  -
+  - PR135 - improved test cases for query keywork
+  - PR158 - improved docs for Catalyst::Test
+  - PR157 - improved error response for data_handlers
+  - PR156 - POD fixes
+  - PR154 - Few dependencies
+  - PR152 - Better support for HTTP Patch
 
 5.90115 - 2017-05-01
   - fixes for silent bad behavior in Catalyst::ScriptRole and 'ensure_class_loaded'
