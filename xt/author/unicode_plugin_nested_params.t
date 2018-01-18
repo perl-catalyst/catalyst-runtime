@@ -5,7 +5,7 @@ use utf8;
 
 # setup library path
 use FindBin qw($Bin);
-use lib "$Bin/../lib";
+use lib "$Bin/../../t/lib";
 
 BEGIN { eval { require Catalyst::Plugin::Params::Nested; 1; } ||
     plan skip_all => 'Need Catalyst::Plugin::Params::Nested' }
@@ -28,14 +28,14 @@ BEGIN {
 {
     my ($res, $c) = ctx_request("/?foo.1=bar&foo.2=$escape_str");
     is( $c->res->output, '<h1>It works</h1>', 'Content displayed' );
-    
+
     my $got = $c->request->parameters;
     my $expected = {
         'foo.1' => 'bar',
         'foo.2' => $decode_str,
         'foo'   => [undef, 'bar', $decode_str],
     };
-    
+
     is( $got->{foo}->[0], undef, '{foo}->[0] is undef' );
     is( $got->{foo}->[1], 'bar', '{foo}->[1] is bar' );
     ok( utf8::is_utf8( $got->{'foo.2'}       ), '{foo.2} is utf8' );
@@ -45,7 +45,7 @@ BEGIN {
 
 {
     my ($res, $c) = ctx_request("/?foo.1=bar&foo.2=$escape_str&bar.baz=$escape_str&baz.bar.foo=$escape_str&&arr.0.1=$escape_str");
-    
+
     my $got = $c->request->parameters;
     my $expected = {
         'foo.1'       => 'bar',
@@ -58,7 +58,7 @@ BEGIN {
         'bar'         => { baz => $decode_str },
         'baz'         => { bar => { foo => $decode_str } },
     };
-    
+
     is( ref $got->{arr}->[0], 'ARRAY', '{arr}->[0] is ARRAY' );
     ok( utf8::is_utf8( $got->{arr}->[0]->[1] ), '{arr}->[0]->[1] is utf8' );
     ok( utf8::is_utf8( $got->{bar}{baz}      ), '{bar}{baz} is utf8' );

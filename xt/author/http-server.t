@@ -88,7 +88,7 @@ is( $return, 0, 'live tests' );
 # kill 'INT' doesn't exist in Windows, so to prevent child hanging,
 # this process will need to commit seppuku to clean up the children.
 if ($^O eq 'MSWin32') {
-    # Furthermore, it needs to do it 'politely' so that TAP doesn't 
+    # Furthermore, it needs to do it 'politely' so that TAP doesn't
     # smell anything 'dubious'.
     require Win32::Process;  # core in all versions of Win32 Perl
     Win32::Process::KillProcess($$, $return);

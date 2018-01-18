@@ -1,0 +1,20 @@
+BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar 0.001;
+
+author 'Sebastian Riedel <sri@cpan.org>';
+
+manifest_include t => 'catalyst_130pix.gif';
+manifest_include 't/conf' => 'extra.conf.in';
+manifest_include 't/lib/TestAppEncodingSetInConfig' => 'testappencodingsetinconfig.json';
+manifest_include 't/lib/TestContentNegotiation/share', 'file.txt';
+manifest_include 't/lib/TestMiddleware/share' => qr/.*/;
+manifest_include 't/lib/TestMiddlewareFromConfig/share' => qr/.*/;
+manifest_include 't/lib/TestMiddlewareFromConfig' => 'testmiddlewarefromconfig.pl';
+manifest_include t => qr/optional_apache-.*\.pl/;
+manifest_include t => 'optional_stress.yml';
+manifest_include t => 'something/Makefile.PL';
+manifest_include t => 'something/script/foo/bar/for_dist';
+manifest_include t => 'utf8.txt';
+
+1;
