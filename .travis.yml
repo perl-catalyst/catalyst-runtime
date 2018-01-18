@@ -57,7 +57,7 @@ script:
    - cpanm --test-only --verbose --metacpan Catalyst::Plugin::Static::Simple
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
    - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
-   - cpanm --test-only --metacpan Catalyst::Authentication::Credential::HTTP
+   - cpanm --test-only --verbose --metacpan Catalyst::Authentication::Credential::HTTP
 
    # Still need to figure out why these fail in travis:
    #- cpanm --test-only --metacpan -v Catalyst::View::Email
