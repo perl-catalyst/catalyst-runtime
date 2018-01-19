@@ -1,6 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
-5.90116 - TBA
+5.90116 - 2017-01-19
   - Switch from Module::Install to Distar (solves problems that MI has with newer Perl) haarg++
   - Killed Test::Aggregate since its clearly doomed
   - PR135 - improved test cases for query keywork
