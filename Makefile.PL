@@ -87,7 +87,6 @@ my %META = (
     },
     develop   => {
       requires => {
-        'Test::Aggregate'         => '0.364',
         'Test::Simple'            => '0.88',
         'CatalystX::LeakChecker'  => '0.05',
         'Catalyst::Devel'         => '1.0', # For http server test

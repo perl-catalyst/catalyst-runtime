@@ -7,7 +7,6 @@ use FindBin;
 use Test::More;
 use HTTP::Request::Common;
 use JSON::MaybeXS;
-use Capture::Tiny qw/:all/;
 
 use lib "$FindBin::Bin/lib";
 use Catalyst::Test 'TestDataHandlers';
