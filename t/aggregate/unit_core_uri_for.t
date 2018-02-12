@@ -17,6 +17,7 @@ my $context = TestApp->new( {
                 namespace => 'yada',
               } );
 
+
 is(
     Catalyst::uri_for( $context, '/bar/baz' )->as_string,
     'http://127.0.0.1/foo/bar/baz',
@@ -67,6 +68,12 @@ is(
 
 is(
     Catalyst::uri_for( $context, '/bar#fragment', { param1 => 'value1' } )->as_string,
+    'http://127.0.0.1/foo/bar?param1=value1#fragment',
+    'URI for path with fragment and query params 1'
+);
+
+is(
+    Catalyst::uri_for( $context, '/bar', { param1 => 'value1' }, \'fragment' )->as_string,
     'http://127.0.0.1/foo/bar?param1=value1#fragment',
     'URI for path with fragment and query params 1'
 );
@@ -289,6 +296,12 @@ TODO: {
 is(
     Catalyst::uri_for( $context, bless( { string => 'test' }, 'MyStringThing' ) ),
     'http://127.0.0.1/test',
+    'overloaded object handled correctly'
+);
+
+is(
+    Catalyst::uri_for( $context, bless( { string => 'test' }, 'MyStringThing' ), \'fragment' ),
+    'http://127.0.0.1/test#fragment',
     'overloaded object handled correctly'
 );
 
