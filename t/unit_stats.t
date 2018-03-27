@@ -2,13 +2,17 @@ use strict;
 use warnings;
 
 use Test::More tests => 13;
-use Time::HiRes qw/gettimeofday/;
+use Time::HiRes ();
 use Tree::Simple;
 
 my @fudge_t = ( 0, 0 );
 BEGIN {
     no warnings;
     *Time::HiRes::gettimeofday = sub () { return @fudge_t };
+    my $original_tv_interval = \&Time::HiRes::tv_interval;
+    *Time::HiRes::tv_interval = sub ($;@) {
+        return $original_tv_interval->($_[0], $_[1] || [Time::HiRes::gettimeofday()]);
+    };
 }
 
 BEGIN { use_ok("Catalyst::Stats") };
