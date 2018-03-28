@@ -1769,7 +1769,7 @@ and it will create the URI /users/the-list.
 
 =item \@captures_and_args?
 
-Optional array reference of Captures (i.e. C<<CaptureArgs or $c->req->captures>)
+Optional array reference of Captures (i.e. C<CaptureArgs> or C<< $c->req->captures >>)
 and arguments to the request. Usually used with L<Catalyst::DispatchType::Chained>
 to interpolate all the parameters in the URI.
 
@@ -3252,7 +3252,7 @@ component or component object. Example:
 
     my $config = MyApp->config_for('MyApp::Model::Foo');
 
-In this case $config is the hashref C< {a=>1, b=>2} >.
+In this case $config is the hashref C<< {a=>1, b=>2} >>.
 
 This is also handy for looking up configuration for a plugin, to make sure you follow
 existing L<Catalyst> standards for where a plugin should put its configuration.
@@ -4095,7 +4095,7 @@ L<Catalyst::Stats|Catalyst::Stats>, but can be set otherwise with
 L<< stats_class|/"$c->stats_class" >>.
 
 Even if L<< -Stats|/"-Stats" >> is not enabled, the stats object is still
-available. By enabling it with C< $c->stats->enabled(1) >, it can be used to
+available. By enabling it with C<< $c->stats->enabled(1) >>, it can be used to
 profile explicitly, although MyApp.pm still won't profile nor output anything
 by itself.
 
