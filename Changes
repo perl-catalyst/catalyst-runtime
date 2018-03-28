@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - fix tests to cope with changes in new versions of Time::HiRes
+  - POD typo and syntax fixes
+
 5.90117 - 2018-01-21
   - Fixed errors in distribution packaging
 
