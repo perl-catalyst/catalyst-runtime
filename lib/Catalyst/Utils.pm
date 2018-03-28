@@ -513,7 +513,7 @@ Used to add components at runtime:
 
     into        The Catalyst package to inject into (e.g. My::App)
     component   The component package to inject
-    traits      (Optional) ArrayRef of L<Moose::Role>s that the componet should consume.
+    traits      (Optional) ArrayRef of L<Moose::Role>s that the component should consume.
     as          An optional moniker to use as the package name for the derived component
 
 For example:
