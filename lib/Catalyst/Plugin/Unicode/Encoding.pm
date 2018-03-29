@@ -1,7 +1,7 @@
 package Catalyst::Plugin::Unicode::Encoding;
 
 # set artificially high to override all older versions.
-# proper dist included for packaging.
+# proper version comment included for packaging.
 our $VERSION = '99.0'; # $VERSION = '5.90117';
 
 1;
