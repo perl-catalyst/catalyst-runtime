@@ -1,10 +1,8 @@
 package Catalyst::Plugin::Test::Plugin;
-
-use strict;
-use warnings;
+use Moose;
 use MRO::Compat;
 
-use base qw/Class::Data::Inheritable/;
+with 'Catalyst::ClassData';
 
  __PACKAGE__->mk_classdata('ran_setup');
 
@@ -34,4 +32,5 @@ sub prepare_action {
     $c->next::method(@_);
 }
 
+no Moose;
 1;

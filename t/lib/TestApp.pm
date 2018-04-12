@@ -145,9 +145,6 @@ sub finalize_headers {
 # Make sure we can load Inline plugins. 
 
 package Catalyst::Plugin::Test::Inline;
-
-use strict;
-
-use base qw/Class::Data::Inheritable/;
+use Moose;
 
 1;

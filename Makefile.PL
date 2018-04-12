@@ -63,7 +63,6 @@ my %META = (
         'Plack'                 => '0.9991', # IIS6+7 fix middleware
         'Plack::Middleware::ReverseProxy' => '0.04',
         'Plack::Test::ExternalServer' => 0,
-        'Class::Data::Inheritable' => 0,
         'Encode'                => '2.49',
         'LWP'                   => '5.837', # LWP had unicode fail in 5.8.26
         'URI'                   => '1.65',
