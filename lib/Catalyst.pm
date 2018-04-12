@@ -4014,14 +4014,14 @@ only two default data handlers, for 'application/json' and an alternative to
 L<CGI::Struct> or via L<CGI::Struct::XS> IF you've installed it.
 
 The 'application/json' data handler is used to parse incoming JSON into a Perl
-data structure.  It used either L<JSON::MaybeXS> or L<JSON>, depending on which
-is installed.  This allows you to fail back to L<JSON:PP>, which is a Pure Perl
-JSON decoder, and has the smallest dependency impact.
+data structure.  It uses L<JSON::MaybeXS>.  This allows you to fail back to
+L<JSON::PP>, which is a Pure Perl JSON decoder, and has the smallest dependency
+impact.
 
 Because we don't wish to add more dependencies to L<Catalyst>, if you wish to
-use this new feature we recommend installing L<JSON> or L<JSON::MaybeXS> in
-order to get the best performance.  You should add either to your dependency
-list (Makefile.PL, dist.ini, cpanfile, etc.)
+use this new feature we recommend installing L<Cpanel::JSON::XS> in order to get
+the best performance.  You should add either to your dependency list
+(Makefile.PL, dist.ini, cpanfile, etc.)
 
 =cut
 
@@ -4056,12 +4056,12 @@ sub default_data_handlers {
       },
       'application/json' => sub {
           my ($fh, $req) = @_;
-          my $parser = Class::Load::load_first_existing_class('JSON::MaybeXS', 'JSON');
+          require JSON::MaybeXS;
           my $slurped;
           return eval { 
             local $/;
             $slurped = $fh->getline;
-            $parser->can("decode_json")->($slurped); # decode_json does utf8 decoding for us
+            JSON::MaybeXS::decode_json($slurped); # decode_json does utf8 decoding for us
           } || Catalyst::Exception->throw(sprintf "Error Parsing POST '%s', Error: %s", (defined($slurped) ? $slurped : 'undef') ,$@);
         },
     };
@@ -4587,7 +4587,7 @@ that parses that content type into something Perl can readily access.
     package MyApp::Web;
  
     use Catalyst;
-    use JSON::Maybe;
+    use JSON::MaybeXS;
  
     __PACKAGE__->config(
       data_handlers => {
@@ -4599,7 +4599,7 @@ that parses that content type into something Perl can readily access.
     __PACKAGE__->setup;
 
 By default L<Catalyst> comes with a generic JSON data handler similar to the
-example given above, which uses L<JSON::Maybe> to provide either L<JSON::PP>
+example given above, which uses L<JSON::MaybeXS> to provide either L<JSON::PP>
 (a pure Perl, dependency free JSON parser) or L<Cpanel::JSON::XS> if you have
 it installed (if you want the faster XS parser, add it to you project Makefile.PL
 or dist.ini, cpanfile, etc.)
