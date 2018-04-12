@@ -83,10 +83,8 @@ my %META = (
     },
     develop   => {
       requires => {
-        'Test::Simple'            => '0.88',
         'CatalystX::LeakChecker'  => '0.05',
         'Catalyst::Devel'         => '1.0', # For http server test
-        'Catalyst::Engine::PSGI'  => 0,
         'Test::WWW::Mechanize::Catalyst' => '0.51',
         'Test::TCP'               => '2.00', # ditto, ships Net::EmptyPort
         'File::Copy::Recursive'   => '0.40',
