@@ -27,7 +27,6 @@ my %META = (
         'namespace::clean'      => '0.23',
         'MooseX::Emulate::Class::Accessor::Fast' => '0.00903',
         'Class::Load'           => '0.12',
-        'Data::OptList'         => 0,
         'Moose'                 => '1.03',
         'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24',
         'MooseX::Role::WithOverloading' => '0.09',
