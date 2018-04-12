@@ -43,7 +43,6 @@ my %META = (
         'HTTP::Headers'         => '1.64',
         'HTTP::Request'         => '5.814',
         'HTTP::Response'        => '5.813',
-        'HTTP::Request::AsCGI'  => '1.0',
         'Module::Pluggable'     => '4.7',
         'Path::Class'           => '0.09',
         'Scalar::Util'          => 0,
