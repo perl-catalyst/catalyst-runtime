@@ -13,7 +13,6 @@ use Catalyst::DispatchType::Index;
 use Catalyst::Utils;
 use Text::SimpleTable;
 use Tree::Simple;
-use Tree::Simple::Visitor::FindByPath;
 use Class::Load qw(load_class try_load_class);
 use Encode 2.21 'decode_utf8';
 
