@@ -727,7 +727,7 @@ constraints.
 
 - \\@captures\_and\_args?
 
-    Optional array reference of Captures (i.e. `<CaptureArgs or $c-`req->captures>)
+    Optional array reference of Captures (i.e. `CaptureArgs` or `$c->req->captures`)
     and arguments to the request. Usually used with [Catalyst::DispatchType::Chained](https://metacpan.org/pod/Catalyst::DispatchType::Chained)
     to interpolate all the parameters in the URI.
 
@@ -1160,7 +1160,7 @@ component or component object. Example:
 
     my $config = MyApp->config_for('MyApp::Model::Foo');
 
-In this case $config is the hashref ` {a=`1, b=>2} >.
+In this case $config is the hashref `{a=>1, b=>2}`.
 
 This is also handy for looking up configuration for a plugin, to make sure you follow
 existing [Catalyst](https://metacpan.org/pod/Catalyst) standards for where a plugin should put its configuration.
@@ -1405,14 +1405,14 @@ only two default data handlers, for 'application/json' and an alternative to
 [CGI::Struct](https://metacpan.org/pod/CGI::Struct) or via [CGI::Struct::XS](https://metacpan.org/pod/CGI::Struct::XS) IF you've installed it.
 
 The 'application/json' data handler is used to parse incoming JSON into a Perl
-data structure.  It used either [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) or [JSON](https://metacpan.org/pod/JSON), depending on which
-is installed.  This allows you to fail back to [JSON:PP](JSON:PP), which is a Pure Perl
-JSON decoder, and has the smallest dependency impact.
+data structure.  It uses [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS).  This allows you to fail back to
+[JSON::PP](https://metacpan.org/pod/JSON::PP), which is a Pure Perl JSON decoder, and has the smallest dependency
+impact.
 
 Because we don't wish to add more dependencies to [Catalyst](https://metacpan.org/pod/Catalyst), if you wish to
-use this new feature we recommend installing [JSON](https://metacpan.org/pod/JSON) or [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) in
-order to get the best performance.  You should add either to your dependency
-list (Makefile.PL, dist.ini, cpanfile, etc.)
+use this new feature we recommend installing [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS) in order to get
+the best performance.  You should add either to your dependency list
+(Makefile.PL, dist.ini, cpanfile, etc.)
 
 ## $c->stack
 
@@ -1426,7 +1426,7 @@ Returns the current timing statistics object. By default Catalyst uses
 [stats\_class](#c-stats_class).
 
 Even if [-Stats](#stats) is not enabled, the stats object is still
-available. By enabling it with ` $c-`stats->enabled(1) >, it can be used to
+available. By enabling it with `$c->stats->enabled(1)`, it can be used to
 profile explicitly, although MyApp.pm still won't profile nor output anything
 by itself.
 
@@ -1816,7 +1816,7 @@ that parses that content type into something Perl can readily access.
        package MyApp::Web;
     
        use Catalyst;
-       use JSON::Maybe;
+       use JSON::MaybeXS;
     
        __PACKAGE__->config(
          data_handlers => {
@@ -1828,7 +1828,7 @@ that parses that content type into something Perl can readily access.
        __PACKAGE__->setup;
 
 By default [Catalyst](https://metacpan.org/pod/Catalyst) comes with a generic JSON data handler similar to the
-example given above, which uses [JSON::Maybe](https://metacpan.org/pod/JSON::Maybe) to provide either [JSON::PP](https://metacpan.org/pod/JSON::PP)
+example given above, which uses [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) to provide either [JSON::PP](https://metacpan.org/pod/JSON::PP)
 (a pure Perl, dependency free JSON parser) or [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS) if you have
 it installed (if you want the faster XS parser, add it to you project Makefile.PL
 or dist.ini, cpanfile, etc.)
@@ -2131,19 +2131,19 @@ Caelum: Rafael Kitover <rkitover@io.com>
 
 chansen: Christian Hansen
 
-Chase Venters `chase.venters@gmail.com`
+Chase Venters <chase.venters@gmail.com>
 
 chicks: Christopher Hicks
 
-Chisel Wright `pause@herlpacker.co.uk`
+Chisel Wright <pause@herlpacker.co.uk>
 
-Danijel Milicevic `me@danijel.de`
+Danijel Milicevic <me@danijel.de>
 
 davewood: David Schmidt <davewood@cpan.org>
 
 David Kamholz <dkamholz@cpan.org>
 
-David Naughton, `naughton@umn.edu`
+David Naughton <naughton@umn.edu>
 
 David E. Wheeler
 
@@ -2165,7 +2165,7 @@ gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
-Gavin Henry `ghenry@perl.me.uk`
+Gavin Henry <ghenry@perl.me.uk>
 
 Geoff Richards
 
@@ -2177,7 +2177,7 @@ ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
 
-jester: Jesse Sheidlower `jester@panix.com`
+jester: Jesse Sheidlower <jester@panix.com>
 
 jhannah: Jay Hannah <jay@jays.net>
 
@@ -2187,9 +2187,9 @@ Johan Lindstrom
 
 jon: Jon Schutz <jjschutz@cpan.org>
 
-Jonathan Rockway `<jrockway@cpan.org>`
+Jonathan Rockway <jrockway@cpan.org>
 
-Kieren Diment `kd@totaldatasolution.com`
+Kieren Diment <kd@totaldatasolution.com>
 
 konobi: Scott McWhirter <konobi@cpan.org>
 
@@ -2225,7 +2225,9 @@ rafl: Florian Ragwitz <rafl@debian.org>
 
 random: Roland Lammel <lammel@cpan.org>
 
-Robert Sedlacek `<rs@474.at>`
+revmischa: Mischa Spiegelmock <revmischa@cpan.org>
+
+Robert Sedlacek <rs@474.at>
 
 SpiceMan: Marcel Montes
 
@@ -2239,17 +2241,17 @@ Ulf Edvinsson
 
 vanstyn: Henry Van Styn <vanstyn@cpan.org>
 
-Viljo Marrandi `vilts@yahoo.com`
+Viljo Marrandi <vilts@yahoo.com>
 
-Will Hawes `info@whawes.co.uk`
+Will Hawes <info@whawes.co.uk>
 
 willert: Sebastian Willert <willert@cpan.org>
 
 wreis: Wallace Reis <wreis@cpan.org>
 
-Yuval Kogman, `nothingmuch@woobling.org`
+Yuval Kogman <nothingmuch@woobling.org>
 
-rainboxx: Matthias Dietrich, `perl@rainboxx.de`
+rainboxx: Matthias Dietrich <perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
 
