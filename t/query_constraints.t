@@ -16,14 +16,14 @@ BEGIN {
 
   use strict;
   use warnings;
- 
+
   use Type::Utils -all;
   use Types::Standard -types;
   use Type::Library
    -base,
    -declare => qw( UserId Heart );
 
-  extends "Types::Standard"; 
+  extends "Types::Standard";
 
   declare UserId,
    as Int,
@@ -59,7 +59,7 @@ BEGIN {
   }
 
   sub string_types :Local Query(q=>'Str',age=>'Int') { pop->res->body('string_type') }
- 
+
   sub as_ref :Local Query(Dict[age=>Int,sex=>Enum['f','m','o'], slurpy HashRef[Int]]) { pop->res->body('as_ref') }
 
   sub utf8 :Local Query(utf8=>Heart) { pop->res->body("heart") }
@@ -68,7 +68,7 @@ BEGIN {
 
     sub big :Chained(chain) PathPart('') Args(0) Query(size=>Int,...) { pop->res->body('big') }
     sub small :Chained(chain) PathPart('') Args(0) Query(size=>UserId,...) { pop->res->body('small') }
-  
+
   sub default :Default {
     my ($self, $c, $int) = @_;
     $c->res->body('default');

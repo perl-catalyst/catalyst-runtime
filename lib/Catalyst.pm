@@ -125,7 +125,7 @@ sub _build_response_constructor_args {
 sub composed_response_class {
   my $class = shift;
   return $class->_composed_response_class if $class->_composed_response_class;
-  
+
   my @traits = (@{$class->response_class_traits||[]}, @{$class->config->{response_class_traits}||[]});
 
   my $trait_ns = 'TraitFor::Response';
@@ -165,7 +165,7 @@ our $RECURSION = 1000;
 our $DETACH    = Catalyst::Exception::Detach->new;
 our $GO        = Catalyst::Exception::Go->new;
 
-#I imagine that very few of these really 
+#I imagine that very few of these really
 #need to be class variables. if any.
 #maybe we should just make them attributes with a default?
 __PACKAGE__->mk_classdata($_)
@@ -1432,9 +1432,9 @@ EOF
         }
 
         my @middleware = map {
-          ref $_ eq 'CODE' ? 
-            "Inline Coderef" : 
-              (ref($_) .'  '. ($_->can('VERSION') ? $_->VERSION || '' : '') 
+          ref $_ eq 'CODE' ?
+            "Inline Coderef" :
+              (ref($_) .'  '. ($_->can('VERSION') ? $_->VERSION || '' : '')
                 || '')  } $class->registered_middlewares;
 
         if (@middleware) {
@@ -2300,7 +2300,7 @@ sub finalize_encoding {
     # to do this early since encodable_response is false for this condition and we need
     # to match the debug output for backcompat (there's a test for this...) -JNAP
     if(
-      $res->content_type_charset and $c->encoding and 
+      $res->content_type_charset and $c->encoding and
       (uc($c->encoding->mime_name) ne uc($res->content_type_charset))
     ) {
         my $ct = lc($res->content_type_charset);
@@ -2321,7 +2321,7 @@ sub finalize_encoding {
         $c->res->body( $c->encoding->encode( $c->res->body, $c->_encode_check ) );
 
         # Set the charset if necessary.  This might be a bit bonkers since encodable response
-        # is false when the set charset is not the same as the encoding mimetype (maybe 
+        # is false when the set charset is not the same as the encoding mimetype (maybe
         # confusing action at a distance here..
         # Don't try to set the charset if one already exists or if headers are already finalized
         $c->res->content_type($c->res->content_type . "; charset=" . $c->encoding->mime_name)
@@ -2877,7 +2877,7 @@ We try each possible role in turn (and throw an error if none load)
 The namespace part 'TraitFor::Request' was chosen to assist in backwards
 compatibility with L<CatalystX::RoleApplicator> which previously provided
 these features in a stand alone package.
-  
+
 =head2 $app->composed_request_class
 
 This is the request class which has been composed with any request_class_traits.
@@ -3237,7 +3237,7 @@ sub setup_component {
       $class->components->{ $component } = $class->setup_component($component);
     }
 
-    return $instance; 
+    return $instance;
 }
 
 =head2 $app->config_for( $component_name )
@@ -3362,7 +3362,7 @@ sub setup_engine {
     return;
 }
 
-## This exists just to supply a prebuild psgi app for mod_perl and for the 
+## This exists just to supply a prebuild psgi app for mod_perl and for the
 ## build in server support (back compat support for pre psgi port behavior).
 ## This is so that we don't build a new psgi app for each request when using
 ## the mod_perl handler or the built in servers (http and fcgi, etc).
@@ -3379,7 +3379,7 @@ sub _finalized_psgi_app {
 }
 
 ## Look for a psgi file like 'myapp_web.psgi' (if the app is MyApp::Web) in the
-## home directory and load that and return it (just assume it is doing the 
+## home directory and load that and return it (just assume it is doing the
 ## right thing :) ).  If that does not exist, call $app->psgi_app, wrap that
 ## in default_middleware and return it ( this is for backward compatibility
 ## with pre psgi port behavior ).
@@ -4058,7 +4058,7 @@ sub default_data_handlers {
           my ($fh, $req) = @_;
           require JSON::MaybeXS;
           my $slurped;
-          return eval { 
+          return eval {
             local $/;
             $slurped = $fh->getline;
             JSON::MaybeXS::decode_json($slurped); # decode_json does utf8 decoding for us
@@ -4347,7 +4347,7 @@ that does not contain uploads, but instead contains inlined complex data
 (very uncommon) we cannot reliably convert that into field => value pairs.  So
 instead we create an instance of L<Catalyst::Request::PartData>.  If this causes
 issue for you, you can disable this by setting C<skip_complex_post_part_handling>
-to true (default is false).  
+to true (default is false).
 
 =item *
 
@@ -4368,7 +4368,7 @@ request URL query or keywords.  Most readings of the relevant specifications
 suggest these should be UTF-* encoded, which is the default that L<Catalyst>
 will use, however if you are creating a lot of URLs manually or have external
 evil clients, this might cause you trouble.  If you find the changes introduced
-in Catalyst version 5.90080+ break some of your query code, you may disable 
+in Catalyst version 5.90080+ break some of your query code, you may disable
 the UTF-8 decoding globally using this configuration.
 
 This setting takes precedence over C<default_query_encoding>
@@ -4585,17 +4585,17 @@ option, C<data_handlers>, which lets you associate a content type with a coderef
 that parses that content type into something Perl can readily access.
 
     package MyApp::Web;
- 
+
     use Catalyst;
     use JSON::MaybeXS;
- 
+
     __PACKAGE__->config(
       data_handlers => {
         'application/json' => sub { local $/; decode_json $_->getline },
       },
       ## Any other configuration.
     );
- 
+
     __PACKAGE__->setup;
 
 By default L<Catalyst> comes with a generic JSON data handler similar to the
@@ -4621,12 +4621,12 @@ arrayref under the configuration key C<psgi_middleware>.  Here's an example
 with details to follow:
 
     package MyApp::Web;
- 
+
     use Catalyst;
     use Plack::Middleware::StackTrace;
- 
+
     my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
- 
+
     __PACKAGE__->config(
       'psgi_middleware', [
         'Debug',
@@ -4643,7 +4643,7 @@ with details to follow:
         },
       ],
     );
- 
+
     __PACKAGE__->setup;
 
 So the general form is:
@@ -4669,26 +4669,26 @@ middleware will wrap closer to the application).  Keep this in mind since in
 some cases the order of middleware is important.
 
 The two approaches are not exclusive.
- 
+
 =over 4
- 
+
 =item Middleware Object
- 
+
 An already initialized object that conforms to the L<Plack::Middleware>
 specification:
- 
+
     my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
- 
+
     __PACKAGE__->config(
       'psgi_middleware', [
         $stacktrace_middleware,
       ]);
- 
- 
+
+
 =item coderef
- 
+
 A coderef that is an inlined middleware:
- 
+
     __PACKAGE__->config(
       'psgi_middleware', [
         sub {
@@ -4705,11 +4705,11 @@ A coderef that is an inlined middleware:
          },
       },
     ]);
- 
- 
- 
+
+
+
 =item a scalar
- 
+
 We assume the scalar refers to a namespace after normalizing it using the
 following rules:
 
@@ -4740,12 +4740,12 @@ Examples:
         '+MyApp::Custom',  ## MyApp::Custom->wrap
       ],
     );
- 
+
 =item a scalar followed by a hashref
- 
+
 Just like the previous, except the following C<HashRef> is used as arguments
 to initialize the middleware object.
- 
+
     __PACKAGE__->config(
       'psgi_middleware', [
          'Session' => {store => 'File'},

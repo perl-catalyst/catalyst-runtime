@@ -31,7 +31,7 @@ BEGIN {
 {
     package TestApp;
     $INC{'TestApp.pm'} = __FILE__;
- 
+
     use Catalyst;
 
     sub handle_unicode_encoding_exception {
@@ -44,15 +44,15 @@ BEGIN {
 
     __PACKAGE__->setup;
 }
- 
- 
+
+
 use Catalyst::Test 'TestApp';
 
 {
     my $res = request('/ok');
     is ($res->content, "ok\n", "app is echoing arguments");
 }
- 
+
 {
     my $res = request('/%E2%C3%83%C6%92%C3%8');
     is ($res->content, "INVALID-UNICODE\n",

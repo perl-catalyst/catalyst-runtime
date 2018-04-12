@@ -53,7 +53,7 @@ sub run_tests {
     {
         my $expected = undef;
 
-        ok( my $response = request('http://localhost/chained/foo/1/end'), 
+        ok( my $response = request('http://localhost/chained/foo/1/end'),
             'chained + local endpoint; missing last argument' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -112,7 +112,7 @@ sub run_tests {
 
         my $expected = join( ", ", @expected );
 
-        ok( my $response = request('http://localhost/chained/foo2/10/20/end2/15/25'), 
+        ok( my $response = request('http://localhost/chained/foo2/10/20/end2/15/25'),
             'chained + local (2 args each)' );
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
@@ -407,7 +407,7 @@ sub run_tests {
     }
 
     #
-    #   This is for testing if the arguments got passed to the actions 
+    #   This is for testing if the arguments got passed to the actions
     #   correctly.
     #
     {
@@ -1037,8 +1037,8 @@ sub run_tests {
     # With args given, run "all"
         ok( $response = request('http://localhost/argsorder/X'),
             'Correct arg order ran' );
-        is( $response->header('X-Catalyst-Executed'), 
-        join(", ", 
+        is( $response->header('X-Catalyst-Executed'),
+        join(", ",
          qw[
              TestApp::Controller::Action::Chained->begin
              TestApp::Controller::Action::Chained::ArgsOrder->base
@@ -1047,7 +1047,7 @@ sub run_tests {
           ])
       );
         is( $response->content, 'base; ; all; X', 'Content OK' );
-    
+
     }
 
     #
@@ -1088,11 +1088,11 @@ sub run_tests {
         is( $response->header('X-Catalyst-Executed'),
             $expected, 'Executed actions' );
     }
-    
+
     #
     #   */search
     #   doc/*
-    # 
+    #
     #   request for doc/search should end up in doc/*
     {
         my @expected = qw[

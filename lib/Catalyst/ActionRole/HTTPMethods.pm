@@ -24,7 +24,7 @@ around ['match','match_captures'] => sub {
 around 'list_extra_info' => sub {
   my ($orig, $self, @args) = @_;
   return {
-    %{ $self->$orig(@args) }, 
+    %{ $self->$orig(@args) },
     HTTP_METHODS => [sort $self->allowed_http_methods],
   };
 };

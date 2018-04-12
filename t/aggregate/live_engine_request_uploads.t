@@ -158,7 +158,7 @@ use Path::Class::Dir;
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
     is( $response->content, ( $request->parts )[0]->content, 'Content' );
-    
+
     # XXX: no way to test that temporary file for this test was deleted
 }
 
@@ -214,7 +214,7 @@ use Path::Class::Dir;
             'Unserialize Catalyst::Request'
         );
     }
-    
+
     for my $file ( $creq->upload ) {
         my $upload = $creq->upload($file);
         SKIP:
@@ -284,7 +284,7 @@ use Path::Class::Dir;
         is( $upload->size, length( $part->content ), 'Upload Content-Length' );
         is( $upload->filename, 'catalyst_130pix.gif', 'Upload Filename' );
         is( $upload->basename, 'catalyst_130pix.gif', 'Upload basename' );
-        
+
         SKIP:
         {
             if ( $ENV{CATALYST_SERVER} ) {
@@ -336,7 +336,7 @@ use Path::Class::Dir;
         # JNAP, I added the following line in order to properly let
         # the $env go out of scope so that the associated tempfile
         # would be deleted.  I think somewhere Catalyst::Test closed
-        # over ENV and holds state until a new command is issues but 
+        # over ENV and holds state until a new command is issues but
         # I can't find it.
 
         request GET  'http://localhost/';
@@ -350,7 +350,7 @@ SKIP:
     if ( $ENV{CATALYST_SERVER} ) {
         skip 'Not testing uploadtmp on remote server', 14;
     }
-    
+
     my $creq;
 
     my $dir = "$FindBin::Bin/";

@@ -114,7 +114,7 @@ use HTTP::Request::Common;
 # raw query string support
 {
     my $creq;
-    
+
     my $body_parameters = {
         a     => 1,
         blank => '',
@@ -132,7 +132,7 @@ use HTTP::Request::Common;
         'Content'      => $body_parameters,
         'Content-Type' => 'application/x-www-form-urlencoded'
     );
-    
+
     ok( my $response = request($request), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->uri->query, 'query+string', 'Catalyst::Request POST query_string' );
@@ -140,7 +140,7 @@ use HTTP::Request::Common;
     is_deeply( $creq->query_parameters, $query_parameters, 'Catalyst::Request query_parameters' );
     is_deeply( $creq->body_parameters, $body_parameters, 'Catalyst::Request body_parameters' );
     is_deeply( $creq->parameters, $parameters, 'Catalyst::Request parameters' );
-    
+
     ok( $response = request('http://localhost/dump/request/a/b?x=1&y=1&z=1'), 'Request' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
     is( $creq->uri->query, 'x=1&y=1&z=1', 'Catalyst::Request GET query_string' );

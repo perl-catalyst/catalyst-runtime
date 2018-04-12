@@ -9,7 +9,7 @@ use Test::More;
   use Moose::Role;
 
   sub role { 'role' }
-  
+
   package Local::Model::Foo;
 
   use Moose;
@@ -69,13 +69,13 @@ use Test::More;
 
   sub user :Local Args(1) {
     my ($self, $c, $int) = @_;
-    
+
     Test::More::ok(my $user = $c->model("User")->find($int));
     Test::More::is($c->model("User")->zoo->a, 2);
     Test::More::is($c->model("Foo")->role, 'role');
     Test::More::is($c->model("One")->a, 'one');
     Test::More::is($c->model("Two")->a, 'two');
-   
+
     $c->res->body("name: $user->{name}, age: $user->{age}");
   }
 

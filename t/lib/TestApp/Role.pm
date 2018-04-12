@@ -9,7 +9,7 @@ our $SETUP_DISPATCHER = 0;
 
 before 'setup_finalize' => sub { $SETUP_FINALIZE++ };
 
-before 'setup_dispatcher' => sub { $SETUP_DISPATCHER++ }; 
+before 'setup_dispatcher' => sub { $SETUP_DISPATCHER++ };
 
 1;
 

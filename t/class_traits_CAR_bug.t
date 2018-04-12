@@ -49,18 +49,18 @@ BEGIN {
 
 
 }
- 
+
 {
   package TestApp;
   $INC{'TestApp.pm'} = __FILE__;
- 
+
   use Catalyst;
 
   __PACKAGE__->request_class_traits([qw/TestRole Foo Bar/]);
   __PACKAGE__->setup;
 }
- 
- 
+
+
 foreach my $class_prefix (qw/request/) {
   my $method = 'composed_' .$class_prefix. '_class';
   ok(

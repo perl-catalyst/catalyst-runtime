@@ -572,7 +572,7 @@ sub inject_component {
             croak "Unable to build component package for \"$component_package\": $@";
         Moose::Util::apply_all_roles($component_package, @{$given{traits}}) if $given{traits};
         (my $file = "$component_package.pm") =~ s{::}{/}g;
-        $INC{$file} ||= 1;    
+        $INC{$file} ||= 1;
     }
 
     my $_setup_component = sub {

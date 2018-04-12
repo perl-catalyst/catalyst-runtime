@@ -14,7 +14,7 @@ use Catalyst::Test 'TestApp';
 }
 
 {
-    my $response = request('http://localhost/moose/methodmodifiers/get_attribute');       
+    my $response = request('http://localhost/moose/methodmodifiers/get_attribute');
     ok($response->is_success);
     is($response->content, '42', 'parent controller method called');
     is($response->header('X-Catalyst-Test-After'), 'after called', 'after works as expected');

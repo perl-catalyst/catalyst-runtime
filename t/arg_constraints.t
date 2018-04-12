@@ -16,14 +16,14 @@ BEGIN {
 
   use strict;
   use warnings;
- 
+
   use Type::Utils -all;
   use Types::Standard -types;
   use Type::Library
    -base,
    -declare => qw( UserId Heart User ContextLike );
 
-  extends "Types::Standard"; 
+  extends "Types::Standard";
 
   class_type User, { class => "MyApp::Model::User::user" };
   duck_type ContextLike, [qw/model/];
@@ -152,7 +152,7 @@ BEGIN {
       sub any_priority_link_any :Chained(link_any) PathPart('') Args(1) { $_[1]->res->body('any_priority_link_any') }
 
       sub int_priority_link_any :Chained(link_any) PathPart('') Args(Int) { $_[1]->res->body('int_priority_link_any') }
-    
+
     sub link_int :Chained(chain_base) PathPart('') CaptureArgs(Int) { }
 
       sub any_priority_link :Chained(link_int) PathPart('') Args(1) { $_[1]->res->body('any_priority_link') }

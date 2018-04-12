@@ -245,7 +245,7 @@ We have started migrating code in Catalyst to equivalent Plack
 Middleware when such exists and is correct to do so.  For example we now use
 L<Plack::Middleware::ContentLength> to determine content length of a response
 when none is provided.  This replaces similar code inlined with L<Catalyst>
-The main advantages to doing this is 1) more similar Catalyst core that is 
+The main advantages to doing this is 1) more similar Catalyst core that is
 focused on the Catalyst special sauce, 2) Middleware is more broadly shared
 so we benefit from better collaboration with developers outside Catalyst, 3)
 In the future you'll be able to change or trim the middleware stack to get
@@ -263,7 +263,7 @@ which does read but not getline.  For now we will just warn when encountering
 such an object and fallback to the previous behavior (where L<Catalyst::Engine>
 itself unrolls the filehandle and performs blocking streams).  However
 this backwards compatibility will be removed in an upcoming release so you should either
-rewrite your custom filehandle objects to support getline or start using the 
+rewrite your custom filehandle objects to support getline or start using the
 middleware that adapts read for getline L<Plack::Middleware::AdaptFilehandleRead>.
 
 =head3 Response->headers become read-only after finalizing
@@ -445,7 +445,7 @@ Below is a brief list of features which have been deprecated in this release:
 =head3 Restarter
 
 The development server restarter has been improved to be compatible with
-immutable Moose classes, and also to optionally use 
+immutable Moose classes, and also to optionally use
 L<B::Hooks::OP::Check::StashChange> to handle more complex application layouts
 correctly.
 
@@ -475,8 +475,8 @@ Log levels have been made additive.
 
 =item *
 
-New print method which prints @data to the output stream, separated by $,.  
-This lets you pass the response object to functions that want to write to an 
+New print method which prints @data to the output stream, separated by $,.
+This lets you pass the response object to functions that want to write to an
 L<IO::Handle>.
 
 =item *
@@ -497,7 +497,7 @@ supported and may be used in components and applications.
 
 =item *
 
-Many reusable extensions which would previously have been plugins or base 
+Many reusable extensions which would previously have been plugins or base
 classes are better implemented as Moose roles.
 
 =item *
@@ -540,7 +540,7 @@ Fixes for FastCGI when used with IIS 6.0
 
 =item *
 
-Fix a bug in uri_for which could cause it to generate paths with multiple 
+Fix a bug in uri_for which could cause it to generate paths with multiple
 slashes in them.
 
 =item *

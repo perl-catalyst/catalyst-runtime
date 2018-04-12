@@ -43,7 +43,7 @@ test_psgi $psgi, sub {
     my $res = $cb->(HEAD "/root/test");
     is $res->code, 200, 'OK';
     is $res->content, '', 'correct body';
-    is $res->content_length, 16, 'correct length';    
+    is $res->content_length, 16, 'correct length';
 };
 
 done_testing;

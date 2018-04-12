@@ -3,7 +3,7 @@ use strict;
 use Test::More;
 use HTTP::Request::Common;
 
-# In DEBUG mode, we get not a number warnigs 
+# In DEBUG mode, we get not a number warnigs
 
 my $error;
 
@@ -20,7 +20,7 @@ my $error;
     $c->response->body("This is the body");
   }
 
-  sub infinity :Chained(root) PathPart('test') Args { 
+  sub infinity :Chained(root) PathPart('test') Args {
     my ($self, $c) = @_;
     $c->response->body("This is the body");
     Test::More::is $c->action->comparable_arg_number, ~0;

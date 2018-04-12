@@ -292,19 +292,19 @@ to use Log4Perl or another logger, you should call it like this:
 
 =head2 autoflush
 
-When enabled (default), messages are written to the log immediately instead 
-of queued until the end of the request. 
+When enabled (default), messages are written to the log immediately instead
+of queued until the end of the request.
 
-This option, as well as C<abort>, is provided for modules such as 
-L<Catalyst::Plugin::Static::Simple> to be able to programmatically 
+This option, as well as C<abort>, is provided for modules such as
+L<Catalyst::Plugin::Static::Simple> to be able to programmatically
 suppress the output of log messages. By turning off C<autoflush> (application-wide
-setting) and then setting the C<abort> flag within a given request, all log 
+setting) and then setting the C<abort> flag within a given request, all log
 messages for the given request will be suppressed. C<abort> can still be set
-independently of turning off C<autoflush>, however. It just means any messages 
-sent to the log up until that point in the request will obviously still be emitted, 
+independently of turning off C<autoflush>, however. It just means any messages
+sent to the log up until that point in the request will obviously still be emitted,
 since C<autoflush> means they are written in real-time.
 
-If you need to turn off autoflush you should do it like this (in your main app 
+If you need to turn off autoflush you should do it like this (in your main app
 class):
 
     after setup_finalize => sub {

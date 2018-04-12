@@ -10,8 +10,8 @@ sub binary : Local {
     my ($self, $c) = @_;
     $c->res->content_type('image/gif');
     $c->res->body(do {
-        open(my $fh, '<', $c->path_to('..', '..', 'catalyst_130pix.gif')) or die $!; 
-        binmode($fh); 
+        open(my $fh, '<', $c->path_to('..', '..', 'catalyst_130pix.gif')) or die $!;
+        binmode($fh);
         local $/ = undef; <$fh>;
     });
 }
@@ -29,7 +29,7 @@ sub binary_utf8 : Local {
 sub utf8_non_ascii_content : Local {
     use utf8;
     my ($self, $c) = @_;
-    
+
     my $str = 'ʇsʎlɐʇɐɔ';  # 'catalyst' flipped at http://www.revfad.com/flip.html
     ok utf8::is_utf8($str), '$str is in UTF8 internally';
 

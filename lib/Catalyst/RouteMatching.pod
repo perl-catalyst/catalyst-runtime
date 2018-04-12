@@ -136,7 +136,7 @@ the L<Types::Standard> library that is packaged with L<Type::Tiny>:
     use Moose;
     use MooseX::MethodAttributes;
     use Types::Standard qw/StrMatch Int/;
-    
+
     extends 'Catalyst::Controller';
 
     sub looks_like_a_date :Path('') Args(StrMatch[qr{\d\d-\d\d-\d\d}]) {
@@ -296,7 +296,7 @@ actions.  The only difference is that you may declare type constraints on Captur
 well as Args.  For Example:
 
   use Types::Standard qw/Int Tuple/;
-  
+
   sub chain_base :Chained(/) CaptureArgs(1) { }
 
     sub any_priority_chain :GET Chained(chain_base) PathPart('') Args(1) {  }
@@ -308,7 +308,7 @@ well as Args.  For Example:
       sub any_priority_link_any :Chained(link_any) PathPart('') Args(1) {  }
 
       sub int_priority_link_any :Chained(link_any) PathPart('') Args(Int) {  }
-    
+
     sub link_int :Chained(chain_base) PathPart('') CaptureArgs(Int) { }
 
       sub any_priority_link :Chained(link_int) PathPart('') Args(1) {  }

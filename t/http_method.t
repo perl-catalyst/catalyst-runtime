@@ -50,23 +50,23 @@ __END__
   use Catalyst;
 
   use HTTP::Headers::ActionPack;
-   
+
   my $cn = HTTP::Headers::ActionPack->new
     ->get_content_negotiator;
-   
+
   sub Catalyst::Response::format
   {
     my $self = shift;
     my %formats = @_;
     my @formats = keys %formats;
-   
+
     my $accept = $self->_context->req->header('Accept') ||
       $format{default} ||
        $_[0];
-   
+
     $self->headers->header('Vary' => 'Accept');
     $self->headers->header('Accepts' => (join ',', @formats));
-   
+
     if(my $which = $cn->choose_media_type(\@formats, $accept)) {
       $self->content_type($which);
       if(my $possible_body = $formats{$which}->($self)) {
@@ -74,7 +74,7 @@ __END__
       }
     } else {
       $self->status(406);
-      $self->body("Method Not Acceptable");      
+      $self->body("Method Not Acceptable");
     }
   }
 

@@ -25,7 +25,7 @@ use Test::More;
 
   package MyApp;
   use Catalyst;
-  
+
   MyApp->setup;
 }
 

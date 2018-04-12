@@ -69,7 +69,7 @@ server.bind = "127.0.0.1"
 server.port = $port
 
 # Work around inability to hit http://localhost/deep/path
-# without a trailing slash 
+# without a trailing slash
 url.rewrite = ( "deep/path\$" => "deep/path/" )
 
 # catalyst app specific fcgi setup
@@ -90,14 +90,14 @@ fastcgi.server = (
 )
 END
 
-open(my $lightconf, '>', "$docroot/lighttpd.conf") 
+open(my $lightconf, '>', "$docroot/lighttpd.conf")
   or die "Can't open $docroot/lighttpd.conf: $!";
 print {$lightconf} $conf or die "Write error: $!";
 close $lightconf;
 
-my $pid = open my $lighttpd, "$lighttpd_bin -D -f $docroot/lighttpd.conf 2>&1 |" 
+my $pid = open my $lighttpd, "$lighttpd_bin -D -f $docroot/lighttpd.conf 2>&1 |"
     or die "Unable to spawn lighttpd: $!";
-    
+
 # wait for it to start
 while ( check_port( 'localhost', $port ) != 1 ) {
     diag "Waiting for server to start...";

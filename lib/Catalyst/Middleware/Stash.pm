@@ -41,7 +41,7 @@ sub _create_stash {
 
 sub call {
   my ($self, $env) = @_;
-  $env->{+PSGI_KEY} = $self->_create_stash 
+  $env->{+PSGI_KEY} = $self->_create_stash
     unless exists($env->{+PSGI_KEY});
 
   return $self->app->($env);

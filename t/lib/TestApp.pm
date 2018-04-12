@@ -2,8 +2,8 @@ package TestApp;
 use strict;
 use Catalyst qw/
     Test::MangleDollarUnderScore
-    Test::Errors 
-    Test::Headers 
+    Test::Errors
+    Test::Headers
     Test::Plugin
     Test::Inline
     +TestApp::Plugin::FullyQualified
@@ -42,10 +42,10 @@ has 'my_greeting_obj_lazy' => (
 
 our $VERSION = '0.01';
 
-TestApp->config( 
-    name => 'TestApp', 
-    root => '/some/dir', 
-    use_request_uri_for_path => 1, 
+TestApp->config(
+    name => 'TestApp',
+    root => '/some/dir',
+    use_request_uri_for_path => 1,
     'Controller::Action::Action' => {
         action_args => {
             action_action_nine => { another_extra_arg => 13 }
@@ -115,9 +115,9 @@ sub execute {
 # useful info if something crashes during a test
 sub finalize_error {
     my $c = shift;
-    
+
     $c->next::method(@_);
-    
+
     $c->res->status(500);
     $c->res->body( 'FATAL ERROR: ' . join( ', ', @{ $c->error } ) );
 }
@@ -142,7 +142,7 @@ sub finalize_headers {
     return $c->maybe::next::method(@_);
 }
 
-# Make sure we can load Inline plugins. 
+# Make sure we can load Inline plugins.
 
 package Catalyst::Plugin::Test::Inline;
 use Moose;

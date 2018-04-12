@@ -151,24 +151,24 @@ What Catalyst does with UTF8 in your GET and classic HTML Form POST
 The same rules that we find in URL paths also cover URL query parts.  That is
 if one types a URL like this into the browser
 
-	http://localhost/example?♥=♥♥
+    http://localhost/example?♥=♥♥
 
 When this goes 'over the wire' to your application server its going to be as
 percent encoded bytes:
 
 
-	http://localhost/example?%E2%99%A5=%E2%99%A5%E2%99%A5
+    http://localhost/example?%E2%99%A5=%E2%99%A5%E2%99%A5
 
 When L<Catalyst> encounters this we decode the percent encoding and the utf8
 so that we can properly display this information (such as in the debugging
 logs or in a response.)
 
-	[debug] Query Parameters are:
-	.-------------------------------------+--------------------------------------.
-	| Parameter                           | Value                                |
-	+-------------------------------------+--------------------------------------+
-	| ♥                                   | ♥♥                                   |
-	'-------------------------------------+--------------------------------------'
+    [debug] Query Parameters are:
+    .-------------------------------------+--------------------------------------.
+    | Parameter                           | Value                                |
+    +-------------------------------------+--------------------------------------+
+    | ♥                                   | ♥♥                                   |
+    '-------------------------------------+--------------------------------------'
 
 All the values and keys that are part of $c->req->query_parameters will be
 utf8 decoded.  So you should not need to do anything special to take those
@@ -182,13 +182,13 @@ the byte length.
 Just like with arguments and captures, you can use utf8 literals (or utf8
 strings) in $c->uri_for:
 
-	use utf8;
-	my $url = $c->uri_for( $c->controller('Root')->action_for('example'), {'♥' => '♥♥'});
+    use utf8;
+    my $url = $c->uri_for( $c->controller('Root')->action_for('example'), {'♥' => '♥♥'});
 
 When you stringify this object (for use in a template, for example) it will automatically
 do the right thing regarding utf8 encoding and url encoding.
 
-	http://localhost/example?%E2%99%A5=%E2%99%A5%E2%99%A5
+    http://localhost/example?%E2%99%A5=%E2%99%A5%E2%99%A5
 
 Since again what you want is a properly url encoded version of this.  Ultimately what you want
 to send over the wire via HTTP needs to be bytes (not unicode characters).
@@ -230,10 +230,10 @@ assumption and decode accordingly (unless you explicitly turn off encoding...)  
 running Catalyst in developer debug, then you will see the correct unicode characters in
 the debug output.  For example if you generate a POST request:
 
-	use Catalyst::Test 'MyApp';
-	use utf8;
+    use Catalyst::Test 'MyApp';
+    use utf8;
 
-	my $res = request POST "/example/posted", ['♥'=>'♥', '♥♥'=>'♥'];
+    my $res = request POST "/example/posted", ['♥'=>'♥', '♥♥'=>'♥'];
 
 Running in CATALYST_DEBUG=1 mode you should see output like this:
 
@@ -247,20 +247,20 @@ Running in CATALYST_DEBUG=1 mode you should see output like this:
 
 And if you had a controller like this:
 
-	package MyApp::Controller::Example;
+    package MyApp::Controller::Example;
 
-	use base 'Catalyst::Controller';
+    use base 'Catalyst::Controller';
 
-	sub posted :POST Local {
-		my ($self, $c) = @_;
-		$c->res->content_type('text/plain');
-		$c->res->body("hearts => ${\$c->req->post_parameters->{♥}}");
-	}
+    sub posted :POST Local {
+        my ($self, $c) = @_;
+        $c->res->content_type('text/plain');
+        $c->res->body("hearts => ${\$c->req->post_parameters->{♥}}");
+    }
 
 The following test case would be true:
 
-	use Encode 2.21 'decode_utf8';
-	is decode_utf8($req->content), 'hearts => ♥';
+    use Encode 2.21 'decode_utf8';
+    is decode_utf8($req->content), 'hearts => ♥';
 
 In this case we decode so that we can print and compare strings with multibyte characters.
 
@@ -311,7 +311,7 @@ header information.  In these cases we will try to inspect the meta data and do 
 right thing (in the above case we'd use SHIFT_JIS to decode, not UTF-8).  However if
 after inspecting the headers we cannot figure out how to decode the data, in those cases it
 will not attempt to apply decoding to the form values.  Instead the part will be represented as
-an instance of an object L<Catalyst::Request::PartData> which will contain all the header 
+an instance of an object L<Catalyst::Request::PartData> which will contain all the header
 information needed for you to perform custom parser of the data.
 
 Ideally we'd fix L<Catalyst> to be smarter about decoding so please submit your cases of
@@ -325,43 +325,43 @@ determine when that is needed.
 
 =head2 Summary
 
-	use utf8;
-	use warnings;
-	use strict;
+    use utf8;
+    use warnings;
+    use strict;
 
-	package MyApp::Controller::Root;
+    package MyApp::Controller::Root;
 
-	use base 'Catalyst::Controller';
-	use File::Spec;
+    use base 'Catalyst::Controller';
+    use File::Spec;
 
-	sub scalar_body :Local {
-		my ($self, $c) = @_;
-		$c->response->content_type('text/html');
-		$c->response->body("<p>This is scalar_body action ♥</p>");
-	}
+    sub scalar_body :Local {
+        my ($self, $c) = @_;
+        $c->response->content_type('text/html');
+        $c->response->body("<p>This is scalar_body action ♥</p>");
+    }
 
-	sub stream_write :Local {
-		my ($self, $c) = @_;
-		$c->response->content_type('text/html');
-		$c->response->write("<p>This is stream_write action ♥</p>");
-	}
+    sub stream_write :Local {
+        my ($self, $c) = @_;
+        $c->response->content_type('text/html');
+        $c->response->write("<p>This is stream_write action ♥</p>");
+    }
 
-	sub stream_write_fh :Local {
-		my ($self, $c) = @_;
-		$c->response->content_type('text/html');
+    sub stream_write_fh :Local {
+        my ($self, $c) = @_;
+        $c->response->content_type('text/html');
 
-		my $writer = $c->res->write_fh;
-		$writer->write_encoded('<p>This is stream_write_fh action ♥</p>');
-		$writer->close;
-	}
+        my $writer = $c->res->write_fh;
+        $writer->write_encoded('<p>This is stream_write_fh action ♥</p>');
+        $writer->close;
+    }
 
-	sub stream_body_fh :Local {
-		my ($self, $c) = @_;
-		my $path = File::Spec->catfile('t', 'utf8.txt');
-		open(my $fh, '<', $path) || die "trouble: $!";
-		$c->response->content_type('text/html');
-		$c->response->body($fh);
-	}
+    sub stream_body_fh :Local {
+        my ($self, $c) = @_;
+        my $path = File::Spec->catfile('t', 'utf8.txt');
+        open(my $fh, '<', $path) || die "trouble: $!";
+        $c->response->content_type('text/html');
+        $c->response->body($fh);
+    }
 
 =head2 Discussion
 
@@ -402,13 +402,13 @@ L<Catalyst> supports several methods of supplying your response with body conten
 and currently most common is to set the L<Catalyst::Response> ->body with a scalar string (
 as in the example):
 
-        use utf8;
+    use utf8;
 
-	sub scalar_body :Local {
-		my ($self, $c) = @_;
-		$c->response->content_type('text/html');
-		$c->response->body("<p>This is scalar_body action ♥</p>");
-	}
+    sub scalar_body :Local {
+        my ($self, $c) = @_;
+        $c->response->content_type('text/html');
+        $c->response->body("<p>This is scalar_body action ♥</p>");
+    }
 
 In general you should need to do nothing else since L<Catalyst> will automatically encode
 this string during body finalization.  The only matter to watch out for is to make sure
@@ -425,10 +425,10 @@ you can override this for a given response.  For example here's how to override 
 encoding and set the correct character set in the response:
 
     sub override_encoding :Local {
-      my ($self, $c) = @_;
-      $c->res->content_type('text/plain');
-      $c->encoding(Encode::find_encoding('Shift_JIS'));
-      $c->response->body("テスト");
+        my ($self, $c) = @_;
+        $c->res->content_type('text/plain');
+        $c->encoding(Encode::find_encoding('Shift_JIS'));
+        $c->response->body("テスト");
     }
 
 This will use the alternative encoding for a single response.
@@ -454,11 +454,11 @@ that before anything else!
 The first streaming method is to use the C<write> method on the response object.  This method
 allows 'inlined' streaming and is generally used with blocking style servers.
 
-	sub stream_write :Local {
-		my ($self, $c) = @_;
-		$c->response->content_type('text/html');
-		$c->response->write("<p>This is stream_write action ♥</p>");
-	}
+    sub stream_write :Local {
+        my ($self, $c) = @_;
+        $c->response->content_type('text/html');
+        $c->response->write("<p>This is stream_write action ♥</p>");
+    }
 
 You may call the C<write> method as often as you need to finish streaming all your content.
 L<Catalyst> will encode each line in turn as long as the content-type meets the 'encodable types'
@@ -476,14 +476,14 @@ stuff with encoding this is likely to just already do the correct thing.
 The second way to stream a response is to get the response writer object and invoke methods
 on that directly:
 
-	sub stream_write_fh :Local {
-		my ($self, $c) = @_;
-		$c->response->content_type('text/html');
+    sub stream_write_fh :Local {
+        my ($self, $c) = @_;
+        $c->response->content_type('text/html');
 
-		my $writer = $c->res->write_fh;
-		$writer->write_encoded('<p>This is stream_write_fh action ♥</p>');
-		$writer->close;
-	}
+        my $writer = $c->res->write_fh;
+        $writer->write_encoded('<p>This is stream_write_fh action ♥</p>');
+        $writer->close;
+    }
 
 This can be used just like the C<write> method, but typically you request this object when
 you want to do a nonblocking style response since the writer object can be closed over or
@@ -508,13 +508,13 @@ The last style of content response that L<Catalyst> supports is setting the body
 like object.  In this case the object is passed down to the Plack application handler directly
 and currently we do nothing to set encoding.
 
-	sub stream_body_fh :Local {
-		my ($self, $c) = @_;
-		my $path = File::Spec->catfile('t', 'utf8.txt');
-		open(my $fh, '<', $path) || die "trouble: $!";
-		$c->response->content_type('text/html');
-		$c->response->body($fh);
-	}
+    sub stream_body_fh :Local {
+        my ($self, $c) = @_;
+        my $path = File::Spec->catfile('t', 'utf8.txt');
+        open(my $fh, '<', $path) || die "trouble: $!";
+        $c->response->content_type('text/html');
+        $c->response->body($fh);
+    }
 
 In this example we create a filehandle to a text file that contains UTF8 encoded characters. We
 pass this down without modification, which I think is correct since we don't want to double
@@ -546,15 +546,15 @@ content encoding header is set when we hit finalization, we skip automatic encod
     use utf8;
 
     sub gzipped :Local {
-      my ($self, $c) = @_;
+        my ($self, $c) = @_;
 
-      $c->res->content_type('text/plain');
-      $c->res->content_type_charset('UTF-8');
-      $c->res->content_encoding('gzip');
+        $c->res->content_type('text/plain');
+        $c->res->content_type_charset('UTF-8');
+        $c->res->content_encoding('gzip');
 
-      $c->response->body(
-        Compress::Zlib::memGzip(
-          Encode::encode_utf8("manual_1 ♥")));
+        $c->response->body(
+          Compress::Zlib::memGzip(
+            Encode::encode_utf8("manual_1 ♥")));
     }
 
 
@@ -623,7 +623,7 @@ come after you are very clear as to your intentions.
 You may encounter issues with your legacy code running under default UTF8 body encoding.  If
 so you can disable this with the following configurations setting:
 
-	MyApp->config(encoding=>undef);
+    MyApp->config(encoding=>undef);
 
 Where C<MyApp> is your L<Catalyst> subclass.
 
@@ -647,7 +647,7 @@ compatible hacks.  Please report issues to the development team.
 
 =head1 Author
 
-John Napiorkowski L<jjnapiork@cpan.org|email:jjnapiork@cpan.org>
+John Napiorkowski L<jjnapiork@cpan.org|mailto:jjnapiork@cpan.org>
 
 =cut
 

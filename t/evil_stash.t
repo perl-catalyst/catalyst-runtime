@@ -13,7 +13,7 @@ use Test::More;
     $c->{stash}->{foo} = 'bar';
     $c->stash(baz=>'boor');
     $c->{stash}->{baz} = $c->stash->{baz} . 2;
-    
+
     Test::More::is($c->stash->{foo}, 'bar');
     Test::More::is($c->stash->{baz}, 'boor2');
     Test::More::is($c->{stash}->{foo}, 'bar');

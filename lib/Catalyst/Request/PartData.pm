@@ -95,7 +95,7 @@ Catalyst::Request::Upload - handles file upload requests
 
 =head1 SYNOPSIS
 
-    my $data_part = 
+    my $data_part =
 
 To specify where Catalyst should put the temporary files, set the 'uploadtmp'
 option in the Catalyst config. If unset, Catalyst will use the system temp dir.

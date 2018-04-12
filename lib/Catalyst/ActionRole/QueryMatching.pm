@@ -32,12 +32,12 @@ has query_constraints => (
   sub _build_query_constraints {
     my $self = shift;
     my ($constraint_proto, @extra) = $self->_query_attr;
-    
+
     die "Action ${\$self->private_path} defines more than one 'Query' attribute" if scalar @extra;
     return +{} unless defined($constraint_proto);
 
     $constraint_proto =~s/^(.+),\.\.\.$/$1/; # slurpy is handled elsewhere
-    
+
     # Query may be a Hash like Query(p=>Int,q=>Str) OR it may be a Ref like
     # Query(Tuple[p=>Int, slurpy HashRef]).  The only way to figure is to eval it
     # and look at what we have.
@@ -83,7 +83,7 @@ around ['match','match_captures'] => sub {
 around 'list_extra_info' => sub {
   my ($orig, $self, @args) = @_;
   return {
-    %{ $self->$orig(@args) }, 
+    %{ $self->$orig(@args) },
   };
 };
 

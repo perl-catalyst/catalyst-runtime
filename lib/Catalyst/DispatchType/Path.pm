@@ -61,7 +61,7 @@ sub list {
 
             my $display_path = "/$path/$parts";
             $display_path =~ s{/{1,}}{/}g;
-            $display_path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg; # deconvert urlencoded for pretty view 
+            $display_path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg; # deconvert urlencoded for pretty view
             $display_path = decode_utf8 $display_path;  # URI does encoding
             $paths->row( $display_path, "/$action" );
         }

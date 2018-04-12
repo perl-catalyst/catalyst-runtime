@@ -42,7 +42,7 @@ SKIP:
     if ( $ENV{CATALYST_SERVER} ) {
         skip 'Using remote server', 5;
     }
-    
+
     local $ENV{HTTPS} = 'on';
     ok( my $response = request('https://localhost/engine/request/uri'), 'HTTPS Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
@@ -57,7 +57,7 @@ SKIP:
         a => [ qw/1 2/ ],
         b => 3,
     };
-    
+
     ok( my $response = request('http://localhost/engine/request/uri?a=1;a=2;b=3'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( eval '$creq = ' . $response->content, 'Unserialize Catalyst::Request' );
@@ -168,7 +168,7 @@ SKIP:
     if ( $ENV{CATALYST_SERVER} ) {
         skip 'Using remote server', 2;
     }
- 
+
     require TestApp::RequestBaseBug;
     TestApp->request_class('TestApp::RequestBaseBug');
     ok( my $response = request('http://localhost/engine/request/uri'), 'Request' );

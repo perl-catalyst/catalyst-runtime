@@ -32,14 +32,14 @@ while ( @tests ) {
     my $data = shift @tests;
 
     #   Run tests for path with trailing slash and without
-  SKIP: for my $req_uri 
-    ( 
+  SKIP: for my $req_uri
+    (
         join( '' => $uri_base, $data->{ path } ),      # Without trailing path
         join( '' => $uri_base, $data->{ path }, '/' ), # With trailing path
     ) {
         my $end_slash = ( $req_uri =~ qr(/$) ? 1 : 0 );
 
-        #   use slash_expect argument if URI ends with slash 
+        #   use slash_expect argument if URI ends with slash
         #   and the slash_expect argument is defined
         my $expect = $data->{ expect } || '';
         if ( $end_slash and exists $data->{ slash_expect } ) {

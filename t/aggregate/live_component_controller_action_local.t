@@ -108,11 +108,11 @@ sub run_tests {
     }
 
     SKIP:
-    { 
+    {
         if ( $ENV{CATALYST_SERVER} ) {
             skip "tests for %2F on remote server", 6;
         }
-        
+
         ok(
             my $response =
               request('http://localhost/action/local/one/foo%2Fbar'),

@@ -122,7 +122,7 @@ my $psgi_app = sub {
     $c->res->body("$uri");
   }
 
-  
+
   sub get_env {
     my ($self, $c) = @_;
     if($c->req->query_parameters->{path_prefix}) {
@@ -255,7 +255,7 @@ use Catalyst::Test 'MyApp';
 
 # END [/user/local_example_args1/***/]
 
-# BEGIN [/user/path-example] 
+# BEGIN [/user/path-example]
 
 {
   my ($res, $c) = ctx_request('/user/path-example');

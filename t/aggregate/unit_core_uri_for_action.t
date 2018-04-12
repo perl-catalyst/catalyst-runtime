@@ -83,11 +83,11 @@ my $context = TestApp->new( {
 # JNAP: I'm going to todo these tests, calling uri_for as a class method
 # should work, but its not really useful so I think theres not much harm
 # if someone needs this for a business case they are welcome to figure out
-# what is going 
+# what is going
 
 TODO: {
     local $TODO = "Need to fix using uri_for and uri_for_action as a class method";
-            
+
 
 # this works, using $ctx
 is($context->uri_for($context->controller('Action::Chained')->action_for('endpoint')),
@@ -157,10 +157,10 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
         'uri_for_action correct for chained with multiple capturing actions and args combined' );
 
     my $action_needs_two = '/action/chained/endpoint2';
-    
+
     ok( ! defined( $context->uri_for_action($action_needs_two, [1],     (2,3)) ),
         'uri_for_action returns undef for not enough captures' );
-        
+
     is( $context->uri_for_action($action_needs_two,            [1,2],   (2,3)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/2/3',
         'uri_for_action returns correct uri for correct captures' );
@@ -171,7 +171,7 @@ is($context->uri_for($chained_action, [ 1 ], 2, { q => 1 }),
 
     ok( ! defined( $context->uri_for_action($action_needs_two, [1,2,3], (2,3)) ),
         'uri_for_action returns undef for too many captures' );
-    
+
     is( $context->uri_for_action($action_needs_two, [1,2],   (3)),
         'http://127.0.0.1/foo/chained/foo2/1/2/end2/3',
         'uri_for_action returns uri with lesser args than specified on action' );

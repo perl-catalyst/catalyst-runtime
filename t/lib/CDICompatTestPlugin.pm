@@ -8,7 +8,7 @@ package CDICompatTestPlugin;
 # stuff, as C::A::Plugin::Credential::Password is added to the plugin
 # list, and that uses base C::A::C::P class, does the mk_accessors.
 
-# If a class data method called _config hasn't been created in 
+# If a class data method called _config hasn't been created in
 # MyApp ($app below), then our call to ->config gets our accessor
 # (rather than the class data one), and we fail..
 
@@ -26,10 +26,10 @@ sub setup {
 }
 
 # However, if we are too enthusiastic about adding accessors to the
-# MyApp package, then this method isn't called (as there is a local 
+# MyApp package, then this method isn't called (as there is a local
 # symbol already).
 
-# Note - use a different package here, so that Moose's 
+# Note - use a different package here, so that Moose's
 # package detection code doesn't get confused..
 $CDICompatTestPlugin::Data::HAS_RUN_SETUP_FINISHED = 0;
 

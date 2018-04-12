@@ -67,8 +67,8 @@ sub run_tests {
         ) or fail("EXCEPTION $@ DESERIALIZING " . $response->content);
         is_deeply( $creq->{arguments}, $expected, 'Arguments ok' );
     }
-    
-    
+
+
     # Test that /foo and /foo/ both do the same thing
     {
         my @expected = qw[
@@ -76,19 +76,19 @@ sub run_tests {
           TestApp::Controller::Action->default
           TestApp::Controller::Root->end
         ];
-        
+
         my $expected = join( ", ", @expected );
-        
+
         ok( my $response = request('http://localhost/action'), 'Request' );
         is( $response->header('X-Catalyst-Executed'),
-            $expected, 
+            $expected,
             'Executed actions for /action'
         );
-        
+
         ok( $response = request('http://localhost/action/'), 'Request' );
         is( $response->header('X-Catalyst-Executed'),
-            $expected, 
+            $expected,
             'Executed actions for /action/'
         );
-    }   
+    }
 }

@@ -13,7 +13,7 @@ use Catalyst::Test 'TestAppEncoding';
 plan skip_all => 'This test does not run live'
     if $ENV{CATALYST_SERVER};
 
-{   
+{
     # Test for https://rt.cpan.org/Ticket/Display.html?id=53678
     # Catalyst::Test::get currently returns the raw octets, but it
     # would be more useful if it decoded the content based on the

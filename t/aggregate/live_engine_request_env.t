@@ -10,7 +10,7 @@ use vars qw/
 /;
 
 BEGIN {
-    $EXPECTED_ENV_VAR = "CATALYSTTEST$$"; # has to be uppercase otherwise fails on Win32 
+    $EXPECTED_ENV_VAR = "CATALYSTTEST$$"; # has to be uppercase otherwise fails on Win32
     $EXPECTED_ENV_VAL = "Test env value " . rand(100000);
 }
 

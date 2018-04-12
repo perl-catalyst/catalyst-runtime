@@ -2,29 +2,29 @@ package TestApp::Controller::HTTPMethods;
 
 use Moose;
 use MooseX::MethodAttributes;
- 
+
 extends 'Catalyst::Controller';
- 
+
 sub default : Path Args {
     my ($self, $ctx) = @_;
     $ctx->response->body('default');
 }
- 
+
 sub get : Path('foo') Method('GET') {
     my ($self, $ctx) = @_;
     $ctx->response->body('get');
 }
- 
+
 sub post : Path('foo') Method('POST') {
     my ($self, $ctx) = @_;
     $ctx->response->body('post');
 }
- 
+
 sub get_or_post : Path('bar') Method('GET') Method('POST') {
     my ($self, $ctx) = @_;
     $ctx->response->body('get or post');
 }
- 
+
 sub any_method : Path('baz') {
     my ($self, $ctx) = @_;
     $ctx->response->body('any');
@@ -63,7 +63,7 @@ sub get_or_put :Chained('base') PathPart('get_put_post_delete') CaptureArgs(0) G
 sub get2 :Chained('get_or_put') PathPart('') Args(0) GET {
     pop->res->body('get2');
 }
-    
+
 sub put2 :Chained('get_or_put') PathPart('') Args(0) PUT {
     pop->res->body('put2');
 }
@@ -73,7 +73,7 @@ sub post_or_delete :Chained('base') PathPart('get_put_post_delete') CaptureArgs(
 sub post2 :Chained('post_or_delete') PathPart('') Args(0) POST {
     pop->res->body('post2');
 }
-    
+
 sub delete2 :Chained('post_or_delete') PathPart('') Args(0) DELETE {
     pop->res->body('delete2');
 }

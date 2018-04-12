@@ -191,21 +191,21 @@ sub mult_nopp2_load            : Chained('mult_nopp2_base') PathPart('') Capture
 sub mult_nopp2_view            : Chained('mult_nopp2_load') PathPart('') Args(0) { }
 
 #
-#	Test Choice between branches and early return logic
+#   Test Choice between branches and early return logic
 #   Declaration order is important for $children->{$*}, since this is first match best.
 #
-sub cc_base 	: Chained('/') 		 PathPart('chained/choose_capture') CaptureArgs(0) { }
-sub cc_link  	: Chained('cc_base') PathPart('') 						CaptureArgs(0) { }
-sub cc_anchor 	: Chained('cc_link') PathPart('anchor.html') 			Args(0) 	   { }
-sub cc_all     	: Chained('cc_base') PathPart('') 						Args() 		   { }
+sub cc_base     : Chained('/')       PathPart('chained/choose_capture') CaptureArgs(0) { }
+sub cc_link     : Chained('cc_base') PathPart('')                       CaptureArgs(0) { }
+sub cc_anchor   : Chained('cc_link') PathPart('anchor.html')            Args(0)        { }
+sub cc_all      : Chained('cc_base') PathPart('')                       Args()         { }
 
-sub cc_a		: Chained('cc_base') 	PathPart('') 	CaptureArgs(1) { }
-sub cc_a_link	: Chained('cc_a') 	 	PathPart('a') 	CaptureArgs(0) { }
-sub cc_a_anchor	: Chained('cc_a_link')  PathPart('') 	Args() 		   { }
+sub cc_a        : Chained('cc_base')    PathPart('')    CaptureArgs(1) { }
+sub cc_a_link   : Chained('cc_a')       PathPart('a')   CaptureArgs(0) { }
+sub cc_a_anchor : Chained('cc_a_link')  PathPart('')    Args()         { }
 
-sub cc_b		: Chained('cc_base') 	PathPart('b') 				CaptureArgs(0) { }
-sub cc_b_link	: Chained('cc_b') 	 	PathPart('') 				CaptureArgs(1) { }
-sub cc_b_anchor	: Chained('cc_b_link')  PathPart('anchor.html') 	Args() 		   { }
+sub cc_b        : Chained('cc_base')    PathPart('b')               CaptureArgs(0) { }
+sub cc_b_link   : Chained('cc_b')       PathPart('')                CaptureArgs(1) { }
+sub cc_b_anchor : Chained('cc_b_link')  PathPart('anchor.html')     Args()         { }
 
 #
 #   Test static paths vs. captures

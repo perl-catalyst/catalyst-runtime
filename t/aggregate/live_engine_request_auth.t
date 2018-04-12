@@ -36,6 +36,6 @@ use HTTP::Request::Common;
     }
 
     isa_ok( $creq, 'Catalyst::Request' );
-    
+
     is( $creq->header('Authorization'), 'Basic dGVzdDoxMjM0NQ==', 'auth header ok' );
 }

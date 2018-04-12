@@ -76,7 +76,7 @@ sub finalize_body {
     if($res->_has_response_cb) {
         ## we have not called the response callback yet, so we are safe to send
         ## the whole body to PSGI
-        
+
         my @headers;
         $res->headers->scan(sub { push @headers, @_ });
 
@@ -92,12 +92,12 @@ sub finalize_body {
                     # In the past, Catalyst only looked for ->read not ->getline.  It is very possible
                     # that one might have an object that respected read but did not have getline.
                     # As a result, we need to handle this case for backcompat.
-                
+
                     # We will just do the old loop for now.  In a future version of Catalyst this support
-                    # will be removed and one will have to rewrite their custom object or use 
+                    # will be removed and one will have to rewrite their custom object or use
                     # Plack::Middleware::AdaptFilehandleRead.  In anycase support for this is officially
                     # deprecated and described as such as of 5.90060
-                   
+
                     my $got;
                     do {
                         $got = read $body, my ($buffer), $CHUNKSIZE;
@@ -109,7 +109,7 @@ sub finalize_body {
                 } else {
                     # Looks like for  backcompat reasons we need to be able to deal
                     # with stringyfiable objects.
-                    $body = ["$body"]; 
+                    $body = ["$body"];
                 }
             } elsif(ref $body) {
                 if( (ref($body) eq 'GLOB') or (ref($body) eq 'ARRAY')) {
@@ -139,7 +139,7 @@ sub finalize_body {
         ## for backcompat we still need to handle a ->body.  I guess I could see
         ## someone calling ->write to presend some stuff, and then doing the rest
         ## via ->body, like in a template.
-        
+
         ## We'll just use the old, existing code for this (or most of it)
 
         if(my $body = $res->body) {
@@ -158,7 +158,7 @@ sub finalize_body {
               close $body;
           }
           else {
-              
+
               # Case where body was set after calling ->write.  We'd prefer not to
               # support this, but I can see some use cases with the way most of the
               # views work. Since body has already been encoded, we need to do
@@ -249,7 +249,7 @@ sub finalize_error {
 
     $c->res->content_type('text/html; charset=utf-8');
     my $name = ref($c)->config->{name} || join(' ', split('::', ref $c));
-    
+
     # Prevent Catalyst::Plugin::Unicode::Encoding from running.
     # This is a little nasty, but it's the best way to be clean whether or
     # not the user has an encoding plugin.

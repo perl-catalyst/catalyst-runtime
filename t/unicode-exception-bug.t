@@ -40,11 +40,11 @@ BEGIN {
 
   TestApp::Controller::Root->config(namespace => '');
 }
- 
+
 {
   package TestApp;
   $INC{'TestApp.pm'} = __FILE__;
- 
+
   use Catalyst;
   use TestApp::Exception;
 
@@ -56,8 +56,8 @@ BEGIN {
 
   __PACKAGE__->setup;
 }
- 
- 
+
+
 use Catalyst::Test 'TestApp';
 
 {
@@ -65,7 +65,7 @@ use Catalyst::Test 'TestApp';
   is ($res->status_line, "200 OK");
   is ($res->content, '<h1>OK</h1>');
 }
- 
+
 {
   my $res = request('/%E2%C3%83%C6%92%C3%8');
   is ($res->content, 'Bad unicode data');

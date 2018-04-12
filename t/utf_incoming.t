@@ -10,7 +10,7 @@ use JSON::MaybeXS;
 use Data::Dumper;
 use Scalar::Util ();
 
-# Test cases for incoming utf8 
+# Test cases for incoming utf8
 
 {
   package MyApp::Controller::Root;
@@ -73,7 +73,7 @@ use Scalar::Util ();
         # Test to make sure redirect can now take an object (sorry don't have a better place for it
         # but wanted test coverage.
         my $location = $c->res->redirect( $c->uri_for($c->controller('Root')->action_for('uri_for')) );
-        Test::More::ok !ref $location; 
+        Test::More::ok !ref $location;
       }
 
   sub stream_write :Local {
@@ -170,7 +170,7 @@ use Scalar::Util ();
 
     # Encode JSON also encodes to a UTF-8 encoded, binary string. This is why we don't
     # have application/json as one of the things we match, otherwise we get double
-    # encoding.  
+    # encoding.
     $c->response->body(JSON::MaybeXS::encode_json($post));
   }
 

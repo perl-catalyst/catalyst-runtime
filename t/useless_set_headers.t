@@ -13,7 +13,7 @@ use HTTP::Request::Common;
 
   sub my_warnings { $warn[0] };
   sub warn { shift; push(@warn, @_) }
- 
+
   package MyApp::Controller::Root;
   $INC{'MyApp/Controller/Root.pm'} = __FILE__;
 

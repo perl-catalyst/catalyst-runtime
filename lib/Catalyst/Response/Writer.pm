@@ -45,7 +45,7 @@ These delegate to the underlying L<PSGI> writer object
 
 =head2 write_encoded
 
-If the application defines a response encoding (default is UTF8) and the 
+If the application defines a response encoding (default is UTF8) and the
 content type is a type that needs to be encoded (text types like HTML or XML and
 Javascript) we first encode the line you want to write.  This is probably the
 thing you want to always do.  If you use the L<\write> method directly you will

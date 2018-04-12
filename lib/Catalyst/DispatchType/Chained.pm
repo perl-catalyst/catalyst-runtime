@@ -317,12 +317,12 @@ sub recurse_match {
                     !$best_action                       ||
                     @parts < @{$best_action->{parts}}   ||
                     (
-                        !@parts && 
-                        defined($args_attr) && 
+                        !@parts &&
+                        defined($args_attr) &&
                         (
                             $args_count eq "0" &&
                             (
-                              ($c->config->{use_chained_args_0_special_case}||0) || 
+                              ($c->config->{use_chained_args_0_special_case}||0) ||
                                 (
                                   exists($best_action->{args_count}) && defined($best_action->{args_count}) ?
                                   ($best_action->{args_count} ne 0) : 1

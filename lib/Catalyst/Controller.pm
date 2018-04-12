@@ -157,7 +157,7 @@ sub _AUTO : Private {
         # We FORCE the auto action user to explicitly return
         # true.  We need to do this since there's some auto
         # users (Catalyst::Authentication::Credential::HTTP) that
-        # actually do a detach instead.  
+        # actually do a detach instead.
         $c->state(0);
         $auto->dispatch( $c );
         return 0 unless $c->state;
@@ -794,7 +794,7 @@ This is a general toolbox for attaching your action to a given path.
 =head2 Regexp
 
 B<Status: Deprecated.>  Use Chained methods or other techniques.
-If you really depend on this, install the standalone 
+If you really depend on this, install the standalone
 L<Catalyst::DispatchType::Regex> distribution.
 
 A global way to match a give regular expression in the incoming request path.
@@ -804,12 +804,12 @@ A global way to match a give regular expression in the incoming request path.
 =head2 LocalRegexp
 
 B<Status: Deprecated.>  Use Chained methods or other techniques.
-If you really depend on this, install the standalone 
+If you really depend on this, install the standalone
 L<Catalyst::DispatchType::Regex> distribution.
 
 Like L</Regex> but scoped under the namespace of the containing controller
 
-=head2 Chained 
+=head2 Chained
 
 =head2 ChainedParent
 
@@ -933,7 +933,7 @@ that actions with an undetermined number of args match at lower precedence than 
 with a fixed number.  You may use reference types such as Tuple from L<Types::Standard>
 that allows you to fix the number of allowed args.  For example Args(Tuple[Int,Int])
 would be determined to be two args (or really the same as Args(Int,Int).)  You may
-find this useful for creating custom subtypes with complex matching rules that you 
+find this useful for creating custom subtypes with complex matching rules that you
 wish to reuse over many actions.
 
 See L<Catalyst::RouteMatching> for more.
@@ -1047,7 +1047,7 @@ Allows you to customize parsing of subroutine attributes.
 
 Please note that this feature does not let you actually assign new functions
 to actions via subroutine attributes, but is really more for creating useful
-aliases to existing core and extended attributes, and transforms based on 
+aliases to existing core and extended attributes, and transforms based on
 existing information (like from configuration).  Code for actually doing
 something meaningful with the subroutine attributes will be located in the
 L<Catalyst::Action> classes (or your subclasses), L<Catalyst::Dispatcher> and

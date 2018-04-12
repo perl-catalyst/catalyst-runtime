@@ -60,9 +60,9 @@ sub run_test_for {
     } else {
         $path = uri_escape($test);
     }
-    
+
     SKIP:
-    {   
+    {
         # Skip %2F, ., [, (, and ) tests on real webservers
         # Both Apache and lighttpd don't seem to like these
         if ( $ENV{CATALYST_SERVER} && $path =~ /(?:%2F|\.|%5B|\(|\))/ ) {
@@ -85,7 +85,7 @@ sub run_test_for {
 
         if( $test =~ m{/} ) {
             $test =~ s{/}{}g;
-            $path = uri_escape( $test ); 
+            $path = uri_escape( $test );
         }
 
         ok( $response = request("http://localhost/chained/multi_cap/$path/baz"), "Requested capture for path $path");

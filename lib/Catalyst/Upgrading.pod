@@ -147,7 +147,7 @@ look.
 
 Also we added a new develop console mode only warning when you call a component
 with arguments that don't expect or do anything meaningful with those args.  Its
-possible if you are logging debug mode in production (please don't...) this 
+possible if you are logging debug mode in production (please don't...) this
 could add verbosity to those logs if you also happen to be calling for components
 and passing pointless arguments.  We added this warning to help people not make this
 error and to better understand the component resolution flow.
@@ -229,7 +229,7 @@ request URL query or keywords.  Most readings of the relevant specifications
 suggest these should be UTF-* encoded, which is the default that L<Catalyst>
 will use, however if you are creating a lot of URLs manually or have external
 evil clients, this might cause you trouble.  If you find the changes introduced
-in Catalyst version 5.90080+ break some of your query code, you may disable 
+in Catalyst version 5.90080+ break some of your query code, you may disable
 the UTF-8 decoding globally using this configuration.
 
 This setting takes precedence over C<default_query_encoding> and

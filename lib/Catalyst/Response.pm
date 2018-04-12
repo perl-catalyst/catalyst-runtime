@@ -21,7 +21,7 @@ has encodable_content_type => (
 
 has _response_cb => (
     is      => 'ro',
-    isa     => 'CodeRef', 
+    isa     => 'CodeRef',
     writer  => '_set_response_cb',
     clearer => '_clear_response_cb',
     predicate => '_has_response_cb',
@@ -191,7 +191,7 @@ sub from_psgi_response {
             } else {
                 return $self->write_fh;
             }
-        });  
+        });
      } else {
         die "You can't set a Catalyst response from that, expect a valid PSGI response";
     }
@@ -239,7 +239,7 @@ will turn the Catalyst::Response into a HTTP Response and return it to the clien
     $c->response->body('Catalyst rocks!');
 
 Sets or returns the output (text or binary data). If you are returning a large body,
-you might want to use a L<IO::Handle> type of object (Something that implements the getline method 
+you might want to use a L<IO::Handle> type of object (Something that implements the getline method
 in the same fashion), or a filehandle GLOB. These will be passed down to the PSGI
 handler you are using and might be optimized using server specific abilities (for
 example L<Twiggy> will attempt to server a real local file in a non blocking manner).
@@ -264,7 +264,7 @@ When using a L<IO::Handle> type of object and no content length has been
 already set in the response headers Catalyst will make a reasonable attempt
 to determine the size of the Handle. Depending on the implementation of your
 handle object, setting the content length may fail. If it is at all possible
-for you to determine the content length of your handle object, 
+for you to determine the content length of your handle object,
 it is recommended that you set the content length in the response headers
 yourself, which will be respected and sent by Catalyst in the response.
 
@@ -489,7 +489,7 @@ even set a 'body' afterward.  So for example you might write your HTTP headers
 and the HEAD section of your document and then set the body from a template
 driven from a database.  In some cases this can seem to the client as if you had
 a faster overall response (but note that unless your server support chunked
-body your content is likely to get queued anyway (L<Starman> and most other 
+body your content is likely to get queued anyway (L<Starman> and most other
 http 1.1 webservers support this).
 
 If there is an encoding set, we encode each line of the response (the default
@@ -624,7 +624,7 @@ Or you can alter the regular expression using this attribute.
 
 =head2 encodable_response
 
-Given a L<Catalyst::Response> return true if its one that can be encoded.  
+Given a L<Catalyst::Response> return true if its one that can be encoded.
 
      make sure there is an encoding set on the response
      make sure the content type is encodable

@@ -19,7 +19,7 @@ for my $action ( keys %{$expected} ) {
     ok( my $response = request('http://localhost/engine/response/large/' . $action ),
         'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
-    
+
     is( length( $response->content ), length( $expected->{$action} ), 'Length OK' );
 }
 

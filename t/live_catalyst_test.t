@@ -46,12 +46,12 @@ my $req = '/dump/request';
 }
 
 {
-	my $response = request( POST( '/bodyparams', { override => 'this' } ) )->content;
+    my $response = request( POST( '/bodyparams', { override => 'this' } ) )->content;
     is($response, 'that', 'body param overridden');
 }
 
 {
-	my $response = request( POST( '/bodyparams/no_params' ) )->content;
+    my $response = request( POST( '/bodyparams/no_params' ) )->content;
     is($response, 'HASH', 'empty body param is hashref');
 }
 

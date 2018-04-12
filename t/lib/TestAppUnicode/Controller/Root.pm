@@ -7,7 +7,7 @@ __PACKAGE__->config(namespace => q{});
 
 use base 'Catalyst::Controller';
 
-sub main :Path('') { 
+sub main :Path('') {
     my ($self, $ctx, $charset) = @_;
     my $content_type = 'text/html';
     if ($ctx->stash->{charset}) {

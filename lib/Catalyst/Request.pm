@@ -141,8 +141,8 @@ sub _build_body_data {
 }
 
 has _use_hash_multivalue => (
-    is=>'ro', 
-    required=>1, 
+    is=>'ro',
+    required=>1,
     default=> sub {0});
 
 # Amount of data to read from input on each pass
@@ -251,7 +251,7 @@ sub prepare_body {
     my ( $self ) = @_;
 
     # If previously applied middleware created the HTTP::Body object, then we
-    # just use that one.  
+    # just use that one.
 
     if(my $plack_body = $self->_has_env ? $self->env->{'plack.request.http.body'} : undef) {
         $self->_body($plack_body);
@@ -283,7 +283,7 @@ sub prepare_body {
     # Ok if we get this far, we have to read psgi.input into the new body
     # object.  Lets play nice with any plack app or other downstream, so
     # we create a buffer unless one exists.
-     
+
     my $stream_buffer;
     if ($self->env->{'psgix.input.buffered'}) {
         # Be paranoid about previous psgi middleware or apps that read the
@@ -774,7 +774,7 @@ sub param {
 
     # If anything in @_ is undef, carp about that, and remove it from
     # the list;
-    
+
     my @params = grep { defined($_) ? 1 : do {carp "You called ->params with an undefined value"; 0} } @_;
 
     if ( @params == 1 ) {
@@ -1125,7 +1125,7 @@ If parameters have already been set will clear the parameters and build them aga
 
 =head2 $self->env
 
-Access to the raw PSGI env.  
+Access to the raw PSGI env.
 
 =head2 meta
 

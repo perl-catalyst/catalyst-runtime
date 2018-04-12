@@ -26,12 +26,12 @@ else {
         plan skip_all => 'Needs a Perl with ithreads enabled';
     }
 }
- 
+
 no warnings 'redefine';
 sub request {
-    my $thr = threads->new( 
+    my $thr = threads->new(
         sub { Catalyst::Test::local_request('TestApp',@_) },
-        @_ 
+        @_
     );
     $thr->join;
 }
@@ -46,7 +46,7 @@ sub request {
     ];
 
     my $expected = join( ", ", @expected );
-    
+
     ok( my $response = request('http://localhost/action/default'), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->header('X-Catalyst-Executed'), $expected, 'Executed actions' );

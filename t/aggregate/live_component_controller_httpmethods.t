@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use HTTP::Request::Common qw/GET POST DELETE PUT/;
- 
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
@@ -15,11 +15,11 @@ sub OPTIONS {
 is(request(GET    '/httpmethods/foo')->content, 'get');
 is(request(POST   '/httpmethods/foo')->content, 'post');
 is(request(DELETE '/httpmethods/foo')->content, 'default');
- 
+
 is(request(GET    '/httpmethods/bar')->content, 'get or post');
 is(request(POST   '/httpmethods/bar')->content, 'get or post');
 is(request(DELETE '/httpmethods/bar')->content, 'default');
- 
+
 is(request(GET    '/httpmethods/baz')->content, 'any');
 is(request(POST   '/httpmethods/baz')->content, 'any');
 is(request(DELETE '/httpmethods/baz')->content, 'any');

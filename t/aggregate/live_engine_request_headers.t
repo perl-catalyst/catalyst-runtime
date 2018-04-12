@@ -14,7 +14,7 @@ use HTTP::Request::Common;
 {
     my $creq;
 
-    my $request = GET( 'http://localhost/dump/request', 
+    my $request = GET( 'http://localhost/dump/request',
         'User-Agent'       => 'MyAgen/1.0',
         'X-Whats-Cool'     => 'Catalyst',
         'X-Multiple'       => [ 1 .. 5 ],
@@ -22,7 +22,7 @@ use HTTP::Request::Common;
         'X-Forwarded-For'  => '192.168.1.1, 1.2.3.4',
         'X-Forwarded-Port' => 443
     );
- 
+
     ok( my $response = request($request), 'Request' );
     ok( $response->is_success, 'Response Successful 2xx' );
     is( $response->content_type, 'text/plain', 'Response Content-Type' );
@@ -32,7 +32,7 @@ use HTTP::Request::Common;
     ok( $creq->secure, 'Forwarded port sets secure' );
     isa_ok( $creq->headers, 'HTTP::Headers', 'Catalyst::Request->headers' );
     is( $creq->header('X-Whats-Cool'), $request->header('X-Whats-Cool'), 'Catalyst::Request->header X-Whats-Cool' );
-    
+
     { # Test that multiple headers are joined as per RFC 2616 4.2 and RFC 3875 4.1.18
 
         my $excpected = '1, 2, 3, 4, 5';
@@ -51,7 +51,7 @@ use HTTP::Request::Common;
         if ( $ENV{CATALYST_SERVER} && $ENV{CATALYST_SERVER} !~ /127.0.0.1|localhost/ ) {
             skip "Using remote server", 2;
         }
-    
+
         is( $creq->base->host, 'frontend.server.com', 'Catalyst::Request proxied base' );
         is( $creq->address, '1.2.3.4', 'Catalyst::Request proxied address' );
     }

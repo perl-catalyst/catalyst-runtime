@@ -12,7 +12,7 @@ use base qw( Catalyst::Controller );
 #      /captureargs/*/edit
 #      /captureargs/test/*
 #   It will output the arguments they got passed to @_ after the
-#   context object. 
+#   context object.
 #   /captureargs/one/edit should not dispatch to /captureargs/*/*
 #   /captureargs/test/one should not dispatch to /captureargs/*/*
 

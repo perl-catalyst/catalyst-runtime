@@ -52,7 +52,7 @@ SKIP:
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Content'      => 'foo=bar&baz=quux'
         );
-    
+
         my $expected = { foo => 'bar', baz => 'quux', wibble => 'wobble' };
 
         ok( my $response = request($request), 'Request' );
@@ -71,13 +71,13 @@ SKIP:
     # Test reading chunks of the request body using $c->read
     {
         my $creq;
-    
+
         my $request = POST(
             'http://localhost/body/read',
             'Content-Type' => 'text/plain',
             'Content'      => 'x' x 105_000
         );
-    
+
         my $expected = '10000|10000|10000|10000|10000|10000|10000|10000|10000|10000|5000';
 
         ok( my $response = request($request), 'Request' );

@@ -25,7 +25,7 @@ use Catalyst::Test 'MyApp';
 
 # These tests assume that the decoding that occurs for the query string follows
 # the payload decoding algorithm described here:
-# https://www.w3.org/TR/html5/forms.html#url-encoded-form-data 
+# https://www.w3.org/TR/html5/forms.html#url-encoded-form-data
 
 {
   ok my $req = GET 'root/bar';

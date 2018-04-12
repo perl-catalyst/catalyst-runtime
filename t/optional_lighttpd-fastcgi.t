@@ -85,14 +85,14 @@ fastcgi.server = (
 )
 END
 
-open(my $lightconf, '>', "$docroot/lighttpd.conf") 
+open(my $lightconf, '>', "$docroot/lighttpd.conf")
   or die "Can't open $docroot/lighttpd.conf: $!";
 print {$lightconf} $conf or die "Write error: $!";
 close $lightconf;
 
-my $pid = open my $lighttpd, "$lighttpd_bin -D -f $docroot/lighttpd.conf 2>&1 |" 
+my $pid = open my $lighttpd, "$lighttpd_bin -D -f $docroot/lighttpd.conf 2>&1 |"
     or die "Unable to spawn lighttpd: $!";
-    
+
 # wait for it to start
 while ( check_port( 'localhost', $port ) != 1 ) {
     diag "Waiting for server to start...";

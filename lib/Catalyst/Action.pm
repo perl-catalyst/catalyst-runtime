@@ -261,7 +261,7 @@ sub resolve_type_constraint {
     my $tc =  Type::Registry->new->foreign_lookup($name);
     return defined $tc ? $tc : die "'$name' not a full namespace type constraint in ${\$self->private_path}";
   }
-  
+
   my @tc = grep { defined $_ } (eval("package ${\$self->class}; $name"));
 
   unless(scalar @tc) {
@@ -289,10 +289,10 @@ sub resolve_type_constraint {
           } else {
             return;
           }
-        } 
+        }
       }
     }
-    
+
     my $classes = join(',', $self->class, @roles, @supers);
     die "'$name' not a type constraint in '${\$self->private_path}', Looked in: $classes";
   }
@@ -470,7 +470,7 @@ sub list_extra_info {
     Args => $self->normalized_arg_number,
     CaptureArgs => $self->number_of_captures,
   }
-} 
+}
 
 __PACKAGE__->meta->make_immutable;
 

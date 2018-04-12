@@ -2,8 +2,8 @@ package TestAppChainedRecursive;
 
 use strict;
 use Catalyst qw/
-    Test::Errors 
-    Test::Headers 
+    Test::Errors
+    Test::Headers
 /;
 use Catalyst::Utils;
 

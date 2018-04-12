@@ -5,7 +5,7 @@ use base 'Catalyst::Controller';
 
 sub one :Relative {
     my ( $self, $c ) = @_;
-    
+
     $c->res->print("foo");
 }
 

@@ -65,7 +65,7 @@ sub can_consume {
 around 'list_extra_info' => sub {
   my ($orig, $self, @args) = @_;
   return {
-    %{ $self->$orig(@args) }, 
+    %{ $self->$orig(@args) },
     CONSUMES => $self->allowed_content_types,
   };
 };
@@ -87,7 +87,7 @@ Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
       sub is_json       : Chained('start') Consumes('application/json') { ... }
       sub is_urlencoded : Chained('start') Consumes('application/x-www-form-urlencoded') { ... }
       sub is_multipart  : Chained('start') Consumes('multipart/form-data') { ... }
-      
+
       ## Alternatively, for common types...
 
       sub is_json       : Chained('start') Consume(JSON) { ... }
@@ -95,13 +95,13 @@ Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
       sub is_multipart  : Chained('start') Consumes(Multipart) { ... }
 
       ## Or allow more than one type
-      
+
       sub is_more_than_one
         : Chained('start')
         : Consumes('application/x-www-form-urlencoded')
         : Consumes('multipart/form-data')
       {
-        ## ... 
+        ## ...
       }
 
       1;
@@ -109,7 +109,7 @@ Catalyst::ActionRole::ConsumesContent - Match on HTTP Request Content-Type
 =head1 DESCRIPTION
 
 This is an action role that lets your L<Catalyst::Action> match on the content
-type of the incoming request.  
+type of the incoming request.
 
 Generally when there's a PUT or POST request, there's a request content body
 with a matching MIME content type.  Commonly this will be one of the types
