@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use base 'Catalyst::Controller';
 
-eval 'use YAML';
+use JSON::MaybeXS qw(encode_json);
 
 sub system : Local {
     my ($self, $c, $ls) = @_;
@@ -21,7 +21,7 @@ sub system : Local {
         $result = $! if $result != 0;
     }
     
-    $c->response->body(Dump({result => $result}));
+    $c->response->body(encode_json({result => $result}));
 }
 
 sub backticks : Local {
@@ -37,7 +37,7 @@ sub backticks : Local {
         $code = $?;
     }
     
-    $c->response->body(Dump({result => $result, code => $code}));
+    $c->response->body(encode_json({result => $result, code => $code}));
 }
 
 sub fork : Local {
@@ -54,7 +54,7 @@ sub fork : Local {
 
     waitpid $pid,0 or die;
     
-    $c->response->body(Dump({pid => $pid, result => $x}));
+    $c->response->body(encode_json({pid => $pid, result => $x}));
 }
 
 1;

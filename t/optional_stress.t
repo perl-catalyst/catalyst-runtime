@@ -14,11 +14,16 @@ use Catalyst::Test 'TestApp';
 our ( $iters, $tests );
 
 BEGIN {
-    eval "use YAML";
-    plan skip_all => 'YAML is required for this test' if $@;
+    use JSON::MaybeXS qw(decode_json);
+
+    my $test_data = do {
+      open my $fh, '<:raw', "$FindBin::Bin/optional_stress.json" or die "$!";
+      local $/;
+      <$fh>;
+    };
 
     $iters = $ENV{TEST_STRESS} || 10;
-    $tests = YAML::LoadFile("$FindBin::Bin/optional_stress.yml");
+    $tests = decode_json($test_data);
 
     my $total_tests = 0;
     map { $total_tests += scalar @{ $tests->{$_} } } keys %{$tests};

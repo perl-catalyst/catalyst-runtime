@@ -17,12 +17,17 @@ plan skip_all => 'Proc::ProcessTable required for this test' if $@;
 eval "use HTTP::Body 0.03";
 plan skip_all => 'HTTP::Body >= 0.03 required for this test' if $@;
 
-eval "use YAML";
-plan skip_all => 'YAML required for this test' if $@;
+use JSON::MaybeXS qw(decode_json);
 
 our $t = Proc::ProcessTable->new( cache_ttys => 1 );
 our ( $initial, $final ) = ( 0, 0 ); 
-our $tests = YAML::LoadFile("$FindBin::Bin/optional_stress.yml");
+my $test_data = do {
+  open my $fh, '<:raw', "$FindBin::Bin/optional_stress.json" or die "$!";
+  local $/;
+  <$fh>;
+};
+
+our $tests = decode_json($test_data);
 
 my $total_tests = 0;
 
