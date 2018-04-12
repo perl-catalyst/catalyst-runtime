@@ -14,7 +14,7 @@ local our $fake_handler = \42;
 {
     package TestFastCGIScript;
     use Moose;
-    use namespace::autoclean;
+    use namespace::clean -except => [ 'meta' ];
 
     extends 'Catalyst::Script::FastCGI';
 

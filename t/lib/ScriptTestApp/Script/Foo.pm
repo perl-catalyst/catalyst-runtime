@@ -1,6 +1,6 @@
 package ScriptTestApp::Script::Foo;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 with 'Catalyst::ScriptRole';
 

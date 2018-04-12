@@ -14,7 +14,7 @@ use Catalyst::Utils;
 use Class::Load 'try_load_class';
 
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 # -----------
 # t/aggregate/unit_core_ctx_attr.t pukes until lazy is true

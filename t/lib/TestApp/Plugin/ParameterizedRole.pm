@@ -1,7 +1,7 @@
 package TestApp::Plugin::ParameterizedRole;
 
 use MooseX::Role::Parameterized;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 parameter method_name => (
     isa      => 'Str',

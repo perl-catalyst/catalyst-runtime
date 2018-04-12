@@ -1,6 +1,6 @@
 package TestAppShowInternalActions;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 use Catalyst::Runtime 5.80;
 

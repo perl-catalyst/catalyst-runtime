@@ -24,7 +24,6 @@ my %META = (
       requires => {
         'perl'                  => 5.008003,
         'List::Util'            => '1.45',
-        'namespace::autoclean'  => '0.28',
         'namespace::clean'      => '0.23',
         'MooseX::Emulate::Class::Accessor::Fast' => '0.00903',
         'Class::Load'           => '0.12',

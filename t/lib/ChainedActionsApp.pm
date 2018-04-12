@@ -1,11 +1,12 @@
 package ChainedActionsApp;
 use Moose;
-use namespace::autoclean;
 use TestLogger;
 
 use Catalyst::Runtime 5.80;
 
 use Catalyst qw//;
+
+use namespace::clean -except => [ 'meta' ];
 
 extends 'Catalyst';
 

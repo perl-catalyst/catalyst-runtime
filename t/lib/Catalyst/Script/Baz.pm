@@ -1,6 +1,6 @@
 package Catalyst::Script::Baz;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 use Test::More;
 

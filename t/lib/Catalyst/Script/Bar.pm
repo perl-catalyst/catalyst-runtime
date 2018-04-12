@@ -1,6 +1,6 @@
 package Catalyst::Script::Bar;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 with 'Catalyst::ScriptRole';
 

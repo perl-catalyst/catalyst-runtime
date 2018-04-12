@@ -2,7 +2,7 @@ package Catalyst::Script::Server;
 use Moose;
 use Catalyst::Utils;
 use Class::Load qw(try_load_class load_class);
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 with 'Catalyst::ScriptRole';
 

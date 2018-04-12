@@ -1,6 +1,6 @@
 package TestPath::Controller::Four;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 BEGIN { extends 'Catalyst::Controller' }
 

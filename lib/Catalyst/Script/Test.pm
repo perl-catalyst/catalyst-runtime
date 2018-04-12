@@ -1,7 +1,7 @@
 package Catalyst::Script::Test;
 use Moose;
 use Catalyst::Test ();
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 with 'Catalyst::ScriptRole';
 

@@ -1,7 +1,7 @@
 package Catalyst::Script::FastCGI;
 use Moose;
 use Data::OptList;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 sub _plack_engine_name { 'FCGI' }
 

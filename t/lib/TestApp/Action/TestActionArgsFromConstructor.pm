@@ -1,7 +1,7 @@
 package TestApp::Action::TestActionArgsFromConstructor;
 
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 extends 'Catalyst::Action';
 

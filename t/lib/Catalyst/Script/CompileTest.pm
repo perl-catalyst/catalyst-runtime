@@ -1,6 +1,6 @@
 package Catalyst::Script::CompileTest;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 use Test::More;
 

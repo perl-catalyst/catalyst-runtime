@@ -5,7 +5,7 @@ use MooseX::Getopt;
 use Catalyst::EngineLoader;
 use Moose::Util::TypeConstraints;
 use Catalyst::Utils;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 subtype 'Catalyst::ScriptRole::LoadableClass',
   as 'ClassName';

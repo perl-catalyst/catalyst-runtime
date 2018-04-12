@@ -1,6 +1,6 @@
 package ScriptTestApp::Controller::Root;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 BEGIN { extends 'Catalyst::Controller' }
 

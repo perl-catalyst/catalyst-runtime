@@ -5,8 +5,8 @@ use lib;
 use File::Spec;
 use Class::Load qw/ load_first_existing_class load_optional_class /;
 use Catalyst::Utils;
-use namespace::autoclean -also => 'subclass_with_traits';
 use Try::Tiny;
+use namespace::clean -except => [ 'meta' ];
 
 sub find_script_class {
     my ($self, $app, $script) = @_;
@@ -19,6 +19,7 @@ sub find_script_traits {
     return grep { load_optional_class($_) } @try;
 }
 
+no namespace::clean;
 sub subclass_with_traits {
     my ($base, @traits) = @_;
 
@@ -31,6 +32,7 @@ sub subclass_with_traits {
 
     return $meta->name;
 }
+use namespace::clean;
 
 sub run {
     my ($self, $appclass, $scriptclass) = @_;

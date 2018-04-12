@@ -1,6 +1,6 @@
 package ScriptTestApp::Script::CompileTest;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 die("Does not compile");
 

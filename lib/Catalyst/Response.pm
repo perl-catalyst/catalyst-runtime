@@ -3,10 +3,11 @@ package Catalyst::Response;
 use Moose;
 use HTTP::Headers;
 use Moose::Util::TypeConstraints;
-use namespace::autoclean;
 use Scalar::Util 'blessed';
 use Catalyst::Response::Writer;
 use Catalyst::Utils ();
+
+use namespace::clean -except => ['meta'];
 
 with 'MooseX::Emulate::Class::Accessor::Fast';
 

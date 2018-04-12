@@ -2,7 +2,7 @@ package Catalyst::Component::ContextClosure;
 
 use Moose::Role;
 use Scalar::Util 'weaken';
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 sub make_context_closure {
     my ($self, $closure, $ctx) = @_;

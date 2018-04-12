@@ -2,7 +2,7 @@ package Catalyst::EngineLoader;
 use Moose;
 use Catalyst::Exception;
 use Catalyst::Utils;
-use namespace::autoclean;
+use namespace::clean -except => ['meta'];
 
 extends 'Plack::Loader';
 

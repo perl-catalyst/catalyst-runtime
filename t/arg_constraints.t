@@ -203,7 +203,7 @@ BEGIN {
 
   use Moose;
   use MooseX::MethodAttributes;
-  use namespace::autoclean -except => 'Int';
+  use namespace::clean -except => [ 'meta' ];
 
   use MyApp::Types qw/Int/;
 

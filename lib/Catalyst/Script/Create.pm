@@ -1,7 +1,7 @@
 package Catalyst::Script::Create;
 use Moose;
 use Class::Load 'load_class';
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 with 'Catalyst::ScriptRole';
 

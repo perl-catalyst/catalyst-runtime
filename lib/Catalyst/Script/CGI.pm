@@ -1,6 +1,6 @@
 package Catalyst::Script::CGI;
 use Moose;
-use namespace::autoclean;
+use namespace::clean -except => [ 'meta' ];
 
 sub _plack_engine_name { 'CGI' }
 
