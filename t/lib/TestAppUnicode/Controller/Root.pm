@@ -52,7 +52,8 @@ sub latin1 :Local {
 sub file :Local {
     my ($self, $c) = @_;
     close *STDERR; # i am evil.
-    $c->response->body($main::TEST_FILE); # filehandle from test file
+    open my $test_file, '<', \"this is a test";
+    $c->response->body($test_file);
 }
 
 sub capture : Chained('/') CaptureArgs(1) {}

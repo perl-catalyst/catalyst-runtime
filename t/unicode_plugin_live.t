@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Scalar;
 
 # setup library path
 use FindBin qw($Bin);
@@ -15,9 +14,6 @@ BEGIN {
 
 # make sure testapp works
 use_ok('TestAppUnicode') or BAIL_OUT($@);
-
-our $TEST_FILE = IO::Scalar->new(\"this is a test");
-sub IO::Scalar::FILENO { -1 }; # needed?
 
 # a live test against TestAppUnicode, the test application
 use Test::WWW::Mechanize::Catalyst 'TestAppUnicode';

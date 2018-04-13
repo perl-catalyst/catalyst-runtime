@@ -16,7 +16,6 @@ my %META = (
         'Test::Fatal' => 0,
         'Test::More' => '0.88',
         'HTTP::Request::Common' => 0,
-        'IO::Scalar' => 0,
         'HTTP::Status' => 0,
       },
     },
