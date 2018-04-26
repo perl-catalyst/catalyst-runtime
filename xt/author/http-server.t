@@ -107,15 +107,11 @@ sub prove {
     if (!(my $pid = fork)) {
         require TAP::Harness;
 
-        my $aggr = -e '.aggregating';
         my $harness = TAP::Harness->new({
-            ($aggr ? (test_args => \@tests) : ()),
             lib => ['lib'],
         });
 
-        my $aggregator = $aggr
-            ? $harness->runtests('t/aggregate.t')
-            : $harness->runtests(@tests);
+        my $aggregator = $harness->runtests(@tests);
 
         exit $aggregator->has_errors ? 1 : 0;
     } else {
