@@ -49,14 +49,14 @@ script:
    - cpanm --metacpan --skip-satisfied Catalyst::Plugin::Authentication
 
    # pure reverse deps (call with --test-only):
-   - cpanm --test-only --metacpan Catalyst::Devel
-   - cpanm --test-only --metacpan Catalyst::Action::REST
-   - cpanm --test-only --metacpan Catalyst::Component::InstancePerContext
-   - cpanm --test-only --metacpan Catalyst::Plugin::Session
-   - cpanm --test-only --metacpan Catalyst::Plugin::Session::State::Cookie
-   - cpanm --test-only --verbose --metacpan Catalyst::Plugin::Static::Simple
-   - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
-   - cpanm --test-only --metacpan Catalyst::Plugin::ConfigLoader
+   - cpanm --test-only --metacpan -v Catalyst::Devel
+   - cpanm --test-only --metacpan -v Catalyst::Action::REST
+   - cpanm --test-only --metacpan -v Catalyst::Component::InstancePerContext
+   - cpanm --test-only --metacpan -v Catalyst::Plugin::Session
+   - cpanm --test-only --metacpan -v Catalyst::Plugin::Session::State::Cookie
+   - cpanm --test-only --metacpan -v Catalyst::Plugin::Static::Simple
+   - cpanm --test-only --metacpan -v Catalyst::Plugin::ConfigLoader
+   - cpanm --test-only --metacpan -v Catalyst::Plugin::ConfigLoader
    #- cpanm --test-only --verbose --metacpan Catalyst::Authentication::Credential::HTTP
 
    # Still need to figure out why these fail in travis:
