@@ -36,6 +36,9 @@ script:
    #  (note: currently skipping DBIC deps for speed)
    - make install
 
+   - export AUTHOR_TESTING=0
+   - export RELEASE_TESTING=0
+
    # pure author deps (of reverse deps):
    - cpanm --notest --metacpan --skip-satisfied YAML::Syck
 
