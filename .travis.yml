@@ -12,6 +12,9 @@ perl:
    - "5.10"
    - "5.8"
 
+before_install:
+   - eval $(curl https://travis-perl.github.io/init)
+   - $HELPERS_ROOT/bin/cpan-config
 install:
    - cpanm --notest --metacpan --skip-satisfied --with-develop --installdeps .
    - perl Makefile.PL
