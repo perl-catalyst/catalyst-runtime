@@ -25,6 +25,7 @@ install:
    # we want these for our tests, but not for any others
    - export AUTHOR_TESTING=1
    - export RELEASE_TESTING=1
+   - export PERL_AUTOINSTALL=--skip
 
    - make manifest
 
