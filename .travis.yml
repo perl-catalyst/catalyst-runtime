@@ -54,7 +54,6 @@ script:
    - cpanm --test-only --metacpan -v Catalyst::Plugin::Session::State::Cookie
    - cpanm --test-only --metacpan -v Catalyst::Plugin::Static::Simple
    - cpanm --test-only --metacpan -v Catalyst::Plugin::ConfigLoader
-   - cpanm --test-only --metacpan -v Catalyst::Plugin::ConfigLoader
    #- cpanm --test-only --verbose --metacpan Catalyst::Authentication::Credential::HTTP
 
    # Still need to figure out why these fail in travis:
