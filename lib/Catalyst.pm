@@ -1601,11 +1601,11 @@ sub uri_for {
         $path .= '/';
     }
 
-    my $fragment =  ((scalar(@args) && ref($args[-1]) eq 'SCALAR') ? pop @args : undef );
+    my $fragment =  ((scalar(@args) && ref($args[-1]) eq 'SCALAR') ? ${pop @args} : undef );
 
     unless(blessed $path) {
       if (defined($path) and $path =~ s/#(.+)$//)  {
-        if(defined($1) and $fragment) {
+        if(defined($1) and defined $fragment) {
           carp "Abiguious fragment declaration: You cannot define a fragment in '$path' and as an argument '$fragment'";
         }
         if(defined($1)) {
@@ -1725,7 +1725,7 @@ sub uri_for {
 
     if(defined $fragment) {
       if(blessed $path) {
-        $fragment = encode_utf8(${$fragment});
+        $fragment = encode_utf8($fragment);
         $fragment =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
         $fragment =~ s/ /+/g;
       }
