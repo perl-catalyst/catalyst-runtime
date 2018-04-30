@@ -1,5 +1,15 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - fix handling of fragments in uri_for when path is an unblessed string (GH#160)
+  - ensure catalyst.pl is included with dist
+  - drop IO::Scalar prereq
+  - include optional test prereqs as develop prereqs
+  - remove unused developer prereq on Catalyst::Engine::PSGI
+  - use namespace::clean consistently rather than namespace::autoclean
+  - use JSON for test metadata to avoid needing YAML
+  - use JSON::MaybeXS consistently in code
+  - drop unused prereq of HTTP::Request::AsCGI
+  - drop unneeded prereq of Class::Data::Inheritable
   - fix tests to cope with changes in new versions of Time::HiRes
   - POD typo and syntax fixes
 
