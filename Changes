@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90118 - 2018-05-01
   - fix handling of fragments in uri_for when path is an unblessed string (GH#160)
   - ensure catalyst.pl is included with dist
   - drop IO::Scalar prereq
