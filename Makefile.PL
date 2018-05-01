@@ -225,7 +225,6 @@ print <<"EOF";
     For development and use of catalyst.pl and myapp_create.pl, make sure
     you also install the development tools package Catalyst::Devel.
 
-        perl -MCPANPLUS -e 'install Catalyst::Devel' # or
         perl -MCPAN -e 'install Catalyst::Devel'     # or
         cpanm Catalyst::Devel
 

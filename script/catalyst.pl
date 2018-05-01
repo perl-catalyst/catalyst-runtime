@@ -14,7 +14,7 @@ part of the Catalyst-Devel distribution. Please install this via a
 vendor package or by running one of -
 
   perl -MCPAN -e 'install Catalyst::Devel'
-  perl -MCPANPLUS -e 'install Catalyst::Devel'
+  cpanm Catalyst::Devel
 END
 
 }
