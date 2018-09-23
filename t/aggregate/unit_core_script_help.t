@@ -6,6 +6,9 @@ use Test::Fatal;
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
 
+no warnings 'once';
+*CORE::GLOBAL::exit = sub {};
+
 {
     package TestHelpScript;
     use Moose;

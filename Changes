@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - fix test for changes in MooseX::Getopt 0.73 (RT#127050)
+
 5.90118 - 2018-05-01
   - fix handling of fragments in uri_for when path is an unblessed string (GH#160)
   - ensure catalyst.pl is included with dist
