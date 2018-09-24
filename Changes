@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90119 - 2018-09-24
   - fix test for changes in MooseX::Getopt 0.73 (RT#127050)
 
 5.90118 - 2018-05-01
