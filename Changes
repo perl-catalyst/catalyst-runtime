@@ -1,5 +1,7 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - split code to log stats report into a separate log_stats method (RT#127392)
+
 5.90122 - 2018-11-03
   - releasing as stable
 

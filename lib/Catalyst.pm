@@ -2196,15 +2196,26 @@ sub finalize {
 
     $c->log_response;
 
-    if ($c->use_stats) {
-        my $elapsed = $c->stats->elapsed;
-        my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
-        $c->log->info(
-            "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
-    }
+    $c->log_stats if $c->use_stats;
 
     return $c->response->status;
 }
+
+=head2 $c->log_stats
+
+Logs statistics.
+
+=cut
+
+sub log_stats {
+    my $c = shift;
+
+    my $elapsed = $c->stats->elapsed;
+    my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+    $c->log->info(
+        "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
+}
+
 
 =head2 $c->finalize_body
 
@@ -5010,6 +5021,8 @@ random: Roland Lammel <lammel@cpan.org>
 revmischa: Mischa Spiegelmock <revmischa@cpan.org>
 
 Robert Sedlacek <rs@474.at>
+
+rrwo: Robert Rothenberg <rrwo@cpan.org>
 
 SpiceMan: Marcel Montes
 
