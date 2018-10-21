@@ -1,5 +1,13 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - use the :utf8_strict (PerlIO::utf8_strict) rather than :encoding file handle
+    layer to handle decoding uploads, as a performance boost.
+  - fix handling of decoding uploaded files.  this fixes the usage of sysread
+    on :utf8 handles, and reenables the tests on all perl versions.  Fixes CPAN
+    RT#125843.  See also erl RT#133585.
+  - giving incorrect types to uri_for will warn to logs rather than via carp
+  - silence warning and error output from tests
+
 5.90120 - 2018-10-19
   - avoid problematic test using sysread() on :utf8 filehandles on dev perl
     versions where this is fatal (starting with 5.29.4). see RT#125843.
