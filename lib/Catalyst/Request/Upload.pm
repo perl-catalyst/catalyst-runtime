@@ -211,14 +211,20 @@ sub slurp {
         $layer = ':raw';
     }
 
-    my $content = undef;
+    my $content = '';
     my $handle  = $self->fh;
 
     binmode( $handle, $layer );
 
     $handle->seek(0, IO::File::SEEK_SET);
-    while ( $handle->sysread( my $buffer, 8192 ) ) {
-        $content .= $buffer;
+
+    if ($layer eq ':raw') {
+        while ( $handle->sysread( my $buffer, 8192 ) ) {
+            $content .= $buffer;
+        }
+    }
+    else {
+        $content = do { local $/; $handle->getline };
     }
 
     $handle->seek(0, IO::File::SEEK_SET);
@@ -237,11 +243,9 @@ sub decoded_slurp {
     my ( $self, $layer ) = @_;
     my $handle = $self->decoded_fh($layer);
 
-    my $content = undef;
     $handle->seek(0, IO::File::SEEK_SET);
-    while ( $handle->sysread( my $buffer, 8192 ) ) {
-        $content .= $buffer;
-    }
+
+    my $content = do { local $/; $handle->getline };
 
     $handle->seek(0, IO::File::SEEK_SET);
     return $content;

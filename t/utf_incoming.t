@@ -409,9 +409,7 @@ use Catalyst::Test 'MyApp';
   is $res->content_charset, 'UTF-8';
 }
 
-SKIP:
 {
-  skip 'skipped: sysread isn\'t allowed on :utf8 handles (starting with 5.029004)', 4 if $] >= '5.029004';
   ok my $path = File::Spec->catfile('t', 'utf8.txt');
   ok my $req = POST '/root/file_upload',
     Content_Type => 'form-data',
@@ -421,9 +419,7 @@ SKIP:
   is decode_utf8($res->content), "<p>This is stream_body_fh action ♥</p>\n";
 }
 
-SKIP:
 {
-  skip 'skipped: sysread isn\'t allowed on :utf8 handles (starting with 5.029004)', 5 if $] >= '5.029004';
   ok my $path = File::Spec->catfile('t', 'utf8.txt');
   ok my $req = POST '/root/file_upload_utf8_param',
     Content_Type => 'form-data',
