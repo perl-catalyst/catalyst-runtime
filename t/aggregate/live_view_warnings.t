@@ -1,5 +1,3 @@
-#!perl
-
 use strict;
 use warnings;
 no warnings 'once';
