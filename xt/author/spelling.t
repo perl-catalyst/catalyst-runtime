@@ -142,6 +142,6 @@ add_stopwords(qw(
     wreis
 ));
 set_spell_cmd('aspell list -l en');
-all_pod_files_spelling_ok();
+all_pod_files_spelling_ok('lib');
 
 done_testing();
