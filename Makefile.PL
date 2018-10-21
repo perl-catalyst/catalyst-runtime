@@ -78,6 +78,7 @@ my %META = (
         "Plack::Middleware::FixMissingBodyInRedirect" => '0.09',
         "Plack::Middleware::MethodOverride" => '0.12',
         "Plack::Middleware::RemoveRedundantBody" => '0.03',
+        'PerlIO::utf8_strict' => 0,
       },
     },
     develop   => {

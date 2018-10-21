@@ -7,6 +7,7 @@ use Catalyst::Exception;
 use File::Copy ();
 use IO::File ();
 use File::Spec::Unix;
+use PerlIO::utf8_strict;
 use namespace::clean -except => 'meta';
 
 has filename => (is => 'rw');
@@ -157,7 +158,7 @@ sub decoded_fh {
     my ($self, $layer) = @_;
     my $fh  = $self->fh;
 
-    $layer = ":encoding(UTF-8)" if !$layer && $self->is_utf8_encoded;
+    $layer = ':utf8_strict' if !$layer && $self->is_utf8_encoded;
     $layer = ':raw' unless $layer;
 
     binmode($fh, $layer);
