@@ -234,7 +234,7 @@ use Scalar::Util ();
   package MyApp;
   use Catalyst;
 
-  Test::More::ok(MyApp->setup, 'setup app');
+  Test::More::ok(MyApp->setup('-Log=fatal'), 'setup app');
 }
 
 ok my $psgi = MyApp->psgi_app, 'build psgi app';

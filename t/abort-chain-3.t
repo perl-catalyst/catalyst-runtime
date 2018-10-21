@@ -35,7 +35,7 @@ BEGIN {
     $INC{'TestApp.pm'} = __FILE__;
     use Catalyst;
     __PACKAGE__->config(abort_chain_on_error_fix => 0);
-    __PACKAGE__->setup;
+    __PACKAGE__->setup('-Log=fatal');
 }
 
 use Catalyst::Test 'TestApp';

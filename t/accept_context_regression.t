@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-{
+BEGIN {
   package MyApp::Model::AcceptContext;
   use base 'Catalyst::Model';
 
@@ -12,7 +12,9 @@ use Test::More;
   }
 
   $INC{'MyApp/Model/AcceptContext.pm'} = __FILE__;
+}
 
+BEGIN {
   package MyApp::Controller::Root;
   use base 'Catalyst::Controller';
 
@@ -22,7 +24,9 @@ use Test::More;
   }
 
   $INC{'MyApp/Controller/Root.pm'} = __FILE__;
+}
 
+BEGIN {
   package MyApp;
   use Catalyst;
 
@@ -31,10 +35,8 @@ use Test::More;
 
 use Catalyst::Test 'MyApp';
 
-my ($res, $c) = ctx_request('/test_model');
+my ($res, $c) = ctx_request('/root/test_model');
 
 ok $res;
 
-
 done_testing;
-

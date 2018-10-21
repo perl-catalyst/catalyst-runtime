@@ -43,7 +43,7 @@ use HTTP::Request::Common;
   use Catalyst;
 
   MyApp->config(show_internal_actions=>1);
-  MyApp->setup;
+  MyApp->setup('-Log=fatal');
 }
 
 use Catalyst::Test 'MyApp';

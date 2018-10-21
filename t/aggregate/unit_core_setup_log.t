@@ -9,7 +9,17 @@ sub mock_app {
     my $name = shift;
     my $meta = Moose->init_meta( for_class => $name );
     $meta->superclasses('Catalyst');
-    return $meta->name;
+
+    $meta->add_after_method_modifier('log', sub {
+        my ($self, $log) = @_;
+        if ($log) {
+            open my $err_fh, '>', \(my $err_out)
+                or die 'unable to open in memory buffer';
+            $log->psgienv({ 'psgi.errors' => $err_fh });
+        }
+    });
+
+    return $name;
 }
 
 sub test_log_object {

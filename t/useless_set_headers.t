@@ -37,7 +37,7 @@ use HTTP::Request::Common;
 
   sub debug { 1 }
 
-  __PACKAGE__->log(TestAppStats::Log->new);
+  __PACKAGE__->log(TestAppStats::Log->new('warn'));
 
   after 'finalize' => sub {
     my ($c) = @_;

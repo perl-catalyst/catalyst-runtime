@@ -14,7 +14,7 @@ my @complist = map { "MyApp::$_"; } qw/C::Controller M::Model V::View/;
   __PACKAGE__->components({ map { ($_, $_) } @complist });
 
   # this is so $c->log->warn will work
-  __PACKAGE__->setup_log;
+  __PACKAGE__->setup_log('fatal');
 }
 
 is(MyApp->comp('MyApp::V::View'), 'MyApp::V::View', 'Explicit return ok');

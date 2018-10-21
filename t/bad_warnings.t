@@ -52,7 +52,7 @@ my $error;
 
   $SIG{__WARN__} = sub { $error = shift };
 
-  MyApp->setup;
+  MyApp->setup('-Log=fatal');
 }
 
 use Catalyst::Test 'MyApp';

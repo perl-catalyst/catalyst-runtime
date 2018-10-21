@@ -21,7 +21,7 @@ my @complist =
     __PACKAGE__->components->{'MyMVCTestApp::Model::Test::Object'} = $thingie;
 
     # allow $c->log->warn to work
-    __PACKAGE__->setup_log;
+    __PACKAGE__->setup_log('fatal');
 }
 
 {

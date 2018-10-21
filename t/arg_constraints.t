@@ -262,7 +262,7 @@ BEGIN {
   package MyApp;
   use Catalyst;
 
-  MyApp->setup;
+  MyApp->setup('-Log=fatal');
 }
 
 use Catalyst::Test 'MyApp';

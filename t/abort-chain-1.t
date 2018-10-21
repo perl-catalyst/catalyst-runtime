@@ -34,7 +34,7 @@ BEGIN {
     package TestApp;
     $INC{'TestApp.pm'} = __FILE__;
     use Catalyst;
-    __PACKAGE__->setup;
+    __PACKAGE__->setup('-Log=fatal');
 }
 
 use Catalyst::Test 'TestApp';

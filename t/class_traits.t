@@ -49,6 +49,17 @@ BEGIN {
   sub d { 'd' }
 }
 
+BEGIN {
+  package TestApp::Controller::Root;
+  $INC{'TestApp/Controller/Root.pm'} = __FILE__;
+
+  use Moose;
+
+  BEGIN { extends 'Catalyst::Controller' };
+
+  sub root :Path('/') {}
+}
+
 {
   package TestApp;
   $INC{'TestApp.pm'} = __FILE__;
