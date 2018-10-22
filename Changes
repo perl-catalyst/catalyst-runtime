@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90_121 - 2018-10-22
   - use the :utf8_strict (PerlIO::utf8_strict) rather than :encoding file handle
     layer to handle decoding uploads, as a performance boost.
   - fix handling of decoding uploaded files.  this fixes the usage of sysread
