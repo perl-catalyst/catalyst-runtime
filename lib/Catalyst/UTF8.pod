@@ -318,6 +318,68 @@ Ideally we'd fix L<Catalyst> to be smarter about decoding so please submit your 
 this so we can add intelligence to the parser and find a way to extract a valid value out
 of it.
 
+=head1 UTF8 Encoding in file uploads
+
+=head2 Summary
+
+L<Catalyst> provides several methods to make dealing with file uploads that
+have a UTF-8 encoding set, as well as overrides to force decoding of manually
+set encodings.  Please see the full package L<Catalyst::Request::Upload> for more
+details and documentation.
+
+B<Note>: Detecting encoding on uploaded files can be very browser dependent.  The
+methods given here work only by examining the Request supplied header and MIME
+information.  We do not attempt any introspection of the uploaded data.  Your
+results may vary.
+
+=head2 Detecting encodings
+
+We provide two methods: L<is_utf8_encoded|Catalyst::Request::Upload/"$upload->is_utf8_encoded">
+and L<charset|Catalyst::Request::Upload/"$upload->charset">.  C<charset> returns the value
+of any character set information associated with the file upload, while C<is_utf8_encoded>
+returns a boolean indicating if we think the character set in UTF-8 (but please see caveat
+above).
+
+=head2 Slurping
+
+For ease of use we provide two methods to 'slurp' file uploads into a variable (these
+are good for when you know the upload is rationally sized):
+
+L<slurp|Catalyst::Request::Upload/"$upload->slurp(?$encoding)">
+and L<decoded_slurp|Catalyst::Request::Upload/"$upload->decoded_slurp(?$encoding)">. 
+
+C<decoded_slurp> will automatically set a UTF-8 encoding layer on the filehandle (if
+we see that the character set is a UTF-8 type).  C<slurp> does not do this.  Both
+methods allow you to manually override the decoding layer.
+
+There's no harm in using C<decoded_slurp> since we don't decode unless we think the
+upload is a UTF-8 type.  However if you don't want to decode to characters you can
+use C<slurp> instead.  You may wish to do you own manual decoding or perhaps you
+are planning to write the data to a storage that prefers bytes instead of characters.
+
+=head2 Getting and using a Filehandle
+
+Sometimes the file upload is large and you don't want to use the C<slurp> method,
+instead preferring to read the upload in chunks or lines to process iteratively.
+For that we also provide two method:
+
+L<fh|Catalyst::Request::Upload/"$upload->fh">
+and L<decoded_fh|Catalyst::Request::Upload/"$upload->decoded_fh(?$encoding)">.
+
+C<fh> returns a filehandle with no additional decoding layers.  Use this for when 
+you know the data is binary or when you wish to handing decoding yourself.
+
+C<decoded_fh> works similar to the C<decoded_slurp> method, it will automatically
+apply a UTF-8 decoding layer if we think you need it.  The resulting filehandle
+will then return characters not bytes.
+
+B<Note> Starting with Perl 5.26 using C<sysread> on a filehandle with a UFT-8
+decoding layer is deprecated.  This is because this method is not certain to
+return characters and instead may return corrupted data (like the first byte of
+a wide character).  If you are iterating over a filehandle that has decoding applied
+(as you do with the C<decoded_fh> method) you should use the C<getline> or
+C<read> methods (See L<IO::File>).
+
 =head1 UTF8 Encoding in Body Response
 
 When does L<Catalyst> encode your response body and what rules does it use to
@@ -505,7 +567,7 @@ binary content, you should just use the C<write> method (although if the content
 correctly we would skip encoding anyway, but you may as well avoid the extra noop overhead).
 
 The last style of content response that L<Catalyst> supports is setting the body to a filehandle
-like object.  In this case the object is passed down to the Plack application handler directly
+like object.  In this case the object is passed down to the L<Plack> application handler directly
 and currently we do nothing to set encoding.
 
     sub stream_body_fh :Local {
