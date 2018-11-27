@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90123 - 2018-11-27
   - Fix emitting warnings when REMOTE_ADDR is undefined (RT#113388)
   - Fix $c->req->hostname empty for IPv6 clients (RT#75731)
   - split code to log stats report into a separate log_stats method (RT#127392)
