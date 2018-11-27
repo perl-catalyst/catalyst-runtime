@@ -50,6 +50,7 @@ my %META = (
         'Tree::Simple::Visitor::FindByUID' => 0,
         'Try::Tiny'             => '0.17',
         'Safe::Isa'             => 0,
+        'Socket'                => '1.96',
         'Task::Weaken'          => 0,
         'Text::Balanced'        => 0, # core in 5.8.x but mentioned for completeness
         'MRO::Compat'           => 0,
