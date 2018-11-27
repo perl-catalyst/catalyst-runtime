@@ -3467,7 +3467,7 @@ sub apply_default_middlewares {
           condition => sub {
               my ($env) = @_;
               return if $app->config->{ignore_frontend_proxy};
-              return $env->{REMOTE_ADDR} eq '127.0.0.1';
+              return $env->{REMOTE_ADDR} && $env->{REMOTE_ADDR} eq '127.0.0.1';
           },
       );
     }
