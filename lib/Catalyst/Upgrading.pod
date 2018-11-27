@@ -2,6 +2,11 @@
 
 Catalyst::Upgrading - Instructions for upgrading to the latest Catalyst
 
+=head1 Upgrading to Catalyst 5.90121
+
+A new C<log_stats> method has been added. This will only affect
+subclasses that have a method with this name added.
+
 =head1 Upgrading to Catalyst 5.90100
 
 We changed the way the middleware stash works so that it no longer localizes

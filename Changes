@@ -2,6 +2,7 @@
 
   - Fix emitting warnings when REMOTE_ADDR is undefined (RT#113388)
   - Fix $c->req->hostname empty for IPv6 clients (RT#75731)
+  - split code to log stats report into a separate log_stats method (RT#127392)
 
 5.90122 - 2018-11-03
   - releasing as stable
