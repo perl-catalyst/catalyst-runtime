@@ -74,6 +74,7 @@ add_stopwords(qw(
     Rockway
     Roditi
     Rodland
+    Rothenberg
     Ruthven
     Sascha
     Scala
@@ -134,6 +135,7 @@ add_stopwords(qw(
     rafl
     rainboxx
     revmischa
+    rrwo
     sri
     szbalint
     uploadtmp
