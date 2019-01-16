@@ -196,7 +196,7 @@ sub from_psgi_response {
         die "You can't set a Catalyst response from that, expect a valid PSGI response";
     }
 
-    return if $self->finalized_headers;
+    return unless $self->_context->has_encoding;
 
     # Encoding compatibilty.   If the response set a charset, well... we need
     # to assume its properly encoded and NOT encode for this response.  Otherwise

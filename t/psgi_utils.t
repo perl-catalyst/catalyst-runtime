@@ -73,6 +73,7 @@ my $psgi_app = sub {
         $writer->write("body");
         $writer->close;
     };
+    $c->clear_encoding;
     $c->res->from_psgi_response($psgi_app);
   }
 
