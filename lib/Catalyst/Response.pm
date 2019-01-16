@@ -180,6 +180,14 @@ sub from_psgi_response {
           ref $body eq 'ARRAY' ? $self->body(join('', @$body)) : $self->body($body);
         }
     } elsif(ref $psgi_res eq 'CODE') {
+
+        # Its not clear to me this is correct.  Right now if the PSGI application wants
+        # to stream, we stream immediately and then completely bypass the rest of the
+        # Catalyst finalization process (unlike if the PSGI app sets an arrayref).  Part of
+        # me thinks we should override the current _response_cb and then let finalize_body
+        # call that.  I'm not sure the downside of bypassing those bits.  I'm going to leave
+        # this be for now and document the behavior.
+
         $psgi_res->(sub {
             my $response = shift;
             my ($status, $headers, $maybe_body) = @$response;
@@ -196,12 +204,14 @@ sub from_psgi_response {
         die "You can't set a Catalyst response from that, expect a valid PSGI response";
     }
 
-    return unless $self->_context->has_encoding;
-
     # Encoding compatibilty.   If the response set a charset, well... we need
     # to assume its properly encoded and NOT encode for this response.  Otherwise
     # We risk double encoding.
-    if($self->content_type_charset) {
+
+    # We check first to make sure headers have not been finalized.  Headers might be finalized
+    # in the case where a PSGI response is streaming and the PSGI application already wrote
+    # to the output stream and close the filehandle.
+    if(!$self->finalized_headers && $self->content_type_charset) {
       # We have to do this since for backcompat reasons having a charset doesn't always
       # mean that the body is already encoded :(
       $self->_context->clear_encoding;
@@ -589,6 +599,17 @@ Example:
       $c->res->from_psgi_response($app->($c->req->env));
     }
 
+    sub streaming_body :Local {
+      my ($self, $c) = @_;
+      my $psgi_app = sub {
+          my $respond = shift;
+          my $writer = $respond->([200,["Content-Type" => "text/plain"]]);
+          $writer->write("body");
+          $writer->close;
+      };
+      $c->res->from_psgi_response($psgi_app);
+    }
+
 Please note this does not attempt to map or nest your PSGI application under
 the Controller and Action namespace or path. You may wish to review 'PSGI Helpers'
 under L<Catalyst::Utils> for help in properly nesting applications.
@@ -597,6 +618,13 @@ B<NOTE> If your external PSGI application returns a response that has a characte
 set associated with the content type (such as "text/html; charset=UTF-8") we set
 $c->clear_encoding to remove any additional content type encoding processing later
 in the application (this is done to avoid double encoding issues).
+
+B<NOTE> If your external PSGI application is streaming, we assume you completely
+handle the entire jobs (including closing the stream).  This will also bypass
+the output finalization methods on Catalyst (such as 'finalize_body' which gets
+called but then skipped when it finds that output is already finished.)  Its possible
+this might cause issue with some plugins that want to do 'things' during those
+finalization methods.  Just understand what is happening.
 
 =head2 encodable_content_type
 
