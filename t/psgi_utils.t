@@ -55,6 +55,28 @@ my $psgi_app = sub {
     $c->res->from_psgi_response([200, ['Content-Type'=>'text/html'], ["hello","world"]]);
   }
 
+  sub streaming_body :Local {
+    my ($self, $c) = @_;
+    my $psgi_app = sub {
+        my $respond = shift;
+        my $writer = $respond->([200,["Content-Type" => "text/plain"]]);
+        $writer->write("body");
+        $writer->close;
+    };
+    $c->res->from_psgi_response($psgi_app);
+  }
+  sub streaming_body_with_charset :Local {
+    my ($self, $c) = @_;
+    my $psgi_app = sub {
+        my $respond = shift;
+        my $writer = $respond->([200,["Content-Type" => "text/plain; charset=utf-8"]]);
+        $writer->write("body");
+        $writer->close;
+    };
+    $c->clear_encoding;
+    $c->res->from_psgi_response($psgi_app);
+  }
+
   package MyApp::Controller::User;
   $INC{'MyApp/Controller/User.pm'} = __FILE__;
 
@@ -405,6 +427,15 @@ use Catalyst::Test 'MyApp';
 {
   my ($res, $c) = ctx_request('/docs/direct');
   is $res->content, "helloworld";
+}
+
+{
+  my ($res, $c) = ctx_request('/docs/streaming_body');
+  is $res->content, "body";
+}
+{
+  my ($res, $c) = ctx_request('/docs/streaming_body_with_charset');
+  is $res->content, "body";
 }
 
 done_testing();
