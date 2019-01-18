@@ -2,7 +2,7 @@
 
 5.90124 - 2019-01-18
   - Fix problem with from_psgi_response and streaming applications (
-      https://github.com/perl-catalyst/catalyst-runtime/pull/168).
+    https://github.com/perl-catalyst/catalyst-runtime/pull/168).
 
 5.90123 - 2018-11-27
   - Fix emitting warnings when REMOTE_ADDR is undefined (RT#113388)
