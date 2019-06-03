@@ -61,14 +61,26 @@ sub psgienv {
     }
 }
 
-around new => sub {
-    my $orig = shift;
+sub BUILDARGS {
     my $class = shift;
-    my $self = $class->$orig;
+    my $args;
 
-    $self->levels( scalar(@_) ? @_ : keys %LEVELS );
+    if (@_ == 1 && ref $_[0] eq 'HASH') {
+        $args = $_[0];
+    }
+    else {
+        $args = {
+            levels => [@_ ? @_ : keys %LEVELS],
+        };
+    }
 
-    return $self;
+    if (delete $args->{levels}) {
+        my $level = 0;
+        $level |= $_
+            for map $LEVEL_MATCH{$_}, @_ ? @_ : keys %LEVELS;
+        $args->{level} = $level;
+    }
+    return $args;
 };
 
 sub levels {
@@ -162,7 +174,7 @@ $meta->add_before_method_modifier('body', sub {
 # End 5.70 backwards compatibility hacks.
 
 no Moose;
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+__PACKAGE__->meta->make_immutable;
 
 1;
 
