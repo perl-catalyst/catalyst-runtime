@@ -4,7 +4,6 @@ use Moose;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 
 use Data::Dump;
-use Moose::Util 'find_meta';
 use Carp qw/ cluck /;
 
 our %LEVELS = (); # Levels stored as bit field, ergo debug = 1, warn = 2 etc
@@ -34,9 +33,8 @@ sub psgienv {
 {
     my @levels = qw[ debug info warn error fatal ];
 
-    my $meta = find_meta(__PACKAGE__);
     my $summed_level = 0;
-    for ( my $i = $#levels ; $i >= 0 ; $i-- ) {
+    for my $i ( reverse 0 .. $#levels ) {
 
         my $name  = $levels[$i];
 
@@ -46,18 +44,20 @@ sub psgienv {
         $LEVELS{$name} = $level;
         $LEVEL_MATCH{$name} = $summed_level;
 
-       $meta->add_method($name, sub {
+        no strict 'refs';
+
+        *$name = sub {
             my $self = shift;
 
             if ( $self->level & $level ) {
                 $self->_log( $name, @_ );
             }
-        });
+        };
 
-        $meta->add_method("is_$name", sub {
+        *{"is_$name"} = sub {
             my $self = shift;
             return $self->level & $level;
-        });;
+        };
     }
 }
 
@@ -160,17 +160,16 @@ sub _send_to_log {
 
 # 5.7 compat code.
 # Alias _body to body, add a before modifier to warn..
-my $meta = __PACKAGE__->meta; # Calling meta method here fine as we happen at compile time.
-$meta->add_method('body', $meta->get_method('_body'));
+*body = \&_body;
 my %package_hash; # Only warn once per method, per package.
                   # I haven't provided a way to disable them, patches welcome.
-$meta->add_before_method_modifier('body', sub {
+before body => sub {
     my $class = blessed(shift);
     $package_hash{$class}++ || do {
         warn("Class $class is calling the deprecated method Catalyst::Log->body method,\n"
             . "this will be removed in Catalyst 5.81");
     };
-});
+};
 # End 5.70 backwards compatibility hacks.
 
 no Moose;
@@ -346,8 +345,6 @@ will send to STDERR as before.
 =head2 clear_psgi
 
 Clears the PSGI environment attributes set by L</psgienv>.
-
-=head2 meta
 
 =head1 SEE ALSO
 
