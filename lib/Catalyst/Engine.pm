@@ -202,6 +202,7 @@ sub finalize_cookies {
                 -path    => $val->{path},
                 -secure  => $val->{secure} || 0,
                 -httponly => $val->{httponly} || 0,
+                -samesite => $val->{samesite},
             )
         );
         if (!defined $cookie) {
