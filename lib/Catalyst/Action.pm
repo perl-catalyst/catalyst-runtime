@@ -541,7 +541,7 @@ Tries to find a type constraint if you have on on a type constrained method.
 Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
 having the highest precedence.
 
-=head2 equal
+=head2 equals
 
     if( $action->equal($other_action) ) { ... }
 
