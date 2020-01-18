@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90125 - 2020-01-18
+  - Support samesite flag for cookies (mitchjacksontech++)
+  - utility method on Catalyst::Action 'equals'
+  - new predicate methods 'has_request' and 'has_response'. Useful in
+    plugins that might run bits before a request is finalized.
+
 5.90124 - 2019-01-18
   - Fix problem with from_psgi_response and streaming applications (
     https://github.com/perl-catalyst/catalyst-runtime/pull/168).

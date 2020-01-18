@@ -460,6 +460,11 @@ sub compare {
     return $a1->comparable_arg_number <=> $a2->comparable_arg_number;
 }
 
+sub equals {
+  my ($self, $target) = @_;
+  return $self->private_path eq $target->private_path ? $self : 0;
+}
+
 sub scheme {
   return exists $_[0]->attributes->{Scheme} ? $_[0]->attributes->{Scheme}[0] : undef;
 }
@@ -535,6 +540,12 @@ Tries to find a type constraint if you have on on a type constrained method.
 
 Compares 2 actions based on the value of the C<Args> attribute, with no C<Args>
 having the highest precedence.
+
+=head2 equal
+
+    if( $action->equal($other_action) ) { ... }
+
+Returns true if the two actions are equal.
 
 =head2 namespace
 

@@ -68,6 +68,7 @@ has request => (
         my $composed_request_class = $class->composed_request_class;
         return $composed_request_class->new( $self->_build_request_constructor_args);
     },
+    predicate => 'has_request',
     lazy => 1,
 );
 sub _build_request_constructor_args {
@@ -113,6 +114,7 @@ has response => (
         my $composed_response_class = $class->composed_response_class;
         return $composed_response_class->new( $self->_build_response_constructor_args);
     },
+    predicate=>'has_response',
     lazy => 1,
 );
 sub _build_response_constructor_args {
@@ -205,7 +207,7 @@ sub composed_stats_class {
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90124';
+our $VERSION = '5.90125';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -409,6 +411,10 @@ Returns the current L<Catalyst::Request> object, giving access to
 information about the current client request (including parameters,
 cookies, HTTP headers, etc.). See L<Catalyst::Request>.
 
+There is a predicate method C<has_request> that returns true if the
+request object has been created.  This is something you might need to
+check if you are writing plugins that run before a request is finalized.
+
 =head2 REQUEST FLOW HANDLING
 
 =head2 $c->forward( $action [, \@arguments ] )
@@ -556,6 +562,10 @@ sub go { my $c = shift; $c->dispatcher->go( $c, @_ ) }
 =head2 $c->res
 
 Returns the current L<Catalyst::Response> object, see there for details.
+
+There is a predicate method C<has_response> that returns true if the
+request object has been created.  This is something you might need to
+check if you are writing plugins that run before a request is finalized.
 
 =head2 $c->stash
 
