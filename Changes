@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90126 - 2020-01-19
+  - fix for broken distribution
+
 5.90125 - 2020-01-18
   - Support samesite flag for cookies (mitchjacksontech++)
   - utility method on Catalyst::Action 'equals'
