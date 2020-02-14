@@ -394,6 +394,7 @@ this
 =cut
 
 my $_term_width;
+my $_use_term_size_any;
 
 sub term_width {
     my $force_reset = shift;
@@ -402,29 +403,36 @@ sub term_width {
 
     return $_term_width if $_term_width;
 
-    my $width;
-    eval '
-      use Term::Size::Any;
-      ($width) = Term::Size::Any::chars;
-      1;
-    ' or do {
-          if($@ =~m[Can't locate Term/Size/Any.pm]) {
-            warn "Term::Size::Any is not installed, can't autodetect terminal column width\n";
-          } else {
-            warn "There was an error trying to detect your terminal size: $@\n";
-          }
-    };
-
-    unless ($width) {
-        warn 'Trouble trying to detect your terminal size, looking at $ENV{COLUMNS}'."\n";
-        $width = $ENV{COLUMNS}
-            if exists($ENV{COLUMNS})
-            && $ENV{COLUMNS} =~ m/^\d+$/;
+    if (!defined $_use_term_size_any) {
+        eval {
+            require Term::Size::Any;
+            Term::Size::Any->import();
+            $_use_term_size_any = 1;
+            1;
+        } or do {
+            if ( $@ =~ m[Can't locate Term/Size/Any\.pm] ) {
+                warn "Term::Size::Any is not installed, can't autodetect terminal column width\n";
+            }
+            else {
+                warn "There was an error trying to detect your terminal size: $@\n";
+            }
+            $_use_term_size_any = 0;
+        };
     }
 
-    do {
-      warn "Cannot determine desired terminal width, using default of 80 columns\n";
-      $width = 80 } unless ($width && $width >= 80);
+    my $width;
+
+    if ($_use_term_size_any) {
+        ($width) = Term::Size::Any::chars();
+    }
+
+    if (!$width && $ENV{COLUMNS} && $ENV{COLUMNS} =~ /\A\d+\z/) {
+        $width = $ENV{COLUMNS};
+    }
+    if (!$width || $width < 80) {
+        $width = 80;
+    }
+
     return $_term_width = $width;
 }
 
