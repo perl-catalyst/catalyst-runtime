@@ -20,7 +20,7 @@ matrix:
     - perl: dev
 
 before_install:
-   - eval $(curl https://travis-perl.github.io/init)
+   - eval $(curl https://travis-perl.github.io/init) --perl
    - $HELPERS_ROOT/bin/cpan-config
 install:
    - cpanm --notest --metacpan --skip-satisfied --with-develop --installdeps .
