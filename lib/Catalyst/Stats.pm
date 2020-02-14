@@ -95,26 +95,35 @@ sub elapsed {
 sub report {
     my $self = shift;
 
-    my $column_width = Catalyst::Utils::term_width() - 9 - 13;
-    my $t = Text::SimpleTable->new( [ $column_width, 'Action' ], [ 9, 'Time' ] );
+    my $t;
     my @results;
-    $self->traverse(
-                sub {
-                my $action = shift;
-                my $stat   = $action->getNodeValue;
-                my @r = ( $action->getDepth,
-                      ($stat->{action} || "") .
-                      ($stat->{action} && $stat->{comment} ? " " : "") . ($stat->{comment} ? '- ' . $stat->{comment} : ""),
-                      $stat->{elapsed},
-                      $stat->{action} ? 1 : 0,
-                      );
-                # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
-                my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
-                $t->row( ( q{ } x $r[0] ) . $r[1],
-                     defined $r[2] ? $elapsed : '??');
-                push(@results, \@r);
-                }
-            );
+
+    if (!wantarray) {
+        $t = Text::SimpleTable->new(
+            [ Catalyst::Utils::term_width() - 9 - 13, 'Action' ],
+            [ 9, 'Time' ],
+        );
+    }
+
+    $self->traverse(sub {
+        my $action = shift;
+        my $stat   = $action->getNodeValue;
+        my @r = ( $action->getDepth,
+              ($stat->{action} || "") .
+              ($stat->{action} && $stat->{comment} ? " " : "") . ($stat->{comment} ? '- ' . $stat->{comment} : ""),
+              $stat->{elapsed},
+              $stat->{action} ? 1 : 0,
+              );
+        # Trim down any times >= 10 to avoid ugly Text::Simple line wrapping
+        my $elapsed = substr(sprintf("%f", $stat->{elapsed}), 0, 8) . "s";
+        if ($t) {
+            $t->row( ( q{ } x $r[0] ) . $r[1],
+              defined $r[2] ? $elapsed : '??');
+        }
+        else {
+            push @results, \@r;
+        }
+    });
     return wantarray ? @results : $t->draw;
 }
 
