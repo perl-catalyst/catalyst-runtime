@@ -1,0 +1,20 @@
+[test]
+-j 4
+-P Catalyst
+-P Catalyst::Action
+-P Catalyst::ActionRole::ConsumesContent
+-P Catalyst::ActionRole::HTTPMethods
+-P Catalyst::ActionRole::QueryMatching
+-P Catalyst::ActionRole::Scheme
+-P Catalyst::DispatchType::Chained
+-P Catalyst::DispatchType::Default
+-P Catalyst::DispatchType::Index
+-P Catalyst::DispatchType::Path
+-P Catalyst::Dispatcher
+-P Catalyst::Model
+-P Catalyst::Request
+-P Catalyst::Response
+-P Catalyst::Stats
+-P Catalyst::Test
+-P Catalyst::View
+-P HTML::HeadParser
