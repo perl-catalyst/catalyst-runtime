@@ -10,6 +10,7 @@ BEGIN {
 use File::Path;
 use FindBin;
 use IO::Socket;
+use Config ();
 
 eval "use FCGI";
 plan skip_all => 'FCGI required' if $@;
@@ -49,7 +50,9 @@ my $docroot = "$FindBin::Bin/../t/tmp";
 my $port    = 8529;
 
 # Clean up docroot path
-$docroot =~ s{/t/..}{};
+$docroot =~ s{/t/\.\.}{};
+
+my $perl5lib = join($Config::Config{path_sep}, "$docroot/../../lib", $ENV{PERL5LIB} || ());
 
 my $conf = <<"END";
 # basic lighttpd config file for testing fcgi+catalyst
@@ -78,7 +81,7 @@ fastcgi.server = (
             "max-procs"       => 1,
             "idle-timeout"    => 20,
             "bin-environment" => (
-                "PERL5LIB" => "$docroot/../../lib"
+                "PERL5LIB" => "$perl5lib"
             )
         )
     )
