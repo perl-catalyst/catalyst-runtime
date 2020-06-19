@@ -1,4 +1,4 @@
-package TestMiddlewareFromConfig::Custom;
+package TestMiddlewareFromPlugin::Custom;
 
 use strict;
 use warnings;
