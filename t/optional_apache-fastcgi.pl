@@ -16,18 +16,10 @@ use File::Copy::Recursive;
 use FindBin;
 use IO::Socket;
 
-# clean up
-rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
+use lib 't/lib';
+use MakeTestApp;
 
-# create a TestApp and copy the test libs into it
-mkdir "$FindBin::Bin/../t/tmp";
-chdir "$FindBin::Bin/../t/tmp";
-system "$FindBin::Bin/../script/catalyst.pl TestApp";
-chdir "$FindBin::Bin/..";
-File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
-
-# remove TestApp's tests so Apache::Test doesn't try to run them
-rmtree 't/tmp/TestApp/t';
+make_test_app;
 
 $ENV{CATALYST_SERVER} = 'http://localhost:8529';
 

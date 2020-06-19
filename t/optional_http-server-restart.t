@@ -14,29 +14,16 @@ use LWP::Simple;
 use IO::Socket;
 use IPC::Open3;
 use Time::HiRes qw/sleep/;
-eval {require Catalyst::Devel; Catalyst::Devel->VERSION(1.0);};
 
-plan skip_all => 'Catalyst::Devel required' if $@;
-plan skip_all => 'Catalyst::Devel >= 1.04 required' if $Catalyst::Devel::VERSION <= 1.03;
-eval "use File::Copy::Recursive";
-plan skip_all => 'File::Copy::Recursive required' if $@;
+BEGIN {
+    eval "use File::Copy::Recursive";
+    plan skip_all => 'File::Copy::Recursive required' if $@;
+}
 
-my $tmpdir = "$FindBin::Bin/../t/tmp";
+use lib 't/lib';
+use MakeTestApp;
 
-# clean up
-rmtree $tmpdir if -d $tmpdir;
-
-# create a TestApp and copy the test libs into it
-mkdir $tmpdir;
-chdir $tmpdir;
-
-system( $^X, "-I$FindBin::Bin/../lib", '-MFile::Spec', '-e', "\@ARGV=('TestApp'); my \$devnull = File::Spec->devnull; open my \$fh, '>', \$devnull or die \"Cannot write to \$devnull: \$!\"; *STDOUT = \$fh; do \"$FindBin::Bin/../script/catalyst.pl\"");
-
-chdir "$FindBin::Bin/..";
-File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
-
-# remove TestApp's tests
-rmtree 't/tmp/TestApp/t';
+make_test_app;
 
 # spawn the standalone HTTP server
 my $port = 30000 + int rand( 1 + 10000 );
