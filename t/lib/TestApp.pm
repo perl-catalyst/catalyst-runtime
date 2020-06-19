@@ -60,23 +60,35 @@ TestApp->config(
 # above ->setup so we have some generated methods to be double sure.
 has an_attribute_before_we_change_base_classes => ( is => 'ro');
 
-if ($::setup_leakchecker && try_load_class('CatalystX::LeakChecker')) {
-    with 'CatalystX::LeakChecker';
+if ($::setup_leakchecker) {
+    require Scalar::Util;
+    require Devel::Cycle;
 
     has leaks => (
         is      => 'ro',
         default => sub { [] },
     );
-}
 
-sub found_leaks {
-    my ($ctx, @leaks) = @_;
-    push @{ $ctx->leaks }, @leaks;
-}
+    sub count_leaks {
+        my ($ctx) = @_;
+        return scalar @{ $ctx->leaks };
+    }
 
-sub count_leaks {
-    my ($ctx) = @_;
-    return scalar @{ $ctx->leaks };
+    after finalize => sub {
+        my ($ctx) = @_;
+        my @leaks;
+
+        my $weak_ctx = $ctx;
+        Scalar::Util::weaken $weak_ctx;
+
+        Devel::Cycle::find_cycle($ctx, sub {
+            my ($path) = @_;
+            push @leaks, $path
+                if $path->[0]->[2] == $weak_ctx;
+        });
+
+        push @{ $ctx->leaks }, @leaks;
+    };
 }
 
 TestApp->setup;
