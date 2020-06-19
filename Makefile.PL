@@ -93,7 +93,6 @@ my %META = (
         'Test::Pod::Coverage'     => 0,
         'Test::Spelling'          => 0,
         'Pod::Coverage::TrustPod' => 0,
-        'Catalyst::Plugin::Params::Nested' => 0,
         'Compress::Zlib'          => 0,
         'Catalyst::Action::REST'  => 0,
         'Type::Tiny'              => 0,
