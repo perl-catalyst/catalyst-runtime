@@ -85,7 +85,6 @@ my %META = (
     develop   => {
       requires => {
         'CatalystX::LeakChecker'  => '0.05',
-        'Test::WWW::Mechanize::Catalyst' => '0.51',
         'Test::TCP'               => '2.00',
         'File::Copy::Recursive'   => '0.40',
         'Starman'                 => 0,
