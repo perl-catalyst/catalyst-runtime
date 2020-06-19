@@ -94,7 +94,6 @@ my %META = (
         'Test::Spelling'          => 0,
         'Pod::Coverage::TrustPod' => 0,
         'Compress::Zlib'          => 0,
-        'Catalyst::Action::REST'  => 0,
         'Type::Tiny'              => 0,
         'Proc::ProcessTable'      => 0,
       },

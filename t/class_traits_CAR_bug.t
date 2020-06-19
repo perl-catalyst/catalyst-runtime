@@ -4,13 +4,6 @@ use Test::More;
 use Class::MOP;
 
 BEGIN {
-  use Test::More;
-  eval "use Catalyst::Action::REST; 1" || do {
-    plan skip_all => "Trouble loading Catalyst::Action::REST => $@";
-  };
-}
-
-BEGIN {
   my %hidden = map { (my $m = "$_.pm") =~ s{::}{/}g; $m => 1 } qw(
     Foo
     Bar
