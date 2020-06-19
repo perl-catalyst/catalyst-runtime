@@ -7,7 +7,6 @@ author 'Sebastian Riedel <sri@cpan.org>';
 manifest_include script => 'catalyst.pl';
 manifest_include t => 'catalyst_130pix.gif';
 manifest_include 't/conf' => 'extra.conf.in';
-manifest_include 't/lib/TestAppEncodingSetInConfig' => 'testappencodingsetinconfig.json';
 manifest_include 't/lib/TestContentNegotiation/share', 'file.txt';
 manifest_include 't/lib/TestMiddleware/share' => qr/.*/;
 manifest_include 't/lib/TestMiddlewareFromConfig/share' => qr/.*/;
