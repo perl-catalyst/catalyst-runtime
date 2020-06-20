@@ -1,8 +1,6 @@
 package Catalyst::Exception::Basic;
 
 use Moose::Role;
-use if !eval { require Moose; Moose->VERSION('2.1300') },
-    'MooseX::Role::WithOverloading';
 use Carp;
 use namespace::clean -except => 'meta';
 

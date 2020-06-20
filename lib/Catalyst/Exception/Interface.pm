@@ -1,8 +1,6 @@
 package Catalyst::Exception::Interface;
 
 use Moose::Role;
-use if !eval { require Moose; Moose->VERSION('2.1300') },
-    'MooseX::Role::WithOverloading';
 use namespace::clean -except => 'meta';
 
 use overload
@@ -39,9 +37,6 @@ This is a role for the required interface for Catalyst exceptions.
 It ensures that all exceptions follow the expected interface,
 and adds overloading for stringification when composed onto a
 class.
-
-Note that if you compose this role onto another role, that role
-must use L<MooseX::Role::WithOverloading>.
 
 =head1 REQUIRED METHODS
 

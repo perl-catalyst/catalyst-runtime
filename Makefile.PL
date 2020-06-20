@@ -26,9 +26,8 @@ my %META = (
         'namespace::clean'      => '0.23',
         'MooseX::Emulate::Class::Accessor::Fast' => '0.00903',
         'Class::Load'           => '0.12',
-        'Moose'                 => '1.03',
+        'Moose'                 => '2.1400',
         'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24',
-        'MooseX::Role::WithOverloading' => '0.09',
         'Carp'                  => '1.25',
         'Class::C3::Adopt::NEXT' => '0.07',
         'CGI::Simple::Cookie'   => '1.109',
@@ -168,11 +167,6 @@ my $tests = 't/*.t t/aggregate/*.t';
 my %MM_ARGS = (
   test => { TESTS => $tests },
   EXE_FILES => [ glob 'script/*.pl' ],
-  PREREQ_PM => {
-    (eval { require Moose; Moose->VERSION('2.1300') } ? () : (
-      'MooseX::Role::WithOverloading' => '0.09'
-    )),
-  },
 );
 
 ## BOILERPLATE ###############################################################
