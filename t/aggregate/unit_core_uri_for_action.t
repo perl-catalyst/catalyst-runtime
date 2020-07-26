@@ -77,45 +77,25 @@ my $context = TestApp->new( {
                 namespace => 'yada',
               } );
 
-
-
-
-# JNAP: I'm going to todo these tests, calling uri_for as a class method
-# should work, but its not really useful so I think theres not much harm
-# if someone needs this for a business case they are welcome to figure out
-# what is going
-
-TODO: {
-    local $TODO = "Need to fix using uri_for and uri_for_action as a class method";
-
-
-# this works, using $ctx
-is($context->uri_for($context->controller('Action::Chained')->action_for('endpoint')),
-   "http://127.0.0.1/foo/yada/chained/foo/end",
+is($context->uri_for($context->controller('Action::Chained')->action_for('endpoint'), [ 1 ]),
+   'http://127.0.0.1/foo/chained/foo/1/end',
    "uri_for a controller and action");
 
+is( $context->uri_for_action( '/action/chained/endpoint', [ 1 ] ),
+    'http://127.0.0.1/foo/chained/foo/1/end',
+    "uri_for a controller and action as string");
 
-# this fails, uri_for returns undef, why isn't this one working??
-  is( $context->uri_for_action( '/action/chained/endpoint' ),
-          'http://127.0.0.1/chained/foo/end',
-     "uri_for a controller and action as string");
+is(TestApp->uri_for_action($context->controller('Action::Chained')->action_for('endpoint'), [ 1 ]),
+    '/chained/foo/1/end',
+    "uri_for a controller and action, called with only class name");
 
-# this fails, uri_for returns undef
-  is(TestApp->uri_for_action($context->controller('Action::Chained')->action_for('endpoint')),
-     "/chained/foo/end",
-     "uri_for a controller and action, called with only class name");
+is(TestApp->uri_for_action('/action/chained/endpoint', [ 1 ] ),
+    '/chained/foo/1/end',
+    "uri_for a controller and action as string, called with only class name");
 
-# this fails, uri_for returns undef
-  is(TestApp->uri_for_action('/action/chained/endpoint' ),
-     "/chained/foo/end",
-     "uri_for a controller and action as string, called with only class name");
-
-# this fails, uri_for returns undef
-  is(TestApp->uri_for_action(  $chained_action),
-     "/chained/foo/end",
-     "uri_for action via dispatcher, called with only class name");
-}
-
+is(TestApp->uri_for_action(  $chained_action, [ 1 ]),
+    '/chained/foo/1/end',
+    "uri_for action via dispatcher, called with only class name");
 
 is($context->uri_for($context->controller('Action')),
    "http://127.0.0.1/foo/yada/action/",
