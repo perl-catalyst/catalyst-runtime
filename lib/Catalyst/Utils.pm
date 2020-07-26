@@ -403,6 +403,14 @@ sub term_width {
 
     return $_term_width if $_term_width;
 
+    if ($ENV{COLUMNS} && $ENV{COLUMNS} =~ /\A\d+\z/) {
+        return $_term_width = $ENV{COLUMNS};
+    }
+
+    if (!-t STDOUT && !-t STDERR) {
+        return $_term_width = 80;
+    }
+
     if (!defined $_use_term_size_any) {
         eval {
             require Term::Size::Any;
@@ -423,12 +431,9 @@ sub term_width {
     my $width;
 
     if ($_use_term_size_any) {
-        ($width) = Term::Size::Any::chars();
+        $width = Term::Size::Any::chars(*STDERR) || Term::Size::Any::chars(*STDOUT);
     }
 
-    if (!$width && $ENV{COLUMNS} && $ENV{COLUMNS} =~ /\A\d+\z/) {
-        $width = $ENV{COLUMNS};
-    }
     if (!$width || $width < 80) {
         $width = 80;
     }
