@@ -1644,7 +1644,7 @@ sub uri_for {
         my $num_captures = $expanded_action->number_of_captures;
 
         # ->uri_for( $action, \@captures_and_args, \%query_values? )
-        if( !@args && $action->number_of_args ) {
+        if( !@args && $action->number_of_args && @$captures > $num_captures ) {
           unshift @args, splice @$captures, $num_captures;
         }
 
