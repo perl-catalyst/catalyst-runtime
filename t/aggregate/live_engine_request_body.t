@@ -85,6 +85,10 @@ use HTTP::Request::Common;
     );
 
     ok( my $response = request($request), 'Request' );
+    my $server = $response->header('server') || '';
+    local $TODO = 'lighttpd refuses GET with body'
+        if $server =~ /lighttpd/;
+
     ok( $response->is_success, 'Response Successful 2xx' );
     ok( $response->header('X-Have-Request-Body'), 'X-Have-Request-Body set' );
 }
