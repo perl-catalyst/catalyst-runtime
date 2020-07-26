@@ -28,13 +28,14 @@ else {
 }
 
 no warnings 'redefine';
-sub request {
+my $request_code = \&request;
+*request = sub {
     my $thr = threads->new(
-        sub { Catalyst::Test::local_request('TestApp',@_) },
+        sub { $request_code->(@_) },
         @_
     );
     $thr->join;
-}
+};
 
 # test that running inside a thread works ok
 {
