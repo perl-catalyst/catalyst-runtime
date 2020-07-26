@@ -32,6 +32,13 @@ chomp $lighttpd_bin;
 plan skip_all => 'Please set LIGHTTPD_BIN to the path to lighttpd'
     unless $lighttpd_bin && -x $lighttpd_bin;
 
+my $fix_scriptname = '';
+if (my ($vmajor, $vminor, $vpatch) = `"$lighttpd_bin" -v` =~ /\b(\d+)\.(\d+)\.(\d+)\b/) {
+    if ($vmajor > 1 || ($vmajor == 1 && ("$vminor.$vpatch" >= 4.23))) {
+        $fix_scriptname = '"fix-root-scriptname" => "enable",';
+    }
+}
+
 plan tests => 1;
 
 # this creates t/tmp/TestApp
@@ -64,7 +71,7 @@ server.port = $port
 
 # catalyst app specific fcgi setup
 fastcgi.server = (
-    "" => (
+    "/" => (
         "FastCgiTest" => (
             "socket"          => "$docroot/test.socket",
             "check-local"     => "disable",
@@ -72,6 +79,7 @@ fastcgi.server = (
             "min-procs"       => 1,
             "max-procs"       => 1,
             "idle-timeout"    => 20,
+            $fix_scriptname
             "bin-environment" => (
                 "PERL5LIB" => "$perl5lib"
             )
