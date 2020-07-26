@@ -3,8 +3,8 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    unless (eval 'use CatalystX::LeakChecker 0.05; 1') {
-        plan skip_all => 'CatalystX::LeakChecker 0.05 required for this test';
+    unless (eval 'use Devel::Cycle 1.11; 1') {
+        plan skip_all => 'Devel::Cycle 1.11 required for this test';
     }
 
     plan tests => 6;

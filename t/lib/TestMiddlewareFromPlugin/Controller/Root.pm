@@ -1,4 +1,4 @@
-package TestMiddlewareFromConfig::Controller::Root;
+package TestMiddlewareFromPlugin::Controller::Root;
 
 use Moose;
 use MooseX::MethodAttributes;

@@ -7,11 +7,8 @@ use FindBin;
 use Test::More;
 use HTTP::Request::Common;
 
-BEGIN { eval { require Catalyst::Plugin::ConfigLoader; 1; } ||
-    plan skip_all => 'Need Catalyst::Plugin::ConfigLoader' }
-
 use lib "$FindBin::Bin/lib";
-use Catalyst::Test 'TestMiddlewareFromConfig';
+use Catalyst::Test 'TestMiddlewareFromPlugin';
 
 ok my($res, $c) = ctx_request('/');
 

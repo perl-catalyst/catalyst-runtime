@@ -1,6 +1,6 @@
-package TestAppEncodingSetInConfig::Controller::Root;
+package TestAppEncodingSetInPlugin::Controller::Root;
 use Moose;
-use namespace::clean -except => [ 'meta' ];
+use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 

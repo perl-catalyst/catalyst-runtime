@@ -83,10 +83,7 @@ my %META = (
     },
     develop   => {
       requires => {
-        'CatalystX::LeakChecker'  => '0.05',
-        'Catalyst::Devel'         => '1.0', # For http server test
-        'Test::WWW::Mechanize::Catalyst' => '0.51',
-        'Test::TCP'               => '2.00', # ditto, ships Net::EmptyPort
+        'Test::TCP'               => '2.00',
         'File::Copy::Recursive'   => '0.40',
         'Starman'                 => 0,
         'MooseX::Daemonize'       => 0,
@@ -95,10 +92,7 @@ my %META = (
         'Test::Pod::Coverage'     => 0,
         'Test::Spelling'          => 0,
         'Pod::Coverage::TrustPod' => 0,
-        'Catalyst::Plugin::Params::Nested' => 0,
-        'Catalyst::Plugin::ConfigLoader' => 0,
         'Compress::Zlib'          => 0,
-        'Catalyst::Action::REST'  => 0,
         'Type::Tiny'              => 0,
         'Proc::ProcessTable'      => 0,
       },
