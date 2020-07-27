@@ -22,8 +22,9 @@ TestApp->psgi_app;
 };
 close($psgi);
 
+my @command = ($^X, '-I', "$FindBin::Bin/../lib", '-I', "$FindBin::Bin/../../lib", '-c', $path);
 open my $stdin, '<', File::Spec->devnull;
-my $pid = open3 $stdin, my $stdout, undef, $^X, '-I', "$FindBin::Bin/../lib", '-c', $path;
+my $pid = open3 $stdin, my $stdout, undef, @command;
 my $output = do { local $/; <$stdout> };
 waitpid $pid, 0;
 
