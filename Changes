@@ -1,5 +1,6 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+5.90_127 - 2020-07-27
   - fix TODO tests for uri_for as a class method
   - silence warnings in tests
   - remove developer prerequisites on Catalyst plugins
