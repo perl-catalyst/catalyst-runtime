@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - fix TODO tests for uri_for as a class method
+  - silence warnings in tests
+  - remove developer prerequisites on Catalyst plugins
+  - cleanups and fixes for optional tests
+  - bump Moose prereq to 2.1400, and drop MooseX::Role::WithOverloading prereq
+  - stop warning about missing Term::Size::Any when it isn't useful
+
 5.90126 - 2020-01-19
   - fix for broken distribution
 
