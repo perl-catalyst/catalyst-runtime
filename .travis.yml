@@ -48,6 +48,8 @@ script:
 
    # pure author deps (of reverse deps):
    - cpanm --notest --metacpan --skip-satisfied YAML::Syck
+   - cpanm --notest --metacpan Carp::Assert::Clan@1.16
+   - cpanm --notest --metacpan Test::WWW::Mechanize@1.50
 
    # both author deps & reverse deps:
    - cpanm --metacpan --skip-satisfied Catalyst::View::TT || ( cat ~/.cpanm/build.log; false )
