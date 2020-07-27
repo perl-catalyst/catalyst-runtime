@@ -7,6 +7,7 @@ use File::Temp qw/ tempdir /;
 use TestApp;
 use File::Spec;
 use Carp qw/croak/;
+use IPC::Open3 qw(open3);
 
 my $home = tempdir( CLEANUP => 1 );
 my $path = File::Spec->catfile($home, 'testapp.psgi');
@@ -21,24 +22,13 @@ TestApp->psgi_app;
 };
 close($psgi);
 
-my ($saved_stdout, $saved_stderr);
-my $stdout = !open( $saved_stdout, '>&'. STDOUT->fileno );
-my $stderr = !open( $saved_stderr, '>&'. STDERR->fileno );
-open( STDOUT, '+>', undef )
-            or croak("Can't reopen stdout to /dev/null");
-open( STDERR, '+>', undef )
-            or croak("Can't reopen stdout to /dev/null");
-# Check we wrote out something that compiles
-system($^X, '-I', "$FindBin::Bin/../lib", '-c', $path)
-    ? fail('.psgi does not compile')
-    : pass('.psgi compiles');
+open my $stdin, '<', File::Spec->devnull;
+my $pid = open3 $stdin, my $stdout, undef, $^X, '-I', "$FindBin::Bin/../lib", '-c', $path;
+my $output = do { local $/; <$stdout> };
+waitpid $pid, 0;
 
-if ($stdout) {
-    open( STDOUT, '>&'. fileno($saved_stdout) );
-}
-if ($stderr) {
-    open( STDERR, '>&'. fileno($saved_stderr) );
-}
+ok $? == 0, '.psgi compiles'
+  or diag $output;
 
 # NOTE - YOU *CANNOT* do something like:
 #my $psgi_ref = require $path;
