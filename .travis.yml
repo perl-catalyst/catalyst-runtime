@@ -23,8 +23,12 @@ before_install:
    - eval $(curl https://travis-perl.github.io/init) --perl
    - $HELPERS_ROOT/bin/cpan-config
 install:
-   - cpanm --notest --metacpan --skip-satisfied --with-develop --installdeps .
-   - perl Makefile.PL
+   - build-dist
+   - cd $BUILD_DIR
+   - cpanm -q --showdeps --with-develop . | grep -v "^perl[~@]" | AUTHOR_TESTING=0 cpanm --notest --metacpan --skip-satisfied
+
+   - test_run='make test'
+   - AUTHOR_TESTING=0 cpanm --notest --metacpan --skip-satisfied Test2::Harness && test_run='yath test t xt' || true
 
    # enable various test options, including parallel testing
    - export AUTOMATED_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
@@ -34,10 +38,8 @@ install:
    - export RELEASE_TESTING=1
    - export PERL_AUTOINSTALL=--skip
 
-   - make manifest
-
 script:
-   - make disttest
+   - make && $test_run
 
    # Test reverse deps (high-profile modules, taken from from Task::Catalyst):
    #  (note: currently skipping DBIC deps for speed)
