@@ -5,10 +5,8 @@ use warnings;
 
 BEGIN { require 5.008003; }
 
-# Remember to update this in Catalyst as well!
-
 our $VERSION = '5.90_127';
-$VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
+$VERSION =~ tr/_//d;
 
 =head1 NAME
 

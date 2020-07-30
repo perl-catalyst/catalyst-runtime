@@ -1,6 +1,7 @@
 package Catalyst::Plugin::Unicode::Encoding;
 
 our $VERSION = '5.90_127';
+$VERSION =~ tr/_//d;
 
 1;
 
