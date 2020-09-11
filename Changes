@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst.
 
+  - fix command to run psgi compile test if Catalyst not already installed
+  - improve debugging output on psgi compile test
+
 5.90_127 - 2020-07-27
   - fix TODO tests for uri_for as a class method
   - silence warnings in tests
