@@ -1,4 +1,4 @@
-BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+BEGIN { -e 'Distar' or system qw(git clone https://github.com/p5sagit/Distar.git) }
 use lib 'Distar/lib';
 use Distar 0.001;
 
