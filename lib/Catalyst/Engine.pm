@@ -296,6 +296,7 @@ sub finalize_error {
 (fr) SVP veuillez revenir plus tard
 (de) Bitte versuchen sie es spaeter nocheinmal
 (at) Konnten's bitt'schoen spaeter nochmal reinschauen
+(ch) Bitte kemme sy spööter noonemol verbyy
 (no) Vennligst prov igjen senere
 (dk) Venligst prov igen senere
 (pl) Prosze sprobowac pozniej
