@@ -6,6 +6,10 @@ use namespace::clean -except => [ 'meta' ];
 
 with 'Catalyst::ScriptRole';
 
+has '+help_flag' => (
+    cmd_aliases   => [qw(usage ?)],
+);
+
 has debug => (
     traits        => [qw(Getopt)],
     cmd_aliases   => 'd',
