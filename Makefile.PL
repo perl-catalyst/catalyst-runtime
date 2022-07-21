@@ -100,9 +100,8 @@ my %META = (
   },
   resources => {
     repository => {
-      # r/w: catagits@git.shadowcat.co.uk:Catalyst-Runtime.git
-      url => 'git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git',
-      web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=summary',
+      url => 'https://github.com/perl-catalyst/catalyst-runtime.git',
+      web => 'https://github.com/perl-catalyst/catalyst-runtime',
       type => 'git',
     },
     x_IRC => 'irc://irc.perl.org/#catalyst',
