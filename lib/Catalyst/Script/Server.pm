@@ -44,6 +44,10 @@ has port => (
     documentation => 'Specify a different listening port (to the default port 3000)',
 );
 
+has '+help_flag' => (
+    cmd_aliases => [ qw(usage ?) ],
+);
+
 use Moose::Util::TypeConstraints;
 class_type 'MooseX::Daemonize::Pid::File';
 subtype 'Catalyst::Script::Server::Types::Pidfile',
