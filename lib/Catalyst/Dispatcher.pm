@@ -328,39 +328,39 @@ sub _find_component {
 }
 
 sub _invoke_as_component {
-  my ( $self, $c, $component_or_class, $method ) = @_;
+    my ( $self, $c, $component_or_class, $method ) = @_;
 
-  my $component = $self->_find_component($c, $component_or_class);
-  my $component_class = blessed $component || return 0;
+    my $component = $self->_find_component($c, $component_or_class);
+    my $component_class = blessed $component || return 0;
 
-  if (my $code = $component_class->can('action_for')) {
-      my $possible_action = $component->$code($method);
-      return $possible_action if $possible_action;
-  }
+    if (my $code = $component_class->can('action_for')) {
+        my $possible_action = $component->$code($method);
+        return $possible_action if $possible_action;
+    }
 
-  my $component_to_call = blessed($component_or_class) ? $component_or_class : $component_class;
+    my $component_to_call = blessed($component_or_class) ? $component_or_class : $component_class;
 
-  if ( my $code = $component_to_call->can($method) ) {
-      return $self->_method_action_class->new(
-          {
-              name      => $method,
-              code      => $code,
-              reverse   => "$component_class->$method",
-              class     => $component_to_call,
-              namespace => Catalyst::Utils::class2prefix(
-                  $component_class, ref($c)->config->{case_sensitive}
-              ),
-          }
-      );
-  }
-  else {
-      my $error =
-        qq/Couldn't forward to "$component_class". Does not implement "$method"/;
-      $c->error($error);
-      $c->log->debug($error)
-        if $c->debug;
-      return 0;
-  }
+    if ( my $code = $component_to_call->can($method) ) {
+        return $self->_method_action_class->new(
+            {
+                name      => $method,
+                code      => $code,
+                reverse   => "$component_class->$method",
+                class     => $component_to_call,
+                namespace => Catalyst::Utils::class2prefix(
+                    $component_class, ref($c)->config->{case_sensitive}
+                ),
+            }
+        );
+    }
+    else {
+        my $error =
+          qq/Couldn't forward to "$component_class". Does not implement "$method"/;
+        $c->error($error);
+        $c->log->debug($error)
+          if $c->debug;
+        return 0;
+    }
 }
 
 =head2 $self->prepare_action($c)
