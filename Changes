@@ -1,4 +1,4 @@
-# This file documents the revision history for Perl extension Catalyst.
+This file documents the revision history for Perl extension Catalyst.
 
 5.90128 - 2020-09-11
   - fix command to run psgi compile test if Catalyst not already installed
