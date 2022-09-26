@@ -3027,7 +3027,6 @@ sub setup_components {
     my $config  = $class->config->{ setup_components };
 
     my @comps = $class->locate_components($config);
-    my %comps = map { $_ => 1 } @comps;
 
     my $deprecatedcatalyst_component_names = grep { /::[CMV]::/ } @comps;
     $class->log->warn(qq{Your application is using the deprecated ::[MVC]:: type naming scheme.\n}.
