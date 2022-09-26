@@ -106,12 +106,11 @@ my %META = (
     },
     x_IRC => 'irc://irc.perl.org/#catalyst',
     bugtracker => {
-      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Runtime',
-      mailto => 'bug-Catalyst-Runtime@rt.cpan.org',
+      web => 'https://github.com/perl-catalyst/catalyst-runtime/issues',
     },
     license => [ 'http://dev.perl.org/licenses/' ],
     x_MailingList => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst',
-    homepage => 'http://dev.catalyst.perl.org/',
+    homepage => 'https://github.com/perl-catalyst/catalyst-runtime',
   },
   no_index => {
     directory => [ 't', 'xt' ]
