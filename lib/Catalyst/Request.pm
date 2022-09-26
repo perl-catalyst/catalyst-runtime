@@ -123,7 +123,7 @@ sub _build_body_data {
 
     # Not sure if these returns should not be exceptions...
     my $content_type = $self->content_type || return;
-    return unless ($self->method eq 'POST' || $self->method eq 'PUT' || $self->method eq 'PATCH');
+    return unless ($self->method eq 'POST' || $self->method eq 'PUT' || $self->method eq 'PATCH' || $self->method eq 'DELETE');
 
     my ($match) = grep { $content_type =~/$_/i }
       keys(%{$self->data_handlers});
@@ -571,17 +571,19 @@ C<multipart/form-data>, in which case a L<File::Temp> object is returned.
 
 =head2 $req->body_data
 
-Returns a Perl representation of POST/PUT body data that is not classic HTML
+Returns a Perl representation of body data that is not classic HTML
 form data, such as JSON, XML, etc.  By default, Catalyst will parse incoming
-data of the type 'application/json' and return access to that data via this
-method.  You may define addition data_handlers via a global configuration
+data of the type 'application/json' for POST, PUT, PATCH or DELETE methods,
+and return access to that data via this method.
+
+You may define addition data_handlers via a global configuration
 setting.  See L<Catalyst\DATA HANDLERS> for more information.
 
-If the POST is malformed in some way (such as undefined or not content that
+If the body is malformed in some way (such as undefined or not content that
 matches the content-type) we raise a L<Catalyst::Exception> with the error
 text as the message.
 
-If the POSTed content type does not match an available data handler, this
+If the body content type does not match an available data handler, this
 will also raise an exception.
 
 =head2 $req->body_parameters
