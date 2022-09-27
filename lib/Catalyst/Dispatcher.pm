@@ -150,7 +150,6 @@ sub _command2action {
 
     # go to a string path ("/foo/bar/gorch")
     # or action object
-    #
     if (blessed($command) && $command->isa('Catalyst::Action')) {
         $action = $command;
     }
