@@ -150,6 +150,7 @@ sub _command2action {
 
     # go to a string path ("/foo/bar/gorch")
     # or action object
+    #
     if (blessed($command) && $command->isa('Catalyst::Action')) {
         $action = $command;
     }
@@ -338,15 +339,14 @@ sub _invoke_as_component {
         return $possible_action if $possible_action;
     }
 
-    my $component_to_call = blessed($component_or_class) ? $component_or_class : $component_class;
-
-    if ( my $code = $component_to_call->can($method) ) {
+    if ( my $code = $component_class->can($method) ) {
         return $self->_method_action_class->new(
             {
                 name      => $method,
                 code      => $code,
                 reverse   => "$component_class->$method",
-                class     => $component_to_call,
+                class     => $component_class,
+                ( blessed($component_or_class) ? (instance => $component_or_class):() ),
                 namespace => Catalyst::Utils::class2prefix(
                     $component_class, ref($c)->config->{case_sensitive}
                 ),

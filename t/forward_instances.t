@@ -11,7 +11,7 @@ use Test::More;
 
   use base 'Catalyst::Controller';
 
-  sub test :Local Args(0) {
+  sub test_forward :Local Args(0) {
     my( $self, $c ) = @_;
     my $view = $c->view('Test');
     $c->forward($view);
@@ -32,7 +32,6 @@ use Test::More;
   sub process {
     my ($self, $c, @args) = @_;
     $c->res->body("$self");
-
   }
 
   package MyApp;
@@ -44,7 +43,7 @@ use HTTP::Request::Common;
 use Catalyst::Test 'MyApp';
 
 {
-  ok my $res = request GET 'root/test';
+  ok my $res = request GET 'root/test_forward';
 }
 
 done_testing(2);

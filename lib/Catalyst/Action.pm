@@ -26,6 +26,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 use namespace::clean -except => 'meta';
 
 has class => (is => 'rw');
+has instance => (is=>'ro', required=>0, predicate=>'has_instance');
 has namespace => (is => 'rw');
 has 'reverse' => (is => 'rw');
 has attributes => (is => 'rw');
@@ -361,7 +362,11 @@ no warnings 'recursion';
 
 sub dispatch {    # Execute ourselves against a context
     my ( $self, $c ) = @_;
-    return $c->execute( $self->class, $self );
+    if($self->has_instance) {
+        return $c->execute( $self->instance, $self );
+    } else {
+        return $c->execute( $self->class, $self );
+    }
 }
 
 sub execute {
