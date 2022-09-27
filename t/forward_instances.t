@@ -15,8 +15,12 @@ use Test::More;
     my( $self, $c ) = @_;
     my $view = $c->view('Test');
     $c->forward($view);
+  }
 
-    Test::More::is("$view", "@{[ $c->res->body]}");
+  sub test_custom :Local Args(0) {
+    my( $self, $c ) = @_;
+    my $view = $c->view('Test');
+    $c->forward($view, 'custom');
   }
 
   package MyApp::View::Test;
@@ -31,8 +35,14 @@ use Test::More;
 
   sub process {
     my ($self, $c, @args) = @_;
-    $c->res->body("$self");
+    $c->res->body(ref $self);
   }
+
+  sub custom {
+    my ($self, $c, @args) = @_;
+    $c->res->body("custom: @{[ ref $self]}");
+  }
+
 
   package MyApp;
   use Catalyst;
@@ -44,6 +54,13 @@ use Catalyst::Test 'MyApp';
 
 {
   ok my $res = request GET 'root/test_forward';
+  is $res->content, 'MyApp::View::Test';
 }
 
-done_testing(2);
+{
+  ok my $res = request GET 'root/test_custom';
+  is $res->content, 'custom: MyApp::View::Test';
+
+}
+
+done_testing(4);
