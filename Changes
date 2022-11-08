@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Catalyst.
 
+  - change forward and detach to be able to work with instances
+  - fix DELETE requests to allow a body
+  - update metadata to point issue tracker to GitHub
+
 5.90129 - 2022-07-23
   - change repo URL in metadata to use github repo
   - fix compatibility with Type::Tiny 1.016002
