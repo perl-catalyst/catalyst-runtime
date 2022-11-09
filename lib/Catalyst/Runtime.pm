@@ -5,7 +5,7 @@ use warnings;
 
 BEGIN { require 5.008003; }
 
-our $VERSION = '5.90129';
+our $VERSION = '5.90130';
 $VERSION =~ tr/_//d;
 
 =head1 NAME
