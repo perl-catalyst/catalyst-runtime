@@ -491,9 +491,9 @@ sent to a model that will invoke it in a non blocking manner.  For more on using
 object for non blocking responses you should review the C<Catalyst> documentation and also
 you can look at several articles from last years advent, in particular:
 
-L<http://www.catalystframework.org/calendar/2013/10>, L<http://www.catalystframework.org/calendar/2013/11>,
-L<http://www.catalystframework.org/calendar/2013/12>, L<http://www.catalystframework.org/calendar/2013/13>,
-L<http://www.catalystframework.org/calendar/2013/14>.
+L<http://catalyst.perl.org/calendar/2013/10>, L<http://catalyst.perl.org/calendar/2013/11>,
+L<http://catalyst.perl.org/calendar/2013/12>, L<http://catalyst.perl.org/calendar/2013/13>,
+L<http://catalyst.perl.org/calendar/2013/14>.
 
 The main difference this year is that previously calling ->write_fh would return the actual
 L<Plack> writer object that was supplied by your Plack application handler, whereas now we wrap
