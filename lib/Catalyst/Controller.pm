@@ -514,6 +514,8 @@ sub _parse_Chained_attr {
             my @levels = split '/', $rel;
 
             $value = '/'.join('/', @parts[0 .. $#parts - @levels], $rest);
+        } elsif ($value =~ /^\*/) {
+          $value = "/$value";
         } elsif ($value !~ m/^\//) {
             my $action_ns = $self->action_namespace($c);
 

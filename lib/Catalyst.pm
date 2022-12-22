@@ -150,6 +150,13 @@ sub composed_response_class {
 
 has namespace => (is => 'rw');
 
+has _last_action_state => (is => 'rw', predicate=>'has_last_action_state');
+
+sub last_action_state {
+  my ($c) = @_;
+  return $c->has_last_action_state ? @{ $c->_last_action_state() } : ();
+}
+
 sub depth { scalar @{ shift->stack || [] }; }
 sub comp { shift->component(@_) }
 
@@ -2045,7 +2052,6 @@ via $c->error.
 sub execute {
     my ( $c, $class, $code ) = @_;
     $class = $c->component($class) || $class;
-    #$c->state(0);
 
     if ( $c->depth >= $RECURSION ) {
         my $action = $code->reverse();
@@ -2064,8 +2070,13 @@ sub execute {
     no warnings 'recursion';
     # N.B. This used to be combined, but I have seen $c get clobbered if so, and
     #      I have no idea how, ergo $ret (which appears to fix the issue)
-    eval { my $ret = $code->execute( $class, $c, @{ $c->req->args } ) || 0; $c->state( $ret ) };
-
+    eval {
+      my @ret = $code->execute($class, $c, @{ $c->req->args }); 
+      my $ret = scalar(@ret) > 1 ? @ret : $ret[0]||0;
+      $c->_last_action_state(\@ret);
+      $c->state($ret);
+    };
+ 
     $c->_stats_finish_execute( $stats_info ) if $c->use_stats and $stats_info;
 
     my $last = pop( @{ $c->stack } );
@@ -2097,7 +2108,6 @@ sub execute {
             }
             $c->error($error);
         }
-        #$c->state(0);
     }
     return $c->state;
 }
@@ -2392,7 +2402,17 @@ sub get_action { my $c = shift; $c->dispatcher->get_action(@_) }
 Gets all actions of a given name in a namespace and all parent
 namespaces.
 
+=head2 $c->action_for( $action_private_name )
+
+Returns the action which matches the full private name or nothing if there's no
+matching action
+
 =cut
+
+sub action_for {
+    my ($c, $action_private_name) = @_ ;
+    return $c->dispatcher->get_action_by_path($action_private_name);
+}
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 

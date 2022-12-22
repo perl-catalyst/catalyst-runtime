@@ -297,6 +297,7 @@ sub _action_rel2abs {
 sub _invoke_as_path {
     my ( $self, $c, $rel_path, $args ) = @_;
 
+    return $c->action_for($rel_path) if $rel_path =~ m/^\*/;
     my $path = $self->_action_rel2abs( $c, $rel_path );
 
     my ( $tail, @extra_args );
@@ -585,6 +586,14 @@ sub register {
 
     $self->_action_hash->{"$namespace/$name"} = $action;
     $self->_container_hash->{$namespace} = $container;
+
+    # Named Actions
+    if(my (@names) = @{$action->attributes->{Name}||[]}) {
+        foreach my $name (@names) {
+            die "Named action '$name' is already defined" if $self->_action_hash->{"/*$name"};
+            $self->_action_hash->{"/*$name"} = $action;
+        }
+    }
 }
 
 sub _find_or_create_action_container {

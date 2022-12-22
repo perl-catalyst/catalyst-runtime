@@ -4,6 +4,13 @@ use Moose;
 extends qw(Catalyst::Action);
 
 has chain => (is => 'rw');
+has _current_chain_actions => (is=>'rw', init_arg=>undef, predicate=>'_has_current_chain_actions');
+has _chain_last_action => (is=>'rw', init_arg=>undef, predicate=>'_has_chain_last_action', clearer=>'_clear_chain_last_action');
+has _chain_captures => (is=>'rw', init_arg=>undef);
+has _chain_original_args => (is=>'rw', init_arg=>undef, clearer=>'_clear_chain_original_args');
+has _chain_next_args => (is=>'rw', init_arg=>undef, predicate=>'_has_chain_next_args', clearer=>'_clear_chain_next_args');
+has _context => (is => 'rw', weak_ref => 1);
+
 no Moose;
 
 =head1 NAME
@@ -27,23 +34,64 @@ sub dispatch {
     my @captures = @{$c->req->captures||[]};
     my @chain = @{ $self->chain };
     my $last = pop(@chain);
-    foreach my $action ( @chain ) {
-        my @args;
-        if (my $cap = $action->number_of_captures) {
-          @args = splice(@captures, 0, $cap);
-        }
-        local $c->request->{arguments} = \@args;
-        $action->dispatch( $c );
 
-        # break the chain if exception occurs in the middle of chain.  We
-        # check the global config flag 'abort_chain_on_error_fix', but this
-        # is now considered true by default, so unless someone explicitly sets
-        # it to false we default it to true (if its not defined).
-        my $abort = defined($c->config->{abort_chain_on_error_fix}) ?
-          $c->config->{abort_chain_on_error_fix} : 1;
-        return if ($c->has_errors && $abort);
+    $self->_current_chain_actions(\@chain);
+    $self->_chain_last_action($last);
+    $self->_chain_captures(\@captures);
+    $self->_chain_original_args($c->request->{arguments});
+    $self->_context($c);
+    $self->_dispatch_chain_actions($c);
+}
+
+sub next {
+    my ($self, @args) = @_;
+    my $ctx = $self->_context;
+
+    if($self->_has_chain_last_action) {
+        @args ? $self->_chain_next_args(\@args) : $self->_chain_next_args([]);
+        $self->_dispatch_chain_actions($ctx);
+    } else {
+        $ctx->action->chain->[-1]->next($ctx, @args) if $ctx->action->chain->[-1]->can('next');
     }
-    $last->dispatch( $c );
+
+    return $ctx->last_action_state if $ctx->has_last_action_state;
+}
+
+sub _dispatch_chain_actions {
+    my ($self, $c) = @_;
+    while( @{$self->_current_chain_actions||[]}) {
+        $self->_dispatch_chain_action($c);
+        return if $self->_abort_needed($c);        
+    }
+    if($self->_has_chain_last_action) {
+        $c->request->{arguments} = $self->_chain_original_args;
+        $self->_clear_chain_original_args;
+        unshift @{$c->request->{arguments}}, @{ $self->_chain_next_args} if $self->_has_chain_next_args;
+        $self->_clear_chain_next_args;
+        my $last_action = $self->_chain_last_action;
+        $self->_clear_chain_last_action;
+        $last_action->dispatch($c);
+    }
+}
+
+sub _dispatch_chain_action {
+    my ($self, $c) = @_;
+    my ($action, @remaining_actions) = @{ $self->_current_chain_actions||[] };
+    $self->_current_chain_actions(\@remaining_actions);
+    my @args;
+    if (my $cap = $action->number_of_captures) {
+        @args = splice(@{ $self->_chain_captures||[] }, 0, $cap);
+    }
+    unshift @args, @{ $self->_chain_next_args} if $self->_has_chain_next_args;
+    $self->_clear_chain_next_args;
+    local $c->request->{arguments} = \@args;
+    $action->dispatch( $c );
+}
+
+sub _abort_needed {
+    my ($self, $c) = @_;
+    my $abort = defined($c->config->{abort_chain_on_error_fix}) ? $c->config->{abort_chain_on_error_fix} : 1;
+    return 1 if ($c->has_errors && $abort); 
 }
 
 sub from_chain {
