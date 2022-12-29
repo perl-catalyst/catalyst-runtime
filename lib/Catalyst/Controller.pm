@@ -514,6 +514,8 @@ sub _parse_Chained_attr {
             my @levels = split '/', $rel;
 
             $value = '/'.join('/', @parts[0 .. $#parts - @levels], $rest);
+        } elsif ($value =~ /^\*/) {
+          $value = "/$value";
         } elsif ($value !~ m/^\//) {
             my $action_ns = $self->action_namespace($c);
 
@@ -1029,6 +1031,125 @@ paths are secure and others are not.  You may also use this to other schemes
 like websockets.
 
 See L<Catalyst::ActionRole::Scheme> for more.
+
+=head2 Name
+
+Allows you to give you action a globally addressable name, in addition to its private
+name.  Useful to decouple action referencing via Chaining and link creation from the
+actions private name, which is tightly bound to the controller namespace as well as the
+action subroutine name.  Example:
+
+    package MyApp::Controller::Root;
+
+    use warnings;
+    use strict;
+    use base 'Catalyst::Controller';
+
+     sub root :Chained(/) PathPart('') CaptureArgs(0) Name(Root) {
+         my ($self, $c) = @_;
+     }
+
+    MyApp::Controller::Root->config(namespace=>'');
+
+    package MyApp::Controller::Home;
+
+    use warnings;
+    use strict;
+    use base 'Catalyst::Controller';
+
+    sub home :Chained(*Root)  Args(0) {
+        my ($self, $c) = @_;
+    }
+
+In this case the 'Home' controller's action '/home/home' is chained to the Root controllers action
+'/root'.  These declarations are the in practice the same:
+
+    package MyApp::Controller::Home;
+
+    use warnings;
+    use strict;
+    use base 'Catalyst::Controller';
+
+    # Reference the target prior chain link via its full private action name
+    sub home :Chained(/root)  Args(0) {
+        my ($self, $c) = @_;
+    }
+
+or:
+
+    # Reference the target prior chain link via a relative action path
+    sub home :Chained(../root)  Args(0) {
+        my ($self, $c) = @_;
+    }
+
+When using a named action's name in a :Chained attribute, when using forward/detach/go/visit or
+when using $c->action_for and $controller->action_for you must prefix the name with a '*' so that
+we can disambiguate a named action from an action relative path:
+
+    package MyApp::Controller::URI;
+
+     use warnings;
+     use strict;
+     use base 'Catalyst::Controller';
+
+     sub target :Path(/target) Args(0) Name (Target) {
+         my ($self, $c) = @_;
+     }
+
+     sub uri :Path(/uri) Args(0) {
+         my ($self, $c) = @_;
+         $c->response->body($c->uri_for( $c->action_for('*Target') ));
+     }
+
+     package MyApp::Controller::Flow;
+
+     use warnings;
+     use strict;
+     use base 'Catalyst::Controller';
+
+     sub test_forward :Path(/forward) Args(0) {
+         my ($self, $c) = @_;
+         $c->forward('*ForForward');
+     }
+
+     sub forward_target :Action Name(ForForward) {
+         my ($self, $c) = @_;
+         $c->response->body('forward');
+     }
+
+     sub test_detach :Path(/detach) Args(0) {
+         my ($self, $c) = @_;
+         $c->detach('*ForDetach');
+     }
+
+     sub detach_target :Action Name(ForDetach) {
+         my ($self, $c) = @_;
+         $c->response->body('detach');
+     }
+
+     sub test_go :Path(/go) Args(0) {
+         my ($self, $c) = @_;
+         $c->detach('*ForGo');
+     }
+
+     sub go_target :Action Name(ForGo) {
+         my ($self, $c) = @_;
+         $c->response->body('go');
+     }
+
+     sub test_visit :Path(/visit) Args(0) {
+         my ($self, $c) = @_;
+         $c->detach('*ForVisit');
+     }
+
+     sub visit_target :Action Name(ForVisit) {
+         my ($self, $c) = @_;
+         $c->response->body('visit');
+     }
+
+B<NOTE>: Named actions are not a replacement for using an actions private name, but are offered
+as an option for when additional clarity or action namespace decoupling improve code understanding
+and maintainability.
 
 =head1 OPTIONAL METHODS
 

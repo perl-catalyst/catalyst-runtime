@@ -2392,7 +2392,17 @@ sub get_action { my $c = shift; $c->dispatcher->get_action(@_) }
 Gets all actions of a given name in a namespace and all parent
 namespaces.
 
+=head2 $c->action_for( $action_private_name )
+
+Returns the action which matches the full private name or nothing if there's no
+matching action
+
 =cut
+
+sub action_for {
+    my ($c, $action_private_name) = @_ ;
+    return $c->dispatcher->get_action_by_path($action_private_name);
+}
 
 sub get_actions { my $c = shift; $c->dispatcher->get_actions( $c, @_ ) }
 
