@@ -182,7 +182,7 @@ Match all the captures that this chain encloses, if any.
 
 Any defined scheme for the actionchain
 
-=head2 next
+=head2 next ( @args)
 
 Dispatches to the next action in the chain immediately. If there are no more actions in the
 chain, this is basically a no-op.  When the last action in the chain returns, we will return
@@ -195,6 +195,9 @@ compatibility.
 
 You can call C<next> in as many actions in a long chain as you want and the chain will correctly
 return to the last action that called C<next> based on order of execution.
+
+Any arguments you pass to C<next> will be passed to the next action in the chain as C<< $c->request->arguments >>.
+They will be added onto the end of any existing arguement that the action itself defines.
 
 =head2 meta
 
