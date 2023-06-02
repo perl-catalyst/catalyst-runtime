@@ -1,6 +1,7 @@
 package Catalyst::Utils;
-
 use strict;
+use warnings;
+
 use File::Spec;
 use HTTP::Request;
 use Path::Class;

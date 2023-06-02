@@ -1,4 +1,6 @@
 package Catalyst::Response::Writer;
+use strict;
+use warnings;
 
 sub write { shift->{_writer}->write(@_) }
 sub close { shift->{_writer}->close }

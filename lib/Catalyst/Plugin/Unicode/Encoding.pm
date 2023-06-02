@@ -1,4 +1,6 @@
 package Catalyst::Plugin::Unicode::Encoding;
+use strict;
+use warnings;
 
 our $VERSION = '5.90130';
 $VERSION =~ tr/_//d;
