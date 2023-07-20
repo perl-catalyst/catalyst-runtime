@@ -199,6 +199,24 @@ return to the last action that called C<next> based on order of execution.
 Any arguments you pass to C<next> will be passed to the next action in the chain as C<< $c->request->arguments >>.
 They will be added onto the end of any existing arguement that the action itself defines.
 
+Example:
+
+    sub action_a :Chained('/') CaptureArgs(0) {
+      my ($self, $ctx) = @_;
+      my $abc = $c->action->next('a'); # $abc = "abc";
+    }
+
+    sub action_b :Chained('action_a') CaptureArgs(0) {
+      my ($self, $ctx, $a) = @_;
+      my $abc = $c->action->next("${a}b");
+      return $abc;
+    }
+
+    sub action_c :Chained('action_b') Args(0) {
+      my ($self, $ctx, $ab) = @_;
+      return "${ab}c";
+    }
+
 =head2 meta
 
 Provided by Moose
