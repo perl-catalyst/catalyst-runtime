@@ -186,7 +186,7 @@ Any defined scheme for the actionchain
 
 Dispatches to the next action in the chain immediately, suspending any remaining code in the action.
 If there are no more actions in the chain, this is basically a no-op.  When the last action in the chain 
-returns, we will return to the most previous action that called next and continue processing that action's
+returns, we will return to the last action that called next and continue processing that action's
 code exactly where it was left off. If more than one action in the chain called C<next> then we proceed
 back up the chain stack in reverse order of calls after the last action completes.
 
@@ -199,7 +199,9 @@ longstanding code in L<Catalyst> that is not easily changed without breaking bac
 
 You can call C<next> in as many actions in a long chain as you want and the chain will correctly
 return to the last action that called C<next> based on order of execution.  If there are actions inbetween
-that didn't call C<next>, those will be skipped when proceeding back up the call stack.
+that didn't call C<next>, those will be skipped when proceeding back up the call stack.  When we've completed
+walking back up the action call stack the dispatcher will then return to normal processing order (for example
+processing any C<end> action present).
 
 Any arguments you pass to C<next> will be passed to the next action in the chain as C<< $c->request->arguments >>.
 You can pass more than one argument.  All arguments passed via C<next> will be added into the argument list prior
