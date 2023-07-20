@@ -4,6 +4,13 @@ use Moose;
 extends qw(Catalyst::Action);
 
 has chain => (is => 'rw');
+has _current_chain_actions => (is=>'rw', init_arg=>undef, predicate=>'_has_current_chain_actions');
+has _chain_last_action => (is=>'rw', init_arg=>undef, predicate=>'_has_chain_last_action', clearer=>'_clear_chain_last_action');
+has _chain_captures => (is=>'rw', init_arg=>undef);
+has _chain_original_args => (is=>'rw', init_arg=>undef, clearer=>'_clear_chain_original_args');
+has _chain_next_args => (is=>'rw', init_arg=>undef, predicate=>'_has_chain_next_args', clearer=>'_clear_chain_next_args');
+has _context => (is => 'rw', weak_ref => 1);
+
 no Moose;
 
 =head1 NAME
@@ -27,23 +34,65 @@ sub dispatch {
     my @captures = @{$c->req->captures||[]};
     my @chain = @{ $self->chain };
     my $last = pop(@chain);
-    foreach my $action ( @chain ) {
-        my @args;
-        if (my $cap = $action->number_of_captures) {
-          @args = splice(@captures, 0, $cap);
-        }
-        local $c->request->{arguments} = \@args;
-        $action->dispatch( $c );
 
-        # break the chain if exception occurs in the middle of chain.  We
-        # check the global config flag 'abort_chain_on_error_fix', but this
-        # is now considered true by default, so unless someone explicitly sets
-        # it to false we default it to true (if its not defined).
-        my $abort = defined($c->config->{abort_chain_on_error_fix}) ?
-          $c->config->{abort_chain_on_error_fix} : 1;
-        return if ($c->has_errors && $abort);
+    $self->_current_chain_actions(\@chain);
+    $self->_chain_last_action($last);
+    $self->_chain_captures(\@captures);
+    $self->_chain_original_args($c->request->{arguments});
+    $self->_context($c);
+    $self->_dispatch_chain_actions($c);
+}
+
+sub next {
+    my ($self, @args) = @_;
+    my $ctx = $self->_context;
+
+    if($self->_has_chain_last_action) {
+        @args ? $self->_chain_next_args(\@args) : $self->_chain_next_args([]);
+        $self->_dispatch_chain_actions($ctx);
+    } else {
+        $ctx->action->chain->[-1]->next($ctx, @args) if $ctx->action->chain->[-1]->can('next');
     }
-    $last->dispatch( $c );
+
+    return $ctx->state;
+
+}
+
+sub _dispatch_chain_actions {
+    my ($self, $c) = @_;
+    while( @{$self->_current_chain_actions||[]}) {
+        $self->_dispatch_chain_action($c);
+        return if $self->_abort_needed($c);
+    }
+    if($self->_has_chain_last_action) {
+        $c->request->{arguments} = $self->_chain_original_args;
+        $self->_clear_chain_original_args;
+        unshift @{$c->request->{arguments}}, @{ $self->_chain_next_args} if $self->_has_chain_next_args;
+        $self->_clear_chain_next_args;
+        my $last_action = $self->_chain_last_action;
+        $self->_clear_chain_last_action;
+        $last_action->dispatch($c);
+    }
+}
+
+sub _dispatch_chain_action {
+    my ($self, $c) = @_;
+    my ($action, @remaining_actions) = @{ $self->_current_chain_actions||[] };
+    $self->_current_chain_actions(\@remaining_actions);
+    my @args;
+    if (my $cap = $action->number_of_captures) {
+        @args = splice(@{ $self->_chain_captures||[] }, 0, $cap);
+    }
+    unshift @args, @{ $self->_chain_next_args} if $self->_has_chain_next_args;
+    $self->_clear_chain_next_args;
+    local $c->request->{arguments} = \@args;
+    $action->dispatch( $c );
+}
+
+sub _abort_needed {
+    my ($self, $c) = @_;
+    my $abort = defined($c->config->{abort_chain_on_error_fix}) ? $c->config->{abort_chain_on_error_fix} : 1;
+    return 1 if ($c->has_errors && $abort);
 }
 
 sub from_chain {
@@ -132,6 +181,49 @@ Match all the captures that this chain encloses, if any.
 =head2 scheme
 
 Any defined scheme for the actionchain
+
+=head2 next ( @args)
+
+Dispatches to the next action in the chain immediately, suspending any remaining code in the action.
+If there are no more actions in the chain, this is basically a no-op.  When the last action in the chain 
+returns, we will return to the last action that called next and continue processing that action's
+code exactly where it was left off. If more than one action in the chain called C<next> then we proceed
+back up the chain stack in reverse order of calls after the last action completes.
+
+The return value of C<next> is the return value of the next action in the chain (that is the action that
+was called with C<next>) or whatever $c->state is set to.
+
+Please note that since C<state> is a scalar, you cannot return a list of values from an action chain.
+If you want to return a list you must return an arrayref or hashref.  This limitation is due to
+longstanding code in L<Catalyst> that is not easily changed without breaking backwards compatibility.
+
+You can call C<next> in as many actions in a long chain as you want and the chain will correctly
+return to the last action that called C<next> based on order of execution.  If there are actions inbetween
+that didn't call C<next>, those will be skipped when proceeding back up the call stack.  When we've completed
+walking back up the action call stack the dispatcher will then return to normal processing order (for example
+processing any C<end> action present).
+
+Any arguments you pass to C<next> will be passed to the next action in the chain as C<< $c->request->arguments >>.
+You can pass more than one argument.  All arguments passed via C<next> will be added into the argument list prior
+to any CaptureArgs or Args that the action itself defines.
+
+Example:
+
+    sub action_a :Chained('/') CaptureArgs(0) {
+      my ($self, $ctx) = @_;
+      my $abc = $c->action->next('a'); # $abc = "abc";
+    }
+
+    sub action_b :Chained('action_a') CaptureArgs(0) {
+      my ($self, $ctx, $a) = @_;
+      my $abc = $c->action->next("${a}b");
+      return $abc;
+    }
+
+    sub action_c :Chained('action_b') Args(0) {
+      my ($self, $ctx, $ab) = @_;
+      return "${ab}c";
+    }
 
 =head2 meta
 
