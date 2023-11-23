@@ -92,7 +92,7 @@ sub prove {
 
         my $aggregator = $harness->runtests(@tests);
 
-        exit $aggregator->has_errors ? 1 : 0;
+        exit($aggregator->has_errors ? 1 : 0);
     } else {
         waitpid $pid, 0;
         return $?;
