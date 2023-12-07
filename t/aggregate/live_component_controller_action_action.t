@@ -190,6 +190,14 @@ sub run_tests {
         my $action = eval $response->content;
         is_deeply $action->attributes->{extra_attribute}, [13];
         is_deeply $action->attributes->{another_extra_attribute}, ['foo'];
+
+        # Test a multi-line attribute on the action comes through as expected
+        is_deeply $action->attributes->{MultiLineAttr}, ["one\n    two\n    three"];
+        # and a normal one e.g. `Foo('bar')`
+        is_deeply $action->attributes->{Foo}, ['bar'];
+        # and one without a value, e.g. `Baz` - note that the presence of
+        # the arrayref shows it was there
+        is_deeply $action->attributes->{Baz}, [undef];
     }
     {
         ok( my $response = request('http://localhost/action_action_nine'),
