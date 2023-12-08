@@ -303,6 +303,7 @@ sub finalize_error {
 (ru) Попробуйте еще раз позже
 (ua) Спробуйте ще раз пізніше
 (it) Per favore riprova più tardi
+(cs) Vraťte se prosím později
 </pre>
 
         $name = '';
