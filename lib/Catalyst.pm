@@ -4570,7 +4570,7 @@ headers.
 
 If you do not wish to use the proxy support at all, you may set:
 
-    MyApp->config(ignore_frontend_proxy => 0);
+    MyApp->config(ignore_frontend_proxy => 1);
 
 =head2 Note about psgi files
 
