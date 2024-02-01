@@ -345,7 +345,7 @@ settings override the application, with <MYAPP>_DEBUG having the highest
 priority.
 
 This sets the log level to 'debug' and enables full debug output on the
-error screen. If you only want the latter, see L<< $c->debug >>.
+error screen. If you only want the latter, see L<< /$c->debug >>.
 
 =head2 -Home
 
