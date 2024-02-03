@@ -400,14 +400,22 @@ sub _parse_attrs {
     my %raw_attributes;
 
     foreach my $attr (@attrs) {
-
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
-
-        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+?)?\s*\))?$/ ) )
+        if ( my ( $key, $value ) = $attr =~ m{
+                \A
+                    (\S*?) # match the key e.g. Foo in example
+                    (?:
+                        \( \s*
+                            (.+?)? # match attr content e.g. "bar" in example
+                        \s* \)
+                    )?
+                \z
+                    }xms )
         {
 
             if ( defined $value ) {
-                ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
+                # Unquote single/double quoted attr values e.g. Foo("bar")
+                ( $value =~ s/^'(.*)'$/$1/s ) || ( $value =~ s/^"(.*)"/$1/s );
             }
             push( @{ $raw_attributes{$key} }, $value );
         }
