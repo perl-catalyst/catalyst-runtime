@@ -278,25 +278,31 @@ sub recurse_match {
                 next TRY_ACTION unless $action->match_captures($c, \@captures);
 
                 # try the remaining parts against children of this action
-                my ($actions, $captures, $action_parts, $n_pathparts) = $self->recurse_match(
-                                             $c, '/'.$action->reverse, \@parts
-                                           );
-                #    No best action currently
-                # OR The action has less parts
-                # OR The action has equal parts but less captured data (ergo more defined)
-                if ($actions    &&
-                    (!$best_action                                 ||
-                     $#$action_parts < $#{$best_action->{parts}}   ||
-                     ($#$action_parts == $#{$best_action->{parts}} &&
-                      $#$captures < $#{$best_action->{captures}} &&
-                      $n_pathparts > $best_action->{n_pathparts}))) {
-                    my @pathparts = split /\//, $action->attributes->{PathPart}->[0];
-                    $best_action = {
-                        actions => [ $action, @$actions ],
-                        captures=> [ @captures, @$captures ],
-                        parts   => $action_parts,
-                        n_pathparts => scalar(@pathparts) + $n_pathparts,
-                    };
+                my @action_names = ($action->reverse);
+                # try Name first if that exists and then short circuit out
+                unshift @action_names, map { "*${_}"} @{$action->attributes->{Name}} if exists $action->attributes->{Name};
+
+                foreach my $action_name (@action_names) {
+                    my ($actions, $captures, $action_parts, $n_pathparts) = $self->recurse_match(
+                                                 $c, '/'.$action_name, \@parts
+                                               );
+                    #    No best action currently
+                    # OR The action has less parts
+                    # OR The action has equal parts but less captured data (ergo more defined)
+                    if ($actions    &&
+                        (!$best_action                                 ||
+                         $#$action_parts < $#{$best_action->{parts}}   ||
+                         ($#$action_parts == $#{$best_action->{parts}} &&
+                          $#$captures < $#{$best_action->{captures}} &&
+                          $n_pathparts > $best_action->{n_pathparts}))) {
+                        my @pathparts = split /\//, $action->attributes->{PathPart}->[0];
+                        $best_action = {
+                            actions => [ $action, @$actions ],
+                            captures=> [ @captures, @$captures ],
+                            parts   => $action_parts,
+                            n_pathparts => scalar(@pathparts) + $n_pathparts,
+                        };
+                    }
                 }
             }
             else {
@@ -398,6 +404,11 @@ sub register {
     unshift(@{ $children->{$encoded_part} ||= [] }, $action);
 
     $self->_actions->{'/'.$action->reverse} = $action;
+
+    if(my ($name) = @{$action->attributes->{Name}||[]}) {
+        die "Named action '$name' is already defined" if exists $self->_actions->{"/*$name"};
+        $self->_actions->{"/*$name"} = $action;
+    }
 
     if (exists $action->attributes->{Args} and exists $action->attributes->{CaptureArgs}) {
         Catalyst::Exception->throw(
