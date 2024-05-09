@@ -415,7 +415,7 @@ sub _parse_attrs {
 
             if ( defined $value ) {
                 # Unquote single/double quoted attr values e.g. Foo("bar")
-                ( $value =~ s/^'(.*)'$/$1/s ) || ( $value =~ s/^"(.*)"/$1/s );
+                $value =~ s/^(['"])(.*)\1$/$2/s;
             }
             push( @{ $raw_attributes{$key} }, $value );
         }
