@@ -199,6 +199,41 @@ sub run_tests {
         # the arrayref shows it was there
         is_deeply $action->attributes->{Baz}, [undef];
     }
+
+    {
+        ok( my $response = request('http://localhost/action_action_eightpointfive'),
+            'Request' );
+        ok( $response->is_success, 'Response Successful 2xx' );
+        is( $response->content_type, 'text/plain', 'Response Content-Type' );
+        is( $response->header('X-Catalyst-Action'),
+            'action_action_eightpointfive', 'Test Action' );
+        is(
+            $response->header('X-Test-Class'),
+            'TestApp::Controller::Action::Action',
+            'Test Class'
+        );
+        like(
+            $response->content,
+            qr/^bless\( .* 'Catalyst::Action' \)$/s,
+            'Content is a serialized Catalyst::Action'
+        );
+
+        require Catalyst::Action; # when running against a remote server, we
+                                  # need to load the class in the test process
+                                  # to be able to introspect the action instance
+                                  # later.
+        my $action = eval $response->content;
+        is_deeply $action->attributes->{extra_attribute}, [13];
+
+        # Test a multi-line attribute on the action comes through as expected
+        is_deeply $action->attributes->{MultiLineAttrQuoted}, ["\n    'one'\n    'two'\n    'three'\n"];
+        # and a normal one e.g. `Foo('bar')`
+        is_deeply $action->attributes->{Foo}, ['bar'];
+        # and one without a value, e.g. `Baz` - note that the presence of
+        # the arrayref shows it was there
+        is_deeply $action->attributes->{Baz}, [undef];
+    }
+
     {
         ok( my $response = request('http://localhost/action_action_nine'),
             'Request' );
