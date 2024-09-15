@@ -53,7 +53,20 @@ sub action_action_seven : Global : ActionClass('~TestExtraArgsAction') {
     $c->forward('TestApp::View::Dump::Request');
 }
 
-sub action_action_eight : Global  {
+sub action_action_eight : Global Foo('bar') MultiLineAttr(
+    one
+    two
+    three
+) Baz {
+    my ( $self, $c ) = @_;
+    $c->forward('TestApp::View::Dump::Action');
+}
+
+sub action_action_eightpointfive : Global Foo('bar') MultiLineAttrQuoted("
+    'one'
+    'two'
+    'three'
+") Baz {
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Action');
 }
@@ -62,4 +75,5 @@ sub action_action_nine : Global : ActionClass('~TestActionArgsFromConstructor') 
     my ( $self, $c ) = @_;
     $c->forward('TestApp::View::Dump::Request');
 }
+
 1;
