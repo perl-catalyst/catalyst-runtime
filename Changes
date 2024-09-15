@@ -3,7 +3,7 @@ This file documents the revision history for Perl extension Catalyst.
 5.90131 - 2023-07-20
   - fixed broken links in various documentation
   - added strict and warnings pragma to all files that needed them
-  - added mailmpa file
+  - added mailmap file
   - enhanced Chaining dispatch with 'next action' feature.  See 
     Catalyst::ActionChain for more.
 
