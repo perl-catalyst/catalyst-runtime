@@ -480,9 +480,9 @@ and access it from the stash.
 
 Keep in mind that the C<end> method used is that of the caller action. So a C<< $c->detach >> inside a forwarded action would run the C<end> method from the original action requested.
 
-If you call c<forward> with the name of a component class or instance, rather than an action name
+If you call C<forward> with the name of a component class or instance, rather than an action name
 or instance, we invoke the C<process> action on that class or instance, or whatever action you
-specific via the second argument $method.
+specify via the second argument C<$method>.
 
 =cut
 
