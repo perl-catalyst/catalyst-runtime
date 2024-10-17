@@ -58,10 +58,8 @@ it under the same terms as Perl itself.
     use Moose;
     use namespace::clean -except => 'meta';
 
-    use vars qw[$CATALYST_EXCEPTION_CLASS];
-
     BEGIN {
-        extends($CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base');
+        extends(our $CATALYST_EXCEPTION_CLASS || 'Catalyst::Exception::Base');
     }
 
     __PACKAGE__->meta->make_immutable;

@@ -4,10 +4,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use vars qw/
-    $EXPECTED_ENV_VAR
-    $EXPECTED_ENV_VAL
-/;
+our $EXPECTED_ENV_VAR;
+our $EXPECTED_ENV_VAL;
 
 BEGIN {
     $EXPECTED_ENV_VAR = "CATALYSTTEST$$"; # has to be uppercase otherwise fails on Win32
