@@ -4088,6 +4088,7 @@ sub default_data_handlers {
           my $slurped;
           return eval {
             local $/;
+            $fh->seek(0,0); # in case it's already been read
             $slurped = $fh->getline;
             JSON::MaybeXS::decode_json($slurped); # decode_json does utf8 decoding for us
           } || Catalyst::Exception->throw(sprintf "Error Parsing POST '%s', Error: %s", (defined($slurped) ? $slurped : 'undef') ,$@);
