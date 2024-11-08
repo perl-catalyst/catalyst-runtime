@@ -394,6 +394,30 @@ sub gather_default_action_roles {
     return @roles;
 }
 
+sub _parse_attr_key_value {
+    my ( $self, $c, $attr ) = @_;
+    if (
+        my ( $key, $value ) = $attr =~ m{
+            \A
+                (\S*?) # match the key e.g. Foo in example
+                (?:
+                    \( \s*
+                        (.+?)? # match attr content e.g. "bar" in example
+                    \s* \)
+                )?
+            \z
+        }xms
+    )
+    {
+
+        if ( defined $value ) {
+            ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
+        }
+        return ( $key, $value );
+    }
+    return;
+}
+
 sub _parse_attrs {
     my ( $self, $c, $name, @attrs ) = @_;
 
@@ -402,14 +426,12 @@ sub _parse_attrs {
     foreach my $attr (@attrs) {
 
         # Parse out :Foo(bar) into Foo => bar etc (and arrayify)
-
-        if ( my ( $key, $value ) = ( $attr =~ /^(.*?)(?:\(\s*(.+?)?\s*\))?$/ ) )
-        {
-
-            if ( defined $value ) {
-                ( $value =~ s/^'(.*)'$/$1/ ) || ( $value =~ s/^"(.*)"/$1/ );
-            }
-            push( @{ $raw_attributes{$key} }, $value );
+        my ( $key, $value ) = $self->_parse_attr_key_value( $c, $attr );
+        if ( defined $key ) {
+            push @{ $raw_attributes{$key} }, $value;
+        }
+        else {
+            $c->log->warn( qq/Unknown attribute "$attr" for "$name"/ ) if $c->debug;
         }
     }
 

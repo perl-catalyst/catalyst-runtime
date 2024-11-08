@@ -8,6 +8,7 @@ our $iters;
 
 BEGIN { $iters = $ENV{CAT_BENCH_ITERS} || 1; }
 
+use utf8;
 use Test::More;
 use Catalyst::Test 'TestApp';
 
@@ -210,6 +211,58 @@ sub run_tests {
             'Content is a serialized Catalyst::Request'
         );
     }
+
+    # all the tests for complex action attributes
+    {
+        ok my $response = request('http://localhost/action_action_ten');
+        my $VAR1; eval $response->content;
+
+        ok $VAR1;
+        is_deeply $VAR1, [
+            undef,
+            undef,
+            "bar",
+            "bar",
+            "aaa bbb    ccc. dddd",
+            12345,
+            "bar",
+            "bar baz",
+            "bar baz",
+            "bar(baz)",
+            "^\$.*+?",
+            "bar\\)baz",
+            "ba\\\\nr",
+            "ba\\tr",
+            "bar, baz",
+            "bar;baz",
+            "bar&baz",
+            "bar=1",
+            "{  \"a\":\"b\"}",
+            "bar=1, baz=2",
+            "bar=1,  baz=2, qux=3",
+            "   bar=1,  baz=2, qux=3 ",
+            "   bar=1,  baz=2, qux=3 ",
+            "   bar=1,  baz=2, qux=3 ",
+            "[   bar=1,  baz=2, qux=3 ]",
+            "bar: baz",
+            "\x{4e2d}\x{6587}\x{6d4b}\x{8bd5}",
+            "bar's baz",
+            "\x{1f600} emoji test",
+            "#comment",
+            "fff\\nfff",
+            "\\taaa\\nbbb",
+            "bar's baz",
+            undef,
+            "[.*?^\$]",
+            undef,
+            "aaa\n        bbb\x{1f600} ccc  \n        ddd",
+            "\"\n        aaa\n        bbb\x{1f600} ccc  \n        ddd\n    \"",
+            "'aaa'\n        'bbb\x{1f600}' 'ccc'  \n        'ddd'",
+            "\"\n        'aaa'\n        'bbb\x{1f600}' 'ccc'  \n        'ddd'\n    \"",
+        ];
+
+    }
+
 }
 
 done_testing;
