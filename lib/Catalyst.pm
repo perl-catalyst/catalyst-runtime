@@ -53,7 +53,7 @@ use Class::Load 'load_class';
 use Encode 2.21 'decode_utf8', 'encode_utf8';
 use Scalar::Util;
 
-our $VERSION = '5.90131';
+our $VERSION = '5.90132';
 $VERSION =~ tr/_//d;
 
 BEGIN { require 5.008003; }
