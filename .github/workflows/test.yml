@@ -1,0 +1,75 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: [
+          # Not all of ours deps support these versions. See #193.
+          # '5.8', '5.10', '5.12',
+
+                          '5.14', '5.16', '5.18',
+          '5.20', '5.22', '5.24', '5.26', '5.28',
+          '5.30', '5.32', '5.34', '5.36', '5.38',
+        ]
+
+    runs-on: ubuntu-latest
+
+    name: ${{ matrix.perl }}
+
+    # 4 CPUs as per https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+    env:
+      HARNESS_OPTIONS: j4
+      HARNESS_TIMER: 1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+
+      # Bump EU:MM on 5.14 to fix MYMETA generation.
+      - run: cpanm --notest --skip-satisfied ExtUtils::MakeMaker~6.57_07
+
+      - run: cpanm --notest --skip-satisfied --installdeps --with-develop .
+      - run: cpanm --notest --skip-satisfied Test2::Harness
+
+      - run: yath test t xt
+
+      # Test high-profile reverse deps, taken from from Task::Catalyst):
+      #  (note: currently skipping DBIC deps for speed)
+      - run: make install
+
+      # Pure author deps (of reverse deps):
+      - run: cpanm --notest --skip-satisfied YAML::Syck
+      - run: cpanm --notest Carp::Assert::More@1.16
+      - run: cpanm --notest Test::WWW::Mechanize@1.50
+
+      # Both author deps & reverse deps:
+      - run: HARNESS_OPTIONS= cpanm --skip-satisfied Catalyst::View::TT || ( cat ~/.cpanm/build.log; false )
+      - run: cpanm --skip-satisfied Catalyst::Plugin::Authentication || ( cat ~/.cpanm/build.log; false )
+
+      # Pure reverse deps (call with --test-only):
+      - run: cpanm --test-only -v Catalyst::Devel
+      - run: cpanm --test-only -v Catalyst::Action::REST
+      - run: cpanm --test-only -v Catalyst::Component::InstancePerContext
+      - run: cpanm --test-only -v Catalyst::Plugin::Session
+      - run: cpanm --test-only -v Catalyst::Plugin::Session::State::Cookie
+      - run: cpanm --test-only -v Catalyst::Plugin::Static::Simple
+      - run: cpanm --test-only -v Catalyst::Plugin::ConfigLoader
+      - run: cpanm --test-only -v Catalyst::Authentication::Credential::HTTP
+      - run: cpanm --test-only -v Catalyst::View::Email
+
+      # Racey under parallel testing.
+      - run: HARNESS_OPTIONS= cpanm --test-only -v Catalyst::Plugin::Session::Store::File
+      - run: HARNESS_OPTIONS= cpanm --test-only -v Catalyst::Plugin::I18N
