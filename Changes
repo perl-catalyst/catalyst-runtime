@@ -2689,7 +2689,7 @@ s
         - Cleaned up generated tests
         - Updated YAML support to use ConfigLoader
         - Fixed path dispatch to canonicalise correctly
-            (see http://dev.catalyst.perl.org/ticket/62)
+            (see http://dev.catalyst.perl.org/ticket/62 [offline, not archived in Internet Archive])
         - Added Catalyst::Manual::About
 
 5.63    2006-01-22 00:00:00
