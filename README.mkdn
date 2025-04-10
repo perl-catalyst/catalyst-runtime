@@ -4,7 +4,7 @@ Catalyst - The Elegant MVC Web Application Framework
 
 # SYNOPSIS
 
-See the [Catalyst::Manual](https://metacpan.org/pod/Catalyst::Manual) distribution for comprehensive
+See the [Catalyst::Manual](https://metacpan.org/pod/Catalyst%3A%3AManual) distribution for comprehensive
 documentation and tutorials.
 
     # Install Catalyst::Devel for helpers and other development tools
@@ -55,16 +55,16 @@ documentation and tutorials.
         $c->forward( 'MyApp::View::TT' ); # render template
     }
 
-See [Catalyst::Manual::Intro](https://metacpan.org/pod/Catalyst::Manual::Intro) for additional information.
+See [Catalyst::Manual::Intro](https://metacpan.org/pod/Catalyst%3A%3AManual%3A%3AIntro) for additional information.
 
 # DESCRIPTION
 
 Catalyst is a modern framework for making web applications without the
 pain usually associated with this process. This document is a reference
 to the main Catalyst application. If you are a new user, we suggest you
-start with [Catalyst::Manual::Tutorial](https://metacpan.org/pod/Catalyst::Manual::Tutorial) or [Catalyst::Manual::Intro](https://metacpan.org/pod/Catalyst::Manual::Intro).
+start with [Catalyst::Manual::Tutorial](https://metacpan.org/pod/Catalyst%3A%3AManual%3A%3ATutorial) or [Catalyst::Manual::Intro](https://metacpan.org/pod/Catalyst%3A%3AManual%3A%3AIntro).
 
-See [Catalyst::Manual](https://metacpan.org/pod/Catalyst::Manual) for more documentation.
+See [Catalyst::Manual](https://metacpan.org/pod/Catalyst%3A%3AManual) for more documentation.
 
 Catalyst plugins can be loaded by naming them as arguments to the "use
 Catalyst" statement. Omit the `Catalyst::Plugin::` prefix from the
@@ -99,7 +99,7 @@ settings override the application, with <MYAPP>\_DEBUG having the highest
 priority.
 
 This sets the log level to 'debug' and enables full debug output on the
-error screen. If you only want the latter, see [$c->debug](https://metacpan.org/pod/$c->debug).
+error screen. If you only want the latter, see ["$c->debug"](#c-debug).
 
 ## -Home
 
@@ -145,8 +145,8 @@ Stats are also enabled if [debugging ](#debug) is enabled.
 
 ## $c->action
 
-Returns a [Catalyst::Action](https://metacpan.org/pod/Catalyst::Action) object for the current action, which
-stringifies to the action name. See [Catalyst::Action](https://metacpan.org/pod/Catalyst::Action).
+Returns a [Catalyst::Action](https://metacpan.org/pod/Catalyst%3A%3AAction) object for the current action, which
+stringifies to the action name. See [Catalyst::Action](https://metacpan.org/pod/Catalyst%3A%3AAction).
 
 ## $c->namespace
 
@@ -160,15 +160,21 @@ corresponding to the controller of the current action. For example:
 
 ## $c->req
 
-Returns the current [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request) object, giving access to
+Returns the current [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest) object, giving access to
 information about the current client request (including parameters,
-cookies, HTTP headers, etc.). See [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request).
+cookies, HTTP headers, etc.). See [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest).
+
+There is a predicate method `has_request` that returns true if the
+request object has been created.  This is something you might need to
+check if you are writing plugins that run before a request is finalized.
 
 ## REQUEST FLOW HANDLING
 
 ## $c->forward( $action \[, \\@arguments \] )
 
 ## $c->forward( $class, $method, \[, \\@arguments \] )
+
+## $c->forward( $component\_instance, $method, \[, \\@arguments \] )
 
 This is one way of calling another action (method) in the same or
 a different controller. You can also use `$self->my_method($c, @args)`
@@ -227,6 +233,10 @@ and access it from the stash.
 
 Keep in mind that the `end` method used is that of the caller action. So a `$c->detach` inside a forwarded action would run the `end` method from the original action requested.
 
+If you call `forward` with the name of a component class or instance, rather than an action name
+or instance, we invoke the `process` action on that class or instance, or whatever action you
+specify via the second argument `$method`.
+
 ## $c->detach( $action \[, \\@arguments \] )
 
 ## $c->detach( $class, $method, \[, \\@arguments \] )
@@ -253,8 +263,8 @@ you go to are called, just like a new request.
 
 In addition both `$c->action` and `$c->namespace` are localized.
 This means, for example, that `$c->action` methods such as
-[name](https://metacpan.org/pod/Catalyst::Action#name), [class](https://metacpan.org/pod/Catalyst::Action#class) and
-[reverse](https://metacpan.org/pod/Catalyst::Action#reverse) return information for the visited action
+[name](https://metacpan.org/pod/Catalyst%3A%3AAction#name), [class](https://metacpan.org/pod/Catalyst%3A%3AAction#class) and
+[reverse](https://metacpan.org/pod/Catalyst%3A%3AAction#reverse) return information for the visited action
 when they are invoked within the visited action.  This is different from the
 behavior of [forward](#c-forward-action-arguments), which
 continues to use the $c->action object from the caller action even when
@@ -294,7 +304,11 @@ $action.
 
 ## $c->res
 
-Returns the current [Catalyst::Response](https://metacpan.org/pod/Catalyst::Response) object, see there for details.
+Returns the current [Catalyst::Response](https://metacpan.org/pod/Catalyst%3A%3AResponse) object, see there for details.
+
+There is a predicate method `has_response` that returns true if the
+request object has been created.  This is something you might need to
+check if you are writing plugins that run before a request is finalized.
 
 ## $c->stash
 
@@ -303,7 +317,7 @@ it between components during a request. You can also set hash keys by
 passing arguments. The stash is automatically sent to the view. The
 stash is cleared at the end of a request; it cannot be used for
 persistent storage (for this you must use a session; see
-[Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst::Plugin::Session) for a complete system integrated with
+[Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3ASession) for a complete system integrated with
 Catalyst).
 
     $c->stash->{foo} = $bar;
@@ -314,7 +328,7 @@ Catalyst).
     $c->forward( 'MyApp::View::TT' );
 
 The stash hash is currently stored in the PSGI `$env` and is managed by
-[Catalyst::Middleware::Stash](https://metacpan.org/pod/Catalyst::Middleware::Stash).  Since it's part of the `$env` items in
+[Catalyst::Middleware::Stash](https://metacpan.org/pod/Catalyst%3A%3AMiddleware%3A%3AStash).  Since it's part of the `$env` items in
 the stash can be accessed in sub applications mounted under your main
 [Catalyst](https://metacpan.org/pod/Catalyst) application.  For example if you delegate the response of an
 action to another [Catalyst](https://metacpan.org/pod/Catalyst) application, that sub application will have
@@ -388,7 +402,7 @@ nothing if there are no more errors.
 
 ## $c->controller($name)
 
-Gets a [Catalyst::Controller](https://metacpan.org/pod/Catalyst::Controller) instance by name.
+Gets a [Catalyst::Controller](https://metacpan.org/pod/Catalyst%3A%3AController) instance by name.
 
     $c->controller('Foo')->do_stuff;
 
@@ -402,7 +416,7 @@ If you want to search for controllers, pass in a regexp as the argument.
 
 ## $c->model($name)
 
-Gets a [Catalyst::Model](https://metacpan.org/pod/Catalyst::Model) instance by name.
+Gets a [Catalyst::Model](https://metacpan.org/pod/Catalyst%3A%3AModel) instance by name.
 
     $c->model('Foo')->do_stuff;
 
@@ -422,7 +436,7 @@ If you want to search for models, pass in a regexp as the argument.
 
 ## $c->view($name)
 
-Gets a [Catalyst::View](https://metacpan.org/pod/Catalyst::View) instance by name.
+Gets a [Catalyst::View](https://metacpan.org/pod/Catalyst%3A%3AView) instance by name.
 
     $c->view('Foo')->do_stuff;
 
@@ -477,15 +491,15 @@ Returns or takes a hashref containing the application's configuration.
 
     __PACKAGE__->config( { db => 'dsn:SQLite:foo.db' } );
 
-You can also use a `YAML`, `XML` or [Config::General](https://metacpan.org/pod/Config::General) config file
+You can also use a `YAML`, `XML` or [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral) config file
 like `myapp.conf` in your applications home directory. See
-[Catalyst::Plugin::ConfigLoader](https://metacpan.org/pod/Catalyst::Plugin::ConfigLoader).
+[Catalyst::Plugin::ConfigLoader](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3AConfigLoader).
 
 ### Cascading configuration
 
 The config method is present on all Catalyst components, and configuration
 will be merged when an application is started. Configuration loaded with
-[Catalyst::Plugin::ConfigLoader](https://metacpan.org/pod/Catalyst::Plugin::ConfigLoader) takes precedence over other configuration,
+[Catalyst::Plugin::ConfigLoader](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3AConfigLoader) takes precedence over other configuration,
 followed by configuration in your top level `MyApp` class. These two
 configurations are merged, and then configuration data whose hash key matches a
 component name is merged with configuration for that component.
@@ -531,7 +545,7 @@ the constructor and use those instead.
 ## $c->log
 
 Returns the logging object instance. Unless it is already set, Catalyst
-sets this up with a [Catalyst::Log](https://metacpan.org/pod/Catalyst::Log) object. To use your own log class,
+sets this up with a [Catalyst::Log](https://metacpan.org/pod/Catalyst%3A%3ALog) object. To use your own log class,
 set the logger with the `__PACKAGE__->log` method prior to calling
 `__PACKAGE__->setup`.
 
@@ -543,7 +557,7 @@ And later:
     $c->log->info( 'Now logging with my own logger!' );
 
 Your log class should implement the methods described in
-[Catalyst::Log](https://metacpan.org/pod/Catalyst::Log).
+[Catalyst::Log](https://metacpan.org/pod/Catalyst%3A%3ALog).
 
 ## has\_encoding
 
@@ -556,7 +570,7 @@ Clears the encoding for the current context
 ## encoding
 
 Sets or gets the application encoding.  Setting encoding takes either an
-Encoding object or a string that we try to resolve via [Encode::find\_encoding](https://metacpan.org/pod/Encode::find_encoding).
+Encoding object or a string that we try to resolve via [Encode::find\_encoding](https://metacpan.org/pod/Encode%3A%3Afind_encoding).
 
 You would expect to get the encoding object back if you attempt to set it.  If
 there is a failure you will get undef returned and an error message in the log.
@@ -578,18 +592,18 @@ Calling `$c->debug(1)` has no effect.
 
 ## $c->dispatcher
 
-Returns the dispatcher instance. See [Catalyst::Dispatcher](https://metacpan.org/pod/Catalyst::Dispatcher).
+Returns the dispatcher instance. See [Catalyst::Dispatcher](https://metacpan.org/pod/Catalyst%3A%3ADispatcher).
 
 ## $c->engine
 
-Returns the engine instance. See [Catalyst::Engine](https://metacpan.org/pod/Catalyst::Engine).
+Returns the engine instance. See [Catalyst::Engine](https://metacpan.org/pod/Catalyst%3A%3AEngine).
 
 ## UTILITY METHODS
 
 ## $c->path\_to(@path)
 
 Merges `@path` with `$c->config->{home}` and returns a
-[Path::Class::Dir](https://metacpan.org/pod/Path::Class::Dir) object. Note you can usually use this object as
+[Path::Class::Dir](https://metacpan.org/pod/Path%3A%3AClass%3A%3ADir) object. Note you can usually use this object as
 a filename, but sometimes you will have to explicitly stringify it
 yourself by calling the `->stringify` method.
 
@@ -646,7 +660,7 @@ Constructs an absolute [URI](https://metacpan.org/pod/URI) object based on the a
 provided path, and the additional arguments and query parameters provided.
 When used as a string, provides a textual URI.  If you need more flexibility
 than this (i.e. the option to provide relative URIs etc.) see
-[Catalyst::Plugin::SmartURI](https://metacpan.org/pod/Catalyst::Plugin::SmartURI).
+[Catalyst::Plugin::SmartURI](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3ASmartURI).
 
 If no arguments are provided, the URI for the current action is returned.
 To return the current action and also provide @args, use
@@ -667,7 +681,7 @@ Where 'baz' is a URI fragment.  We consider this first argument string to be
 'expert' mode where you are expected to create a valid URL and we for the most
 part just pass it through without a lot of internal effort to escape and encode.
 
-If the first argument is a [Catalyst::Action](https://metacpan.org/pod/Catalyst::Action) it represents an action which
+If the first argument is a [Catalyst::Action](https://metacpan.org/pod/Catalyst%3A%3AAction) it represents an action which
 will have its path resolved using `$c->dispatcher->uri_for_action`. The
 optional `\@captures` argument (an arrayref) allows passing the captured
 variables that are needed to fill in the paths of Chained and Regex actions;
@@ -728,7 +742,7 @@ constraints.
 - \\@captures\_and\_args?
 
     Optional array reference of Captures (i.e. `CaptureArgs` or `$c->req->captures`)
-    and arguments to the request. Usually used with [Catalyst::DispatchType::Chained](https://metacpan.org/pod/Catalyst::DispatchType::Chained)
+    and arguments to the request. Usually used with [Catalyst::DispatchType::Chained](https://metacpan.org/pod/Catalyst%3A%3ADispatchType%3A%3AChained)
     to interpolate all the parameters in the URI.
 
 - @args?
@@ -811,6 +825,10 @@ via $c->error.
 
 Finalizes the request.
 
+## $c->log\_stats
+
+Logs statistics.
+
 ## $c->finalize\_body
 
 Finalizes body.
@@ -837,7 +855,7 @@ default the encoding is UTF-8 but you can disable it by explicitly setting the
 encoding configuration value to undef.
 
 We can only encode when the body is a scalar.  Methods for encoding via the
-streaming interfaces (such as `write` and `write_fh` on [Catalyst::Response](https://metacpan.org/pod/Catalyst::Response)
+streaming interfaces (such as `write` and `write_fh` on [Catalyst::Response](https://metacpan.org/pod/Catalyst%3A%3AResponse)
 are available).
 
 See ["ENCODING"](#encoding).
@@ -874,7 +892,7 @@ etc.).
 
 ## $c->prepare\_action
 
-Prepares action. See [Catalyst::Dispatcher](https://metacpan.org/pod/Catalyst::Dispatcher).
+Prepares action. See [Catalyst::Dispatcher](https://metacpan.org/pod/Catalyst%3A%3ADispatcher).
 
 ## $c->prepare\_body
 
@@ -882,9 +900,9 @@ Prepares message body.
 
 ## $c->prepare\_body\_chunk( $chunk )
 
-Prepares a chunk of data before sending it to [HTTP::Body](https://metacpan.org/pod/HTTP::Body).
+Prepares a chunk of data before sending it to [HTTP::Body](https://metacpan.org/pod/HTTP%3A%3ABody).
 
-See [Catalyst::Engine](https://metacpan.org/pod/Catalyst::Engine).
+See [Catalyst::Engine](https://metacpan.org/pod/Catalyst%3A%3AEngine).
 
 ## $c->prepare\_body\_parameters
 
@@ -921,7 +939,7 @@ Prepares query parameters.
 Writes information about the request to the debug logs.  This includes:
 
 - Request method, path, and remote IP address
-- Query keywords (see ["query\_keywords" in Catalyst::Request](https://metacpan.org/pod/Catalyst::Request#query_keywords))
+- Query keywords (see ["query\_keywords" in Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest#query_keywords))
 - Request parameters
 - File uploads
 
@@ -960,7 +978,7 @@ No-op in the default implementation.
 
 ## $c->log\_headers($type => $headers)
 
-Logs [HTTP::Headers](https://metacpan.org/pod/HTTP::Headers) (either request or response) to the debug logs.
+Logs [HTTP::Headers](https://metacpan.org/pod/HTTP%3A%3AHeaders) (either request or response) to the debug logs.
 
 ## $c->prepare\_read
 
@@ -980,11 +998,11 @@ Prepares the output for writing.
 
 ## $c->request\_class
 
-Returns or sets the request class. Defaults to [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request).
+Returns or sets the request class. Defaults to [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest).
 
 ## $app->request\_class\_traits
 
-An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s which are applied to the request class.  You can
+An arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s which are applied to the request class.  You can
 name the full namespace of the role, or a namespace suffix, which will then
 be tried against the following standard namespace prefixes.
 
@@ -1002,7 +1020,7 @@ We try each possible role in turn (and throw an error if none load)
     Catalyst::TraitFor::Request::Foo
 
 The namespace part 'TraitFor::Request' was chosen to assist in backwards
-compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX::RoleApplicator) which previously provided
+compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX%3A%3ARoleApplicator) which previously provided
 these features in a stand alone package.
 
 ## $app->composed\_request\_class
@@ -1011,11 +1029,11 @@ This is the request class which has been composed with any request\_class\_trait
 
 ## $c->response\_class
 
-Returns or sets the response class. Defaults to [Catalyst::Response](https://metacpan.org/pod/Catalyst::Response).
+Returns or sets the response class. Defaults to [Catalyst::Response](https://metacpan.org/pod/Catalyst%3A%3AResponse).
 
 ## $app->response\_class\_traits
 
-An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s which are applied to the response class.  You can
+An arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s which are applied to the response class.  You can
 name the full namespace of the role, or a namespace suffix, which will then
 be tried against the following standard namespace prefixes.
 
@@ -1033,7 +1051,7 @@ We try each possible role in turn (and throw an error if none load)
     Catalyst::TraitFor::Responset::Foo
 
 The namespace part 'TraitFor::Response' was chosen to assist in backwards
-compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX::RoleApplicator) which previously provided
+compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX%3A%3ARoleApplicator) which previously provided
 these features in a stand alone package.
 
 ## $app->composed\_response\_class
@@ -1101,7 +1119,7 @@ current application and \\%args where
 
 - roles
 
-    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s that are applied to your component.
+    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s that are applied to your component.
 
 Example
 
@@ -1128,10 +1146,10 @@ Inject a list of components:
 ## $c->locate\_components( $setup\_component\_config )
 
 This method is meant to provide a list of component modules that should be
-setup for the application.  By default, it will use [Module::Pluggable](https://metacpan.org/pod/Module::Pluggable).
+setup for the application.  By default, it will use [Module::Pluggable](https://metacpan.org/pod/Module%3A%3APluggable).
 
 Specify a `setup_components` config option to pass additional options directly
-to [Module::Pluggable](https://metacpan.org/pod/Module::Pluggable). To add additional search paths, specify a key named
+to [Module::Pluggable](https://metacpan.org/pod/Module%3A%3APluggable). To add additional search paths, specify a key named
 `search_extra` as an array reference. Items in the array beginning with `::`
 will have the application class name prepended to them.
 
@@ -1178,11 +1196,11 @@ Sets up engine.
 Adds the following [Plack](https://metacpan.org/pod/Plack) middlewares to your application, since they are
 useful and commonly needed:
 
-[Plack::Middleware::LighttpdScriptNameFix](https://metacpan.org/pod/Plack::Middleware::LighttpdScriptNameFix) (if you are using Lighttpd),
-[Plack::Middleware::IIS6ScriptNameFix](https://metacpan.org/pod/Plack::Middleware::IIS6ScriptNameFix) (always applied since this middleware
+[Plack::Middleware::LighttpdScriptNameFix](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ALighttpdScriptNameFix) (if you are using Lighttpd),
+[Plack::Middleware::IIS6ScriptNameFix](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AIIS6ScriptNameFix) (always applied since this middleware
 is smart enough to conditionally apply itself).
 
-We will also automatically add [Plack::Middleware::ReverseProxy](https://metacpan.org/pod/Plack::Middleware::ReverseProxy) if we notice
+We will also automatically add [Plack::Middleware::ReverseProxy](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AReverseProxy) if we notice
 that your HTTP $env variable `REMOTE_ADDR` is '127.0.0.1'.  This is usually
 an indication that your server is running behind a proxy frontend.  However in
 2014 this is often not the case.  We preserve this code for backwards compatibility
@@ -1211,14 +1229,14 @@ Returns a PSGI application code reference for the catalyst application
 `$c`. This is the bare application created without the `apply_default_middlewares`
 method called.  We do however apply `registered_middleware` since those are
 integral to how [Catalyst](https://metacpan.org/pod/Catalyst) functions.  Also, unlike starting your application
-with a generated server script (via [Catalyst::Devel](https://metacpan.org/pod/Catalyst::Devel) and `catalyst.pl`) we do
+with a generated server script (via [Catalyst::Devel](https://metacpan.org/pod/Catalyst%3A%3ADevel) and `catalyst.pl`) we do
 not attempt to return a valid [PSGI](https://metacpan.org/pod/PSGI) application using any existing `${myapp}.psgi`
 scripts in your $HOME directory.
 
 **NOTE** `apply_default_middlewares` was originally created when the first PSGI
 port was done for v5.90000.  These are middlewares that are added to achieve
 backward compatibility with older applications.  If you start your application
-using one of the supplied server scripts (generated with [Catalyst::Devel](https://metacpan.org/pod/Catalyst::Devel) and
+using one of the supplied server scripts (generated with [Catalyst::Devel](https://metacpan.org/pod/Catalyst%3A%3ADevel) and
 the project skeleton script `catalyst.pl`) we apply `apply_default_middlewares`
 automatically.  This was done so that pre and post PSGI port applications would
 work the same way.
@@ -1278,7 +1296,7 @@ an exception the setup is aborted.
 
 ## $c->setup\_log
 
-Sets up log by instantiating a [Catalyst::Log](https://metacpan.org/pod/Catalyst::Log) object and
+Sets up log by instantiating a [Catalyst::Log](https://metacpan.org/pod/Catalyst%3A%3ALog) object and
 passing it to `log()`. Pass in a comma-delimited list of levels to set the
 log to.
 
@@ -1338,7 +1356,7 @@ If the configuration setting `using_frontend_proxy_path` is true we add:
 
       Plack::Middleware::ReverseProxyPath
 
-But **NOTE** that [Plack::Middleware::ReverseProxyPath](https://metacpan.org/pod/Plack::Middleware::ReverseProxyPath) is not a dependency of the
+But **NOTE** that [Plack::Middleware::ReverseProxyPath](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AReverseProxyPath) is not a dependency of the
 [Catalyst](https://metacpan.org/pod/Catalyst) distribution so if you want to use this option you should add it to
 your project distribution file.
 
@@ -1350,7 +1368,7 @@ These middlewares will be added at ["setup\_middleware"](#setup_middleware) duri
 Read only accessor that returns an array of all the middleware in the order
 that they were added (which is the REVERSE of the order they will be applied).
 
-The values returned will be either instances of [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware) or of a
+The values returned will be either instances of [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware) or of a
 compatible interface, or a coderef, which is assumed to be inlined middleware
 
 ## setup\_middleware (?@middleware)
@@ -1359,7 +1377,7 @@ Read configuration information stored in configuration key `psgi_middleware` or
 from passed @args.
 
 See under ["CONFIGURATION"](#configuration) information regarding `psgi_middleware` and how
-to use it to enable [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware)
+to use it to enable [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware)
 
 This method is automatically called during 'setup' of your application, so
 you really don't need to invoke it.  However you may do so if you find the idea
@@ -1374,8 +1392,8 @@ of loading middleware via configuration weird :).  For example:
 
 When we read middleware definitions from configuration, we reverse the list
 which sounds odd but is likely how you expect it to work if you have prior
-experience with [Plack::Builder](https://metacpan.org/pod/Plack::Builder) or if you previously used the plugin
-[Catalyst::Plugin::EnableMiddleware](https://metacpan.org/pod/Catalyst::Plugin::EnableMiddleware) (which is now considered deprecated)
+experience with [Plack::Builder](https://metacpan.org/pod/Plack%3A%3ABuilder) or if you previously used the plugin
+[Catalyst::Plugin::EnableMiddleware](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3AEnableMiddleware) (which is now considered deprecated)
 
 So basically your middleware handles an incoming request from the first
 registered middleware, down and handles the response from the last middleware
@@ -1402,15 +1420,15 @@ you really don't need to invoke it.
 Default Data Handlers that come bundled with [Catalyst](https://metacpan.org/pod/Catalyst).  Currently there are
 only two default data handlers, for 'application/json' and an alternative to
 'application/x-www-form-urlencoded' which supposed nested form parameters via
-[CGI::Struct](https://metacpan.org/pod/CGI::Struct) or via [CGI::Struct::XS](https://metacpan.org/pod/CGI::Struct::XS) IF you've installed it.
+[CGI::Struct](https://metacpan.org/pod/CGI%3A%3AStruct) or via [CGI::Struct::XS](https://metacpan.org/pod/CGI%3A%3AStruct%3A%3AXS) IF you've installed it.
 
 The 'application/json' data handler is used to parse incoming JSON into a Perl
-data structure.  It uses [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS).  This allows you to fail back to
-[JSON::PP](https://metacpan.org/pod/JSON::PP), which is a Pure Perl JSON decoder, and has the smallest dependency
+data structure.  It uses [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS).  This allows you to fail back to
+[JSON::PP](https://metacpan.org/pod/JSON%3A%3APP), which is a Pure Perl JSON decoder, and has the smallest dependency
 impact.
 
 Because we don't wish to add more dependencies to [Catalyst](https://metacpan.org/pod/Catalyst), if you wish to
-use this new feature we recommend installing [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS) in order to get
+use this new feature we recommend installing [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS) in order to get
 the best performance.  You should add either to your dependency list
 (Makefile.PL, dist.ini, cpanfile, etc.)
 
@@ -1422,7 +1440,7 @@ currently executing).
 ## $c->stats
 
 Returns the current timing statistics object. By default Catalyst uses
-[Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats), but can be set otherwise with
+[Catalyst::Stats](https://metacpan.org/pod/Catalyst%3A%3AStats), but can be set otherwise with
 [stats\_class](#c-stats_class).
 
 Even if [-Stats](#stats) is not enabled, the stats object is still
@@ -1432,11 +1450,11 @@ by itself.
 
 ## $c->stats\_class
 
-Returns or sets the stats (timing statistics) class. [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats) is used by default.
+Returns or sets the stats (timing statistics) class. [Catalyst::Stats](https://metacpan.org/pod/Catalyst%3A%3AStats) is used by default.
 
 ## $app->stats\_class\_traits
 
-A arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s that are applied to the stats\_class before creating it.
+A arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s that are applied to the stats\_class before creating it.
 
 ## $app->composed\_stats\_class
 
@@ -1458,7 +1476,7 @@ We try each possible role in turn (and throw an error if none load)
     Catalyst::TraitFor::Stats::Foo
 
 The namespace part 'TraitFor::Stats' was chosen to assist in backwards
-compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX::RoleApplicator) which previously provided
+compatibility with [CatalystX::RoleApplicator](https://metacpan.org/pod/CatalystX%3A%3ARoleApplicator) which previously provided
 these features in a stand alone package.
 
 ## $c->use\_stats
@@ -1485,7 +1503,7 @@ There are a number of 'base' config variables which can be set:
 
 - `always_catch_http_exceptions` - As of version 5.90060 Catalyst
 rethrows errors conforming to the interface described by
-[Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack::Middleware::HTTPExceptions) and lets the middleware deal with it.
+[Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AHTTPExceptions) and lets the middleware deal with it.
 Set true to get the deprecated behaviour and have Catalyst catch HTTP exceptions.
 - `default_model` - The default model picked if you say `$c->model`. See ["$c->model($name)"](#c-model-name).
 - `default_view` - The default view to be rendered or returned when `$c->view` is called. See ["$c->view($name)"](#c-view-name).
@@ -1550,7 +1568,7 @@ variable should be used for determining the request path.
         `$c->request->base` will be incorrect.
 
 - `using_frontend_proxy` - See ["PROXY SUPPORT"](#proxy-support).
-- `using_frontend_proxy_path` - Enabled [Plack::Middleware::ReverseProxyPath](https://metacpan.org/pod/Plack::Middleware::ReverseProxyPath) on your application (if
+- `using_frontend_proxy_path` - Enabled [Plack::Middleware::ReverseProxyPath](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AReverseProxyPath) on your application (if
 installed, otherwise log an error).  This is useful if your application is not running on the
 'root' (or /) of your host server.  **NOTE** if you use this feature you should add the required
 middleware to your project dependency list since its not automatically a dependency of [Catalyst](https://metacpan.org/pod/Catalyst).
@@ -1579,7 +1597,7 @@ This has been done since not all people need this feature and we wish to restric
 
 - `use_hash_multivalue_in_request`
 
-    In [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request) the methods `query_parameters`, `body_parametes`
+    In [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest) the methods `query_parameters`, `body_parametes`
     and `parameters` return a hashref where values might be scalar or an arrayref
     depending on the incoming data.  In many cases this can be undesirable as it
     leads one to writing defensive code like the following:
@@ -1589,8 +1607,8 @@ This has been done since not all people need this feature and we wish to restric
             $c->req->parameters->{a};
 
     Setting this configuration item to true will make [Catalyst](https://metacpan.org/pod/Catalyst) populate the
-    attributes underlying these methods with an instance of [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue)
-    which is used by [Plack::Request](https://metacpan.org/pod/Plack::Request) and others to solve this very issue.  You
+    attributes underlying these methods with an instance of [Hash::MultiValue](https://metacpan.org/pod/Hash%3A%3AMultiValue)
+    which is used by [Plack::Request](https://metacpan.org/pod/Plack%3A%3ARequest) and others to solve this very issue.  You
     may prefer this behavior to the default, if so enable this option (be warned
     if you enable it in a legacy application we are not sure if it is completely
     backwardly compatible).
@@ -1600,9 +1618,9 @@ This has been done since not all people need this feature and we wish to restric
     When creating body parameters from a POST, if we run into a multipart POST
     that does not contain uploads, but instead contains inlined complex data
     (very uncommon) we cannot reliably convert that into field => value pairs.  So
-    instead we create an instance of [Catalyst::Request::PartData](https://metacpan.org/pod/Catalyst::Request::PartData).  If this causes
+    instead we create an instance of [Catalyst::Request::PartData](https://metacpan.org/pod/Catalyst%3A%3ARequest%3A%3APartData).  If this causes
     issue for you, you can disable this by setting `skip_complex_post_part_handling`
-    to true (default is false).  
+    to true (default is false).
 
 - `skip_body_param_unicode_decoding`
 
@@ -1619,7 +1637,7 @@ This has been done since not all people need this feature and we wish to restric
     suggest these should be UTF-\* encoded, which is the default that [Catalyst](https://metacpan.org/pod/Catalyst)
     will use, however if you are creating a lot of URLs manually or have external
     evil clients, this might cause you trouble.  If you find the changes introduced
-    in Catalyst version 5.90080+ break some of your query code, you may disable 
+    in Catalyst version 5.90080+ break some of your query code, you may disable
     the UTF-8 decoding globally using this configuration.
 
     This setting takes precedence over `default_query_encoding`
@@ -1652,19 +1670,19 @@ This has been done since not all people need this feature and we wish to restric
 - `data_handlers` - See ["DATA HANDLERS"](#data-handlers).
 - `stats_class_traits`
 
-    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s that get composed into your stats class.
+    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s that get composed into your stats class.
 
 - `request_class_traits`
 
-    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s that get composed into your request class.
+    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s that get composed into your request class.
 
 - `response_class_traits`
 
-    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose::Role)s that get composed into your response class.
+    An arrayref of [Moose::Role](https://metacpan.org/pod/Moose%3A%3ARole)s that get composed into your response class.
 
 - `inject_components`
 
-    A Hashref of [Catalyst::Component](https://metacpan.org/pod/Catalyst::Component) subclasses that are 'injected' into configuration.
+    A Hashref of [Catalyst::Component](https://metacpan.org/pod/Catalyst%3A%3AComponent) subclasses that are 'injected' into configuration.
     For example:
 
         MyApp->config({
@@ -1696,10 +1714,10 @@ This has been done since not all people need this feature and we wish to restric
 Generally when you throw an exception inside an Action (or somewhere in
 your stack, such as in a model that an Action is calling) that exception
 is caught by Catalyst and unless you either catch it yourself (via eval
-or something like [Try::Tiny](https://metacpan.org/pod/Try::Tiny) or by reviewing the ["error"](#error) stack, it
+or something like [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny) or by reviewing the ["error"](#error) stack, it
 will eventually reach ["finalize\_errors"](#finalize_errors) and return either the debugging
 error stack page, or the default error page.  However, if your exception
-can be caught by [Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack::Middleware::HTTPExceptions), [Catalyst](https://metacpan.org/pod/Catalyst) will
+can be caught by [Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AHTTPExceptions), [Catalyst](https://metacpan.org/pod/Catalyst) will
 instead rethrow it so that it can be handled by that middleware (which
 is part of the default middleware).  For example this would allow
 
@@ -1771,14 +1789,14 @@ headers.
 
 If you do not wish to use the proxy support at all, you may set:
 
-    MyApp->config(ignore_frontend_proxy => 0);
+    MyApp->config(ignore_frontend_proxy => 1);
 
 ## Note about psgi files
 
 Note that if you supply your own .psgi file, calling
 `MyApp->psgi_app(@_);`, then **this will not happen automatically**.
 
-You either need to apply [Plack::Middleware::ReverseProxy](https://metacpan.org/pod/Plack::Middleware::ReverseProxy) yourself
+You either need to apply [Plack::Middleware::ReverseProxy](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AReverseProxy) yourself
 in your psgi, for example:
 
     builder {
@@ -1790,7 +1808,7 @@ This will unconditionally add the ReverseProxy support, or you need to call
 `$app = MyApp->apply_default_middlewares($app)` (to conditionally
 apply the support depending upon your config).
 
-See [Catalyst::PSGI](https://metacpan.org/pod/Catalyst::PSGI) for more information.
+See [Catalyst::PSGI](https://metacpan.org/pod/Catalyst%3A%3APSGI) for more information.
 
 # THREAD SAFETY
 
@@ -1800,11 +1818,11 @@ believe the Catalyst core to be thread-safe.
 
 If you plan to operate in a threaded environment, remember that all other
 modules you are using must also be thread-safe. Some modules, most notably
-[DBD::SQLite](https://metacpan.org/pod/DBD::SQLite), are not thread-safe.
+[DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite), are not thread-safe.
 
 # DATA HANDLERS
 
-The [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request) object uses [HTTP::Body](https://metacpan.org/pod/HTTP::Body) to populate 'classic' HTML
+The [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest) object uses [HTTP::Body](https://metacpan.org/pod/HTTP%3A%3ABody) to populate 'classic' HTML
 form parameters and URL search query fields.  However it has become common
 for various alternative content types to be PUT or POSTed to your controllers
 and actions.  People working on RESTful APIs, or using AJAX often use JSON,
@@ -1813,23 +1831,23 @@ order to better support this use case, [Catalyst](https://metacpan.org/pod/Catal
 option, `data_handlers`, which lets you associate a content type with a coderef
 that parses that content type into something Perl can readily access.
 
-       package MyApp::Web;
-    
-       use Catalyst;
-       use JSON::MaybeXS;
-    
-       __PACKAGE__->config(
-         data_handlers => {
-           'application/json' => sub { local $/; decode_json $_->getline },
-         },
-         ## Any other configuration.
-       );
-    
-       __PACKAGE__->setup;
+    package MyApp::Web;
+
+    use Catalyst;
+    use JSON::MaybeXS;
+
+    __PACKAGE__->config(
+      data_handlers => {
+        'application/json' => sub { local $/; decode_json $_->getline },
+      },
+      ## Any other configuration.
+    );
+
+    __PACKAGE__->setup;
 
 By default [Catalyst](https://metacpan.org/pod/Catalyst) comes with a generic JSON data handler similar to the
-example given above, which uses [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) to provide either [JSON::PP](https://metacpan.org/pod/JSON::PP)
-(a pure Perl, dependency free JSON parser) or [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS) if you have
+example given above, which uses [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS) to provide either [JSON::PP](https://metacpan.org/pod/JSON%3A%3APP)
+(a pure Perl, dependency free JSON parser) or [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS) if you have
 it installed (if you want the faster XS parser, add it to you project Makefile.PL
 or dist.ini, cpanfile, etc.)
 
@@ -1844,43 +1862,43 @@ alternative request body content.  Your reports welcomed!
 
 # PSGI MIDDLEWARE
 
-You can define middleware, defined as [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware) or a compatible
+You can define middleware, defined as [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware) or a compatible
 interface in configuration.  Your middleware definitions are in the form of an
 arrayref under the configuration key `psgi_middleware`.  Here's an example
 with details to follow:
 
-       package MyApp::Web;
-    
-       use Catalyst;
-       use Plack::Middleware::StackTrace;
-    
-       my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
-    
-       __PACKAGE__->config(
-         'psgi_middleware', [
-           'Debug',
-           '+MyApp::Custom',
-           $stacktrace_middleware,
-           'Session' => {store => 'File'},
-           sub {
-             my $app = shift;
-             return sub {
-               my $env = shift;
-               $env->{myapp.customkey} = 'helloworld';
-               $app->($env);
-             },
-           },
-         ],
-       );
-    
-       __PACKAGE__->setup;
+    package MyApp::Web;
+
+    use Catalyst;
+    use Plack::Middleware::StackTrace;
+
+    my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
+
+    __PACKAGE__->config(
+      'psgi_middleware', [
+        'Debug',
+        '+MyApp::Custom',
+        $stacktrace_middleware,
+        'Session' => {store => 'File'},
+        sub {
+          my $app = shift;
+          return sub {
+            my $env = shift;
+            $env->{myapp.customkey} = 'helloworld';
+            $app->($env);
+          },
+        },
+      ],
+    );
+
+    __PACKAGE__->setup;
 
 So the general form is:
 
     __PACKAGE__->config(psgi_middleware => \@middleware_definitions);
 
 Where `@middleware` is one or more of the following, applied in the REVERSE of
-the order listed (to make it function similarly to [Plack::Builder](https://metacpan.org/pod/Plack::Builder):
+the order listed (to make it function similarly to [Plack::Builder](https://metacpan.org/pod/Plack%3A%3ABuilder):
 
 Alternatively, you may also define middleware by calling the ["setup\_middleware"](#setup_middleware)
 package method:
@@ -1901,41 +1919,36 @@ The two approaches are not exclusive.
 
 - Middleware Object
 
-    An already initialized object that conforms to the [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware)
+    An already initialized object that conforms to the [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware)
     specification:
 
-           my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
-        
-           __PACKAGE__->config(
-             'psgi_middleware', [
-               $stacktrace_middleware,
-             ]);
-        
-        
+        my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
+
+        __PACKAGE__->config(
+          'psgi_middleware', [
+            $stacktrace_middleware,
+          ]);
 
 - coderef
 
     A coderef that is an inlined middleware:
 
-           __PACKAGE__->config(
-             'psgi_middleware', [
-               sub {
-                 my $app = shift;
-                 return sub {
-                   my $env = shift;
-                   if($env->{PATH_INFO} =~m/forced/) {
-                     Plack::App::File
-                       ->new(file=>TestApp->path_to(qw/share static forced.txt/))
-                       ->call($env);
-                   } else {
-                     return $app->($env);
-                   }
-                },
+        __PACKAGE__->config(
+          'psgi_middleware', [
+            sub {
+              my $app = shift;
+              return sub {
+                my $env = shift;
+                if($env->{PATH_INFO} =~m/forced/) {
+                  Plack::App::File
+                    ->new(file=>TestApp->path_to(qw/share static forced.txt/))
+                    ->call($env);
+                } else {
+                  return $app->($env);
+                }
              },
-           ]);
-        
-        
-        
+          },
+        ]);
 
 - a scalar
 
@@ -1953,23 +1966,22 @@ The two approaches are not exclusive.
     resolve it first by looking for it under your application namespace (for example
     if you application is "MyApp::Web" and the scalar is "MyMiddleware", we'd look
     under "MyApp::Web::Middleware::MyMiddleware") and if we don't find it there, we
-    will then look under the regular [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware) namespace (i.e. for the
+    will then look under the regular [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware) namespace (i.e. for the
     previous we'd try "Plack::Middleware::MyMiddleware").  We look under your application
-    namespace first to let you 'override' common [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware) locally, should
+    namespace first to let you 'override' common [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware) locally, should
     you find that a good idea.
 
     Examples:
 
-           package MyApp::Web;
+        package MyApp::Web;
 
-           __PACKAGE__->config(
-             'psgi_middleware', [
-               'Debug',  ## MyAppWeb::Middleware::Debug->wrap or Plack::Middleware::Debug->wrap
-               'Plack::Middleware::Stacktrace', ## Plack::Middleware::Stacktrace->wrap
-               '+MyApp::Custom',  ## MyApp::Custom->wrap
-             ],
-           );
-        
+        __PACKAGE__->config(
+          'psgi_middleware', [
+            'Debug',  ## MyAppWeb::Middleware::Debug->wrap or Plack::Middleware::Debug->wrap
+            'Plack::Middleware::Stacktrace', ## Plack::Middleware::Stacktrace->wrap
+            '+MyApp::Custom',  ## MyApp::Custom->wrap
+          ],
+        );
 
 - a scalar followed by a hashref
 
@@ -2013,8 +2025,8 @@ Encoding is set on the application, but it is copied to the context object
 so that you can override it on a request basis.
 
 Be default we don't automatically encode 'application/json' since the most
-common approaches to generating this type of response (Either via [Catalyst::View::JSON](https://metacpan.org/pod/Catalyst::View::JSON)
-or [Catalyst::Action::REST](https://metacpan.org/pod/Catalyst::Action::REST)) will do so already and we want to avoid double
+common approaches to generating this type of response (Either via [Catalyst::View::JSON](https://metacpan.org/pod/Catalyst%3A%3AView%3A%3AJSON)
+or [Catalyst::Action::REST](https://metacpan.org/pod/Catalyst%3A%3AAction%3A%3AREST)) will do so already and we want to avoid double
 encoding issues.
 
 If you are producing JSON response in an unconventional manner (such
@@ -2025,9 +2037,9 @@ NOTE: We also examine the value of $c->response->content\_encoding.  If
 you set this (like for example 'gzip', and manually gzipping the body)
 we assume that you have done all the necessary encoding yourself, since
 we cannot encode the gzipped contents.  If you use a plugin like
-[Catalyst::Plugin::Compress](https://metacpan.org/pod/Catalyst::Plugin::Compress) you need to update to a modern version in order
+[Catalyst::Plugin::Compress](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3ACompress) you need to update to a modern version in order
 to have this function correctly  with the new UTF8 encoding code, or you
-can use [Plack::Middleware::Deflater](https://metacpan.org/pod/Plack::Middleware::Deflater) or (probably best) do your compression on
+can use [Plack::Middleware::Deflater](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ADeflater) or (probably best) do your compression on
 a front end proxy.
 
 ## Methods
@@ -2085,21 +2097,21 @@ Wiki:
 
 # SEE ALSO
 
-## [Task::Catalyst](https://metacpan.org/pod/Task::Catalyst) - All you need to start with Catalyst
+## [Task::Catalyst](https://metacpan.org/pod/Task%3A%3ACatalyst) - All you need to start with Catalyst
 
-## [Catalyst::Manual](https://metacpan.org/pod/Catalyst::Manual) - The Catalyst Manual
+## [Catalyst::Manual](https://metacpan.org/pod/Catalyst%3A%3AManual) - The Catalyst Manual
 
-## [Catalyst::Component](https://metacpan.org/pod/Catalyst::Component), [Catalyst::Controller](https://metacpan.org/pod/Catalyst::Controller) - Base classes for components
+## [Catalyst::Component](https://metacpan.org/pod/Catalyst%3A%3AComponent), [Catalyst::Controller](https://metacpan.org/pod/Catalyst%3A%3AController) - Base classes for components
 
-## [Catalyst::Engine](https://metacpan.org/pod/Catalyst::Engine) - Core engine
+## [Catalyst::Engine](https://metacpan.org/pod/Catalyst%3A%3AEngine) - Core engine
 
-## [Catalyst::Log](https://metacpan.org/pod/Catalyst::Log) - Log class.
+## [Catalyst::Log](https://metacpan.org/pod/Catalyst%3A%3ALog) - Log class.
 
-## [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request) - Request object
+## [Catalyst::Request](https://metacpan.org/pod/Catalyst%3A%3ARequest) - Request object
 
-## [Catalyst::Response](https://metacpan.org/pod/Catalyst::Response) - Response object
+## [Catalyst::Response](https://metacpan.org/pod/Catalyst%3A%3AResponse) - Response object
 
-## [Catalyst::Test](https://metacpan.org/pod/Catalyst::Test) - The test suite.
+## [Catalyst::Test](https://metacpan.org/pod/Catalyst%3A%3ATest) - The test suite.
 
 # PROJECT FOUNDER
 
@@ -2228,6 +2240,8 @@ random: Roland Lammel <lammel@cpan.org>
 revmischa: Mischa Spiegelmock <revmischa@cpan.org>
 
 Robert Sedlacek <rs@474.at>
+
+rrwo: Robert Rothenberg <rrwo@cpan.org>
 
 SpiceMan: Marcel Montes
 
