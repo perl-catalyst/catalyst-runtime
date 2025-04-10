@@ -90,7 +90,7 @@ use HTTP::Request::Common;
     is_deeply( $creq->cookies,   {}, 'Catalyst::Request cookie' );
 }
 
-# http://dev.catalyst.perl.org/ticket/37
+# https://web.archive.org/web/20051210163434/http://dev.catalyst.perl.org/ticket/37
 # multipart/form-data parameters that contain 'http://'
 # was an HTTP::Message bug, but HTTP::Body handles it properly now
 {

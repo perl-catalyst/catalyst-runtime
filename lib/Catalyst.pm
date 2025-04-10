@@ -1913,15 +1913,14 @@ sub welcome_message {
     <body>
         <div id="content">
             <div id="topbar">
-                <h1><span id="appname">$name</span> on <a href="http://catalyst.perl.org">Catalyst</a>
-                    $VERSION</h1>
+                <h1><span id="appname">$name</span> on Catalyst $VERSION</h1>
              </div>
              <div id="answers">
                  <p>
                  <img src="$logo" alt="Catalyst Logo" />
                  </p>
                  <p>Welcome to the  world of Catalyst.
-                    This <a href="http://en.wikipedia.org/wiki/MVC">MVC</a>
+                    This <a href="https://en.wikipedia.org/wiki/Model-view-controller">MVC</a>
                     framework will make web development something you had
                     never expected it to be: Fun, rewarding, and quick.</p>
                  <h2>What to do now?</h2>
@@ -1953,13 +1952,16 @@ sub welcome_message {
                     get in touch with us.</p>
                  <ul>
                      <li>
-                         <a href="http://dev.catalyst.perl.org">Wiki</a>
+                         <a href="https://github.com/perl-catalyst/catalyst-runtime/issues">issues for Catalyst on GitHub.com</a>
+                     <li>
+                         <a href="https://web.archive.org/web/20161125132533/http://wiki.catalystframework.org:80/wiki/">Wiki</a> (offline, latest available capture from 2021 in Internet Archive)
                      </li>
                      <li>
-                         <a href="http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst">Mailing-List</a>
+                         IRC channel <a href="irc://irc.perl.org/catalyst">#catalyst</a>
+                         on <a href="https://www.irc.perl.org/">irc.perl.org</a>
                      </li>
                      <li>
-                         <a href="irc://irc.perl.org/catalyst">IRC channel #catalyst on irc.perl.org</a>
+                        <a href="https://metacpan.org/pod/Catalyst">Catalyst on MetaCPAN.org</a>
                      </li>
                  </ul>
                  <h2>In conclusion</h2>
@@ -4874,22 +4876,18 @@ and C<uploads> - for request upload filenames.
 
 =head1 SUPPORT
 
-IRC:
+=over
 
-    Join #catalyst on irc.perl.org.
+=item L<issues for Catalyst on GitHub.com|https://github.com/perl-catalyst/catalyst-runtime/issues>
 
-Mailing Lists:
+=item L<Wiki|https://web.archive.org/web/20161125132533/http://wiki.catalystframework.org:80/wiki/>
+(offline, latest available capture from 2021 in Internet Archive)
 
-    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
-    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
+=item Join L<#catalyst|irc://irc.perl.org/catalyst> on L<irc.perl.org|https://www.irc.perl.org/>
 
-Web:
+=item L<Catalyst on MetaCPAN.org|https://metacpan.org/pod/Catalyst>
 
-    http://catalyst.perl.org
-
-Wiki:
-
-    http://dev.catalyst.perl.org
+=back
 
 =head1 SEE ALSO
 

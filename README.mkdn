@@ -2078,22 +2078,11 @@ a front end proxy.
 
 # SUPPORT
 
-IRC:
-
-    Join #catalyst on irc.perl.org.
-
-Mailing Lists:
-
-    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
-    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
-
-Web:
-
-    http://catalyst.perl.org
-
-Wiki:
-
-    http://dev.catalyst.perl.org
+- [issues for Catalyst on GitHub.com](https://github.com/perl-catalyst/catalyst-runtime/issues)
+- [Wiki](https://web.archive.org/web/20161125132533/http://wiki.catalystframework.org:80/wiki/)
+(offline, latest available capture from 2021 in Internet Archive)
+- Join [#catalyst](irc://irc.perl.org/catalyst) on [irc.perl.org](https://www.irc.perl.org/)
+- [Catalyst on MetaCPAN.org](https://metacpan.org/pod/Catalyst)
 
 # SEE ALSO
 
