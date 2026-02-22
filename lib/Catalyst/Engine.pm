@@ -58,9 +58,12 @@ a filehandle, otherwise write it out all in one go.  If there is no body in
 the response, we assume you are handling it 'manually', such as for nonblocking
 style or asynchronous streaming responses.  You do this by calling L</write>
 several times (which sends HTTP headers if needed) or you close over
-C<< $response->write_fh >>.
+C<< $response->write_fh >>.  Note that this method (and the entire C<finalize>
+sequence of the Engine) is bypassed entirely if you are using
+C<< $request->io_fh >> for things like comet or websockets.
 
-See L<Catalyst::Response/write> and L<Catalyst::Response/write_fh> for more.
+See L<Catalyst::Response/write>, L<Catalyst::Response/write_fh> and
+L<Catalyst::Request/io_fh> for more.
 
 =cut
 

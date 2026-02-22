@@ -2172,7 +2172,9 @@ sub _stats_finish_execute {
 
 =head2 $c->finalize
 
-Finalizes the request.
+Finalizes the request.  This logs errors, logs the request, and then writes
+the HTTP response to the client unless C<< $c->request->io_fh >> is being used
+to respond in some other manner. (i.e. comet or websockets)
 
 =cut
 

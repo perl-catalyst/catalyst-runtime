@@ -496,6 +496,7 @@ Catalyst::Request - provides information about the current client request
     $req->headers;
     $req->hostname;
     $req->input;
+    $req->io_fh;
     $req->query_keywords;
     $req->match;
     $req->method;
@@ -1106,6 +1107,9 @@ version string.
 Returns a psgix.io bidirectional socket, if your server supports one.  Used for
 when you want to jailbreak out of PSGI and handle bidirectional client server
 communication manually, such as when you are using cometd or websockets.
+Note that I<accessing> this attribute will prevent Catalyst from writing an
+HTTP response.  Once you have the file handle, it is your responsibility to
+handle the remainder of the connection.
 
 =head1 SETUP METHODS
 
